@@ -3,6 +3,7 @@
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-loader.hpp"
+#include "gx-gl-check.hpp"
 #include <vector>
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
@@ -157,6 +158,9 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convert_mag(info.sampler_info.mag_filter));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convert(info.sampler_info.wrap_s));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convert(info.sampler_info.wrap_t));
+        if (pixels.size() > 1 || !info.has_mipmap) {
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
+        }
         for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
             const auto li = static_cast<gl::sint>(level_index);
             auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
@@ -170,6 +174,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         if (needs_mipmap_generation) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
+        GX_GL_CHECK_D;
     });
     return result;
 }

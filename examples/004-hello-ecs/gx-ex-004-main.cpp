@@ -93,6 +93,7 @@ struct GameApp final : public gearoenix::core::Application {
                 gearoenix::core::sync::EndCallerIgnored(end_callback),
                 true);
             gearoenix::render::material::Pbr material(render_engine);
+            material.randomise_albedo();
             model_builder->set_material(material);
             Speed speed;
             Position position;
@@ -109,7 +110,6 @@ struct GameApp final : public gearoenix::core::Application {
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
         scene_builder->add(std::move(camera_builder));
-        GX_LOG_D("dfffddfdfdfdf")
     }
 
     void update() noexcept final

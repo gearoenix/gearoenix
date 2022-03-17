@@ -3,6 +3,7 @@
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
@@ -13,6 +14,8 @@
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 struct GameApp final : public gearoenix::core::Application {
+    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
+
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
@@ -59,17 +62,20 @@ struct GameApp final : public gearoenix::core::Application {
             },
             end_callback));
         // Or you can load a image, before that make sure you have the image in the assets folder
-        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
-            "gearoenix-logo",
-            // gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
-            gearoenix::platform::AssetPath(plt_app, "logo.png"),
-            gearoenix::render::texture::TextureInfo(),
-            end_callback));
+        //material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+        //    "gearoenix-logo",
+        //    // gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
+        //    gearoenix::platform::AssetPath(plt_app, "logo.png"),
+        //    gearoenix::render::texture::TextureInfo(),
+        //    end_callback));
         model_builder->set_material(material);
         scene_builder->add(std::move(model_builder));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
+        camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
+            render_engine,
+            camera_builder->get_entity_builder()->get_builder().get_id());
         scene_builder->add(std::move(camera_builder));
         GX_LOG_D("Initialised")
     }
@@ -77,6 +83,7 @@ struct GameApp final : public gearoenix::core::Application {
     void update() noexcept final
     {
         Application::update();
+        camera_controller->update();
     }
 };
 

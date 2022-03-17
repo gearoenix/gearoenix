@@ -53,7 +53,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 2);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -77,8 +77,8 @@ void gearoenix::platform::Application::initialize_window() noexcept
         // if (create_gl_window(3, 3, flags))
         //     return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        if (create_gl_window(3, 2, flags))
-            return;
+        // if (create_gl_window(3, 2, flags))
+        //     return;
         if (create_gl_window(3, 1, flags))
             return;
         if (create_gl_window(3, 0, flags))
@@ -110,7 +110,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, mj);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, mn);
-    if (create_gl_sample_window(16, flags) || create_gl_sample_window(8, flags) || create_gl_sample_window(4, flags) || create_gl_sample_window(2, flags) || create_gl_sample_window(0, flags)) {
+    if (create_gl_sample_window(0, flags)) {
         gl_major = mj;
         gl_minor = mn;
         GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.")
@@ -124,7 +124,7 @@ bool gearoenix::platform::Application::create_gl_sample_window(const int samples
 {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
-    if (create_gl_depth_window(32, flags) || create_gl_depth_window(24, flags) || create_gl_depth_window(16, flags)) {
+    if (create_gl_depth_window(24, flags) || create_gl_depth_window(16, flags)) {
         gl_samples = samples;
         return true;
     }

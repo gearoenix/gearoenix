@@ -16,6 +16,7 @@
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
 #include "gx-gl-texture.hpp"
+#include "gx-gl-check.hpp"
 #include <thread>
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
@@ -24,13 +25,13 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
 {
     glClearColor(0.3f, 0.15f, 0.115f, 1.0f);
     // Pipeline settings
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_TRUE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(gl_blend_mode.value().first, gl_blend_mode.value().second);
-    // glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_SCISSOR_TEST);
-    // glEnable(GL_STENCIL_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_STENCIL_TEST);
 }
 
 gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
@@ -110,7 +111,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
                     return;
                 const auto dir = camera_location - bvh_node_data.box.get_center();
-                const auto dis = dir.square_length() * (dir.dot(transform.get_z_axis()) > 0.0 ? 1.0 : -1.0) - bvh_node_data.box.get_diameter().square_length() * 0.5;
+                const auto dis = dir.square_length();
                 camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data.model });
                 // TODO opaque/translucent in ModelBvhData
             });
@@ -121,7 +122,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
 
     const auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
-
+    GX_GL_CHECK_D;
     // Bind target
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -134,7 +135,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     gbuffers_filler->bind();
-
+    GX_GL_CHECK_D;
     const auto gbuffers_filler_txt_index_albedo = static_cast<enumerated>(gbuffers_filler->get_albedo_index());
     const auto gbuffers_filler_txt_index_normal_metallic = static_cast<enumerated>(gbuffers_filler->get_normal_metallic_index());
     const auto gbuffers_filler_txt_index_emission_roughness = static_cast<enumerated>(gbuffers_filler->get_emission_roughness_index());
@@ -142,34 +143,39 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            GX_GL_CHECK_D;
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             gbuffers_filler->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
             gbuffers_filler->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
+            GX_GL_CHECK_D;
             for (auto& distance_model_data : camera.opaque_models_data) {
+                GX_GL_CHECK_D;
                 auto& model_data = distance_model_data.second;
                 gbuffers_filler->set_m_data(reinterpret_cast<const float*>(&model_data.m));
                 gbuffers_filler->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
                 gbuffers_filler->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
                 gbuffers_filler->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
                 gbuffers_filler->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
-
+                GX_GL_CHECK_D;
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_albedo);
                 glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_normal_metallic);
                 glBindTexture(GL_TEXTURE_2D, model_data.normal_metallic_txt);
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_emission_roughness);
                 glBindTexture(GL_TEXTURE_2D, model_data.emission_roughness_txt);
-
+                GX_GL_CHECK_D;
                 glBindVertexArray(model_data.vertex_object);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model_data.index_buffer);
                 glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
+                GX_GL_CHECK_D;
             }
         }
     }
-
+    GX_GL_CHECK_D;
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(os_app.get_window());
 #endif
+    GX_GL_CHECK_D;
 }
 
 #endif

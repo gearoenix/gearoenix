@@ -5,6 +5,7 @@
 #include "gx-math-vector-3d.hpp"
 #include <limits>
 #include <optional>
+#include <array>
 
 #ifdef max
 #undef max

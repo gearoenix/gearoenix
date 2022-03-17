@@ -22,7 +22,7 @@
 
 #define GX_GL_UNIFORM(name, function)                        \
     GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED)         \
-    void set_##name##_data(const float* data) const noexcept \
+    void set_##name##_data(const float* const data) const noexcept \
     {                                                        \
         glUniform##function;                                 \
     }

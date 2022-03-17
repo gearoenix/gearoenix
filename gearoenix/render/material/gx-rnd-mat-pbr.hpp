@@ -15,7 +15,7 @@ struct Texture2D;
 
 namespace gearoenix::render::material {
 struct Pbr final {
-    GX_GET_CREF_PRV(math::Vec4<float>, albedo_factor)
+    GX_GETSET_CREF_PRV(math::Vec4<float>, albedo_factor)
     GX_GET_CREF_PRV(math::Vec4<float>, emission_roughness_factor)
     GX_GET_CREF_PRV(math::Vec4<float>, normal_metallic_factor)
     GX_GET_VAL_PRV(float, alpha_cutoff, 0.0f)
@@ -33,6 +33,8 @@ public:
     Pbr(Pbr&&) noexcept;
     Pbr& operator=(Pbr&&) noexcept;
     Pbr& operator=(const Pbr&) noexcept;
+
+    void randomise_albedo() noexcept;
 };
 }
 
