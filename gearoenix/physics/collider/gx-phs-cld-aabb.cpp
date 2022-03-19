@@ -18,7 +18,8 @@ gearoenix::physics::collider::Aabb3::Aabb3(Aabb3&&) noexcept = default;
 
 gearoenix::physics::collider::Aabb3::~Aabb3() noexcept = default;
 
-void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& transform) noexcept {
+void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& transform) noexcept
+{
     std::array<math::Vec3<double>, 8> corners;
     original_box.get_all_corners(corners);
     auto tmp = transform * math::Vec4(corners[0], 1.0);

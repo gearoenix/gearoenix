@@ -41,7 +41,7 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
         cam.set_flag(flag);
         flag <<= 1;
     });
-    world->parallel_system<model::Model>([&](const core::ecs::Entity::id_t, model::Model& mdl, const unsigned int) {
+    world->parallel_system<model::Model>([&](const core::ecs::Entity::id_t, model::Model& mdl) {
         if (!mdl.enabled || mdl.scene_id != scene_entity_id)
             return;
         mdl.block_cameras_flags = static_cast<std::uint64_t>(-1);

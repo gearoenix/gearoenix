@@ -22,10 +22,10 @@ void gearoenix::gl::Shader::link() const noexcept
     glGetProgramInfoLog(shader_program, static_cast<sizei>(max_length), nullptr, &(info_log[0]));
     if (is_success == 0) {
         info_log[max_length - 1] = '\n';
-        GX_LOG_F("Error linking shader program: " << info_log)
+        GX_LOG_F("Error linking shader program: " << info_log);
     } else if (!info_log.empty()) {
         info_log[max_length - 1] = '\n';
-        GX_LOG_D("Shader linking log is: " << info_log)
+        GX_LOG_D("Shader linking log is: " << info_log);
     }
     glUseProgram(shader_program);
 }
@@ -42,10 +42,10 @@ void gearoenix::gl::Shader::validate() const noexcept
     glGetProgramInfoLog(shader_program, static_cast<sizei>(max_length), nullptr, &(info_log[0]));
     if (!is_success) {
         info_log[max_length - 1] = '\n';
-        GX_LOG_F("Invalid shader program: " << info_log)
+        GX_LOG_F("Invalid shader program: " << info_log);
     } else if (!info_log.empty()) {
         info_log[max_length - 1] = '\n';
-        GX_LOG_D("Shader program log is: " << info_log)
+        GX_LOG_D("Shader program log is: " << info_log);
     }
     glUseProgram(shader_program);
 }
@@ -54,7 +54,7 @@ gearoenix::gl::uint gearoenix::gl::Shader::add_shader_to_program(const std::stri
 {
     uint shader_obj = glCreateShader(shader_type);
     if (shader_obj == 0) {
-        GX_LOG_F("Error creating shader type.")
+        GX_LOG_F("Error creating shader type.");
     }
     const char* const shader_src_ptr = shd.c_str();
     const auto shader_src_len = static_cast<sint>(shd.length());
@@ -70,10 +70,10 @@ gearoenix::gl::uint gearoenix::gl::Shader::add_shader_to_program(const std::stri
     if (!success) {
         info_log[sts_size - 1] = '\n';
         GX_LOG_F("Error compiling shader. Info: " << info_log << ", shader source: \n"
-                                                  << shd)
+                                                  << shd);
     } else if (!info_log.empty()) {
         info_log[sts_size - 1] = '\n';
-        GX_LOG_D("Shader compiler log is: " << info_log)
+        GX_LOG_D("Shader compiler log is: " << info_log);
     }
     glAttachShader(shader_program, shader_obj);
     return shader_obj;
@@ -94,7 +94,7 @@ gearoenix::gl::Shader::Shader(Engine& e) noexcept
     , e(e)
 {
     if (shader_program == 0) {
-        GX_LOG_F("Error creating shader program.")
+        GX_LOG_F("Error creating shader program.");
     }
 }
 

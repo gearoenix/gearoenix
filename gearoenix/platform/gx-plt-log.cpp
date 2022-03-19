@@ -13,7 +13,7 @@
 std::ofstream gearoenix::platform::Log::file(GX_APPLICATION_NAME ".log", std::ios::out GX_PLT_LOG_FILE_APPEND);
 #endif
 
-GX_CREATE_GUARD(gearoenix::platform::Log::log)
+GX_CREATE_GUARD(gearoenix::platform::Log::log);
 
 std::stringstream gearoenix::platform::Log::header(const char* const file_name, int line, const char* msg_type)
 {

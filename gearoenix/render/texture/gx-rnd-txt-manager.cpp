@@ -23,7 +23,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     static_assert(sizeof(float) == 4, "Only float 32 bit are supported.");
     auto name = "colour{" + std::to_string(colour.x) + "," + std::to_string(colour.y) + "," + std::to_string(colour.z) + "," + std::to_string(colour.w) + "}";
     {
-        GX_GUARD_LOCK(textures_2d)
+        GX_GUARD_LOCK(textures_2d);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -53,7 +53,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    GX_GUARD_LOCK(brdflut)
+    GX_GUARD_LOCK(brdflut);
     constexpr std::size_t resolution = 256;
     if (nullptr != brdflut)
         return brdflut;
@@ -108,7 +108,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_checker(
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    GX_GUARD_LOCK(checkers)
+    GX_GUARD_LOCK(checkers);
     if (nullptr != checkers)
         return checkers;
     const TextureInfo texture_info {
@@ -143,27 +143,27 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d)
+        GX_GUARD_LOCK(textures_2d);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
     }
     if (Type::Unknown != info.type)
-        GX_UNIMPLEMENTED // type converting is not implemented and is not going to be implemented in near future.
-            if (TextureFormat::Unknown != info.format)
-                GX_UNIMPLEMENTED // formate converting does not have a high priority
-            if (0 != info.width)
-                GX_UNIMPLEMENTED // dimention changing does not have a high priority
-            if (0 != info.height)
-                GX_UNIMPLEMENTED // dimention changing does not have a high priority
-                    std::size_t img_width;
+        GX_UNIMPLEMENTED; // type converting is not implemented and is not going to be implemented in near future.
+    if (TextureFormat::Unknown != info.format)
+        GX_UNIMPLEMENTED; // formate converting does not have a high priority
+    if (0 != info.width)
+        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+    if (0 != info.height)
+        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+    std::size_t img_width;
     std::size_t img_height;
     std::size_t img_channels;
     std::vector<std::uint8_t> pixels0;
     Image::decode(
         reinterpret_cast<const unsigned char*>(data), size, 4,
         pixels0, img_width, img_height, img_channels);
-    GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels)
+    GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
     TextureInfo new_info = info;
     new_info.format = TextureFormat::RgbaUint8;
     new_info.type = Type::Texture2D;
@@ -179,14 +179,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d)
+        GX_GUARD_LOCK(textures_2d);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
     }
     /// TODO: Later I have to add a good streaming support here.
     std::ifstream file(path.raw, std::ios::in | std::ios::binary);
-    GX_ASSERT(file.is_open() && file.good())
+    GX_ASSERT(file.is_open() && file.good());
     file.seekg(0, std::ios::end);
     std::vector<char> data(file.tellg());
     file.seekg(0);
@@ -211,9 +211,10 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
         const auto h = math::Vec3<float>::importance_sample_ggx(xi, n, roughness);
         const auto l = (h * (2.0f * v.dot(h)) - v).normalized();
 
-        const auto n_dot_l = math::Numeric::maximum(l.z, 0.0f);
-        const auto n_dot_h = math::Numeric::maximum(h.z, 0.0f);
-        const auto v_dot_h = math::Numeric::maximum(v.dot(h), 0.0f);
+        const auto n_dot_l = l.z > 0.0f ? l.z : 0.0f;
+        const auto n_dot_h = h.z > 0.0f ? h.z : 0.0f;
+        auto temp = v.dot(h);
+        const auto v_dot_h = temp > 0.0f ? temp : 0.0f;
 
         if (n_dot_l > 0.0f) {
             const auto g = geometry_smith(n, v, l, roughness);
@@ -234,9 +235,15 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
 std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
 {
     std::vector<math::Vec2<float>> pixels(resolution * resolution);
+    std::vector<std::size_t> indices(pixels.size());
+    std::size_t index = 0;
+    for (auto& i : indices) {
+        i = index;
+        ++index;
+    }
     const auto inv_res = 1.0f / float(resolution);
-    core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](math::Vec2<float>& pixel, const unsigned int index, const unsigned int) {
-        pixel = integrate_brdf(
+    core::sync::ParallelFor::map(indices.begin(), indices.end(), [&](const std::size_t index) {
+        pixels[index] = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
             (static_cast<float>(index / resolution) + 0.5f) * inv_res);
     });

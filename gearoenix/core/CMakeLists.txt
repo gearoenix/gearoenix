@@ -45,6 +45,7 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-flagger.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-getter-setter.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-loop.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-profiler.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-stringifier.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-zeroer.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channel.hpp

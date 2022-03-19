@@ -36,7 +36,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {
-        GX_LOG_D("Can not find/open assets file: " << name)
+        GX_LOG_D("Can not find/open assets file: " << name);
         delete asset;
         return nullptr;
     }
@@ -44,7 +44,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
     asset->platform_application = &platform_application;
     asset->file = AAssetManager_open(platform_application.get_android_application()->activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
     if (asset->file == nullptr) {
-        GX_LOG_D("Asset not found! " << name)
+        GX_LOG_D("Asset not found! " << name);
         return nullptr;
     }
 #else
@@ -65,14 +65,14 @@ std::size_t gearoenix::platform::stream::Asset::read(void* data, const std::size
 #endif
 #ifdef GX_DEBUG_MODE
     if (result != length)
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
 #endif
     return result;
 }
 
 std::size_t gearoenix::platform::stream::Asset::write(const void*, std::size_t) noexcept
 {
-    GX_UNEXPECTED
+    GX_UNEXPECTED;
 }
 
 void gearoenix::platform::stream::Asset::seek(std::size_t offset) noexcept

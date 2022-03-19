@@ -20,11 +20,11 @@
     GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED) \
     GX_GET_VAL_PRV(sint, name##_index, GX_GL_TEXTURE_INDEX_FAILED)
 
-#define GX_GL_UNIFORM(name, function)                        \
-    GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED)         \
+#define GX_GL_UNIFORM(name, function)                              \
+    GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED)               \
     void set_##name##_data(const float* const data) const noexcept \
-    {                                                        \
-        glUniform##function;                                 \
+    {                                                              \
+        glUniform##function;                                       \
     }
 
 #define GX_GL_UNIFORM_VECTOR(name, element_count, count) \

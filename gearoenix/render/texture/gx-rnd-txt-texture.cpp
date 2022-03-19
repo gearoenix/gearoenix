@@ -24,21 +24,22 @@ std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
     const std::size_t pixels_count,
     const std::size_t out_components_count) noexcept
 {
-    auto begin = Pixel<float>::ConstIterator(data, in_components_count, pixels_count);
-    auto end = begin + (pixels_count + 1);
+    auto iter = Pixel<float>::ConstIterator(data, in_components_count, pixels_count);
+    auto end = iter + (pixels_count + 1);
     std::vector<std::uint8_t> result(out_components_count * pixels_count);
-    core::sync::ParallelFor::execi(begin, end, [in_components_count, out_components_count, &result](decltype(begin)::reference& pixel, const unsigned int index, const unsigned int) {
+    for (; iter < end; ++iter) {
         std::size_t i = 0;
-        const auto* const pixel_elements = &pixel;
+        const std::size_t index = iter.get_pixel_index() * out_components_count;
+        const float* const pixel_elements = iter.get_data();
         for (; i < in_components_count && i < out_components_count; ++i) {
-            const float c = std::round((pixel_elements[i] * 255.0f)) + 0.1f;
-            result[index * out_components_count + i] = c >= 255.0 ? 255 : c <= 0.0 ? 0
-                                                                                   : static_cast<std::uint8_t>(c);
+            const int c = static_cast<int>(pixel_elements[i] * 255.0f + 0.501f);
+            result[index + i] = c >= 255 ? 255 : c <= 0.0 ? 0
+                                                          : static_cast<std::uint8_t>(c);
         }
         for (; i < out_components_count; ++i) {
-            result[index * out_components_count + i] = i < 4 ? 0 : 255;
+            result[index + i] = i < 4 ? 0 : 255;
         }
-    });
+    }
     return result;
 }
 
@@ -74,5 +75,5 @@ std::vector<std::vector<std::vector<std::uint8_t>>> gearoenix::render::texture::
 std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(
     const std::size_t img_width, const std::size_t img_height) noexcept
 {
-    return math::Numeric::floor_log2(math::Numeric::maximum(img_width, img_height)) + 1;
+    return math::Numeric::floor_log2(img_width > img_height ? img_width : img_height) + 1;
 }

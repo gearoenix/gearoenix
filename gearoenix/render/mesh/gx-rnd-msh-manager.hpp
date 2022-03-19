@@ -18,7 +18,7 @@ struct Mesh;
 struct Manager {
 protected:
     engine::Engine& e;
-    GX_CREATE_GUARD(meshes)
+    GX_CREATE_GUARD(meshes);
     std::map<std::string, std::weak_ptr<Mesh>> meshes;
 
     explicit Manager(engine::Engine& e) noexcept;

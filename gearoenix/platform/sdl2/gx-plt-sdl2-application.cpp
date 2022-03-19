@@ -14,8 +14,7 @@ void gearoenix::platform::Application::initialize_sdl() noexcept
         return;
     sdl_initialized = true;
     if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) {
-        GX_LOG_E("SDL_Init error: " << SDL_GetError())
-        std::terminate();
+        GX_LOG_F("SDL_Init error: " << SDL_GetError());
     }
 }
 
@@ -46,7 +45,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
     if (available_engines.contains(render::engine::Type::Vulkan)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN;
         if (create_window(flags)) {
-            GX_LOG_D("Gearoenix SDL2 window has been created by Vulkan setting.")
+            GX_LOG_D("Gearoenix SDL2 window has been created by Vulkan setting.");
             return;
         }
     }
@@ -86,7 +85,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
         if (create_gl_window(2, 0, flags))
             return;
     }
-    GX_LOG_F("Can not create window with minimum requirements")
+    GX_LOG_F("Can not create window with minimum requirements");
 }
 
 void gearoenix::platform::Application::initialize_mouse() noexcept
@@ -113,10 +112,10 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
     if (create_gl_sample_window(0, flags)) {
         gl_major = mj;
         gl_minor = mn;
-        GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.")
+        GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.");
         return true;
     }
-    GX_LOG_D("OpenGL window creatin with major: " << mj << " and minor: " << mn << " has been failed.")
+    GX_LOG_D("OpenGL window creatin with major: " << mj << " and minor: " << mn << " has been failed.");
     return false;
 }
 
@@ -371,7 +370,7 @@ void gearoenix::platform::Application::fetch_events() noexcept
                         case SDLK_KP_PERIOD:
                             return key::Id::NumpadDot;
                         default:
-                            GX_LOG_D("Unhandled button: " << static_cast<int>(e.key.keysym.sym))
+                            GX_LOG_D("Unhandled button: " << static_cast<int>(e.key.keysym.sym));
                             return key::Id::Unknown;
                     } }(), e.type == SDL_KEYUP ? key::Action::Release : key::Action::Press);
             break;
@@ -402,7 +401,7 @@ void gearoenix::platform::Application::fetch_events() noexcept
                     case SDL_BUTTON_MIDDLE:
                         return key::Id::Middle;
                     default:
-                        GX_LOG_E("Unhandled mouse button, left button returned instead." << e.button.button)
+                        GX_LOG_E("Unhandled mouse button, left button returned instead." << e.button.button);
                         return key::Id::Left;
                     }
                 }(),
@@ -416,12 +415,12 @@ void gearoenix::platform::Application::fetch_events() noexcept
                     static_cast<int>(e.window.data2));
                 break;
             default:
-                GX_LOG_E("Unhandled windows event: " << static_cast<int>(e.window.event))
+                GX_LOG_E("Unhandled windows event: " << static_cast<int>(e.window.event));
                 break;
             }
             break;
         default:
-            GX_LOG_E("Unhandled event " << e.type)
+            GX_LOG_E("Unhandled event " << e.type);
             break;
         }
     }
@@ -484,7 +483,7 @@ void gearoenix::platform::Application::create_vulkan_surface(
             reinterpret_cast<VkInstance>(vulkan_instance),
             reinterpret_cast<VkSurfaceKHR*>(vulkan_data_ptr))
         == 0)
-        GX_LOG_F("Failed to create Vulkan surface.")
+        GX_LOG_F("Failed to create Vulkan surface.");
 }
 
 #endif

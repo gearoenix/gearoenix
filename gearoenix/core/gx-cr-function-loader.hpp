@@ -7,7 +7,7 @@
 namespace gearoenix::core {
 struct FunctionLoader final {
 private:
-    GX_CREATE_GUARD(load_functions)
+    GX_CREATE_GUARD(load_functions);
     std::vector<std::function<void()>> load_functions;
 
 public:

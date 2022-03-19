@@ -26,7 +26,7 @@ void gearoenix::render::model::Builder::set_material_type_index(const std::type_
 {
     auto& builder = entity_builder->get_builder();
     if (const auto* model = builder.get_component<Model>(); nullptr != model)
-        GX_LOG_F("Material already exist in mesh entity: " << *builder.get_name())
+        GX_LOG_F("Material already exist in mesh entity: " << *builder.get_name());
     builder.add_component(Model(std::move(bound_mesh), in_material_type));
 }
 

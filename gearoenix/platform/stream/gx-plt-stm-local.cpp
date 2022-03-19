@@ -35,7 +35,7 @@ gearoenix::platform::stream::Local::Local(const Application& app, const std::str
     : file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : std::ios::in))
 {
     if (!file.is_open() || !file.good())
-        GX_LOG_F("Can not open file: " << name)
+        GX_LOG_F("Can not open file: " << name);
 }
 
 gearoenix::platform::stream::Local::~Local() noexcept = default;
@@ -54,7 +54,7 @@ std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t len
     const auto result = (std::size_t)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
 #endif
     file.seekp(file.tellg());
     return result;
@@ -67,7 +67,7 @@ std::size_t gearoenix::platform::stream::Local::write(const void* data, std::siz
     const std::size_t result = ((std::size_t)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
 #endif
     file.seekg(file.tellp());
     return result;

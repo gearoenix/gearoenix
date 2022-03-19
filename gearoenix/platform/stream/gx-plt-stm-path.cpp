@@ -9,6 +9,6 @@ const std::string& gearoenix::platform::stream::Path::get_raw_data() const noexc
     case 1:
         return std::get<1>(data).data;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
 }

@@ -46,7 +46,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T maximum(const T a, const T b) noexcept
+    [[nodiscard]] constexpr static T safe_maximum(const T a, const T b) noexcept
     {
         if constexpr (std::is_floating_point_v<T>) {
             if (std::isnan(a))
@@ -58,7 +58,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T minimum(const T a, const T b) noexcept
+    [[nodiscard]] constexpr static T safe_minimum(const T a, const T b) noexcept
     {
         if constexpr (std::is_floating_point_v<T>) {
             if (std::isnan(a))

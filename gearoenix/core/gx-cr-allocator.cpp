@@ -13,7 +13,7 @@ gearoenix::core::Allocator::Allocator(
 
 void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexcept
 {
-    GX_GUARD_LOCK(this)
+    GX_GUARD_LOCK(this);
     auto* const child_previous = child->previous;
     auto* const child_next = child->next;
     const auto new_range = std::make_pair(child_previous, child_next);
@@ -42,7 +42,7 @@ void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexce
 
 std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::construct(const std::size_t size) noexcept
 {
-    GX_CHECK_NOT_EQUAL_D(size, 0)
+    GX_CHECK_NOT_EQUAL_D(size, 0);
     std::shared_ptr<Allocator> result(new Allocator(size, 0));
     result->self = result;
     return result;
@@ -56,14 +56,14 @@ gearoenix::core::Allocator::~Allocator() noexcept
 
 std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(const std::size_t sz) noexcept
 {
-    GX_GUARD_LOCK(this)
+    GX_GUARD_LOCK(this);
     auto search = std::upper_bound(
         ranges.begin(), ranges.end(), sz,
         [](const std::size_t a, const decltype(ranges)::value_type& b) {
             return a <= b.first.first;
         });
     if (ranges.end() == search) {
-        GX_LOG_D("Not enough space left to allocate: " << sz)
+        GX_LOG_D("Not enough space left to allocate: " << sz);
         return nullptr;
     }
     const auto found_size = search->first.first;

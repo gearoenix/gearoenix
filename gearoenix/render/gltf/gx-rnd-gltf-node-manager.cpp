@@ -10,28 +10,28 @@
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_camera(
     const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
 {
-    GX_TODO
+    GX_TODO;
     return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_camera(
     const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
 {
-    GX_TODO
+    GX_TODO;
     return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_skin(
     const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
 {
-    GX_TODO
+    GX_TODO;
     return 0;
 }
 
 gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get_light(
     const std::size_t, const std::size_t, const gearoenix::core::sync::EndCallerIgnored&) noexcept
 {
-    GX_TODO
+    GX_TODO;
     return 0;
 }
 
@@ -62,19 +62,19 @@ gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get(
 
     if (!node.scale.empty()) {
         const auto& s = node.scale;
-        GX_CHECK_EQUAL_D(s.size(), 3)
+        GX_CHECK_EQUAL_D(s.size(), 3);
         transformation.local_scale(math::Vec3(s[0], s[1], s[2]));
     }
 
     if (!node.rotation.empty()) {
         const auto& r = node.rotation;
-        GX_CHECK_EQUAL_D(r.size(), 4)
+        GX_CHECK_EQUAL_D(r.size(), 4);
         transformation.set_orientation(math::Quat(r[0], r[1], r[2], r[3]));
     }
 
     if (!node.translation.empty()) {
         const auto& t = node.translation;
-        GX_CHECK_EQUAL_D(t.size(), 3)
+        GX_CHECK_EQUAL_D(t.size(), 3);
         transformation.translate(math::Vec3(t[0], t[1], t[2]));
     }
 
@@ -93,20 +93,20 @@ gearoenix::core::ecs::Entity::id_t gearoenix::render::gltf::NodeManager::get(
     if (node.skin >= 0)
         return get_skin(index, c);
 
-    GX_CHECK_EQUAL_D(node.children.size(), 1)
+    GX_CHECK_EQUAL_D(node.children.size(), 1);
 
     const std::size_t child_node_index = node.children[0];
-    GX_CHECK_EQUAL_D(loaded_nodes.end(), loaded_nodes.find(child_node_index))
+    GX_CHECK_EQUAL_D(loaded_nodes.end(), loaded_nodes.find(child_node_index));
     const auto& child_node = nodes[child_node_index];
 
     if (child_node.camera >= 0)
         return get_camera(index, child_node_index, c);
 
-    GX_CHECK_EQUAL_D(child_node.mesh, -1)
-    GX_CHECK_EQUAL_D(child_node.skin, -1)
+    GX_CHECK_EQUAL_D(child_node.mesh, -1);
+    GX_CHECK_EQUAL_D(child_node.skin, -1);
 
     if (child_node.extensions.contains("KHR_lights_punctual"))
         return get_light(index, child_node_index, c);
 
-    GX_UNEXPECTED
+    GX_UNEXPECTED;
 }

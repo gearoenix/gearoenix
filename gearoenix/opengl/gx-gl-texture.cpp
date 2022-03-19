@@ -1,9 +1,9 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-loader.hpp"
-#include "gx-gl-check.hpp"
 #include <vector>
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
@@ -22,7 +22,7 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT32F;
     default:
-        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f))
+        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f));
     }
 }
 
@@ -41,7 +41,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::T
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT;
     default:
-        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f))
+        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f));
     }
 }
 
@@ -58,7 +58,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::textu
     case render::texture::TextureFormat::RgbaUint8:
         return GL_UNSIGNED_BYTE;
     default:
-        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f))
+        GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f));
     }
 }
 
@@ -78,7 +78,7 @@ float gearoenix::gl::convert_min(const render::texture::Filter f) noexcept
     case render::texture::Filter::LinearMipmapNearest:
         return GL_LINEAR_MIPMAP_NEAREST;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
 }
 
@@ -90,7 +90,7 @@ float gearoenix::gl::convert_mag(const render::texture::Filter f) noexcept
     case render::texture::Filter::Linear:
         return GL_LINEAR;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
 }
 
@@ -104,7 +104,7 @@ gearoenix::gl::sint gearoenix::gl::convert(const render::texture::Wrap w) noexce
     case render::texture::Wrap::Repeat:
         return GL_REPEAT;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
 }
 

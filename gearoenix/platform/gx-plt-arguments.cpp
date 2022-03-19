@@ -41,16 +41,16 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
     tokens.resize(argc - 1);
     has_tokens = argc > 1;
 
-    GX_LOG_D("Parsing arguments")
+    GX_LOG_D("Parsing arguments");
     for (int ai = 1, ti = 0; ai < argc; ++ai, ++ti) {
-        GX_LOG_D("Application Arg[" << ti << "] = " << argv[ai])
+        GX_LOG_D("Application Arg[" << ti << "] = " << argv[ai]);
         tokens[ti] = std::string(argv[ai]);
     }
 
     for (std::size_t ti = 0; ti < tokens.size();) {
         const auto& token = tokens[ti];
         if (!is_key(token)) {
-            GX_LOG_F("Unexpected token '" << token << "'.")
+            GX_LOG_F("Unexpected token '" << token << "'.");
         }
         const auto key = token.substr(2);
         ++ti;
@@ -81,13 +81,13 @@ bool gearoenix::platform::Arguments::get_value(const std::string& key, std::stri
         if (i->second.has_value()) {
             value = i->second.value();
         } else {
-            GX_LOG_F("The '" << key << "' key must have value.")
+            GX_LOG_F("The '" << key << "' key must have value.");
         }
     }
     if (count < 1 && necessary) {
-        GX_LOG_F("The '" << key << "' key is needed and must have value.")
+        GX_LOG_F("The '" << key << "' key is needed and must have value.");
     } else if (count > 1) {
-        GX_LOG_F("The '" << key << "' key is needed only once.")
+        GX_LOG_F("The '" << key << "' key is needed only once.");
     }
     return false;
 }

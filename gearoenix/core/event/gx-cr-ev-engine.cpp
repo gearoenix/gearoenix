@@ -7,7 +7,7 @@ gearoenix::core::event::Engine::Engine() noexcept { }
 gearoenix::core::event::Engine::~Engine() noexcept
 {
     if (!events_id_priority_listeners.empty())
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
 }
 
 void gearoenix::core::event::Engine::add_listener(const Id event_id, Listener* const listener, const double priority) noexcept

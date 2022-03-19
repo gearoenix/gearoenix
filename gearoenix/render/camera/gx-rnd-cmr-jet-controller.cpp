@@ -85,7 +85,7 @@ gearoenix::core::event::Listener::Response gearoenix::render::camera::JetControl
         break;
     }
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
     return Response::Continue;
 }
@@ -119,7 +119,7 @@ void gearoenix::render::camera::JetController::update() noexcept
     auto* const trn = e.get_world()->get_component<physics::Transformation>(camera_entity_id);
     const auto delta_time = e.get_delta_time();
     if (nullptr == trn) {
-        GX_LOG_D("Jet camera controller is not able to find the transformation component of the camera: " << camera_entity_id)
+        GX_LOG_D("Jet camera controller is not able to find the transformation component of the camera: " << camera_entity_id);
         return;
     }
     if (0.0 != rotate_x) {

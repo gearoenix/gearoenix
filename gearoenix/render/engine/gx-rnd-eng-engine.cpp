@@ -83,7 +83,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
         result = gl::Engine::construct(platform_application);
     }
 #endif
-    GX_CHECK_NOT_EQUAL(result, nullptr)
+    GX_CHECK_NOT_EQUAL(result, nullptr);
     return result;
 }
 

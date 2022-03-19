@@ -40,7 +40,7 @@ inline std::ostream& operator<<(std::ostream& os, const gearoenix::math::Interse
         os << "'Under'";
         break;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
         break;
     }
     return os;

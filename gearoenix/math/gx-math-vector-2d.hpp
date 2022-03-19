@@ -151,7 +151,7 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            GX_LOG_F("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i);
         }
     }
 
@@ -165,7 +165,7 @@ struct Vec2 {
         case static_cast<T>(1):
             return y;
         default:
-            GX_LOG_F("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i);
         }
     }
 

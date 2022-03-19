@@ -19,8 +19,7 @@ std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Man
 
 void gearoenix::render::scene::Manager::update() noexcept
 {
-    e.get_world()->parallel_system<Scene>(
-        [](const core::ecs::Entity::id_t scene_id, Scene& s, const unsigned int) noexcept {
-            s.update(scene_id);
-        });
+    e.get_world()->parallel_system<Scene>([](const core::ecs::Entity::id_t scene_id, Scene& s) noexcept {
+        s.update(scene_id);
+    });
 }

@@ -67,7 +67,7 @@ private:
         const math::Aabb3<double>& volume) noexcept
     {
         const auto data_size = data_ending_index - data_starting_index;
-        GX_ASSERT_D(data_size > 0)
+        GX_ASSERT_D(data_size > 0);
         if (data_size <= local_data_size) {
             auto& l = allocate<Leaf>();
             l.volume = volume;

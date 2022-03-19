@@ -7,14 +7,14 @@ void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) 
     entities.emplace(b.id, Entity(ai, index, b.name));
     if (b.name.has_value()) {
         if (name_to_entity_id.contains(*b.name))
-            GX_LOG_F("Entity with name `" << *b.name << "' is already in the world.")
+            GX_LOG_F("Entity with name `" << *b.name << "' is already in the world.");
         name_to_entity_id.emplace(std::move(*b.name), b.id);
     }
 }
 
 void gearoenix::core::ecs::World::delayed_create_entity_with_builder(EntityBuilder&& b) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions)
+    GX_GUARD_LOCK(delayed_actions);
     delayed_actions.emplace_back(std::move(b));
 }
 
@@ -23,7 +23,7 @@ void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
     auto search = entities.find(id);
 #ifdef GX_DEBUG_MODE
     if (entities.end() == search) {
-        GX_LOG_E("Deleting an already deleted entity: " << id)
+        GX_LOG_E("Deleting an already deleted entity: " << id);
         return;
     }
 #endif
@@ -35,7 +35,7 @@ void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
 
 void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions)
+    GX_GUARD_LOCK(delayed_actions);
     delayed_actions.emplace_back(id);
 }
 
@@ -45,7 +45,7 @@ void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Enti
         return;
     auto* const entity = get_entity(id);
     if (nullptr == entity) {
-        GX_LOG_E("Entity: " << id << " does not exist.")
+        GX_LOG_E("Entity: " << id << " does not exist.");
         return;
     }
     const auto old_archetype_index = entity->archetype;
@@ -60,7 +60,7 @@ void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Enti
 
 void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t ei, EntityBuilder::components_t&& cs) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions)
+    GX_GUARD_LOCK(delayed_actions);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -68,12 +68,12 @@ void gearoenix::core::ecs::World::remove_components_list(
     const Entity::id_t id, const std::type_index* const ts, const std::size_t sz) noexcept
 {
     if (0 == sz) {
-        GX_LOG_E("At least one component must be selected to remove. Entity: " << id)
+        GX_LOG_E("At least one component must be selected to remove. Entity: " << id);
         return;
     }
     auto* const entity = get_entity(id);
     if (nullptr == entity) {
-        GX_LOG_E("Entity " << id << " does not exist.")
+        GX_LOG_E("Entity " << id << " does not exist.");
         return;
     }
     const auto old_archetype_index = entity->archetype;
@@ -95,7 +95,7 @@ void gearoenix::core::ecs::World::delayed_remove_components_list(
     const Entity::id_t ei,
     std::vector<std::type_index>&& cs) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions)
+    GX_GUARD_LOCK(delayed_actions);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -111,7 +111,7 @@ std::size_t gearoenix::core::ecs::World::get_archetype_index(const EntityBuilder
         bool is_ok;
         std::tie(search, is_ok) = archetypes_map.emplace(archetype_id, archetypes.size());
         if (!is_ok)
-            GX_LOG_F("Insertion in archetype map was not successful")
+            GX_LOG_F("Insertion in archetype map was not successful");
         archetypes.push_back(Archetype(cs));
     }
     return search->second;
@@ -137,7 +137,7 @@ void gearoenix::core::ecs::World::update() noexcept
 {
     decltype(delayed_actions) actions;
     {
-        GX_GUARD_LOCK(delayed_actions)
+        GX_GUARD_LOCK(delayed_actions);
         std::swap(actions, delayed_actions);
     }
     for (auto& action : actions) {
@@ -159,7 +159,7 @@ void gearoenix::core::ecs::World::update() noexcept
             break;
         }
         default:
-            GX_UNEXPECTED
+            GX_UNEXPECTED;
         }
     }
 }

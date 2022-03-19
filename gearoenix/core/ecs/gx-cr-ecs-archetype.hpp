@@ -40,7 +40,7 @@ private:
         id_t id {
             Component::create_type_index<ComponentsTypes>()...,
         };
-        GX_ASSERT(id.size() == sizeof...(ComponentsTypes))
+        GX_ASSERT(id.size() == sizeof...(ComponentsTypes));
         return id;
     }
 
@@ -169,10 +169,9 @@ private:
         const Entity::id_t id,
         std::uint8_t* const ptr,
         const std::size_t (&indices)[N],
-        F&& f,
-        const unsigned int kernel_index) noexcept
+        F&& f) noexcept
     {
-        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])..., kernel_index);
+        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])...);
     }
 
     template <typename... C, std::size_t... I, std::size_t N, typename F>
@@ -193,10 +192,10 @@ private:
             (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
-        sync::ParallelFor::exec(range.begin(), range.end(), [&](std::uint8_t* const ptr, const unsigned int kernel_index) noexcept {
+        sync::ParallelFor::map(range.begin(), range.end(), [&](std::uint8_t* const ptr) noexcept {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
             call_function<ComponentsTypes...>(
-                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun, kernel_index);
+                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);
         });
     }
 

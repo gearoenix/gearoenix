@@ -14,7 +14,8 @@
         GX_PLT_LOG_COMMON(s, "FATAL")                                                                                                      \
         (void)MessageBoxA(nullptr, GX_PLT_LOG_STR_VAR.c_str(), "Fatal error", static_cast<UINT>(MB_OK) | static_cast<UINT>(MB_ICONERROR)); \
         std::terminate();                                                                                                                  \
-    }
+    }                                                                                                                                      \
+    static_assert(true, "")
 
 #endif
 #endif

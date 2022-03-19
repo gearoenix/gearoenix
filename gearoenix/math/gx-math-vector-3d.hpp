@@ -172,7 +172,7 @@ struct Vec3 final {
         case static_cast<T>(2):
             return z;
         default:
-            GX_LOG_F("Out of range index. " << i)
+            GX_LOG_F("Out of range index. " << i);
         }
     }
 
@@ -188,7 +188,7 @@ struct Vec3 final {
         case static_cast<T>(2):
             return z;
         default:
-            GX_LOG_F("Out of range index. " << i)
+            GX_LOG_F("Out of range index. " << i);
         }
     }
 
@@ -299,24 +299,52 @@ struct Vec3 final {
         return Vec3<Element>(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x);
     }
 
+    [[nodiscard]] constexpr Vec3<Element> safe_minimum(const Vec3<Element>& o) const noexcept
+    {
+        return Vec3<Element>(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y), Numeric::safe_minimum(z, o.z));
+    }
+
     [[nodiscard]] constexpr Vec3<Element> minimum(const Vec3<Element>& o) const noexcept
     {
-        return Vec3<Element>(Numeric::minimum(x, o.x), Numeric::minimum(y, o.y), Numeric::minimum(z, o.z));
+        return Vec3<Element>(
+            x < o.x ? x : o.x,
+            y < o.y ? y : o.y,
+            z < o.z ? z : o.z);
+    }
+
+    [[nodiscard]] constexpr Vec3<Element> safe_maximum(const Vec3<Element>& o) const noexcept
+    {
+        return Vec3<Element>(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y), Numeric::safe_maximum(z, o.z));
     }
 
     [[nodiscard]] constexpr Vec3<Element> maximum(const Vec3<Element>& o) const noexcept
     {
-        return Vec3<Element>(Numeric::maximum(x, o.x), Numeric::maximum(y, o.y), Numeric::maximum(z, o.z));
+        return Vec3<Element>(
+            x > o.x ? x : o.x,
+            y > o.y ? y : o.y,
+            z > o.z ? z : o.z);
+    }
+
+    [[nodiscard]] constexpr Element safe_minimum() const noexcept
+    {
+        return Numeric::safe_minimum(Numeric::safe_minimum(x, y), z);
     }
 
     [[nodiscard]] constexpr Element minimum() const noexcept
     {
-        return Numeric::minimum(Numeric::minimum(x, y), z);
+        const auto m = x < y ? x : y;
+        return m < z ? m : z;
+    }
+
+    [[nodiscard]] constexpr Element safe_maximum() const noexcept
+    {
+        return Numeric::safe_maximum(Numeric::safe_maximum(x, y), z);
     }
 
     [[nodiscard]] constexpr Element maximum() const noexcept
     {
-        return Numeric::maximum(Numeric::maximum(x, y), z);
+        const auto m = x > y ? x : y;
+        return m > z ? m : z;
     }
 
     [[nodiscard]] constexpr Vec3<Element> normalized() const noexcept

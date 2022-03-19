@@ -22,11 +22,11 @@ struct Texture2D;
 struct TextureCube;
 struct Manager {
 protected:
-    GX_CREATE_GUARD(brdflut)
+    GX_CREATE_GUARD(brdflut);
     std::shared_ptr<Texture2D> brdflut;
-    GX_CREATE_GUARD(checkers)
+    GX_CREATE_GUARD(checkers);
     std::shared_ptr<Texture2D> checkers;
-    GX_CREATE_GUARD(textures_2d)
+    GX_CREATE_GUARD(textures_2d);
     std::map<std::string, std::weak_ptr<Texture2D>> textures_2d;
 
 public:
@@ -82,8 +82,10 @@ constexpr float gearoenix::render::texture::Manager::geometry_smith(
     const math::Vec3<float>& l,
     const float roughness) noexcept
 {
-    const auto n_dot_v = math::Numeric::maximum(n.dot(v), 0.0f);
-    const auto n_dot_l = math::Numeric::maximum(n.dot(l), 0.0f);
+    auto temp = n.dot(v);
+    const auto n_dot_v = temp < 0.0f ? 0.0f : temp;
+    temp = n.dot(l);
+    const auto n_dot_l = temp < 0.0f ? 0.0f : temp;
     const auto ggx2 = math::Numeric::geometry_schlick_ggx(n_dot_v, roughness);
     const auto ggx1 = math::Numeric::geometry_schlick_ggx(n_dot_l, roughness);
     return ggx1 * ggx2;

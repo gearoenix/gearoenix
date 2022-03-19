@@ -10,17 +10,17 @@ void gearoenix::gl::check_for_error() noexcept
     case GL_NO_ERROR:
         break;
     case GL_INVALID_ENUM:
-        GX_LOG_F("Invalid enum")
+        GX_LOG_F("Invalid enum");
     case GL_INVALID_VALUE:
-        GX_LOG_F("Invalid value")
+        GX_LOG_F("Invalid value");
     case GL_INVALID_OPERATION:
-        GX_LOG_F("Invalid operation")
+        GX_LOG_F("Invalid operation");
     case GL_INVALID_FRAMEBUFFER_OPERATION:
-        GX_LOG_F("Invalid framebuffer operation error.")
+        GX_LOG_F("Invalid framebuffer operation error.");
     case GL_OUT_OF_MEMORY:
-        GX_LOG_F("Out of memory error.")
+        GX_LOG_F("Out of memory error.");
     default:
-        GX_LOG_F("Unknown error.")
+        GX_LOG_F("Unknown error.");
     }
 }
 

@@ -23,7 +23,7 @@ private:
 
         ~Caller() noexcept
         {
-            GX_CHECK_NOT_EQUAL_D(nullptr, data)
+            GX_CHECK_NOT_EQUAL_D(nullptr, data);
             f(std::move(data));
         }
     };

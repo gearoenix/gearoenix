@@ -1,9 +1,9 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
@@ -62,7 +62,7 @@ struct GameApp final : public gearoenix::core::Application {
             },
             end_callback));
         // Or you can load a image, before that make sure you have the image in the assets folder
-        //material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
+        // material.set_albedo(render_engine.get_texture_manager()->create_2d_from_file(
         //    "gearoenix-logo",
         //    // gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
         //    gearoenix::platform::AssetPath(plt_app, "logo.png"),

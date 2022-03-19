@@ -108,7 +108,7 @@ std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>> gearoe
     }
 #ifdef GX_DEBUG_MODE
     if (start_index + entity_size != data.size())
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
 #endif
     data.resize(start_index);
     return std::nullopt;

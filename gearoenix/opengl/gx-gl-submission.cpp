@@ -1,6 +1,7 @@
 #include "gx-gl-submission.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
+#include "../core/macro/gx-cr-mcr-profiler.hpp"
 #include "../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../physics/gx-phs-transformation.hpp"
@@ -9,6 +10,7 @@
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "../render/scene/gx-rnd-scn-scene.hpp"
 #include "gx-gl-camera.hpp"
+#include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-gbuffers-filler-shader.hpp"
@@ -16,7 +18,8 @@
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
 #include "gx-gl-texture.hpp"
-#include "gx-gl-check.hpp"
+#include <algorithm>
+#include <execution>
 #include <thread>
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
@@ -27,8 +30,8 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     // Pipeline settings
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
@@ -65,7 +68,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
     });
 
-    world->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene, const unsigned int) {
+    world->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
         if (!scene.enabled)
             return;
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
@@ -96,7 +99,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                     } } });
         });
         bvh.create_nodes();
-        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, const unsigned int) {
+        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform) {
             if (!render_camera.get_is_enabled())
                 return;
             if (scene_id != render_camera.get_scene_id())
@@ -115,8 +118,8 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data.model });
                 // TODO opaque/translucent in ModelBvhData
             });
-            std::sort(camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-            std::sort(camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+            std::sort(std::execution::par_unseq, camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+            std::sort(std::execution::par_unseq, camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
         });
     });
 
@@ -172,9 +175,13 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         }
     }
     GX_GL_CHECK_D;
+    GX_PROFILE_END_S(cpu);
+    GX_PROFILE_BEGIN(gl_swap);
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(os_app.get_window());
 #endif
+    GX_PROFILE_END(gl_swap);
+    GX_PROFILE_BEGIN_S(cpu);
     GX_GL_CHECK_D;
 }
 

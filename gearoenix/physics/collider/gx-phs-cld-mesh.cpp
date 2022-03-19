@@ -3,5 +3,5 @@
 
 std::optional<double> gearoenix::physics::collider::Mesh::hit(const math::Ray3<double>&, const double) const noexcept
 {
-    GX_UNIMPLEMENTED
+    GX_UNIMPLEMENTED;
 }

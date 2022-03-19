@@ -78,7 +78,7 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            GX_LOG_F("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i);
         }
     }
 
@@ -96,7 +96,7 @@ struct Vec4 {
         case static_cast<T>(3):
             return w;
         default:
-            GX_LOG_F("Out of bound index: " << i)
+            GX_LOG_F("Out of bound index: " << i);
         }
     }
 

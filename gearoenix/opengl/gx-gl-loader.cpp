@@ -26,21 +26,21 @@ bool gearoenix::gl::load_library() noexcept
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 
     if (SDL_GL_LoadLibrary(nullptr) != 0) {
-        GX_LOG_D("Failed to load OpenGL shared library through SDL2 library loader.")
+        GX_LOG_D("Failed to load OpenGL shared library through SDL2 library loader.");
         return false;
     }
 
 #define GX_GL_FUNCTION_LOAD(name)                                                          \
     gl##name = reinterpret_cast<name##Fnp>(SDL_GL_GetProcAddress(GX_STRINGIFY(gl##name))); \
     if (nullptr == gl##name) {                                                             \
-        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found.")                    \
+        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found.");                   \
         return false;                                                                      \
     }
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD);
 
     auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-    GX_LOG_D(extensions)
+    GX_LOG_D(extensions);
 
     if (SDL_FALSE == SDL_GL_ExtensionSupported("GL_OES_texture_float"))
         return false;

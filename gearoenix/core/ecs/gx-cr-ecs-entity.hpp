@@ -63,7 +63,7 @@ public:
             std::vector<std::uint8_t>(sizeof(ComponentType)));
         const auto search = components.find(c.first);
         if (search != components.end())
-            GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id)
+            GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id);
         new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
         components.emplace(std::move(c));
     }

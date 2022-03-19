@@ -19,7 +19,7 @@ private:
     boost::container::flat_map<Entity::id_t, Entity> entities;
     boost::container::flat_map<std::string, Entity::id_t> name_to_entity_id;
 
-    GX_CREATE_GUARD(delayed_actions)
+    GX_CREATE_GUARD(delayed_actions);
     // 0 - Entity addition
     // 1 - Entity deletion
     // 2 - Component(s) addition
@@ -48,7 +48,7 @@ public:
             bool is_ok;
             std::tie(search, is_ok) = archetypes_map.emplace(std::move(archetype_id), archetypes.size());
             if (!is_ok) {
-                GX_LOG_F("Problem in allocation of archetype")
+                GX_LOG_F("Problem in allocation of archetype");
             }
             archetypes.push_back(Archetype::create<ComponentsTypes...>());
         }

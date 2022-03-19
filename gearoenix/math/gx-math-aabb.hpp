@@ -3,9 +3,9 @@
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-intersection-status.hpp"
 #include "gx-math-vector-3d.hpp"
+#include <array>
 #include <limits>
 #include <optional>
-#include <array>
 
 #ifdef max
 #undef max

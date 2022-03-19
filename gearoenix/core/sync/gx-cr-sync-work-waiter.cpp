@@ -26,7 +26,7 @@ void gearoenix::core::sync::WorkWaiter::wait_loop() noexcept
         function_loader.unload();
     }
     state = State::Terminated;
-    GX_LOG_D("Worker thread: " << std::this_thread::get_id() << " is finished.")
+    GX_LOG_D("Worker thread: " << std::this_thread::get_id() << " is finished.");
 }
 
 gearoenix::core::sync::WorkWaiter::WorkWaiter() noexcept
@@ -36,7 +36,7 @@ gearoenix::core::sync::WorkWaiter::WorkWaiter() noexcept
 
 gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
 {
-    GX_CHECK_NOT_EQUAL_D(state, State::Terminated)
+    GX_CHECK_NOT_EQUAL_D(state, State::Terminated);
     do {
         state = State::Finished;
         semaphore.release();

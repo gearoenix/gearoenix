@@ -31,14 +31,14 @@ void gearoenix::render::gltf::MeshManager::get(
     const auto& acs = data.accessors;
     const auto& bvs = data.bufferViews;
     const auto& bfs = data.buffers;
-    GX_CHECK_EQUAL_D(pris.size(), 1) // Only one primitive for a mesh is acceptable
+    GX_CHECK_EQUAL_D(pris.size(), 1); // Only one primitive for a mesh is acceptable
     const auto& pri = pris[0];
     auto pos_ai = static_cast<std::size_t>(-1);
     auto nrm_ai = static_cast<std::size_t>(-1);
     auto tng_ai = static_cast<std::size_t>(-1);
     auto txc_ai = static_cast<std::size_t>(-1);
     const auto& attrs = pri.attributes;
-    GX_CHECK_EQUAL_D(attrs.size(), 4)
+    GX_CHECK_EQUAL_D(attrs.size(), 4);
     for (const auto& att : attrs) {
         if ("POSITION" == att.first) {
             pos_ai = static_cast<std::size_t>(att.second);
@@ -49,15 +49,15 @@ void gearoenix::render::gltf::MeshManager::get(
         } else if ("TEXCOORD_0" == att.first) {
             txc_ai = static_cast<std::size_t>(att.second);
         } else
-            GX_UNEXPECTED
+            GX_UNEXPECTED;
     }
-    GX_CHECK_NOT_EQUAL_D(pos_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_NOT_EQUAL_D(nrm_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_NOT_EQUAL_D(tng_ai, static_cast<std::size_t>(-1))
-    GX_CHECK_NOT_EQUAL_D(txc_ai, static_cast<std::size_t>(-1))
+    GX_CHECK_NOT_EQUAL_D(pos_ai, static_cast<std::size_t>(-1));
+    GX_CHECK_NOT_EQUAL_D(nrm_ai, static_cast<std::size_t>(-1));
+    GX_CHECK_NOT_EQUAL_D(tng_ai, static_cast<std::size_t>(-1));
+    GX_CHECK_NOT_EQUAL_D(txc_ai, static_cast<std::size_t>(-1));
 
-    GX_CHECK_NOT_EQUAL_D(-1, pri.indices)
-    GX_CHECK_NOT_EQUAL_D(-1, pri.material)
+    GX_CHECK_NOT_EQUAL_D(-1, pri.indices);
+    GX_CHECK_NOT_EQUAL_D(-1, pri.material);
 
     const auto& pos_a = acs[pos_ai];
     const auto& nrm_a = acs[nrm_ai];
@@ -65,25 +65,25 @@ void gearoenix::render::gltf::MeshManager::get(
     const auto& txc_a = acs[txc_ai];
     const auto& ids_a = acs[pri.indices];
 
-    GX_CHECK_EQUAL_D(pos_a.count, nrm_a.count)
-    GX_CHECK_EQUAL_D(pos_a.count, tng_a.count)
-    GX_CHECK_EQUAL_D(pos_a.count, txc_a.count)
+    GX_CHECK_EQUAL_D(pos_a.count, nrm_a.count);
+    GX_CHECK_EQUAL_D(pos_a.count, tng_a.count);
+    GX_CHECK_EQUAL_D(pos_a.count, txc_a.count);
 
-    GX_CHECK_EQUAL_D(pos_a.type, TINYGLTF_TYPE_VEC3)
-    GX_CHECK_EQUAL_D(nrm_a.type, TINYGLTF_TYPE_VEC3)
-    GX_CHECK_EQUAL_D(tng_a.type, TINYGLTF_TYPE_VEC4)
-    GX_CHECK_EQUAL_D(txc_a.type, TINYGLTF_TYPE_VEC2)
-    GX_CHECK_EQUAL_D(ids_a.type, TINYGLTF_TYPE_SCALAR)
+    GX_CHECK_EQUAL_D(pos_a.type, TINYGLTF_TYPE_VEC3);
+    GX_CHECK_EQUAL_D(nrm_a.type, TINYGLTF_TYPE_VEC3);
+    GX_CHECK_EQUAL_D(tng_a.type, TINYGLTF_TYPE_VEC4);
+    GX_CHECK_EQUAL_D(txc_a.type, TINYGLTF_TYPE_VEC2);
+    GX_CHECK_EQUAL_D(ids_a.type, TINYGLTF_TYPE_SCALAR);
 
-    GX_CHECK_EQUAL_D(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
-    GX_CHECK_EQUAL_D(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
-    GX_CHECK_EQUAL_D(tng_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
-    GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT)
+    GX_CHECK_EQUAL_D(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(tng_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
 
     const auto& pos_max = pos_a.maxValues;
     const auto& pos_min = pos_a.maxValues;
-    GX_CHECK_EQUAL_D(pos_max.size(), 3)
-    GX_CHECK_EQUAL_D(pos_min.size(), 3)
+    GX_CHECK_EQUAL_D(pos_max.size(), 3);
+    GX_CHECK_EQUAL_D(pos_min.size(), 3);
 
     builder->get_builder().add_component(physics::Boundary(
         math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
@@ -145,7 +145,7 @@ void gearoenix::render::gltf::MeshManager::get(
         case TINYGLTF_COMPONENT_TYPE_BYTE:
             return sizeof(std::uint8_t);
         default:
-            GX_UNEXPECTED
+            GX_UNEXPECTED;
         }
     }();
     bi = 0;
@@ -172,7 +172,7 @@ void gearoenix::render::gltf::MeshManager::get(
         }
         break;
     default:
-        GX_UNEXPECTED
+        GX_UNEXPECTED;
     }
 
     //    core::sync::EndCaller<mesh::Mesh> end([c, b { std::move(builder) }](const std::shared_ptr<mesh::Mesh>& m) noexcept {

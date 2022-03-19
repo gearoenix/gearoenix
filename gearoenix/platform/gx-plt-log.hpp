@@ -21,7 +21,7 @@ struct Log {
 #ifndef GX_PLATFORM_ANDROID
     static std::ofstream file;
 #endif
-    GX_CREATE_GUARD_S(log)
+    GX_CREATE_GUARD_S(log);
     static std::stringstream header(const char*, int, const char*);
 };
 }
@@ -30,7 +30,7 @@ struct Log {
 #define GX_PLT_LOG_STR_VAR GX_CONCAT_5(_gearoenix_platform_log_str_, __LINE__)
 
 #ifdef GX_DEBUG_MODE
-#define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::log)
+#define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::log);
 #define GX_PLT_LOG_END_OF_MSG << std::flush
 #else
 #define GX_PLT_LOG_FILE_LOCK_GUARD
@@ -57,24 +57,28 @@ struct Log {
 #define GX_LOG_I(s)                  \
     {                                \
         GX_PLT_LOG_COMMON(s, "INFO") \
-    }
+    }                                \
+    static_assert(true, "")
 #ifdef GX_DEBUG_MODE
 #define GX_LOG_D(s)                   \
     {                                 \
         GX_PLT_LOG_COMMON(s, "DEBUG") \
-    }
+    }                                 \
+    static_assert(true, "")
 #else
 #define GX_LOG_D(s)
 #endif
 #define GX_LOG_E(s)                   \
     {                                 \
         GX_PLT_LOG_COMMON(s, "ERROR") \
-    }
+    }                                 \
+    static_assert(true, "")
 #define GX_LOG_F(s)                   \
     {                                 \
         GX_PLT_LOG_COMMON(s, "FATAL") \
         std::terminate();             \
-    }
+    }                                 \
+    static_assert(true, "")
 
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "android/gx-plt-and-log.hpp"

@@ -16,7 +16,7 @@ struct InfluenceManager {
     GX_GET_CREF_PRV(std::vector<std::size_t>, influencers_indices)
 private:
     std::map<Id, std::tuple<std::vector<Id>, double, std::function<void()>>> added_functions;
-    GX_CREATE_GUARD(actions)
+    GX_CREATE_GUARD(actions);
     std::vector<std::variant<Id, std::tuple<Id, std::vector<Id>, double, std::function<void()>>>> actions;
 
 public:

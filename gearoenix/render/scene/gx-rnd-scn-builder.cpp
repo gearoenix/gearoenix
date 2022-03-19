@@ -22,7 +22,7 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<model::Builder>&& mo
     auto& b = entity_builder->get_builder();
     auto& mb = model_builder->get_entity_builder()->get_builder();
     auto* m = mb.get_component<model::Model>();
-    GX_ASSERT_D(nullptr != m)
+    GX_ASSERT_D(nullptr != m);
     b.get_component<Scene>()->add_model(mb.get_id(), *m);
     m->scene_id = b.get_id();
     model_builders.push_back(std::move(model_builder));
@@ -33,7 +33,7 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& c
     auto& b = entity_builder->get_builder();
     auto& cb = camera_builder->get_entity_builder()->get_builder();
     auto* c = cb.get_component<camera::Camera>();
-    GX_ASSERT_D(nullptr != c)
+    GX_ASSERT_D(nullptr != c);
     b.get_component<Scene>()->add_camera(cb.get_id(), *c);
     c->set_scene_id(b.get_id());
     camera_builders.push_back(std::move(camera_builder));

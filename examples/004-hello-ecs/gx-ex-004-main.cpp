@@ -116,7 +116,7 @@ struct GameApp final : public gearoenix::core::Application {
     {
         Application::update();
         camera_controller->update();
-        render_engine.get_world()->parallel_system<Speed, Position, gearoenix::physics::Transformation>([&](auto, Speed& speed, Position& position, gearoenix::physics::Transformation& trn, auto) noexcept {
+        render_engine.get_world()->parallel_system<Speed, Position, gearoenix::physics::Transformation>([&](auto, Speed& speed, Position& position, gearoenix::physics::Transformation& trn) noexcept {
             position.update(render_engine.get_delta_time(), speed);
             speed.update();
             trn.set_location(position.value);

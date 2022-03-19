@@ -13,6 +13,8 @@ struct Pixel {
         using reference = const Element&;
         using iterator_category = std::random_access_iterator_tag;
 
+        constexpr ConstIterator() noexcept { }
+
         constexpr ConstIterator(const Element* data, std::size_t components_count, std::size_t pixel_counts) noexcept
             : data(data)
             , pixels_count(pixel_counts)
@@ -63,6 +65,11 @@ struct Pixel {
             ConstIterator o(*this);
             o += i;
             return o;
+        }
+
+        [[nodiscard]] constexpr difference_type operator-(const ConstIterator& o) const noexcept
+        {
+            return pixel_index - o.pixel_index;
         }
 
         template <typename I>
@@ -116,14 +123,19 @@ struct Pixel {
             return pixel_index;
         }
 
+        [[nodiscard]] constexpr const Element* get_data() const noexcept
+        {
+            return data;
+        }
+
     private:
-        const Element* const data;
-        const std::size_t pixels_count;
-        const std::size_t elements_count;
-        const std::size_t pixel_size;
+        const Element* data = nullptr;
+        std::size_t pixels_count = 0;
+        std::size_t elements_count = 0;
+        std::size_t pixel_size = 0;
         std::size_t pixel_index = 0;
-        std::size_t current_ptr;
-        const std::size_t end_ptr;
+        std::size_t current_ptr = 0;
+        std::size_t end_ptr = 0;
     };
 };
 }

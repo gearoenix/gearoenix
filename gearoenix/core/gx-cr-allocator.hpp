@@ -18,7 +18,7 @@ private:
     typedef std::pair<std::size_t, std::size_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space
     typedef std::pair<Allocator*, Allocator*> Range;
-    GX_CREATE_GUARD(this)
+    GX_CREATE_GUARD(this);
     std::map<SizeOffset, Range> ranges;
     std::weak_ptr<Allocator> self;
     const std::shared_ptr<Allocator> parent;

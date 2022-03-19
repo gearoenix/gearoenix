@@ -45,7 +45,7 @@ void gearoenix::render::texture::Image::decode(
     unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
-        GX_LOG_F("Image decoder error.")
+        GX_LOG_F("Image decoder error.");
     }
     img_width = static_cast<unsigned int>(iw);
     img_height = static_cast<unsigned int>(ih);
@@ -70,7 +70,7 @@ void gearoenix::render::texture::Image::decode(
     float* const dd = stbi_loadf_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
-        GX_LOG_F("Image decoder error.")
+        GX_LOG_F("Image decoder error.");
     }
     img_width = static_cast<std::size_t>(iw);
     img_height = static_cast<std::size_t>(ih);

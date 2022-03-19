@@ -24,7 +24,8 @@ gearoenix::render::material::Pbr& gearoenix::render::material::Pbr::operator=(Pb
 
 gearoenix::render::material::Pbr& gearoenix::render::material::Pbr::operator=(const Pbr&) noexcept = default;
 
-void gearoenix::render::material::Pbr::randomise_albedo() noexcept {
+void gearoenix::render::material::Pbr::randomise_albedo() noexcept
+{
     albedo_factor.x = static_cast<float>((std::rand() & 127) + 128) / 255.0f;
     albedo_factor.y = static_cast<float>((std::rand() & 127) + 128) / 255.0f;
     albedo_factor.z = static_cast<float>((std::rand() & 127) + 128) / 255.0f;
