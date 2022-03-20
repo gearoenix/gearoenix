@@ -41,6 +41,10 @@ struct SubmissionManager final {
         math::Vec3<float> pos;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
         std::vector<std::pair<double, ModelData>> tranclucent_models_data;
+        std::vector<std::vector<std::pair<double, ModelData>>> threads_opaque_models_data;
+        std::vector<std::vector<std::pair<double, ModelData>>> threads_tranclucent_models_data;
+
+        CameraData() noexcept;
     };
 
     struct SceneData final {

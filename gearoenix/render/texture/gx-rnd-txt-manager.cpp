@@ -235,15 +235,9 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
 std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
 {
     std::vector<math::Vec2<float>> pixels(resolution * resolution);
-    std::vector<std::size_t> indices(pixels.size());
-    std::size_t index = 0;
-    for (auto& i : indices) {
-        i = index;
-        ++index;
-    }
     const auto inv_res = 1.0f / float(resolution);
-    core::sync::ParallelFor::map(indices.begin(), indices.end(), [&](const std::size_t index) {
-        pixels[index] = integrate_brdf(
+    core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::size_t index, auto) {
+        pixel = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
             (static_cast<float>(index / resolution) + 0.5f) * inv_res);
     });

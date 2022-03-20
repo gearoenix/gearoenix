@@ -13,12 +13,12 @@ void gearoenix::physics::Engine::start_frame() noexcept
 {
     auto* const world = render_engine.get_world();
     world->parallel_system<Transformation, collider::Aabb3>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform, collider::Aabb3& cld) {
+        [&](const core::ecs::Entity::id_t, Transformation& transform, collider::Aabb3& cld, const auto /*kernel_index*/) {
             if (transform.get_changed())
                 cld.update(transform.get_matrix());
         });
     world->parallel_system<Transformation>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform) {
+        [&](const core::ecs::Entity::id_t, Transformation& transform, const auto /*kernel_index*/) {
             transform.update();
         });
 }
@@ -27,7 +27,7 @@ void gearoenix::physics::Engine::end_frame() noexcept
 {
     auto* const world = render_engine.get_world();
     world->parallel_system<Transformation>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform) {
+        [&](const core::ecs::Entity::id_t, Transformation& transform, const auto /*kernel_index*/) {
             transform.clear();
         });
 }

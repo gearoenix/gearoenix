@@ -169,9 +169,10 @@ private:
         const Entity::id_t id,
         std::uint8_t* const ptr,
         const std::size_t (&indices)[N],
-        F&& f) noexcept
+        F&& f,
+        const unsigned int kernel_index) noexcept
     {
-        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])...);
+        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])..., kernel_index);
     }
 
     template <typename... C, std::size_t... I, std::size_t N, typename F>
@@ -192,10 +193,10 @@ private:
             (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
-        sync::ParallelFor::map(range.begin(), range.end(), [&](std::uint8_t* const ptr) noexcept {
+        sync::ParallelFor::map(range.begin(), range.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
             call_function<ComponentsTypes...>(
-                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);
+                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun, kernel_index);
         });
     }
 

@@ -14,11 +14,12 @@ void gearoenix::render::camera::Manager::update() noexcept
 {
     auto* const world = e.get_world();
     world->parallel_system<Camera, physics::Transformation, physics::collider::Frustum>(
-        [&](
+        [](
             const core::ecs::Entity::id_t /*entity-id*/,
             Camera& cam,
             physics::Transformation& transform,
-            physics::collider::Frustum& collider) {
+            physics::collider::Frustum& collider,
+            const unsigned int /*kernel_index*/) {
             cam.set_view(math::Mat4x4<float>(transform.get_inverted_matrix()));
             std::array<math::Vec3<double>, 8> points;
             cam.generate_frustum_points(

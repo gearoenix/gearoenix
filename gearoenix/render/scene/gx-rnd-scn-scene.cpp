@@ -43,9 +43,8 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
         cam.set_flag(flag);
         flag <<= 1;
     });
-    recreate_bvh = false;
-    std::atomic<bool> refresh_bvh;
-    world->parallel_system<model::Model, physics::Transformation>([&](const core::ecs::Entity::id_t, model::Model& mdl, physics::Transformation& trn) {
+    std::atomic<bool> refresh_bvh = false;
+    world->parallel_system<model::Model, physics::Transformation>([&](const core::ecs::Entity::id_t, model::Model& mdl, physics::Transformation& trn, const auto /*kernel_index*/) {
         if (!mdl.enabled || mdl.scene_id != scene_entity_id)
             return;
         mdl.block_cameras_flags = static_cast<std::uint64_t>(-1);
@@ -56,11 +55,12 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
             refresh_bvh = true;
         }
     });
-
     if (refresh_bvh) {
         GX_LOG_D("Warning, recreation of BVH, do not transfom static models,"
                  "if you are seeing this log only once for each scene it is ok,"
                  "otherwise you're going to have performance problem.");
         recreate_bvh = true;
+    } else {
+        recreate_bvh = false;
     }
 }
