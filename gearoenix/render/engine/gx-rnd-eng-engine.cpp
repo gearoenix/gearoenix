@@ -101,11 +101,12 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
     world->update();
+    physics_engine->start_frame();
 }
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
 {
-    physics_engine->update();
     camera_manager->update();
     scene_manager->update();
+    physics_engine->end_frame();
 }

@@ -20,7 +20,8 @@ public:
     Engine(Engine&&) = delete;
     Engine(const Engine&) = delete;
 
-    void update() noexcept;
+    void start_frame() noexcept;
+    void end_frame() noexcept;
 };
 }
 #endif

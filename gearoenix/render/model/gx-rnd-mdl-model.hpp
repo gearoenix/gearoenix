@@ -25,6 +25,7 @@ struct Model final : public core::ecs::Component {
     bool is_enabled_rendering = true;
     bool is_shadow_caster = true;
     bool is_shadow_receiver = true;
+    bool is_transformable = false;
     boost::container::flat_map<texture::BindingPoint, std::shared_ptr<texture::Texture>> bound_textures;
     const std::shared_ptr<mesh::Mesh> bound_mesh;
     boost::container::flat_set<core::ecs::Entity::id_t> blocked_cameras;
@@ -34,6 +35,7 @@ struct Model final : public core::ecs::Component {
     Model(
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         std::type_index material_type_index,
+        bool is_transformable,
         TranslucencyMode translucency = TranslucencyMode::Opaque,
         bool is_enabled_rendering = true,
         bool is_shadow_caster = true,

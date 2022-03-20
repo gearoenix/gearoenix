@@ -373,7 +373,7 @@ struct Vec3 final {
             z = upper;
     }
 
-    constexpr Vec3 atan() const noexcept
+    [[nodiscard]] constexpr Vec3 atan() const noexcept
     {
         return Vec3(
             static_cast<Element>(std::atan(static_cast<double>(x))),
@@ -381,12 +381,38 @@ struct Vec3 final {
             static_cast<Element>(std::atan(static_cast<double>(z))));
     }
 
-    constexpr Vec3 sign() const noexcept
+    [[nodiscard]] constexpr Vec3 sign() const noexcept
     {
         return Vec3(
             std::signbit(x) ? static_cast<Element>(-1) : static_cast<Element>(1),
             std::signbit(y) ? static_cast<Element>(-1) : static_cast<Element>(1),
             std::signbit(z) ? static_cast<Element>(-1) : static_cast<Element>(1));
+    }
+
+    /// the called vector must be normalised
+    [[nodiscard]] constexpr Vec3 reflect(const Vec3& o) const noexcept
+    {
+        return o + (*this * (dot(o) * static_cast<Element>(-2)));
+    }
+
+    [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const noexcept
+    {
+        return Vec3<bool>(x > v, y > v, z > v);
+    }
+
+    [[nodiscard]] constexpr Vec3<bool> greater(const Vec3& o) const noexcept
+    {
+        return Vec3<bool>(x > o.x, y > o.y, z > o.z);
+    }
+
+    [[nodiscard]] constexpr bool and_elements() const noexcept
+    {
+        return x && y && z;
+    }
+
+    [[nodiscard]] constexpr bool or_elements() const noexcept
+    {
+        return x || y || z;
     }
 
     [[nodiscard]] static constexpr Vec3<Element> importance_sample_ggx(

@@ -179,6 +179,10 @@ void gearoenix::physics::Transformation::update() noexcept
 {
     if (changed) {
         inverted_matrix = matrix.inverted();
-        changed = false;
     }
+}
+
+void gearoenix::physics::Transformation::clear() noexcept
+{
+    changed = false;
 }

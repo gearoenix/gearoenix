@@ -42,6 +42,7 @@ public:
     void local_z_scale(double s) noexcept;
     void set_orientation(const math::Quat<double>& q) noexcept;
     void update() noexcept;
+    void clear() noexcept;
 };
 }
 #endif

@@ -14,12 +14,12 @@ gearoenix::render::model::Builder::Builder(
     bool is_transformable) noexcept
     : entity_builder(e.get_world()->create_shared_builder())
     , bound_mesh(std::move(_bound_mesh))
+    , is_transformable(is_transformable)
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
     builder.add_component(physics::collider::Aabb3(bound_mesh->box));
-    if (is_transformable)
-        builder.add_component(physics::Transformation());
+    builder.add_component(physics::Transformation());
 }
 
 void gearoenix::render::model::Builder::set_material_type_index(const std::type_index& in_material_type) noexcept
@@ -27,7 +27,7 @@ void gearoenix::render::model::Builder::set_material_type_index(const std::type_
     auto& builder = entity_builder->get_builder();
     if (const auto* model = builder.get_component<Model>(); nullptr != model)
         GX_LOG_F("Material already exist in mesh entity: " << *builder.get_name());
-    builder.add_component(Model(std::move(bound_mesh), in_material_type));
+    builder.add_component(Model(std::move(bound_mesh), in_material_type, is_transformable));
 }
 
 gearoenix::render::model::Builder::~Builder() noexcept = default;

@@ -1,6 +1,8 @@
 #include "gx-rnd-scn-scene.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
@@ -41,12 +43,24 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
         cam.set_flag(flag);
         flag <<= 1;
     });
-    world->parallel_system<model::Model>([&](const core::ecs::Entity::id_t, model::Model& mdl) {
+    recreate_bvh = false;
+    std::atomic<bool> refresh_bvh;
+    world->parallel_system<model::Model, physics::Transformation>([&](const core::ecs::Entity::id_t, model::Model& mdl, physics::Transformation& trn) {
         if (!mdl.enabled || mdl.scene_id != scene_entity_id)
             return;
         mdl.block_cameras_flags = static_cast<std::uint64_t>(-1);
         for (const auto blocked_camera : mdl.blocked_cameras)
             if (auto blocked_camera_search = cameras_flags.find(blocked_camera); cameras_flags.end() != blocked_camera_search)
                 mdl.block_cameras_flags &= ~blocked_camera_search->second;
+        if (!mdl.is_transformable && trn.get_changed()) {
+            refresh_bvh = true;
+        }
     });
+
+    if (refresh_bvh) {
+        GX_LOG_D("Warning, recreation of BVH, do not transfom static models,"
+                 "if you are seeing this log only once for each scene it is ok,"
+                 "otherwise you're going to have performance problem.");
+        recreate_bvh = true;
+    }
 }

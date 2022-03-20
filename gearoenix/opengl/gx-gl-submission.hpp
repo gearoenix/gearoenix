@@ -44,12 +44,11 @@ struct SubmissionManager final {
     };
 
     struct SceneData final {
-        std::size_t bvh_pool_index = 0;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
     };
 
 private:
-    core::Pool<physics::accelerator::Bvh<ModelBvhData>> bvh_pool;
+    boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 

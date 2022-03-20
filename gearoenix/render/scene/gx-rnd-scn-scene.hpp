@@ -26,6 +26,7 @@ struct Scene final : public core::ecs::Component {
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, camera_entities)
     GX_GETSET_VAL_PRV(double, layer, 0.0)
     GX_GETSET_VAL_PRV(bool, is_enabled, true)
+    GX_GET_VAL_PRV(bool, recreate_bvh, true)
 
 private:
     boost::container::flat_map<core::ecs::Entity::id_t, std::uint64_t> cameras_flags;

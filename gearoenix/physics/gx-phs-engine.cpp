@@ -9,7 +9,7 @@ gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine) noexce
 {
 }
 
-void gearoenix::physics::Engine::update() noexcept
+void gearoenix::physics::Engine::start_frame() noexcept
 {
     auto* const world = render_engine.get_world();
     world->parallel_system<Transformation, collider::Aabb3>(
@@ -20,5 +20,14 @@ void gearoenix::physics::Engine::update() noexcept
     world->parallel_system<Transformation>(
         [&](const core::ecs::Entity::id_t, Transformation& transform) {
             transform.update();
+        });
+}
+
+void gearoenix::physics::Engine::end_frame() noexcept
+{
+    auto* const world = render_engine.get_world();
+    world->parallel_system<Transformation>(
+        [&](const core::ecs::Entity::id_t, Transformation& transform) {
+            transform.clear();
         });
 }

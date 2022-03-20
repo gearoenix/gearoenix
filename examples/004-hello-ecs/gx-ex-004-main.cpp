@@ -19,7 +19,7 @@
 
 constexpr static double position_limit = 2.0;
 constexpr static double cube_size = 0.05;
-constexpr static double max_speed = cube_size * 0.5;
+constexpr static double max_speed = cube_size * 2.5;
 
 static std::random_device random_device;
 static std::default_random_engine random_engine;
@@ -28,6 +28,7 @@ static std::uniform_real_distribution<double> speed_distribution(-max_speed, max
 static std::uniform_real_distribution<float> colour_distribution(0.0f, 1.0f);
 
 struct GameApp final : public gearoenix::core::Application {
+    struct Position;
     struct Speed final : public gearoenix::core::ecs::Component {
         gearoenix::math::Vec3<double> value;
 
@@ -38,14 +39,41 @@ struct GameApp final : public gearoenix::core::Application {
                   speed_distribution(random_engine),
                   speed_distribution(random_engine))
         {
+            value.x += value.x > 0 ? max_speed : -max_speed;
+            value.y += value.y > 0 ? max_speed : -max_speed;
+            value.z += value.z > 0 ? max_speed : -max_speed;
         }
 
-        void update() noexcept
+        void update(const Position& p) noexcept
         {
-            value.x += speed_distribution(random_engine);
-            value.y += speed_distribution(random_engine);
-            value.z += speed_distribution(random_engine);
-            value *= 0.5;
+            const auto pos = p.value.abs() + 0.1f;
+            if (pos.greater(position_limit).or_elements()) {
+                gearoenix::math::Vec3<double> n;
+                if (pos.x > position_limit) {
+                    if (p.value.x < 0.0) {
+                        n = gearoenix::math::Vec3<double>(1.0, 0.0, 0.0);
+                    } else {
+                        n = gearoenix::math::Vec3<double>(-1.0, 0.0, 0.0);
+                    }
+                    value = n.reflect(value);
+                }
+                if (pos.y > position_limit) {
+                    if (p.value.y < 0.0) {
+                        n = gearoenix::math::Vec3<double>(0.0, 1.0, 0.0);
+                    } else {
+                        n = gearoenix::math::Vec3<double>(0.0, -1.0, 0.0);
+                    }
+                    value = n.reflect(value);
+                }
+                if (pos.z > position_limit) {
+                    if (p.value.z < 0.0) {
+                        n = gearoenix::math::Vec3<double>(0.0, 0.0, 1.0);
+                    } else {
+                        n = gearoenix::math::Vec3<double>(0.0, 0.0, -1.0);
+                    }
+                    value = n.reflect(value);
+                }
+            }
         }
 
         Speed(Speed&&) noexcept = default;
@@ -118,7 +146,7 @@ struct GameApp final : public gearoenix::core::Application {
         camera_controller->update();
         render_engine.get_world()->parallel_system<Speed, Position, gearoenix::physics::Transformation>([&](auto, Speed& speed, Position& position, gearoenix::physics::Transformation& trn) noexcept {
             position.update(render_engine.get_delta_time(), speed);
-            speed.update();
+            speed.update(position);
             trn.set_location(position.value);
         });
     }
