@@ -2,6 +2,7 @@
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
+#include "gx-plt-sdl2-key.hpp"
 #include <SDL_vulkan.h>
 
 #include "../../opengl/gx-gl-loader.hpp"
@@ -161,218 +162,10 @@ void gearoenix::platform::Application::fetch_events() noexcept
         case SDL_APP_WILLENTERBACKGROUND:
             break;
         case SDL_KEYDOWN:
+            base.keyboard_key(convert_sdl_key(e.key.keysym.sym), key::Action::Press);
+            break;
         case SDL_KEYUP:
-            base.keyboard_key(
-                [&]() noexcept {
-                    switch (e.key.keysym.sym) {
-                        case SDLK_LEFT:
-                            return key::Id::Left;
-                        case SDLK_RIGHT:
-                            return key::Id::Right;
-                        case SDLK_UP:
-                            return key::Id::Up;
-                        case SDLK_DOWN:
-                            return key::Id::Down;
-                        case SDLK_ESCAPE:
-                            return key::Id::Escape;
-                        case SDLK_a:
-                            return key::Id::A;
-                        case SDLK_b:
-                            return key::Id::B;
-                        case SDLK_c:
-                            return key::Id::C;
-                        case SDLK_d:
-                            return key::Id::D;
-                        case SDLK_e:
-                            return key::Id::E;
-                        case SDLK_f:
-                            return key::Id::F;
-                        case SDLK_g:
-                            return key::Id::G;
-                        case SDLK_h:
-                            return key::Id::H;
-                        case SDLK_i:
-                            return key::Id::I;
-                        case SDLK_j:
-                            return key::Id::J;
-                        case SDLK_k:
-                            return key::Id::K;
-                        case SDLK_l:
-                            return key::Id::L;
-                        case SDLK_m:
-                            return key::Id::M;
-                        case SDLK_n:
-                            return key::Id::N;
-                        case SDLK_o:
-                            return key::Id::O;
-                        case SDLK_p:
-                            return key::Id::P;
-                        case SDLK_q:
-                            return key::Id::Q;
-                        case SDLK_r:
-                            return key::Id::R;
-                        case SDLK_s:
-                            return key::Id::S;
-                        case SDLK_t:
-                            return key::Id::T;
-                        case SDLK_u:
-                            return key::Id::U;
-                        case SDLK_v:
-                            return key::Id::V;
-                        case SDLK_w:
-                            return key::Id::W;
-                        case SDLK_x:
-                            return key::Id::X;
-                        case SDLK_y:
-                            return key::Id::Y;
-                        case SDLK_z:
-                            return key::Id::Z;
-                        case SDLK_0:
-                            return key::Id::Num0;
-                        case SDLK_1:
-                            return key::Id::Num1;
-                        case SDLK_2:
-                            return key::Id::Num2;
-                        case SDLK_3:
-                            return key::Id::Num3;
-                        case SDLK_4:
-                            return key::Id::Num4;
-                        case SDLK_5:
-                            return key::Id::Num5;
-                        case SDLK_6:
-                            return key::Id::Num6;
-                        case SDLK_7:
-                            return key::Id::Num7;
-                        case SDLK_8:
-                            return key::Id::Num8;
-                        case SDLK_9:
-                            return key::Id::Num9;
-                        case SDLK_KP_0:
-                            return key::Id::Numpad0;
-                        case SDLK_KP_1:
-                            return key::Id::Numpad1;
-                        case SDLK_KP_2:
-                            return key::Id::Numpad2;
-                        case SDLK_KP_3:
-                            return key::Id::Numpad3;
-                        case SDLK_KP_4:
-                            return key::Id::Numpad4;
-                        case SDLK_KP_5:
-                            return key::Id::Numpad5;
-                        case SDLK_KP_6:
-                            return key::Id::Numpad6;
-                        case SDLK_KP_7:
-                            return key::Id::Numpad7;
-                        case SDLK_KP_8:
-                            return key::Id::Numpad8;
-                        case SDLK_KP_9:
-                            return key::Id::Numpad9;
-                        case SDLK_SPACE:
-                            return key::Id::Space;
-                        case SDLK_LEFTBRACKET:
-                            return key::Id::LeftBracket;
-                        case SDLK_RIGHTBRACKET:
-                            return key::Id::RightBracket;
-                        case SDLK_BACKQUOTE:
-                            return key::Id::Tilda;
-                        case SDLK_BACKSPACE:
-                            return key::Id::Backspace;
-                        case SDLK_BACKSLASH:
-                            return key::Id::Backslash;
-                        case SDLK_SLASH:
-                            return key::Id::Slash;
-                        case SDLK_QUOTE:
-                            return key::Id::Quote;
-                        case SDLK_SEMICOLON:
-                            return key::Id::Semicolon;
-                        case SDLK_MINUS:
-                            return key::Id::Minus;
-                        case SDLK_EQUALS:
-                            return key::Id::Equal;
-                        case SDLK_TAB:
-                            return key::Id::Tab;
-                        case SDLK_CAPSLOCK:
-                            return key::Id::CapsLock;
-                        case SDLK_LSHIFT:
-                            return key::Id::LeftShift;
-                        case SDLK_RSHIFT:
-                            return key::Id::RightShift;
-                        case SDLK_LCTRL:
-                            return key::Id::LeftControl;
-                        case SDLK_RCTRL:
-                            return key::Id::RightControl;
-                        case SDLK_LALT:
-                            return key::Id::LeftAlt;
-                        case SDLK_RALT:
-                            return key::Id::RightAlt;
-                        case SDLK_MENU:
-                            return key::Id::Menu;
-                        case SDLK_COMMA:
-                            return key::Id::Comma;
-                        case SDLK_PERIOD:
-                            return key::Id::Dot;
-                        case SDLK_F1:
-                            return key::Id::F1;
-                        case SDLK_F2:
-                            return key::Id::F2;
-                        case SDLK_F3:
-                            return key::Id::F3;
-                        case SDLK_F4:
-                            return key::Id::F4;
-                        case SDLK_F5:
-                            return key::Id::F5;
-                        case SDLK_F6:
-                            return key::Id::F6;
-                        case SDLK_F7:
-                            return key::Id::F7;
-                        case SDLK_F8:
-                            return key::Id::F8;
-                        case SDLK_F9:
-                            return key::Id::F9;
-                        case SDLK_F10:
-                            return key::Id::F10;
-                        case SDLK_F11:
-                            return key::Id::F11;
-                        case SDLK_F12:
-                            return key::Id::F12;
-                        case SDLK_INSERT:
-                            return key::Id::Insert;
-                        case SDLK_DELETE:
-                            return key::Id::Delete;
-                        case SDLK_HOME:
-                            return key::Id::Home;
-                        case SDLK_END:
-                            return key::Id::End;
-                        case SDLK_PAGEDOWN:
-                            return key::Id::PageDown;
-                        case SDLK_PAGEUP:
-                            return key::Id::PageUp;
-                        case SDLK_SCROLLLOCK:
-                            return key::Id::ScrollLock;
-                        case SDLK_PAUSE:
-                            return key::Id::Pause;
-                        case SDLK_LESS:
-                            return key::Id::Less;
-                        case SDLK_GREATER:
-                            return key::Id::Greater;
-                        case SDLK_NUMLOCKCLEAR:
-                            return key::Id::NumpadLock;
-                        case SDLK_KP_DIVIDE:
-                            return key::Id::NumpadSlash;
-                        case SDLK_KP_MULTIPLY:
-                            return key::Id::NumpadStar;
-                        case SDLK_KP_MINUS:
-                            return key::Id::NumpadMinus;
-                        case SDLK_KP_PLUS:
-                            return key::Id::NumpadPlus;
-                        case SDLK_KP_ENTER:
-                            return key::Id::NumpadEnter;
-                        case SDLK_KP_PERIOD:
-                            return key::Id::NumpadDot;
-                        default:
-                            GX_LOG_D("Unhandled button: " << static_cast<int>(e.key.keysym.sym));
-                            return key::Id::Unknown;
-                    } }(), e.type == SDL_KEYUP ? key::Action::Release : key::Action::Press);
+            base.keyboard_key(convert_sdl_key(e.key.keysym.sym), key::Action::Release);
             break;
         case SDL_FINGERDOWN: {
             break;
@@ -390,29 +183,15 @@ void gearoenix::platform::Application::fetch_events() noexcept
             base.update_mouse_position(e.motion.x, e.motion.y);
             break;
         case SDL_MOUSEBUTTONUP:
+            base.mouse_key(convert_sdl_mouse_key(e.button.button), key::Action::Release);
+            break;
         case SDL_MOUSEBUTTONDOWN:
-            base.mouse_key(
-                [&]() noexcept {
-                    switch (e.button.button) {
-                    case SDL_BUTTON_LEFT:
-                        return key::Id::Left;
-                    case SDL_BUTTON_RIGHT:
-                        return key::Id::Right;
-                    case SDL_BUTTON_MIDDLE:
-                        return key::Id::Middle;
-                    default:
-                        GX_LOG_E("Unhandled mouse button, left button returned instead." << e.button.button);
-                        return key::Id::Left;
-                    }
-                }(),
-                SDL_MOUSEBUTTONUP == e.type ? key::Action::Release : key::Action::Press);
+            base.mouse_key(convert_sdl_mouse_key(e.button.button), key::Action::Press);
             break;
         case SDL_WINDOWEVENT:
             switch (e.window.event) {
             case SDL_WINDOWEVENT_RESIZED:
-                base.update_window_size(
-                    static_cast<int>(e.window.data1),
-                    static_cast<int>(e.window.data2));
+                base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
                 break;
             default:
                 GX_LOG_E("Unhandled windows event: " << static_cast<int>(e.window.event));
