@@ -1,6 +1,7 @@
 #include "gx-plt-application.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
+#include "../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include <imgui.h>
 
@@ -9,6 +10,7 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
 {
+    core::sync::ParallelFor::initialise();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();

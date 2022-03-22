@@ -194,6 +194,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
 
     const auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
+
     GX_GL_CHECK_D;
     // Bind target
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -244,13 +245,9 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         }
     }
     GX_GL_CHECK_D;
-    GX_PROFILE_END_S(cpu);
-    GX_PROFILE_BEGIN(gl_swap);
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(os_app.get_window());
 #endif
-    GX_PROFILE_END(gl_swap);
-    GX_PROFILE_BEGIN_S(cpu);
     GX_GL_CHECK_D;
 }
 

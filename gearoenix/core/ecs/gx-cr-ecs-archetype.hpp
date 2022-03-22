@@ -193,7 +193,7 @@ private:
             (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
-        sync::ParallelFor::map(range.begin(), range.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
+        sync::ParallelFor::exec(range.begin(), range.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
             call_function<ComponentsTypes...>(
                 std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun, kernel_index);
