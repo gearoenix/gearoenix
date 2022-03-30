@@ -42,9 +42,9 @@ cmake-build-*/
 .idea/
 sdk/
 
+*.jar
 *.iml
 .gradle
-gradle/
 gradle.properties
 gradlew
 gradlew.bat
