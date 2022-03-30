@@ -23,6 +23,10 @@
 #include <execution>
 #include <thread>
 
+#ifdef GX_PLATFORM_INTERFACE_ANDROID
+#include "../platform/android/gx-plt-gl-context.hpp"
+#endif
+
 gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
     : threads_opaque_models_data(std::thread::hardware_concurrency())
     , threads_tranclucent_models_data(std::thread::hardware_concurrency())
@@ -180,19 +184,23 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                     std::move(v.begin(), v.end(), std::back_inserter(camera_data.tranclucent_models_data));
 
                 std::sort(
+#ifndef GX_PLATFORM_INTERFACE_ANDROID
                     std::execution::par_unseq,
+#endif
                     camera_data.opaque_models_data.begin(),
                     camera_data.opaque_models_data.end(),
                     [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
                 std::sort(
+#ifndef GX_PLATFORM_INTERFACE_ANDROID
                     std::execution::par_unseq,
+#endif
                     camera_data.tranclucent_models_data.begin(),
                     camera_data.tranclucent_models_data.end(),
                     [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
             });
     });
 
-    const auto& os_app = e.get_platform_application();
+    auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
 
     GX_GL_CHECK_D;
@@ -201,10 +209,10 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(
         static_cast<sizei>(0), static_cast<sizei>(0),
-        static_cast<sizei>(base_os_app.get_window_width()), static_cast<sizei>(base_os_app.get_window_height()));
+        static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
     glScissor(
         static_cast<sizei>(0), static_cast<sizei>(0),
-        static_cast<sizei>(base_os_app.get_window_width()), static_cast<sizei>(base_os_app.get_window_height()));
+        static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     gbuffers_filler->bind();
@@ -247,6 +255,8 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     GX_GL_CHECK_D;
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(os_app.get_window());
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+    os_app.get_gl_context()->swap();
 #endif
     GX_GL_CHECK_D;
 }

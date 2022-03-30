@@ -2,6 +2,7 @@
 #ifndef GX_THREAD_NOT_SUPPORTED
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-sync-semaphore.hpp"
+#include <vector>
 
 struct GearoenixCoreSyncParallelForData final {
     struct Job final {

@@ -1,81 +1,70 @@
 #include "gx-plt-and-application.hpp"
-
-#if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL)
-
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/event/gx-cr-ev-engine.hpp"
-#include "../../core/event/gx-cr-ev-system.hpp"
+#ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../../core/gx-cr-application.hpp"
-#include "../../core/gx-cr-static.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-log.hpp"
+#include "gx-plt-and-key.hpp"
 
-#ifdef GX_USE_OPENGL
-
-#include "../../glc3/engine/gx-glc3-eng-engine.hpp"
-#include "../../gles2/engine/gx-gles2-eng-engine.hpp"
+#ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-plt-gl-context.hpp"
-
 #endif
-
-#include <android_native_app_glue.h>
-#include <string>
 
 void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd) noexcept
 {
     switch (cmd) {
     case APP_CMD_START:
-        GXLOGD("Application started.")
+        GX_LOG_D("Application started.");
         on_check_ready_to_render(a);
         break;
     case APP_CMD_RESUME:
-        GXLOGD("Application resumed.")
+        GX_LOG_D("Application resumed.");
         resumed = true;
         on_check_ready_to_render(a);
         break;
     case APP_CMD_PAUSE:
-        GXLOGD("Application paused.")
+        GX_LOG_D("Application paused.");
         resumed = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_STOP:
-        GXLOGD("Application stopped.")
+        GX_LOG_D("Application stopped.");
         resumed = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_DESTROY:
-        GXLOGD("Application destroyed.")
+        GX_LOG_D("Application destroyed.");
         break;
     case APP_CMD_GAINED_FOCUS:
-        GXLOGD("Application focused.")
+        GX_LOG_D("Application focused.");
         focused = true;
         on_check_ready_to_render(a);
         break;
     case APP_CMD_LOST_FOCUS:
-        GXLOGD("Application unfocused.")
+        GX_LOG_D("Application unfocused.");
         focused = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_INIT_WINDOW:
-        GXLOGD("Application surface ready.")
+        GX_LOG_D("Application surface ready.");
         surface_ready = true;
         on_check_ready_to_render(a);
         break;
     case APP_CMD_TERM_WINDOW:
-        GXLOGD("Android window terminated.")
+        GX_LOG_D("Android window terminated.");
         surface_ready = false;
         on_not_ready_to_render();
         break;
     case APP_CMD_WINDOW_RESIZED:
-        GXLOGD("Android window resized.")
+        GX_LOG_D("Android window resized.");
         // todo
         break;
     case APP_CMD_CONFIG_CHANGED:
-        GXLOGD("Android config changed.")
+        GX_LOG_D("Android config changed.");
         // todo
         break;
     default:
-        GXLOGI("event not handled: " << cmd);
+        GX_LOG_D("event not handled: " << cmd);
     }
 }
 
@@ -83,232 +72,18 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
 {
     const auto event_type = AInputEvent_getType(e);
     switch (event_type) {
-    case AINPUT_EVENT_TYPE_KEY: {
-        event_engine->broadcast(core::event::Data(core::event::Id::ButtonKeyboard, core::event::button::KeyboardData([&]() noexcept {
+    case AINPUT_EVENT_TYPE_KEY:
+        base.keyboard_key(convert_android_key(AKeyEvent_getKeyCode(e)), [&]() noexcept {
             switch (AKeyEvent_getAction(e)) {
                 case AKEY_EVENT_ACTION_UP:
-                    return core::event::button::KeyboardActionId::Release;
+                    return gearoenix::platform::key::Action::Release;
                 case AKEY_EVENT_ACTION_DOWN:
-                    return core::event::button::KeyboardActionId::Press;
+                    return gearoenix::platform::key::Action::Press;
                 default:
-                    return core::event::button::KeyboardActionId::Unknown;
-            } }(), [&]() noexcept {
-            const auto key = AKeyEvent_getKeyCode(e);
-            switch (key) {
-                case AKEYCODE_DPAD_LEFT:
-                case AKEYCODE_META_LEFT:
-                case AKEYCODE_SOFT_LEFT:
-                case AKEYCODE_SYSTEM_NAVIGATION_LEFT:
-                    return core::event::button::KeyboardKeyId::Left;
-                case AKEYCODE_DPAD_RIGHT:
-                case AKEYCODE_META_RIGHT:
-                case AKEYCODE_SOFT_RIGHT:
-                case AKEYCODE_SYSTEM_NAVIGATION_RIGHT:
-                    return core::event::button::KeyboardKeyId::Right;
-                case AKEYCODE_DPAD_UP:
-                case AKEYCODE_SYSTEM_NAVIGATION_UP:
-                    return core::event::button::KeyboardKeyId::Up;
-                case AKEYCODE_DPAD_DOWN:
-                case AKEYCODE_SYSTEM_NAVIGATION_DOWN:
-                    return core::event::button::KeyboardKeyId::Down;
-                case AKEYCODE_ESCAPE:
-                    return core::event::button::KeyboardKeyId::Escape;
-                case AKEYCODE_A:
-                    return core::event::button::KeyboardKeyId::A;
-                case AKEYCODE_B:
-                    return core::event::button::KeyboardKeyId::B;
-                case AKEYCODE_C:
-                    return core::event::button::KeyboardKeyId::C;
-                case AKEYCODE_D:
-                    return core::event::button::KeyboardKeyId::D;
-                case AKEYCODE_E:
-                    return core::event::button::KeyboardKeyId::E;
-                case AKEYCODE_F:
-                    return core::event::button::KeyboardKeyId::F;
-                case AKEYCODE_G:
-                    return core::event::button::KeyboardKeyId::G;
-                case AKEYCODE_H:
-                    return core::event::button::KeyboardKeyId::H;
-                case AKEYCODE_I:
-                    return core::event::button::KeyboardKeyId::I;
-                case AKEYCODE_J:
-                    return core::event::button::KeyboardKeyId::J;
-                case AKEYCODE_K:
-                    return core::event::button::KeyboardKeyId::K;
-                case AKEYCODE_L:
-                    return core::event::button::KeyboardKeyId::L;
-                case AKEYCODE_M:
-                    return core::event::button::KeyboardKeyId::M;
-                case AKEYCODE_N:
-                    return core::event::button::KeyboardKeyId::N;
-                case AKEYCODE_O:
-                    return core::event::button::KeyboardKeyId::O;
-                case AKEYCODE_P:
-                    return core::event::button::KeyboardKeyId::P;
-                case AKEYCODE_Q:
-                    return core::event::button::KeyboardKeyId::Q;
-                case AKEYCODE_R:
-                    return core::event::button::KeyboardKeyId::R;
-                case AKEYCODE_S:
-                    return core::event::button::KeyboardKeyId::S;
-                case AKEYCODE_T:
-                    return core::event::button::KeyboardKeyId::T;
-                case AKEYCODE_U:
-                    return core::event::button::KeyboardKeyId::U;
-                case AKEYCODE_V:
-                    return core::event::button::KeyboardKeyId::V;
-                case AKEYCODE_W:
-                    return core::event::button::KeyboardKeyId::W;
-                case AKEYCODE_X:
-                    return core::event::button::KeyboardKeyId::X;
-                case AKEYCODE_Y:
-                    return core::event::button::KeyboardKeyId::Y;
-                case AKEYCODE_Z:
-                    return core::event::button::KeyboardKeyId::Z;
-                case AKEYCODE_0:
-                    return core::event::button::KeyboardKeyId::Num0;
-                case AKEYCODE_1:
-                    return core::event::button::KeyboardKeyId::Num1;
-                case AKEYCODE_2:
-                    return core::event::button::KeyboardKeyId::Num2;
-                case AKEYCODE_3:
-                    return core::event::button::KeyboardKeyId::Num3;
-                case AKEYCODE_4:
-                    return core::event::button::KeyboardKeyId::Num4;
-                case AKEYCODE_5:
-                    return core::event::button::KeyboardKeyId::Num5;
-                case AKEYCODE_6:
-                    return core::event::button::KeyboardKeyId::Num6;
-                case AKEYCODE_7:
-                    return core::event::button::KeyboardKeyId::Num7;
-                case AKEYCODE_8:
-                    return core::event::button::KeyboardKeyId::Num8;
-                case AKEYCODE_9:
-                    return core::event::button::KeyboardKeyId::Num9;
-                case AKEYCODE_NUMPAD_0:
-                    return core::event::button::KeyboardKeyId::Numpad0;
-                case AKEYCODE_NUMPAD_1:
-                    return core::event::button::KeyboardKeyId::Numpad1;
-                case AKEYCODE_NUMPAD_2:
-                    return core::event::button::KeyboardKeyId::Numpad2;
-                case AKEYCODE_NUMPAD_3:
-                    return core::event::button::KeyboardKeyId::Numpad3;
-                case AKEYCODE_NUMPAD_4:
-                    return core::event::button::KeyboardKeyId::Numpad4;
-                case AKEYCODE_NUMPAD_5:
-                    return core::event::button::KeyboardKeyId::Numpad5;
-                case AKEYCODE_NUMPAD_6:
-                    return core::event::button::KeyboardKeyId::Numpad6;
-                case AKEYCODE_NUMPAD_7:
-                    return core::event::button::KeyboardKeyId::Numpad7;
-                case AKEYCODE_NUMPAD_8:
-                    return core::event::button::KeyboardKeyId::Numpad8;
-                case AKEYCODE_NUMPAD_9:
-                    return core::event::button::KeyboardKeyId::Numpad9;
-                case AKEYCODE_SPACE:
-                    return core::event::button::KeyboardKeyId::Space;
-                case AKEYCODE_LEFT_BRACKET:
-                    return core::event::button::KeyboardKeyId::LeftBracket;
-                case AKEYCODE_RIGHT_BRACKET:
-                    return core::event::button::KeyboardKeyId::RightBracket;
-                case AKEYCODE_GRAVE:
-                    return core::event::button::KeyboardKeyId::Tilda;
-                case AKEYCODE_DEL:
-                    return core::event::button::KeyboardKeyId::Backspace;
-                case AKEYCODE_BACKSLASH:
-                    return core::event::button::KeyboardKeyId::Backslash;
-                case AKEYCODE_SLASH:
-                    return core::event::button::KeyboardKeyId::Slash;
-                case AKEYCODE_APOSTROPHE:
-                    return core::event::button::KeyboardKeyId::Quote;
-                case AKEYCODE_SEMICOLON:
-                    return core::event::button::KeyboardKeyId::Semicolon;
-                case AKEYCODE_MINUS:
-                    return core::event::button::KeyboardKeyId::Minus;
-                case AKEYCODE_EQUALS:
-                    return core::event::button::KeyboardKeyId::Equal;
-                case AKEYCODE_TAB:
-                    return core::event::button::KeyboardKeyId::Tab;
-                case AKEYCODE_CAPS_LOCK:
-                    return core::event::button::KeyboardKeyId::CapsLock;
-                case AKEYCODE_SHIFT_LEFT:
-                    return core::event::button::KeyboardKeyId::LeftShift;
-                case AKEYCODE_SHIFT_RIGHT:
-                    return core::event::button::KeyboardKeyId::RightShift;
-                case AKEYCODE_CTRL_LEFT:
-                    return core::event::button::KeyboardKeyId::LeftControl;
-                case AKEYCODE_CTRL_RIGHT:
-                    return core::event::button::KeyboardKeyId::RightControl;
-                case AKEYCODE_ALT_LEFT:
-                    return core::event::button::KeyboardKeyId::LeftAlt;
-                case AKEYCODE_ALT_RIGHT:
-                    return core::event::button::KeyboardKeyId::RightAlt;
-                case AKEYCODE_MENU:
-                    return core::event::button::KeyboardKeyId::Menu;
-                case AKEYCODE_COMMA:
-                    return core::event::button::KeyboardKeyId::Comma;
-                case AKEYCODE_PERIOD:
-                    return core::event::button::KeyboardKeyId::Dot;
-                case AKEYCODE_F1:
-                    return core::event::button::KeyboardKeyId::F1;
-                case AKEYCODE_F2:
-                    return core::event::button::KeyboardKeyId::F2;
-                case AKEYCODE_F3:
-                    return core::event::button::KeyboardKeyId::F3;
-                case AKEYCODE_F4:
-                    return core::event::button::KeyboardKeyId::F4;
-                case AKEYCODE_F5:
-                    return core::event::button::KeyboardKeyId::F5;
-                case AKEYCODE_F6:
-                    return core::event::button::KeyboardKeyId::F6;
-                case AKEYCODE_F7:
-                    return core::event::button::KeyboardKeyId::F7;
-                case AKEYCODE_F8:
-                    return core::event::button::KeyboardKeyId::F8;
-                case AKEYCODE_F9:
-                    return core::event::button::KeyboardKeyId::F9;
-                case AKEYCODE_F10:
-                    return core::event::button::KeyboardKeyId::F10;
-                case AKEYCODE_F11:
-                    return core::event::button::KeyboardKeyId::F11;
-                case AKEYCODE_F12:
-                    return core::event::button::KeyboardKeyId::F12;
-                case AKEYCODE_INSERT:
-                    return core::event::button::KeyboardKeyId::Insert;
-                case AKEYCODE_FORWARD_DEL:
-                    return core::event::button::KeyboardKeyId::Delete;
-                case AKEYCODE_HOME:
-                    return core::event::button::KeyboardKeyId::Home;
-                case AKEYCODE_MOVE_END:
-                    return core::event::button::KeyboardKeyId::End;
-                case AKEYCODE_PAGE_DOWN:
-                    return core::event::button::KeyboardKeyId::PageDown;
-                case AKEYCODE_PAGE_UP:
-                    return core::event::button::KeyboardKeyId::PageUp;
-                case AKEYCODE_SCROLL_LOCK:
-                    return core::event::button::KeyboardKeyId::ScrollLock;
-                case AKEYCODE_MEDIA_PAUSE:
-                    return core::event::button::KeyboardKeyId::Pause;
-                case AKEYCODE_NUM_LOCK:
-                    return core::event::button::KeyboardKeyId::NumpadLock;
-                case AKEYCODE_NUMPAD_DIVIDE:
-                    return core::event::button::KeyboardKeyId::NumpadSlash;
-                case AKEYCODE_NUMPAD_MULTIPLY:
-                    return core::event::button::KeyboardKeyId::NumpadStar;
-                case AKEYCODE_NUMPAD_SUBTRACT:
-                    return core::event::button::KeyboardKeyId::NumpadMinus;
-                case AKEYCODE_NUMPAD_ADD:
-                    return core::event::button::KeyboardKeyId::NumpadPlus;
-                case AKEYCODE_NUMPAD_ENTER:
-                    return core::event::button::KeyboardKeyId::NumpadEnter;
-                case AKEYCODE_NUMPAD_DOT:
-                    return core::event::button::KeyboardKeyId::NumpadDot;
-                default:
-                    GXLOGD("Unhandled mouse button, left button returned instead. " << static_cast<int>(key))
-                    return core::event::button::KeyboardKeyId::Unknown;
-            } }())));
+                    GX_LOG_E("Unhandled key action.");
+                    return gearoenix::platform::key::Action::Press;
+            } }());
         break;
-    }
     case AINPUT_EVENT_TYPE_MOTION: {
         const auto action = AMotionEvent_getAction(e);
         const auto flags = action & AMOTION_EVENT_ACTION_MASK;
@@ -320,40 +95,34 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
         switch (flags) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN:
-            event_engine->touch_down(
-                static_cast<core::event::touch::FingerId>(pointer_id),
-                static_cast<int>(x),
-                event_engine->get_window_height() - static_cast<int>(y));
+            base.touch_down(
+                static_cast<FingerId>(pointer_id),
+                static_cast<double>(x),
+                base.window_size.y - static_cast<double>(y));
             break;
         case AMOTION_EVENT_ACTION_MOVE:
             for (auto pi = decltype(pointer_counts) { 0 }; pi < pointer_counts; ++pi) {
-                event_engine->touch_move(
-                    static_cast<core::event::touch::FingerId>(AMotionEvent_getPointerId(e, pi)),
-                    static_cast<int>(AMotionEvent_getRawX(e, pi)),
-                    event_engine->get_window_height() - static_cast<int>(AMotionEvent_getRawY(e, pi)));
+                base.touch_move(
+                    static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)),
+                    static_cast<double>(AMotionEvent_getRawX(e, pi)),
+                    base.window_size.y - static_cast<double>(AMotionEvent_getRawY(e, pi)));
             }
             break;
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP:
-            event_engine->touch_up(
-                static_cast<core::event::touch::FingerId>(pointer_id),
-                static_cast<int>(x),
-                event_engine->get_window_height() - static_cast<int>(y));
+            base.touch_up(static_cast<FingerId>(pointer_id));
             break;
         case AMOTION_EVENT_ACTION_CANCEL:
-            event_engine->touch_cancel(
-                static_cast<core::event::touch::FingerId>(pointer_id),
-                static_cast<int>(x),
-                event_engine->get_window_height() - static_cast<int>(y));
+            base.touch_cancel(static_cast<FingerId>(pointer_id));
             break;
         default:
-            GXLOGD("Unhandled motion event flag: " << flags)
+            GX_LOG_E("Unhandled motion event flag: " << flags);
             break;
         }
         break;
     }
     default:
-        GXLOGE("Unexpected event type value: " << event_type)
+        GX_LOG_E("Unexpected event type value: " << event_type);
         break;
     }
     return 0;
@@ -379,32 +148,18 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
         return;
     if (android_application->window == nullptr)
         return;
-    if (render_engine == nullptr) {
-#ifdef GX_USE_OPENGL
+    if (nullptr == base.render_engine) {
+#ifdef GX_RENDER_OPENGL_ENABLED
         if (gl_context != nullptr) {
             gl_context->init(android_application->window);
-            event_engine->initialize_window_size(
-                static_cast<std::size_t>(gl_context->get_screen_width()),
-                static_cast<std::size_t>(gl_context->get_screen_height()));
+            base.initialize_window_size(
+                ANativeWindow_getWidth(android_application->window),
+                ANativeWindow_getHeight(android_application->window));
+            base.initialize_engine(*this);
         }
 #endif
-#ifdef GX_USE_OPENGL_ES3
-        if (gl_context->get_es3_supported()) {
-            GXLOGD("Going to create OpenGL ES3 render engine.")
-            render_engine = std::unique_ptr<render::engine::Engine>(
-                glc3::engine::Engine::construct(this, render::engine::Type::OPENGL_ES3));
-        }
-#endif
-#ifdef GX_USE_OPENGL_ES2
-        if (!gl_context->get_es3_supported()) {
-            GXLOGD("Going to create OpenGL ES2 render engine.")
-            render_engine = std::unique_ptr<render::engine::Engine>(
-                gles2::engine::Engine::construct(this));
-        }
-#endif
-        asset_manager = std::make_unique<core::asset::Manager>(this, GX_APP_DATA_NAME);
     } else if (a->window != android_application->window) {
-        GXLOGF("Window reinitialized with different window (not implemented).")
+        GX_LOG_F("Window reinitialized with different window (not implemented).");
         // todo
         // core::event::platform::System eul(core::event::platform::System::Action::UNLOAD);
         // core_app->on_event(eul);
@@ -416,13 +171,14 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
         // core_app->on_event(erl);
         // render_engine->on_event(erl);
     } else {
-        GXLOGE("Window Reinitialized")
-#ifdef GX_USE_OPENGL
-        if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
+        GX_LOG_D("Window Reinitialized");
+#ifdef GX_RENDER_OPENGL_ENABLED
+        if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
             gl_context->resume(android_application->window);
-            event_engine->initialize_window_size(
-                static_cast<std::size_t>(gl_context->get_screen_width()),
-                static_cast<std::size_t>(gl_context->get_screen_height()));
+            // TODO
+            //            event_engine->initialize_window_size(
+            //                static_cast<std::size_t>(gl_context->get_screen_width()),
+            //                static_cast<std::size_t>(gl_context->get_screen_height()));
         }
 #endif
         // todo: send event about reinitialization
@@ -437,48 +193,39 @@ void gearoenix::platform::Application::on_not_ready_to_render() noexcept
     if (resumed && surface_ready)
         return;
     running = false;
-#ifdef GX_USE_OPENGL
-    if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
+#ifdef GX_RENDER_OPENGL_ENABLED
+    if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
         gl_context->suspend();
     }
 #endif
 }
 
-gearoenix::platform::Application::Application(android_app* and_app) noexcept
-    : android_application(and_app)
-    , event_engine(new core::event::Engine())
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+    : base(GX_MAIN_ENTRY_ARGS, config)
+    , android_application(state)
     , gl_context(new GlContext())
 {
-    and_app->userData = this;
-    and_app->onAppCmd = gearoenix::platform::Application::handle_cmd;
-    and_app->onInputEvent = gearoenix::platform::Application::handle_input;
+    state->userData = this;
+    state->onAppCmd = gearoenix::platform::Application::handle_cmd;
+    state->onInputEvent = gearoenix::platform::Application::handle_input;
     int events;
     android_poll_source* source;
     do {
         if (ALooper_pollAll(-1, nullptr, &events, (void**)&source) >= 0) {
             if (source != nullptr)
-                source->process(and_app, source);
+                source->process(state, source);
         }
-        if (render_engine != nullptr) {
-            event_engine->initialize_render_engine(render_engine.get());
+        if (nullptr != base.render_engine) {
             break;
         }
-    } while (and_app->destroyRequested == 0);
+    } while (state->destroyRequested == 0);
 }
 
-gearoenix::platform::Application::~Application() noexcept
-{
-    core_application = nullptr;
-    event_engine = nullptr;
-    asset_manager = nullptr;
-    render_engine = nullptr;
-    gl_context = nullptr;
-    android_application = nullptr;
-}
+gearoenix::platform::Application::~Application() noexcept = default;
 
-void gearoenix::platform::Application::execute(std::unique_ptr<core::Application> app) noexcept
+void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
 {
-    core_application = std::move(app);
+    base.initialize_core_application(*this, core_app);
     int events;
     android_poll_source* source;
     do {
@@ -489,18 +236,10 @@ void gearoenix::platform::Application::execute(std::unique_ptr<core::Application
                 source->process(android_application.get(), source);
         }
         if (running) {
-            core_application->update();
-            render_engine->update();
-#ifdef GX_USE_OPENGL
-            if (GX_RUNTIME_USE_OPENGL_E(render_engine)) {
-                gl_context->swap();
-            }
-#endif
+            base.update();
         }
     } while (android_application->destroyRequested == 0);
     running = false;
-    core_application->terminate();
-    render_engine->terminate();
 }
 
 const char* gearoenix::platform::Application::get_clipboard() const noexcept
@@ -519,7 +258,7 @@ void gearoenix::platform::Application::set_soft_keyboard_visibility(const bool s
     java_vm_attach_args.name = "NativeThread";
     java_vm_attach_args.group = nullptr;
     if (JNI_ERR == java_vm->AttachCurrentThread(&jni_env, &java_vm_attach_args)) {
-        GXLOGE("Error in attaching current thread to JVM")
+        GX_LOG_E("Error in attaching current thread to JVM");
         return;
     }
     jobject native_activity = activity->clazz;

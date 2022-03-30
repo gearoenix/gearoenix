@@ -9,7 +9,7 @@
 #define GX_PLT_LOG_FILE_APPEND
 #endif
 
-#ifndef GX_PLT_ANDROID
+#ifndef GX_PLATFORM_ANDROID
 std::ofstream gearoenix::platform::Log::file(GX_APPLICATION_NAME ".log", std::ios::out GX_PLT_LOG_FILE_APPEND);
 #endif
 

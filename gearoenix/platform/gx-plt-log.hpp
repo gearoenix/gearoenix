@@ -80,7 +80,7 @@ struct Log {
     }                                 \
     static_assert(true, "")
 
-#ifdef GX_PLATFORM_INTERFACE_ANDROID
+#ifdef GX_PLATFORM_ANDROID
 #include "android/gx-plt-and-log.hpp"
 #elif defined(GX_PLATFORM_INTERFACE_WIN32)
 #include "win32/gx-plt-win-log.hpp"

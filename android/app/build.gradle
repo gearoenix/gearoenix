@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    ndkVersion "24.0.8215888"
+    compileSdkVersion 31
+    defaultConfig {
+        applicationId "com.geareonix.engine_demo"
+        minSdkVersion 16
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_TOOLCHAIN=clang',
+                        '-DANDROID_STL=c++_static',
+                        '-DGX_ENABLE_TOOLS=OFF',
+//                        '-DGX_ENABLE_EXAMPLE_000_HELLO_WORLD=True'
+//                        '-DGX_ENABLE_EXAMPLE_001_EMPTY_WINDOW=True'
+//                        '-DGX_ENABLE_EXAMPLE_002_HELLO_TRIANGLE=True'
+                        '-DGX_ENABLE_EXAMPLE_003_HELLO_TEXTURE=True'
+//                        '-DGX_ENABLE_EXAMPLE_004_HELLO_ECS=True'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "../../CMakeLists.txt"
+        }
+    }
+}
+dependencies {
+}

@@ -161,7 +161,7 @@ typedef void(GXGL_APIENTRY ViewportFnp)(sint, sint, sizei, sizei);
 GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_DECL);
 
 [[nodiscard]] bool load_library() noexcept;
-[[nodiscard]] void unload_library() noexcept;
+void unload_library() noexcept;
 }
 #endif
 #endif

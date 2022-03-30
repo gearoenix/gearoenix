@@ -12,7 +12,7 @@
 
 #ifdef GX_USE_STD_FILE
 #include <fstream>
-#elif defined(GX_IN_ANDROID)
+#elif defined(GX_PLATFORM_ANDROID)
 #include <android/asset_manager.h>
 #else
 #error "Unknown file implementation!"
@@ -27,8 +27,8 @@ struct Asset final : public Stream {
 private:
 #ifdef GX_USE_STD_FILE
     std::ifstream file;
-#elif defined(GX_IN_ANDROID)
-    platform::Application* platform_application;
+#elif defined(GX_PLATFORM_ANDROID)
+    platform::Application* platform_application = nullptr;
     AAsset* file = nullptr;
 #else
 #error "File usage is not specified!"

@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.18.4 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.18.1 FATAL_ERROR)
 
 PROJECT(Gearoenix)
 
@@ -14,7 +14,16 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 # Test coverage
 OPTION(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
-IF (CMAKE_SYSTEM_NAME MATCHES "Linux")
+IF (CMAKE_SYSTEM_NAME MATCHES "Android")
+    SET(GX_IN_ANDROID TRUE)
+    ADD_LIBRARY(native_app_glue
+            STATIC
+            ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    INCLUDE_DIRECTORIES(${ANDROID_NDK}/sources/android/native_app_glue)
+    SET(CMAKE_SHARED_LINKER_FLAGS
+            "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} android native_app_glue EGL log)
+ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
     SET(GX_IN_LINUX TRUE)
 ENDIF()
 

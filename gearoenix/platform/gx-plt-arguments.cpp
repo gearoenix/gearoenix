@@ -34,6 +34,10 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
         argv[i] = s_argv[i].c_str();
     }
     LocalFree(w_argv);
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+    // TODO:
+    const int argc = 1;
+    const std::vector<const char*> argv { "temporary" };
 #endif
 
     process_name = argv[0];
@@ -66,6 +70,7 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
         map.insert(std::make_pair(key, next_token));
         ++ti;
     }
+    GX_LOG_D("Parsing of arguments has been finished.");
 }
 
 bool gearoenix::platform::Arguments::is_key(const std::string& s) noexcept

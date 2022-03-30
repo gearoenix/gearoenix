@@ -6,7 +6,7 @@
 
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include <SDL.h>
-#elif defined(GX_ANDROID)
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
 #include <EGL/egl.h>
 #else
 #error "Not implemented for this platform."
@@ -20,9 +20,18 @@ static bool is_loaded = false;
 
 bool gearoenix::gl::load_library() noexcept
 {
-    if (is_loaded)
-        return glActiveTexture != nullptr;
+#define GX_GL_FUNCTION_LOAD_CHECK(name)                                  \
+    if (nullptr == gl##name) {                                           \
+        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
+        return false;                                                    \
+    }
+
+    if (is_loaded) {
+        GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_CHECK)
+        return true;
+    }
     is_loaded = true;
+
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 
     if (SDL_GL_LoadLibrary(nullptr) != 0) {
@@ -32,12 +41,9 @@ bool gearoenix::gl::load_library() noexcept
 
 #define GX_GL_FUNCTION_LOAD(name)                                                          \
     gl##name = reinterpret_cast<name##Fnp>(SDL_GL_GetProcAddress(GX_STRINGIFY(gl##name))); \
-    if (nullptr == gl##name) {                                                             \
-        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found.");                   \
-        return false;                                                                      \
-    }
+    GX_GL_FUNCTION_LOAD_CHECK(name)
 
-    GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD);
+    GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
 
     auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
     GX_LOG_D(extensions);
@@ -47,14 +53,12 @@ bool gearoenix::gl::load_library() noexcept
     if (SDL_FALSE == SDL_GL_ExtensionSupported("GL_OES_texture_float_linear"))
         return false;
 
-#elif defined(GX_ANDROID)
-#define GXFUNLDF(name, fun)                                      \
-    fun = reinterpret_cast<fun##_fnp>(eglGetProcAddress(#name)); \
-    if (fun == nullptr) {                                        \
-        GXLOGD("Failed to load " << #name)                       \
-        unload_library();                                        \
-        return false;                                            \
-    }
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+#define GX_GL_FUNCTION_LOAD(name)                                                      \
+    gl##name = reinterpret_cast<name##Fnp>(eglGetProcAddress(GX_STRINGIFY(gl##name))); \
+    GX_GL_FUNCTION_LOAD_CHECK(name)
+
+    GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
 #else
 #error "Not implemented for this platform."
 #endif
@@ -64,7 +68,10 @@ bool gearoenix::gl::load_library() noexcept
 void gearoenix::gl::unload_library() noexcept
 {
     is_loaded = false;
+
+#ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_UnloadLibrary();
+#endif
 
 #define GX_GL_FUNCTION_UNLOAD(name) gl##name = nullptr
 

@@ -1,30 +1,57 @@
-#ifndef GEAROENIX_SYSTEM_ANDROID_LOG_HPP
-#define GEAROENIX_SYSTEM_ANDROID_LOG_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_IN_ANDROID
+#ifndef GEAROENIX_PLATFORM_ANDROID_LOG_HPP
+#define GEAROENIX_PLATFORM_ANDROID_LOG_HPP
+#include "../gx-plt-build-configuration.hpp"
+#ifdef GX_PLATFORM_ANDROID
 #include <android/log.h>
-#include <sstream>
 
-#define GXLOG(p, s)                                                            \
-    {                                                                          \
-        std::stringstream stringstream;                                        \
-        stringstream << __FILE__ << " " << __LINE__ << ": ";                   \
-        stringstream << s;                                                     \
-        __android_log_print(p, GX_APP_NAME, "%s", stringstream.str().c_str()); \
-    }
-
-#define GXLOGI(s) GXLOG(ANDROID_LOG_INFO, s)
-#ifdef GX_DEBUG_MODE
-#define GXLOGD(s) GXLOG(ANDROID_LOG_DEBUG, s)
-#else
-#define GXLOGD(s)
+#ifdef GX_LOG_I
+#undef GX_LOG_I
 #endif
-#define GXLOGE(s) GXLOG(ANDROID_LOG_ERROR, s)
-#define GXLOGF(s)                    \
-    {                                \
-        GXLOG(ANDROID_LOG_FATAL, s); \
-        std::terminate();            \
-    }
+
+#ifdef GX_LOG_D
+#undef GX_LOG_D
+#endif
+
+#ifdef GX_LOG_E
+#undef GX_LOG_E
+#endif
+
+#ifdef GX_LOG_F
+#undef GX_LOG_F
+#endif
+
+#define GX_LOG_I(s)                                                                                   \
+    {                                                                                                 \
+        GX_PLT_LOG_COMMON_STR(s, "INFO")                                                              \
+        __android_log_print(ANDROID_LOG_INFO, GX_APPLICATION_NAME, "%s", GX_PLT_LOG_STR_VAR.c_str()); \
+    }                                                                                                 \
+    static_assert(true, "")
+#ifdef GX_DEBUG_MODE
+
+#define GX_LOG_D(s)                                                                                    \
+    {                                                                                                  \
+        GX_PLT_LOG_COMMON_STR(s, "DEBUG")                                                              \
+        __android_log_print(ANDROID_LOG_DEBUG, GX_APPLICATION_NAME, "%s", GX_PLT_LOG_STR_VAR.c_str()); \
+    }                                                                                                  \
+    static_assert(true, "")
+#else
+#define GX_LOG_D(s)
+#endif
+
+#define GX_LOG_E(s)                                                                                    \
+    {                                                                                                  \
+        GX_PLT_LOG_COMMON_STR(s, "ERROR")                                                              \
+        __android_log_print(ANDROID_LOG_ERROR, GX_APPLICATION_NAME, "%s", GX_PLT_LOG_STR_VAR.c_str()); \
+    }                                                                                                  \
+    static_assert(true, "")
+
+#define GX_LOG_F(s)                                                                                    \
+    {                                                                                                  \
+        GX_PLT_LOG_COMMON_STR(s, "FATAL")                                                              \
+        __android_log_print(ANDROID_LOG_FATAL, GX_APPLICATION_NAME, "%s", GX_PLT_LOG_STR_VAR.c_str()); \
+        std::terminate();                                                                              \
+    }                                                                                                  \
+    static_assert(true, "")
 
 #endif
 #endif

@@ -1,11 +1,16 @@
 #ifndef GEAROENIX_PLATFORM_APPLICATION_HPP
 #define GEAROENIX_PLATFORM_APPLICATION_HPP
+#include "../core/event/gx-cr-ev-point.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../math/gx-math-vector-2d.hpp"
 #include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
 #include "gx-plt-main-entry.hpp"
 #include "gx-plt-runtime-configuration.hpp"
+#include "gx-plt-touch.hpp"
+#include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 #include <chrono>
 #include <memory>
 
@@ -32,35 +37,27 @@ struct BaseApplication final {
     GX_GET_VAL_PRV(bool, running, true)
 
     GX_GET_VAL_PRV(bool, window_resizing, false)
-    GX_GET_VAL_PRV(int, previous_window_width, -1)
-    GX_GET_VAL_PRV(int, previous_window_height, -1)
-    GX_GET_VAL_PRV(int, window_width, -1)
-    GX_GET_VAL_PRV(int, window_height, -1)
-
-    GX_GET_VAL_PRV(int, window_x, -1)
-    GX_GET_VAL_PRV(int, window_y, -1)
+    GX_GET_CREF_PRV(math::Vec2<int>, previous_window_size)
+    GX_GET_CREF_PRV(math::Vec2<int>, window_size)
+    GX_GET_CREF_PRV(math::Vec2<int>, window_position)
     GX_GET_VAL_PRV(bool, window_is_up, false)
 
-    GX_GET_VAL_PRV(double, mouse_x, -1.0)
-    GX_GET_VAL_PRV(double, mouse_y, -1.0)
-    /// From -window_aspect -> +window_aspect
-    GX_GET_VAL_PRV(double, mouse_x_nrm, -1.0)
-    /// From -1.0 -> +1.0
-    GX_GET_VAL_PRV(double, mouse_y_nrm, -1.0)
-    GX_GET_VAL_PRV(double, pre_mouse_x, -1.0)
-    GX_GET_VAL_PRV(double, pre_mouse_y, -1.0)
-    GX_GET_VAL_PRV(double, pre_mouse_x_nrm, -1.0)
-    GX_GET_VAL_PRV(double, pre_mouse_y_nrm, -1.0)
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_position)
+    /// {-window_aspect, -1.0} -> {+window_aspect, +1.0}
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position)
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_position)
+    /// {-window_aspect, -1.0} -> {+window_aspect, +1.0}
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position)
 
     GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
     GX_GET_UPTR_PRV(core::event::Engine, event_engine)
     GX_GET_UPTR_PRV(core::Application, core_application)
 
-    // boost::container::flat_map<platform::key::Id, Point2D> pressed_mouse_buttons_state;
-    // boost::container::flat_map<touch::FingerId, Point2D> touch_states;
-    // boost::container::flat_set<platform::key::Id> pressed_keyboard_buttons;
+    typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
+    GX_GET_CREF_PRV(TouchStateMap, touch_states)
+    GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons)
 
-    std::chrono::high_resolution_clock::time_point last_time_window_resized;
+    GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now())
 
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
     ~BaseApplication() noexcept;
@@ -79,6 +76,11 @@ struct BaseApplication final {
     void keyboard_key(key::Id, key::Action) noexcept;
     void character_input(char16_t ch) noexcept;
 
+    void touch_down(FingerId finger_id, double x, double y) noexcept;
+    void touch_move(FingerId finger_id, double x, double y) noexcept;
+    void touch_up(FingerId finger_id) noexcept;
+    void touch_cancel(FingerId finger_id) noexcept;
+
     void initialize_engine(Application&) noexcept;
     void initialize_core_application(Application&, core::Application*) noexcept;
 
@@ -86,6 +88,11 @@ struct BaseApplication final {
     void terminate() noexcept;
 
     void update() noexcept;
+
+private:
+    [[nodiscard]] double normalise_x(double x) const noexcept;
+    [[nodiscard]] double normalise_y(double y) const noexcept;
+    [[nodiscard]] math::Vec2<double> normalise_position(double x, double y) const noexcept;
 };
 }
 

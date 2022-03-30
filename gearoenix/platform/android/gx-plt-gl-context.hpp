@@ -1,19 +1,20 @@
-#ifndef GEAROENIX_SYSTEM_ANDROID_GL_CONTEXT_HPP
-#define GEAROENIX_SYSTEM_ANDROID_GL_CONTEXT_HPP
-#include "../../core/gx-cr-build-configuration.hpp"
-#if defined(GX_IN_ANDROID) && !defined(GX_USE_SDL) && defined(GX_USE_OPENGL)
-#include "../../core/gx-cr-static.hpp"
+#ifndef GEAROENIX_PLATFORM_ANDROID_GL_CONTEXT_HPP
+#define GEAROENIX_PLATFORM_ANDROID_GL_CONTEXT_HPP
+#include "../gx-plt-build-configuration.hpp"
+#ifdef GX_PLATFORM_INTERFACE_ANDROID
+#include "../../render/gx-rnd-build-configuration.hpp"
+#ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 
 namespace gearoenix::platform {
-struct GlContext {
+struct GlContext final {
     GX_GET_VAL_PRV(int, screen_width, -1)
     GX_GET_VAL_PRV(int, screen_height, -1)
     GX_GET_VAL_PRV(int, depth_size, -1)
     GX_GET_VAL_PRV(int, samples_size, -1)
-    GX_GET_VAL_PRV(bool, es3_supported, false)
-public:
+
     enum struct State {
         RUNNING,
         TERMINATED,
@@ -49,5 +50,6 @@ public:
     void resume(ANativeWindow* window) noexcept;
 };
 }
+#endif
 #endif
 #endif

@@ -5,9 +5,11 @@ ADD_SUBDIRECTORY(macos)
 SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-key.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-key.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.hpp
         ${GX_ENGINE_PLATFORM_MACOS_SRC}
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp
@@ -54,4 +56,5 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-path.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-path.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-runtime-configuration.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-touch.hpp
         PARENT_SCOPE)

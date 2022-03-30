@@ -56,9 +56,9 @@ struct MouseDrag {
 
 struct TouchClick {
     GX_GET_REFC_PRV(Click, base)
-    GX_GET_CVAL_PRV(touch::FingerId, finger_id)
+    GX_GET_CVAL_PRV(platform::FingerId, finger_id)
 
-    TouchClick(Click c, const touch::FingerId fi) noexcept
+    TouchClick(Click c, const platform::FingerId fi) noexcept
         : base(std::move(c))
         , finger_id(fi)
     {
@@ -67,9 +67,9 @@ struct TouchClick {
 
 struct TouchDrag {
     GX_GET_REFC_PRV(Drag2D, base)
-    GX_GET_CVAL_PRV(touch::FingerId, finger_id)
+    GX_GET_CVAL_PRV(platform::FingerId, finger_id)
 
-    TouchDrag(Drag2D d, const touch::FingerId fi) noexcept
+    TouchDrag(Drag2D d, const platform::FingerId fi) noexcept
         : base(std::move(d))
         , finger_id(fi)
     {
@@ -78,9 +78,9 @@ struct TouchDrag {
 
 struct TouchScale {
     GX_GET_REFC_PRV(Scale, base)
-    GX_GET_CARR_PRV(touch::FingerId, finger_ids, 2)
+    GX_GET_CARR_PRV(platform::FingerId, finger_ids, 2)
 
-    TouchScale(Scale s, const touch::FingerId fi1, const touch::FingerId fi2) noexcept
+    TouchScale(Scale s, const platform::FingerId fi1, const platform::FingerId fi2) noexcept
         : base(std::move(s))
         , finger_ids { fi1, fi2 }
     {

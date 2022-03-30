@@ -6,6 +6,8 @@
 #include "win32/gx-plt-win-main-entry.hpp"
 #elif defined(GX_PLATFORM_INTERFACE_SDL2)
 #include "sdl2/gx-plt-sdl2-main-entry.hpp"
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+#include "android/gx-plt-and-main-entry.hpp"
 #else
 
 #define GX_MAIN_ENTRY_ARGS_DEF \

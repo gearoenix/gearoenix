@@ -24,7 +24,7 @@ static std::string create_path(const gearoenix::platform::Application& app, cons
         return gearoenix::core::String::join_path(path, name);
     }
 #elif defined(GX_PLATFORM_ANDROID)
-    return std::string(app->get_android_application()->activity->internalDataPath) + "/" + name;
+    return std::string(app.get_android_application()->activity->internalDataPath) + "/" + name;
 #else
     (void)app;
     return name;

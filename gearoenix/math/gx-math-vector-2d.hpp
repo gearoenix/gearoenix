@@ -208,12 +208,22 @@ struct Vec2 {
 
     [[nodiscard]] constexpr Vec2<Element> maximum(const Vec2<Element>& o) const noexcept
     {
-        return Vec2(Numeric::maximum(x, o.x), Numeric::maximum(y, o.y));
+        return Vec2(x > o.x ? x : o.x, y > o.y ? y : o.y);
+    }
+
+    [[nodiscard]] constexpr Vec2<Element> safe_maximum(const Vec2<Element>& o) const noexcept
+    {
+        return Vec2(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y));
     }
 
     [[nodiscard]] constexpr Vec2<Element> minimum(const Vec2<Element>& o) const noexcept
     {
-        return Vec2(Numeric::minimum(x, o.x), Numeric::minimum(y, o.y));
+        return Vec2(x < o.x ? x : o.x, y < o.y ? y : o.y);
+    }
+
+    [[nodiscard]] constexpr Vec2<Element> safe_minimum(const Vec2<Element>& o) const noexcept
+    {
+        return Vec2(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y));
     }
 
     [[nodiscard]] constexpr Element length() const noexcept

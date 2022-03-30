@@ -1,5 +1,7 @@
 #ifndef GEAROENIX_MATH_MATRIX_4D_TEST_HPP
 #define GEAROENIX_MATH_MATRIX_4D_TEST_HPP
+#include "../platform/gx-plt-build-configuration.hpp"
+#ifndef GX_PLATFORM_ANDROID
 #include "gx-math-matrix-4d.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -47,4 +49,5 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
 
     compare("hard-coded-inverse-1");
 }
+#endif
 #endif
