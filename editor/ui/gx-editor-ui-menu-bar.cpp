@@ -2,6 +2,7 @@
 #include "../control/gx-editor-ctrl-manager.hpp"
 
 #include <gearoenix/platform/gx-plt-log.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
@@ -14,7 +15,7 @@ constexpr static const char *const key_gltf_file_chooser = "key_gltf_file_choose
 constexpr static const char *const  filter_gltf_file = ".gltf,.glb";
 
 void gearoenix::editor::ui::MenuBar::show_project() noexcept {
-    auto& project = control_manager->get_project();
+    auto& project = control_manager.get_project();
     if (ImGui::BeginMenu("Project"))
     {
         if (ImGui::MenuItem("New", "Ctrl+N"))
@@ -62,7 +63,7 @@ void gearoenix::editor::ui::MenuBar::show_project() noexcept {
 void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
     if (ImGui::BeginMenu("Scene"))
     {
-        auto& project = control_manager->get_project();
+        auto& project = control_manager.get_project();
         if (ImGui::MenuItem("New", "Alt+S,Alt+N", false, project.is_project_opened())) {}
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false, project.is_project_opened())) {
 //            show_scene_import_popup = true;
@@ -81,8 +82,9 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-                platform_application->get_base().get_render_engine()->get_scene_manager()->load_gltf(
-                        platform::stream::Path::create_absolute(file_path_name));
+                GX_TODO;
+                // platform_application.get_base().get_render_engine()->get_scene_manager()->load_gltf(
+                //         platform::stream::AbsolutePath(file_path_name));
             }
 
             // close
@@ -92,8 +94,8 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
 }
 
 gearoenix::editor::ui::MenuBar::MenuBar(
-        platform::Application * const platform_application,
-        editor::control::Manager *const control_manager) noexcept
+        platform::Application& platform_application,
+        editor::control::Manager& control_manager) noexcept
     : platform_application(platform_application)
     , control_manager(control_manager)
 {
@@ -118,9 +120,9 @@ void gearoenix::editor::ui::MenuBar::update() noexcept {
         }
         if (ImGui::BeginMenu("Window"))
         {
-            const bool is_fullscreen = platform_application->get_base().get_configuration().get_fullscreen();
+            const bool is_fullscreen = platform_application.get_base().get_configuration().get_fullscreen();
             if (ImGui::MenuItem(is_fullscreen? "Unset Fullscreen": "Set Fullscreen", "F11")) {
-                platform_application->set_window_fullscreen(!is_fullscreen);
+                platform_application.set_window_fullscreen(!is_fullscreen);
             }
             ImGui::EndMenu();
         }

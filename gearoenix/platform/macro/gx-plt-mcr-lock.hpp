@@ -2,7 +2,7 @@
 #define GEAROENIX_PLATFORM_MACRO_LOCK_HPP
 #include "../gx-plt-build-configuration.hpp"
 
-#ifdef GX_PLT_THREAD_NOT_SUPPORTED
+#ifdef GX_PLATFORM_THREAD_NOT_SUPPORTED
 #define GX_CREATE_GUARD(m)
 #define GX_CREATE_GUARD_S(m)
 #define GX_GUARD_LOCK(m)

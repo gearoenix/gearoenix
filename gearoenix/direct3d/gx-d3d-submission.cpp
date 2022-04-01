@@ -24,6 +24,7 @@
 #include "gx-d3d-texture.hpp"
 #include "shaders/gx-d3d-shd-common.hpp"
 #include <algorithm>
+#include <execution>
 
 gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device) noexcept
 {
@@ -192,8 +193,16 @@ bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
                     camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data });
                     // TODO opaque/translucent in ModelBvhData
                 });
-                std::sort(camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-                std::sort(camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+                std::sort(
+                    std::execution::par_unseq,
+                    camera_data.opaque_models_data.begin(),
+                    camera_data.opaque_models_data.end(),
+                    [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+                std::sort(
+                    std::execution::par_unseq,
+                    camera_data.tranclucent_models_data.begin(),
+                    camera_data.tranclucent_models_data.end(),
+                    [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
             });
     });
 

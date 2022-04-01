@@ -20,7 +20,7 @@ LRESULT CALLBACK gearoenix::platform::Application::static_handler(
         SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(platform_application));
     }
     if (nullptr == platform_application) {
-        GX_LOG_D("Unhandled message for nullptr interface, uMsg is: " << message)
+        GX_LOG_D("Unhandled message for nullptr interface, uMsg is: " << message);
         return DefWindowProc(hwnd, message, w_param, l_param);
     }
     return platform_application->handler(hwnd, message, w_param, l_param);
@@ -123,7 +123,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
 
     WNDCLASSEXA wc;
-    GX_SET_ZERO(wc)
+    GX_SET_ZERO(wc);
     instance = GetModuleHandle(nullptr);
     wc.style = static_cast<UINT>(CS_HREDRAW) | static_cast<UINT>(CS_VREDRAW) | static_cast<UINT>(CS_OWNDC);
     wc.lpfnWndProc = static_handler;
@@ -141,10 +141,10 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     DWORD style = WS_VISIBLE;
     if (config.get_fullscreen()) {
         DEVMODE screen_settings;
-        GX_SET_ZERO(screen_settings)
+        GX_SET_ZERO(screen_settings);
         screen_settings.dmSize = sizeof(screen_settings);
-        screen_settings.dmPelsWidth = static_cast<decltype(screen_settings.dmPelsWidth)>(base.window_width);
-        screen_settings.dmPelsHeight = static_cast<decltype(screen_settings.dmPelsHeight)>(base.window_height);
+        screen_settings.dmPelsWidth = static_cast<decltype(screen_settings.dmPelsWidth)>(base.window_size.x);
+        screen_settings.dmPelsHeight = static_cast<decltype(screen_settings.dmPelsHeight)>(base.window_size.y);
         screen_settings.dmBitsPerPel = 32;
         screen_settings.dmFields = static_cast<DWORD>(DM_BITSPERPEL) | static_cast<DWORD>(DM_PELSWIDTH) | static_cast<DWORD>(DM_PELSHEIGHT);
         ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
@@ -152,13 +152,13 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         style |= WS_POPUP;
     } else {
         base.initialize_window_position(
-            (GetSystemMetrics(SM_CXSCREEN) - base.window_width) / 2,
-            (GetSystemMetrics(SM_CYSCREEN) - base.window_height) / 2);
+            (GetSystemMetrics(SM_CXSCREEN) - base.window_size.x) / 2,
+            (GetSystemMetrics(SM_CYSCREEN) - base.window_size.x) / 2);
         style |= WS_OVERLAPPEDWINDOW;
     }
     window = CreateWindowExA(
         WS_EX_APPWINDOW, GX_APPLICATION_NAME, GX_APPLICATION_NAME, style,
-        base.window_x, base.window_y, base.window_width, base.window_height,
+        base.window_position.x, base.window_position.y, base.window_size.x, base.window_size.y,
         nullptr, nullptr, instance, this);
     ShowWindow(window, SW_SHOW);
     SetForegroundWindow(window);
@@ -190,7 +190,7 @@ gearoenix::platform::Application::~Application() noexcept = default;
 void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
     base.initialize_core_application(*this, core_app);
-    GX_LOG_D("Run function of WinApi interface called.")
+    GX_LOG_D("Run function of WinApi interface called.");
     MSG msg;
     while (base.running) {
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {

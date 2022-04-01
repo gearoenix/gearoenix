@@ -14,8 +14,8 @@ namespace gearoenix::editor::control {
 namespace gearoenix::editor::ui {
 struct MenuBar final {
 private:
-    platform::Application* const platform_application;
-    editor::control::Manager *const control_manager;
+    platform::Application& platform_application;
+    editor::control::Manager& control_manager;
 
     bool show_project_new_popup = false;
     bool show_scene_import_popup = false;
@@ -23,7 +23,7 @@ private:
     void show_project() noexcept;
     void show_scene() noexcept;
 public:
-    explicit MenuBar(platform::Application* platform_application, editor::control::Manager *control_manager) noexcept;
+    explicit MenuBar(platform::Application& platform_application, editor::control::Manager& control_manager) noexcept;
     void update() noexcept;
 };
 }

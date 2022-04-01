@@ -28,8 +28,9 @@
 //#define GX_RENDER_VULKAN_ENABLED
 #ifndef GX_PLATFORM_INTERFACE_SDL2
 #define GX_RENDER_DIRECT3D_ENABLED
-#endif
+#else
 #define GX_RENDER_OPENGL_ENABLED
+#endif
 #elif defined(GX_PLATFORM_LINUX)
 #define GX_RENDER_VULKAN_ENABLED
 #elif defined(GX_PLATFORM_MACOS) || defined(GX_PLATFORM_IOS)
@@ -37,6 +38,8 @@
 #elif defined(GX_PLATFORM_ANDROID)
 #define GX_RENDER_OPENGL_ENABLED
 //#define GX_RENDER_VULKAN_ENABLED
+#elif defined(GX_PLATFORM_WEBASSEMBLY)
+#define GX_RENDER_OPENGL_ENABLED
 #else
 #error "Unexpected/unimplemented platform."
 #endif

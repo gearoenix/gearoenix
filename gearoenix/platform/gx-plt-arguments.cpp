@@ -25,7 +25,7 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
     int argc = 0;
     auto* const w_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (nullptr == w_argv) {
-        GX_LOG_F("Can not fetch arguments.")
+        GX_LOG_F("Can not fetch arguments.");
     }
     std::vector<std::string> s_argv(argc);
     std::vector<const char*> argv(argc);

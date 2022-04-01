@@ -13,12 +13,12 @@ gearoenix::d3d::CpuBuffer::CpuBuffer(
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);
-    GX_D3D_CHECK(device->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &d, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)))
+    GX_D3D_CHECK(device->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &d, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)));
     if (nullptr != resource_name) {
         resource->SetName(resource_name);
     }
     auto r = CD3DX12_RANGE(0, 0);
-    GX_D3D_CHECK(resource->Map(0, &r, &pointer))
+    GX_D3D_CHECK(resource->Map(0, &r, &pointer));
 }
 
 gearoenix::d3d::CpuBuffer::~CpuBuffer() noexcept
@@ -47,7 +47,7 @@ gearoenix::d3d::GpuBuffer::GpuBuffer(
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);
-    GX_D3D_CHECK(device->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &d, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)))
+    GX_D3D_CHECK(device->CreateCommittedResource(&p, D3D12_HEAP_FLAG_NONE, &d, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&resource)));
     resource->SetName(resource_name);
 }
 
@@ -56,7 +56,7 @@ gearoenix::d3d::UniformBuffer::UniformBuffer(const Engine& e, const UINT buffer_
     , descriptor(e.get_descriptor_manager()->allocate_others())
 {
     D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-    GX_SET_ZERO(desc)
+    GX_SET_ZERO(desc);
     desc.BufferLocation = buffer.get_resource()->GetGPUVirtualAddress();
     desc.SizeInBytes = math::Numeric::align(buffer_size, 256U);
     e.get_device()->get_device()->CreateConstantBufferView(&desc, descriptor.cpu_handle);

@@ -17,11 +17,11 @@ namespace gearoenix::editor::control {
     GX_GET_CREF_PRV(std::optional<core::Project>, project)
 
     private:
-        platform::Application* const platform_application;
-        Manager* const manager;
+        platform::Application& platform_application;
+        Manager& manager;
 
     public:
-        explicit Project(platform::Application* platform_application, Manager* manager) noexcept;
+        explicit Project(platform::Application& platform_application, Manager& manager) noexcept;
         void create_project() noexcept;
         void caption_changed() noexcept;
         [[nodiscard]] std::string get_caption() noexcept;

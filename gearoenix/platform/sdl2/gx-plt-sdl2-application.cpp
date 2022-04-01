@@ -1,11 +1,14 @@
 #include "gx-plt-sdl2-application.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
+#include "../../opengl/gx-gl-loader.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
 #include "gx-plt-sdl2-key.hpp"
 #include <SDL_vulkan.h>
 
-#include "../../opengl/gx-gl-loader.hpp"
+#ifdef GX_PLATFORM_WEBASSEMBLY
+#include <emscripten.h>
+#endif
 
 static bool sdl_initialized = false;
 
@@ -59,26 +62,30 @@ void gearoenix::platform::Application::initialize_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
         // SDL_GL_SetSwapInterval(0);
-        // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        // if (create_gl_window(4, 6, flags))
-        //     return;
-        // if (create_gl_window(4, 5, flags))
-        //     return;
-        // if (create_gl_window(4, 4, flags))
-        //     return;
-        // if (create_gl_window(4, 3, flags))
-        //     return;
-        // if (create_gl_window(4, 2, flags))
-        //     return;
-        // if (create_gl_window(4, 1, flags))
-        //     return;
-        // if (create_gl_window(4, 0, flags))
-        //     return;
-        // if (create_gl_window(3, 3, flags))
-        //     return;
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        if (create_gl_window(4, 6, flags))
+            return;
+        if (create_gl_window(4, 5, flags))
+            return;
+        if (create_gl_window(4, 4, flags))
+            return;
+        if (create_gl_window(4, 3, flags))
+            return;
+        if (create_gl_window(4, 2, flags))
+            return;
+        if (create_gl_window(4, 1, flags))
+            return;
+        if (create_gl_window(4, 0, flags))
+            return;
+        if (create_gl_window(3, 3, flags))
+            return;
+        if (create_gl_window(3, 2, flags))
+            return;
+        if (create_gl_window(3, 1, flags))
+            return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        // if (create_gl_window(3, 2, flags))
-        //     return;
+        if (create_gl_window(3, 2, flags))
+            return;
         if (create_gl_window(3, 1, flags))
             return;
         if (create_gl_window(3, 0, flags))
@@ -210,9 +217,13 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
 {
     initialize_sdl();
     initialize_screen();
+    GX_REACHED;
     initialize_window();
+    GX_REACHED;
     initialize_mouse();
+    GX_REACHED;
     base.initialize_engine(*this);
+    GX_REACHED;
 }
 
 gearoenix::platform::Application::~Application() noexcept
@@ -225,13 +236,30 @@ gearoenix::platform::Application::~Application() noexcept
     SDL_Quit();
 }
 
+#ifdef GX_PLATFORM_WEBASSEMBLY
+static void gearoenix_platform_application_loop(void* const arg) noexcept
+{
+    reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
+}
+#endif
+
 void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 {
     base.initialize_core_application(*this, core_app);
+
+#ifdef GX_PLATFORM_WEBASSEMBLY
+    emscripten_set_main_loop_arg(gearoenix_platform_application_loop, this, 120, 1);
+#else
     while (base.running) {
-        fetch_events();
-        base.update();
+        loop();
     }
+#endif
+}
+
+void gearoenix::platform::Application::loop() noexcept
+{
+    fetch_events();
+    base.update();
 }
 
 void gearoenix::platform::Application::set_caption(const std::string& s) noexcept

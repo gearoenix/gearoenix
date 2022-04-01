@@ -2,7 +2,6 @@
 #define GEAROENIX_CORE_BUILD_CONFIGURATION_HPP
 #define GX_ENGINE_NAME "Gearoenix"
 #define GX_APPLICATION_NAME GX_ENGINE_NAME " Application"
-#define GX_APPLICATION_DATA_NAME "data.gx3d"
 #define GX_DEBUG_MODE
 #define GX_PROFILING_MODE
 #endif

@@ -10,16 +10,15 @@ namespace gearoenix::editor {
         ui::Manager ui_manager;
 
     public:
-        explicit Application(platform::Application *plt_app) noexcept;
-        void update() noexcept final;
-    };
-}
-
-gearoenix::editor::Application::Application(platform::Application* plt_app) noexcept
+        explicit Application(platform::Application& plt_app) noexcept
         : core::Application(plt_app)
         , control_manager(plt_app)
-        , ui_manager(plt_app, &control_manager)
+        , ui_manager(plt_app, control_manager)
 {
+}
+
+        void update() noexcept final;
+    };
 }
 
 void gearoenix::editor::Application::update() noexcept

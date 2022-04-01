@@ -25,7 +25,7 @@
 #include <string>
 
 gearoenix::d3d::Engine::Engine(platform::Application& platform_application) noexcept
-    : render::engine::Engine(render::engine::Type::Direct3DX, platform_application)
+    : render::engine::Engine(render::engine::Type::Direct3D, platform_application)
     , platform_application(platform_application)
 {
     frames_count = GX_D3D_FRAMES_BACKBUFFER_NUMBER;
@@ -34,7 +34,7 @@ gearoenix::d3d::Engine::Engine(platform::Application& platform_application) noex
 
 void gearoenix::d3d::Engine::device_lost_handle(const int failed_tries) noexcept
 {
-    GX_ASSERT(failed_tries < 3)
+    GX_ASSERT(failed_tries < 3);
 
     texture_manager = nullptr;
     submission_manager = nullptr;
@@ -91,7 +91,7 @@ gearoenix::d3d::Engine::~Engine() noexcept
 
 bool gearoenix::d3d::Engine::is_supported() noexcept
 {
-    GX_TODO
+    GX_TODO;
     return true;
 }
 
@@ -115,7 +115,7 @@ void gearoenix::d3d::Engine::end_frame() noexcept
 
 void gearoenix::d3d::Engine::upload_imgui_fonts() noexcept
 {
-    GX_TODO
+    GX_TODO;
 }
 
 #endif

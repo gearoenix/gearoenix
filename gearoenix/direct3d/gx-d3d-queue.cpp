@@ -8,7 +8,7 @@ gearoenix::d3d::Queue::Queue(std::shared_ptr<Device> _device, const Type ty) noe
     : device(std::move(_device))
 {
     D3D12_COMMAND_QUEUE_DESC queue_desc;
-    GX_SET_ZERO(queue_desc)
+    GX_SET_ZERO(queue_desc);
     queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     switch (ty) {
     case Type::Compute:
@@ -21,7 +21,7 @@ gearoenix::d3d::Queue::Queue(std::shared_ptr<Device> _device, const Type ty) noe
         queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
         break;
     }
-    GX_D3D_CHECK(device->get_device()->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&command_queue)))
+    GX_D3D_CHECK(device->get_device()->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&command_queue)));
 }
 
 gearoenix::d3d::Queue::~Queue() noexcept = default;

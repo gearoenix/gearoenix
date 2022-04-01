@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#if defined(GX_PLATFORM_DESKTOP) || defined(GX_PLATFORM_IOS) || defined(GX_PLATFORM_WEB)
+#if defined(GX_PLATFORM_DESKTOP) || defined(GX_PLATFORM_IOS) || defined(GX_PLATFORM_WEBASSEMBLY)
 #define GX_USE_STD_FILE
 #endif
 

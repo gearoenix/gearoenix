@@ -54,9 +54,13 @@ void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat
     for (auto& uniform : m.uniforms) {
         auto& u = *reinterpret_cast<ModelUniform*>(uniform.get_buffer().get_pointer());
         u.colour_factor = mat.get_albedo_factor();
-        u.emission_factor__alpha_cutoff = math::Vec4(mat.get_emission_factor(), mat.get_alpha_cutoff());
-        u.normal_scale__occlusion_strength = math::Vec4(mat.get_normal_scale(), mat.get_occlusion_strength());
-        u.metallic_factor__roughness_factor__radiance_lod_coefficient = math::Vec4(mat.get_metallic_factor(), mat.get_roughness_factor(), mat.get_radiance_lod_coefficient(), 0.0f);
+        // TODO use the layout of the material structure
+        u.emission_factor__alpha_cutoff = math::Vec4(mat.get_emission_roughness_factor().xyz(), mat.get_alpha_cutoff());
+        u.normal_scale__occlusion_strength = math::Vec4(mat.get_normal_metallic_factor().xyz(), mat.get_occlusion_strength());
+        u.metallic_factor__roughness_factor__radiance_lod_coefficient = math::Vec4(
+            mat.get_normal_metallic_factor().w,
+            mat.get_emission_roughness_factor().w,
+            mat.get_radiance_lod_coefficient(), 0.0f);
         const auto& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
         u.sampler_albedo_normal_emission.x = at.get_sampler_index();
         u.sampler_albedo_normal_emission.y = at.get_descriptor().resource_index;

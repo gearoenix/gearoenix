@@ -21,10 +21,10 @@ gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(
     desc.Type = descriptor_type;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     const auto& dev = d.get_device();
-    GX_D3D_CHECK(dev->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap)))
+    GX_D3D_CHECK(dev->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap)));
 
 #ifdef GX_DEBUG_MODE
-    GX_D3D_CHECK(heap->SetName(name))
+    GX_D3D_CHECK(heap->SetName(name));
 #endif
 
     size_increment = dev->GetDescriptorHandleIncrementSize(descriptor_type);
@@ -46,10 +46,10 @@ gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(
     desc.NumDescriptors = descriptors_count;
     desc.Type = descriptor_type;
     const auto& dev = d.get_device();
-    GX_D3D_CHECK(dev->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap)))
+    GX_D3D_CHECK(dev->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap)));
 
 #ifdef GX_DEBUG_MODE
-    GX_D3D_CHECK(heap->SetName(name))
+    GX_D3D_CHECK(heap->SetName(name));
 #endif
 
     size_increment = dev->GetDescriptorHandleIncrementSize(descriptor_type);

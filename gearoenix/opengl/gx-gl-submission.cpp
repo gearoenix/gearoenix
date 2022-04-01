@@ -20,8 +20,15 @@
 #include "gx-gl-model.hpp"
 #include "gx-gl-texture.hpp"
 #include <algorithm>
+
+#if defined(GX_PLATFORM_INTERFACE_ANDROID) || defined(GX_PLATFORM_THREAD_NOT_SUPPORTED)
+#define GX_ALGORITHM_EXECUTION
+#else
 #include <execution>
 #include <thread>
+
+#define GX_ALGORITHM_EXECUTION std::execution::par_unseq,
+#endif
 
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../platform/android/gx-plt-gl-context.hpp"
@@ -184,17 +191,13 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                     std::move(v.begin(), v.end(), std::back_inserter(camera_data.tranclucent_models_data));
 
                 std::sort(
-#ifndef GX_PLATFORM_INTERFACE_ANDROID
-                    std::execution::par_unseq,
-#endif
-                    camera_data.opaque_models_data.begin(),
+                    GX_ALGORITHM_EXECUTION
+                        camera_data.opaque_models_data.begin(),
                     camera_data.opaque_models_data.end(),
                     [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
                 std::sort(
-#ifndef GX_PLATFORM_INTERFACE_ANDROID
-                    std::execution::par_unseq,
-#endif
-                    camera_data.tranclucent_models_data.begin(),
+                    GX_ALGORITHM_EXECUTION
+                        camera_data.tranclucent_models_data.begin(),
                     camera_data.tranclucent_models_data.end(),
                     [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
             });

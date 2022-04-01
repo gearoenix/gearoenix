@@ -11,10 +11,10 @@ namespace gearoenix::editor::control {
     struct Manager final {
         GX_GET_REF_PRV(Project, project)
     private:
-        platform::Application* const platform_application;
+        platform::Application& platform_application;
 
     public:
-        explicit Manager(platform::Application* platform_application) noexcept;
+        explicit Manager(platform::Application& platform_application) noexcept;
         void caption_changed() noexcept;
     };
 }

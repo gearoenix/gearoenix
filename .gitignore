@@ -33,6 +33,7 @@
 
 .DS_store
 
+webassembly-build/
 build/
 build-debug/
 build-coverage/
@@ -41,6 +42,7 @@ cmake-build-*/
 .settings
 .idea/
 sdk/
+/assets/
 
 *.jar
 *.iml

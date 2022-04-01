@@ -21,13 +21,13 @@ gearoenix::d3d::Swapchain::Swapchain(Engine& e) noexcept
 {
     auto* const dev = device->get_device().Get();
     // Create a fence for tracking GPU execution progress.
-    GX_D3D_CHECK(dev->CreateFence(current_fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))
+    GX_D3D_CHECK(dev->CreateFence(current_fence_value, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
     for (UINT i = 1; i <= GX_D3D_FRAMES_BACKBUFFER_NUMBER; ++i)
         fence_values.push(current_fence_value);
     fence_event.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
-    GX_ASSERT(fence_event.IsValid())
-    GX_SET_ZERO(viewport)
-    GX_SET_ZERO(scissor)
+    GX_ASSERT(fence_event.IsValid());
+    GX_SET_ZERO(viewport);
+    GX_SET_ZERO(scissor);
 }
 
 gearoenix::d3d::Swapchain::~Swapchain() noexcept = default;
@@ -36,8 +36,8 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
 {
     auto* const dev = device->get_device().Get();
     const auto& base_plt_app = platform_application.get_base();
-    const auto window_width = static_cast<UINT>(base_plt_app.get_window_width());
-    const auto window_height = static_cast<UINT>(base_plt_app.get_window_height());
+    const auto window_width = static_cast<UINT>(base_plt_app.get_window_size().x);
+    const auto window_height = static_cast<UINT>(base_plt_app.get_window_size().y);
     wait_for_gpu();
     // Release resources that are tied to the swapchain
     for (auto& frame : frames) {
@@ -55,14 +55,14 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
             0);
 
         if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
-            GX_LOG_D("Device lost on resize.")
+            GX_LOG_D("Device lost on resize.");
             return true;
         }
-        GX_D3D_CHECK(hr)
+        GX_D3D_CHECK(hr);
     } else {
         // Create a descriptor for the swap chain.
         DXGI_SWAP_CHAIN_DESC1 swap_chain_desc;
-        GX_SET_ZERO(swap_chain_desc)
+        GX_SET_ZERO(swap_chain_desc);
         swap_chain_desc.Width = window_width;
         swap_chain_desc.Height = window_height;
         swap_chain_desc.Format = BACK_BUFFER_FORMAT;
@@ -75,16 +75,16 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
         swap_chain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
         DXGI_SWAP_CHAIN_FULLSCREEN_DESC fs_swapchain_desc;
-        GX_SET_ZERO(fs_swapchain_desc)
+        GX_SET_ZERO(fs_swapchain_desc);
         fs_swapchain_desc.Windowed = TRUE;
-        GX_TODO // We have to make sure the following commented is not necessary
-                //- DXGI does not allow creating a swapchain targeting a window which has fullscreen styles(no border + topmost).
-                //- Temporarily remove the topmost property for creating the swapchain.
-                // bool prevIsFullscreen = Win32Application::IsFullscreen();
-                // if (prevIsFullscreen) {
-                //    Win32Application::SetWindowZorderToTopMost(false);
-                // }
-            const auto& factory
+        GX_TODO; // We have to make sure the following commented is not necessary
+        //- DXGI does not allow creating a swapchain targeting a window which has fullscreen styles(no border + topmost).
+        //- Temporarily remove the topmost property for creating the swapchain.
+        // bool prevIsFullscreen = Win32Application::IsFullscreen();
+        // if (prevIsFullscreen) {
+        //    Win32Application::SetWindowZorderToTopMost(false);
+        // }
+        const auto& factory
             = device->get_adapter()->get_factory();
         Microsoft::WRL::ComPtr<IDXGISwapChain1> base_swapchain;
         GX_D3D_CHECK(factory->CreateSwapChainForHwnd(
@@ -93,12 +93,12 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
             &swap_chain_desc,
             &fs_swapchain_desc,
             nullptr,
-            &base_swapchain))
-        GX_TODO // We have to make sure the following commented is not necessary
-                // if (prevIsFullscreen) {
-                //    Win32Application::SetWindowZorderToTopMost(true);
-                // }
-        GX_D3D_CHECK(base_swapchain.As(&swapchain))
+            &base_swapchain));
+        GX_TODO; // We have to make sure the following commented is not necessary
+                 // if (prevIsFullscreen) {
+                 //    Win32Application::SetWindowZorderToTopMost(true);
+                 // }
+        GX_D3D_CHECK(base_swapchain.As(&swapchain));
     }
     // Obtain the back buffers for this window which will be the final render targets
     // and create render target views for each of them.
@@ -106,12 +106,12 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
         auto& frame = frames[n];
         auto& render_target = frame.render_target;
         auto& rtv_descriptor = frame.render_target_decriptor;
-        GX_D3D_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)))
+        GX_D3D_CHECK(swapchain->GetBuffer(n, IID_PPV_ARGS(&render_target)));
         const auto name = std::wstring(L"Render target ") + std::to_wstring(n);
         render_target->SetName(name.c_str());
 
         D3D12_RENDER_TARGET_VIEW_DESC rtv_desc;
-        GX_SET_ZERO(rtv_desc)
+        GX_SET_ZERO(rtv_desc);
         rtv_desc.Format = BACK_BUFFER_FORMAT;
         rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
@@ -125,7 +125,7 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
         DEPTH_BUFFER_FORMAT, window_width, window_height, 1, 1);
     depth_stencil_desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     D3D12_CLEAR_VALUE depth_optimized_clear_value;
-    GX_SET_ZERO(depth_optimized_clear_value)
+    GX_SET_ZERO(depth_optimized_clear_value);
     depth_optimized_clear_value.Format = DEPTH_BUFFER_FORMAT;
     depth_optimized_clear_value.DepthStencil.Depth = 1.0f;
     depth_optimized_clear_value.DepthStencil.Stencil = 0;
@@ -135,12 +135,12 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
         &depth_stencil_desc,
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &depth_optimized_clear_value,
-        IID_PPV_ARGS(&depth_stencil)))
+        IID_PPV_ARGS(&depth_stencil)));
     depth_stencil->SetName(L"main-depth-stencil");
     depth_stencil_descriptor = nullptr; // making space for new one
     depth_stencil_descriptor = std::make_unique<CpuDescriptor>(descriptor_manager->allocate_dsv());
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc;
-    GX_SET_ZERO(dsv_desc)
+    GX_SET_ZERO(dsv_desc);
     dsv_desc.Format = DEPTH_BUFFER_FORMAT;
     dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dev->CreateDepthStencilView(depth_stencil.Get(), &dsv_desc, depth_stencil_descriptor->cpu_handle);
@@ -158,10 +158,10 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
 
 void gearoenix::d3d::Swapchain::wait_for_gpu() noexcept
 {
-    GX_ASSERT(nullptr != fence && fence_event.IsValid())
-    GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value))
-    GX_D3D_CHECK(fence->SetEventOnCompletion(current_fence_value, fence_event.Get()))
-    GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
+    GX_ASSERT(nullptr != fence && fence_event.IsValid());
+    GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value));
+    GX_D3D_CHECK(fence->SetEventOnCompletion(current_fence_value, fence_event.Get()));
+    GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE));
     for (; !fence_values.empty(); fence_values.pop())
         ;
     for (UINT fi = 0; fi < GX_D3D_FRAMES_BACKBUFFER_NUMBER - 1; ++fi)
@@ -210,10 +210,10 @@ bool gearoenix::d3d::Swapchain::present() noexcept
     const auto hr = swapchain->Present(1, 0);
     // If the device was reset we must completely reinitialize the renderer.
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
-        GX_LOG_D("Device lost.")
+        GX_LOG_D("Device lost.");
         return true;
     } else {
-        GX_D3D_CHECK(hr)
+        GX_D3D_CHECK(hr);
         move_to_next_frame();
     }
     return false;
@@ -226,8 +226,8 @@ void gearoenix::d3d::Swapchain::move_to_next_frame() noexcept
     back_buffer_index = swapchain->GetCurrentBackBufferIndex();
     // If the next frame is not ready to be rendered yet, wait until it is ready.
     if (fence->GetCompletedValue() < fence_values.front()) {
-        GX_D3D_CHECK(fence->SetEventOnCompletion(fence_values.front(), fence_event.Get()))
-        GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE))
+        GX_D3D_CHECK(fence->SetEventOnCompletion(fence_values.front(), fence_event.Get()));
+        GX_ASSERT(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event.Get(), INFINITE, FALSE));
     }
     fence_values.pop();
     fence_values.push(current_fence_value);

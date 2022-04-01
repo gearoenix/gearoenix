@@ -44,15 +44,6 @@ bool gearoenix::gl::load_library() noexcept
     GX_GL_FUNCTION_LOAD_CHECK(name)
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
-
-    auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-    GX_LOG_D(extensions);
-
-    if (SDL_FALSE == SDL_GL_ExtensionSupported("GL_OES_texture_float"))
-        return false;
-    if (SDL_FALSE == SDL_GL_ExtensionSupported("GL_OES_texture_float_linear"))
-        return false;
-
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
 #define GX_GL_FUNCTION_LOAD(name)                                                      \
     gl##name = reinterpret_cast<name##Fnp>(eglGetProcAddress(GX_STRINGIFY(gl##name))); \
@@ -62,6 +53,8 @@ bool gearoenix::gl::load_library() noexcept
 #else
 #error "Not implemented for this platform."
 #endif
+    auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    GX_LOG_D(extensions);
     return true;
 }
 

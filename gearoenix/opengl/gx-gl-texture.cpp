@@ -151,7 +151,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(info.width);
     const auto gl_img_height = static_cast<gl::sizei>(info.height);
-    e.todos.load([result, needs_mipmap_generation, pixels = move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+    e.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convert_min(info.sampler_info.min_filter));

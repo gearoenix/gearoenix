@@ -12,7 +12,7 @@ gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
 {
     if (FAILED(D3D12CreateDevice(
             adapter->get_adapter().Get(), Adapter::MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&device))))
-        GX_LOG_F("Can not create device.")
+        GX_LOG_F("Can not create device.");
 #ifdef GX_DEBUG_MODE
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3d_info_queue;
     if (SUCCEEDED(device.As(&d3d_info_queue))) {
@@ -27,7 +27,7 @@ gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
             D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
         };
         D3D12_INFO_QUEUE_FILTER filter;
-        GX_SET_ZERO(filter)
+        GX_SET_ZERO(filter);
         filter.DenyList.NumIDs = GX_COUNT_OF(hide);
         filter.DenyList.pIDList = hide;
         d3d_info_queue->AddStorageFilterEntries(&filter);

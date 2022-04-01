@@ -19,7 +19,11 @@
 namespace gearoenix::platform {
 struct Log {
 #ifndef GX_PLATFORM_ANDROID
+#ifdef GX_PLATFORM_WEBASSEMBLY
+    static decltype(std::cout)& file;
+#else
     static std::ofstream file;
+#endif
 #endif
     GX_CREATE_GUARD_S(log);
     static std::stringstream header(const char*, int, const char*);
