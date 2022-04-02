@@ -20,6 +20,7 @@
 #include "gx-gl-model.hpp"
 #include "gx-gl-texture.hpp"
 #include <algorithm>
+#include <imgui_impl_opengl3.h>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID) || defined(GX_PLATFORM_THREAD_NOT_SUPPORTED)
 #define GX_ALGORITHM_EXECUTION
@@ -256,6 +257,14 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         }
     }
     GX_GL_CHECK_D;
+
+    ImGui::Render();
+    ImGuiIO& io = ImGui::GetIO();
+    glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+    glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    glGetError();
+
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(os_app.get_window());
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)

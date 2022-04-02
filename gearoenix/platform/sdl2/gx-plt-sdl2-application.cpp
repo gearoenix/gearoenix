@@ -61,28 +61,24 @@ void gearoenix::platform::Application::initialize_window() noexcept
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-        // SDL_GL_SetSwapInterval(0);
+        SDL_GL_SetSwapInterval(1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        if (create_gl_window(4, 6, flags))
-            return;
-        if (create_gl_window(4, 5, flags))
-            return;
-        if (create_gl_window(4, 4, flags))
-            return;
-        if (create_gl_window(4, 3, flags))
-            return;
-        if (create_gl_window(4, 2, flags))
-            return;
-        if (create_gl_window(4, 1, flags))
-            return;
-        if (create_gl_window(4, 0, flags))
-            return;
-        if (create_gl_window(3, 3, flags))
-            return;
-        if (create_gl_window(3, 2, flags))
-            return;
-        if (create_gl_window(3, 1, flags))
-            return;
+        // if (create_gl_window(4, 4, flags))
+        //     return;
+        // if (create_gl_window(4, 3, flags))
+        //     return;
+        // if (create_gl_window(4, 2, flags))
+        //     return;
+        // if (create_gl_window(4, 1, flags))
+        //     return;
+        // if (create_gl_window(4, 0, flags))
+        //     return;
+        // if (create_gl_window(3, 3, flags))
+        //     return;
+        // if (create_gl_window(3, 2, flags))
+        //     return;
+        // if (create_gl_window(3, 1, flags))
+        //     return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
         if (create_gl_window(3, 2, flags))
             return;

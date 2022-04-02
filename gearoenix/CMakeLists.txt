@@ -51,6 +51,7 @@ SET(GX_ENGINE_IMGUI_SRC
         ${GX_IMGUI_PATH}/imgui_draw.cpp
         ${GX_IMGUI_PATH}/imgui_tables.cpp
         ${GX_IMGUI_PATH}/imgui_widgets.cpp
+        ${GX_IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
         ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp
         ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
         ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)

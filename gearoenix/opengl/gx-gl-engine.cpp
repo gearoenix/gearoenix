@@ -1,5 +1,6 @@
 #include "gx-gl-engine.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-constants.hpp"
@@ -8,11 +9,13 @@
 #include "gx-gl-model.hpp"
 #include "gx-gl-submission.hpp"
 #include "gx-gl-texture.hpp"
+#include <imgui_impl_opengl3.h>
 
 gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
     , submission_manager(new SubmissionManager(*this))
 {
+    ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
     camera_manager = std::make_unique<CameraManager>(*this);
     mesh_manager = std::make_unique<MeshManager>(*this);
@@ -20,13 +23,25 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     texture_manager = std::make_unique<TextureManager>(*this);
 }
 
-gearoenix::gl::Engine::~Engine() noexcept = default;
+gearoenix::gl::Engine::~Engine() noexcept
+{
+    world = nullptr;
+    texture_manager = nullptr;
+    model_manager = nullptr;
+    mesh_manager = nullptr;
+    camera_manager = nullptr;
+    todos.unload();
+    ImGui_ImplOpenGL3_Shutdown();
+}
 
 void gearoenix::gl::Engine::start_frame() noexcept
 {
     todos.unload();
     render::engine::Engine::start_frame();
     todos.unload();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
 }
 
 void gearoenix::gl::Engine::end_frame() noexcept

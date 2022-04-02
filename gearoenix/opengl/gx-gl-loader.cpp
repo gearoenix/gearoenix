@@ -30,7 +30,6 @@ bool gearoenix::gl::load_library() noexcept
         GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_CHECK)
         return true;
     }
-    is_loaded = true;
 
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 
@@ -53,8 +52,11 @@ bool gearoenix::gl::load_library() noexcept
 #else
 #error "Not implemented for this platform."
 #endif
-    auto extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    const auto* const extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    if (nullptr == extensions)
+        return false;
     GX_LOG_D(extensions);
+    is_loaded = true;
     return true;
 }
 

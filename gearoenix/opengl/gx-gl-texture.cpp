@@ -119,9 +119,9 @@ gearoenix::gl::Texture2D::Texture2D(
 
 gearoenix::gl::Texture2D::~Texture2D() noexcept
 {
-    e.todos.load([=]() {
+    e.todos.load([o = object]() {
         glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &object);
+        glDeleteTextures(1, &o);
     });
 }
 

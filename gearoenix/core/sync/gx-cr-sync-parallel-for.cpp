@@ -43,6 +43,7 @@ struct GearoenixCoreSyncParallelForData final {
         do {
             signal.release();
         } while (!is_running);
+        thread.join();
     }
 
     void send_work(

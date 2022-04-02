@@ -263,6 +263,7 @@ void gearoenix::platform::BaseApplication::terminate() noexcept
 {
     core_application = nullptr;
     render_engine = nullptr;
+    ImGui::DestroyContext();
 }
 
 void gearoenix::platform::BaseApplication::update() noexcept
