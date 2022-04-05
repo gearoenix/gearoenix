@@ -32,6 +32,7 @@ public:
     void global_rotate(double d, const math::Vec3<double>& axis, const math::Vec3<double>& location) noexcept;
     void global_rotate(double d, const math::Vec3<double>& axis) noexcept;
     void local_rotate(double d, const math::Vec3<double>& axis) noexcept;
+    void local_rotate_quaternion(double x, double y, double z, double w) noexcept;
     void local_x_rotate(double d) noexcept;
     void local_y_rotate(double d) noexcept;
     void local_z_rotate(double d) noexcept;

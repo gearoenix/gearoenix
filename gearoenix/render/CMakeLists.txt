@@ -23,12 +23,6 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-type.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh-manager.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh-manager.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
@@ -119,6 +113,8 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-vertex.cpp

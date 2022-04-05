@@ -38,8 +38,10 @@ void gearoenix::render::model::Builder::set_material(const material::Pbr& mat) n
     auto model = entity_builder->get_builder().get_component<Model>();
     auto& bts = model->bound_textures;
     bts[texture::BindingPoint::Albedo] = mat.get_albedo();
-    bts[texture::BindingPoint::NormalMetallic] = mat.get_normal__metallic();
-    bts[texture::BindingPoint::EmissionRoughness] = mat.get_emission__roughness();
+    bts[texture::BindingPoint::Normal] = mat.get_normal();
+    bts[texture::BindingPoint::Emission] = mat.get_emission();
+    bts[texture::BindingPoint::MetallicRoughness] = mat.get_metallic_roughness();
+    bts[texture::BindingPoint::Occlusion] = mat.get_occlusion();
 }
 
 gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_transformation() noexcept

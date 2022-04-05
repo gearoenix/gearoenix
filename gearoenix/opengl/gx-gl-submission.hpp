@@ -22,13 +22,16 @@ struct SubmissionManager final {
         math::Vec4<float> albedo_factor;
         math::Vec4<float> normal_metallic_factor;
         math::Vec4<float> emission_roughness_factor;
+        math::Vec4<float> alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;
         uint vertex_object = 0;
         uint vertex_buffer = 0;
         uint index_buffer = 0;
         sizei indices_count = 0;
         uint albedo_txt = 0;
-        uint normal_metallic_txt = 0;
-        uint emission_roughness_txt = 0;
+        uint normal_txt = 0;
+        uint emission_txt = 0;
+        uint metallic_roughness_txt = 0;
+        uint occlusion_txt = 0;
     };
 
     struct ModelBvhData final {

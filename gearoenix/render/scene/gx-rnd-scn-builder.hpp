@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #define GEAROENIX_RENDER_SCENE_BUILDER_HPP
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,8 +25,9 @@ namespace gearoenix::render::scene {
 struct Builder final {
     friend struct Manager;
 
+    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+
 private:
-    const std::shared_ptr<core::ecs::EntitySharedBuilder> entity_builder;
     std::vector<std::shared_ptr<model::Builder>> model_builders;
     std::vector<std::shared_ptr<camera::Builder>> camera_builders;
 

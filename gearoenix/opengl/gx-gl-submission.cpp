@@ -48,7 +48,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     glClearColor(0.3f, 0.15f, 0.115f, 1.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -108,13 +108,16 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                                 .albedo_factor = model.material.get_albedo_factor(),
                                 .normal_metallic_factor = model.material.get_normal_metallic_factor(),
                                 .emission_roughness_factor = model.material.get_emission_roughness_factor(),
+                                .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
                                 .vertex_object = mesh.vertex_object,
                                 .vertex_buffer = mesh.vertex_buffer,
                                 .index_buffer = mesh.index_buffer,
                                 .indices_count = mesh.indices_count,
                                 .albedo_txt = model.albedo->get_object(),
-                                .normal_metallic_txt = model.normal_metallic->get_object(),
-                                .emission_roughness_txt = model.emission_roughness->get_object(),
+                                .normal_txt = model.normal->get_object(),
+                                .emission_txt = model.emission->get_object(),
+                                .metallic_roughness_txt = model.metallic_roughness->get_object(),
+                                .occlusion_txt = model.occlusion->get_object(),
                             } } });
                 });
             bvh.create_nodes();
@@ -174,13 +177,16 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                                 .albedo_factor = gl_model.material.get_albedo_factor(),
                                 .normal_metallic_factor = gl_model.material.get_normal_metallic_factor(),
                                 .emission_roughness_factor = gl_model.material.get_emission_roughness_factor(),
+                                .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = gl_model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
                                 .vertex_object = mesh.vertex_object,
                                 .vertex_buffer = mesh.vertex_buffer,
                                 .index_buffer = mesh.index_buffer,
                                 .indices_count = mesh.indices_count,
                                 .albedo_txt = gl_model.albedo->get_object(),
-                                .normal_metallic_txt = gl_model.normal_metallic->get_object(),
-                                .emission_roughness_txt = gl_model.emission_roughness->get_object(),
+                                .normal_txt = gl_model.normal->get_object(),
+                                .emission_txt = gl_model.emission->get_object(),
+                                .metallic_roughness_txt = gl_model.metallic_roughness->get_object(),
+                                .occlusion_txt = gl_model.occlusion->get_object(),
                             });
                         // TODO opaque/translucent in ModelBvhData
                     });
@@ -222,8 +228,10 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     gbuffers_filler->bind();
     GX_GL_CHECK_D;
     const auto gbuffers_filler_txt_index_albedo = static_cast<enumerated>(gbuffers_filler->get_albedo_index());
-    const auto gbuffers_filler_txt_index_normal_metallic = static_cast<enumerated>(gbuffers_filler->get_normal_metallic_index());
-    const auto gbuffers_filler_txt_index_emission_roughness = static_cast<enumerated>(gbuffers_filler->get_emission_roughness_index());
+    const auto gbuffers_filler_txt_index_normal = static_cast<enumerated>(gbuffers_filler->get_normal_index());
+    const auto gbuffers_filler_txt_index_emission = static_cast<enumerated>(gbuffers_filler->get_emission_index());
+    const auto gbuffers_filler_txt_index_metallic_roughness = static_cast<enumerated>(gbuffers_filler->get_metallic_roughness_index());
+    const auto gbuffers_filler_txt_index_occlusion = static_cast<enumerated>(gbuffers_filler->get_occlusion_index());
 
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
@@ -241,13 +249,18 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 gbuffers_filler->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
                 gbuffers_filler->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
                 gbuffers_filler->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
+                gbuffers_filler->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
                 GX_GL_CHECK_D;
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_albedo);
                 glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
-                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_normal_metallic);
-                glBindTexture(GL_TEXTURE_2D, model_data.normal_metallic_txt);
-                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_emission_roughness);
-                glBindTexture(GL_TEXTURE_2D, model_data.emission_roughness_txt);
+                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_normal);
+                glBindTexture(GL_TEXTURE_2D, model_data.normal_txt);
+                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_emission);
+                glBindTexture(GL_TEXTURE_2D, model_data.emission_txt);
+                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_metallic_roughness);
+                glBindTexture(GL_TEXTURE_2D, model_data.metallic_roughness_txt);
+                glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_occlusion);
+                glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
                 GX_GL_CHECK_D;
                 glBindVertexArray(model_data.vertex_object);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model_data.index_buffer);

@@ -16,8 +16,10 @@ gearoenix::gl::Model::Model(
     , bound_mesh(std::move(bound_mesh))
     , material(std::move(_material))
     , albedo(std::dynamic_pointer_cast<Texture2D>(material.get_albedo()))
-    , normal_metallic(std::dynamic_pointer_cast<Texture2D>(material.get_normal__metallic()))
-    , emission_roughness(std::dynamic_pointer_cast<Texture2D>(material.get_emission__roughness()))
+    , normal(std::dynamic_pointer_cast<Texture2D>(material.get_normal()))
+    , emission(std::dynamic_pointer_cast<Texture2D>(material.get_emission()))
+    , metallic_roughness(std::dynamic_pointer_cast<Texture2D>(material.get_metallic_roughness()))
+    , occlusion(std::dynamic_pointer_cast<Texture2D>(material.get_occlusion()))
 {
 }
 

@@ -15,8 +15,10 @@ struct Model final : public core::ecs::Component {
     std::shared_ptr<Mesh> bound_mesh;
     render::material::Pbr material;
     std::shared_ptr<Texture2D> albedo;
-    std::shared_ptr<Texture2D> normal_metallic;
-    std::shared_ptr<Texture2D> emission_roughness;
+    std::shared_ptr<Texture2D> normal;
+    std::shared_ptr<Texture2D> emission;
+    std::shared_ptr<Texture2D> metallic_roughness;
+    std::shared_ptr<Texture2D> occlusion;
     // TODO later we can inbring the actual opengl objects here to make it more cache friendly
 
     Model(

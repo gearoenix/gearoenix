@@ -47,10 +47,13 @@ static constexpr const char* const fragment_shader_src = "#version 300 es\n"
                                                          "uniform vec4 albedo_factor;\n"
                                                          "uniform vec4 normal_metallic_factor;\n"
                                                          "uniform vec4 emission_roughness_factor;\n"
+                                                         "uniform vec4 alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;\n"
                                                          "uniform vec3 camera_position;\n"
                                                          "uniform sampler2D albedo;\n"
-                                                         "uniform sampler2D normal_metallic;\n"
-                                                         "uniform sampler2D emission_roughness;\n"
+                                                         "uniform sampler2D normal;\n"
+                                                         "uniform sampler2D emission;\n"
+                                                         "uniform sampler2D metallic_roughness;\n"
+                                                         "uniform sampler2D occlusion;\n"
                                                          "in vec3 out_pos;\n"
                                                          "in vec3 out_nrm;\n"
                                                          "in vec3 out_tng;\n"
@@ -58,11 +61,17 @@ static constexpr const char* const fragment_shader_src = "#version 300 es\n"
                                                          "in vec2 out_uv;\n"
                                                          "out vec4 frag_colour;\n"
                                                          "void main() {\n"
-                                                         "    frag_colour = texture(albedo, out_uv) * albedo_factor;\n"
-                                                         "    vec4 temp = vec4(out_pos + out_nrm + out_tng + out_btg, 0.0);\n"
+                                                         "    vec4 alb = texture(albedo, out_uv) * albedo_factor;\n"
+                                                         "    if(alb.a < alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.x) discard;\n"
+                                                         "    frag_colour = alb;\n"
+                                                         "    vec3 nrm = normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz));\n"
+                                                         "    vec3 ems = texture(emission, out_uv).xyz * emission_roughness_factor.xyz;\n"
+                                                         "    vec2 mtl_rgh = texture(metallic_roughness, out_uv).xy * vec2(normal_metallic_factor.w, emission_roughness_factor.w);\n"
+                                                         "    vec3 occ = texture(occlusion, out_uv).xyz * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n"
+
+                                                         "    vec4 temp = vec4(out_pos + nrm + ems + occ, 0.0);\n"
+                                                         "    temp.xy += mtl_rgh;\n"
                                                          "    temp += vec4(camera_position, 0.0);\n"
-                                                         "    temp += texture(normal_metallic, out_uv) * normal_metallic_factor;\n"
-                                                         "    temp += texture(emission_roughness, out_uv) * emission_roughness_factor;\n"
                                                          "    frag_colour += temp * 0.0000001;\n"
                                                          "}";
 
@@ -79,10 +88,13 @@ gearoenix::gl::GBuffersFillerShader::GBuffersFillerShader(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM(albedo_factor)
     GX_GL_THIS_GET_UNIFORM(normal_metallic_factor)
     GX_GL_THIS_GET_UNIFORM(emission_roughness_factor)
+    GX_GL_THIS_GET_UNIFORM(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved)
     GX_GL_THIS_GET_UNIFORM(camera_position)
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_metallic)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission_roughness)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion)
 }
 
 gearoenix::gl::GBuffersFillerShader::~GBuffersFillerShader() noexcept = default;
@@ -91,8 +103,10 @@ void gearoenix::gl::GBuffersFillerShader::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_metallic)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission_roughness)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion)
 }
 
 #endif

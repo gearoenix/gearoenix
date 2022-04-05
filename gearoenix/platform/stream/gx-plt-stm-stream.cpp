@@ -1,4 +1,7 @@
 #include "gx-plt-stm-stream.hpp"
+#include "gx-plt-stm-asset.hpp"
+#include "gx-plt-stm-local.hpp"
+#include "gx-plt-stm-path.hpp"
 
 void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const std::size_t length) noexcept
 {
@@ -11,6 +14,15 @@ void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, c
         c_data[i] = c_data[j];
         c_data[j] = tmp;
     }
+}
+
+std::unique_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream::Stream::open(const Path& path, Application& app) noexcept
+{
+    if (path.is_asset())
+        return std::unique_ptr<Stream>(Asset::construct(app, path.get_raw_data()));
+    if (path.is_absolute())
+        return std::unique_ptr<Stream>(Local::open(app, path.get_raw_data()));
+    return std::unique_ptr<Stream>();
 }
 
 std::string gearoenix::platform::stream::Stream::read_string() noexcept

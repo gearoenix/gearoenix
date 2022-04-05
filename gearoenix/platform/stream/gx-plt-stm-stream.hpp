@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_SYSTEM_STREAM_STREAM_HPP
 #define GEAROENIX_SYSTEM_STREAM_STREAM_HPP
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -10,6 +11,7 @@ struct Application;
 }
 
 namespace gearoenix::platform::stream {
+struct Path;
 struct Stream {
     GX_GETSET_VAL_PRT(bool, endian_compatibility, true)
 
@@ -19,6 +21,7 @@ protected:
 
 public:
     virtual ~Stream() noexcept = default;
+    [[nodiscard]] static std::unique_ptr<Stream> open(const Path& path, Application& app) noexcept;
     [[nodiscard]] virtual std::size_t read(void* data, std::size_t length) noexcept = 0;
     [[nodiscard]] virtual std::size_t write(const void* data, std::size_t length) noexcept = 0;
     virtual void seek(std::size_t offset) noexcept = 0;

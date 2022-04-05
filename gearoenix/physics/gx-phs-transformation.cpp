@@ -91,6 +91,20 @@ void gearoenix::physics::Transformation::local_rotate(const double d, const math
     matrix.set_location(loc);
 }
 
+void gearoenix::physics::Transformation::local_rotate_quaternion(const double x, const double y, const double z, const double w) noexcept
+{
+    changed = true;
+    const auto loc = matrix.get_location();
+    matrix.set_location(math::Origin3D<double>);
+    math::Quat q(x, y, z, w);
+    const auto r = q.to_mat();
+    x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
+    y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
+    z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
+    matrix = r * matrix;
+    matrix.set_location(loc);
+}
+
 void gearoenix::physics::Transformation::local_x_rotate(const double d) noexcept
 {
     changed = true;
