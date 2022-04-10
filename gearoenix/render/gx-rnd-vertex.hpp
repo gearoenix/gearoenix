@@ -9,7 +9,13 @@ struct PbrVertex final {
     math::Vec4<float> tangent;
     math::Vec2<float> uv;
 
-    constexpr PbrVertex() noexcept = default;
+    constexpr PbrVertex() noexcept
+        : position(0.0f)
+        , normal(0.0f, 0.0f, 1.0f)
+        , tangent(0.0f, 1.0f, 0.0f, 1.0)
+        , uv(0.0f)
+    {
+    }
 
     constexpr PbrVertex(const math::Vec3<float>& position,
         const math::Vec3<float>& normal,

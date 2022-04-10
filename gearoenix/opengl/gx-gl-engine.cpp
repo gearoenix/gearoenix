@@ -13,7 +13,6 @@
 
 gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
-    , submission_manager(new SubmissionManager(*this))
 {
     ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
@@ -21,11 +20,14 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     mesh_manager = std::make_unique<MeshManager>(*this);
     model_manager = std::make_unique<ModelManager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);
+    submission_manager = std::make_unique<SubmissionManager>(*this);
+    todos.unload();
 }
 
 gearoenix::gl::Engine::~Engine() noexcept
 {
     world = nullptr;
+    submission_manager = nullptr;
     texture_manager = nullptr;
     model_manager = nullptr;
     mesh_manager = nullptr;

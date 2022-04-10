@@ -27,7 +27,7 @@ struct GameApp final : public gearoenix::core::Application {
         vertices[2].set_position(-1.0f, -1.0f, 0.0f);
         vertices[2].set_uv(-1.0f, -1.0f);
 
-        std::vector<std::uint32_t> indices = { 0, 2, 1 };
+        std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
         const auto scene_builder = render_engine.get_scene_manager()->build("scene");
 

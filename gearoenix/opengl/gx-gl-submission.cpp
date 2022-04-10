@@ -14,10 +14,12 @@
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
+#include "gx-gl-final-effects-shader.hpp"
 #include "gx-gl-gbuffers-filler-shader.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
+#include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 #include <algorithm>
 #include <imgui_impl_opengl3.h>
@@ -41,10 +43,52 @@ gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
 {
 }
 
+void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
+{
+    auto* const txt_mgr = e.get_texture_manager();
+    const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
+    gbuffer_width = cfg.get_runtime_resolution_width();
+    gbuffer_height = cfg.get_runtime_resolution_height();
+    const render::texture::TextureInfo txt_info {
+        .format = render::texture::TextureFormat::RgbaFloat32,
+        .sampler_info = render::texture::SamplerInfo {
+            .min_filter = render::texture::Filter::Nearest,
+            .mag_filter = render::texture::Filter::Nearest,
+            .wrap_s = render::texture::Wrap::ClampToEdge,
+            .wrap_t = render::texture::Wrap::ClampToEdge,
+            .wrap_r = render::texture::Wrap::ClampToEdge,
+            .anisotropic_level = 0,
+        },
+        .width = cfg.get_runtime_resolution_width(),
+        .height = cfg.get_runtime_resolution_height(),
+        .depth = 0,
+        .type = render::texture::Type::Texture2D,
+        .has_mipmap = false,
+    };
+    const core::sync::EndCallerIgnored txt_end([this] {
+        gbuffers_target = std::make_unique<Target>(std::vector<Target::Attachment> {
+            Target::Attachment { .texture = position_depth_texture },
+            Target::Attachment { .texture = albedo_metallic_texture },
+            Target::Attachment { .texture = normal_roughness_texture },
+            Target::Attachment { .texture = emission_ambient_occlusion_texture },
+        });
+    });
+    position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, txt_info, txt_end));
+    albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, txt_info, txt_end));
+    normal_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-normal-roughness", {}, txt_info, txt_end));
+    emission_ambient_occlusion_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-emission-ambient-occlusion", {}, txt_info, txt_end));
+}
+
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
-    , gbuffers_filler(new GBuffersFillerShader(e))
+    , gbuffers_filler_shader(new GBuffersFillerShader(e))
+    , final_effects_shader(new FinalEffectsShader(e))
 {
+    initialise_gbuffers();
     glClearColor(0.3f, 0.15f, 0.115f, 1.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
@@ -54,6 +98,20 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
+
+    const float screen_vertices[] = {
+        -1.0f, 3.0f, // 1
+        -1.0f, -1.0f, // 2
+        3.0f, -1.0f, // 3
+    };
+    glGenVertexArrays(1, &screen_vertex_object);
+    glBindVertexArray(screen_vertex_object);
+    glGenBuffers(1, &screen_vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, screen_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
+    glBindVertexArray(0);
 }
 
 gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
@@ -214,42 +272,40 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     const auto& base_os_app = os_app.get_base();
 
     GX_GL_CHECK_D;
-    // Bind target
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(
-        static_cast<sizei>(0), static_cast<sizei>(0),
-        static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
-    glScissor(
-        static_cast<sizei>(0), static_cast<sizei>(0),
-        static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    gbuffers_filler->bind();
-    GX_GL_CHECK_D;
-    const auto gbuffers_filler_txt_index_albedo = static_cast<enumerated>(gbuffers_filler->get_albedo_index());
-    const auto gbuffers_filler_txt_index_normal = static_cast<enumerated>(gbuffers_filler->get_normal_index());
-    const auto gbuffers_filler_txt_index_emission = static_cast<enumerated>(gbuffers_filler->get_emission_index());
-    const auto gbuffers_filler_txt_index_metallic_roughness = static_cast<enumerated>(gbuffers_filler->get_metallic_roughness_index());
-    const auto gbuffers_filler_txt_index_occlusion = static_cast<enumerated>(gbuffers_filler->get_occlusion_index());
-
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        gbuffers_target->bind();
+        glViewport(
+            static_cast<sizei>(0), static_cast<sizei>(0),
+            static_cast<sizei>(gbuffer_width), static_cast<sizei>(gbuffer_height));
+        glScissor(
+            static_cast<sizei>(0), static_cast<sizei>(0),
+            static_cast<sizei>(gbuffer_width), static_cast<sizei>(gbuffer_height));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        gbuffers_filler_shader->bind();
+        GX_GL_CHECK_D;
+        const auto gbuffers_filler_txt_index_albedo = static_cast<enumerated>(gbuffers_filler_shader->get_albedo_index());
+        const auto gbuffers_filler_txt_index_normal = static_cast<enumerated>(gbuffers_filler_shader->get_normal_index());
+        const auto gbuffers_filler_txt_index_emission = static_cast<enumerated>(gbuffers_filler_shader->get_emission_index());
+        const auto gbuffers_filler_txt_index_metallic_roughness = static_cast<enumerated>(gbuffers_filler_shader->get_metallic_roughness_index());
+        const auto gbuffers_filler_txt_index_occlusion = static_cast<enumerated>(gbuffers_filler_shader->get_occlusion_index());
+
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             GX_GL_CHECK_D;
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
-            gbuffers_filler->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-            gbuffers_filler->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
+            gbuffers_filler_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+            gbuffers_filler_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
             GX_GL_CHECK_D;
             for (auto& distance_model_data : camera.opaque_models_data) {
                 GX_GL_CHECK_D;
                 auto& model_data = distance_model_data.second;
-                gbuffers_filler->set_m_data(reinterpret_cast<const float*>(&model_data.m));
-                gbuffers_filler->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
-                gbuffers_filler->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
-                gbuffers_filler->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
-                gbuffers_filler->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
-                gbuffers_filler->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
+                gbuffers_filler_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
+                gbuffers_filler_shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+                gbuffers_filler_shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
+                gbuffers_filler_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
+                gbuffers_filler_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
+                gbuffers_filler_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
                 GX_GL_CHECK_D;
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_albedo);
                 glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
@@ -268,6 +324,31 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 GX_GL_CHECK_D;
             }
         }
+
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(
+            static_cast<sizei>(0), static_cast<sizei>(0),
+            static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
+        glScissor(
+            static_cast<sizei>(0), static_cast<sizei>(0),
+            static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        final_effects_shader->bind();
+
+        const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_position_depth_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[0].texture->get_object());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_albedo_metallic_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[1].texture->get_object());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_normal_roughness_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[2].texture->get_object());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_emission_ambient_occlusion_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[3].texture->get_object());
+
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     GX_GL_CHECK_D;
 

@@ -3,7 +3,7 @@
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
-#include "../gltf/gx-rnd-gltf-loader.hpp"
+#include "../gx-rnd-gltf-loader.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"

@@ -21,6 +21,8 @@ struct RuntimeConfiguration {
     GX_GETSET_VAL_PRV(std::uint16_t, brdflut_resolution, GX_RENDER_DEFAULT_BRDFLUT_RESOLUTION)
     GX_GET_VAL_PRV(std::uint16_t, runtime_reflection_radiance_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_RADIANCE_RESOLUTION)
     GX_GET_VAL_PRV(std::uint8_t, runtime_reflection_radiance_levels, 1)
+    GX_GETSET_VAL_PRV(std::uint32_t, runtime_resolution_width, GX_RENDER_DEFAULT_RESOLUTION_WIDTH)
+    GX_GETSET_VAL_PRV(std::uint32_t, runtime_resolution_height, GX_RENDER_DEFAULT_RESOLUTION_HEIGHT)
 
     RuntimeConfiguration() noexcept;
     void set_runtime_reflection_radiance_resolution(std::uint16_t value) noexcept;

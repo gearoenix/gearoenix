@@ -178,14 +178,9 @@ public:
 
     [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o) const noexcept
     {
-        // o.upper > lower
-        // o.lower < upper
-        return lower.x < o.upper.x
-            && upper.x > o.lower.x
-            && lower.y < o.upper.y
-            && upper.y > o.lower.y
-            && lower.z < o.upper.z
-            && upper.z > o.lower.z;
+        const auto max_dis = diameter + o.diameter;
+        const auto dis = (center - o.center).abs() * static_cast<Element>(2);
+        return max_dis.greater(dis).and_elements();
     }
 
     constexpr void set_center(const Vec3<Element>& c) noexcept

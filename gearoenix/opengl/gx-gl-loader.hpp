@@ -37,6 +37,8 @@ typedef void(GXGL_APIENTRY DeleteTexturesFnp)(sizei n, const uint* textures);
 typedef void(GXGL_APIENTRY DeleteVertexArraysFnp)(sizei n, const uint* arrays);
 typedef void(GXGL_APIENTRY DepthMaskFnp)(boolean flag);
 typedef void(GXGL_APIENTRY DisableFnp)(enumerated cap);
+typedef void(GXGL_APIENTRY DrawArraysFnp)(enumerated mode, sint first, sizei count);
+typedef void(GXGL_APIENTRY DrawBuffersFnp)(sizei n, const enumerated* bufs);
 typedef void(GXGL_APIENTRY DrawElementsFnp)(enumerated mode, sizei count, enumerated type, const void* indices);
 typedef void(GXGL_APIENTRY EnableFnp)(enumerated);
 typedef void(GXGL_APIENTRY EnableVertexAttribArrayFnp)(uint index);
@@ -110,6 +112,8 @@ typedef void(GXGL_APIENTRY ViewportFnp)(sint, sint, sizei, sizei);
     gx_gl_function_map_arg(DeleteVertexArrays);      \
     gx_gl_function_map_arg(DepthMask);               \
     gx_gl_function_map_arg(Disable);                 \
+    gx_gl_function_map_arg(DrawArrays);              \
+    gx_gl_function_map_arg(DrawBuffers);             \
     gx_gl_function_map_arg(DrawElements);            \
     gx_gl_function_map_arg(Enable);                  \
     gx_gl_function_map_arg(EnableVertexAttribArray); \

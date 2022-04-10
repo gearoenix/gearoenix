@@ -9,16 +9,18 @@
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::RgbaFloat16:
+        return GL_RGBA16F;
     case render::texture::TextureFormat::RgbaFloat32:
         return GL_RGBA32F;
-    case render::texture::TextureFormat::RgbFloat32:
-        return GL_RGB32F;
-    case render::texture::TextureFormat::RgFloat32:
-        return GL_RG32F;
-    case render::texture::TextureFormat::RgbFloat16:
-        return GL_RGB16F;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;
+    case render::texture::TextureFormat::RgbFloat32:
+        return GL_RGB32F;
+    case render::texture::TextureFormat::RgbFloat16:
+        return GL_RGB16F;
+    case render::texture::TextureFormat::RgFloat32:
+        return GL_RG32F;
     case render::texture::TextureFormat::D32:
         return GL_DEPTH_COMPONENT32F;
     default:
@@ -29,8 +31,9 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
 gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
-    case render::texture::TextureFormat::RgbaUint8:
+    case render::texture::TextureFormat::RgbaFloat16:
     case render::texture::TextureFormat::RgbaFloat32:
+    case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgbFloat16:
@@ -53,6 +56,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::textu
     case render::texture::TextureFormat::RgFloat32:
     case render::texture::TextureFormat::D32:
         return GL_FLOAT;
+    case render::texture::TextureFormat::RgbaFloat16:
     case render::texture::TextureFormat::RgbFloat16:
         return GL_HALF_FLOAT;
     case render::texture::TextureFormat::RgbaUint8:
@@ -161,15 +165,19 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         if (pixels.size() > 1 || !info.has_mipmap) {
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
         }
-        for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
-            const auto li = static_cast<gl::sint>(level_index);
-            auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
-            if (lw < 1)
-                lw = 1;
-            auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
-            if (lh < 1)
-                lh = 1;
-            glTexImage2D(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
+        if (pixels.empty()) {
+            glTexImage2D(GL_TEXTURE_2D, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
+        } else {
+            for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
+                const auto li = static_cast<gl::sint>(level_index);
+                auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
+                if (lw < 1)
+                    lw = 1;
+                auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
+                if (lh < 1)
+                    lh = 1;
+                glTexImage2D(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
+            }
         }
         if (needs_mipmap_generation) {
             glGenerateMipmap(GL_TEXTURE_2D);

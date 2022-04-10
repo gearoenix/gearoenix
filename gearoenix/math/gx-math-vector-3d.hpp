@@ -395,6 +395,16 @@ struct Vec3 final {
         return o + (*this * (dot(o) * static_cast<Element>(-2)));
     }
 
+    [[nodiscard]] constexpr Vec3<bool> less(const Element v) const noexcept
+    {
+        return Vec3<bool>(x < v, y < v, z < v);
+    }
+
+    [[nodiscard]] constexpr Vec3<bool> less(const Vec3& o) const noexcept
+    {
+        return Vec3<bool>(x < o.x, y < o.y, z < o.z);
+    }
+
     [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const noexcept
     {
         return Vec3<bool>(x > v, y > v, z > v);

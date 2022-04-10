@@ -7,6 +7,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-constants.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-final-effects-shader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-final-effects-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.cpp
@@ -19,6 +21,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-texture.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-texture.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-types.hpp

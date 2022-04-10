@@ -19,7 +19,7 @@
 #define TINYGLTF_IMPLEMENTATION
 #include <tiny_gltf.h>
 
-std::vector<gearoenix::core::ecs::Entity::id_t> gearoenix::render::load_gltf(
+std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::render::load_gltf(
     engine::Engine& e,
     const platform::stream::Path& file,
     const core::sync::EndCallerIgnored& end_callback) noexcept
@@ -38,7 +38,7 @@ std::vector<gearoenix::core::ecs::Entity::id_t> gearoenix::render::load_gltf(
     if (!err.empty())
         GX_LOG_F("Error in GLTF loader: " << err);
 
-    std::vector<core::ecs::Entity::id_t> result;
+    std::vector<std::shared_ptr<scene::Builder>> result;
     result.reserve(data.scenes.size());
 
     std::vector<std::shared_ptr<texture::Texture2D>> gx_txt2ds(data.textures.size());
@@ -184,7 +184,7 @@ std::vector<gearoenix::core::ecs::Entity::id_t> gearoenix::render::load_gltf(
         GX_CHECK_EQUAL(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
 
         const auto& pos_max = pos_a.maxValues;
-        const auto& pos_min = pos_a.maxValues;
+        const auto& pos_min = pos_a.minValues;
         GX_CHECK_EQUAL(pos_max.size(), 3);
         GX_CHECK_EQUAL(pos_min.size(), 3);
 
@@ -322,8 +322,7 @@ std::vector<gearoenix::core::ecs::Entity::id_t> gearoenix::render::load_gltf(
 
     for (const tinygltf::Scene& scn : data.scenes) {
         GX_LOG_D("Loading scene: " << scn.name);
-        const auto scene_builder = e.get_scene_manager()->build(scn.name);
-        result.push_back(scene_builder->get_entity_builder()->get_builder().get_id());
+        auto scene_builder = e.get_scene_manager()->build(scn.name);
         auto scene_end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder, end_callback = end_callback] {});
         for (const int scene_node_index : scn.nodes) {
             const tinygltf::Node& scene_node = data.nodes[scene_node_index];
@@ -366,6 +365,7 @@ std::vector<gearoenix::core::ecs::Entity::id_t> gearoenix::render::load_gltf(
             } else
                 GX_UNIMPLEMENTED;
         }
+        result.push_back(std::move(scene_builder));
     }
     return result;
 }

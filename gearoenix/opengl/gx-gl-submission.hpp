@@ -7,15 +7,16 @@
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
+#include <memory>
 #include <vector>
 
 namespace gearoenix::gl {
 struct Engine;
+struct FinalEffectsShader;
 struct GBuffersFillerShader;
+struct Target;
+struct Texture2D;
 struct SubmissionManager final {
-    Engine& e;
-    const std::unique_ptr<GBuffersFillerShader> gbuffers_filler;
-
     struct ModelData final {
         math::Mat4x4<float> m;
         math::Mat4x4<float> inv_m;
@@ -55,13 +56,25 @@ struct SubmissionManager final {
     };
 
 private:
+    Engine& e;
+    const std::unique_ptr<GBuffersFillerShader> gbuffers_filler_shader;
+    const std::unique_ptr<FinalEffectsShader> final_effects_shader;
+    uint gbuffer_width, gbuffer_height;
+    std::shared_ptr<Texture2D> position_depth_texture;
+    std::shared_ptr<Texture2D> albedo_metallic_texture;
+    std::shared_ptr<Texture2D> normal_roughness_texture;
+    std::shared_ptr<Texture2D> emission_ambient_occlusion_texture;
+    std::unique_ptr<Target> gbuffers_target;
+    uint screen_vertex_object = 0;
+    uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
 
-    [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index) noexcept;
+    void initialise_gbuffers() noexcept;
+    [[nodiscard]] bool fill_gbuffers(const std::size_t camera_pool_index) noexcept;
 
 public:
     SubmissionManager(Engine& e) noexcept;
