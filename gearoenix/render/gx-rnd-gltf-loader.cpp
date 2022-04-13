@@ -4,6 +4,7 @@
 #include "../platform/stream/gx-plt-stm-path.hpp"
 #include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "camera/gx-rnd-cmr-builder.hpp"
+#include "camera/gx-rnd-cmr-camera.hpp"
 #include "camera/gx-rnd-cmr-manager.hpp"
 #include "engine/gx-rnd-eng-engine.hpp"
 #include "mesh/gx-rnd-msh-manager.hpp"
@@ -337,6 +338,17 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                 const tinygltf::Camera& cmr = data.cameras[scene_node.camera];
                 GX_LOG_D("Loading camera: " << cmr.name);
                 auto camera_builder = e.get_camera_manager()->build(cmr.name);
+                auto& rnd_cmr = camera_builder->get_camera();
+                if ("perspective" == cmr.type) {
+                    rnd_cmr.set_projection_type(camera::Projection::Perspective);
+                    rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
+                    rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
+                    rnd_cmr.set_yfov(static_cast<float>(cmr.perspective.yfov));
+                } else {
+                    rnd_cmr.set_projection_type(camera::Projection::Orthographic);
+                    rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
+                    rnd_cmr.set_near(static_cast<float>(cmr.orthographic.znear));
+                }
                 auto& transform = camera_builder->get_transformation();
                 if (scale.size() == 3)
                     transform.local_scale({ scale[0], scale[1], scale[2] });

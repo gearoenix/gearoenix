@@ -19,6 +19,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-ssao-resolve-shader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-ssao-resolve-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.cpp

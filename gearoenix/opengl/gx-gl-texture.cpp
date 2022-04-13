@@ -9,6 +9,8 @@
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::Float32:
+        return GL_R32F;
     case render::texture::TextureFormat::RgbaFloat16:
         return GL_RGBA16F;
     case render::texture::TextureFormat::RgbaFloat32:
@@ -31,6 +33,8 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
 gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::Float32:
+        return GL_RED;
     case render::texture::TextureFormat::RgbaFloat16:
     case render::texture::TextureFormat::RgbaFloat32:
     case render::texture::TextureFormat::RgbaUint8:
@@ -51,6 +55,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::T
 gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::Float32:
     case render::texture::TextureFormat::RgbaFloat32:
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgFloat32:

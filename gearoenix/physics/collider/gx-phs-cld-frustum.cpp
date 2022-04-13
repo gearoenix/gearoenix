@@ -11,21 +11,7 @@ gearoenix::physics::collider::Frustum::Frustum(const std::array<math::Vec3<doubl
 
 void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<double>, 8>& points) noexcept
 {
-    const auto v01 = (points[1] - points[0]).normalized();
-    const auto v02 = (points[2] - points[0]).normalized();
-    const auto v04 = (points[4] - points[0]).normalized();
-
-    const auto v75 = (points[5] - points[7]).normalized();
-    const auto v76 = (points[6] - points[7]).normalized();
-    const auto v73 = (points[3] - points[7]).normalized();
-
-    frustum = math::Frustum<double>({ math::Plane(points[0], v02.cross(v01)),
-        math::Plane(points[0], v01.cross(v04)),
-        math::Plane(points[0], v04.cross(v02)),
-        math::Plane(points[7], v76.cross(v75)),
-        math::Plane(points[7], v75.cross(v73)),
-        math::Plane(points[7], v73.cross(v76)) });
-
+    frustum = math::Frustum<double>(points);
     surrounding_box.reset(points[0]);
     for (std::size_t i = 1; i < points.size(); ++i) {
         surrounding_box.put_without_update(points[i]);

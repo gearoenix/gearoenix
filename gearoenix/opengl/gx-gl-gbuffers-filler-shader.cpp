@@ -78,7 +78,7 @@ void main() {\n\
     vec3 ems = texture(emission, out_uv).xyz * emission_roughness_factor.xyz;\n\
     vec2 mtl_rgh = texture(metallic_roughness, out_uv).xy * vec2(normal_metallic_factor.w, emission_roughness_factor.w);\n\
     float occ = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n\
-    position_ss_depth = vec4(out_pos, gl_FragCoord.w);\n\
+    position_ss_depth = vec4(out_pos, gl_FragCoord.z);\n\
     albedo_metallic = vec4(alb.xyz, mtl_rgh.x);\n\
     normal_roughness = vec4(nrm, mtl_rgh.y);\n\
     emissio_ambient_occlusion_texture = vec4(ems + camera_position * 0.001, occ);\n\

@@ -41,3 +41,13 @@ const gearoenix::physics::Transformation& gearoenix::render::camera::Builder::ge
 {
     return *entity_builder->get_builder().get_component<physics::Transformation>();
 }
+
+gearoenix::render::camera::Camera& gearoenix::render::camera::Builder::get_camera() noexcept
+{
+    return *entity_builder->get_builder().get_component<Camera>();
+}
+
+const gearoenix::render::camera::Camera& gearoenix::render::camera::Builder::get_camera() const noexcept
+{
+    return *entity_builder->get_builder().get_component<Camera>();
+}

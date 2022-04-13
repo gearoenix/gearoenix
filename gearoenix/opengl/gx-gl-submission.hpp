@@ -14,6 +14,7 @@ namespace gearoenix::gl {
 struct Engine;
 struct FinalEffectsShader;
 struct GBuffersFillerShader;
+struct SsaoResolveShader;
 struct Target;
 struct Texture2D;
 struct SubmissionManager final {
@@ -52,19 +53,26 @@ struct SubmissionManager final {
     };
 
     struct SceneData final {
+        math::Vec4<float> ssao_settings;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
     };
 
 private:
     Engine& e;
     const std::unique_ptr<GBuffersFillerShader> gbuffers_filler_shader;
+    const std::unique_ptr<SsaoResolveShader> ssao_resolve_shader;
     const std::unique_ptr<FinalEffectsShader> final_effects_shader;
     uint gbuffer_width, gbuffer_height;
+    float gbuffer_aspect_ratio = 1.2f;
+    float gbuffer_uv_move_x = 0.001f;
+    float gbuffer_uv_move_y = 0.001f;
     std::shared_ptr<Texture2D> position_depth_texture;
     std::shared_ptr<Texture2D> albedo_metallic_texture;
     std::shared_ptr<Texture2D> normal_roughness_texture;
     std::shared_ptr<Texture2D> emission_ambient_occlusion_texture;
     std::unique_ptr<Target> gbuffers_target;
+    std::shared_ptr<Texture2D> ssao_resolve_texture;
+    std::unique_ptr<Target> ssao_resolve_target;
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
@@ -74,6 +82,7 @@ private:
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
 
     void initialise_gbuffers() noexcept;
+    void initialise_ssao() noexcept;
     [[nodiscard]] bool fill_gbuffers(const std::size_t camera_pool_index) noexcept;
 
 public:

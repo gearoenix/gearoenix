@@ -19,6 +19,7 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
+#include "gx-gl-ssao-resolve-shader.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 #include <algorithm>
@@ -49,6 +50,9 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     gbuffer_width = cfg.get_runtime_resolution_width();
     gbuffer_height = cfg.get_runtime_resolution_height();
+    gbuffer_aspect_ratio = static_cast<float>(gbuffer_width) / static_cast<float>(gbuffer_height);
+    gbuffer_uv_move_x = 1.0f / static_cast<float>(gbuffer_width);
+    gbuffer_uv_move_y = 1.0f / static_cast<float>(gbuffer_height);
     const render::texture::TextureInfo txt_info {
         .format = render::texture::TextureFormat::RgbaFloat32,
         .sampler_info = render::texture::SamplerInfo {
@@ -59,8 +63,8 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = cfg.get_runtime_resolution_width(),
-        .height = cfg.get_runtime_resolution_height(),
+        .width = gbuffer_width,
+        .height = gbuffer_height,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -81,15 +85,49 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
         "gearoenix-opengl-texture-gbuffer-normal-roughness", {}, txt_info, txt_end));
     emission_ambient_occlusion_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-emission-ambient-occlusion", {}, txt_info, txt_end));
+
+    e.todos.unload();
+}
+
+void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
+{
+    auto* const txt_mgr = e.get_texture_manager();
+    const render::texture::TextureInfo txt_info {
+        .format = render::texture::TextureFormat::Float32,
+        .sampler_info = render::texture::SamplerInfo {
+            .min_filter = render::texture::Filter::Linear,
+            .mag_filter = render::texture::Filter::Linear,
+            .wrap_s = render::texture::Wrap::ClampToEdge,
+            .wrap_t = render::texture::Wrap::ClampToEdge,
+            .wrap_r = render::texture::Wrap::ClampToEdge,
+            .anisotropic_level = 0,
+        },
+        .width = gbuffer_width,
+        .height = gbuffer_height,
+        .depth = 0,
+        .type = render::texture::Type::Texture2D,
+        .has_mipmap = false,
+    };
+    const core::sync::EndCallerIgnored txt_end([this] {
+        ssao_resolve_target = std::make_unique<Target>(std::vector<Target::Attachment> {
+            Target::Attachment { .texture = ssao_resolve_texture },
+        });
+    });
+    ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, txt_end));
+
+    e.todos.unload();
 }
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
     , gbuffers_filler_shader(new GBuffersFillerShader(e))
+    , ssao_resolve_shader(new SsaoResolveShader(e))
     , final_effects_shader(new FinalEffectsShader(e))
 {
     initialise_gbuffers();
-    glClearColor(0.3f, 0.15f, 0.115f, 1.0f);
+    initialise_ssao();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -149,6 +187,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         if (!scene.enabled)
             return;
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
+        scene_data.ssao_settings = scene.get_ssao_settings();
         auto& bvh = scenes_bvhs[scene_id];
         if (scene.get_recreate_bvh()) {
             bvh.reset();
@@ -270,10 +309,11 @@ void gearoenix::gl::SubmissionManager::update() noexcept
 
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
-
+    const float screen_uv_move_reserved[] = { gbuffer_uv_move_x, gbuffer_uv_move_y, 0.0f, 0.0f };
     GX_GL_CHECK_D;
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        // Filling GBuffers -------------------------------------------------------------------------------------------------
         gbuffers_target->bind();
         glViewport(
             static_cast<sizei>(0), static_cast<sizei>(0),
@@ -324,20 +364,55 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 GX_GL_CHECK_D;
             }
         }
-
+        // SSAO resolving ------------------------------------------------------------------------------------------
+        ssao_resolve_target->bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        ssao_resolve_shader->bind();
+        const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_position_depth_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[0].texture->get_object());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_normal_roughness_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[2].texture->get_object());
+        ssao_resolve_shader->set_ssao_radius_move_start_end_data(reinterpret_cast<const float*>(&scene.ssao_settings));
+        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            GX_GL_CHECK_D;
+            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+            ssao_resolve_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+            glBindVertexArray(screen_vertex_object);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            GX_GL_CHECK_D;
+        }
+        // Final effects ----------------------------------------------------------------------------------------------
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(
-            static_cast<sizei>(0), static_cast<sizei>(0),
-            static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
-        glScissor(
-            static_cast<sizei>(0), static_cast<sizei>(0),
-            static_cast<sizei>(base_os_app.get_window_size().x), static_cast<sizei>(base_os_app.get_window_size().y));
+
+        const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
+        if (screen_ratio < gbuffer_aspect_ratio) {
+            const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / gbuffer_aspect_ratio + 0.1f);
+            const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
+            glViewport(
+                static_cast<sizei>(0), screen_y,
+                static_cast<sizei>(base_os_app.get_window_size().x), screen_height);
+            glScissor(
+                static_cast<sizei>(0), screen_y,
+                static_cast<sizei>(base_os_app.get_window_size().x), screen_height);
+        } else {
+            const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * gbuffer_aspect_ratio + 0.1f);
+            const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
+            glViewport(
+                screen_x, static_cast<sizei>(0),
+                screen_width, static_cast<sizei>(base_os_app.get_window_size().y));
+            glScissor(
+                screen_x, static_cast<sizei>(0),
+                screen_width, static_cast<sizei>(base_os_app.get_window_size().y));
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         final_effects_shader->bind();
 
-        const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
+        const auto* const ssao_resolved_attachments = ssao_resolve_target->get_attachments().data();
+
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_position_depth_index()));
         glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[0].texture->get_object());
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_albedo_metallic_index()));
@@ -346,9 +421,19 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[2].texture->get_object());
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_emission_ambient_occlusion_index()));
         glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[3].texture->get_object());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_ssao_resolved_index()));
+        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture->get_object());
 
-        glBindVertexArray(screen_vertex_object);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        final_effects_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
+
+        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            GX_GL_CHECK_D;
+            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+
+            glBindVertexArray(screen_vertex_object);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            GX_GL_CHECK_D;
+        }
     }
     GX_GL_CHECK_D;
 

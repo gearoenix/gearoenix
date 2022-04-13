@@ -25,7 +25,7 @@ void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& tra
     auto tmp = transform * math::Vec4(corners[0], 1.0);
     updated_box.reset(tmp.xyz());
     for (std::size_t i = 0; i < 8; ++i) {
-        tmp = transform * math::Vec4(corners[0], 1.0);
+        tmp = transform * math::Vec4(corners[i], 1.0);
         updated_box.put_without_update(tmp.xyz());
     }
     updated_box.update();
