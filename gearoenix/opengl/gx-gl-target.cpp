@@ -1,12 +1,15 @@
 #include "gx-gl-target.hpp"
+
+#include <utility>
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/macro/gx-cr-mcr-assert.hpp"
+#include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Target::Target(const std::vector<Attachment>& _attachments, const bool is_depth_necessary) noexcept
-    : attachments(_attachments)
+gearoenix::gl::Target::Target(std::vector<Attachment> _attachments, const bool is_depth_necessary) noexcept
+    : attachments(std::move(_attachments))
 {
     GX_ASSERT_D(!attachments.empty());
 #ifdef GX_DEBUG_MODE
@@ -23,11 +26,11 @@ gearoenix::gl::Target::Target(const std::vector<Attachment>& _attachments, const
     enumerated current_binding_point = GL_COLOR_ATTACHMENT0;
     bool has_depth = false;
     std::vector<enumerated> binding_points;
+    GX_GL_CHECK_D;
     for (auto& a : attachments) {
         if (a.texture->get_info().format == render::texture::TextureFormat::D32 && a.texture->get_info().format == render::texture::TextureFormat::D24 && a.texture->get_info().format == render::texture::TextureFormat::D16) {
             GX_ASSERT_D(static_cast<enumerated>(-1) == a.binding_index || GL_DEPTH_ATTACHMENT == a.binding_index);
             a.binding_index = GL_DEPTH_ATTACHMENT;
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, a.texture->get_object(), a.mipmap_level);
             depth_attachment = a;
             GX_ASSERT_D(!has_depth); // Only one depth is allowed.
             has_depth = true;
@@ -36,12 +39,13 @@ gearoenix::gl::Target::Target(const std::vector<Attachment>& _attachments, const
                 a.binding_index = current_binding_point;
                 ++current_binding_point;
             }
-            ++current_binding_point;
             colour_attachments.push_back(a);
             binding_points.push_back(a.binding_index);
         }
         glFramebufferTexture2D(GL_FRAMEBUFFER, a.binding_index, GL_TEXTURE_2D, a.texture->get_object(), a.mipmap_level);
+        GX_GL_CHECK_D;
     }
+    GX_GL_CHECK_D;
     glDrawBuffers(static_cast<sizei>(binding_points.size()), binding_points.data());
     if (!has_depth && is_depth_necessary) {
         const auto& info = attachments[0].texture->get_info();
@@ -78,6 +82,7 @@ gearoenix::gl::Target::Target(const std::vector<Attachment>& _attachments, const
         GX_LOG_F("Unknown framebuffer error: " << framebuffer_status);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    GX_GL_CHECK_D;
 }
 
 gearoenix::gl::Target::~Target() noexcept

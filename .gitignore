@@ -43,6 +43,7 @@ cmake-build-*/
 .idea/
 sdk/
 /assets/
+assets/
 
 *.jar
 *.iml

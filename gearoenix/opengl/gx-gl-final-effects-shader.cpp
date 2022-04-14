@@ -44,16 +44,16 @@ out vec4 frag_colour;\n\
 void main() {\n\
     vec4 pos_depth = texture(position_depth, out_uv);\n\
     vec4 nrm_rgh = texture(normal_roughness, out_uv);\n\
-    float ssao_main_pixel_value = texture(ssao_resolved, out_uv);\n\
+    float ssao_main_pixel_value = texture(ssao_resolved, out_uv).x;\n\
     float ssao_value = ssao_main_pixel_value;\n\
-    ssao_value += texture(ssao_resolved, out_uv + screen_uv_move_reserved.xy);\n\
-    ssao_value += texture(ssao_resolved, out_uv - screen_uv_move_reserved.xy);\n\
-    ssao_value += texture(ssao_resolved, out_uv + vec2(screen_uv_move_reserved.x, 0.0));\n\
-    ssao_value += texture(ssao_resolved, out_uv - vec2(screen_uv_move_reserved.x, 0.0));\n\
-    ssao_value += texture(ssao_resolved, out_uv + vec2(0.0, screen_uv_move_reserved.y));\n\
-    ssao_value += texture(ssao_resolved, out_uv - vec2(0.0, screen_uv_move_reserved.y));\n\
-    ssao_value += texture(ssao_resolved, out_uv + vec2(screen_uv_move_reserved.x, -screen_uv_move_reserved.y));\n\
-    ssao_value += texture(ssao_resolved, out_uv + vec2(-screen_uv_move_reserved.x, screen_uv_move_reserved.y));\n\
+    ssao_value += texture(ssao_resolved, out_uv + screen_uv_move_reserved.xy).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv - screen_uv_move_reserved.xy).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv + vec2(screen_uv_move_reserved.x, 0.0)).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv - vec2(screen_uv_move_reserved.x, 0.0)).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv + vec2(0.0, screen_uv_move_reserved.y)).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv - vec2(0.0, screen_uv_move_reserved.y)).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv + vec2(screen_uv_move_reserved.x, -screen_uv_move_reserved.y)).x;\n\
+    ssao_value += texture(ssao_resolved, out_uv + vec2(-screen_uv_move_reserved.x, screen_uv_move_reserved.y)).x;\n\
     ssao_value = 1.0 - (step(ssao_main_pixel_value, 0.999) * (1.0 - ssao_value * 0.1111111111111111111111111));\n\
     frag_colour = vec4(vec3(ssao_value), 1.0) +\n\
         texture(albedo_metallic, out_uv) * 0.001 + pos_depth * 0.001 + nrm_rgh * 0.001 +\n\

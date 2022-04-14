@@ -23,7 +23,7 @@ struct Target final {
     GX_GET_CREF_PRV(std::optional<Attachment>, depth_attachment)
     GX_GET_CREF_PRV(std::optional<uint>, depth_render_buffer)
 
-    Target(const std::vector<Attachment>& attachments, bool is_depth_necessary = true) noexcept;
+    Target(std::vector<Attachment> attachments, bool is_depth_necessary = true) noexcept;
     ~Target() noexcept;
     void bind() noexcept;
 };

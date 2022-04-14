@@ -87,6 +87,7 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
         "gearoenix-opengl-texture-gbuffer-emission-ambient-occlusion", {}, txt_info, txt_end));
 
     e.todos.unload();
+    GX_LOG_D("GBuffers have been created.");
 }
 
 void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
@@ -95,8 +96,8 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
     const render::texture::TextureInfo txt_info {
         .format = render::texture::TextureFormat::Float32,
         .sampler_info = render::texture::SamplerInfo {
-            .min_filter = render::texture::Filter::Linear,
-            .mag_filter = render::texture::Filter::Linear,
+            .min_filter = render::texture::Filter::Nearest,
+            .mag_filter = render::texture::Filter::Nearest,
             .wrap_s = render::texture::Wrap::ClampToEdge,
             .wrap_t = render::texture::Wrap::ClampToEdge,
             .wrap_r = render::texture::Wrap::ClampToEdge,
@@ -117,6 +118,7 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
         "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, txt_end));
 
     e.todos.unload();
+    GX_LOG_D("SSAO resolve buffer has been created.");
 }
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
@@ -125,6 +127,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , ssao_resolve_shader(new SsaoResolveShader(e))
     , final_effects_shader(new FinalEffectsShader(e))
 {
+    GX_LOG_D("Creating submission manager.");
     initialise_gbuffers();
     initialise_ssao();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

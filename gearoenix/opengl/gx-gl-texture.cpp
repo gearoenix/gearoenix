@@ -170,6 +170,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         if (pixels.size() > 1 || !info.has_mipmap) {
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
         }
+        GX_GL_CHECK_D;
         if (pixels.empty()) {
             glTexImage2D(GL_TEXTURE_2D, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
         } else {
