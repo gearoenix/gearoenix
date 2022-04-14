@@ -161,13 +161,17 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     const auto gl_img_width = static_cast<gl::sizei>(info.width);
     const auto gl_img_height = static_cast<gl::sizei>(info.height);
     e.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+        GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
+        GX_GL_CHECK_D;
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convert_min(info.sampler_info.min_filter));
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convert_mag(info.sampler_info.mag_filter));
+        GX_GL_CHECK_D;
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convert(info.sampler_info.wrap_s));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convert(info.sampler_info.wrap_t));
-        if (pixels.size() > 1 || !info.has_mipmap) {
+        GX_GL_CHECK_D;
+        if (pixels.size() > 1 || (!pixels.empty() && !info.has_mipmap)) {
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
         }
         GX_GL_CHECK_D;
