@@ -64,17 +64,12 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-uniform.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-cube.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-equirectangular.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-equirectangular.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-binding-point.cpp

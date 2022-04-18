@@ -9,6 +9,8 @@
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::Float16:
+        return GL_R16F;
     case render::texture::TextureFormat::Float32:
         return GL_R32F;
     case render::texture::TextureFormat::RgbaFloat16:
@@ -17,10 +19,12 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
         return GL_RGBA32F;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;
-    case render::texture::TextureFormat::RgbFloat32:
-        return GL_RGB32F;
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB16F;
+    case render::texture::TextureFormat::RgbFloat32:
+        return GL_RGB32F;
+    case render::texture::TextureFormat::RgFloat16:
+        return GL_RG16F;
     case render::texture::TextureFormat::RgFloat32:
         return GL_RG32F;
     case render::texture::TextureFormat::D32:
@@ -33,6 +37,7 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
 gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::Float16:
     case render::texture::TextureFormat::Float32:
         return GL_RED;
     case render::texture::TextureFormat::RgbaFloat16:
@@ -55,14 +60,16 @@ gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::T
 gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
+    case render::texture::TextureFormat::D32:
     case render::texture::TextureFormat::Float32:
     case render::texture::TextureFormat::RgbaFloat32:
     case render::texture::TextureFormat::RgbFloat32:
     case render::texture::TextureFormat::RgFloat32:
-    case render::texture::TextureFormat::D32:
         return GL_FLOAT;
+    case render::texture::TextureFormat::Float16:
     case render::texture::TextureFormat::RgbaFloat16:
     case render::texture::TextureFormat::RgbFloat16:
+    case render::texture::TextureFormat::RgFloat16:
         return GL_HALF_FLOAT;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_UNSIGNED_BYTE;
@@ -141,7 +148,8 @@ void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) noexcept
 }
 
 gearoenix::gl::TextureManager::TextureManager(Engine& e) noexcept
-    : e(e)
+    : render::texture::Manager(e)
+    , eng(e)
 {
 }
 
@@ -153,14 +161,14 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     const render::texture::TextureInfo& info,
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    std::shared_ptr<Texture2D> result(new Texture2D(e, info, std::move(name)));
+    std::shared_ptr<Texture2D> result(new Texture2D(eng, info, std::move(name)));
     const bool needs_mipmap_generation = info.has_mipmap && pixels.size() < 2;
     const auto internal_format = convert_internal_format(info.format);
     const auto format = convert_format(info.format);
     const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(info.width);
     const auto gl_img_height = static_cast<gl::sizei>(info.height);
-    e.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+    eng.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
@@ -173,6 +181,10 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         GX_GL_CHECK_D;
         if (pixels.size() > 1 || (!pixels.empty() && !info.has_mipmap)) {
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
+        }
+        if (GL_DEPTH_COMPONENT32F == internal_format) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
         }
         GX_GL_CHECK_D;
         if (pixels.empty()) {
@@ -192,6 +204,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         if (needs_mipmap_generation) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
+        glBindTexture(GL_TEXTURE_2D, 0);
         GX_GL_CHECK_D;
     });
     return result;

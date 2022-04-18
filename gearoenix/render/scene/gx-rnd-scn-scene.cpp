@@ -32,6 +32,12 @@ void gearoenix::render::scene::Scene::add_camera(const core::ecs::Entity::id_t e
     entities.insert(entity);
 }
 
+void gearoenix::render::scene::Scene::add_skybox(const core::ecs::Entity::id_t entity, skybox::Skybox&) noexcept
+{
+    skybox_entities.insert(entity);
+    entities.insert(entity);
+}
+
 void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene_entity_id) noexcept
 {
     auto* const world = e.get_world();

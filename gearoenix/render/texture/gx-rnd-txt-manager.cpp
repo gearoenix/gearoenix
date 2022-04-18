@@ -1,17 +1,18 @@
 #include "gx-rnd-txt-manager.hpp"
-#include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../../core/gx-cr-string.hpp"
 #include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
 #include "../../platform/stream/gx-plt-stm-local.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-txt-texture-cube.hpp"
 #include <array>
 
-gearoenix::render::texture::Manager::Manager() noexcept
+gearoenix::render::texture::Manager::Manager(engine::Engine& e) noexcept
+    : e(e)
 {
 }
 
@@ -172,9 +173,10 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return create_2d_from_pixels(std::move(name), { pixels0 }, new_info, c);
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_file(
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2df_from_formatted(
     std::string name,
-    const platform::Path& path,
+    const void* const data,
+    std::size_t size,
     const TextureInfo& info,
     const core::sync::EndCallerIgnored& c) noexcept
 {
@@ -184,13 +186,49 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
     }
-    /// TODO: Later I have to add a good streaming support here.
-    std::ifstream file(path.raw, std::ios::in | std::ios::binary);
-    GX_ASSERT(file.is_open() && file.good());
-    file.seekg(0, std::ios::end);
-    std::vector<char> data(file.tellg());
-    file.seekg(0);
-    file.read(data.data(), data.size());
+    if (Type::Unknown != info.type)
+        GX_UNIMPLEMENTED; // type converting is not implemented and is not going to be implemented in near future.
+    if (TextureFormat::Unknown != info.format)
+        GX_UNIMPLEMENTED; // formate converting does not have a high priority
+    if (0 != info.width)
+        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+    if (0 != info.height)
+        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+    std::size_t img_width;
+    std::size_t img_height;
+    std::size_t img_channels;
+    std::vector<float> pixels0f;
+    Image::decode(
+        reinterpret_cast<const unsigned char*>(data), size, 4,
+        pixels0f, img_width, img_height, img_channels);
+    GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
+    TextureInfo new_info = info;
+    new_info.format = TextureFormat::RgbaFloat32;
+    new_info.type = Type::Texture2D;
+    new_info.width = img_width;
+    new_info.height = img_height;
+    const auto pixels0_sz = pixels0f.size() * sizeof(float);
+    std::vector<std::uint8_t> pixels0(pixels0_sz);
+    std::memcpy(pixels0.data(), pixels0f.data(), pixels0_sz);
+    return create_2d_from_pixels(std::move(name), { pixels0 }, new_info, c);
+}
+
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_file(
+    std::string name,
+    const platform::stream::Path& path,
+    const TextureInfo& info,
+    const core::sync::EndCallerIgnored& c) noexcept
+{
+    {
+        GX_GUARD_LOCK(textures_2d);
+        if (auto search = textures_2d.find(name); textures_2d.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
+    }
+    const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
+    auto data = stream->get_file_content();
+    if (path.get_raw_data().ends_with(".hdr"))
+        return create_2df_from_formatted(std::move(name), data.data(), data.size(), info, c);
     return create_2d_from_formatted(std::move(name), data.data(), data.size(), info, c);
 }
 

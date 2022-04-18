@@ -22,10 +22,14 @@ gearoenix::gl::Target::Target(std::vector<Attachment> _attachments, const bool i
 
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    std::vector<enumerated> binding_points;
+    binding_points.reserve(attachments.size());
+
     colour_attachments.reserve(attachments.size());
     enumerated current_binding_point = GL_COLOR_ATTACHMENT0;
     bool has_depth = false;
-    std::vector<enumerated> binding_points;
+
     GX_GL_CHECK_D;
     for (auto& a : attachments) {
         if (a.texture->get_info().format == render::texture::TextureFormat::D32 && a.texture->get_info().format == render::texture::TextureFormat::D24 && a.texture->get_info().format == render::texture::TextureFormat::D16) {
@@ -34,6 +38,7 @@ gearoenix::gl::Target::Target(std::vector<Attachment> _attachments, const bool i
             depth_attachment = a;
             GX_ASSERT_D(!has_depth); // Only one depth is allowed.
             has_depth = true;
+            binding_points.push_back(GL_NONE);
         } else {
             if (static_cast<enumerated>(-1) == a.binding_index) {
                 a.binding_index = current_binding_point;
@@ -46,7 +51,6 @@ gearoenix::gl::Target::Target(std::vector<Attachment> _attachments, const bool i
         GX_GL_CHECK_D;
     }
     GX_GL_CHECK_D;
-    glDrawBuffers(static_cast<sizei>(binding_points.size()), binding_points.data());
     if (!has_depth && is_depth_necessary) {
         const auto& info = attachments[0].texture->get_info();
         depth_render_buffer = 0;
@@ -57,6 +61,9 @@ gearoenix::gl::Target::Target(std::vector<Attachment> _attachments, const bool i
     } else {
         depth_render_buffer = std::nullopt;
     }
+
+    glDrawBuffers(static_cast<sizei>(binding_points.size()), binding_points.data());
+    glReadBuffer(GL_NONE);
 
     const auto framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     switch (framebuffer_status) {

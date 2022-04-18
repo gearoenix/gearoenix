@@ -41,6 +41,10 @@ namespace gearoenix::render::scene {
 struct Manager;
 }
 
+namespace gearoenix::render::skybox {
+struct Manager;
+}
+
 namespace gearoenix::render::texture {
 struct Manager;
 }
@@ -62,6 +66,7 @@ struct Engine {
     GX_GET_UPTR_PRT(model::Manager, model_manager)
     GX_GET_UPTR_PRT(camera::Manager, camera_manager)
     GX_GET_UPTR_PRT(texture::Manager, texture_manager)
+    GX_GET_UPTR_PRT(skybox::Manager, skybox_manager)
     GX_GET_UPTR_PRT(core::ecs::World, world)
 
 protected:
@@ -70,6 +75,8 @@ protected:
     Engine(Type engine_type, platform::Application& platform_application) noexcept;
 
 public:
+    Engine(const Engine&) = delete;
+    Engine(Engine&&) = delete;
     [[nodiscard]] static std::set<Type> get_available_engines() noexcept;
     [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application) noexcept;
     virtual ~Engine() noexcept;

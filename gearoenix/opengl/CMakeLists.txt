@@ -7,20 +7,28 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-constants.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-final-effects-shader.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-final-effects-shader.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-gbuffers-filler-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr-transparent.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr-transparent.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-ssao-resolve-shader.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-ssao-resolve-shader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.cpp

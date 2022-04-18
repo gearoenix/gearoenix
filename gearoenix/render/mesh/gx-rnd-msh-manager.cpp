@@ -1,5 +1,4 @@
 #include "gx-rnd-msh-manager.hpp"
-#include "../../core/asset/gx-cr-asset-manager.hpp"
 
 gearoenix::render::mesh::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
@@ -200,187 +199,160 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::move(c));
 }
 
-// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_inward_cube(core::sync::EndCaller<Mesh>& c) noexcept
-//{
-//     if (std::shared_ptr<Mesh> m = inward_cube.lock()) {
-//         c.set_data(m);
-//         return m;
-//     }
-//     const std::vector<math::BasicVertex> vertices = {
-//         PbrVertex(
-//             math::Vec3(-1.f, -1.0f, 1.0f),
-//             math::Vec3(0.0f, 0.0f, 1.0f),
-//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, -1.0f, 1.0f),
-//             math::Vec3(0.0f, 0.0f, 1.0f),
-//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, 1.0f, 1.0f),
-//             math::Vec3(0.0f, 0.0f, 1.0f),
-//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, 1.0f),
-//             math::Vec3(0.0f, 0.0f, 1.0f),
-//             math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//         //------------------------------------------------------------------------------------------------
-//         PbrVertex(
-//             math::Vec3(-1.f, -1.0f, -1.0f),
-//             math::Vec3(0.0f, 0.0f, -1.0f),
-//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, -1.0f, -1.0f),
-//             math::Vec3(0.0f, 0.0f, -1.0f),
-//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, 1.0f, -1.0f),
-//             math::Vec3(0.0f, 0.0f, -1.0f),
-//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, -1.0f),
-//             math::Vec3(0.0f, 0.0f, -1.0f),
-//             math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//         //------------------------------------------------------------------------------------------------
-//         PbrVertex(
-//             math::Vec3(-1.f, -1.0f, -1.0f),
-//             math::Vec3(-1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, 1.0f, -1.0f),
-//             math::Vec3(-1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, -1.0f, 1.0f),
-//             math::Vec3(-1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, 1.0f, 1.0f),
-//             math::Vec3(-1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//         //------------------------------------------------------------------------------------------------
-//         PbrVertex(
-//             math::Vec3(1.f, -1.0f, -1.0f),
-//             math::Vec3(1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, -1.0f),
-//             math::Vec3(1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, -1.0f, 1.0f),
-//             math::Vec3(1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, 1.0f),
-//             math::Vec3(1.0f, 0.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//         //------------------------------------------------------------------------------------------------
-//         PbrVertex(
-//             math::Vec3(-1.f, -1.0f, -1.0f),
-//             math::Vec3(0.0f, -1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, -1.0f, -1.0f),
-//             math::Vec3(0.0f, -1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, -1.0f, 1.0f),
-//             math::Vec3(0.0f, -1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, -1.0f, 1.0f),
-//             math::Vec3(0.0f, -1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//         //------------------------------------------------------------------------------------------------
-//         PbrVertex(
-//             math::Vec3(-1.f, 1.0f, -1.0f),
-//             math::Vec3(0.0f, 1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, -1.0f),
-//             math::Vec3(0.0f, 1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 0.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(-1.0f, 1.0f, 1.0f),
-//             math::Vec3(0.0f, 1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(0.0f, 1.0f),
-//         },
-//         PbrVertex(
-//             math::Vec3(1.0f, 1.0f, 1.0f),
-//             math::Vec3(0.0f, 1.0f, 0.0f),
-//             math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
-//             math::Vec2(1.0f, 1.0f),
-//         },
-//     };
-//     const std::vector<std::uint32_t> indices = {
-//         0, 2, 1, // - 1
-//         1, 2, 3, // - 2
-//         4, 5, 6, // - 3
-//         5, 7, 6, // - 4
-//         8, 9, 10, // - 5
-//         9, 11, 10, // - 6
-//         12, 14, 13, // - 7
-//         13, 14, 15, // - 8
-//         16, 18, 17, // - 9
-//         17, 18, 19, // - 10
-//         20, 21, 22, // - 11
-//         21, 23, 22, // - 12
-//     };
-//     const auto id = core::asset::Manager::create_id();
-//     std::shared_ptr<Mesh> m(new Mesh(
-//         id, "inward-cube", vertices, indices,
-//         math::Aabb3(math::Vec3(1.0), math::Vec3(-1.0)),
-//         e, core::sync::EndCaller<core::sync::EndCallerIgnore>([c] {})));
-//     c.set_data(m);
-//     inward_cube = m;
-//     cache.get_cacher().get_cacheds()[id] = m;
-//     return m;
-// }
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_inward_cube(core::sync::EndCallerIgnored&& c) noexcept
+{
+    std::string name = "default-cube-mesh";
+    {
+        GX_GUARD_LOCK(meshes);
+        if (auto search = meshes.find(name); meshes.end() != search)
+            if (auto m = search->second.lock(); nullptr != m)
+                return m;
+    }
+    return build(
+        std::move(name),
+        std::vector<PbrVertex> {
+            PbrVertex(
+                math::Vec3(-1.f, -1.0f, 1.0f),
+                math::Vec3(0.0f, 0.0f, -1.0f),
+                math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, -1.0f, 1.0f),
+                math::Vec3(0.0f, 0.0f, -1.0f),
+                math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, 1.0f, 1.0f),
+                math::Vec3(0.0f, 0.0f, -1.0f),
+                math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, 1.0f),
+                math::Vec3(0.0f, 0.0f, -1.0f),
+                math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+            //------------------------------------------------------------------------------------------------
+            PbrVertex(
+                math::Vec3(-1.f, -1.0f, -1.0f),
+                math::Vec3(0.0f, 0.0f, 1.0f),
+                math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, -1.0f, -1.0f),
+                math::Vec3(0.0f, 0.0f, 1.0f),
+                math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, 1.0f, -1.0f),
+                math::Vec3(0.0f, 0.0f, 1.0f),
+                math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, -1.0f),
+                math::Vec3(0.0f, 0.0f, 1.0f),
+                math::Vec4(-1.0f, 0.0f, 0.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+            //------------------------------------------------------------------------------------------------
+            PbrVertex(
+                math::Vec3(-1.f, -1.0f, -1.0f),
+                math::Vec3(1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, 1.0f, -1.0f),
+                math::Vec3(1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, -1.0f, 1.0f),
+                math::Vec3(1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, 1.0f, 1.0f),
+                math::Vec3(1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+            //------------------------------------------------------------------------------------------------
+            PbrVertex(
+                math::Vec3(1.f, -1.0f, -1.0f),
+                math::Vec3(-1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, -1.0f),
+                math::Vec3(-1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, -1.0f, 1.0f),
+                math::Vec3(-1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, 1.0f),
+                math::Vec3(-1.0f, 0.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+            //------------------------------------------------------------------------------------------------
+            PbrVertex(
+                math::Vec3(-1.f, -1.0f, -1.0f),
+                math::Vec3(0.0f, 1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, -1.0f, -1.0f),
+                math::Vec3(0.0f, 1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, -1.0f, 1.0f),
+                math::Vec3(0.0f, 1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, -1.0f, 1.0f),
+                math::Vec3(0.0f, 1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+            //------------------------------------------------------------------------------------------------
+            PbrVertex(
+                math::Vec3(-1.f, 1.0f, -1.0f),
+                math::Vec3(0.0f, -1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, -1.0f),
+                math::Vec3(0.0f, -1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 0.0f)),
+            PbrVertex(
+                math::Vec3(-1.0f, 1.0f, 1.0f),
+                math::Vec3(0.0f, -1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(0.0f, 1.0f)),
+            PbrVertex(
+                math::Vec3(1.0f, 1.0f, 1.0f),
+                math::Vec3(0.0f, -1.0f, 0.0f),
+                math::Vec4(0.0f, 0.0f, -1.0f, 1.0f),
+                math::Vec2(1.0f, 1.0f)),
+        },
+        std::vector<std::uint32_t> {
+            0, 2, 1, // 1
+            1, 2, 3, // 2
+            4, 5, 6, // 3
+            5, 7, 6, // 4
+            8, 9, 10, // 5
+            9, 11, 10, // 6
+            12, 14, 13, // 7
+            13, 14, 15, // 8
+            16, 18, 17, // 9
+            17, 18, 19, // 10
+            20, 21, 22, // 11
+            21, 23, 22, // 12
+        },
+        std::move(c));
+}
 
 // std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::create_face_square(
 //     const texture::Face f,

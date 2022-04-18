@@ -12,9 +12,12 @@
 
 namespace gearoenix::gl {
 struct Engine;
-struct FinalEffectsShader;
-struct GBuffersFillerShader;
-struct SsaoResolveShader;
+struct ShaderFinal;
+struct ShaderGBuffersFiller;
+struct ShaderPbr;
+struct ShaderPbrTransparent;
+struct ShaderSkyboxEquirectangular;
+struct ShaderSsaoResolve;
 struct Target;
 struct Texture2D;
 struct SubmissionManager final {
@@ -44,6 +47,7 @@ struct SubmissionManager final {
     struct CameraData final {
         math::Mat4x4<float> vp;
         math::Vec3<float> pos;
+        float skybox_scale = 1.0;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
         std::vector<std::pair<double, ModelData>> tranclucent_models_data;
         std::vector<std::vector<std::pair<double, ModelData>>> threads_opaque_models_data;
@@ -52,27 +56,39 @@ struct SubmissionManager final {
         CameraData() noexcept;
     };
 
+    struct SkyboxData final {
+        uint vertex_object = 0;
+        uint index_buffer = 0;
+        uint albedo_txt = 0;
+    };
+
     struct SceneData final {
         math::Vec4<float> ssao_settings;
+        boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equrectangualr*/>, SkyboxData> skyboxes;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
     };
 
 private:
     Engine& e;
-    const std::unique_ptr<GBuffersFillerShader> gbuffers_filler_shader;
-    const std::unique_ptr<SsaoResolveShader> ssao_resolve_shader;
-    const std::unique_ptr<FinalEffectsShader> final_effects_shader;
+    const std::unique_ptr<ShaderFinal> final_shader;
+    const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
+    const std::unique_ptr<ShaderPbr> pbr_shader;
+    const std::unique_ptr<ShaderPbrTransparent> pbr_transparent_shader;
+    const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
+    const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
     uint gbuffer_width, gbuffer_height;
     float gbuffer_aspect_ratio = 1.2f;
     float gbuffer_uv_move_x = 0.001f;
     float gbuffer_uv_move_y = 0.001f;
-    std::shared_ptr<Texture2D> position_depth_texture;
     std::shared_ptr<Texture2D> albedo_metallic_texture;
-    std::shared_ptr<Texture2D> normal_roughness_texture;
-    std::shared_ptr<Texture2D> emission_ambient_occlusion_texture;
+    std::shared_ptr<Texture2D> position_depth_texture;
+    std::shared_ptr<Texture2D> normal_ao_texture;
+    std::shared_ptr<Texture2D> emission_roughness_texture;
     std::unique_ptr<Target> gbuffers_target;
     std::shared_ptr<Texture2D> ssao_resolve_texture;
     std::unique_ptr<Target> ssao_resolve_target;
+    std::shared_ptr<Texture2D> final_texture;
+    std::unique_ptr<Target> final_target;
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
@@ -83,6 +99,7 @@ private:
 
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
+    void initialise_final() noexcept;
     [[nodiscard]] bool fill_gbuffers(const std::size_t camera_pool_index) noexcept;
 
 public:

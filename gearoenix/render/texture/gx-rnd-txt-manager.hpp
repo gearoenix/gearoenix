@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
-#include "../../platform/gx-plt-path.hpp"
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 #include <map>
@@ -10,6 +9,7 @@
 
 namespace gearoenix::platform::stream {
 struct Stream;
+struct Path;
 }
 
 namespace gearoenix::render::engine {
@@ -22,6 +22,7 @@ struct Texture2D;
 struct TextureCube;
 struct Manager {
 protected:
+    engine::Engine& e;
     GX_CREATE_GUARD(brdflut);
     std::shared_ptr<Texture2D> brdflut;
     GX_CREATE_GUARD(checkers);
@@ -30,7 +31,7 @@ protected:
     std::map<std::string, std::weak_ptr<Texture2D>> textures_2d;
 
 public:
-    Manager() noexcept;
+    explicit Manager(engine::Engine& e) noexcept;
     virtual ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_colour(
         const math::Vec4<float>& colour,
@@ -50,9 +51,15 @@ public:
         std::size_t size,
         const TextureInfo& info = TextureInfo(),
         const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2df_from_formatted(
+        std::string name,
+        const void* data,
+        std::size_t size,
+        const TextureInfo& info = TextureInfo(),
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_file(
         std::string name,
-        const platform::Path& path,
+        const platform::stream::Path& path,
         const TextureInfo& info = TextureInfo(),
         const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_colour(

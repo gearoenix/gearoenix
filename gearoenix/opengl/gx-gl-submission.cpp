@@ -10,16 +10,21 @@
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "../render/scene/gx-rnd-scn-scene.hpp"
+#include "../render/skybox/gx-rnd-sky-skybox.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
-#include "gx-gl-final-effects-shader.hpp"
-#include "gx-gl-gbuffers-filler-shader.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
-#include "gx-gl-ssao-resolve-shader.hpp"
+#include "gx-gl-shader-final.hpp"
+#include "gx-gl-shader-gbuffers-filler.hpp"
+#include "gx-gl-shader-pbr-transparent.hpp"
+#include "gx-gl-shader-pbr.hpp"
+#include "gx-gl-shader-skybox-equirectangular.hpp"
+#include "gx-gl-shader-ssao-resolve.hpp"
+#include "gx-gl-skybox.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 #include <algorithm>
@@ -53,7 +58,17 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
     gbuffer_aspect_ratio = static_cast<float>(gbuffer_width) / static_cast<float>(gbuffer_height);
     gbuffer_uv_move_x = 1.0f / static_cast<float>(gbuffer_width);
     gbuffer_uv_move_y = 1.0f / static_cast<float>(gbuffer_height);
-    const render::texture::TextureInfo txt_info {
+
+    const core::sync::EndCallerIgnored txt_end([this] {
+        std::vector<Target::Attachment> attachments(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT);
+        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture = albedo_metallic_texture;
+        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture = position_depth_texture;
+        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture = normal_ao_texture;
+        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture = emission_roughness_texture;
+        gbuffers_target = std::make_unique<Target>(std::move(attachments));
+    });
+
+    const render::texture::TextureInfo position_depth_txt_info {
         .format = render::texture::TextureFormat::RgbaFloat32,
         .sampler_info = render::texture::SamplerInfo {
             .min_filter = render::texture::Filter::Nearest,
@@ -69,22 +84,23 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    const core::sync::EndCallerIgnored txt_end([this] {
-        gbuffers_target = std::make_unique<Target>(std::vector<Target::Attachment> {
-            Target::Attachment { .texture = position_depth_texture },
-            Target::Attachment { .texture = albedo_metallic_texture },
-            Target::Attachment { .texture = normal_roughness_texture },
-            Target::Attachment { .texture = emission_ambient_occlusion_texture },
-        });
-    });
     position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, txt_end));
+
+    auto albedo_metallic_txt_info = position_depth_txt_info;
+    albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, txt_info, txt_end));
-    normal_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-roughness", {}, txt_info, txt_end));
-    emission_ambient_occlusion_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-ambient-occlusion", {}, txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, txt_end));
+
+    auto normal_ao_txt_info = position_depth_txt_info;
+    normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
+    normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, txt_end));
+
+    auto emission_roughness_txt_info = position_depth_txt_info;
+    emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
+    emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, txt_end));
 
     e.todos.unload();
     GX_LOG_D("GBuffers have been created.");
@@ -111,8 +127,9 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
     };
     const core::sync::EndCallerIgnored txt_end([this] {
         ssao_resolve_target = std::make_unique<Target>(std::vector<Target::Attachment> {
-            Target::Attachment { .texture = ssao_resolve_texture },
-        });
+                                                           Target::Attachment { .texture = ssao_resolve_texture },
+                                                       },
+            false);
     });
     ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, txt_end));
@@ -121,21 +138,55 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
 
+void gearoenix::gl::SubmissionManager::initialise_final() noexcept
+{
+    auto* const txt_mgr = e.get_texture_manager();
+    const render::texture::TextureInfo txt_info {
+        .format = render::texture::TextureFormat::RgbaFloat16,
+        .sampler_info = render::texture::SamplerInfo {
+            .min_filter = render::texture::Filter::Linear,
+            .mag_filter = render::texture::Filter::Linear,
+            .wrap_s = render::texture::Wrap::ClampToEdge,
+            .wrap_t = render::texture::Wrap::ClampToEdge,
+            .wrap_r = render::texture::Wrap::ClampToEdge,
+            .anisotropic_level = 0,
+        },
+        .width = gbuffer_width,
+        .height = gbuffer_height,
+        .depth = 0,
+        .type = render::texture::Type::Texture2D,
+        .has_mipmap = false,
+    };
+    const core::sync::EndCallerIgnored txt_end([this] {
+        final_target = std::make_unique<Target>(std::vector<Target::Attachment> {
+                                                    Target::Attachment { .texture = final_texture },
+                                                },
+            false);
+    });
+    final_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-final", {}, txt_info, txt_end));
+
+    e.todos.unload();
+}
+
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
-    , gbuffers_filler_shader(new GBuffersFillerShader(e))
-    , ssao_resolve_shader(new SsaoResolveShader(e))
-    , final_effects_shader(new FinalEffectsShader(e))
+    , final_shader(new ShaderFinal(e))
+    , gbuffers_filler_shader(new ShaderGBuffersFiller(e))
+    , pbr_shader(new ShaderPbr(e))
+    , pbr_transparent_shader(new ShaderPbrTransparent(e))
+    , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
+    , ssao_resolve_shader(new ShaderSsaoResolve(e))
 {
     GX_LOG_D("Creating submission manager.");
     initialise_gbuffers();
     initialise_ssao();
+    initialise_final();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
@@ -173,6 +224,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         if (!scenes_bvhs.contains(scene_id))
             scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<ModelBvhData>());
         scene_pool_ref.cameras.clear();
+        scene_pool_ref.skyboxes.clear();
         world->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
             if (!camera.enabled)
                 return;
@@ -182,6 +234,19 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             scene_pool_ref.cameras.emplace(
                 std::make_pair(camera.get_layer(), camera_id),
                 camera_pool_index);
+        });
+        world->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) {
+            if (!render_skybox.get_enabled())
+                return;
+            if (render_skybox.get_scene_id() != scene_id)
+                return;
+            scene_pool_ref.skyboxes.emplace(
+                std::make_tuple(render_skybox.get_layer(), skybox_id, render_skybox.is_equirectangular()),
+                SkyboxData {
+                    .vertex_object = gl_skybox.get_vertex_object(),
+                    .index_buffer = gl_skybox.get_index_buffer(),
+                    .albedo_txt = gl_skybox.get_texture_object(),
+                });
         });
         scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
     });
@@ -235,6 +300,9 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 auto& camera_data = camera_pool[scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)]];
                 camera_data.vp = render_camera.get_view_projection();
                 camera_data.pos = math::Vec3<float>(camera_location);
+                camera_data.skybox_scale = render_camera.get_far() / 1.732051f;
+                camera_data.skybox_scale += render_camera.get_near();
+                camera_data.skybox_scale *= 0.5f;
                 camera_data.opaque_models_data.clear();
                 camera_data.tranclucent_models_data.clear();
                 for (auto& v : camera_data.threads_opaque_models_data)
@@ -313,10 +381,13 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
     const float screen_uv_move_reserved[] = { gbuffer_uv_move_x, gbuffer_uv_move_y, 0.0f, 0.0f };
+    const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
+    const auto* const ssao_resolved_attachments = ssao_resolve_target->get_attachments().data();
+    const auto* const final_attachments = final_target->get_attachments().data();
     GX_GL_CHECK_D;
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
-        // Filling GBuffers -------------------------------------------------------------------------------------------------
+        // Filling GBuffers -----------------------------------------------------------------------------------
         gbuffers_target->bind();
         glViewport(
             static_cast<sizei>(0), static_cast<sizei>(0),
@@ -334,11 +405,12 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         const auto gbuffers_filler_txt_index_metallic_roughness = static_cast<enumerated>(gbuffers_filler_shader->get_metallic_roughness_index());
         const auto gbuffers_filler_txt_index_occlusion = static_cast<enumerated>(gbuffers_filler_shader->get_occlusion_index());
 
+        glDisable(GL_BLEND); // TODO find the best place for it
+
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             GX_GL_CHECK_D;
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             gbuffers_filler_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-            gbuffers_filler_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
             GX_GL_CHECK_D;
             for (auto& distance_model_data : camera.opaque_models_data) {
                 GX_GL_CHECK_D;
@@ -367,15 +439,17 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 GX_GL_CHECK_D;
             }
         }
-        // SSAO resolving ------------------------------------------------------------------------------------------
+        // SSAO resolving -------------------------------------------------------------------------------------
         ssao_resolve_target->bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         ssao_resolve_shader->bind();
-        const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
+
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[0].texture->get_object());
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_normal_roughness_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[2].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture->get_object());
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_normal_ao_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture->get_object());
+
         ssao_resolve_shader->set_ssao_radius_move_start_end_data(reinterpret_cast<const float*>(&scene.ssao_settings));
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             GX_GL_CHECK_D;
@@ -385,7 +459,55 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             glDrawArrays(GL_TRIANGLES, 0, 3);
             GX_GL_CHECK_D;
         }
-        // Final effects ----------------------------------------------------------------------------------------------
+        // PBR ------------------------------------------------------------------------------------------------
+        final_target->bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        skybox_equirectangular_shader->bind();
+
+        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            GX_GL_CHECK_D;
+            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+            skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+            const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
+            skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
+            for (const auto& key_skybox : scene.skyboxes) {
+                const auto& skybox = key_skybox.second;
+                glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index()));
+                glBindTexture(GL_TEXTURE_2D, skybox.albedo_txt);
+                glBindVertexArray(skybox.vertex_object);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skybox.index_buffer);
+                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+            }
+            glBindVertexArray(screen_vertex_object);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            GX_GL_CHECK_D;
+        }
+
+        pbr_shader->bind();
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_position_depth_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture->get_object());
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_albedo_metallic_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture->get_object());
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_normal_ao_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture->get_object());
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_emission_roughness_index()));
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture->get_object());
+
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_ssao_resolved_index()));
+        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture->get_object());
+
+        pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
+
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GX_GL_CHECK_D;
+
+        // Final ----------------------------------------------------------------------------------------------
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -412,31 +534,14 @@ void gearoenix::gl::SubmissionManager::update() noexcept
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        final_effects_shader->bind();
+        final_shader->bind();
 
-        const auto* const ssao_resolved_attachments = ssao_resolve_target->get_attachments().data();
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+        glBindTexture(GL_TEXTURE_2D, final_attachments[0].texture->get_object());
 
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[0].texture->get_object());
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_albedo_metallic_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[1].texture->get_object());
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_normal_roughness_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[2].texture->get_object());
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_emission_ambient_occlusion_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[3].texture->get_object());
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_effects_shader->get_ssao_resolved_index()));
-        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture->get_object());
-
-        final_effects_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
-
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            GX_GL_CHECK_D;
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
-
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            GX_GL_CHECK_D;
-        }
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GX_GL_CHECK_D;
     }
     GX_GL_CHECK_D;
 

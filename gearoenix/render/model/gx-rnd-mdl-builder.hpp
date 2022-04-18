@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_MESH_BUILDER_HPP
-#define GEAROENIX_RENDER_MESH_BUILDER_HPP
+#ifndef GEAROENIX_RENDER_MODEL_BUILDER_HPP
+#define GEAROENIX_RENDER_MODEL_BUILDER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
 #include <memory>

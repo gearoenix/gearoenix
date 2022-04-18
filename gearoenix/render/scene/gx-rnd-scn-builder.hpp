@@ -21,6 +21,10 @@ namespace gearoenix::render::model {
 struct Builder;
 }
 
+namespace gearoenix::render::skybox {
+struct Builder;
+}
+
 namespace gearoenix::render::scene {
 struct Builder final {
     friend struct Manager;
@@ -30,6 +34,7 @@ struct Builder final {
 private:
     std::vector<std::shared_ptr<model::Builder>> model_builders;
     std::vector<std::shared_ptr<camera::Builder>> camera_builders;
+    std::vector<std::shared_ptr<skybox::Builder>> skybox_builders;
 
     Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 
@@ -42,6 +47,7 @@ public:
 
     void add(std::shared_ptr<model::Builder>&& model_builder) noexcept;
     void add(std::shared_ptr<camera::Builder>&& camera_builder) noexcept;
+    void add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept;
 };
 }
 

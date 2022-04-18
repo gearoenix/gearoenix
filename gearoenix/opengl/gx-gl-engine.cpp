@@ -7,6 +7,7 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
+#include "gx-gl-skybox.hpp"
 #include "gx-gl-submission.hpp"
 #include "gx-gl-texture.hpp"
 #include <imgui_impl_opengl3.h>
@@ -21,12 +22,14 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     model_manager = std::make_unique<ModelManager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);
     submission_manager = std::make_unique<SubmissionManager>(*this);
+    skybox_manager = std::make_unique<SkyboxManager>(*this);
     todos.unload();
 }
 
 gearoenix::gl::Engine::~Engine() noexcept
 {
     world = nullptr;
+    skybox_manager = nullptr;
     submission_manager = nullptr;
     texture_manager = nullptr;
     model_manager = nullptr;

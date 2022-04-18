@@ -53,8 +53,6 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-log.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-main-entry.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-path.cpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-path.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-runtime-configuration.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/gx-plt-touch.hpp
         PARENT_SCOPE)

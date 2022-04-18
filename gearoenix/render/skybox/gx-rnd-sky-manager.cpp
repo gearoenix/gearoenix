@@ -1,33 +1,38 @@
 #include "gx-rnd-sky-manager.hpp"
-#include "gx-rnd-sky-cube.hpp"
-#include "gx-rnd-sky-equirectangular.hpp"
+#include "../../platform/gx-plt-log.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
+#include "../engine/gx-rnd-eng-engine.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
+#include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::skybox::Manager::Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* const e) noexcept
+gearoenix::render::skybox::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
-    , cache(std::move(s))
 {
 }
 
 gearoenix::render::skybox::Manager::~Manager() noexcept = default;
 
-std::shared_ptr<gearoenix::render::skybox::Skybox> gearoenix::render::skybox::Manager::get_gx3d(
-    const core::Id id,
-    core::sync::EndCaller<Skybox>& c) noexcept
+std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::render::skybox::Manager::build(
+    std::string&& name, platform::stream::Path&& texture_path, const core::sync::EndCallerIgnored& c) noexcept
 {
-    std::shared_ptr<Skybox> s = cache.get<Skybox>(
-        id, [id, c, this](std::string name) noexcept {
-            GXLOGD("Going to load Skybox: " << id)
-            platform::stream::Stream* const f = cache.get_file();
-            const auto t = f->read<Type>();
-            const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-            switch (t) {
-            case Type::Cube:
-            case Type::Equirectangular:
-                return std::shared_ptr<Skybox>(new Cube(id, std::move(name), f, e, call));
-            default:
-                GX_UNEXPECTED
-            }
-        });
-    c.set_data(s);
-    return s;
+    if (texture_path.get_raw_data().ends_with(".hdr")) {
+        auto txt = e.get_texture_manager()->create_2d_from_file(
+            name + "-texture",
+            texture_path,
+            gearoenix::render::texture::TextureInfo {
+                .sampler_info = gearoenix::render::texture::SamplerInfo {
+                    .min_filter = gearoenix::render::texture::Filter::Linear,
+                    .mag_filter = gearoenix::render::texture::Filter::Linear,
+                    .wrap_s = gearoenix::render::texture::Wrap::ClampToEdge,
+                    .wrap_t = gearoenix::render::texture::Wrap::ClampToEdge,
+                    .wrap_r = gearoenix::render::texture::Wrap::ClampToEdge,
+                },
+                .has_mipmap = false,
+            },
+            c);
+        return build(std::move(name), std::move(txt), c);
+    } else if (texture_path.get_raw_data().ends_with(".gx-sky")) {
+        GX_UNIMPLEMENTED;
+    }
+    GX_UNEXPECTED;
 }

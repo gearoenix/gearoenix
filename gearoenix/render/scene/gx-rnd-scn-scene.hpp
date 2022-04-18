@@ -19,12 +19,17 @@ namespace gearoenix::render::model {
 struct Model;
 }
 
+namespace gearoenix::render::skybox {
+struct Skybox;
+}
+
 namespace gearoenix::render::scene {
 struct Scene final : public core::ecs::Component {
     GX_GET_RRF_PRV(engine::Engine, e)
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, entities)
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, model_entities)
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, camera_entities)
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, skybox_entities)
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRV(math::Vec4<float>, ssao_settings)
     GX_GETSET_VAL_PRV(double, layer, 0.0)
@@ -40,6 +45,7 @@ public:
     Scene(Scene&&) noexcept;
     void add_model(core::ecs::Entity::id_t entity, model::Model& m) noexcept;
     void add_camera(core::ecs::Entity::id_t entity, camera::Camera& c) noexcept;
+    void add_skybox(core::ecs::Entity::id_t entity, skybox::Skybox& s) noexcept;
     void update(core::ecs::Entity::id_t scene_entity_id) noexcept;
 };
 }

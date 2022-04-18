@@ -16,42 +16,47 @@
 
 GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_DEF);
 
+GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_DEF);
+
 static bool is_loaded = false;
 
 bool gearoenix::gl::load_library() noexcept
 {
+    if (is_loaded)
+        return true;
+
+#ifdef GX_PLATFORM_INTERFACE_SDL2
+    if (SDL_GL_LoadLibrary(nullptr) != 0) {
+        GX_LOG_D("Failed to load OpenGL shared library through SDL2 library loader.");
+        return false;
+    }
+#define GX_GL_FUNCTION_LOAD_UNCHECKED(name) gl##name = reinterpret_cast<name##Fnp>(SDL_GL_GetProcAddress(GX_STRINGIFY(gl##name)))
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+#define GX_GL_FUNCTION_LOAD_UNCHECKED(name) gl##name = reinterpret_cast<name##Fnp>(eglGetProcAddress(GX_STRINGIFY(gl##name)))
+#else
+#error "Not implemented for this platform."
+#endif
+
 #define GX_GL_FUNCTION_LOAD_CHECK(name)                                  \
     if (nullptr == gl##name) {                                           \
         GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
         return false;                                                    \
     }
 
-    if (is_loaded) {
-        GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_CHECK)
-        return true;
-    }
-
-#ifdef GX_PLATFORM_INTERFACE_SDL2
-
-    if (SDL_GL_LoadLibrary(nullptr) != 0) {
-        GX_LOG_D("Failed to load OpenGL shared library through SDL2 library loader.");
-        return false;
-    }
-
-#define GX_GL_FUNCTION_LOAD(name)                                                          \
-    gl##name = reinterpret_cast<name##Fnp>(SDL_GL_GetProcAddress(GX_STRINGIFY(gl##name))); \
+#define GX_GL_FUNCTION_LOAD(name)        \
+    GX_GL_FUNCTION_LOAD_UNCHECKED(name); \
     GX_GL_FUNCTION_LOAD_CHECK(name)
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
-#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
-#define GX_GL_FUNCTION_LOAD(name)                                                      \
-    gl##name = reinterpret_cast<name##Fnp>(eglGetProcAddress(GX_STRINGIFY(gl##name))); \
-    GX_GL_FUNCTION_LOAD_CHECK(name)
+    GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_UNCHECKED);
 
-    GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
-#else
-#error "Not implemented for this platform."
+#ifdef GX_DEBUG_MODE
+    if (nullptr != glDebugMessageCallback) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(debug_callback, nullptr);
+    }
 #endif
+
     const auto* const extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
     if (nullptr == extensions)
         return false;
@@ -72,5 +77,19 @@ void gearoenix::gl::unload_library() noexcept
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_UNLOAD);
 }
+
+#ifdef GX_DEBUG_MODE
+void gearoenix::gl::debug_callback(
+    const enumerated source,
+    const enumerated t,
+    const uint id,
+    const enumerated severity,
+    const sizei length,
+    const char* const message,
+    const void* const /*userParam*/)
+{
+    GX_LOG_E("source: " << source << ", type: " << t << ", id: " << id << ", severity: " << severity << ", length: " << length << ", message: " << message);
+}
+#endif
 
 #endif

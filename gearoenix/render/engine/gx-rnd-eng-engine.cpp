@@ -7,6 +7,7 @@
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
+#include "../skybox/gx-rnd-sky-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 
 #ifdef GX_RENDER_VULKAN_ENABLED

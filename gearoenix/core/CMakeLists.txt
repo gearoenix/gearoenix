@@ -1,9 +1,5 @@
 SET(GX_ENGINE_CORE_SRC_DIR ${GX_ENGINE_SRC_DIR}/core)
 SET(GX_ENGINE_CORE_SRC
-#        ${GX_ENGINE_CORE_SRC_DIR}/asset/gx-cr-asset-manager.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/asset/gx-cr-asset-manager.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/asset/gx-cr-asset-type.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/asset/gx-cr-asset.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-file.cpp
@@ -34,10 +30,6 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-link.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-node.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-node.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list-node.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list-node.hpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.cpp
-#        ${GX_ENGINE_CORE_SRC_DIR}/list/gx-cr-list.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-assert.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-characterifier.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-concatenate.hpp

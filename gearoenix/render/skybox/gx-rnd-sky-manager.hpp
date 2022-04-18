@@ -1,46 +1,49 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../core/cache/gx-cr-cache-file.hpp"
-#include "../../core/gx-cr-types.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "gx-rnd-sky-skybox.hpp"
 #include <memory>
-
-namespace gearoenix::platform::stream {
-struct Stream;
-}
+#include <string>
+#include <variant>
 
 namespace gearoenix::render::engine {
 struct Engine;
 }
 
+namespace gearoenix::platform::stream {
+struct Path;
+}
+
+namespace gearoenix::render::texture {
+struct Texture2D;
+struct TextureCube;
+}
+
 namespace gearoenix::render::skybox {
+struct Builder;
 struct Manager {
+    typedef std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>> Texture;
+
 protected:
-    engine::Engine* const e;
-    core::cache::File<Skybox> cache;
+    engine::Engine& e;
+
+    explicit Manager(engine::Engine& e) noexcept;
 
 public:
-    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Skybox> get_gx3d(core::Id mid, core::sync::EndCaller<Skybox>& c) noexcept;
-    template <typename T>
-    [[nodiscard]] typename std::enable_if<std::is_base_of<Skybox, T>::value, std::shared_ptr<T>>::type
-    create(std::string name, core::sync::EndCaller<T>& c) noexcept;
+    Manager(Manager&&) = delete;
+    Manager(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+    Manager& operator=(const Manager&) = delete;
+    virtual ~Manager() noexcept;
+
+    [[nodiscard]] virtual std::shared_ptr<Builder> build(
+        std::string&& name,
+        Texture&& bound_texture,
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
+
+    [[nodiscard]] virtual std::shared_ptr<Builder> build(
+        std::string&& name,
+        platform::stream::Path&& texture_path,
+        const core::sync::EndCallerIgnored& c) noexcept;
 };
 }
-
-template <typename T>
-typename std::enable_if<std::is_base_of<gearoenix::render::skybox::Skybox, T>::value, std::shared_ptr<T>>::type
-gearoenix::render::skybox::Manager::create(std::string name, core::sync::EndCaller<T>& c) noexcept
-{
-    const core::Id id = core::asset::Manager::create_id();
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> call([c] {});
-    const std::shared_ptr<T> result(new T(id, std::move(name), e, call));
-    c.set_data(result);
-    cache.get_cacher().get_cacheds()[id] = result;
-    return result;
-}
-
 #endif

@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/texture/gx-rnd-txt-manager.hpp"
 #include "../render/texture/gx-rnd-txt-texture-2d.hpp"
+#include "../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
@@ -32,8 +33,15 @@ struct Texture2D final : public render::texture::Texture2D {
     void bind(enumerated texture_unit) noexcept;
 };
 
-struct TextureManager final : public render::texture::Manager {
+struct TextureCube final : public render::texture::TextureCube {
+    friend struct TextureManager;
+
     Engine& e;
+    GX_GET_VAL_PRV(uint, object, 0)
+};
+
+struct TextureManager final : public render::texture::Manager {
+    Engine& eng;
 
     TextureManager(Engine& e) noexcept;
     ~TextureManager() noexcept final;

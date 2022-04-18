@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_RENDER_MODEL_MANAGER_HPP
 #define GEAROENIX_RENDER_MODEL_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include <map>
 #include <memory>
 #include <string>
 
@@ -14,7 +13,6 @@ struct Mesh;
 }
 
 namespace gearoenix::render::model {
-struct Model;
 struct Builder;
 struct Manager {
 protected:

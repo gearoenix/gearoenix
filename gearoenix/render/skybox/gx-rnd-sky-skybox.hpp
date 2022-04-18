@@ -1,48 +1,39 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #define GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
-#include "../../core/asset/gx-cr-asset.hpp"
-#include "../../core/gx-cr-static.hpp"
+#include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "gx-rnd-sky-type.hpp"
-
-namespace gearoenix::platform::stream {
-struct Stream;
-}
-
-namespace gearoenix::render::material {
-struct Material;
-}
+#include <memory>
+#include <variant>
 
 namespace gearoenix::render::mesh {
 struct Mesh;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
-namespace gearoenix::render::reflection {
-struct Baked;
+namespace gearoenix::render::texture {
+struct Texture2D;
+struct TextureCube;
 }
 
 namespace gearoenix::render::skybox {
-struct Skybox : public core::asset::Asset {
-    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, msh)
-    GX_GET_CREF_PRT(std::shared_ptr<reflection::Baked>, baked_reflection)
-    GX_GET_CREF_PRT(std::shared_ptr<material::Material>, mat)
-    GX_GET_CVAL_PRT(Type, skybox_type)
+struct Skybox final : public core::ecs::Component {
+    typedef std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>> Texture;
+
+    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh)
+    GX_GET_CREF_PRT(Texture, bound_texture)
+    GX_GETSET_VAL_PRT(core::ecs::Entity::id_t, scene_id, 0)
     GX_GETSET_VAL_PRT(double, layer, 0.0)
     GX_GETSET_VAL_PRT(bool, enabled, true)
-protected:
-    engine::Engine* const e;
-    void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-
-    Skybox(Type t, core::Id id, std::string name, platform::stream::Stream* s, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Skybox(Type t, core::Id id, std::string name, engine::Engine* e, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
 
 public:
-    ~Skybox() noexcept override;
-    virtual void update() noexcept;
+    Skybox(
+        std::shared_ptr<mesh::Mesh>&& bound_mesh,
+        Texture&& bound_texture) noexcept;
+    ~Skybox() noexcept final;
+    Skybox(Skybox&&) noexcept;
+    [[nodiscard]] bool is_equirectangular() const noexcept { return bound_texture.index() == 0; }
+    [[nodiscard]] bool is_cube() const noexcept { return bound_texture.index() == 1; }
 };
 }
 #endif

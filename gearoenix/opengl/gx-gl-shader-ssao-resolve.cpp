@@ -1,4 +1,4 @@
-#include "gx-gl-ssao-resolve-shader.hpp"
+#include "gx-gl-shader-ssao-resolve.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -122,23 +122,24 @@ const vec3 ssao_samples[ssao_samples_count] = vec3[ssao_samples_count](\n\
 );\n\
 uniform mat4 vp; \n\
 uniform vec4 ssao_radius_move_start_end;\n\
-uniform sampler2D position_depth; \n\
-uniform sampler2D normal_roughness; \n\
+\n\
+uniform sampler2D position_depth;\n\
+uniform sampler2D normal_ao;\n\
 \n\
 in vec2 out_uv;\n\
 \n\
 out float ssao_value;\n\
 \n\
 void main() {\n\
-    vec4 pos_depth = texture(position_depth, out_uv);\n\
-    vec4 nrm_rgh = texture(normal_roughness, out_uv);\n\
+    vec3 pos = texture(position_depth, out_uv).xyz;\n\
+    vec3 nrm = texture(normal_ao, out_uv).xyz;\n\
     ssao_value = 0.0;\n\
     for(int i = 0; i < ssao_samples_count; ++i) {\n\
         vec3 smp = ssao_samples[i];\n\
-        smp *= ((1.5 * step(0.0, dot(nrm_rgh.xyz, smp)) - 0.5) * ssao_radius_move_start_end.x) + (nrm_rgh.xyz * ssao_radius_move_start_end.y);\n\
-        smp += pos_depth.xyz;\n\
-        vec4 pos = vp * vec4(smp, 1.0);\n\
-        smp = pos.xyz / pos.w;\n\
+        smp *= ((1.5 * step(0.0, dot(nrm, smp)) - 0.5) * ssao_radius_move_start_end.x) + (nrm * ssao_radius_move_start_end.y);\n\
+        smp += pos;\n\
+        vec4 p = vp * vec4(smp, 1.0);\n\
+        smp = p.xyz / p.w;\n\
         smp *= 0.5;\n\
         smp += 0.5;\n\
         float coverage = smp.z - texture(position_depth, smp.xy).w;\n\
@@ -147,7 +148,7 @@ void main() {\n\
     ssao_value = smoothstep(0.0, 1.0, ssao_value * ssao_samples_weight);\n\
 }\n";
 
-gearoenix::gl::SsaoResolveShader::SsaoResolveShader(Engine& e) noexcept
+gearoenix::gl::ShaderSsaoResolve::ShaderSsaoResolve(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -157,16 +158,16 @@ gearoenix::gl::SsaoResolveShader::SsaoResolveShader(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM(vp)
     GX_GL_THIS_GET_UNIFORM(ssao_radius_move_start_end)
     GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_roughness)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao)
 }
 
-gearoenix::gl::SsaoResolveShader::~SsaoResolveShader() noexcept = default;
+gearoenix::gl::ShaderSsaoResolve::~ShaderSsaoResolve() noexcept = default;
 
-void gearoenix::gl::SsaoResolveShader::bind() const noexcept
+void gearoenix::gl::ShaderSsaoResolve::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_roughness)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao)
 }
 
 #endif
