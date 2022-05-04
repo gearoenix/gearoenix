@@ -336,6 +336,11 @@ struct Mat4x4 final {
         const auto z = (target - position).normalized();
         const auto x = up.cross(z).normalized();
         const auto y = z.cross(x);
+        return look_at(position, x, y, z);
+    }
+
+    [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z) noexcept
+    {
         Mat4x4<Element> m;
         m.data[0][0] = -x.x;
         m.data[0][1] = y.x;

@@ -8,9 +8,9 @@
 #include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
-
 struct Engine;
 struct Uploader;
+struct Target;
 
 [[nodiscard]] sint convert_internal_format(render::texture::TextureFormat f) noexcept;
 [[nodiscard]] enumerated convert_format(render::texture::TextureFormat f) noexcept;
@@ -18,6 +18,7 @@ struct Uploader;
 [[nodiscard]] float convert_min(render::texture::Filter f) noexcept;
 [[nodiscard]] float convert_mag(render::texture::Filter f) noexcept;
 [[nodiscard]] sint convert(render::texture::Wrap w) noexcept;
+[[nodiscard]] enumerated convert(render::texture::Face f) noexcept;
 
 struct Texture2D final : public render::texture::Texture2D {
     friend struct TextureManager;
@@ -49,6 +50,10 @@ struct TextureManager final : public render::texture::Manager {
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
+        const core::sync::EndCallerIgnored& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::texture::Target> create_target(
+        std::string name,
+        std::vector<render::texture::Attachment>&& attachments,
         const core::sync::EndCallerIgnored& c) noexcept final;
 };
 }

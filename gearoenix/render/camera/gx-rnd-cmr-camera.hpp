@@ -16,12 +16,20 @@
 #undef near
 #endif
 
+namespace gearoenix::render::texture {
+struct Target;
+}
+
 namespace gearoenix::render::camera {
 struct Camera final : public core::ecs::Component {
+    friend struct Builder;
+    friend struct Manager;
+
     GX_GET_CREF_PRV(math::Mat4x4<float>, view)
     GX_GET_CREF_PRV(math::Mat4x4<float>, projection)
     GX_GET_CREF_PRV(math::Mat4x4<float>, view_projection)
-    GX_GET_CREF_PRV(math::Vec4<float>, starting_clip_ending_clip) // Portion of the target that it is renderer into. // = math::Vec4<float>(0.0f, 0.0f, 1.0f, 1.0f);
+    GX_GET_CREF_PRV(math::Vec4<float>, starting_clip_ending_clip)
+    GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, target)
     GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0)
     GX_GETSET_VAL_PRV(std::uint64_t, flag, 1)
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f)
@@ -54,6 +62,10 @@ struct Camera final : public core::ecs::Component {
     void set_near(float) noexcept;
     void set_far(float) noexcept;
     void set_yfov(float) noexcept;
+
+private:
+    /// It must be changed by Builder or Manager, because the other components must know about the change
+    void set_target(std::shared_ptr<texture::Target>&&) noexcept;
 };
 }
 #endif

@@ -84,11 +84,12 @@ private:
     std::shared_ptr<Texture2D> position_depth_texture;
     std::shared_ptr<Texture2D> normal_ao_texture;
     std::shared_ptr<Texture2D> emission_roughness_texture;
-    std::unique_ptr<Target> gbuffers_target;
+    std::shared_ptr<Texture2D> gbuffers_depth_texture;
+    std::shared_ptr<Target> gbuffers_target;
     std::shared_ptr<Texture2D> ssao_resolve_texture;
-    std::unique_ptr<Target> ssao_resolve_target;
+    std::shared_ptr<Target> ssao_resolve_target;
     std::shared_ptr<Texture2D> final_texture;
-    std::unique_ptr<Target> final_target;
+    std::shared_ptr<Target> final_target;
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;

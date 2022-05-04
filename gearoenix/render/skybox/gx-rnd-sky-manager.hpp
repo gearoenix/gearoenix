@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include <map>
 #include <memory>
 #include <string>
 #include <variant>

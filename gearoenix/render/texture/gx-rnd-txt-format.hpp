@@ -78,5 +78,17 @@ constexpr std::size_t format_components_count(const TextureFormat f) noexcept
         return 0;
     }
 }
+
+constexpr bool format_is_depth(const TextureFormat f) noexcept
+{
+    switch (f) {
+    case TextureFormat::D16:
+    case TextureFormat::D24:
+    case TextureFormat::D32:
+        return true;
+    default:
+        return false;
+    }
+}
 }
 #endif

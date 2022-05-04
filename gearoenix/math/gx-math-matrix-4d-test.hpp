@@ -13,6 +13,7 @@
 BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
 {
     using GxMat4 = gearoenix::math::Mat4x4<float>;
+    using GxVec3 = gearoenix::math::Vec3<float>;
 
     glm::mat4 glmm;
     GxMat4 gxm;
@@ -47,6 +48,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
     gxm.inverse();
 
     compare("hard-coded-inverse-1", __LINE__);
+
+    glmm = glm::lookAt(glm::vec3(32.0, 11.0, -89.0), glm::vec3(-4.0, -5.0, -7.0), glm::vec3(0.0, 0.0, 1.0));
+    gxm = GxMat4::look_at(GxVec3(32.0, 11.0, -89.0), GxVec3(-4.0, -5.0, -7.0), GxVec3(0.0, 0.0, 1.0));
+
+    compare("hard-coded-look-at-1", __LINE__);
 }
 #endif
 #endif

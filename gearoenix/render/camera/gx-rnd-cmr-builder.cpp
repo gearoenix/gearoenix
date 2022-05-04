@@ -51,3 +51,8 @@ const gearoenix::render::camera::Camera& gearoenix::render::camera::Builder::get
 {
     return *entity_builder->get_builder().get_component<Camera>();
 }
+
+void gearoenix::render::camera::Builder::set_target(std::shared_ptr<texture::Target>&& target) noexcept
+{
+    entity_builder->get_builder().get_component<Camera>()->set_target(std::move(target));
+}

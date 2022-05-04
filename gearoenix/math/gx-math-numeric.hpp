@@ -46,6 +46,17 @@ public:
     }
 
     template <typename T>
+    [[nodiscard]] constexpr static T is_p2(T v) noexcept
+    {
+        int r = 0;
+        while (v > 0) {
+            r += v & 1;
+            v >>= 1;
+        }
+        return r < 2;
+    }
+
+    template <typename T>
     [[nodiscard]] constexpr static T safe_maximum(const T a, const T b) noexcept
     {
         if constexpr (std::is_floating_point_v<T>) {

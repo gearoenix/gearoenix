@@ -17,6 +17,10 @@ namespace gearoenix::render::engine {
 struct Engine;
 }
 
+namespace gearoenix::render::texture {
+struct Target;
+}
+
 namespace gearoenix::render::camera {
 struct Manager;
 struct Camera;
@@ -39,6 +43,7 @@ public:
     [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;
     [[nodiscard]] Camera& get_camera() noexcept;
     [[nodiscard]] const Camera& get_camera() const noexcept;
+    virtual void set_target(std::shared_ptr<texture::Target>&& target) noexcept;
 };
 }
 #endif

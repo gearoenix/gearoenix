@@ -3,6 +3,7 @@
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
+#include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 #include <map>
 #include <memory>
@@ -20,6 +21,7 @@ namespace gearoenix::render::texture {
 struct Texture;
 struct Texture2D;
 struct TextureCube;
+struct Target;
 struct Manager {
 protected:
     engine::Engine& e;
@@ -70,6 +72,10 @@ public:
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept;
+    [[nodiscard]] virtual std::shared_ptr<Target> create_target(
+        std::string name,
+        std::vector<Attachment>&& attachments,
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
     [[nodiscard]] static constexpr float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,

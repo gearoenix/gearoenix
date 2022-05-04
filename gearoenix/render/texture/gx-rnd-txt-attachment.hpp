@@ -9,52 +9,27 @@
 #include <variant>
 
 namespace gearoenix::render::texture {
-enum struct UsageFlag : core::TypeId {
-    Depth = 1,
-    Color = 2,
-    Stencil = 4,
-};
-
-struct Texture;
 struct TextureCube;
 struct Texture2D;
 
-struct Attachment2D {
+struct Attachment2D final {
     std::shared_ptr<Texture2D> txt;
 
     ~Attachment2D() noexcept;
 };
 
-struct AttachmentCube {
+struct AttachmentCube final {
     std::shared_ptr<TextureCube> txt;
     Face face = Face::PositiveZ;
 
     ~AttachmentCube() noexcept;
 };
 
-struct Attachment {
-    std::shared_ptr<Texture> txt = nullptr;
-    unsigned int img_width = 0;
-    unsigned int img_height = 0;
-    unsigned int img_depth = 0;
+struct Attachment final {
     unsigned int mipmap_level = 0;
-    UsageFlag usage = UsageFlag::Color;
     std::variant<Attachment2D, AttachmentCube> var;
 
     ~Attachment() noexcept;
-};
-
-struct AttachmentInfo {
-    TextureInfo texture_info;
-    unsigned int img_width = 512;
-    unsigned int img_height = 512;
-    unsigned int img_depth = 0;
-    unsigned int mipmap_level = 0;
-    UsageFlag usage = UsageFlag::Color;
-    /// This field will be available whenever the attachment is cube map
-    std::optional<Face> face = std::nullopt;
-    /// This field is for situations that already a texture is allocated.
-    std::optional<std::shared_ptr<Texture>> txt = std::nullopt;
 };
 }
 #endif

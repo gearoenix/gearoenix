@@ -42,6 +42,7 @@ public:
     void local_y_scale(double s) noexcept;
     void local_z_scale(double s) noexcept;
     void set_orientation(const math::Quat<double>& q) noexcept;
+    void look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
     void update() noexcept;
     void clear() noexcept;
 };

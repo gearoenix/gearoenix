@@ -48,16 +48,14 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-reflection.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-reflection.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-type.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-builder.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.cpp

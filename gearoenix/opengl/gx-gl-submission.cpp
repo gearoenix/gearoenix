@@ -59,15 +59,6 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
     gbuffer_uv_move_x = 1.0f / static_cast<float>(gbuffer_width);
     gbuffer_uv_move_y = 1.0f / static_cast<float>(gbuffer_height);
 
-    const core::sync::EndCallerIgnored txt_end([this] {
-        std::vector<Target::Attachment> attachments(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT);
-        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture = albedo_metallic_texture;
-        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture = position_depth_texture;
-        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture = normal_ao_texture;
-        attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture = emission_roughness_texture;
-        gbuffers_target = std::make_unique<Target>(std::move(attachments));
-    });
-
     const render::texture::TextureInfo position_depth_txt_info {
         .format = render::texture::TextureFormat::RgbaFloat32,
         .sampler_info = render::texture::SamplerInfo {
@@ -85,24 +76,36 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
         .has_mipmap = false,
     };
     position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, txt_end));
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
-    e.todos.unload();
+    auto gbuffers_depth_txt_info = position_depth_txt_info;
+    gbuffers_depth_txt_info.format = render::texture::TextureFormat::D32;
+    gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-depth", {}, gbuffers_depth_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+
+    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = albedo_metallic_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = position_depth_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = normal_ao_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = emission_roughness_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
+    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+
     GX_LOG_D("GBuffers have been created.");
 }
 
@@ -125,16 +128,13 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    const core::sync::EndCallerIgnored txt_end([this] {
-        ssao_resolve_target = std::make_unique<Target>(std::vector<Target::Attachment> {
-                                                           Target::Attachment { .texture = ssao_resolve_texture },
-                                                       },
-            false);
-    });
     ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, txt_end));
+        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
-    e.todos.unload();
+    std::vector<render::texture::Attachment> attachments(1);
+    attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
+    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
 
@@ -157,16 +157,14 @@ void gearoenix::gl::SubmissionManager::initialise_final() noexcept
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    const core::sync::EndCallerIgnored txt_end([this] {
-        final_target = std::make_unique<Target>(std::vector<Target::Attachment> {
-                                                    Target::Attachment { .texture = final_texture },
-                                                },
-            false);
-    });
     final_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-final", {}, txt_info, txt_end));
+        "gearoenix-opengl-texture-final", {}, txt_info, GX_DEFAULT_IGNORED_END_CALLER));
 
-    e.todos.unload();
+    std::vector<render::texture::Attachment> attachments(1);
+    attachments[0].var = render::texture::Attachment2D { .txt = final_texture };
+    final_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-final", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+
+    GX_LOG_D("Final render target has been created.");
 }
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
@@ -182,6 +180,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     initialise_gbuffers();
     initialise_ssao();
     initialise_final();
+    e.todos.unload();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
@@ -381,9 +380,9 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
     const float screen_uv_move_reserved[] = { gbuffer_uv_move_x, gbuffer_uv_move_y, 0.0f, 0.0f };
-    const auto* const gbuffers_attachments = gbuffers_target->get_attachments().data();
-    const auto* const ssao_resolved_attachments = ssao_resolve_target->get_attachments().data();
-    const auto* const final_attachments = final_target->get_attachments().data();
+    const auto* const gbuffers_attachments = gbuffers_target->get_gl_attachments().data();
+    const auto* const ssao_resolved_attachments = ssao_resolve_target->get_gl_attachments().data();
+    const auto* const final_attachments = final_target->get_gl_attachments().data();
     GX_GL_CHECK_D;
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
@@ -445,10 +444,10 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         ssao_resolve_shader->bind();
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_normal_ao_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
 
         ssao_resolve_shader->set_ssao_radius_move_start_end_data(reinterpret_cast<const float*>(&scene.ssao_settings));
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
@@ -487,19 +486,19 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         pbr_shader->bind();
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_albedo_metallic_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_normal_ao_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_emission_roughness_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(pbr_shader->get_ssao_resolved_index()));
-        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture_object);
 
         pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
 
@@ -537,7 +536,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         final_shader->bind();
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
-        glBindTexture(GL_TEXTURE_2D, final_attachments[0].texture->get_object());
+        glBindTexture(GL_TEXTURE_2D, final_attachments[0].texture_object);
 
         glBindVertexArray(screen_vertex_object);
         glDrawArrays(GL_TRIANGLES, 0, 3);

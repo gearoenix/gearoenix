@@ -1,5 +1,6 @@
 #include "gx-rnd-cmr-camera.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../texture/gx-rnd-txt-target.hpp"
 
 gearoenix::render::camera::Camera::Camera(
     const float target_aspect_ratio,
@@ -89,4 +90,9 @@ void gearoenix::render::camera::Camera::set_yfov(const float f) noexcept
     GX_ASSERT_D(Projection::Perspective == projection_type);
     scale = 2.0f * near * std::tanf(f);
     update_projection();
+}
+
+void gearoenix::render::camera::Camera::set_target(std::shared_ptr<texture::Target>&& t) noexcept
+{
+    target = std::move(t);
 }

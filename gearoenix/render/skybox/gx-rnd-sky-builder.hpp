@@ -14,10 +14,6 @@ namespace gearoenix::render::engine {
 struct Engine;
 }
 
-namespace gearoenix::render::mesh {
-struct Mesh;
-}
-
 namespace gearoenix::render::texture {
 struct Texture2D;
 struct TextureCube;
