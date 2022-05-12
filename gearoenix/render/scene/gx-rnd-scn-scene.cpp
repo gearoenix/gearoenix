@@ -32,6 +32,18 @@ void gearoenix::render::scene::Scene::add_camera(const core::ecs::Entity::id_t e
     entities.insert(entity);
 }
 
+void gearoenix::render::scene::Scene::add_baked_reflection(const core::ecs::Entity::id_t entity, reflection::Baked&) noexcept
+{
+    baked_reflection_entities.insert(entity);
+    entities.insert(entity);
+}
+
+void gearoenix::render::scene::Scene::add_runtime_reflection(const core::ecs::Entity::id_t entity, reflection::Runtime&) noexcept
+{
+    runtime_reflection_entities.insert(entity);
+    entities.insert(entity);
+}
+
 void gearoenix::render::scene::Scene::add_skybox(const core::ecs::Entity::id_t entity, skybox::Skybox&) noexcept
 {
     skybox_entities.insert(entity);
@@ -44,7 +56,7 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
     std::uint64_t flag = 1;
     cameras_flags.clear();
     world->synchronised_system<camera::Camera>([&](const core::ecs::Entity::id_t id, camera::Camera& cam) {
-        if (!cam.get_is_enabled() || cam.get_scene_id() != scene_entity_id)
+        if (!cam.enabled || cam.get_scene_id() != scene_entity_id)
             return;
         cameras_flags[id] = flag;
         cam.set_flag(flag);

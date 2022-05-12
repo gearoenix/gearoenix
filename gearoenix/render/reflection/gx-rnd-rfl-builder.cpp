@@ -1,6 +1,7 @@
 #include "gx-rnd-rfl-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../math/gx-math-numeric.hpp"
+#include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
@@ -24,6 +25,7 @@ gearoenix::render::reflection::Builder::Builder(
     builder.set_name(name);
     builder.add_component(Runtime(
         e,
+        *this,
         name,
         receive_box,
         exclude_box,
@@ -33,6 +35,17 @@ gearoenix::render::reflection::Builder::Builder(
         radiance_resolution,
         radiance_mipmap_levels,
         end_callback));
+    auto* const r = builder.get_component<Runtime>();
+    builder.add_component(Baked(
+        e,
+        std::shared_ptr(r->get_irradiance()),
+        std::shared_ptr(r->get_radiance()),
+        include_box));
 }
 
 gearoenix::render::reflection::Builder::~Builder() noexcept = default;
+
+void gearoenix::render::reflection::Builder::set_camera_builder(std::shared_ptr<camera::Builder>&& builder, const std::size_t face_index) noexcept
+{
+    faces_camera_builders[face_index] = std::move(builder);
+}

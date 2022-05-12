@@ -1,4 +1,5 @@
 #include "gx-rnd-rfl-manager.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-rfl-builder.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
@@ -32,4 +33,16 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::refle
         radiance_resolution,
         radiance_mipmap_levels,
         end_callback);
+}
+
+void gearoenix::render::reflection::Manager::update() noexcept
+{
+    e.get_world()->parallel_system<Runtime>([this](
+                                                const core::ecs::Entity::id_t /*entity_id*/,
+                                                Runtime& runtime_probe,
+                                                const unsigned int /*kernel_index*/) {
+        if (runtime_probe.enabled) {
+            runtime_probe.update_state();
+        }
+    });
 }

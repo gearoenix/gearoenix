@@ -22,7 +22,6 @@ namespace gearoenix::render::model {
 struct Model final : public core::ecs::Component {
     std::type_index material_type_index;
     TranslucencyMode translucency = TranslucencyMode::Opaque;
-    bool is_enabled_rendering = true;
     bool is_shadow_caster = true;
     bool is_shadow_receiver = true;
     bool is_transformable = false;
@@ -37,7 +36,6 @@ struct Model final : public core::ecs::Component {
         std::type_index material_type_index,
         bool is_transformable,
         TranslucencyMode translucency = TranslucencyMode::Opaque,
-        bool is_enabled_rendering = true,
         bool is_shadow_caster = true,
         bool is_shadow_receiver = true) noexcept;
     ~Model() noexcept final;

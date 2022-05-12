@@ -1,4 +1,4 @@
-#include "gx-gl-shader-gbuffers-filler.hpp"
+#include "gx-gl-shader-forward-pbr-transparent.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "gx-gl-engine.hpp"
@@ -90,7 +90,7 @@ void main() {\n\
 \n\
 }\n";
 
-gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept
+gearoenix::gl::ShaderForwardPbrTransparent::ShaderForwardPbrTransparent(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -113,9 +113,9 @@ gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept
     // GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance)
 }
 
-gearoenix::gl::ShaderGBuffersFiller::~ShaderGBuffersFiller() noexcept = default;
+gearoenix::gl::ShaderForwardPbrTransparent::~ShaderForwardPbrTransparent() noexcept = default;
 
-void gearoenix::gl::ShaderGBuffersFiller::bind() const noexcept
+void gearoenix::gl::ShaderForwardPbrTransparent::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo)

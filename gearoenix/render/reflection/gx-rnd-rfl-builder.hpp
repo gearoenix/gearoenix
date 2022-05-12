@@ -11,6 +11,10 @@ namespace gearoenix::core::ecs {
 struct EntitySharedBuilder;
 }
 
+namespace gearoenix::render::camera {
+struct Builder;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -22,6 +26,7 @@ struct TextureCube;
 namespace gearoenix::render::reflection {
 struct Builder {
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+    GX_GET_CREF_PRT(std::array<std::shared_ptr<camera::Builder> GX_COMMA 6>, faces_camera_builders)
 
     /// Creates static reflection probe
     Builder(
@@ -48,6 +53,7 @@ struct Builder {
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
     virtual ~Builder() noexcept;
+    void set_camera_builder(std::shared_ptr<camera::Builder>&& builder, std::size_t face_index) noexcept;
 };
 }
 #endif

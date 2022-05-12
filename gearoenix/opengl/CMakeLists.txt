@@ -13,14 +13,20 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr-transparent.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr-transparent.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr-transparent.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr-transparent.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr-transparent.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr-transparent.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-pbr.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.cpp

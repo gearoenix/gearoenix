@@ -67,11 +67,11 @@ public:
     [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_colour(
         const math::Vec4<float>& colour,
         const core::sync::EndCallerIgnored& c) noexcept;
-    [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_pixels(
+    [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
     [[nodiscard]] virtual std::shared_ptr<Target> create_target(
         std::string name,
         std::vector<Attachment>&& attachments,

@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_REFLECTION_BAKED_HPP
 #define GEAROENIX_RENDER_REFLECTION_BAKED_HPP
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include <vector>
 
@@ -17,8 +18,8 @@ struct Baked final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Aabb3<double>, include_box)
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance)
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance)
+    GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0)
     GX_GET_RRF_PRV(engine::Engine, e)
-    GX_GETSET_VAL_PRV(bool, enabled, true)
 
     Baked(
         engine::Engine& e,

@@ -14,7 +14,7 @@ struct Plane {
 
     Plane() = delete;
 
-    /// Normal must be normalized.
+    /// Normal must be normalised.
     constexpr Plane(const Vec3<Element>& point, const Vec3<Element>& normalized_normal) noexcept
         : normal_d(normalized_normal, -(normalized_normal.dot(point)))
         , point(point)
@@ -22,7 +22,7 @@ struct Plane {
     }
 
     constexpr Plane(const Vec3<Element>& point1, const Vec3<Element>& point2, const Vec3<Element>& point3) noexcept
-        : normal_d((point2 - point1).cross(point3 - point1).normalized(), static_cast<Element>(0))
+        : normal_d((point2 - point1).cross(point3 - point1).normalised(), static_cast<Element>(0))
         , point(point1)
     {
         normal_d.w = -(point.dot(normal_d.xyz()));

@@ -267,7 +267,7 @@ struct Vec3 final {
         return (*this - o).abs_length();
     }
 
-    /// \note Only on unit(normalized) vectors will give expected result.
+    /// \note Only on unit(normalised) vectors will give expected result.
     [[nodiscard]] constexpr Vec3 normalized_perpendicular() const noexcept
     {
         math::Vec3 result(static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0));
@@ -283,7 +283,7 @@ struct Vec3 final {
         return result;
     }
 
-    /// \note Only on (this) unit(normalized) vectors will give expected result.
+    /// \note Only on (this) unit(normalised) vectors will give expected result.
     [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const noexcept
     {
         return o - (*this * dot(o));
@@ -347,12 +347,12 @@ struct Vec3 final {
         return m > z ? m : z;
     }
 
-    [[nodiscard]] constexpr Vec3<Element> normalized() const noexcept
+    [[nodiscard]] constexpr Vec3<Element> normalised() const noexcept
     {
         return *this / length();
     }
 
-    constexpr void normalize() noexcept
+    constexpr void normalise() noexcept
     {
         *this /= length();
     }
@@ -443,10 +443,10 @@ struct Vec3 final {
         const auto sin_theta = static_cast<Element>(std::sqrt(one - cos_theta_p_2));
         const Vec3<Element> h(cos_phi * sin_theta, sin_phi * sin_theta, cos_theta);
         const Vec3<Element> up = std::abs(n.z) < (one - tolerance) ? Vec3(0.0f, 0.0f, 1.0f) : Vec3(1.0f, 0.0f, 0.0f);
-        const Vec3<Element> tangent = up.cross(n).normalized();
+        const Vec3<Element> tangent = up.cross(n).normalised();
         const Vec3<Element> bitangent = n.cross(tangent);
         const Vec3<Element> sample_vec = tangent * h.x + bitangent * h.y + n * h.z;
-        return sample_vec.normalized();
+        return sample_vec.normalised();
     }
 
     void read(platform::stream::Stream& f) noexcept

@@ -21,6 +21,10 @@ namespace gearoenix::render::model {
 struct Builder;
 }
 
+namespace gearoenix::render::reflection {
+struct Builder;
+}
+
 namespace gearoenix::render::skybox {
 struct Builder;
 }
@@ -35,6 +39,7 @@ private:
     std::vector<std::shared_ptr<model::Builder>> model_builders;
     std::vector<std::shared_ptr<camera::Builder>> camera_builders;
     std::vector<std::shared_ptr<skybox::Builder>> skybox_builders;
+    std::vector<std::shared_ptr<reflection::Builder>> reflection_builders;
 
     Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 
@@ -45,8 +50,9 @@ public:
     Builder& operator=(const Builder&) = delete;
     ~Builder() noexcept;
 
-    void add(std::shared_ptr<model::Builder>&& model_builder) noexcept;
     void add(std::shared_ptr<camera::Builder>&& camera_builder) noexcept;
+    void add(std::shared_ptr<model::Builder>&& model_builder) noexcept;
+    void add(std::shared_ptr<reflection::Builder>&& reflection_builder) noexcept;
     void add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept;
 };
 }

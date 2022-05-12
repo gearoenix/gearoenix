@@ -334,7 +334,7 @@ struct Mat4x4 final {
     [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& target, const Vec3<Element>& up) noexcept
     {
         const auto z = (target - position).normalized();
-        const auto x = up.cross(z).normalized();
+        const auto x = up.cross(z).normalised();
         const auto y = z.cross(x);
         return look_at(position, x, y, z);
     }

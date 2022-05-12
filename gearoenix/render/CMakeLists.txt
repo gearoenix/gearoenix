@@ -83,6 +83,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-pixel-iterator.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-sampler.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-sampler.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-target.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-target.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture.hpp

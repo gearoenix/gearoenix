@@ -247,7 +247,7 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
         // preferred alignment direction (importance sampling).
         const auto xi = math::Vec2<float>::hammersley(i, SAMPLE_COUNT);
         const auto h = math::Vec3<float>::importance_sample_ggx(xi, n, roughness);
-        const auto l = (h * (2.0f * v.dot(h)) - v).normalized();
+        const auto l = (h * (2.0f * v.dot(h)) - v).normalised();
 
         const auto n_dot_l = l.z > 0.0f ? l.z : 0.0f;
         const auto n_dot_h = h.z > 0.0f ? h.z : 0.0f;

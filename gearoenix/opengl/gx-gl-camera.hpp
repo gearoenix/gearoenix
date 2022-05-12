@@ -20,6 +20,7 @@ struct Camera final : public core::ecs::Component {
 
 struct CameraBuilder final : public render::camera::Builder {
     friend struct CameraManager;
+    Engine& eng;
 
 private:
     CameraBuilder(Engine& e, const std::string& name) noexcept;

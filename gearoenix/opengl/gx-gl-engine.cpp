@@ -7,6 +7,7 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
+#include "gx-gl-reflection.hpp"
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-submission.hpp"
 #include "gx-gl-texture.hpp"
@@ -23,6 +24,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     texture_manager = std::make_unique<TextureManager>(*this);
     submission_manager = std::make_unique<SubmissionManager>(*this);
     skybox_manager = std::make_unique<SkyboxManager>(*this);
+    reflection_manager = std::make_unique<ReflectionManager>(*this);
     todos.unload();
 }
 

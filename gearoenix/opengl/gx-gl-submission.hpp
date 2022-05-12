@@ -7,6 +7,7 @@
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -14,8 +15,8 @@ namespace gearoenix::gl {
 struct Engine;
 struct ShaderFinal;
 struct ShaderGBuffersFiller;
-struct ShaderPbr;
-struct ShaderPbrTransparent;
+struct ShaderDeferredPbr;
+struct ShaderDeferredPbrTransparent;
 struct ShaderSkyboxEquirectangular;
 struct ShaderSsaoResolve;
 struct Target;
@@ -37,6 +38,10 @@ struct SubmissionManager final {
         uint emission_txt = 0;
         uint metallic_roughness_txt = 0;
         uint occlusion_txt = 0;
+        // Reflection probe data
+        uint irradiance = static_cast<uint>(-1);
+        uint radiance = static_cast<uint>(-1);
+        double reflection_probe_size = std::numeric_limits<double>::max();
     };
 
     struct ModelBvhData final {
@@ -44,7 +49,14 @@ struct SubmissionManager final {
         ModelData model;
     };
 
+    struct DynamicModelData final {
+        ModelBvhData base;
+        math::Aabb3<double> box;
+    };
+
     struct CameraData final {
+        uint framebuffer = static_cast<uint>(-1);
+        math::Vec4<sizei> viewport_clip;
         math::Mat4x4<float> vp;
         math::Vec3<float> pos;
         float skybox_scale = 1.0;
@@ -58,22 +70,34 @@ struct SubmissionManager final {
 
     struct SkyboxData final {
         uint vertex_object = 0;
-        uint index_buffer = 0;
         uint albedo_txt = 0;
+    };
+
+    struct ReflectionData final {
+        uint irradiance = 0;
+        uint radiance = 0;
+        math::Aabb3<double> box;
+        double size = std::numeric_limits<double>::max();
+        ;
     };
 
     struct SceneData final {
         math::Vec4<float> ssao_settings;
         boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equrectangualr*/>, SkyboxData> skyboxes;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
+        boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> reflection_cameras;
+        boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> shadow_cameras;
+        std::vector<DynamicModelData> dynamic_models;
+        ReflectionData default_reflection;
+        std::vector<ReflectionData> reflections;
     };
 
 private:
     Engine& e;
     const std::unique_ptr<ShaderFinal> final_shader;
     const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
-    const std::unique_ptr<ShaderPbr> pbr_shader;
-    const std::unique_ptr<ShaderPbrTransparent> pbr_transparent_shader;
+    const std::unique_ptr<ShaderDeferredPbr> deferred_pbr_shader;
+    const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
     uint gbuffer_width, gbuffer_height;
@@ -102,6 +126,9 @@ private:
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
     [[nodiscard]] bool fill_gbuffers(const std::size_t camera_pool_index) noexcept;
+    void render_shadows() noexcept;
+    void render_reflection_probes() noexcept;
+    void render_reflection_probes(SceneData& scene) noexcept;
 
 public:
     SubmissionManager(Engine& e) noexcept;

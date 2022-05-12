@@ -8,6 +8,7 @@ gearoenix::render::camera::Camera::Camera(
     const float near,
     const float far) noexcept
     : core::ecs::Component(this)
+    , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target_aspect_ratio(target_aspect_ratio)
     , far(far)
     , near(near)

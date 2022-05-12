@@ -15,6 +15,7 @@ gearoenix::gl::Camera::Camera(Camera&&) noexcept = default;
 
 gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name) noexcept
     : render::camera::Builder(e, name)
+    , eng(e)
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(Camera());

@@ -6,6 +6,7 @@
 #include "../gx-rnd-gltf-loader.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
+#include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
 #include "../skybox/gx-rnd-sky-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
@@ -109,5 +110,6 @@ void gearoenix::render::engine::Engine::end_frame() noexcept
     physics_engine->start_frame(); // Don't mistake this with the actual start of frame, in start_frame of Engine, we prepare every thing for user intraction
     camera_manager->update();
     scene_manager->update();
+    reflection_manager->update();
     physics_engine->end_frame();
 }

@@ -39,6 +39,13 @@ struct TextureCube final : public render::texture::TextureCube {
 
     Engine& e;
     GX_GET_VAL_PRV(uint, object, 0)
+
+    TextureCube(
+        Engine& e,
+        const render::texture::TextureInfo& info,
+        std::string name) noexcept;
+    ~TextureCube() noexcept final;
+    void bind(enumerated texture_unit) noexcept;
 };
 
 struct TextureManager final : public render::texture::Manager {
@@ -49,6 +56,11 @@ struct TextureManager final : public render::texture::Manager {
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
+        const render::texture::TextureInfo& info,
+        const core::sync::EndCallerIgnored& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_cube_from_pixels(
+        std::string name,
+        std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const render::texture::TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Target> create_target(

@@ -52,6 +52,16 @@ struct Vec4 {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
+    template <typename T>
+    constexpr explicit Vec4(const Vec2<T>& v1, const Vec2<T>& v2) noexcept
+        : x(static_cast<Element>(v1.x))
+        , y(static_cast<Element>(v1.y))
+        , z(static_cast<Element>(v2.x))
+        , w(static_cast<Element>(v2.y))
+    {
+        static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
+    }
+
     [[nodiscard]] constexpr Vec3<Element> xyz() const noexcept
     {
         return Vec3<Element>(x, y, z);
@@ -128,6 +138,11 @@ struct Vec4 {
     [[nodiscard]] constexpr Vec4<Element> operator*(const Element o) const noexcept
     {
         return Vec4<Element>(x * o, y * o, z * o, w * o);
+    }
+
+    [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& o) const noexcept
+    {
+        return Vec4<Element>(x * o.x, y * o.y, z * o.z, w * o.w);
     }
 
     [[nodiscard]] constexpr Vec4<Element> operator/(const Element o) const noexcept

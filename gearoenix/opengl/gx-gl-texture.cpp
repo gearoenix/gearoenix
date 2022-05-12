@@ -168,6 +168,29 @@ void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) noexcept
     glBindTexture(GL_TEXTURE_2D, object);
 }
 
+gearoenix::gl::TextureCube::TextureCube(
+    Engine& e,
+    const render::texture::TextureInfo& info,
+    std::string name) noexcept
+    : render::texture::TextureCube(std::move(name), info, e)
+    , e(e)
+{
+}
+
+gearoenix::gl::TextureCube::~TextureCube() noexcept
+{
+    e.todos.load([o = object]() {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        glDeleteTextures(1, &o);
+    });
+}
+
+void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) noexcept
+{
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, object);
+}
+
 gearoenix::gl::TextureManager::TextureManager(Engine& e) noexcept
     : render::texture::Manager(e)
     , eng(e)
@@ -226,6 +249,65 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         glBindTexture(GL_TEXTURE_2D, 0);
+        GX_GL_CHECK_D;
+    });
+    return result;
+}
+
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureManager::create_cube_from_pixels(
+    std::string name,
+    std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+    const render::texture::TextureInfo& info,
+    const core::sync::EndCallerIgnored& c) noexcept
+{
+    std::shared_ptr<TextureCube> result(new TextureCube(eng, info, std::move(name)));
+    const bool needs_mipmap_generation = info.has_mipmap && (pixels.empty() || pixels[0].size() < 2);
+    const auto internal_format = convert_internal_format(info.format);
+    const auto format = convert_format(info.format);
+    const auto data_format = convert_data_format(info.format);
+    const auto gl_img_width = static_cast<gl::sizei>(info.width);
+    const auto gl_img_height = static_cast<gl::sizei>(info.height);
+    eng.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+        GX_GL_CHECK_D;
+        glGenTextures(1, &(result->object));
+        glBindTexture(GL_TEXTURE_CUBE_MAP, result->object);
+        GX_GL_CHECK_D;
+        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, convert_min(info.sampler_info.min_filter));
+        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, convert_mag(info.sampler_info.mag_filter));
+        GX_GL_CHECK_D;
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, convert(info.sampler_info.wrap_s));
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, convert(info.sampler_info.wrap_t));
+        GX_GL_CHECK_D;
+        if (pixels.size() > 1 || (!pixels.empty() && !info.has_mipmap)) {
+            glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
+        }
+        if (GL_DEPTH_COMPONENT32F == internal_format) {
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+        }
+        GX_GL_CHECK_D;
+        for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+            const auto gl_face = convert(render::texture::FACES[face_index]);
+            if (pixels.empty() || pixels[face_index].empty()) {
+                glTexImage2D(gl_face, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
+            } else {
+                const auto& face_pixels = pixels[face_index];
+                for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
+                    const auto li = static_cast<gl::sint>(level_index);
+                    auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
+                    if (lw < 1)
+                        lw = 1;
+                    auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
+                    if (lh < 1)
+                        lh = 1;
+                    glTexImage2D(gl_face, li, internal_format, lw, lh, 0, format, data_format, face_pixels[level_index].data());
+                }
+            }
+        }
+        if (needs_mipmap_generation) {
+            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+        }
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         GX_GL_CHECK_D;
     });
     return result;

@@ -260,7 +260,7 @@ private:
     }
 
     template <typename Function>
-    void call_on_all(const std::size_t ptr, Function&& function) const noexcept
+    void call_on_all(const std::size_t ptr, Function&& function) noexcept
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         if (node.leaf) {
@@ -268,7 +268,7 @@ private:
             for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                  data_index < data_size;
                  ++data_index, data_ptr += sizeof(Data)) {
-                function(*reinterpret_cast<const Data*>(data_ptr));
+                function(*reinterpret_cast<Data*>(data_ptr));
             }
         } else {
             call_on_all(reinterpret_cast<std::size_t>(&nodes[node.left]), function);
@@ -277,7 +277,7 @@ private:
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection) const noexcept
+    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection) noexcept
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
@@ -292,7 +292,7 @@ private:
             for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                  data_index < data_size;
                  ++data_index, data_ptr += sizeof(Data)) {
-                const auto& d = *reinterpret_cast<const Data*>(data_ptr);
+                auto& d = *reinterpret_cast<Data*>(data_ptr);
                 const auto is = cld.check_intersection_status(d.box);
                 if (math::IntersectionStatus::Out == is)
                     continue;
@@ -337,7 +337,7 @@ public:
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const Collider& cld, Function&& on_intersection) const noexcept
+    void call_on_intersecting(const Collider& cld, Function&& on_intersection) noexcept
     {
         if (nodes.empty())
             return;

@@ -1,10 +1,10 @@
-#ifndef GEAROENIX_GL_SHADER_GBUFFERS_FILLER_HPP
-#define GEAROENIX_GL_SHADER_GBUFFERS_FILLER_HPP
+#ifndef GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
+#define GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl {
-struct ShaderGBuffersFiller final : public Shader {
+struct ShaderForwardPbr final : public Shader {
     GX_GL_UNIFORM_MATRIX(m, 4, 1)
     GX_GL_UNIFORM_MATRIX(inv_m, 4, 1)
     GX_GL_UNIFORM_MATRIX(vp, 4, 1)
@@ -20,8 +20,8 @@ struct ShaderGBuffersFiller final : public Shader {
     GX_GL_UNIFORM_TEXTURE(irradiance)
     GX_GL_UNIFORM_TEXTURE(radiance)
 
-    ShaderGBuffersFiller(Engine& e) noexcept;
-    ~ShaderGBuffersFiller() noexcept final;
+    ShaderForwardPbr(Engine& e) noexcept;
+    ~ShaderForwardPbr() noexcept final;
     void bind() const noexcept final;
 };
 }

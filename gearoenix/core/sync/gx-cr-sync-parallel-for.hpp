@@ -27,8 +27,15 @@ public:
             f(*first, 0);
 #else
         exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
-            for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count) {
+            Iter iter = first;
+            for (unsigned int i = 0; i < kernel_index; ++i, ++iter)
+                if (iter == end)
+                    return;
+            while (iter != end) {
                 f(*iter, kernel_index);
+                for (unsigned int i = 0; i < kernels_count; ++i, ++iter)
+                    if (iter == end)
+                        return;
             }
         });
 #endif

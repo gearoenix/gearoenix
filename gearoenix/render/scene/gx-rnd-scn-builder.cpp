@@ -5,6 +5,9 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
+#include "../reflection/gx-rnd-rfl-baked.hpp"
+#include "../reflection/gx-rnd-rfl-builder.hpp"
+#include "../reflection/gx-rnd-rfl-runtime.hpp"
 #include "../skybox/gx-rnd-sky-builder.hpp"
 #include "../skybox/gx-rnd-sky-skybox.hpp"
 #include "gx-rnd-scn-scene.hpp"
@@ -39,6 +42,24 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& c
     b.get_component<Scene>()->add_camera(cb.get_id(), *c);
     c->set_scene_id(b.get_id());
     camera_builders.push_back(std::move(camera_builder));
+}
+
+void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>&& reflection_builder) noexcept
+{
+    auto& b = entity_builder->get_builder();
+    auto& rb = reflection_builder->get_entity_builder()->get_builder();
+    if (auto* const rr = rb.get_component<reflection::Runtime>(); nullptr != rr) {
+        b.get_component<Scene>()->add_runtime_reflection(rb.get_id(), *rr);
+        rr->set_scene_id(b.get_id());
+    }
+    if (auto* const br = rb.get_component<reflection::Baked>(); nullptr != br) {
+        b.get_component<Scene>()->add_baked_reflection(rb.get_id(), *br);
+        br->set_scene_id(b.get_id());
+    }
+    for (const auto& camera_builder : reflection_builder->get_faces_camera_builders())
+        if (nullptr != camera_builder)
+            add(std::shared_ptr<camera::Builder>(camera_builder));
+    reflection_builders.push_back(std::move(reflection_builder));
 }
 
 void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept

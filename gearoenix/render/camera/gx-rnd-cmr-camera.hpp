@@ -25,6 +25,12 @@ struct Camera final : public core::ecs::Component {
     friend struct Builder;
     friend struct Manager;
 
+    enum struct Usage {
+        ReflectionProbe,
+        Shadow,
+        Main,
+    };
+
     GX_GET_CREF_PRV(math::Mat4x4<float>, view)
     GX_GET_CREF_PRV(math::Mat4x4<float>, projection)
     GX_GET_CREF_PRV(math::Mat4x4<float>, view_projection)
@@ -39,8 +45,8 @@ struct Camera final : public core::ecs::Component {
     GX_GETSET_VAL_PRV(float, hdr_tune_mapping, 1.0f)
     GX_GETSET_VAL_PRV(float, gamma_correction, 2.2f)
     GX_GET_VAL_PRV(Projection, projection_type, Projection::Perspective)
-    GX_GETSET_VAL_PRV(bool, is_enabled, true)
     GX_GETSET_VAL_PRV(double, layer, 0.0)
+    GX_GETSET_VAL_PRV(Usage, usage, Usage::Main)
 
     Camera(
         float target_aspect_ratio,

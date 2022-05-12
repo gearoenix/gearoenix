@@ -1,4 +1,4 @@
-#include "gx-gl-shader-pbr-transparent.hpp"
+#include "gx-gl-shader-deferred-pbr-transparent.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -66,7 +66,7 @@ void main() {\n\
         (alb_mtl + pos_dpt + ems_rgh) * 0.00001;\n\
 }\n";
 
-gearoenix::gl::ShaderPbrTransparent::ShaderPbrTransparent(Engine& e) noexcept
+gearoenix::gl::ShaderDeferredPbrTransparent::ShaderDeferredPbrTransparent(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -81,9 +81,9 @@ gearoenix::gl::ShaderPbrTransparent::ShaderPbrTransparent(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved)
 }
 
-gearoenix::gl::ShaderPbrTransparent::~ShaderPbrTransparent() noexcept = default;
+gearoenix::gl::ShaderDeferredPbrTransparent::~ShaderDeferredPbrTransparent() noexcept = default;
 
-void gearoenix::gl::ShaderPbrTransparent::bind() const noexcept
+void gearoenix::gl::ShaderDeferredPbrTransparent::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic)

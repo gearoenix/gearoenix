@@ -37,6 +37,10 @@ namespace gearoenix::render::model {
 struct Manager;
 }
 
+namespace gearoenix::render::reflection {
+struct Manager;
+}
+
 namespace gearoenix::render::scene {
 struct Manager;
 }
@@ -67,6 +71,7 @@ struct Engine {
     GX_GET_UPTR_PRT(camera::Manager, camera_manager)
     GX_GET_UPTR_PRT(texture::Manager, texture_manager)
     GX_GET_UPTR_PRT(skybox::Manager, skybox_manager)
+    GX_GET_UPTR_PRT(reflection::Manager, reflection_manager)
     GX_GET_UPTR_PRT(core::ecs::World, world)
 
 protected:
