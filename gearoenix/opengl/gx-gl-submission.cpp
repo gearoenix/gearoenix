@@ -24,6 +24,7 @@
 #include "gx-gl-shader-deferred-pbr-transparent.hpp"
 #include "gx-gl-shader-deferred-pbr.hpp"
 #include "gx-gl-shader-final.hpp"
+#include "gx-gl-shader-forward-pbr.hpp"
 #include "gx-gl-shader-gbuffers-filler.hpp"
 #include "gx-gl-shader-skybox-equirectangular.hpp"
 #include "gx-gl-shader-ssao-resolve.hpp"
@@ -61,6 +62,7 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
     gbuffer_aspect_ratio = static_cast<float>(gbuffer_width) / static_cast<float>(gbuffer_height);
     gbuffer_uv_move_x = 1.0f / static_cast<float>(gbuffer_width);
     gbuffer_uv_move_y = 1.0f / static_cast<float>(gbuffer_height);
+    gbuffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(gbuffer_width), static_cast<sizei>(gbuffer_height));
 
     const render::texture::TextureInfo position_depth_txt_info {
         .format = render::texture::TextureFormat::RgbaFloat32,
@@ -170,13 +172,302 @@ void gearoenix::gl::SubmissionManager::initialise_final() noexcept
     GX_LOG_D("Final render target has been created.");
 }
 
+void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
+{
+    e.get_world()->synchronised_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
+        if (!scene.enabled)
+            return;
+        const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
+        auto& scene_pool_ref = scene_pool[scene_pool_index];
+        if (!scenes_bvhs.contains(scene_id))
+            scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<ModelBvhData>());
+        scene_pool_ref.skyboxes.clear();
+        scene_pool_ref.cameras.clear();
+        scene_pool_ref.reflections.clear();
+        scene_pool_ref.reflection_cameras.clear();
+        scene_pool_ref.shadow_cameras.clear();
+        scene_pool_ref.dynamic_models.clear();
+        e.get_world()->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
+            if (!camera.enabled)
+                return;
+            if (camera.get_scene_id() != scene_id)
+                return;
+            const auto camera_pool_index = camera_pool.emplace([&] { return CameraData(); });
+            switch (camera.get_usage()) {
+            case render::camera::Camera::Usage::Main:
+                scene_pool_ref.cameras.emplace(std::make_pair(camera.get_layer(), camera_id), camera_pool_index);
+                break;
+            case render::camera::Camera::Usage::ReflectionProbe:
+                scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
+                break;
+            case render::camera::Camera::Usage::Shadow:
+                scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
+                break;
+            }
+        });
+        e.get_world()->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) {
+            if (!render_skybox.enabled)
+                return;
+            if (render_skybox.get_scene_id() != scene_id)
+                return;
+            scene_pool_ref.skyboxes.emplace(
+                std::make_tuple(render_skybox.get_layer(), skybox_id, render_skybox.is_equirectangular()),
+                SkyboxData {
+                    .vertex_object = gl_skybox.get_vertex_object(),
+                    .albedo_txt = gl_skybox.get_texture_object(),
+                });
+        });
+        if (scene.get_reflection_probs_changed()) {
+            scene_pool_ref.default_reflection.size = -std::numeric_limits<double>::max();
+            // TODO: set black cube for reflection here
+            e.get_world()->synchronised_system<render::reflection::Baked, Reflection, ReflectionRuntime>([&](const core::ecs::Entity::id_t, render::reflection::Baked& render_baked, Reflection& gl_baked, ReflectionRuntime& rrg /*TODO temp*/) {
+                if (!render_baked.enabled)
+                    return;
+                if (render_baked.get_scene_id() != scene_id)
+                    return;
+                const ReflectionData r {
+                    //.irradiance = gl_baked.get_irradiance_v(),
+                    .irradiance = rrg.get_environment_v(),
+                    .radiance = gl_baked.get_radiance_v(),
+                    .box = render_baked.get_include_box(),
+                    .size = render_baked.get_include_box().get_diameter().square_length(),
+                };
+                scene_pool_ref.reflections.push_back(r);
+                if (r.size > scene_pool_ref.default_reflection.size) {
+                    scene_pool_ref.default_reflection = r;
+                }
+            });
+        }
+        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
+    });
+}
+
+void gearoenix::gl::SubmissionManager::update_scenes() noexcept
+{
+    e.get_world()->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& render_scene, const unsigned int /*kernel_index*/) noexcept {
+        if (!render_scene.enabled)
+            return;
+        auto& scene_data = scene_pool[scenes[std::make_pair(render_scene.get_layer(), scene_id)]];
+        update_scene(scene_id, scene_data, render_scene);
+    });
+}
+
+void gearoenix::gl::SubmissionManager::update_scene(const core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene) noexcept
+{
+    scene_data.ssao_settings = render_scene.get_ssao_settings();
+    auto& bvh = scenes_bvhs[scene_id];
+    update_scene_bvh(scene_id, scene_data, render_scene, bvh);
+    update_scene_dynamic_models(scene_id, scene_data);
+    update_scene_reflection_probes(scene_data, render_scene, bvh);
+    update_scene_cameras(scene_id, scene_data, bvh);
+}
+
+void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept
+{
+    if (!render_scene.get_recreate_bvh())
+        return;
+    bvh.reset();
+    e.get_world()->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
+        [&](const core::ecs::Entity::id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
+            if (!render_model.enabled || render_model.is_transformable || render_model.scene_id != scene_id)
+                return;
+            auto& mesh = *model.bound_mesh;
+            bvh.add({ collider.get_updated_box(),
+                ModelBvhData {
+                    .blocked_cameras_flags = render_model.block_cameras_flags,
+                    .model = ModelData {
+                        .m = math::Mat4x4<float>(model_transform.get_matrix()),
+                        .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
+                        .albedo_factor = model.material.get_albedo_factor(),
+                        .normal_metallic_factor = model.material.get_normal_metallic_factor(),
+                        .emission_roughness_factor = model.material.get_emission_roughness_factor(),
+                        .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
+                        .vertex_object = mesh.vertex_object,
+                        .vertex_buffer = mesh.vertex_buffer,
+                        .index_buffer = mesh.index_buffer,
+                        .indices_count = mesh.indices_count,
+                        .albedo_txt = model.albedo->get_object(),
+                        .normal_txt = model.normal->get_object(),
+                        .emission_txt = model.emission->get_object(),
+                        .metallic_roughness_txt = model.metallic_roughness->get_object(),
+                        .occlusion_txt = model.occlusion->get_object(),
+                        // Reflection probe data
+                        .irradiance = scene_data.default_reflection.irradiance,
+                        .radiance = scene_data.default_reflection.radiance,
+                        .reflection_probe_size = scene_data.default_reflection.size,
+                    } } });
+        });
+    bvh.create_nodes();
+}
+
+void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::ecs::Entity::id_t scene_id, SceneData& scene_data) noexcept
+{
+    e.get_world()->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
+        [&](
+            const core::ecs::Entity::id_t,
+            physics::collider::Aabb3& collider,
+            render::model::Model& render_model,
+            Model& gl_model,
+            physics::Transformation& model_transform) noexcept {
+            if (!render_model.enabled || !render_model.is_transformable || render_model.scene_id != scene_id)
+                return;
+            const auto& mesh = *gl_model.bound_mesh;
+            scene_data.dynamic_models.push_back(
+                DynamicModelData {
+                    .base = ModelBvhData {
+                        .blocked_cameras_flags = render_model.block_cameras_flags,
+                        .model = ModelData {
+                            .m = math::Mat4x4<float>(model_transform.get_matrix()),
+                            .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
+                            .albedo_factor = gl_model.material.get_albedo_factor(),
+                            .normal_metallic_factor = gl_model.material.get_normal_metallic_factor(),
+                            .emission_roughness_factor = gl_model.material.get_emission_roughness_factor(),
+                            .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = gl_model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
+                            .vertex_object = mesh.vertex_object,
+                            .vertex_buffer = mesh.vertex_buffer,
+                            .index_buffer = mesh.index_buffer,
+                            .indices_count = mesh.indices_count,
+                            .albedo_txt = gl_model.albedo->get_object(),
+                            .normal_txt = gl_model.normal->get_object(),
+                            .emission_txt = gl_model.emission->get_object(),
+                            .metallic_roughness_txt = gl_model.metallic_roughness->get_object(),
+                            .occlusion_txt = gl_model.occlusion->get_object(),
+                        },
+                    },
+                    .box = collider.get_updated_box(),
+                });
+        });
+}
+
+void gearoenix::gl::SubmissionManager::update_scene_reflection_probes(SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept
+{
+    if (render_scene.get_recreate_bvh() || render_scene.get_reflection_probs_changed()) {
+        for (const auto& reflection : scene_data.reflections) {
+            bvh.call_on_intersecting(reflection.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+                auto& m = bvh_node_data.user_data.model;
+                if (reflection.size > m.reflection_probe_size)
+                    return;
+                m.irradiance = reflection.irradiance;
+                m.radiance = reflection.radiance;
+                m.reflection_probe_size = reflection.size;
+            });
+        }
+    }
+
+    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const unsigned int) noexcept {
+        for (const auto& reflection : scene_data.reflections) {
+            if (!reflection.box.check_intersection(m.box))
+                return;
+            auto& mm = m.base.model;
+            if (reflection.size > mm.reflection_probe_size)
+                return;
+            mm.irradiance = reflection.irradiance;
+            mm.radiance = reflection.radiance;
+            mm.reflection_probe_size = reflection.size;
+        }
+    });
+}
+
+void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Entity::id_t scene_id, SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept
+{
+    e.get_world()->parallel_system<render::camera::Camera, Camera, physics::collider::Frustum, physics::Transformation>(
+        [&](
+            const core::ecs::Entity::id_t camera_id,
+            render::camera::Camera& render_camera,
+            Camera& gl_camera,
+            physics::collider::Frustum& frustum,
+            physics::Transformation& transform,
+            const unsigned int /*kernel_index*/) noexcept {
+            if (!render_camera.enabled || scene_id != render_camera.get_scene_id())
+                return;
+            const auto camera_location = transform.get_location();
+            std::size_t camera_pool_index = static_cast<std::size_t>(-1);
+            switch (render_camera.get_usage()) {
+            case render::camera::Camera::Usage::Main:
+                camera_pool_index = scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)];
+                break;
+            case render::camera::Camera::Usage::ReflectionProbe:
+                camera_pool_index = scene_data.reflection_cameras[camera_id];
+                break;
+            case render::camera::Camera::Usage::Shadow:
+                camera_pool_index = scene_data.shadow_cameras[camera_id];
+                break;
+            }
+            auto& camera_data = camera_pool[camera_pool_index];
+            math::Vec2<std::size_t> target_dimension;
+            if (nullptr != gl_camera.target) {
+                camera_data.framebuffer = gl_camera.target->get_framebuffer();
+                target_dimension = render_camera.get_target()->get_dimension();
+            } else {
+                camera_data.framebuffer = gbuffers_target->get_framebuffer();
+                target_dimension = gbuffers_target->get_dimension();
+            }
+            camera_data.viewport_clip = math::Vec4<sizei>(render_camera.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
+            camera_data.vp = render_camera.get_view_projection();
+            camera_data.pos = math::Vec3<float>(camera_location);
+            camera_data.skybox_scale = render_camera.get_far() / 1.732051f;
+            camera_data.skybox_scale += render_camera.get_near();
+            camera_data.skybox_scale *= 0.5f;
+            camera_data.opaque_models_data.clear();
+            camera_data.tranclucent_models_data.clear();
+
+            for (auto& v : camera_data.threads_opaque_models_data)
+                v.clear();
+            for (auto& v : camera_data.threads_tranclucent_models_data)
+                v.clear();
+
+            // Recoding static models
+            bvh.call_on_intersecting(frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+                if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
+                    return;
+                const auto dir = camera_location - bvh_node_data.box.get_center();
+                const auto dis = dir.square_length();
+                camera_data.opaque_models_data.emplace_back(dis, bvh_node_data.user_data.model);
+                // TODO opaque/translucent in ModelBvhData
+            });
+
+            // Recording dynamic models
+            core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const unsigned int kernel_index) noexcept {
+                if ((m.base.blocked_cameras_flags & render_camera.get_flag()) == 0)
+                    return;
+                if (!frustum.check_intersection(m.box))
+                    return;
+                const auto dir = camera_location - m.box.get_center();
+                const auto dis = dir.square_length();
+                camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, m.base.model);
+                // TODO opaque/translucent in ModelBvhData
+            });
+
+            for (auto& v : camera_data.threads_opaque_models_data)
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.opaque_models_data));
+
+            for (auto& v : camera_data.threads_tranclucent_models_data)
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.tranclucent_models_data));
+
+            std::sort(
+                GX_ALGORITHM_EXECUTION
+                    camera_data.opaque_models_data.begin(),
+                camera_data.opaque_models_data.end(),
+                [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+            std::sort(
+                GX_ALGORITHM_EXECUTION
+                    camera_data.tranclucent_models_data.begin(),
+                camera_data.tranclucent_models_data.end(),
+                [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+        });
+}
+
+void gearoenix::gl::SubmissionManager::fill_gbuffers(const std::size_t camera_pool_index) noexcept
+{
+}
+
 void gearoenix::gl::SubmissionManager::render_shadows() noexcept
 {
 }
 
 void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
 {
-    e.get_world()->synchronised_system<Reflection, ReflectionRuntime, render::reflection::Runtime>([&](auto, Reflection& r, ReflectionRuntime& rr, render::reflection::Runtime& rrr) noexcept {
+    e.get_world()->synchronised_system<Reflection, ReflectionRuntime, render::reflection::Runtime>([&](const core::ecs::Entity::id_t, Reflection& r, ReflectionRuntime& rr, render::reflection::Runtime& rrr) noexcept {
         constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
             std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // PositiveX
             std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // NegativeX
@@ -208,11 +499,24 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene
         GX_GL_CHECK_D;
         auto& camera = camera_pool[camera_pool_index.second];
 
-        glBindFramebuffer(GL_FRAMEBUFFER, camera.framebuffer);
+        if (current_bound_framebuffer != camera.framebuffer) {
+            current_bound_framebuffer = camera.framebuffer;
+            glBindFramebuffer(GL_FRAMEBUFFER, camera.framebuffer);
+        }
+
+        if (current_viewport_clip != camera.viewport_clip) {
+            current_viewport_clip = camera.viewport_clip;
+            glViewport(
+                camera.viewport_clip.x, camera.viewport_clip.y,
+                camera.viewport_clip.z, camera.viewport_clip.w);
+            glScissor(
+                camera.viewport_clip.x, camera.viewport_clip.y,
+                camera.viewport_clip.z, camera.viewport_clip.w);
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+        // Rendering skyboxes
         skybox_equirectangular_shader->bind();
-
         skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
         const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
         skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
@@ -224,12 +528,50 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
         }
         GX_GL_CHECK_D;
+        // Rendering forward pbr
+        forward_pbr_shader->bind();
+        const auto forward_pbr_txt_index_albedo = static_cast<enumerated>(forward_pbr_shader->get_albedo_index());
+        const auto forward_pbr_txt_index_normal = static_cast<enumerated>(forward_pbr_shader->get_normal_index());
+        const auto forward_pbr_txt_index_emission = static_cast<enumerated>(forward_pbr_shader->get_emission_index());
+        const auto forward_pbr_txt_index_metallic_roughness = static_cast<enumerated>(forward_pbr_shader->get_metallic_roughness_index());
+        const auto forward_pbr_txt_index_occlusion = static_cast<enumerated>(forward_pbr_shader->get_occlusion_index());
+        const auto forward_pbr_txt_index_irradiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
+        forward_pbr_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+        GX_GL_CHECK_D;
+        for (auto& distance_model_data : camera.opaque_models_data) {
+            GX_GL_CHECK_D;
+            auto& model_data = distance_model_data.second;
+            forward_pbr_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
+            forward_pbr_shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+            forward_pbr_shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
+            forward_pbr_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
+            forward_pbr_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
+            forward_pbr_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
+            GX_GL_CHECK_D;
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_albedo);
+            glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_normal);
+            glBindTexture(GL_TEXTURE_2D, model_data.normal_txt);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_emission);
+            glBindTexture(GL_TEXTURE_2D, model_data.emission_txt);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_metallic_roughness);
+            glBindTexture(GL_TEXTURE_2D, model_data.metallic_roughness_txt);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_occlusion);
+            glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_irradiance);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
+            GX_GL_CHECK_D;
+            glBindVertexArray(model_data.vertex_object);
+            glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
+            GX_GL_CHECK_D;
+        }
     }
 }
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
     , final_shader(new ShaderFinal(e))
+    , forward_pbr_shader(new ShaderForwardPbr(e))
     , gbuffers_filler_shader(new ShaderGBuffersFiller(e))
     , deferred_pbr_shader(new ShaderDeferredPbr(e))
     , deferred_pbr_transparent_shader(new ShaderDeferredPbrTransparent(e))
@@ -243,7 +585,8 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     e.todos.unload();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -274,267 +617,9 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     camera_pool.clear();
     scene_pool.clear();
     scenes.clear();
-    GX_REACHED;
-    world->synchronised_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
-        if (!scene.enabled)
-            return;
-        const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
-        auto& scene_pool_ref = scene_pool[scene_pool_index];
-        if (!scenes_bvhs.contains(scene_id))
-            scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<ModelBvhData>());
-        scene_pool_ref.cameras.clear();
-        scene_pool_ref.skyboxes.clear();
-        scene_pool_ref.reflections.clear();
-        scene_pool_ref.dynamic_models.clear();
-        scene_pool_ref.reflection_cameras.clear();
-        scene_pool_ref.shadow_cameras.clear();
-        world->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
-            if (!camera.enabled)
-                return;
-            if (camera.get_scene_id() != scene_id)
-                return;
-            const auto camera_pool_index = camera_pool.emplace([&] { return CameraData(); });
-            switch (camera.get_usage()) {
-            case render::camera::Camera::Usage::Main:
-                scene_pool_ref.cameras.emplace(std::make_pair(camera.get_layer(), camera_id), camera_pool_index);
-            case render::camera::Camera::Usage::ReflectionProbe:
-                scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
-            case render::camera::Camera::Usage::Shadow:
-                scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
-            }
-        });
-        world->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) {
-            if (!render_skybox.enabled)
-                return;
-            if (render_skybox.get_scene_id() != scene_id)
-                return;
-            scene_pool_ref.skyboxes.emplace(
-                std::make_tuple(render_skybox.get_layer(), skybox_id, render_skybox.is_equirectangular()),
-                SkyboxData {
-                    .vertex_object = gl_skybox.get_vertex_object(),
-                    .albedo_txt = gl_skybox.get_texture_object(),
-                });
-        });
-        if (scene.get_reflection_probs_changed()) {
-            scene_pool_ref.default_reflection.size = std::numeric_limits<double>::max();
-            // TODO: set black cube for reflection here
-            world->synchronised_system<render::reflection::Baked, Reflection, ReflectionRuntime>([&](const core::ecs::Entity::id_t, render::reflection::Baked& render_baked, Reflection& gl_baked, ReflectionRuntime& rrg /*TODO temp*/) {
-                if (!render_baked.enabled)
-                    return;
-                if (render_baked.get_scene_id() != scene_id)
-                    return;
-                const ReflectionData r {
-                    //.irradiance = gl_baked.get_irradiance_v(),
-                    .irradiance = rrg.get_environment_v(),
-                    .radiance = gl_baked.get_radiance_v(),
-                    .box = render_baked.get_include_box(),
-                    .size = render_baked.get_include_box().get_diameter().square_length(),
-                };
-                scene_pool_ref.reflections.push_back(r);
-                if (r.size > scene_pool_ref.default_reflection.size) {
-                    scene_pool_ref.default_reflection = r;
-                }
-            });
-        }
-        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
-    });
-    GX_REACHED;
 
-    world->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene, const auto /*kernel_index*/) {
-        if (!scene.enabled)
-            return;
-        auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
-        scene_data.ssao_settings = scene.get_ssao_settings();
-        auto& bvh = scenes_bvhs[scene_id];
-        if (scene.get_recreate_bvh()) {
-            bvh.reset();
-            world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
-                [&](const core::ecs::Entity::id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
-                    if (!render_model.enabled || render_model.is_transformable || render_model.scene_id != scene_id)
-                        return;
-                    auto& mesh = *model.bound_mesh;
-                    bvh.add({ collider.get_updated_box(),
-                        ModelBvhData {
-                            .blocked_cameras_flags = render_model.block_cameras_flags,
-                            .model = ModelData {
-                                .m = math::Mat4x4<float>(model_transform.get_matrix()),
-                                .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
-                                .albedo_factor = model.material.get_albedo_factor(),
-                                .normal_metallic_factor = model.material.get_normal_metallic_factor(),
-                                .emission_roughness_factor = model.material.get_emission_roughness_factor(),
-                                .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
-                                .vertex_object = mesh.vertex_object,
-                                .vertex_buffer = mesh.vertex_buffer,
-                                .index_buffer = mesh.index_buffer,
-                                .indices_count = mesh.indices_count,
-                                .albedo_txt = model.albedo->get_object(),
-                                .normal_txt = model.normal->get_object(),
-                                .emission_txt = model.emission->get_object(),
-                                .metallic_roughness_txt = model.metallic_roughness->get_object(),
-                                .occlusion_txt = model.occlusion->get_object(),
-                                // Reflection probe data
-                                .irradiance = scene_data.default_reflection.irradiance,
-                                .radiance = scene_data.default_reflection.radiance,
-                                .reflection_probe_size = scene_data.default_reflection.size,
-                            } } });
-                });
-            bvh.create_nodes();
-        }
-        GX_REACHED;
-
-        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
-            [&](
-                const core::ecs::Entity::id_t,
-                physics::collider::Aabb3& collider,
-                render::model::Model& render_model,
-                Model& gl_model,
-                physics::Transformation& model_transform) noexcept {
-                if (!render_model.enabled || !render_model.is_transformable || render_model.scene_id != scene_id)
-                    return;
-                const auto& mesh = *gl_model.bound_mesh;
-                scene_data.dynamic_models.push_back(
-                    DynamicModelData {
-                        .base = ModelBvhData {
-                            .blocked_cameras_flags = render_model.block_cameras_flags,
-                            .model = ModelData {
-                                .m = math::Mat4x4<float>(model_transform.get_matrix()),
-                                .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
-                                .albedo_factor = gl_model.material.get_albedo_factor(),
-                                .normal_metallic_factor = gl_model.material.get_normal_metallic_factor(),
-                                .emission_roughness_factor = gl_model.material.get_emission_roughness_factor(),
-                                .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = gl_model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
-                                .vertex_object = mesh.vertex_object,
-                                .vertex_buffer = mesh.vertex_buffer,
-                                .index_buffer = mesh.index_buffer,
-                                .indices_count = mesh.indices_count,
-                                .albedo_txt = gl_model.albedo->get_object(),
-                                .normal_txt = gl_model.normal->get_object(),
-                                .emission_txt = gl_model.emission->get_object(),
-                                .metallic_roughness_txt = gl_model.metallic_roughness->get_object(),
-                                .occlusion_txt = gl_model.occlusion->get_object(),
-                            },
-                        },
-                        .box = collider.get_updated_box(),
-                    });
-            });
-        GX_REACHED;
-
-        if (scene.get_recreate_bvh() || scene.get_reflection_probs_changed()) {
-            for (const auto& reflection : scene_data.reflections) {
-                bvh.call_on_intersecting(reflection.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
-                    auto& m = bvh_node_data.user_data.model;
-                    if (reflection.size > m.reflection_probe_size)
-                        return;
-                    m.irradiance = reflection.irradiance;
-                    m.radiance = reflection.radiance;
-                    m.reflection_probe_size = reflection.size;
-                });
-            }
-        }
-        GX_REACHED;
-
-        core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const auto) noexcept {
-            for (const auto& reflection : scene_data.reflections) {
-                if (!reflection.box.check_intersection(m.box))
-                    return;
-                auto& mm = m.base.model;
-                if (reflection.size > mm.reflection_probe_size)
-                    return;
-                mm.irradiance = reflection.irradiance;
-                mm.radiance = reflection.radiance;
-                mm.reflection_probe_size = reflection.size;
-            }
-        });
-        GX_REACHED;
-
-        world->parallel_system<render::camera::Camera, Camera, physics::collider::Frustum, physics::Transformation>(
-            [&](
-                const core::ecs::Entity::id_t camera_id,
-                render::camera::Camera& render_camera,
-                Camera& gl_camera,
-                physics::collider::Frustum& frustum,
-                physics::Transformation& transform,
-                const auto /*kernel_index*/) noexcept {
-                if (!render_camera.enabled || scene_id != render_camera.get_scene_id())
-                    return;
-                const auto camera_location = transform.get_location();
-                std::size_t camera_pool_index = -1;
-                switch (render_camera.get_usage()) {
-                case render::camera::Camera::Usage::Main:
-                    camera_pool_index = scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)];
-                    break;
-                case render::camera::Camera::Usage::ReflectionProbe:
-                    camera_pool_index = scene_data.reflection_cameras[camera_id];
-                    break;
-                case render::camera::Camera::Usage::Shadow:
-                    camera_pool_index = scene_data.shadow_cameras[camera_id];
-                    break;
-                }
-                auto& camera_data = camera_pool[camera_pool_index];
-                math::Vec2<std::size_t> target_dimension;
-                if (nullptr != gl_camera.target) {
-                    camera_data.framebuffer = gl_camera.target->get_framebuffer();
-                    target_dimension = render_camera.get_target()->get_dimension();
-                } else {
-                    camera_data.framebuffer = gbuffers_target->get_framebuffer();
-                    target_dimension = gbuffers_target->get_dimension();
-                }
-                camera_data.viewport_clip = math::Vec4<sizei>(render_camera.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
-                camera_data.vp = render_camera.get_view_projection();
-                camera_data.pos = math::Vec3<float>(camera_location);
-                camera_data.skybox_scale = render_camera.get_far() / 1.732051f;
-                camera_data.skybox_scale += render_camera.get_near();
-                camera_data.skybox_scale *= 0.5f;
-                camera_data.opaque_models_data.clear();
-                camera_data.tranclucent_models_data.clear();
-
-                for (auto& v : camera_data.threads_opaque_models_data)
-                    v.clear();
-                for (auto& v : camera_data.threads_tranclucent_models_data)
-                    v.clear();
-
-                // Recoding static models
-                bvh.call_on_intersecting(frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                    if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
-                        return;
-                    const auto dir = camera_location - bvh_node_data.box.get_center();
-                    const auto dis = dir.square_length();
-                    camera_data.opaque_models_data.emplace_back(dis, bvh_node_data.user_data.model);
-                    // TODO opaque/translucent in ModelBvhData
-                });
-
-                // Recording dynamic models
-                core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const unsigned int kernel_index) noexcept {
-                    if ((m.base.blocked_cameras_flags & render_camera.get_flag()) == 0)
-                        return;
-                    if (!frustum.check_intersection(m.box))
-                        return;
-                    const auto dir = camera_location - m.box.get_center();
-                    const auto dis = dir.square_length();
-                    camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, m.base.model);
-                    // TODO opaque/translucent in ModelBvhData
-                });
-
-                for (auto& v : camera_data.threads_opaque_models_data)
-                    std::move(v.begin(), v.end(), std::back_inserter(camera_data.opaque_models_data));
-
-                for (auto& v : camera_data.threads_tranclucent_models_data)
-                    std::move(v.begin(), v.end(), std::back_inserter(camera_data.tranclucent_models_data));
-
-                std::sort(
-                    GX_ALGORITHM_EXECUTION
-                        camera_data.opaque_models_data.begin(),
-                    camera_data.opaque_models_data.end(),
-                    [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-                std::sort(
-                    GX_ALGORITHM_EXECUTION
-                        camera_data.tranclucent_models_data.begin(),
-                    camera_data.tranclucent_models_data.end(),
-                    [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-            });
-        GX_REACHED;
-    });
-    GX_REACHED;
+    fill_scenes();
+    update_scenes();
 
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
@@ -555,10 +640,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         const auto gbuffers_filler_txt_index_occlusion = static_cast<enumerated>(gbuffers_filler_shader->get_occlusion_index());
         const auto gbuffers_filler_txt_index_irradiance = static_cast<enumerated>(gbuffers_filler_shader->get_irradiance_index());
 
-        GX_REACHED;
         glDisable(GL_BLEND); // TODO find the best place for it
-        uint current_bound_framebuffer = static_cast<uint>(-1);
-        math::Vec4<sizei> current_viewport_clip;
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             GX_GL_CHECK_D;
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
@@ -583,7 +665,6 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             gbuffers_filler_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
             GX_GL_CHECK_D;
             for (auto& distance_model_data : camera.opaque_models_data) {
-                GX_REACHED;
                 GX_GL_CHECK_D;
                 auto& model_data = distance_model_data.second;
                 gbuffers_filler_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
@@ -611,17 +692,29 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 GX_GL_CHECK_D;
             }
         }
-        //}
+    }
 
-        // render_shadows();
-        // render_reflection_probes();
+    // render_shadows();
+    // render_reflection_probes();
 
-        // for (auto& scene_layer_entity_id_pool_index : scenes) {
-        //     auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
-        // render_reflection_probes(scene);
+    for (auto& scene_layer_entity_id_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        render_reflection_probes(scene);
 
         // SSAO resolving -------------------------------------------------------------------------------------
         ssao_resolve_target->bind();
+
+        // TODO: repeatative block make it a function
+        if (current_viewport_clip != gbuffer_viewport_clip) {
+            current_viewport_clip = gbuffer_viewport_clip;
+            glViewport(
+                current_viewport_clip.x, current_viewport_clip.y,
+                current_viewport_clip.z, current_viewport_clip.w);
+            glScissor(
+                current_viewport_clip.x, current_viewport_clip.y,
+                current_viewport_clip.z, current_viewport_clip.w);
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         ssao_resolve_shader->bind();
 
@@ -659,8 +752,6 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 glBindVertexArray(skybox.vertex_object);
                 glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
             }
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
             GX_GL_CHECK_D;
         }
 
@@ -701,6 +792,10 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             glScissor(
                 static_cast<sizei>(0), screen_y,
                 static_cast<sizei>(base_os_app.get_window_size().x), screen_height);
+            current_viewport_clip.x = 0;
+            current_viewport_clip.y = screen_y;
+            current_viewport_clip.z = static_cast<sizei>(base_os_app.get_window_size().x);
+            current_viewport_clip.w = screen_height;
         } else {
             const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * gbuffer_aspect_ratio + 0.1f);
             const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
@@ -710,6 +805,10 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             glScissor(
                 screen_x, static_cast<sizei>(0),
                 screen_width, static_cast<sizei>(base_os_app.get_window_size().y));
+            current_viewport_clip.x = screen_x;
+            current_viewport_clip.y = 0;
+            current_viewport_clip.z = screen_width;
+            current_viewport_clip.w = static_cast<sizei>(base_os_app.get_window_size().y);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

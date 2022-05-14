@@ -17,8 +17,6 @@ public:
     ParallelFor() = delete;
     ~ParallelFor() = delete;
 
-    static void initialise() noexcept;
-
     template <typename Iter, typename Fun>
     static void exec(Iter first, Iter end, Fun&& f)
     {

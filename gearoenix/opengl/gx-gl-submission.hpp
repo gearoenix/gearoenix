@@ -11,9 +11,14 @@
 #include <memory>
 #include <vector>
 
+namespace gearoenix::render::scene {
+struct Scene;
+}
+
 namespace gearoenix::gl {
 struct Engine;
 struct ShaderFinal;
+struct ShaderForwardPbr;
 struct ShaderGBuffersFiller;
 struct ShaderDeferredPbr;
 struct ShaderDeferredPbrTransparent;
@@ -77,7 +82,7 @@ struct SubmissionManager final {
         uint irradiance = 0;
         uint radiance = 0;
         math::Aabb3<double> box;
-        double size = std::numeric_limits<double>::max();
+        double size = -std::numeric_limits<double>::max();
         ;
     };
 
@@ -95,6 +100,7 @@ struct SubmissionManager final {
 private:
     Engine& e;
     const std::unique_ptr<ShaderFinal> final_shader;
+    const std::unique_ptr<ShaderForwardPbr> forward_pbr_shader;
     const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
     const std::unique_ptr<ShaderDeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
@@ -119,13 +125,23 @@ private:
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
-
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+    math::Vec4<sizei> current_viewport_clip;
+    math::Vec4<sizei> gbuffer_viewport_clip;
+    uint current_bound_framebuffer = static_cast<uint>(-1);
 
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
-    [[nodiscard]] bool fill_gbuffers(const std::size_t camera_pool_index) noexcept;
+
+    void fill_scenes() noexcept;
+    void update_scenes() noexcept;
+    void update_scene(core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene) noexcept;
+    void update_scene_bvh(core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
+    void update_scene_dynamic_models(core::ecs::Entity::id_t scene_id, SceneData& scene_data) noexcept;
+    void update_scene_reflection_probes(SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
+    void update_scene_cameras(core::ecs::Entity::id_t scene_id, SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
+    void fill_gbuffers(const std::size_t camera_pool_index) noexcept;
     void render_shadows() noexcept;
     void render_reflection_probes() noexcept;
     void render_reflection_probes(SceneData& scene) noexcept;

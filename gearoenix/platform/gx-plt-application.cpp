@@ -13,7 +13,6 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
 {
-    core::sync::ParallelFor::initialise();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();

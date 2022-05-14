@@ -36,13 +36,13 @@ gearoenix::render::reflection::Runtime::Runtime(
     GX_ASSERT((radiance_resolution >> radiance_mipmap_levels) > 2);
     const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
     const auto fars = math::Vec3<float>(receive_box.get_diameter() * 0.5);
-    const std::tuple<texture::Face, math::Vec3<double> /*target*/, math::Vec3<double> /*up*/, float /*near*/, float /*far*/> faces[6] = {
-        { texture::FACES[0], math::Vec3(1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0), nears.x, fars.x },
-        { texture::FACES[1], math::Vec3(-1.0, 0.0, 0.0), math::Vec3(0.0, -1.0, 0.0), nears.x, fars.x },
-        { texture::FACES[2], math::Vec3(0.0, 1.0, 0.0), math::Vec3(0.0, 0.0, 1.0), nears.y, fars.y },
-        { texture::FACES[3], math::Vec3(0.0, -1.0, 0.0), math::Vec3(0.0, 0.0, -1.0), nears.y, fars.y },
-        { texture::FACES[4], math::Vec3(0.0, 0.0, 1.0), math::Vec3(0.0, -1.0, 0.0), nears.z, fars.z },
-        { texture::FACES[5], math::Vec3(0.0, 0.0, -1.0), math::Vec3(0.0, -1.0, 0.0), nears.z, fars.z },
+    const std::tuple<texture::Face, double /*x-rotate*/, double /*y-rotate*/, double /*z-rotate*/, float /*near*/, float /*far*/> faces[6] = {
+        { texture::FACES[0], GX_PI * 0.0, GX_PI * 1.5, GX_PI * 1.0, nears.x, fars.x },
+        { texture::FACES[1], GX_PI * 0.0, GX_PI * 0.5, GX_PI * 1.0, nears.x, fars.x },
+        { texture::FACES[2], GX_PI * 0.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
+        { texture::FACES[3], GX_PI * 1.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
+        { texture::FACES[4], GX_PI * 1.0, GX_PI * 0.0, GX_PI * 0.0, nears.z, fars.z },
+        { texture::FACES[5], GX_PI * 0.0, GX_PI * 0.0, GX_PI * 1.0, nears.z, fars.z },
     };
     auto* const txt_mgr = e.get_texture_manager();
     auto* const cam_mgr = e.get_camera_manager();
@@ -124,14 +124,16 @@ gearoenix::render::reflection::Runtime::Runtime(
             end_callback);
         camera_builder->set_target(std::shared_ptr<texture::Target>(environment_targets[face_index]));
         auto& cam = camera_builder->get_camera();
-        cam.set_yfov(1.570796327f);
+        cam.set_yfov(static_cast<float>(GX_PI * 0.25));
         cam.set_target_aspect_ratio(1.0f);
-        cam.set_near(std::get<3>(face));
-        cam.set_far(std::get<4>(face));
+        cam.set_near(std::get<4>(face));
+        cam.set_far(std::get<5>(face));
         cam.set_usage(camera::Camera::Usage::ReflectionProbe);
         cam.enabled = false;
         auto& transform = camera_builder->get_transformation();
-        transform.look_at(std::get<1>(face), std::get<2>(face));
+        transform.local_x_rotate(std::get<1>(face));
+        transform.local_y_rotate(std::get<2>(face));
+        transform.local_z_rotate(std::get<3>(face));
         transform.set_location(receive_box.get_center());
         builder.set_camera_builder(std::move(camera_builder), face_index);
         irradiance_targets[face_index] = txt_mgr->create_target(
@@ -192,7 +194,7 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
         e.get_world()->get_component<camera::Camera>(cameras[0])->enabled = true;
         break;
     case State::EnvironmentCubeRender:
-        e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = false;
+        // e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = false;
         ++state_environment_face;
         if (state_environment_face < 6) {
             e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = true;
@@ -225,7 +227,8 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
             if (state_radiance_face > 5) {
                 state_radiance_face = 0;
                 state = State::Resting;
-                on_rendered();
+                if (on_rendered.has_value())
+                    (*on_rendered)();
             }
         }
         break;

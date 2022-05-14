@@ -69,10 +69,7 @@ in vec3 out_tng;\n\
 in vec3 out_btg;\n\
 in vec2 out_uv;\n\
 \n\
-layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC) ") out vec4 frag_out_albedo_metallic;\n\
-layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH) ") out vec4 frag_out_position_depth;\n\
-layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO) ") out vec4 frag_out_normal_ao;\n\
-layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS) ") out vec4 frag_out_emission_roughness;\n\
+out vec4 frag_out;\n\
 \n\
 void main() {\n\
 \n\
@@ -80,14 +77,16 @@ void main() {\n\
 \n\
     float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n\
 \n\
-    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos);\n\
+    frag_out = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos);\n\
 \n\
-    frag_out_position_depth = vec4(out_pos, gl_FragCoord.z);\n\
+    frag_out += vec4(out_pos, gl_FragCoord.z);\n\
 \n\
-    frag_out_normal_ao = vec4(normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz)), ao);\n\
+    frag_out += vec4(normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz)), ao);\n\
 \n\
-    frag_out_emission_roughness = vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, mtr.y);\n\
+    frag_out += vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, mtr.y);\n\
 \n\
+    frag_out *= 0.00001;\n\
+    frag_out += vec4(0.0, 1.0, 0.0, 1.0);\n\
 }\n";
 
 gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(Engine& e) noexcept

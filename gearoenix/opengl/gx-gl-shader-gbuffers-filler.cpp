@@ -80,7 +80,7 @@ void main() {\n\
 \n\
     float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n\
 \n\
-    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos);\n\
+    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + vec4(texture(irradiance, normalize(out_pos)).xyz, 1.0);\n\
 \n\
     frag_out_position_depth = vec4(out_pos, gl_FragCoord.z);\n\
 \n\

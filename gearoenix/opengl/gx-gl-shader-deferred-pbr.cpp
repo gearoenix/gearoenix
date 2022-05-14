@@ -64,7 +64,7 @@ void main() {\n\
     ssao_value = 1.0 - (step(ssao_main_pixel_value, 0.999) * (1.0 - ssao_value * 0.1111111111111111111111111));\n\
     ssao_value *= nrm_ao.w;\n\
 \n\
-    frag_colour = vec4(vec3(ssao_value), 1.0) +\n\
+    frag_colour = vec4(alb_mtl.xyz * vec3(ssao_value), 1.0) +\n\
         (alb_mtl + pos_dpt + ems_rgh) * 0.00001;\n\
 }\n";
 

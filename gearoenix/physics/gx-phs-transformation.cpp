@@ -191,7 +191,7 @@ void gearoenix::physics::Transformation::set_orientation(const math::Quat<double
 
 void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
 {
-    changed = false;
+    changed = true;
     math::Vec3<double> l;
     get_location(l);
     z_axis = (l - target).normalised();

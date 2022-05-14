@@ -11,6 +11,7 @@
 #include <functional>
 #include <limits>
 #include <memory>
+#include <optional>
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -51,7 +52,7 @@ struct Runtime final : public core::ecs::Component {
     GX_GET_VAL_PRV(std::size_t, state_radiance_level, 0)
     GX_GET_VAL_PRV(std::size_t, state_resting_frame, 0)
     GX_GETSET_VAL_PRV(std::size_t, resting_frames_count, std::numeric_limits<std::size_t>::max())
-    GX_GETSET_CREF_PRV(std::function<void()>, on_rendered)
+    GX_GETSET_CREF_PRV(std::optional<std::function<void()>>, on_rendered)
     GX_GETSET_VAL_PRV(bool, pending_to_start, false)
     GX_GET_CREF_PRV(math::Aabb3<double>, receive_box)
     GX_GET_CREF_PRV(math::Aabb3<double>, exclude_box)

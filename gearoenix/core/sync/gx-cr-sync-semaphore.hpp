@@ -18,19 +18,17 @@ public:
     void operator=(Semaphore const&) = delete;
     ~Semaphore() noexcept = default;
     void lock() noexcept;
-    template <typename Duration>
-    void lock_until(const Duration& timeout_time) noexcept;
     void release() noexcept;
-};
-}
 
-template <typename Duration>
-void gearoenix::core::sync::Semaphore::lock_until(const Duration& timeout_time) noexcept
-{
-    std::unique_lock<std::mutex> lock(m);
-    if (c.wait_until(lock, timeout_time, [this] { return count > 0; })) {
-        --count;
+    template <typename Duration>
+    void lock_for(const Duration& timeout_time) noexcept
+    {
+        std::unique_lock<std::mutex> lock(m);
+        if (c.wait_for(lock, timeout_time, [this] { return count > 0; })) {
+            --count;
+        }
     }
+};
 }
 #endif
 #endif

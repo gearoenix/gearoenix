@@ -25,10 +25,10 @@ struct Camera final : public core::ecs::Component {
     friend struct Builder;
     friend struct Manager;
 
-    enum struct Usage {
-        ReflectionProbe,
-        Shadow,
-        Main,
+    enum struct Usage : std::uint8_t {
+        ReflectionProbe = 5,
+        Shadow = 11,
+        Main = 23,
     };
 
     GX_GET_CREF_PRV(math::Mat4x4<float>, view)
