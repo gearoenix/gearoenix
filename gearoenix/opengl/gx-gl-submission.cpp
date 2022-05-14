@@ -218,23 +218,24 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
                 });
         });
         if (scene.get_reflection_probs_changed()) {
-            scene_pool_ref.default_reflection.size = -std::numeric_limits<double>::max();
-            // TODO: set black cube for reflection here
-            e.get_world()->synchronised_system<render::reflection::Baked, Reflection, ReflectionRuntime>([&](const core::ecs::Entity::id_t, render::reflection::Baked& render_baked, Reflection& gl_baked, ReflectionRuntime& rrg /*TODO temp*/) {
+            scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
+            scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
+            scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
+            e.get_world()->synchronised_system<render::reflection::Baked, Reflection>([&](const core::ecs::Entity::id_t reflection_id, render::reflection::Baked& render_baked, Reflection& gl_baked) {
                 if (!render_baked.enabled)
                     return;
                 if (render_baked.get_scene_id() != scene_id)
                     return;
                 const ReflectionData r {
-                    //.irradiance = gl_baked.get_irradiance_v(),
-                    .irradiance = rrg.get_environment_v(),
+                    .irradiance = gl_baked.get_irradiance_v(),
                     .radiance = gl_baked.get_radiance_v(),
                     .box = render_baked.get_include_box(),
                     .size = render_baked.get_include_box().get_diameter().square_length(),
                 };
-                scene_pool_ref.reflections.push_back(r);
-                if (r.size > scene_pool_ref.default_reflection.size) {
-                    scene_pool_ref.default_reflection = r;
+                scene_pool_ref.reflections.emplace(reflection_id, r);
+                if (r.size > scene_pool_ref.default_reflection.second.size) {
+                    scene_pool_ref.default_reflection.first = reflection_id;
+                    scene_pool_ref.default_reflection.second = r;
                 }
             });
         }
@@ -292,9 +293,9 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
                         .metallic_roughness_txt = model.metallic_roughness->get_object(),
                         .occlusion_txt = model.occlusion->get_object(),
                         // Reflection probe data
-                        .irradiance = scene_data.default_reflection.irradiance,
-                        .radiance = scene_data.default_reflection.radiance,
-                        .reflection_probe_size = scene_data.default_reflection.size,
+                        .irradiance = scene_data.default_reflection.second.irradiance,
+                        .radiance = scene_data.default_reflection.second.radiance,
+                        .reflection_probe_size = scene_data.default_reflection.second.size,
                     } } });
         });
     bvh.create_nodes();
@@ -332,6 +333,10 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                             .emission_txt = gl_model.emission->get_object(),
                             .metallic_roughness_txt = gl_model.metallic_roughness->get_object(),
                             .occlusion_txt = gl_model.occlusion->get_object(),
+                            // Reflection probe data
+                            .irradiance = scene_data.default_reflection.second.irradiance,
+                            .radiance = scene_data.default_reflection.second.radiance,
+                            .reflection_probe_size = scene_data.default_reflection.second.size,
                         },
                     },
                     .box = collider.get_updated_box(),
@@ -343,27 +348,27 @@ void gearoenix::gl::SubmissionManager::update_scene_reflection_probes(SceneData&
 {
     if (render_scene.get_recreate_bvh() || render_scene.get_reflection_probs_changed()) {
         for (const auto& reflection : scene_data.reflections) {
-            bvh.call_on_intersecting(reflection.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+            bvh.call_on_intersecting(reflection.second.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
                 auto& m = bvh_node_data.user_data.model;
-                if (reflection.size > m.reflection_probe_size)
+                if (reflection.second.size > m.reflection_probe_size)
                     return;
-                m.irradiance = reflection.irradiance;
-                m.radiance = reflection.radiance;
-                m.reflection_probe_size = reflection.size;
+                m.irradiance = reflection.second.irradiance;
+                m.radiance = reflection.second.radiance;
+                m.reflection_probe_size = reflection.second.size;
             });
         }
     }
 
     core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const unsigned int) noexcept {
         for (const auto& reflection : scene_data.reflections) {
-            if (!reflection.box.check_intersection(m.box))
+            if (!reflection.second.box.check_intersection(m.box))
                 return;
             auto& mm = m.base.model;
-            if (reflection.size > mm.reflection_probe_size)
+            if (reflection.second.size > mm.reflection_probe_size)
                 return;
-            mm.irradiance = reflection.irradiance;
-            mm.radiance = reflection.radiance;
-            mm.reflection_probe_size = reflection.size;
+            mm.irradiance = reflection.second.irradiance;
+            mm.radiance = reflection.second.radiance;
+            mm.reflection_probe_size = reflection.second.size;
         }
     });
 }
@@ -406,10 +411,9 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             camera_data.vp = render_camera.get_view_projection();
             camera_data.pos = math::Vec3<float>(camera_location);
             camera_data.skybox_scale = render_camera.get_far() / 1.732051f;
-            camera_data.skybox_scale += render_camera.get_near();
-            camera_data.skybox_scale *= 0.5f;
             camera_data.opaque_models_data.clear();
             camera_data.tranclucent_models_data.clear();
+            camera_data.out_reference = render_camera.get_reference_id();
 
             for (auto& v : camera_data.threads_opaque_models_data)
                 v.clear();
@@ -495,9 +499,12 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
 
 void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene) noexcept
 {
+    const auto default_irradiance = black_cube->get_object();
+    const auto default_radiance = black_cube->get_object();
     for (auto& camera_pool_index : scene.reflection_cameras) {
         GX_GL_CHECK_D;
         auto& camera = camera_pool[camera_pool_index.second];
+        auto& reflection = scene.reflections[camera.out_reference];
 
         if (current_bound_framebuffer != camera.framebuffer) {
             current_bound_framebuffer = camera.framebuffer;
@@ -536,6 +543,7 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene
         const auto forward_pbr_txt_index_metallic_roughness = static_cast<enumerated>(forward_pbr_shader->get_metallic_roughness_index());
         const auto forward_pbr_txt_index_occlusion = static_cast<enumerated>(forward_pbr_shader->get_occlusion_index());
         const auto forward_pbr_txt_index_irradiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
+        const auto forward_pbr_txt_index_radiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
         forward_pbr_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
         GX_GL_CHECK_D;
         for (auto& distance_model_data : camera.opaque_models_data) {
@@ -559,7 +567,15 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene
             glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_occlusion);
             glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
             glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_irradiance);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
+            if (model_data.irradiance == reflection.irradiance)
+                glBindTexture(GL_TEXTURE_CUBE_MAP, default_irradiance);
+            else
+                glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
+            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_radiance);
+            if (model_data.radiance == reflection.radiance)
+                glBindTexture(GL_TEXTURE_CUBE_MAP, default_radiance);
+            else
+                glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.radiance);
             GX_GL_CHECK_D;
             glBindVertexArray(model_data.vertex_object);
             glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
@@ -582,7 +598,9 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     initialise_gbuffers();
     initialise_ssao();
     initialise_final();
-    e.todos.unload();
+
+    black_cube = std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f)));
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
     // glEnable(GL_CULL_FACE);
@@ -606,6 +624,8 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
     glBindVertexArray(0);
+
+    e.todos.unload();
 }
 
 gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;

@@ -77,7 +77,7 @@ void main() {\n\
 \n\
     float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n\
 \n\
-    frag_out = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos);\n\
+    frag_out = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos) + texture(radiance, out_pos);\n\
 \n\
     frag_out += vec4(out_pos, gl_FragCoord.z);\n\
 \n\
@@ -109,7 +109,7 @@ gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness)
     GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion)
     GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance)
-    // GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance)
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance)
 }
 
 gearoenix::gl::ShaderForwardPbr::~ShaderForwardPbr() noexcept = default;
@@ -123,7 +123,7 @@ void gearoenix::gl::ShaderForwardPbr::bind() const noexcept
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness)
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion)
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance)
-    // GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance)
 }
 
 #endif

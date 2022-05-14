@@ -53,17 +53,19 @@ struct TextureManager final : public render::texture::Manager {
 
     TextureManager(Engine& e) noexcept;
     ~TextureManager() noexcept final;
-    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
+
+private:
+    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels_v(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_cube_from_pixels(
+    [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_cube_from_pixels_v(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const render::texture::TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::texture::Target> create_target(
+    [[nodiscard]] std::shared_ptr<render::texture::Target> create_target_v(
         std::string name,
         std::vector<render::texture::Attachment>&& attachments,
         const core::sync::EndCallerIgnored& c) noexcept final;

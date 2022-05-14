@@ -21,21 +21,28 @@ gearoenix::render::texture::Manager::~Manager() noexcept = default;
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_colour(
     const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
 {
-    static_assert(sizeof(float) == 4, "Only float 32 bit are supported.");
-    auto name = "colour{" + std::to_string(colour.x) + "," + std::to_string(colour.y) + "," + std::to_string(colour.z) + "," + std::to_string(colour.w) + "}";
+    std::vector<std::uint8_t> pixels0(4);
+    pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
+                                                                                     : colour.x * 255.0f + 0.51f);
+    pixels0[1] = static_cast<std::uint8_t>(colour.y >= 1.0 ? 255.1 : colour.y <= 0.0 ? 0.1
+                                                                                     : colour.y * 255.0f + 0.51f);
+    pixels0[2] = static_cast<std::uint8_t>(colour.z >= 1.0 ? 255.1 : colour.z <= 0.0 ? 0.1
+                                                                                     : colour.z * 255.0f + 0.51f);
+    pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
+                                                                                     : colour.w * 255.0f + 0.51f);
+    auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
         GX_GUARD_LOCK(textures_2d);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
     }
-    std::vector<std::vector<std::uint8_t>> pixels { std::vector<std::uint8_t>(sizeof(math::Vec4<float>)) };
-    std::memcpy(pixels[0].data(), colour.data(), sizeof(math::Vec4<float>));
+    std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
     return create_2d_from_pixels(
         std::move(name),
         std::move(pixels),
         TextureInfo {
-            .format = TextureFormat::RgbaFloat32,
+            .format = TextureFormat::RgbaUint8,
             .sampler_info = SamplerInfo {
                 .min_filter = Filter::Nearest,
                 .mag_filter = Filter::Nearest,
@@ -136,6 +143,18 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     return checkers;
 }
 
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_pixels(
+    std::string name, std::vector<std::vector<std::uint8_t>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
+{
+    {
+        GX_GUARD_LOCK(textures_2d);
+        if (const auto search = textures_2d.find(name); textures_2d.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
+    }
+    return create_2d_from_pixels_v(std::move(name), std::move(pixels), info, c);
+}
+
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_formatted(
     std::string name,
     const void* const data,
@@ -230,6 +249,70 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     if (path.get_raw_data().ends_with(".hdr"))
         return create_2df_from_formatted(std::move(name), data.data(), data.size(), info, c);
     return create_2d_from_formatted(std::move(name), data.data(), data.size(), info, c);
+}
+
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube_from_colour(
+    const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
+{
+    std::vector<std::uint8_t> pixels0(4);
+    pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
+                                                                                     : colour.x * 255.0f + 0.51f);
+    pixels0[1] = static_cast<std::uint8_t>(colour.y >= 1.0 ? 255.1 : colour.y <= 0.0 ? 0.1
+                                                                                     : colour.y * 255.0f + 0.51f);
+    pixels0[2] = static_cast<std::uint8_t>(colour.z >= 1.0 ? 255.1 : colour.z <= 0.0 ? 0.1
+                                                                                     : colour.z * 255.0f + 0.51f);
+    pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
+                                                                                     : colour.w * 255.0f + 0.51f);
+    auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
+    {
+        GX_GUARD_LOCK(textures_cube);
+        if (const auto search = textures_cube.find(name); textures_cube.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
+    }
+    std::vector<std::vector<std::vector<std::uint8_t>>> pixels { { pixels0 }, { pixels0 }, { pixels0 }, { pixels0 }, { pixels0 }, { pixels0 } };
+    return create_cube_from_pixels(
+        std::move(name),
+        std::move(pixels),
+        TextureInfo {
+            .format = TextureFormat::RgbaUint8,
+            .sampler_info = SamplerInfo {
+                .min_filter = Filter::Nearest,
+                .mag_filter = Filter::Nearest,
+                .wrap_s = Wrap::Repeat,
+                .wrap_t = Wrap::Repeat,
+                .wrap_r = Wrap::Repeat,
+            },
+            .width = 1,
+            .height = 1,
+            .type = Type::TextureCube,
+            .has_mipmap = false,
+        },
+        c);
+}
+
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube_from_pixels(
+    std::string name, std::vector<std::vector<std::vector<std::uint8_t>>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
+{
+    {
+        GX_GUARD_LOCK(textures_cube);
+        if (const auto search = textures_cube.find(name); textures_cube.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
+    }
+    return create_cube_from_pixels_v(std::move(name), std::move(pixels), info, c);
+}
+
+std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::Manager::create_target(
+    std::string name, std::vector<Attachment>&& attachments, const core::sync::EndCallerIgnored& c) noexcept
+{
+    {
+        GX_GUARD_LOCK(targets);
+        if (const auto search = targets.find(name); targets.end() != search)
+            if (auto r = search->second.lock(); nullptr != r)
+                return r;
+    }
+    return create_target_v(std::move(name), std::move(attachments), c);
 }
 
 gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf(const float n_dot_v, const float roughness) noexcept

@@ -9,6 +9,7 @@
 #include "gx-gl-types.hpp"
 #include <limits>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace gearoenix::render::scene {
@@ -26,6 +27,7 @@ struct ShaderSkyboxEquirectangular;
 struct ShaderSsaoResolve;
 struct Target;
 struct Texture2D;
+struct TextureCube;
 struct SubmissionManager final {
     struct ModelData final {
         math::Mat4x4<float> m;
@@ -64,6 +66,7 @@ struct SubmissionManager final {
         math::Vec4<sizei> viewport_clip;
         math::Mat4x4<float> vp;
         math::Vec3<float> pos;
+        core::ecs::Entity::id_t out_reference = 0;
         float skybox_scale = 1.0;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
         std::vector<std::pair<double, ModelData>> tranclucent_models_data;
@@ -83,7 +86,6 @@ struct SubmissionManager final {
         uint radiance = 0;
         math::Aabb3<double> box;
         double size = -std::numeric_limits<double>::max();
-        ;
     };
 
     struct SceneData final {
@@ -92,9 +94,9 @@ struct SubmissionManager final {
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
         boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> reflection_cameras;
         boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> shadow_cameras;
+        boost::container::flat_map<core::ecs::Entity::id_t, ReflectionData> reflections;
+        std::pair<core::ecs::Entity::id_t, ReflectionData> default_reflection;
         std::vector<DynamicModelData> dynamic_models;
-        ReflectionData default_reflection;
-        std::vector<ReflectionData> reflections;
     };
 
 private:
@@ -120,6 +122,7 @@ private:
     std::shared_ptr<Target> ssao_resolve_target;
     std::shared_ptr<Texture2D> final_texture;
     std::shared_ptr<Target> final_target;
+    std::shared_ptr<TextureCube> black_cube;
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;

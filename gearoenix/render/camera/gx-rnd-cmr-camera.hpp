@@ -36,6 +36,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Mat4x4<float>, view_projection)
     GX_GET_CREF_PRV(math::Vec4<float>, starting_clip_ending_clip)
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, target)
+    GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, reference_id, 0) // It can be light or reflection probe or any other owner entity
     GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0)
     GX_GETSET_VAL_PRV(std::uint64_t, flag, 1)
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f)

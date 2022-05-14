@@ -199,7 +199,7 @@ gearoenix::gl::TextureManager::TextureManager(Engine& e) noexcept
 
 gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
 
-[[nodiscard]] std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gl::TextureManager::create_2d_from_pixels(
+[[nodiscard]] std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
@@ -254,7 +254,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     return result;
 }
 
-std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureManager::create_cube_from_pixels(
+std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     std::string name,
     std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
     const render::texture::TextureInfo& info,
@@ -313,7 +313,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
     return result;
 }
 
-std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gl::TextureManager::create_target(
+std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gl::TextureManager::create_target_v(
     std::string name,
     std::vector<render::texture::Attachment>&& attachments,
     const core::sync::EndCallerIgnored& c) noexcept

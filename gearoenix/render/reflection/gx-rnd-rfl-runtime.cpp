@@ -129,6 +129,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam.set_near(std::get<4>(face));
         cam.set_far(std::get<5>(face));
         cam.set_usage(camera::Camera::Usage::ReflectionProbe);
+        cam.set_reference_id(builder.get_entity_builder()->get_builder().get_id());
         cam.enabled = false;
         auto& transform = camera_builder->get_transformation();
         transform.local_x_rotate(std::get<1>(face));

@@ -31,6 +31,27 @@ protected:
     std::shared_ptr<Texture2D> checkers;
     GX_CREATE_GUARD(textures_2d);
     std::map<std::string, std::weak_ptr<Texture2D>> textures_2d;
+    GX_CREATE_GUARD(textures_cube);
+    std::map<std::string, std::weak_ptr<TextureCube>> textures_cube;
+    GX_CREATE_GUARD(targets);
+    std::map<std::string, std::weak_ptr<Target>> targets;
+
+    [[nodiscard]] virtual std::shared_ptr<Texture2D> create_2d_from_pixels_v(
+        std::string name,
+        std::vector<std::vector<std::uint8_t>> pixels,
+        const TextureInfo& info,
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
+
+    [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels_v(
+        std::string name,
+        std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+        const TextureInfo& info,
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
+
+    [[nodiscard]] virtual std::shared_ptr<Target> create_target_v(
+        std::string name,
+        std::vector<Attachment>&& attachments,
+        const core::sync::EndCallerIgnored& c) noexcept = 0;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;
@@ -42,11 +63,11 @@ public:
         const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> get_checker(
         const core::sync::EndCallerIgnored& c) noexcept;
-    [[nodiscard]] virtual std::shared_ptr<Texture2D> create_2d_from_pixels(
+    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
+        const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_formatted(
         std::string name,
         const void* data,
@@ -66,16 +87,16 @@ public:
         const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_colour(
         const math::Vec4<float>& colour,
-        const core::sync::EndCallerIgnored& c) noexcept;
-    [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels(
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_pixels(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
-    [[nodiscard]] virtual std::shared_ptr<Target> create_target(
+        const core::sync::EndCallerIgnored& c) noexcept;
+    [[nodiscard]] std::shared_ptr<Target> create_target(
         std::string name,
         std::vector<Attachment>&& attachments,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
+        const core::sync::EndCallerIgnored& c) noexcept;
     [[nodiscard]] static constexpr float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,
