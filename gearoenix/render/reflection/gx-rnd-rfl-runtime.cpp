@@ -54,7 +54,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     const texture::TextureInfo environment_texture_info {
         .format = texture::TextureFormat::RgbaFloat32,
         .sampler_info = texture::SamplerInfo {
-            .min_filter = texture::Filter::Linear,
+            .min_filter = texture::Filter::LinearMipmapLinear,
             .mag_filter = texture::Filter::Linear,
             .wrap_s = texture::Wrap::ClampToEdge,
             .wrap_t = texture::Wrap::ClampToEdge,
