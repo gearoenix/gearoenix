@@ -27,6 +27,10 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-irradiance.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-irradiance.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.cpp

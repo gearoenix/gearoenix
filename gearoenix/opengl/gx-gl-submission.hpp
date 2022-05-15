@@ -23,6 +23,8 @@ struct ShaderForwardPbr;
 struct ShaderGBuffersFiller;
 struct ShaderDeferredPbr;
 struct ShaderDeferredPbrTransparent;
+struct ShaderIrradiance;
+struct ShaderRadiance;
 struct ShaderSkyboxEquirectangular;
 struct ShaderSsaoResolve;
 struct Target;
@@ -106,6 +108,8 @@ private:
     const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
     const std::unique_ptr<ShaderDeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
+    const std::unique_ptr<ShaderIrradiance> irradiance_shader;
+    // const std::unique_ptr<ShaderRadiance> radiance_shader;
     const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
     uint gbuffer_width, gbuffer_height;
@@ -148,6 +152,7 @@ private:
     void render_shadows() noexcept;
     void render_reflection_probes() noexcept;
     void render_reflection_probes(SceneData& scene) noexcept;
+    void set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept;
 
 public:
     SubmissionManager(Engine& e) noexcept;

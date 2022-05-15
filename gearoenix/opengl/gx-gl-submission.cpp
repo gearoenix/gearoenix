@@ -26,6 +26,8 @@
 #include "gx-gl-shader-final.hpp"
 #include "gx-gl-shader-forward-pbr.hpp"
 #include "gx-gl-shader-gbuffers-filler.hpp"
+#include "gx-gl-shader-irradiance.hpp"
+#include "gx-gl-shader-radiance.hpp"
 #include "gx-gl-shader-skybox-equirectangular.hpp"
 #include "gx-gl-shader-ssao-resolve.hpp"
 #include "gx-gl-skybox.hpp"
@@ -473,20 +475,35 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
 {
     e.get_world()->synchronised_system<Reflection, ReflectionRuntime, render::reflection::Runtime>([&](const core::ecs::Entity::id_t, Reflection& r, ReflectionRuntime& rr, render::reflection::Runtime& rrr) noexcept {
         constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
-            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // PositiveX
-            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // NegativeX
+            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
+            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
             std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
-            std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // NegativeY
-            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
-            std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
+            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
+            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
+            std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
         };
         switch (rrr.get_state()) {
         case render::reflection::Runtime::State::EnvironmentCubeMipMap:
             glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
             return;
-        case render::reflection::Runtime::State::IrradianceFace:
+        case render::reflection::Runtime::State::IrradianceFace: {
+            const auto fi = rrr.get_state_irradiance_face();
+            auto& target = *rr.get_irradiance_targets()[fi];
+            target.bind();
+            const auto w = static_cast<sizei>(rrr.get_irradiance()->get_info().width);
+            set_viewport_clip({ 0, 0, w, w });
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            irradiance_shader->bind();
+            GX_GL_CHECK_D;
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(irradiance_shader->get_environment_index()));
+            glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
+            irradiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
+            glBindVertexArray(screen_vertex_object);
+            GX_GL_CHECK_D;
+            glDrawArrays(GL_TRIANGLES, 0, 3);
             return;
+        }
         case render::reflection::Runtime::State::IrradianceMipMap:
             glBindTexture(GL_TEXTURE_CUBE_MAP, r.get_irradiance_v());
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -511,15 +528,7 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene
             glBindFramebuffer(GL_FRAMEBUFFER, camera.framebuffer);
         }
 
-        if (current_viewport_clip != camera.viewport_clip) {
-            current_viewport_clip = camera.viewport_clip;
-            glViewport(
-                camera.viewport_clip.x, camera.viewport_clip.y,
-                camera.viewport_clip.z, camera.viewport_clip.w);
-            glScissor(
-                camera.viewport_clip.x, camera.viewport_clip.y,
-                camera.viewport_clip.z, camera.viewport_clip.w);
-        }
+        set_viewport_clip(camera.viewport_clip);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         // Rendering skyboxes
@@ -591,6 +600,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , gbuffers_filler_shader(new ShaderGBuffersFiller(e))
     , deferred_pbr_shader(new ShaderDeferredPbr(e))
     , deferred_pbr_transparent_shader(new ShaderDeferredPbrTransparent(e))
+    , irradiance_shader(new ShaderIrradiance(e))
     , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
     , ssao_resolve_shader(new ShaderSsaoResolve(e))
 {
@@ -661,24 +671,12 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         const auto gbuffers_filler_txt_index_irradiance = static_cast<enumerated>(gbuffers_filler_shader->get_irradiance_index());
 
         glDisable(GL_BLEND); // TODO find the best place for it
+        gbuffers_target->bind();
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             GX_GL_CHECK_D;
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
 
-            if (current_bound_framebuffer != camera.framebuffer) {
-                current_bound_framebuffer = camera.framebuffer;
-                glBindFramebuffer(GL_FRAMEBUFFER, camera.framebuffer);
-            }
-
-            if (current_viewport_clip != camera.viewport_clip) {
-                current_viewport_clip = camera.viewport_clip;
-                glViewport(
-                    camera.viewport_clip.x, camera.viewport_clip.y,
-                    camera.viewport_clip.z, camera.viewport_clip.w);
-                glScissor(
-                    camera.viewport_clip.x, camera.viewport_clip.y,
-                    camera.viewport_clip.z, camera.viewport_clip.w);
-            }
+            set_viewport_clip(camera.viewport_clip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -715,7 +713,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     }
 
     // render_shadows();
-    // render_reflection_probes();
+    render_reflection_probes();
 
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
@@ -724,16 +722,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         // SSAO resolving -------------------------------------------------------------------------------------
         ssao_resolve_target->bind();
 
-        // TODO: repeatative block make it a function
-        if (current_viewport_clip != gbuffer_viewport_clip) {
-            current_viewport_clip = gbuffer_viewport_clip;
-            glViewport(
-                current_viewport_clip.x, current_viewport_clip.y,
-                current_viewport_clip.z, current_viewport_clip.w);
-            glScissor(
-                current_viewport_clip.x, current_viewport_clip.y,
-                current_viewport_clip.z, current_viewport_clip.w);
-        }
+        set_viewport_clip(gbuffer_viewport_clip);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         ssao_resolve_shader->bind();
@@ -806,29 +795,11 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         if (screen_ratio < gbuffer_aspect_ratio) {
             const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / gbuffer_aspect_ratio + 0.1f);
             const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
-            glViewport(
-                static_cast<sizei>(0), screen_y,
-                static_cast<sizei>(base_os_app.get_window_size().x), screen_height);
-            glScissor(
-                static_cast<sizei>(0), screen_y,
-                static_cast<sizei>(base_os_app.get_window_size().x), screen_height);
-            current_viewport_clip.x = 0;
-            current_viewport_clip.y = screen_y;
-            current_viewport_clip.z = static_cast<sizei>(base_os_app.get_window_size().x);
-            current_viewport_clip.w = screen_height;
+            set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
         } else {
             const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * gbuffer_aspect_ratio + 0.1f);
             const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
-            glViewport(
-                screen_x, static_cast<sizei>(0),
-                screen_width, static_cast<sizei>(base_os_app.get_window_size().y));
-            glScissor(
-                screen_x, static_cast<sizei>(0),
-                screen_width, static_cast<sizei>(base_os_app.get_window_size().y));
-            current_viewport_clip.x = screen_x;
-            current_viewport_clip.y = 0;
-            current_viewport_clip.z = screen_width;
-            current_viewport_clip.w = static_cast<sizei>(base_os_app.get_window_size().y);
+            set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -846,7 +817,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
 
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
-    glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+    set_viewport_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glGetError();
@@ -857,6 +828,19 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     os_app.get_gl_context()->swap();
 #endif
     GX_GL_CHECK_D;
+}
+
+void gearoenix::gl::SubmissionManager::set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept
+{
+    if (current_viewport_clip == viewport_clip)
+        return;
+    current_viewport_clip = viewport_clip;
+    glViewport(
+        current_viewport_clip.x, current_viewport_clip.y,
+        current_viewport_clip.z, current_viewport_clip.w);
+    glScissor(
+        current_viewport_clip.x, current_viewport_clip.y,
+        current_viewport_clip.z, current_viewport_clip.w);
 }
 
 #endif

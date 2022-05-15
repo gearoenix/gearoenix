@@ -195,7 +195,7 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
         e.get_world()->get_component<camera::Camera>(cameras[0])->enabled = true;
         break;
     case State::EnvironmentCubeRender:
-        // e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = false;
+        e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = false;
         ++state_environment_face;
         if (state_environment_face < 6) {
             e.get_world()->get_component<camera::Camera>(cameras[state_environment_face])->enabled = true;
