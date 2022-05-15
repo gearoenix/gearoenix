@@ -52,7 +52,7 @@ struct GameApp final : public gearoenix::core::Application {
             gearoenix::math::Aabb3(gearoenix::math::Vec3(10.0), gearoenix::math::Vec3(-10.0)),
             gearoenix::math::Aabb3(gearoenix::math::Vec3(1.0), gearoenix::math::Vec3(-1.0)),
             gearoenix::math::Aabb3(gearoenix::math::Vec3(10.0), gearoenix::math::Vec3(-10.0)),
-            512, 128, 256, 4,
+            512, 128, 256,
             end_callback);
         scene_builder->add(std::move(runtime_reflection_probe_builder));
 

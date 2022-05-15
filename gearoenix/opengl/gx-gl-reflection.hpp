@@ -60,7 +60,6 @@ private:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        std::size_t radiance_mipmap_levels,
         const core::sync::EndCallerIgnored& end_callback) noexcept;
 
 public:
@@ -79,7 +78,6 @@ private:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        std::size_t radiance_mipmap_levels,
         const core::sync::EndCallerIgnored& end_callback) noexcept final;
 
 public:

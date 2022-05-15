@@ -32,7 +32,6 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const std::size_t radiance_mipmap_levels,
     const core::sync::EndCallerIgnored& end_callback) noexcept
     : render::reflection::Builder(
         e,
@@ -43,7 +42,6 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
         environment_resolution,
         irradiance_resolution,
         radiance_resolution,
-        radiance_mipmap_levels,
         end_callback)
 {
     auto& builder = entity_builder->get_builder();
@@ -89,7 +87,6 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::Reflectio
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const std::size_t radiance_mipmap_levels,
     const core::sync::EndCallerIgnored& end_callback) noexcept
 {
     return std::shared_ptr<ReflectionBuilder>(new ReflectionBuilder(
@@ -101,7 +98,6 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::Reflectio
         environment_resolution,
         irradiance_resolution,
         radiance_resolution,
-        radiance_mipmap_levels,
         end_callback));
 }
 

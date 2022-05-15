@@ -19,7 +19,6 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::refle
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const std::size_t radiance_mipmap_levels,
     const core::sync::EndCallerIgnored& end_callback) noexcept
 {
     return std::make_shared<Builder>(
@@ -31,7 +30,6 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::refle
         environment_resolution,
         irradiance_resolution,
         radiance_resolution,
-        radiance_mipmap_levels,
         end_callback);
 }
 

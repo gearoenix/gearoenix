@@ -15,6 +15,7 @@ struct TextureCube;
 
 namespace gearoenix::render::reflection {
 struct Baked final : public core::ecs::Component {
+    GX_GET_VAL_PRV(std::size_t, radiance_mips_count, 0)
     GX_GET_CREF_PRV(math::Aabb3<double>, include_box)
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance)
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance)

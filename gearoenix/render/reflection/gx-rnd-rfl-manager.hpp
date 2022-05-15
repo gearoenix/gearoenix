@@ -30,7 +30,6 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        std::size_t radiance_mipmap_levels,
         const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
 
     virtual void update() noexcept;

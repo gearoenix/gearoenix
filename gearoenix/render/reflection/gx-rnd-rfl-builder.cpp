@@ -17,7 +17,6 @@ gearoenix::render::reflection::Builder::Builder(
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const std::size_t radiance_mipmap_levels,
     const core::sync::EndCallerIgnored& end_callback) noexcept
     : entity_builder(e.get_world()->create_shared_builder())
 {
@@ -33,7 +32,6 @@ gearoenix::render::reflection::Builder::Builder(
         environment_resolution,
         irradiance_resolution,
         radiance_resolution,
-        radiance_mipmap_levels,
         end_callback));
     auto* const r = builder.get_component<Runtime>();
     builder.add_component(Baked(

@@ -82,36 +82,48 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+    gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+    gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+    gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+    gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info));
 
-    auto gbuffers_depth_txt_info = position_depth_txt_info;
-    gbuffers_depth_txt_info.format = render::texture::TextureFormat::D32;
+    auto irradiance_txt_info = position_depth_txt_info;
+    irradiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
+    gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info));
+
+    auto radiance_txt_info = position_depth_txt_info;
+    radiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
+    gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info));
+
+    auto depth_txt_info = position_depth_txt_info;
+    depth_txt_info.format = render::texture::TextureFormat::D32;
     gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-depth", {}, gbuffers_depth_txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = albedo_metallic_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = position_depth_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = normal_ao_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = emission_roughness_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_position_depth_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = gbuffers_normal_ao_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = gbuffers_emission_roughness_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
+    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
     attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
-    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments)));
 
     GX_LOG_D("GBuffers have been created.");
 }
@@ -223,7 +235,8 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
             scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
             scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
             scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
-            e.get_world()->synchronised_system<render::reflection::Baked, Reflection>([&](const core::ecs::Entity::id_t reflection_id, render::reflection::Baked& render_baked, Reflection& gl_baked) {
+            scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
+            e.get_world()->synchronised_system<render::reflection::Baked, Reflection>([&](const core::ecs::Entity::id_t reflection_id, render::reflection::Baked& render_baked, Reflection& gl_baked) noexcept {
                 if (!render_baked.enabled)
                     return;
                 if (render_baked.get_scene_id() != scene_id)
@@ -233,6 +246,7 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
                     .radiance = gl_baked.get_radiance_v(),
                     .box = render_baked.get_include_box(),
                     .size = render_baked.get_include_box().get_diameter().square_length(),
+                    .radiance_mips_count = static_cast<float>(render_baked.get_radiance_mips_count() - 1),
                 };
                 scene_pool_ref.reflections.emplace(reflection_id, r);
                 if (r.size > scene_pool_ref.default_reflection.second.size) {
@@ -284,7 +298,7 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
                         .albedo_factor = model.material.get_albedo_factor(),
                         .normal_metallic_factor = model.material.get_normal_metallic_factor(),
                         .emission_roughness_factor = model.material.get_emission_roughness_factor(),
-                        .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
+                        .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                         .vertex_object = mesh.vertex_object,
                         .vertex_buffer = mesh.vertex_buffer,
                         .index_buffer = mesh.index_buffer,
@@ -325,7 +339,7 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                             .albedo_factor = gl_model.material.get_albedo_factor(),
                             .normal_metallic_factor = gl_model.material.get_normal_metallic_factor(),
                             .emission_roughness_factor = gl_model.material.get_emission_roughness_factor(),
-                            .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = gl_model.material.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved(),
+                            .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(gl_model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                             .vertex_object = mesh.vertex_object,
                             .vertex_buffer = mesh.vertex_buffer,
                             .index_buffer = mesh.index_buffer,
@@ -357,6 +371,7 @@ void gearoenix::gl::SubmissionManager::update_scene_reflection_probes(SceneData&
                 m.irradiance = reflection.second.irradiance;
                 m.radiance = reflection.second.radiance;
                 m.reflection_probe_size = reflection.second.size;
+                m.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z = reflection.second.radiance_mips_count;
             });
         }
     }
@@ -371,6 +386,7 @@ void gearoenix::gl::SubmissionManager::update_scene_reflection_probes(SceneData&
             mm.irradiance = reflection.second.irradiance;
             mm.radiance = reflection.second.radiance;
             mm.reflection_probe_size = reflection.second.size;
+            mm.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z = reflection.second.radiance_mips_count;
         }
     });
 }
@@ -463,7 +479,7 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
         });
 }
 
-void gearoenix::gl::SubmissionManager::fill_gbuffers(const std::size_t camera_pool_index) noexcept
+void gearoenix::gl::SubmissionManager::fill_gbuffers(const std::size_t) noexcept
 {
 }
 
@@ -518,12 +534,12 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(radiance_shader->get_environment_index()));
             glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
             radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-            const float roughness = rrr.get_roughnesses()[li];
+            const auto roughness = static_cast<float>(rrr.get_roughnesses()[li]);
             radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
             const float roughness_p_4 = roughness * roughness * roughness * roughness;
             radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
             const float resolution = static_cast<float>(rrr.get_environment()->get_info().width);
-            const float sa_texel = (GX_PI / 1.5f) / (resolution * resolution);
+            const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
             radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
             glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -628,8 +644,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
-    // glEnable(GL_CULL_FACE);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -657,8 +672,6 @@ gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
 
 void gearoenix::gl::SubmissionManager::update() noexcept
 {
-    auto* const world = e.get_world();
-
     camera_pool.clear();
     scene_pool.clear();
     scenes.clear();
@@ -702,6 +715,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 gbuffers_filler_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
                 gbuffers_filler_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
                 gbuffers_filler_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
+                gbuffers_filler_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_albedo);
                 glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_normal);

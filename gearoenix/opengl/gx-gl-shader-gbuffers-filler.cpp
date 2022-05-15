@@ -21,8 +21,10 @@ layout(location = 3) in vec2 uv;\n\
 uniform mat4 m;\n\
 uniform mat4 inv_m;\n\
 uniform mat4 vp;\n\
+uniform vec3 camera_position;\n\
 \n\
 out vec3 out_pos;\n\
+out vec3 out_eye;\n\
 out vec3 out_nrm;\n\
 out vec3 out_tng;\n\
 out vec3 out_btg;\n\
@@ -32,6 +34,7 @@ void main() {\n\
     out_uv = uv;\n\
     vec4 pos = m * vec4(position, 1.0);\n\
     out_pos = pos.xyz;\n\
+    out_eye = normalize(pos.xyz - camera_position);\n\
     out_nrm = (inv_m * vec4(normal, 0.0)).xyz;\n\
     out_tng = (inv_m * vec4(tangent.xyz, 0.0)).xyz;\n\
     out_btg = cross(out_nrm, out_tng) * tangent.w;\n\
@@ -64,6 +67,7 @@ uniform samplerCube irradiance;\n\
 uniform samplerCube radiance;\n\
 \n\
 in vec3 out_pos;\n\
+in vec3 out_eye;\n\
 in vec3 out_nrm;\n\
 in vec3 out_tng;\n\
 in vec3 out_btg;\n\
@@ -73,6 +77,8 @@ layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_IND
 layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH) ") out vec4 frag_out_position_depth;\n\
 layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO) ") out vec4 frag_out_normal_ao;\n\
 layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS) ") out vec4 frag_out_emission_roughness;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE) ") out vec3 frag_out_irradiance;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE) ") out vec3 frag_out_radiance;\n\
 \n\
 void main() {\n\
 \n\
@@ -80,7 +86,7 @@ void main() {\n\
 \n\
     float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n\
 \n\
-    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + vec4(texture(irradiance, normalize(out_pos)).xyz * 0.0001 + textureLod(radiance, normalize(out_pos), 0.0).xyz, 1.0);\n\
+    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x);\n\
 \n\
     frag_out_position_depth = vec4(out_pos, gl_FragCoord.z);\n\
 \n\
@@ -88,6 +94,9 @@ void main() {\n\
 \n\
     frag_out_emission_roughness = vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, mtr.y);\n\
 \n\
+    frag_out_irradiance = texture(irradiance, frag_out_normal_ao.xyz).xyz;\n\
+\n\
+    frag_out_radiance = textureLod(radiance, reflect(out_eye, frag_out_normal_ao.xyz), mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n\
 }\n";
 
 gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept

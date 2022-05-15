@@ -23,7 +23,6 @@ gearoenix::render::reflection::Runtime::Runtime(
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const std::size_t radiance_mipmap_levels,
     const core::sync::EndCallerIgnored& end_callback) noexcept
     : core::ecs::Component(this)
     , e(e)
@@ -33,7 +32,7 @@ gearoenix::render::reflection::Runtime::Runtime(
 {
     GX_ASSERT(receive_box.get_center() == exclude_box.get_center());
     GX_ASSERT(include_box.get_center() == exclude_box.get_center());
-    GX_ASSERT((radiance_resolution >> radiance_mipmap_levels) > 2);
+    const auto radiance_mipmap_levels = static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
     const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
     const auto fars = math::Vec3<float>(receive_box.get_diameter() * 0.5);
     const std::tuple<texture::Face, double /*x-rotate*/, double /*y-rotate*/, double /*z-rotate*/, float /*near*/, float /*far*/> faces[6] = {

@@ -23,7 +23,7 @@ struct Pbr final {
     GX_GET_REF_PRV(math::Vec4<float>, albedo_factor)
     GX_GET_REF_PRV(math::Vec4<float>, emission_roughness_factor)
     GX_GET_REF_PRV(math::Vec4<float>, normal_metallic_factor)
-    GX_GET_REF_PRV(math::Vec4<float>, alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved)
+    GX_GET_REF_PRV(math::Vec2<float>, alpha_cutoff_occlusion_strength)
     GX_GETSET_VAL_PRV(AlphaMode, alpha_mode, AlphaMode::Opaque)
     GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, albedo)
     GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, normal)

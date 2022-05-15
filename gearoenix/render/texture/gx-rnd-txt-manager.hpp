@@ -58,16 +58,16 @@ public:
     virtual ~Manager() noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_colour(
         const math::Vec4<float>& colour,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> get_brdflut(
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> get_checker(
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_formatted(
         std::string name,
         const void* data,
@@ -92,11 +92,11 @@ public:
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Target> create_target(
         std::string name,
         std::vector<Attachment>&& attachments,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] static constexpr float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,

@@ -26,6 +26,7 @@ struct RuntimeConfiguration {
 
     RuntimeConfiguration() noexcept;
     void set_runtime_reflection_radiance_resolution(std::uint16_t value) noexcept;
+    [[nodiscard]] static std::uint8_t compute_radiance_mipmaps_count(std::uint16_t value) noexcept;
 };
 }
 #endif

@@ -88,6 +88,7 @@ struct SubmissionManager final {
         uint radiance = 0;
         math::Aabb3<double> box;
         double size = -std::numeric_limits<double>::max();
+        float radiance_mips_count = 0.0f;
     };
 
     struct SceneData final {
@@ -116,10 +117,12 @@ private:
     float gbuffer_aspect_ratio = 1.2f;
     float gbuffer_uv_move_x = 0.001f;
     float gbuffer_uv_move_y = 0.001f;
-    std::shared_ptr<Texture2D> albedo_metallic_texture;
-    std::shared_ptr<Texture2D> position_depth_texture;
-    std::shared_ptr<Texture2D> normal_ao_texture;
-    std::shared_ptr<Texture2D> emission_roughness_texture;
+    std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
+    std::shared_ptr<Texture2D> gbuffers_position_depth_texture;
+    std::shared_ptr<Texture2D> gbuffers_normal_ao_texture;
+    std::shared_ptr<Texture2D> gbuffers_emission_roughness_texture;
+    std::shared_ptr<Texture2D> gbuffers_irradiance_texture;
+    std::shared_ptr<Texture2D> gbuffers_radiance_texture;
     std::shared_ptr<Texture2D> gbuffers_depth_texture;
     std::shared_ptr<Target> gbuffers_target;
     std::shared_ptr<Texture2D> ssao_resolve_texture;

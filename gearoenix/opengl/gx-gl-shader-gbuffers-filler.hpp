@@ -12,6 +12,7 @@ struct ShaderGBuffersFiller final : public Shader {
     GX_GL_UNIFORM_VECTOR(normal_metallic_factor, 4, 1)
     GX_GL_UNIFORM_VECTOR(emission_roughness_factor, 4, 1)
     GX_GL_UNIFORM_VECTOR(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved, 4, 1)
+    GX_GL_UNIFORM_VECTOR(camera_position, 3, 1)
     GX_GL_UNIFORM_TEXTURE(albedo)
     GX_GL_UNIFORM_TEXTURE(normal)
     GX_GL_UNIFORM_TEXTURE(emission)

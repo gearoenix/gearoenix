@@ -291,7 +291,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             GX_UNIMPLEMENTED;
         const auto& albedo_factor = mat.pbrMetallicRoughness.baseColorFactor;
         GX_ASSERT(albedo_factor.size() == 4);
-        gx_mat.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved().x = static_cast<float>(mat.alphaCutoff);
+        gx_mat.get_alpha_cutoff_occlusion_strength().x = static_cast<float>(mat.alphaCutoff);
         if ("OPAQUE" == mat.alphaMode)
             gx_mat.set_alpha_mode(material::AlphaMode::Opaque);
         else if ("TRANSPARENT" == mat.alphaMode)
@@ -308,7 +308,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
         gx_mat.get_normal_metallic_factor().y = static_cast<float>(mat.normalTexture.scale);
         gx_mat.get_normal_metallic_factor().z = 1.0f; // stange but tinygltf docs says that
         gx_mat.set_occlusion(create_texture2d(mat.occlusionTexture.index, mesh_end_callback, gx_mat.get_occlusion()));
-        gx_mat.get_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved().y = static_cast<float>(mat.occlusionTexture.strength);
+        gx_mat.get_alpha_cutoff_occlusion_strength().y = static_cast<float>(mat.occlusionTexture.strength);
         gx_mat.set_albedo(create_texture2d(mat.pbrMetallicRoughness.baseColorTexture.index, mesh_end_callback, gx_mat.get_albedo()));
         gx_mat.get_albedo_factor() = math::Vec4<float>(
             static_cast<float>(albedo_factor[0]),
