@@ -66,7 +66,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     if (nullptr != brdflut)
         return brdflut;
     const TextureInfo texture_info {
-        .format = TextureFormat::RgFloat32,
+        .format = TextureFormat::RgbaUint8,
         .sampler_info = SamplerInfo {
             .min_filter = Filter::Linear,
             .mag_filter = Filter::Linear,
@@ -82,32 +82,15 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const auto pixels_vectors = create_brdflut_pixels();
     std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
     std::size_t data_index = 0;
-    for (const auto& p : pixels_vectors) {
-        {
-            const auto b = static_cast<int>(p.x * 255.0f);
-            if (b < 0) {
-                pixels0[data_index] = 0;
-            } else if (b > 255) {
-                pixels0[data_index] = 255;
-            } else {
-                pixels0[data_index] = static_cast<std::uint8_t>(b);
-            }
-        }
-        ++data_index;
-        {
-            const auto b = static_cast<int>(p.y * 255.0f);
-            if (b < 0) {
-                pixels0[data_index] = 0;
-            } else if (b > 255) {
-                pixels0[data_index] = 255;
-            } else {
-                pixels0[data_index] = static_cast<std::uint8_t>(b);
-            }
-        }
-        pixels0[++data_index] = 0;
-        pixels0[++data_index] = 255;
-        ++data_index;
-    }
+    core::sync::ParallelFor::execi(pixels_vectors.begin(), pixels_vectors.end(), [&](auto& pixel, const std::size_t index, auto) {
+        auto* const p = reinterpret_cast<std::uint8_t*>(&pixels0[index << 2]);
+        p[0] = static_cast<std::uint8_t>(pixel.x >= 1.0f ? 255.1 : pixel.x <= 0.0f ? 0.1f
+                                                                                   : 255.0 * pixel.x);
+        p[1] = static_cast<std::uint8_t>(pixel.y >= 1.0f ? 255.1 : pixel.y <= 0.0f ? 0.1f
+                                                                                   : 255.0 * pixel.y);
+        p[2] = 0;
+        p[3] = 255;
+    });
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
     brdflut = create_2d_from_pixels("default-brdflut", std::move(pixels), texture_info, c);
     return brdflut;

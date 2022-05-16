@@ -42,7 +42,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f)
     GX_GET_VAL_PRV(float, far, 100.0f)
     GX_GET_VAL_PRV(float, near, 1.0f)
-    GX_GET_VAL_PRV(float, scale, 1.0f)
+    GX_GET_VAL_PRV(float, scale_fovy, 0.8f)
     GX_GETSET_VAL_PRV(float, hdr_tune_mapping, 1.0f)
     GX_GETSET_VAL_PRV(float, gamma_correction, 2.2f)
     GX_GET_VAL_PRV(Projection, projection_type, Projection::Perspective)

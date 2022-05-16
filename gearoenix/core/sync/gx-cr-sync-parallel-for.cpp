@@ -23,7 +23,7 @@ struct GearoenixCoreSyncParallelForData final {
             std::vector<Job> local_jobs;
             is_running = true;
             while (is_running) {
-                signal.lock_for(std::chrono::seconds(1));
+                signal.lock();
                 {
                     std::lock_guard<std::mutex> _lg(jobs_lock);
                     std::swap(jobs, local_jobs);

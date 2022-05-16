@@ -197,7 +197,7 @@ void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& targe
     z_axis = (l - target).normalised();
     x_axis = up.cross(z_axis).normalised();
     y_axis = z_axis.cross(x_axis).normalised();
-    inverted_matrix = math::Mat4x4<double>::look_at(l, x_axis, y_axis, -z_axis);
+    inverted_matrix = math::Mat4x4<double>::look_at(l, -x_axis, y_axis, -z_axis);
     matrix = inverted_matrix.inverted();
     scale = math::Vec3<double>(1.0);
 }

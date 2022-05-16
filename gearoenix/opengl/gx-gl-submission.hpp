@@ -129,6 +129,7 @@ private:
     std::shared_ptr<Target> ssao_resolve_target;
     std::shared_ptr<Texture2D> final_texture;
     std::shared_ptr<Target> final_target;
+    std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;

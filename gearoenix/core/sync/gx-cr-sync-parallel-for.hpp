@@ -48,8 +48,15 @@ public:
 #else
         exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
             unsigned int index = kernel_index;
-            for (Iter iter = (first + kernel_index); iter != end; iter += kernels_count, index += kernels_count) {
+            Iter iter = first;
+            for (unsigned int i = 0; i < kernel_index; ++i, ++iter)
+                if (iter == end)
+                    return;
+            for (; iter != end; index += kernels_count) {
                 f(*iter, index, kernel_index);
+                for (unsigned int i = 0; i < kernels_count; ++i, ++iter)
+                    if (iter == end)
+                        return;
             }
         });
 #endif

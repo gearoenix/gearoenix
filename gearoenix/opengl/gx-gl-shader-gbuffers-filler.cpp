@@ -96,7 +96,7 @@ void main() {\n\
 \n\
     frag_out_irradiance = texture(irradiance, frag_out_normal_ao.xyz).xyz;\n\
 \n\
-    frag_out_radiance = textureLod(radiance, reflect(out_eye, frag_out_normal_ao.xyz), mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n\
+    frag_out_radiance = textureLod(radiance, normalize(reflect(out_eye, frag_out_normal_ao.xyz)), mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n\
 }\n";
 
 gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept
@@ -110,6 +110,7 @@ gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM(inv_m)
     GX_GL_THIS_GET_UNIFORM(vp)
     GX_GL_THIS_GET_UNIFORM(albedo_factor)
+    GX_GL_THIS_GET_UNIFORM(camera_position)
     GX_GL_THIS_GET_UNIFORM(normal_metallic_factor)
     GX_GL_THIS_GET_UNIFORM(emission_roughness_factor)
     GX_GL_THIS_GET_UNIFORM(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved)

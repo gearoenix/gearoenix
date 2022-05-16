@@ -634,13 +634,13 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , radiance_shader(new ShaderRadiance(e))
     , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
     , ssao_resolve_shader(new ShaderSsaoResolve(e))
+    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
+    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {
     GX_LOG_D("Creating submission manager.");
     initialise_gbuffers();
     initialise_ssao();
     initialise_final();
-
-    black_cube = std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f)));
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
@@ -707,6 +707,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             gbuffers_filler_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+            gbuffers_filler_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
             for (auto& distance_model_data : camera.opaque_models_data) {
                 auto& model_data = distance_model_data.second;
                 gbuffers_filler_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
@@ -715,7 +716,6 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 gbuffers_filler_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
                 gbuffers_filler_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
                 gbuffers_filler_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
-                gbuffers_filler_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_albedo);
                 glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
                 glActiveTexture(GL_TEXTURE0 + gbuffers_filler_txt_index_normal);
@@ -782,29 +782,39 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 glBindVertexArray(skybox.vertex_object);
                 glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
             }
+
+            deferred_pbr_shader->bind();
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_position_depth_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_albedo_metallic_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_normal_ao_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_emission_roughness_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_irradiance_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_radiance_index()));
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_ssao_resolved_index()));
+            glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture_object);
+
+            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_brdflut_index()));
+            glBindTexture(GL_TEXTURE_2D, brdflut->get_object());
+
+            deferred_pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
+            deferred_pbr_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
+
+            glBindVertexArray(screen_vertex_object);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-
-        deferred_pbr_shader->bind();
-
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
-
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_albedo_metallic_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture_object);
-
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_normal_ao_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
-
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_emission_roughness_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture_object);
-
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_ssao_resolved_index()));
-        glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture_object);
-
-        deferred_pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
-
-        glBindVertexArray(screen_vertex_object);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Final ----------------------------------------------------------------------------------------------
         glBindRenderbuffer(GL_RENDERBUFFER, 0);

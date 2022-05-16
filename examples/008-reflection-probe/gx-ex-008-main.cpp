@@ -1,4 +1,5 @@
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
@@ -27,13 +28,26 @@ struct GameApp final : public gearoenix::core::Application {
             4,
             gearoenix::core::sync::EndCallerIgnored(end_callback));
 
-        auto model_builder = render_engine.get_model_manager()->build(
-            "icosphere",
-            std::move(icosphere_mesh),
-            gearoenix::core::sync::EndCallerIgnored(end_callback),
-            true);
-        model_builder->set_material(gearoenix::render::material::Pbr(render_engine));
-        scene_builder->add(std::move(model_builder));
+        gearoenix::render::material::Pbr material(render_engine);
+        material.get_albedo_factor().x = 0.999f;
+        material.get_albedo_factor().y = 0.1f;
+        material.get_albedo_factor().z = 0.4f;
+        for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
+            material.get_normal_metallic_factor().w = static_cast<float>(metallic_i) * 0.1f;
+            for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
+                material.get_emission_roughness_factor().w = static_cast<float>(roughness_i) * 0.1f;
+                auto model_builder = render_engine.get_model_manager()->build(
+                    "icosphere-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i),
+                    std::shared_ptr(icosphere_mesh),
+                    gearoenix::core::sync::EndCallerIgnored(end_callback),
+                    true);
+                model_builder->set_material(material);
+                model_builder->get_transformation().translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
+                    static_cast<double>(roughness_i) * 3.0 - 15.0,
+                    0.0 });
+                scene_builder->add(std::move(model_builder));
+            }
+        }
 
         auto skybox_builder = render_engine.get_skybox_manager()->build(
             "hello-skybox",
@@ -42,6 +56,9 @@ struct GameApp final : public gearoenix::core::Application {
         scene_builder->add(std::move(skybox_builder));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto& camera_transform = camera_builder->get_transformation();
+        camera_transform.translate({ -19.0, -19.0, 5.0 });
+        camera_transform.look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
@@ -49,9 +66,9 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto runtime_reflection_probe_builder = render_engine.get_reflection_manager()->build_runtime(
             "hello-runtime-reflection-probe",
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(10.0), gearoenix::math::Vec3(-10.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(1.0), gearoenix::math::Vec3(-1.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(10.0), gearoenix::math::Vec3(-10.0)),
+            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
+            gearoenix::math::Aabb3(gearoenix::math::Vec3(20.0), gearoenix::math::Vec3(-20.0)),
+            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
             512, 128, 256,
             end_callback);
         scene_builder->add(std::move(runtime_reflection_probe_builder));
