@@ -28,6 +28,7 @@
 #include "gx-gl-shader-gbuffers-filler.hpp"
 #include "gx-gl-shader-irradiance.hpp"
 #include "gx-gl-shader-radiance.hpp"
+#include "gx-gl-shader-skybox-cube.hpp"
 #include "gx-gl-shader-skybox-equirectangular.hpp"
 #include "gx-gl-shader-ssao-resolve.hpp"
 #include "gx-gl-skybox.hpp"
@@ -57,6 +58,8 @@ gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
 
 void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
 {
+    if (!e.get_specification().is_deferred_supported)
+        return;
     auto* const txt_mgr = e.get_texture_manager();
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     gbuffer_width = cfg.get_runtime_resolution_width();
@@ -130,6 +133,8 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
 
 void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
 {
+    if (!e.get_specification().is_deferred_supported)
+        return;
     auto* const txt_mgr = e.get_texture_manager();
     const render::texture::TextureInfo txt_info {
         .format = render::texture::TextureFormat::Float32,
@@ -159,6 +164,8 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
 
 void gearoenix::gl::SubmissionManager::initialise_final() noexcept
 {
+    if (!e.get_specification().is_deferred_supported)
+        return;
     auto* const txt_mgr = e.get_texture_manager();
     const render::texture::TextureInfo txt_info {
         .format = render::texture::TextureFormat::RgbaFloat16,
@@ -184,6 +191,23 @@ void gearoenix::gl::SubmissionManager::initialise_final() noexcept
     final_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-final", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
 
     GX_LOG_D("Final render target has been created.");
+}
+
+void gearoenix::gl::SubmissionManager::initialise_screen_vertices() noexcept
+{
+    constexpr float screen_vertices[] = {
+        -1.0f, 3.0f, // 1
+        -1.0f, -1.0f, // 2
+        3.0f, -1.0f, // 3
+    };
+    glGenVertexArrays(1, &screen_vertex_object);
+    glBindVertexArray(screen_vertex_object);
+    glGenBuffers(1, &screen_vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, screen_vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
+    glBindVertexArray(0);
 }
 
 void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
@@ -405,13 +429,19 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 return;
             const auto camera_location = transform.get_location();
             std::size_t camera_pool_index = static_cast<std::size_t>(-1);
+            uint self_irradiance = static_cast<uint>(-1);
+            uint self_radiance = static_cast<uint>(-1);
             switch (render_camera.get_usage()) {
             case render::camera::Camera::Usage::Main:
                 camera_pool_index = scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)];
                 break;
-            case render::camera::Camera::Usage::ReflectionProbe:
+            case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
+                auto& reflection = scene_data.reflections[render_camera.get_reference_id()];
+                self_irradiance = reflection.irradiance;
+                self_radiance = reflection.radiance;
                 break;
+            }
             case render::camera::Camera::Usage::Shadow:
                 camera_pool_index = scene_data.shadow_cameras[camera_id];
                 break;
@@ -421,9 +451,12 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             if (nullptr != gl_camera.target) {
                 camera_data.framebuffer = gl_camera.target->get_framebuffer();
                 target_dimension = render_camera.get_target()->get_dimension();
-            } else {
+            } else if (e.get_specification().is_deferred_supported) {
                 camera_data.framebuffer = gbuffers_target->get_framebuffer();
                 target_dimension = gbuffers_target->get_dimension();
+            } else {
+                camera_data.framebuffer = 0;
+                target_dimension = math::Vec2<std::size_t>(e.get_platform_application().get_base().get_window_size());
             }
             camera_data.viewport_clip = math::Vec4<sizei>(render_camera.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
             camera_data.vp = render_camera.get_view_projection();
@@ -444,7 +477,12 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                     return;
                 const auto dir = camera_location - bvh_node_data.box.get_center();
                 const auto dis = dir.square_length();
-                camera_data.opaque_models_data.emplace_back(dis, bvh_node_data.user_data.model);
+                auto m = bvh_node_data.user_data.model;
+                if (self_irradiance == m.irradiance)
+                    m.irradiance = black_cube->get_object();
+                if (self_radiance == m.radiance)
+                    m.radiance = black_cube->get_object();
+                camera_data.opaque_models_data.emplace_back(dis, m);
                 // TODO opaque/translucent in ModelBvhData
             });
 
@@ -456,7 +494,12 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                     return;
                 const auto dir = camera_location - m.box.get_center();
                 const auto dis = dir.square_length();
-                camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, m.base.model);
+                auto md = m.base.model;
+                if (self_irradiance == md.irradiance)
+                    md.irradiance = black_cube->get_object();
+                if (self_radiance == md.radiance)
+                    md.radiance = black_cube->get_object();
+                camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
                 // TODO opaque/translucent in ModelBvhData
             });
 
@@ -506,7 +549,7 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
         case render::reflection::Runtime::State::IrradianceFace: {
             const auto fi = rrr.get_state_irradiance_face();
             auto& target = *rr.get_irradiance_targets()[fi];
-            target.bind();
+            set_framebuffer(target.get_framebuffer());
             const auto w = static_cast<sizei>(rrr.get_irradiance()->get_info().width);
             set_viewport_clip({ 0, 0, w, w });
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -526,7 +569,7 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
             const auto fi = rrr.get_state_radiance_face();
             const auto li = rrr.get_state_radiance_level();
             auto& target = *rr.get_radiance_targets()[fi][li];
-            target.bind();
+            set_framebuffer(target.get_framebuffer());
             const auto w = static_cast<sizei>(rrr.get_radiance()->get_info().width >> li);
             set_viewport_clip({ 0, 0, w, w });
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -549,136 +592,104 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
     });
 }
 
-void gearoenix::gl::SubmissionManager::render_reflection_probes(SceneData& scene) noexcept
+void gearoenix::gl::SubmissionManager::render_reflection_probes(const SceneData& scene) noexcept
 {
-    const auto default_irradiance = black_cube->get_object();
-    const auto default_radiance = black_cube->get_object();
     for (auto& camera_pool_index : scene.reflection_cameras) {
         auto& camera = camera_pool[camera_pool_index.second];
-        auto& reflection = scene.reflections[camera.out_reference];
-
-        if (current_bound_framebuffer != camera.framebuffer) {
-            current_bound_framebuffer = camera.framebuffer;
-            glBindFramebuffer(GL_FRAMEBUFFER, camera.framebuffer);
-        }
-
-        set_viewport_clip(camera.viewport_clip);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        // Rendering skyboxes
-        skybox_equirectangular_shader->bind();
-        skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-        const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
-        skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
-        for (const auto& key_skybox : scene.skyboxes) {
-            const auto& skybox = key_skybox.second;
-            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index()));
-            glBindTexture(GL_TEXTURE_2D, skybox.albedo_txt);
-            glBindVertexArray(skybox.vertex_object);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-        }
-        // Rendering forward pbr
-        forward_pbr_shader->bind();
-        const auto forward_pbr_txt_index_albedo = static_cast<enumerated>(forward_pbr_shader->get_albedo_index());
-        const auto forward_pbr_txt_index_normal = static_cast<enumerated>(forward_pbr_shader->get_normal_index());
-        const auto forward_pbr_txt_index_emission = static_cast<enumerated>(forward_pbr_shader->get_emission_index());
-        const auto forward_pbr_txt_index_metallic_roughness = static_cast<enumerated>(forward_pbr_shader->get_metallic_roughness_index());
-        const auto forward_pbr_txt_index_occlusion = static_cast<enumerated>(forward_pbr_shader->get_occlusion_index());
-        const auto forward_pbr_txt_index_irradiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
-        const auto forward_pbr_txt_index_radiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
-        forward_pbr_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-        for (auto& distance_model_data : camera.opaque_models_data) {
-            auto& model_data = distance_model_data.second;
-            forward_pbr_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
-            forward_pbr_shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
-            forward_pbr_shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
-            forward_pbr_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
-            forward_pbr_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
-            forward_pbr_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
-
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_albedo);
-            glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_normal);
-            glBindTexture(GL_TEXTURE_2D, model_data.normal_txt);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_emission);
-            glBindTexture(GL_TEXTURE_2D, model_data.emission_txt);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_metallic_roughness);
-            glBindTexture(GL_TEXTURE_2D, model_data.metallic_roughness_txt);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_occlusion);
-            glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_irradiance);
-            if (model_data.irradiance == reflection.irradiance)
-                glBindTexture(GL_TEXTURE_CUBE_MAP, default_irradiance);
-            else
-                glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
-            glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_radiance);
-            if (model_data.radiance == reflection.radiance)
-                glBindTexture(GL_TEXTURE_CUBE_MAP, default_radiance);
-            else
-                glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.radiance);
-
-            glBindVertexArray(model_data.vertex_object);
-            glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
-        }
+        render_forward_camera(scene, camera);
     }
 }
 
-gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
-    : e(e)
-    , final_shader(new ShaderFinal(e))
-    , forward_pbr_shader(new ShaderForwardPbr(e))
-    , gbuffers_filler_shader(new ShaderGBuffersFiller(e))
-    , deferred_pbr_shader(new ShaderDeferredPbr(e))
-    , deferred_pbr_transparent_shader(new ShaderDeferredPbrTransparent(e))
-    , irradiance_shader(new ShaderIrradiance(e))
-    , radiance_shader(new ShaderRadiance(e))
-    , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
-    , ssao_resolve_shader(new ShaderSsaoResolve(e))
-    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
-    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
+void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept
 {
-    GX_LOG_D("Creating submission manager.");
-    initialise_gbuffers();
-    initialise_ssao();
-    initialise_final();
+    GX_GL_CHECK_D;
+    set_framebuffer(camera.framebuffer);
+    set_viewport_clip(camera.viewport_clip);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glDepthMask(GL_FALSE);
+    // Rendering skyboxes
+    bool is_equirectangular_current = true;
+    skybox_equirectangular_shader->bind();
+    skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+    {
+        const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
+        skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
+    }
+    auto skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
+    for (const auto& key_skybox : scene.skyboxes) {
+        const auto is_equirectangular = std::get<2>(key_skybox.first);
+        if (is_equirectangular != is_equirectangular_current) {
+            is_equirectangular_current = is_equirectangular;
+            if (is_equirectangular) {
+                skybox_equirectangular_shader->bind();
+                skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+                const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
+                skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
+                skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
+            } else {
+                skybox_cube_shader->bind();
+                skybox_cube_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+                const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
+                skybox_cube_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
+                skybox_texture_bind_index = static_cast<enumerated>(skybox_cube_shader->get_albedo_index());
+            }
+        }
+        const auto& skybox = key_skybox.second;
+        glActiveTexture(GL_TEXTURE0 + skybox_texture_bind_index);
+        glBindTexture(is_equirectangular ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP, skybox.albedo_txt);
+        glBindVertexArray(skybox.vertex_object);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    }
+    glDepthMask(GL_TRUE);
+    GX_GL_CHECK_D;
+    glDisable(GL_BLEND);
+    // Rendering forward pbr
+    forward_pbr_shader->bind();
+    const auto forward_pbr_txt_index_albedo = static_cast<enumerated>(forward_pbr_shader->get_albedo_index());
+    const auto forward_pbr_txt_index_normal = static_cast<enumerated>(forward_pbr_shader->get_normal_index());
+    const auto forward_pbr_txt_index_emission = static_cast<enumerated>(forward_pbr_shader->get_emission_index());
+    const auto forward_pbr_txt_index_metallic_roughness = static_cast<enumerated>(forward_pbr_shader->get_metallic_roughness_index());
+    const auto forward_pbr_txt_index_occlusion = static_cast<enumerated>(forward_pbr_shader->get_occlusion_index());
+    const auto forward_pbr_txt_index_irradiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
+    const auto forward_pbr_txt_index_radiance = static_cast<enumerated>(forward_pbr_shader->get_radiance_index());
+    const auto forward_pbr_txt_index_brdflut = static_cast<enumerated>(forward_pbr_shader->get_brdflut_index());
+    forward_pbr_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+    const math::Vec4<float> camera_position_reserved(camera.pos, 0.0f);
+    forward_pbr_shader->set_camera_position_reserved_data(reinterpret_cast<const float*>(&camera_position_reserved));
+    for (auto& distance_model_data : camera.opaque_models_data) {
+        auto& model_data = distance_model_data.second;
+        forward_pbr_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
+        forward_pbr_shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+        forward_pbr_shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
+        forward_pbr_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
+        forward_pbr_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
+        forward_pbr_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    // Pipeline settings
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_SCISSOR_TEST);
-    glEnable(GL_STENCIL_TEST);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_albedo);
+        glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_normal);
+        glBindTexture(GL_TEXTURE_2D, model_data.normal_txt);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_emission);
+        glBindTexture(GL_TEXTURE_2D, model_data.emission_txt);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_metallic_roughness);
+        glBindTexture(GL_TEXTURE_2D, model_data.metallic_roughness_txt);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_occlusion);
+        glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_irradiance);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_radiance);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.radiance);
+        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_brdflut);
+        glBindTexture(GL_TEXTURE_2D, brdflut->get_object());
 
-    const float screen_vertices[] = {
-        -1.0f, 3.0f, // 1
-        -1.0f, -1.0f, // 2
-        3.0f, -1.0f, // 3
-    };
-    glGenVertexArrays(1, &screen_vertex_object);
-    glBindVertexArray(screen_vertex_object);
-    glGenBuffers(1, &screen_vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, screen_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
-    glBindVertexArray(0);
-
-    e.todos.unload();
+        glBindVertexArray(model_data.vertex_object);
+        glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
+        GX_GL_CHECK_D;
+    }
 }
 
-gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
-
-void gearoenix::gl::SubmissionManager::update() noexcept
+void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
 {
-    camera_pool.clear();
-    scene_pool.clear();
-    scenes.clear();
-
-    fill_scenes();
-    update_scenes();
-
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
     const float screen_uv_move_reserved[] = { gbuffer_uv_move_x, gbuffer_uv_move_y, 0.0f, 0.0f };
@@ -698,7 +709,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         const auto gbuffers_filler_txt_index_radiance = static_cast<enumerated>(gbuffers_filler_shader->get_radiance_index());
 
         glDisable(GL_BLEND); // TODO find the best place for it
-        gbuffers_target->bind();
+        set_framebuffer(gbuffers_target->get_framebuffer());
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
 
@@ -734,18 +745,11 @@ void gearoenix::gl::SubmissionManager::update() noexcept
                 glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
             }
         }
-    }
 
-    // render_shadows();
-    render_reflection_probes();
-
-    for (auto& scene_layer_entity_id_pool_index : scenes) {
-        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         render_reflection_probes(scene);
 
         // SSAO resolving -------------------------------------------------------------------------------------
-        ssao_resolve_target->bind();
-
+        set_framebuffer(ssao_resolve_target->get_framebuffer());
         set_viewport_clip(gbuffer_viewport_clip);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -765,7 +769,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
         // PBR ------------------------------------------------------------------------------------------------
-        final_target->bind();
+        set_framebuffer(final_target->get_framebuffer());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         skybox_equirectangular_shader->bind();
@@ -817,8 +821,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         }
 
         // Final ----------------------------------------------------------------------------------------------
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        set_framebuffer(0);
 
         const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
         if (screen_ratio < gbuffer_aspect_ratio) {
@@ -841,20 +844,28 @@ void gearoenix::gl::SubmissionManager::update() noexcept
         glBindVertexArray(screen_vertex_object);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
-    GX_GL_CHECK_D;
+}
 
+void gearoenix::gl::SubmissionManager::render_with_forward() noexcept
+{
+    for (auto& scene_layer_entity_id_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        render_reflection_probes(scene);
+        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+            render_forward_camera(scene, camera);
+        }
+    }
+}
+
+void gearoenix::gl::SubmissionManager::render_imgui() noexcept
+{
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
     set_viewport_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glGetError();
-
-#ifdef GX_PLATFORM_INTERFACE_SDL2
-    SDL_GL_SwapWindow(os_app.get_window());
-#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
-    os_app.get_gl_context()->swap();
-#endif
 }
 
 void gearoenix::gl::SubmissionManager::set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept
@@ -868,6 +879,79 @@ void gearoenix::gl::SubmissionManager::set_viewport_clip(const math::Vec4<sizei>
     glScissor(
         current_viewport_clip.x, current_viewport_clip.y,
         current_viewport_clip.z, current_viewport_clip.w);
+}
+
+void gearoenix::gl::SubmissionManager::set_framebuffer(const uint framebuffer_object) noexcept
+{
+    if (current_bound_framebuffer == framebuffer_object)
+        return;
+    current_bound_framebuffer = framebuffer_object;
+    if (0 == current_bound_framebuffer)
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, current_bound_framebuffer);
+}
+
+gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
+    : e(e)
+    , final_shader(e.get_specification().is_deferred_supported ? new ShaderFinal(e) : nullptr)
+    , forward_pbr_shader(new ShaderForwardPbr(e))
+    , gbuffers_filler_shader(e.get_specification().is_deferred_supported ? new ShaderGBuffersFiller(e) : nullptr)
+    , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbr(e) : nullptr)
+    , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbrTransparent(e) : nullptr)
+    , irradiance_shader(new ShaderIrradiance(e))
+    , radiance_shader(new ShaderRadiance(e))
+    , skybox_cube_shader(new ShaderSkyboxCube(e))
+    , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
+    , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new ShaderSsaoResolve(e) : nullptr)
+    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
+    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
+{
+    GX_LOG_D("Creating submission manager.");
+    initialise_gbuffers();
+    initialise_ssao();
+    initialise_final();
+    initialise_screen_vertices();
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // Pipeline settings
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_STENCIL_TEST);
+
+    e.todos.unload();
+}
+
+gearoenix::gl::SubmissionManager::~SubmissionManager() noexcept = default;
+
+void gearoenix::gl::SubmissionManager::update() noexcept
+{
+    camera_pool.clear();
+    scene_pool.clear();
+    scenes.clear();
+
+    fill_scenes();
+    update_scenes();
+
+    // render_shadows();
+    render_reflection_probes();
+
+    if (e.get_specification().is_deferred_supported)
+        render_with_deferred();
+    else
+        render_with_forward();
+
+    GX_GL_CHECK_D;
+
+    render_imgui();
+
+#ifdef GX_PLATFORM_INTERFACE_SDL2
+    SDL_GL_SwapWindow(e.get_platform_application().get_window());
+#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
+    e.get_platform_application().get_gl_context()->swap();
+#endif
 }
 
 #endif

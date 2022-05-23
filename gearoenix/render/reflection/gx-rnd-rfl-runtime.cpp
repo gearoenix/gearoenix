@@ -2,6 +2,7 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
@@ -227,7 +228,7 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
             if (state_radiance_face > 5) {
                 state_radiance_face = 0;
                 state = State::Resting;
-                if (on_rendered.has_value())
+                if (nullptr != on_rendered)
                     (*on_rendered)();
             }
         }
@@ -256,4 +257,16 @@ void gearoenix::render::reflection::Runtime::set_scene_id(const core::ecs::Entit
     for (const auto camera_id : cameras)
         if (auto* const c = e.get_world()->get_component<camera::Camera>(camera_id); nullptr != c)
             c->set_scene_id(scene_id);
+}
+
+void gearoenix::render::reflection::Runtime::set_on_rendered(std::function<void()>&& f) noexcept
+{
+    on_rendered = std::make_unique<std::function<void()>>(std::move(f));
+}
+
+void gearoenix::render::reflection::Runtime::export_baked(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& end_callback) const noexcept
+{
+    irradiance->write(s, end_callback);
+    radiance->write(s, end_callback);
+    include_box.write(*s);
 }

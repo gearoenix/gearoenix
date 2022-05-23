@@ -1,22 +1,22 @@
 #include "gx-rnd-txt-sampler.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 
-void gearoenix::render::texture::SamplerInfo::write(platform::stream::Stream* const s) const noexcept
+void gearoenix::render::texture::SamplerInfo::write(platform::stream::Stream& s) const noexcept
 {
-    (void)s->write(min_filter);
-    (void)s->write(mag_filter);
-    (void)s->write(wrap_s);
-    (void)s->write(wrap_t);
-    (void)s->write(wrap_r);
+    s.write_fail_debug(min_filter);
+    s.write_fail_debug(mag_filter);
+    s.write_fail_debug(wrap_s);
+    s.write_fail_debug(wrap_t);
+    s.write_fail_debug(wrap_r);
 }
 
-void gearoenix::render::texture::SamplerInfo::read(platform::stream::Stream* const s) noexcept
+void gearoenix::render::texture::SamplerInfo::read(platform::stream::Stream& s) noexcept
 {
-    s->read(min_filter);
-    s->read(mag_filter);
-    s->read(wrap_s);
-    s->read(wrap_t);
-    s->read(wrap_r);
+    s.read(min_filter);
+    s.read(mag_filter);
+    s.read(wrap_s);
+    s.read(wrap_t);
+    s.read(wrap_r);
 }
 
 bool gearoenix::render::texture::SamplerInfo::needs_mipmap() const noexcept

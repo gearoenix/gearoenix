@@ -234,6 +234,19 @@ public:
         corners[7].y = lower.y;
         corners[7].z = lower.z;
     }
+
+    void write(platform::stream::Stream& s) const noexcept
+    {
+        upper.write(s);
+        lower.write(s);
+    }
+
+    void read(platform::stream::Stream& s) noexcept
+    {
+        upper.read(s);
+        lower.read(s);
+        update();
+    }
 };
 }
 #endif

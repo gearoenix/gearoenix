@@ -1,6 +1,7 @@
 #include "gx-rnd-txt-texture.hpp"
 #include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../math/gx-math-numeric.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-pixel-iterator.hpp"
@@ -11,12 +12,57 @@ gearoenix::render::texture::Texture::Texture(
     const TextureInfo& info,
     engine::Engine& e) noexcept
     : e(e)
-    , info(info)
     , name(std::move(name))
+    , info(info)
 {
 }
 
+void gearoenix::render::texture::Texture::write_image(
+    platform::stream::Stream& s,
+    const std::uint8_t* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const TextureFormat format) const noexcept
+{
+    if (format_has_float_component(format)) {
+        if (32 != format_component_bits_count(format))
+            GX_LOG_F("We can only export 32bit float format.");
+        render::texture::Image::encode_hdr(s, data, img_width, img_height, format_components_count(format));
+    } else {
+        if (8 != format_component_bits_count(format))
+            GX_UNIMPLEMENTED;
+        render::texture::Image::encode_png(s, data, img_width, img_height, format_components_count(format));
+    }
+}
+
+void gearoenix::render::texture::Texture::write_gx3d_image(
+    platform::stream::Stream& s,
+    const std::uint8_t* const data,
+    const std::size_t img_width,
+    const std::size_t img_height,
+    const TextureFormat format) const noexcept
+{
+    const auto offset_of_size = s.tell();
+    s.write_fail_debug(static_cast<std::uint32_t>(0));
+    write_image(s, data, img_width, img_height, format);
+    const auto curr_off = s.tell();
+    s.seek(offset_of_size);
+    s.write_fail_debug(static_cast<std::uint32_t>((curr_off - offset_of_size) - sizeof(std::uint32_t)));
+    s.seek(curr_off);
+}
+
 gearoenix::render::texture::Texture::~Texture() noexcept = default;
+
+void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored&) const noexcept
+{
+    s->write_fail_debug(name);
+    info.write(*s);
+}
+
+std::size_t gearoenix::render::texture::Texture::get_mipmaps_count() const noexcept
+{
+    return compute_mipmaps_count(info);
+}
 
 std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
     const float* const data,
@@ -76,4 +122,9 @@ std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(
     const std::size_t img_width, const std::size_t img_height) noexcept
 {
     return math::Numeric::floor_log2(img_width > img_height ? img_width : img_height) + 1;
+}
+
+std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(const TextureInfo& info) noexcept
+{
+    return info.has_mipmap ? compute_mipmaps_count(info.width, info.height) : 1;
 }

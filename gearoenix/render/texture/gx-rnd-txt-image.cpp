@@ -81,14 +81,15 @@ void gearoenix::render::texture::Image::decode(
 }
 
 void gearoenix::render::texture::Image::encode_png(
-    platform::stream::Stream* const file,
-    const unsigned char* const data,
+    platform::stream::Stream& file,
+    const std::uint8_t* const data,
     const std::size_t img_width,
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
     stbi_write_png_to_func(
-        encode_write_func, file,
+        encode_write_func,
+        &file,
         static_cast<int>(img_width),
         static_cast<int>(img_height),
         static_cast<int>(components_count),
@@ -97,16 +98,17 @@ void gearoenix::render::texture::Image::encode_png(
 }
 
 void gearoenix::render::texture::Image::encode_hdr(
-    platform::stream::Stream* const file,
-    const float* const data,
+    platform::stream::Stream& file,
+    const void* const data,
     const std::size_t img_width,
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
     stbi_write_hdr_to_func(
-        encode_write_func, file,
+        encode_write_func,
+        &file,
         static_cast<int>(img_width),
         static_cast<int>(img_height),
         static_cast<int>(components_count),
-        data);
+        reinterpret_cast<const float*>(data));
 }

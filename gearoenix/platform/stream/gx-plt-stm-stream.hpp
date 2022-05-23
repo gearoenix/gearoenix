@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_SYSTEM_STREAM_STREAM_HPP
 #define GEAROENIX_SYSTEM_STREAM_STREAM_HPP
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <memory>
 #include <string>
@@ -21,52 +22,40 @@ protected:
 
 public:
     virtual ~Stream() noexcept = default;
-    [[nodiscard]] static std::unique_ptr<Stream> open(const Path& path, Application& app) noexcept;
+    [[nodiscard]] static std::shared_ptr<Stream> open(const Path& path, Application& app) noexcept;
     [[nodiscard]] virtual std::size_t read(void* data, std::size_t length) noexcept = 0;
     [[nodiscard]] virtual std::size_t write(const void* data, std::size_t length) noexcept = 0;
     virtual void seek(std::size_t offset) noexcept = 0;
     [[nodiscard]] virtual std::size_t tell() noexcept = 0;
     [[nodiscard]] virtual std::size_t size() noexcept = 0;
-    [[nodiscard]] std::string read_string() noexcept;
-    [[nodiscard]] bool read_bool() noexcept;
+
+    void read(std::string& s) noexcept;
 
     template <typename T>
-    typename std::enable_if<sizeof(T) != 1, void>::type
-    read(std::vector<T>& data) noexcept
+    void read(std::vector<T>& data) noexcept
     {
-        std::size_t c;
-        read(c);
-        data.resize((size_t)c);
-        for (std::size_t i = 0; i < c; ++i) {
-            read(data[i]);
+        const auto c = read<std::uint32_t>();
+        data.resize(static_cast<size_t>(c));
+        if constexpr (sizeof(T) == 1) {
+            GX_ASSERT(data.size() == read(data.data(), data.size()));
+        } else {
+            for (std::uint32_t i = 0; i < c; ++i) {
+                read(data[i]);
+            }
         }
     }
 
     template <typename T>
-    typename std::enable_if<sizeof(T) == 1, void>::type
-    read(std::vector<T>& data) noexcept
+    void read(T& data) noexcept
     {
-        std::size_t c;
-        read(c);
-        data.resize((size_t)c);
-        for (std::size_t i = 0; i < c; ++i) {
-            read(data[i]);
+        constexpr auto b1 = sizeof(T) == 1;
+        constexpr auto b2 = sizeof(T) < 9 && (std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_enum_v<T>);
+        static_assert(b1 || b2, "Unexpected type to read.");
+        if constexpr (b1) {
+            GX_ASSERT(1 == read(&data, 1));
+        } else {
+            built_in_type_read(&data, sizeof(T));
         }
-    }
-
-    template <typename T>
-    typename std::enable_if<
-        sizeof(T) == 1 && (std::is_integral<T>::value || std::is_enum<T>::value), void>::type
-    read(T& data) noexcept
-    {
-        (void)read(&data, sizeof(T));
-    }
-
-    template <typename T>
-    typename std::enable_if<(sizeof(T) > 1) && (sizeof(T) < 9) && (std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_enum<T>::value), void>::type
-    read(T& data) noexcept
-    {
-        built_in_type_read(&data, sizeof(T));
     }
 
     template <typename T>
@@ -82,6 +71,17 @@ public:
     {
         return write(&d, sizeof(T));
     }
+
+    [[nodiscard]] bool write(const std::string& s) noexcept;
+
+    template <typename T>
+    void write_fail_debug(const T& d) noexcept
+    {
+        [[maybe_unused]] const auto sz = write(&d, sizeof(T));
+        GX_ASSERT_D(sz == sizeof(T));
+    }
+
+    void write_fail_debug(const std::string& s) noexcept;
 
     [[nodiscard]] std::vector<std::uint8_t> get_file_content() noexcept;
 };

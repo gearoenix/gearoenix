@@ -24,17 +24,19 @@ struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
+struct Runtime;
 struct Builder {
+    typedef std::array<std::shared_ptr<camera::Builder>, 6> CameraBuilders;
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GET_CREF_PRT(std::array<std::shared_ptr<camera::Builder> GX_COMMA 6>, faces_camera_builders)
+    GX_GET_CREF_PRT(CameraBuilders, faces_camera_builders)
 
     /// Creates static reflection probe
     Builder(
         engine::Engine& e,
         const std::string& name,
         const math::Aabb3<double>& include_box,
-        std::shared_ptr<texture::TextureCube>&& radiance_texture,
-        std::shared_ptr<texture::TextureCube>&& irradiance_texture,
+        const std::shared_ptr<texture::TextureCube>& irradiance_texture,
+        const std::shared_ptr<texture::TextureCube>& radiance_texture,
         const core::sync::EndCallerIgnored& end_callback) noexcept;
     /// Creates runtime reflection probe
     Builder(
@@ -51,6 +53,8 @@ struct Builder {
     Builder(const Builder&) = delete;
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
+    [[nodiscard]] const Runtime& get_runtime() const noexcept;
+    [[nodiscard]] Runtime& get_runtime() noexcept;
     virtual ~Builder() noexcept;
     void set_camera_builder(std::shared_ptr<camera::Builder>&& builder, std::size_t face_index) noexcept;
 };

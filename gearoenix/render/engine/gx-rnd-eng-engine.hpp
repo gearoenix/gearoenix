@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "../texture/gx-rnd-txt-attachment.hpp"
-#include "gx-rnd-eng-limitations.hpp"
+#include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
 #include <memory>
@@ -58,7 +58,7 @@ struct Engine {
     GX_GET_CVAL_PRT(Type, engine_type)
     GX_GET_RRF_PRT(platform::Application, platform_application)
     GX_GET_UPTR_PRT(physics::Engine, physics_engine)
-    GX_GET_CREF_PRT(Limitations, limitations)
+    GX_GET_CREF_PRT(Specification, specification)
     GX_GET_VAL_PRT(std::size_t, frames_count, 2)
     GX_GET_VAL_PRT(std::size_t, frame_number, 0)
     GX_GET_VAL_PRT(std::size_t, next_frame_number, 1)

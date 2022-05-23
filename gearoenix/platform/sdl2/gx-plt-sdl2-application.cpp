@@ -216,13 +216,9 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
 {
     initialize_sdl();
     initialize_screen();
-    GX_REACHED;
     initialize_window();
-    GX_REACHED;
     initialize_mouse();
-    GX_REACHED;
     base.initialize_engine(*this);
-    GX_REACHED;
 }
 
 gearoenix::platform::Application::~Application() noexcept

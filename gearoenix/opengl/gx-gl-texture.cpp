@@ -1,11 +1,17 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../platform/stream/gx-plt-stm-local.hpp"
+#include "../render/texture/gx-rnd-txt-image.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-target.hpp"
 #include <vector>
+
+#ifdef GX_DEBUG_MODE
+//#define GX_DEBUG_TEXTURE_WRITE
+#endif
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
 {
@@ -145,6 +151,36 @@ gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f) noexce
     }
 }
 
+void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept
+{
+    render::texture::Texture2D::write(s, c);
+    e.todos.load([this, s, c] {
+        GX_GL_CHECK_D;
+        gl::uint framebuffer;
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindTexture(GL_TEXTURE_2D, object);
+        std::vector<std::uint8_t> data(info.width * info.height * format_pixel_size(info.format));
+        auto level_width = static_cast<gl::sizei>(info.width);
+        auto level_height = static_cast<gl::sizei>(info.height);
+        const auto mips_count = get_mipmaps_count();
+        for (gl::sint mip_index = 0; mip_index < mips_count; ++mip_index, level_width >>= 1u, level_height >>= 1u) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
+            glReadPixels(0, 0, level_width, level_height, convert_format(info.format), convert_data_format(info.format), data.data());
+#ifdef GX_DEBUG_TEXTURE_WRITE
+            const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
+            platform::stream::Local l(e.get_platform_application(),
+                "texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
+            write_image(l, data.data(), level_width, level_height, info.format);
+#endif
+            write_gx3d_image(*s, data.data(), level_width, level_height, info.format);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDeleteFramebuffers(1, &framebuffer);
+        GX_GL_CHECK_D;
+    });
+}
+
 gearoenix::gl::Texture2D::Texture2D(
     Engine& e,
     const render::texture::TextureInfo& info,
@@ -166,6 +202,37 @@ void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) noexcept
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, object);
+}
+
+void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept
+{
+    render::texture::TextureCube::write(s, c);
+    e.todos.load([this, s, c] {
+        GX_GL_CHECK_D;
+        gl::uint framebuffer;
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, object);
+        std::vector<std::uint8_t> data(info.width * info.width * format_pixel_size(info.format));
+        for (auto face : render::texture::FACES) {
+            auto level_aspect = static_cast<gl::sizei>(info.width);
+            const auto mips_count = get_mipmaps_count();
+            for (gl::sint mipmap_index = 0; mipmap_index < mips_count; ++mipmap_index, level_aspect >>= 1u) {
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
+                glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.format), convert_data_format(info.format), data.data());
+#ifdef GX_DEBUG_TEXTURE_WRITE
+                const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
+                platform::stream::Local l(e.get_platform_application(),
+                    "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
+                write_image(l, data.data(), level_aspect, level_aspect, info.format);
+#endif
+                write_gx3d_image(*s, data.data(), level_aspect, level_aspect, info.format);
+            }
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDeleteFramebuffers(1, &framebuffer);
+        GX_GL_CHECK_D;
+    });
 }
 
 gearoenix::gl::TextureCube::TextureCube(

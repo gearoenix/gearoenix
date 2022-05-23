@@ -1,5 +1,6 @@
 #include "gx-gl-reflection.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
@@ -22,6 +23,27 @@ gearoenix::gl::ReflectionRuntime::ReflectionRuntime() noexcept
 gearoenix::gl::ReflectionRuntime::~ReflectionRuntime() noexcept = default;
 
 gearoenix::gl::ReflectionRuntime::ReflectionRuntime(ReflectionRuntime&&) noexcept = default;
+
+gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
+    Engine& e,
+    const std::string& name,
+    const math::Aabb3<double>& include_box,
+    const std::shared_ptr<render::texture::TextureCube>& irradiance_texture,
+    const std::shared_ptr<render::texture::TextureCube>& radiance_texture,
+    const core::sync::EndCallerIgnored& end_callback) noexcept
+    : render::reflection::Builder(e, name, include_box, irradiance_texture, radiance_texture, end_callback)
+{
+    auto& builder = entity_builder->get_builder();
+    builder.add_component(Reflection());
+    auto* const gb = builder.get_component<Reflection>();
+    auto* const rb = builder.get_component<render::reflection::Baked>();
+    gb->irradiance = std::dynamic_pointer_cast<TextureCube>(rb->get_irradiance());
+    gb->radiance = std::dynamic_pointer_cast<TextureCube>(rb->get_radiance());
+    e.todos.load([this, gb, rb, entity_builder = entity_builder, end_callback] {
+        gb->irradiance_v = gb->irradiance->get_object();
+        gb->radiance_v = gb->radiance->get_object();
+    });
+}
 
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     Engine& e,
@@ -78,6 +100,22 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
 }
 
 gearoenix::gl::ReflectionBuilder::~ReflectionBuilder() noexcept = default;
+
+std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::ReflectionManager::build_baked(
+    const std::string& name,
+    const std::shared_ptr<render::texture::TextureCube>& irradiance,
+    const std::shared_ptr<render::texture::TextureCube>& radiance,
+    const math::Aabb3<double>& include_box,
+    const core::sync::EndCallerIgnored& end_callback) noexcept
+{
+    return std::shared_ptr<ReflectionBuilder>(new ReflectionBuilder(
+        eng,
+        name,
+        include_box,
+        irradiance,
+        radiance,
+        end_callback));
+}
 
 std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::ReflectionManager::build_runtime(
     const std::string& name,

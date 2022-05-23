@@ -1,8 +1,6 @@
 #ifndef GEAROENIX_CORE_MACRO_GETTER_SETTER_HPP
 #define GEAROENIX_CORE_MACRO_GETTER_SETTER_HPP
 
-#define GX_COMMA ,
-
 #define GX_GET_CREF(v, c, t, x) \
     v:                          \
     c t x;                      \

@@ -26,6 +26,10 @@ struct Texture2D final : public render::texture::Texture2D {
     Engine& e;
     GX_GET_VAL_PRV(uint, object, 0)
 
+private:
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
+
+public:
     Texture2D(
         Engine& e,
         const render::texture::TextureInfo& info,
@@ -40,6 +44,10 @@ struct TextureCube final : public render::texture::TextureCube {
     Engine& e;
     GX_GET_VAL_PRV(uint, object, 0)
 
+private:
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
+
+public:
     TextureCube(
         Engine& e,
         const render::texture::TextureInfo& info,

@@ -4,8 +4,15 @@
 #include "../../math/gx-math-aabb.hpp"
 #include <string>
 
+namespace gearoenix::platform::stream {
+struct Path;
+}
 namespace gearoenix::render::engine {
 struct Engine;
+}
+
+namespace gearoenix::render::texture {
+struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
@@ -21,6 +28,18 @@ public:
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
     virtual ~Manager() noexcept;
+
+    [[nodiscard]] std::shared_ptr<Builder> build_baked(
+        const std::string& name,
+        const platform::stream::Path& path,
+        const core::sync::EndCallerIgnored& c) noexcept;
+
+    [[nodiscard]] virtual std::shared_ptr<Builder> build_baked(
+        const std::string& name,
+        const std::shared_ptr<texture::TextureCube>& irradiance,
+        const std::shared_ptr<texture::TextureCube>& radiance,
+        const math::Aabb3<double>& include_box,
+        const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_runtime(
         const std::string& name,

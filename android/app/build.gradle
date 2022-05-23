@@ -22,8 +22,10 @@ android {
 //                        '-DGX_ENABLE_EXAMPLE_003_HELLO_TEXTURE=True'
 //                        '-DGX_ENABLE_EXAMPLE_004_HELLO_ECS=True'
 //                        '-DGX_ENABLE_EXAMPLE_005_HELLO_IMGUI=True'
-                        '-DGX_ENABLE_EXAMPLE_006_HELLO_GLTF=True'
+//                        '-DGX_ENABLE_EXAMPLE_006_HELLO_GLTF=True'
 //                        '-DGX_ENABLE_EXAMPLE_007_HELLO_SKYBOX=True'
+//                        '-DGX_ENABLE_EXAMPLE_007_HELLO_SKYBOX=True'
+                        '-DGX_ENABLE_EXAMPLE_008_REFLECTION_PROBE=True'
             }
         }
     }
@@ -39,6 +41,7 @@ android {
             path "../../CMakeLists.txt"
         }
     }
+    namespace 'com.geareonix.engine'
 }
 dependencies {
 }

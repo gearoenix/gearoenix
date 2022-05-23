@@ -25,6 +25,7 @@ struct ShaderDeferredPbr;
 struct ShaderDeferredPbrTransparent;
 struct ShaderIrradiance;
 struct ShaderRadiance;
+struct ShaderSkyboxCube;
 struct ShaderSkyboxEquirectangular;
 struct ShaderSsaoResolve;
 struct Target;
@@ -93,7 +94,7 @@ struct SubmissionManager final {
 
     struct SceneData final {
         math::Vec4<float> ssao_settings;
-        boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equrectangualr*/>, SkyboxData> skyboxes;
+        boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equirectangular*/>, SkyboxData> skyboxes;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
         boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> reflection_cameras;
         boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> shadow_cameras;
@@ -111,6 +112,7 @@ private:
     const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<ShaderIrradiance> irradiance_shader;
     const std::unique_ptr<ShaderRadiance> radiance_shader;
+    const std::unique_ptr<ShaderSkyboxCube> skybox_cube_shader;
     const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
     uint gbuffer_width, gbuffer_height;
@@ -144,6 +146,7 @@ private:
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
+    void initialise_screen_vertices() noexcept;
 
     void fill_scenes() noexcept;
     void update_scenes() noexcept;
@@ -155,8 +158,13 @@ private:
     void fill_gbuffers(const std::size_t camera_pool_index) noexcept;
     void render_shadows() noexcept;
     void render_reflection_probes() noexcept;
-    void render_reflection_probes(SceneData& scene) noexcept;
+    void render_reflection_probes(const SceneData& scene) noexcept;
+    void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
+    void render_with_deferred() noexcept;
+    void render_with_forward() noexcept;
+    void render_imgui() noexcept;
     void set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept;
+    void set_framebuffer(uint framebuffer_object) noexcept;
 
 public:
     SubmissionManager(Engine& e) noexcept;

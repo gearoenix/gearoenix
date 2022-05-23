@@ -1,5 +1,6 @@
 #include "gx-rnd-rfl-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -7,6 +8,23 @@
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-rnd-rfl-baked.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
+
+gearoenix::render::reflection::Builder::Builder(
+    engine::Engine& e,
+    const std::string& name,
+    const math::Aabb3<double>& include_box,
+    const std::shared_ptr<texture::TextureCube>& irradiance_texture,
+    const std::shared_ptr<texture::TextureCube>& radiance_texture,
+    const core::sync::EndCallerIgnored&) noexcept
+{
+    auto& builder = entity_builder->get_builder();
+    builder.set_name(name);
+    builder.add_component(Baked(
+        e,
+        irradiance_texture,
+        radiance_texture,
+        include_box));
+}
 
 gearoenix::render::reflection::Builder::Builder(
     engine::Engine& e,
@@ -39,6 +57,20 @@ gearoenix::render::reflection::Builder::Builder(
         std::shared_ptr(r->get_irradiance()),
         std::shared_ptr(r->get_radiance()),
         include_box));
+}
+
+const gearoenix::render::reflection::Runtime& gearoenix::render::reflection::Builder::get_runtime() const noexcept
+{
+    const auto* const c = entity_builder->get_builder().get_component<Runtime>();
+    GX_ASSERT(nullptr != c);
+    return *c;
+}
+
+gearoenix::render::reflection::Runtime& gearoenix::render::reflection::Builder::get_runtime() noexcept
+{
+    auto* const c = entity_builder->get_builder().get_component<Runtime>();
+    GX_ASSERT(nullptr != c);
+    return *c;
 }
 
 gearoenix::render::reflection::Builder::~Builder() noexcept = default;

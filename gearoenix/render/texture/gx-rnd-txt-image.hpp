@@ -39,14 +39,14 @@ public:
         std::size_t& img_height,
         std::size_t& img_channels) noexcept;
     static void encode_png(
-        platform::stream::Stream* file,
-        const unsigned char* data,
+        platform::stream::Stream& file,
+        const std::uint8_t* data,
         std::size_t img_width,
         std::size_t img_height,
         std::size_t components_count) noexcept;
     static void encode_hdr(
-        platform::stream::Stream* file,
-        const float* data,
+        platform::stream::Stream& file,
+        const void* data,
         std::size_t img_width,
         std::size_t img_height,
         std::size_t components_count) noexcept;

@@ -18,6 +18,16 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
 {
     ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
+
+    sint max_attach = 0;
+    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attach);
+    specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);
+    specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT;
+    specification.is_raytracing_supported = false;
+
+    specification.is_float_texture_supported = true;
+    specification.is_deferred_supported = false;
+
     camera_manager = std::make_unique<CameraManager>(*this);
     mesh_manager = std::make_unique<MeshManager>(*this);
     model_manager = std::make_unique<ModelManager>(*this);

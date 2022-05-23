@@ -21,9 +21,6 @@
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-cube.hpp>
 
-//#define GX_EXAMPLE_008_EXPORT_ENVIRONMENT
-#define GX_EXAMPLE_008_EXPORT_REFLECTION
-
 struct GameApp final : public gearoenix::core::Application {
     std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
 
@@ -61,7 +58,7 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto skybox_builder = render_engine.get_skybox_manager()->build(
             "hello-skybox",
-            gearoenix::platform::stream::Path::create_asset("sky.hdr"),
+            gearoenix::platform::stream::Path::create_asset("sky.gx-cube-texture"),
             end_callback);
         scene_builder->add(std::move(skybox_builder));
 
@@ -74,28 +71,11 @@ struct GameApp final : public gearoenix::core::Application {
             camera_builder->get_entity_builder()->get_builder().get_id());
         scene_builder->add(std::move(camera_builder));
 
-        auto runtime_reflection_probe_builder = render_engine.get_reflection_manager()->build_runtime(
-            "hello-runtime-reflection-probe",
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(20.0), gearoenix::math::Vec3(-20.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
-            1024, 128, 256,
+        auto baked_reflection_probe_builder = render_engine.get_reflection_manager()->build_baked(
+            "baked-reflection",
+            gearoenix::platform::stream::Path::create_asset("exported.gx-reflection"),
             end_callback);
-#if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT) || defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
-        const auto id = runtime_reflection_probe_builder->get_entity_builder()->get_builder().get_id();
-        runtime_reflection_probe_builder->get_runtime().set_on_rendered([id, this] {
-            const auto* const r = render_engine.get_world()->get_component<gearoenix::render::reflection::Runtime>(id);
-#if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
-            std::shared_ptr<gearoenix::platform::stream::Stream> rl(new gearoenix::platform::stream::Local(platform_application, "exported.gx-reflection", true));
-            r->export_baked(rl);
-#endif
-#if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT)
-            std::shared_ptr<gearoenix::platform::stream::Stream> tl(new gearoenix::platform::stream::Local(platform_application, "sky.gx-cube-texture", true));
-            r->get_environment()->write(tl, GX_DEFAULT_IGNORED_END_CALLER);
-#endif
-        });
-#endif
-        scene_builder->add(std::move(runtime_reflection_probe_builder));
+        scene_builder->add(std::move(baked_reflection_probe_builder));
 
         GX_LOG_D("Initialised");
     }

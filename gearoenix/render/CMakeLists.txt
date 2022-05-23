@@ -13,7 +13,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-projection.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-engine.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-limitations.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-specification.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-type.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-type.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-2d.cpp
@@ -91,6 +91,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-2d.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-cube.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-cube.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-info.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-info.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-wrap.hpp

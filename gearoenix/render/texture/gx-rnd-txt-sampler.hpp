@@ -8,7 +8,7 @@ struct Stream;
 }
 
 namespace gearoenix::render::texture {
-struct SamplerInfo {
+struct SamplerInfo final {
     Filter min_filter = Filter::LinearMipmapLinear;
     Filter mag_filter = Filter::Linear;
     Wrap wrap_s = Wrap::Repeat;
@@ -16,8 +16,8 @@ struct SamplerInfo {
     Wrap wrap_r = Wrap::Repeat;
     std::uint8_t anisotropic_level = 0;
 
-    void write(platform::stream::Stream* s) const noexcept;
-    void read(platform::stream::Stream* s) noexcept;
+    void write(platform::stream::Stream& s) const noexcept;
+    void read(platform::stream::Stream& s) noexcept;
     [[nodiscard]] bool needs_mipmap() const noexcept;
     [[nodiscard]] bool operator<(const SamplerInfo& o) const noexcept;
     [[nodiscard]] bool operator>(const SamplerInfo& o) const noexcept;

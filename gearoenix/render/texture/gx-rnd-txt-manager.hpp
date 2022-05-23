@@ -41,13 +41,11 @@ protected:
         std::vector<std::vector<std::uint8_t>> pixels,
         const TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept = 0;
-
     [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels_v(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
         const core::sync::EndCallerIgnored& c) noexcept = 0;
-
     [[nodiscard]] virtual std::shared_ptr<Target> create_target_v(
         std::string name,
         std::vector<Attachment>&& attachments,
@@ -56,6 +54,12 @@ protected:
 public:
     explicit Manager(engine::Engine& e) noexcept;
     virtual ~Manager() noexcept;
+    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(
+        const platform::stream::Path& path,
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(
+        const std::shared_ptr<platform::stream::Stream>& stream,
+        const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_colour(
         const math::Vec4<float>& colour,
         const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
@@ -105,7 +109,7 @@ public:
     [[nodiscard]] static math::Vec2<float> integrate_brdf(
         float n_dot_v,
         float roughness) noexcept;
-    [[nodiscard]] static std::vector<math::Vec2<float>> create_brdflut_pixels(
+    [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(
         std::size_t resolution = 256) noexcept;
 };
 }

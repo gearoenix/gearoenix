@@ -4,6 +4,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
+#include "../texture/gx-rnd-txt-texture-cube.hpp"
 
 gearoenix::render::skybox::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
@@ -31,8 +32,11 @@ std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::render::skybox::M
             },
             c);
         return build(std::move(name), std::move(txt), c);
-    } else if (texture_path.get_raw_data().ends_with(".gx-sky")) {
-        GX_UNIMPLEMENTED;
+    } else if (texture_path.get_raw_data().ends_with(".gx-cube-texture")) {
+        const auto txt = e.get_texture_manager()->read_gx3d(texture_path, c);
+        auto cube = std::dynamic_pointer_cast<texture::TextureCube>(txt);
+        GX_ASSERT(nullptr != cube);
+        return build(std::move(name), std::move(cube), c);
     }
     GX_UNEXPECTED;
 }

@@ -27,7 +27,35 @@ enum struct TextureFormat : core::TypeId {
     Unknown = 255,
 };
 
-constexpr bool format_has_float_component(const TextureFormat f) noexcept
+[[nodiscard]] constexpr std::size_t format_component_bits_count(const TextureFormat f) noexcept
+{
+    switch (f) {
+    case TextureFormat::RgbaFloat16:
+    case TextureFormat::RgbFloat16:
+    case TextureFormat::RgFloat16:
+    case TextureFormat::Float16:
+    case TextureFormat::D16:
+        return 16;
+    case TextureFormat::RgbaFloat24:
+    case TextureFormat::RgbFloat24:
+    case TextureFormat::RgFloat24:
+    case TextureFormat::Float24:
+    case TextureFormat::D24:
+        return 24;
+    case TextureFormat::RgbaFloat32:
+    case TextureFormat::RgbFloat32:
+    case TextureFormat::RgFloat32:
+    case TextureFormat::Float32:
+    case TextureFormat::D32:
+        return 32;
+    case TextureFormat::RgbaUint8:
+        return 8;
+    default:
+        return static_cast<std::size_t>(-1);
+    }
+}
+
+[[nodiscard]] constexpr bool format_has_float_component(const TextureFormat f) noexcept
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -51,7 +79,7 @@ constexpr bool format_has_float_component(const TextureFormat f) noexcept
     }
 }
 
-constexpr std::size_t format_components_count(const TextureFormat f) noexcept
+[[nodiscard]] constexpr std::size_t format_components_count(const TextureFormat f) noexcept
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -79,7 +107,7 @@ constexpr std::size_t format_components_count(const TextureFormat f) noexcept
     }
 }
 
-constexpr bool format_is_depth(const TextureFormat f) noexcept
+[[nodiscard]] constexpr bool format_is_depth(const TextureFormat f) noexcept
 {
     switch (f) {
     case TextureFormat::D16:
@@ -90,5 +118,38 @@ constexpr bool format_is_depth(const TextureFormat f) noexcept
         return false;
     }
 }
+
+[[nodiscard]] constexpr std::size_t format_pixel_size(const TextureFormat f) noexcept
+{
+    switch (f) {
+    case TextureFormat::Float16:
+    case TextureFormat::D16:
+        return 2;
+    case TextureFormat::Float24:
+    case TextureFormat::D24:
+        return 3;
+    case TextureFormat::RgbaUint8:
+    case TextureFormat::RgFloat16:
+    case TextureFormat::Float32:
+    case TextureFormat::D32:
+        return 4;
+    case TextureFormat::RgbFloat16:
+    case TextureFormat::RgFloat24:
+        return 6;
+    case TextureFormat::RgbaFloat16:
+    case TextureFormat::RgFloat32:
+        return 8;
+    case TextureFormat::RgbFloat24:
+        return 9;
+    case TextureFormat::RgbaFloat24:
+    case TextureFormat::RgbFloat32:
+        return 12;
+    case TextureFormat::RgbaFloat32:
+        return 16;
+    default:
+        return static_cast<std::size_t>(-1);
+    }
+}
+
 }
 #endif

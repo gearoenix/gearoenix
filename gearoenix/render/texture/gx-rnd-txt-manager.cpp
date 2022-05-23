@@ -18,6 +18,90 @@ gearoenix::render::texture::Manager::Manager(engine::Engine& e) noexcept
 
 gearoenix::render::texture::Manager::~Manager() noexcept = default;
 
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
+    const platform::stream::Path& path,
+    const core::sync::EndCallerIgnored& c) noexcept
+{
+    const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
+    return read_gx3d(stream, c);
+}
+
+std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
+    const std::shared_ptr<platform::stream::Stream>& stream,
+    const core::sync::EndCallerIgnored& c) noexcept
+{
+    std::string name;
+    stream->read(name);
+    TextureInfo txt_info;
+    txt_info.read(*stream);
+    const auto is_float = format_has_float_component(txt_info.format);
+    const auto comps_count = format_components_count(txt_info.format);
+    const auto mips_count = Texture::compute_mipmaps_count(txt_info);
+    const auto comp_bits = format_component_bits_count(txt_info.format);
+    if (is_float) {
+        GX_ASSERT(32 == comp_bits);
+        if (!e.get_specification().is_float_texture_supported) {
+            txt_info.format = TextureFormat::RgbaUint8; // No other format is supported
+        }
+    } else {
+        GX_ASSERT(8 == comp_bits);
+    }
+    const auto fill_mips = [&](std::vector<std::vector<std::uint8_t>>& pixels) noexcept {
+        pixels.resize(mips_count);
+        auto mip_w = txt_info.width;
+        auto mip_h = txt_info.height;
+        for (std::size_t mip_index = 0; mip_index < mips_count; ++mip_index, mip_w >>= 1, mip_h >>= 1) {
+            auto& mip_pixels = pixels[mip_index];
+            const auto data = stream->read<std::vector<std::uint8_t>>();
+            if (is_float) {
+                std::vector<float> float_pixels;
+                std::size_t decode_w, decode_h, ignored;
+                Image::decode(data.data(), data.size(), comps_count, float_pixels, decode_w, decode_h, ignored);
+                GX_ASSERT(mip_w == decode_w);
+                GX_ASSERT(mip_h == decode_h);
+                if (e.get_specification().is_float_texture_supported) {
+                    mip_pixels.resize(float_pixels.size() << 2);
+                    std::memcpy(mip_pixels.data(), float_pixels.data(), mip_pixels.size());
+                } else {
+                    GX_LOG_D("Loading float texture in a an unsupported engine, inefficient load of texture.");
+                    mip_pixels.resize((float_pixels.size() * 4) / comps_count); // 4 is because we use RgbaUint8
+                    for (std::size_t pixel_index = 0, float_index = 0, comp_index = 0; pixel_index < mip_pixels.size();) {
+                        for (comp_index = 0; comp_index < comps_count; ++comp_index, ++pixel_index, ++float_index) {
+                            const float f = float_pixels[float_index];
+                            mip_pixels[pixel_index] = f >= 1.0f ? 225 : f <= 0.0f ? 0
+                                                                                  : static_cast<std::uint8_t>(f * 255.0f + 0.5f);
+                        }
+                        for (; comp_index < 3; ++comp_index, ++pixel_index)
+                            mip_pixels[pixel_index] = 0;
+                        if (comp_index < 4) {
+                            mip_pixels[pixel_index] = 0;
+                            ++pixel_index;
+                        }
+                    }
+                }
+            } else {
+                std::size_t decode_w, decode_h, ignored;
+                Image::decode(data.data(), data.size(), comps_count, mip_pixels, decode_w, decode_h, ignored);
+                GX_ASSERT(mip_w == decode_w);
+                GX_ASSERT(mip_h == decode_h);
+            }
+        }
+    };
+    if (Type::TextureCube == txt_info.type) {
+        GX_ASSERT(txt_info.width == txt_info.height);
+        std::vector<std::vector<std::vector<std::uint8_t>>> pixels(6);
+        for (auto& face_pixels : pixels)
+            fill_mips(face_pixels);
+        return create_cube_from_pixels(std::move(name), std::move(pixels), txt_info, c);
+    } else if (Type::Texture2D == txt_info.type) {
+        std::vector<std::vector<std::uint8_t>> pixels;
+        fill_mips(pixels);
+        return create_2d_from_pixels(std::move(name), std::move(pixels), txt_info, c);
+    } else {
+        GX_UNIMPLEMENTED;
+    }
+}
+
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_colour(
     const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
 {
@@ -62,9 +146,18 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     GX_GUARD_LOCK(brdflut);
-    constexpr std::size_t resolution = 256;
     if (nullptr != brdflut)
         return brdflut;
+    constexpr auto file_name = "default-brdflut.gx-2d-texture";
+    std::shared_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(e.get_platform_application(), file_name));
+    if (nullptr == stream)
+        stream = std::shared_ptr<platform::stream::Stream>(platform::stream::Local::open(e.get_platform_application(), file_name));
+    if (nullptr != stream) {
+        brdflut = std::dynamic_pointer_cast<Texture2D>(read_gx3d(stream, c));
+        GX_ASSERT(nullptr != brdflut);
+        return brdflut;
+    }
+    constexpr std::size_t resolution = 256;
     const TextureInfo texture_info {
         .format = TextureFormat::RgbaUint8,
         .sampler_info = SamplerInfo {
@@ -80,19 +173,11 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         .has_mipmap = false
     };
     const auto pixels_vectors = create_brdflut_pixels();
-    std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
-    std::size_t data_index = 0;
-    core::sync::ParallelFor::execi(pixels_vectors.begin(), pixels_vectors.end(), [&](auto& pixel, const std::size_t index, auto) {
-        auto* const p = reinterpret_cast<std::uint8_t*>(&pixels0[index << 2]);
-        p[0] = static_cast<std::uint8_t>(pixel.x >= 1.0f ? 255.1 : pixel.x <= 0.0f ? 0.1f
-                                                                                   : 255.0 * pixel.x);
-        p[1] = static_cast<std::uint8_t>(pixel.y >= 1.0f ? 255.1 : pixel.y <= 0.0f ? 0.1f
-                                                                                   : 255.0 * pixel.y);
-        p[2] = 0;
-        p[3] = 255;
-    });
+    std::vector<std::uint8_t> pixels0(pixels_vectors.size() * sizeof(math::Vec4<std::uint8_t>));
+    std::memcpy(pixels0.data(), pixels_vectors.data(), pixels0.size());
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
     brdflut = create_2d_from_pixels("default-brdflut", std::move(pixels), texture_info, c);
+    brdflut->write(std::shared_ptr<platform::stream::Stream>(new platform::stream::Local(e.get_platform_application(), file_name, true)), c);
     return brdflut;
 }
 
@@ -336,14 +421,22 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
     return math::Vec2<float>(a, b);
 }
 
-std::vector<gearoenix::math::Vec2<float>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
+std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
 {
-    std::vector<math::Vec2<float>> pixels(resolution * resolution);
+    std::vector<math::Vec4<std::uint8_t>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / float(resolution);
     core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::size_t index, auto) {
-        pixel = integrate_brdf(
+        auto p = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
             (static_cast<float>(index / resolution) + 0.5f) * inv_res);
+        p *= 255.0f;
+        p += 0.5f;
+        pixel.x = p.x >= 255.0f ? 255 : p.x <= 0.0f ? 0
+                                                    : static_cast<std::uint8_t>(p.x);
+        pixel.y = p.y >= 255.0f ? 255 : p.y <= 0.0f ? 0
+                                                    : static_cast<std::uint8_t>(p.y);
+        pixel.z = 0;
+        pixel.w = 255;
     });
     return pixels;
 }

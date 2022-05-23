@@ -16,30 +16,21 @@ void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, c
     }
 }
 
-std::unique_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream::Stream::open(const Path& path, Application& app) noexcept
+std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream::Stream::open(const Path& path, Application& app) noexcept
 {
     if (path.is_asset())
-        return std::unique_ptr<Stream>(Asset::construct(app, path.get_raw_data()));
+        return std::shared_ptr<Stream>(Asset::construct(app, path.get_raw_data()));
     if (path.is_absolute())
-        return std::unique_ptr<Stream>(Local::open(app, path.get_raw_data()));
-    return std::unique_ptr<Stream>();
+        return std::shared_ptr<Stream>(Local::open(app, path.get_raw_data()));
+    return std::shared_ptr<Stream>();
 }
 
-std::string gearoenix::platform::stream::Stream::read_string() noexcept
+void gearoenix::platform::stream::Stream::read(std::string& s) noexcept
 {
-    std::size_t c;
-    (void)read(c);
-    std::string s;
-    s.resize(c);
-    (void)read(&(s[0]), c);
-    return s;
-}
-
-bool gearoenix::platform::stream::Stream::read_bool() noexcept
-{
-    std::uint8_t data;
-    (void)read(&data, 1);
-    return data != 0;
+    std::uint32_t sz;
+    read(sz);
+    s.resize(sz);
+    GX_ASSERT(s.size() == read(s.data(), s.size()));
 }
 
 std::vector<std::uint8_t> gearoenix::platform::stream::Stream::get_file_content() noexcept
@@ -48,4 +39,18 @@ std::vector<std::uint8_t> gearoenix::platform::stream::Stream::get_file_content(
     seek(0);
     (void)read(result.data(), result.size());
     return result;
+}
+
+bool gearoenix::platform::stream::Stream::write(const std::string& s) noexcept
+{
+    if (sizeof(std::uint32_t) != write(static_cast<std::uint32_t>(s.size())))
+        return false;
+    if (s.size() != write(s.data(), s.size()))
+        return false;
+    return true;
+}
+
+void gearoenix::platform::stream::Stream::write_fail_debug(const std::string& s) noexcept
+{
+    GX_ASSERT_D(write(s));
 }
