@@ -16,6 +16,7 @@ gearoenix::render::reflection::Builder::Builder(
     const std::shared_ptr<texture::TextureCube>& irradiance_texture,
     const std::shared_ptr<texture::TextureCube>& radiance_texture,
     const core::sync::EndCallerIgnored&) noexcept
+    : entity_builder(e.get_world()->create_shared_builder())
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);

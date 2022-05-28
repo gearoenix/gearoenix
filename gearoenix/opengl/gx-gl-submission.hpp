@@ -159,6 +159,7 @@ private:
     void render_shadows() noexcept;
     void render_reflection_probes() noexcept;
     void render_reflection_probes(const SceneData& scene) noexcept;
+    void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;
     void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;

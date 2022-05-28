@@ -47,7 +47,9 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     write_image(s, data, img_width, img_height, format);
     const auto curr_off = s.tell();
     s.seek(offset_of_size);
-    s.write_fail_debug(static_cast<std::uint32_t>((curr_off - offset_of_size) - sizeof(std::uint32_t)));
+    const auto sz = static_cast<std::uint32_t>((curr_off - offset_of_size) - sizeof(std::uint32_t));
+    GX_ASSERT(sz != 0);
+    s.write_fail_debug(sz);
     s.seek(curr_off);
 }
 

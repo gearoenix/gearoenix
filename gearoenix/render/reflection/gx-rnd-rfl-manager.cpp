@@ -23,12 +23,12 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::refle
 {
     const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
     GX_ASSERT(nullptr != stream);
+    math::Aabb3<double> include_box;
+    include_box.read(*stream);
     const auto irradiance = std::dynamic_pointer_cast<texture::TextureCube>(e.get_texture_manager()->read_gx3d(stream, c));
     GX_ASSERT(irradiance != nullptr);
     const auto radiance = std::dynamic_pointer_cast<texture::TextureCube>(e.get_texture_manager()->read_gx3d(stream, c));
     GX_ASSERT(radiance != nullptr);
-    math::Aabb3<double> include_box;
-    include_box.read(*stream);
     return build_baked(name, irradiance, radiance, include_box, c);
 }
 

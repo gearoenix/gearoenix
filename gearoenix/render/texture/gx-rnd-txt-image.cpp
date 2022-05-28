@@ -5,7 +5,6 @@
 // This is a workaround for warnings in stb
 #include "../../platform/macro/gx-plt-mcr-disable-warnings.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#define STBI_NO_STDIO
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
@@ -87,6 +86,7 @@ void gearoenix::render::texture::Image::encode_png(
     const std::size_t img_height,
     const std::size_t components_count) noexcept
 {
+    stbi_write_png_compression_level = 100;
     stbi_write_png_to_func(
         encode_write_func,
         &file,

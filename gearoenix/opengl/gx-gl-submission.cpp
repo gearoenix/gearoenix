@@ -600,21 +600,15 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes(const SceneData&
     }
 }
 
-void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept
+void gearoenix::gl::SubmissionManager::render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept
 {
-    GX_GL_CHECK_D;
-    set_framebuffer(camera.framebuffer);
-    set_viewport_clip(camera.viewport_clip);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDepthMask(GL_FALSE);
     // Rendering skyboxes
+    const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
     bool is_equirectangular_current = true;
     skybox_equirectangular_shader->bind();
     skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-    {
-        const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
-        skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
-    }
+    skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
     auto skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
     for (const auto& key_skybox : scene.skyboxes) {
         const auto is_equirectangular = std::get<2>(key_skybox.first);
@@ -623,13 +617,11 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
             if (is_equirectangular) {
                 skybox_equirectangular_shader->bind();
                 skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-                const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
                 skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
                 skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
             } else {
                 skybox_cube_shader->bind();
                 skybox_cube_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-                const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
                 skybox_cube_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
                 skybox_texture_bind_index = static_cast<enumerated>(skybox_cube_shader->get_albedo_index());
             }
@@ -641,6 +633,15 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }
     glDepthMask(GL_TRUE);
+}
+
+void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept
+{
+    GX_GL_CHECK_D;
+    set_framebuffer(camera.framebuffer);
+    set_viewport_clip(camera.viewport_clip);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    render_skyboxes(scene, camera);
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
     // Rendering forward pbr
@@ -772,20 +773,10 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
         set_framebuffer(final_target->get_framebuffer());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        skybox_equirectangular_shader->bind();
-
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
-            skybox_equirectangular_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
-            const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
-            skybox_equirectangular_shader->set_camera_position_box_scale_data(reinterpret_cast<const float*>(&camera_pos_scale));
-            for (const auto& key_skybox : scene.skyboxes) {
-                const auto& skybox = key_skybox.second;
-                glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index()));
-                glBindTexture(GL_TEXTURE_2D, skybox.albedo_txt);
-                glBindVertexArray(skybox.vertex_object);
-                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-            }
+
+            render_skyboxes(scene, camera);
 
             deferred_pbr_shader->bind();
 

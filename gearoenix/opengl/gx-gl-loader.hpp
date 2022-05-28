@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
 #include "gx-gl-types.hpp"
+#include <string>
 
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
 #define GX_GL_APIENTRY __stdcall*
@@ -175,6 +176,7 @@ GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_DECL);
 
 [[nodiscard]] bool load_library() noexcept;
 void unload_library() noexcept;
+[[nodiscard]] bool extension_exists(const std::string& ext_name) noexcept;
 
 #ifdef GX_DEBUG_MODE
 void debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);

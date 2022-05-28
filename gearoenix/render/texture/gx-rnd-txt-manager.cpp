@@ -50,9 +50,10 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
         pixels.resize(mips_count);
         auto mip_w = txt_info.width;
         auto mip_h = txt_info.height;
+        std::vector<std::uint8_t> data;
         for (std::size_t mip_index = 0; mip_index < mips_count; ++mip_index, mip_w >>= 1, mip_h >>= 1) {
             auto& mip_pixels = pixels[mip_index];
-            const auto data = stream->read<std::vector<std::uint8_t>>();
+            stream->read(data);
             if (is_float) {
                 std::vector<float> float_pixels;
                 std::size_t decode_w, decode_h, ignored;
@@ -289,15 +290,26 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
         reinterpret_cast<const unsigned char*>(data), size, 4,
         pixels0f, img_width, img_height, img_channels);
     GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
+
+    std::vector<std::uint8_t> pixels0;
     TextureInfo new_info = info;
-    new_info.format = TextureFormat::RgbaFloat32;
+    if (e.get_specification().is_float_texture_supported) {
+        new_info.format = TextureFormat::RgbaFloat32;
+        const auto pixels0_sz = pixels0f.size() * sizeof(float);
+        pixels0.resize(pixels0_sz);
+        std::memcpy(pixels0.data(), pixels0f.data(), pixels0_sz);
+    } else {
+        new_info.format = TextureFormat::RgbaUint8;
+        pixels0.resize(pixels0f.size());
+        core::sync::ParallelFor::execi(pixels0f.begin(), pixels0f.end(), [&](float p, unsigned int index, unsigned int) noexcept {
+            pixels0[index] = p >= 1.0f ? 255 : p <= 0.0f ? 0
+                                                         : static_cast<std::uint8_t>(p * 255.0f + 0.501f);
+        });
+    }
     new_info.type = Type::Texture2D;
     new_info.width = img_width;
     new_info.height = img_height;
-    const auto pixels0_sz = pixels0f.size() * sizeof(float);
-    std::vector<std::uint8_t> pixels0(pixels0_sz);
-    std::memcpy(pixels0.data(), pixels0f.data(), pixels0_sz);
-    return create_2d_from_pixels(std::move(name), { pixels0 }, new_info, c);
+    return create_2d_from_pixels(std::move(name), { std::move(pixels0) }, new_info, c);
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_file(

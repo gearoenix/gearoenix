@@ -28,6 +28,8 @@ static constexpr const char* const fragment_shader_src = "\
 \n\
 #extension GL_OES_texture_float: enable\n\
 #extension GL_OES_texture_float_linear: enable\n\
+#extension OES_texture_float: enable\n\
+#extension OES_texture_float_linear: enable\n\
 \n\
 #define GX_PI 3.141592653589793238\n\
 \n\

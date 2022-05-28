@@ -3,6 +3,7 @@
 #include "../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include "gx-gl-constants.hpp"
+#include <boost/container/flat_set.hpp>
 
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include <SDL.h>
@@ -11,6 +12,8 @@
 #else
 #error "Not implemented for this platform."
 #endif
+
+static boost::container::flat_set<std::string> gearoenix_gl_extensions;
 
 #define GX_GL_FUNCTION_DEF(gx_gl_function) gearoenix::gl::gx_gl_function##Fnp gearoenix::gl::gl##gx_gl_function = nullptr
 
@@ -57,10 +60,15 @@ bool gearoenix::gl::load_library() noexcept
     }
 #endif
 
-    const auto* const extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    const char* const extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
     if (nullptr == extensions)
         return false;
-    GX_LOG_D(extensions);
+    std::istringstream iss_extentions(extensions);
+    std::string str_ext;
+    while (iss_extentions >> str_ext) {
+        GX_LOG_D(str_ext);
+        gearoenix_gl_extensions.emplace(str_ext);
+    }
     is_loaded = true;
     return true;
 }
@@ -76,6 +84,11 @@ void gearoenix::gl::unload_library() noexcept
 #define GX_GL_FUNCTION_UNLOAD(name) gl##name = nullptr
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_UNLOAD);
+}
+
+bool gearoenix::gl::extension_exists(const std::string& ext_name) noexcept
+{
+    return gearoenix_gl_extensions.contains(ext_name);
 }
 
 #ifdef GX_DEBUG_MODE

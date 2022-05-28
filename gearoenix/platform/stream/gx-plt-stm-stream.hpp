@@ -35,7 +35,7 @@ public:
     void read(std::vector<T>& data) noexcept
     {
         const auto c = read<std::uint32_t>();
-        data.resize(static_cast<size_t>(c));
+        data.resize(static_cast<std::size_t>(c));
         if constexpr (sizeof(T) == 1) {
             GX_ASSERT(data.size() == read(data.data(), data.size()));
         } else {

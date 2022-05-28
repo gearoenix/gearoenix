@@ -52,7 +52,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         roughnesses.push_back(current_roughness);
     }
     const texture::TextureInfo environment_texture_info {
-        .format = texture::TextureFormat::RgbaFloat32,
+        .format = e.get_specification().is_float_texture_supported ? texture::TextureFormat::RgbaFloat32 : texture::TextureFormat::RgbaUint8,
         .sampler_info = texture::SamplerInfo {
             .min_filter = texture::Filter::LinearMipmapLinear,
             .mag_filter = texture::Filter::Linear,
@@ -266,7 +266,8 @@ void gearoenix::render::reflection::Runtime::set_on_rendered(std::function<void(
 
 void gearoenix::render::reflection::Runtime::export_baked(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& end_callback) const noexcept
 {
-    irradiance->write(s, end_callback);
-    radiance->write(s, end_callback);
     include_box.write(*s);
+    irradiance->write(s, core::sync::EndCallerIgnored([s, radiance = radiance, end_callback] {
+        radiance->write(s, end_callback);
+    }));
 }
