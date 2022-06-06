@@ -4,9 +4,11 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../core/gx-cr-pool.hpp"
+#include "../math/gx-math-frustum.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
+#include <array>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -25,6 +27,7 @@ struct ShaderDeferredPbr;
 struct ShaderDeferredPbrTransparent;
 struct ShaderIrradiance;
 struct ShaderRadiance;
+struct ShaderShadowCaster;
 struct ShaderSkyboxCube;
 struct ShaderSkyboxEquirectangular;
 struct ShaderSsaoResolve;
@@ -32,6 +35,13 @@ struct Target;
 struct Texture2D;
 struct TextureCube;
 struct SubmissionManager final {
+    struct DirectionalShadowData final {
+        math::Mat4x4<float> normalised_vp;
+        math::Vec3<float> direction;
+        math::Vec3<float> colour;
+        uint shadow_map_texture = static_cast<uint>(-1);
+    };
+
     struct ModelData final {
         math::Mat4x4<float> m;
         math::Mat4x4<float> inv_m;
@@ -39,6 +49,11 @@ struct SubmissionManager final {
         math::Vec4<float> normal_metallic_factor;
         math::Vec4<float> emission_roughness_factor;
         math::Vec4<float> alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;
+        std::size_t shadow_caster_directional_lights_count = 0;
+        std::array<math::Mat4x4<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_normalised_vp;
+        std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_direction;
+        std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_colour;
+        std::array<uint, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_shadow_map_texture;
         uint vertex_object = 0;
         uint vertex_buffer = 0;
         uint index_buffer = 0;
@@ -92,29 +107,39 @@ struct SubmissionManager final {
         float radiance_mips_count = 0.0f;
     };
 
+    struct DirectionalShadowCasterData final {
+        math::Frustum<double> frustum;
+        DirectionalShadowData shadow_data;
+    };
+
     struct SceneData final {
         math::Vec4<float> ssao_settings;
         boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equirectangular*/>, SkyboxData> skyboxes;
         boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
-        boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> reflection_cameras;
-        boost::container::flat_map<core::ecs::Entity::id_t, std::size_t /*camera-pool-index*/> shadow_cameras;
-        boost::container::flat_map<core::ecs::Entity::id_t, ReflectionData> reflections;
-        std::pair<core::ecs::Entity::id_t, ReflectionData> default_reflection;
+        boost::container::flat_map<core::ecs::Entity::id_t /*camera-id*/, std::size_t /*camera-pool-index*/> reflection_cameras;
+        boost::container::flat_map<core::ecs::Entity::id_t /*camera-id*/, std::size_t /*camera-pool-index*/> shadow_cameras;
+        boost::container::flat_map<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> reflections;
+        boost::container::flat_map<core::ecs::Entity::id_t /*light-id*/, DirectionalShadowCasterData> shadow_caster_directional_lights;
+        std::pair<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> default_reflection;
         std::vector<DynamicModelData> dynamic_models;
     };
+
+    typedef std::array<std::unique_ptr<ShaderForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> DirectionalLightShaderForwardPbr;
+    typedef DirectionalLightShaderForwardPbr ShaderForwardPbrCombination;
 
 private:
     Engine& e;
     const std::unique_ptr<ShaderFinal> final_shader;
-    const std::unique_ptr<ShaderForwardPbr> forward_pbr_shader;
     const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
     const std::unique_ptr<ShaderDeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<ShaderIrradiance> irradiance_shader;
+    const std::unique_ptr<ShaderShadowCaster> shadow_caster_shader;
     const std::unique_ptr<ShaderRadiance> radiance_shader;
     const std::unique_ptr<ShaderSkyboxCube> skybox_cube_shader;
     const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
+    ShaderForwardPbrCombination forward_pbr_shader_combination;
     uint gbuffer_width, gbuffer_height;
     float gbuffer_aspect_ratio = 1.2f;
     float gbuffer_uv_move_x = 0.001f;
@@ -154,9 +179,11 @@ private:
     void update_scene_bvh(core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
     void update_scene_dynamic_models(core::ecs::Entity::id_t scene_id, SceneData& scene_data) noexcept;
     void update_scene_reflection_probes(SceneData& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
+    void update_scene_lights(SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
     void update_scene_cameras(core::ecs::Entity::id_t scene_id, SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept;
-    void fill_gbuffers(const std::size_t camera_pool_index) noexcept;
     void render_shadows() noexcept;
+    void render_shadows(const CameraData& camera) noexcept;
+    void render_shadows(const SceneData& scene) noexcept;
     void render_reflection_probes() noexcept;
     void render_reflection_probes(const SceneData& scene) noexcept;
     void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;

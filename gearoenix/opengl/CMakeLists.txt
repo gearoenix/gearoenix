@@ -7,6 +7,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-constants.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-light.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-light.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-mesh.cpp
@@ -31,6 +33,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-irradiance.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-shadow-caster.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-shadow-caster.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-cube.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-cube.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.cpp

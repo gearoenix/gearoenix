@@ -38,7 +38,10 @@ struct Frustum final {
     }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
-    // [[nodiscard]] IntersectionStatus check_intersection(const Sphere& s) const noexcept;
+    [[nodiscard]] bool check_intersection(const Aabb3<Element>& aabb) const noexcept
+    {
+        return IntersectionStatus::Out != check_intersection_status(aabb);
+    }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
     /// It is not a completely correct, sometime it includes non-colliding objects

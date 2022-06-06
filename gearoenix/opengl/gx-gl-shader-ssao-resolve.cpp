@@ -154,11 +154,11 @@ gearoenix::gl::ShaderSsaoResolve::ShaderSsaoResolve(Engine& e) noexcept
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(vp)
-    GX_GL_THIS_GET_UNIFORM(ssao_radius_move_start_end)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(vp);
+    GX_GL_THIS_GET_UNIFORM(ssao_radius_move_start_end);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao);
 }
 
 gearoenix::gl::ShaderSsaoResolve::~ShaderSsaoResolve() noexcept = default;
@@ -166,8 +166,8 @@ gearoenix::gl::ShaderSsaoResolve::~ShaderSsaoResolve() noexcept = default;
 void gearoenix::gl::ShaderSsaoResolve::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao);
 }
 
 #endif

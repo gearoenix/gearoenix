@@ -4,6 +4,7 @@
 #include "../platform/gx-plt-application.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-constants.hpp"
+#include "gx-gl-light.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
@@ -27,7 +28,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
 
     // specification.is_float_texture_supported = true;
-    // specification.is_deferred_supported = false;
+    specification.is_deferred_supported = false;
 
     camera_manager = std::make_unique<CameraManager>(*this);
     mesh_manager = std::make_unique<MeshManager>(*this);
@@ -36,6 +37,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     submission_manager = std::make_unique<SubmissionManager>(*this);
     skybox_manager = std::make_unique<SkyboxManager>(*this);
     reflection_manager = std::make_unique<ReflectionManager>(*this);
+    light_manager = std::make_unique<LightManager>(*this);
     todos.unload();
 }
 

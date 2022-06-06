@@ -189,6 +189,17 @@ void gearoenix::physics::Transformation::set_orientation(const math::Quat<double
     translate(l);
 }
 
+void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
+{
+    changed = true;
+    z_axis = (location - target).normalised();
+    x_axis = up.cross(z_axis).normalised();
+    y_axis = z_axis.cross(x_axis).normalised();
+    inverted_matrix = math::Mat4x4<double>::look_at(location, -x_axis, y_axis, -z_axis);
+    matrix = inverted_matrix.inverted();
+    scale = math::Vec3<double>(1.0);
+}
+
 void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
 {
     changed = true;

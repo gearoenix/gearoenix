@@ -8,6 +8,8 @@
 #include "../platform/gx-plt-application.hpp"
 #include "../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
+#include "../render/light/gx-rnd-lt-directional.hpp"
+#include "../render/light/gx-rnd-lt-light.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
@@ -17,6 +19,7 @@
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
+#include "gx-gl-light.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
@@ -28,6 +31,7 @@
 #include "gx-gl-shader-gbuffers-filler.hpp"
 #include "gx-gl-shader-irradiance.hpp"
 #include "gx-gl-shader-radiance.hpp"
+#include "gx-gl-shader-shadow-caster.hpp"
 #include "gx-gl-shader-skybox-cube.hpp"
 #include "gx-gl-shader-skybox-equirectangular.hpp"
 #include "gx-gl-shader-ssao-resolve.hpp"
@@ -225,6 +229,7 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
         scene_pool_ref.reflection_cameras.clear();
         scene_pool_ref.shadow_cameras.clear();
         scene_pool_ref.dynamic_models.clear();
+        scene_pool_ref.shadow_caster_directional_lights.clear();
         e.get_world()->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
             if (!camera.enabled)
                 return;
@@ -243,7 +248,23 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
                 break;
             }
         });
-        e.get_world()->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) {
+        e.get_world()->synchronised_system<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDiractionaLight>([&](const core::ecs::Entity::id_t light_id, render::light::Light& l, render::light::ShadowCasterDirectional& rl, ShadowCasterDiractionaLight& gll) noexcept {
+            if (!l.enabled)
+                return;
+            if (!rl.enabled)
+                return;
+            if (!gll.enabled)
+                return;
+            if (scene_id != l.scene_id)
+                return;
+            scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, DirectionalShadowCasterData { .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl.get_camera_id())->get_frustum(), .shadow_data = DirectionalShadowData {
+                                                                                                                                                                                                                        .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl.get_camera_id())->get_view_projection(),
+                                                                                                                                                                                                                        .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl.get_camera_id())->get_z_axis()),
+                                                                                                                                                                                                                        .colour = l.colour,
+                                                                                                                                                                                                                        .shadow_map_texture = gll.get_shadow_map_texture_v(),
+                                                                                                                                                                                                                    } });
+        });
+        e.get_world()->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) noexcept {
             if (!render_skybox.enabled)
                 return;
             if (render_skybox.get_scene_id() != scene_id)
@@ -300,6 +321,7 @@ void gearoenix::gl::SubmissionManager::update_scene(const core::ecs::Entity::id_
     update_scene_bvh(scene_id, scene_data, render_scene, bvh);
     update_scene_dynamic_models(scene_id, scene_data);
     update_scene_reflection_probes(scene_data, render_scene, bvh);
+    update_scene_lights(scene_data, bvh);
     update_scene_cameras(scene_id, scene_data, bvh);
 }
 
@@ -313,30 +335,31 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
             if (!render_model.enabled || render_model.is_transformable || render_model.scene_id != scene_id)
                 return;
             auto& mesh = *model.bound_mesh;
-            bvh.add({ collider.get_updated_box(),
-                ModelBvhData {
-                    .blocked_cameras_flags = render_model.block_cameras_flags,
-                    .model = ModelData {
-                        .m = math::Mat4x4<float>(model_transform.get_matrix()),
-                        .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
-                        .albedo_factor = model.material.get_albedo_factor(),
-                        .normal_metallic_factor = model.material.get_normal_metallic_factor(),
-                        .emission_roughness_factor = model.material.get_emission_roughness_factor(),
-                        .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
-                        .vertex_object = mesh.vertex_object,
-                        .vertex_buffer = mesh.vertex_buffer,
-                        .index_buffer = mesh.index_buffer,
-                        .indices_count = mesh.indices_count,
-                        .albedo_txt = model.albedo->get_object(),
-                        .normal_txt = model.normal->get_object(),
-                        .emission_txt = model.emission->get_object(),
-                        .metallic_roughness_txt = model.metallic_roughness->get_object(),
-                        .occlusion_txt = model.occlusion->get_object(),
-                        // Reflection probe data
-                        .irradiance = scene_data.default_reflection.second.irradiance,
-                        .radiance = scene_data.default_reflection.second.radiance,
-                        .reflection_probe_size = scene_data.default_reflection.second.size,
-                    } } });
+            ModelBvhData md {
+                .blocked_cameras_flags = render_model.block_cameras_flags,
+                .model = ModelData {
+                    .m = math::Mat4x4<float>(model_transform.get_matrix()),
+                    .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
+                    .albedo_factor = model.material.get_albedo_factor(),
+                    .normal_metallic_factor = model.material.get_normal_metallic_factor(),
+                    .emission_roughness_factor = model.material.get_emission_roughness_factor(),
+                    .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
+                    .vertex_object = mesh.vertex_object,
+                    .vertex_buffer = mesh.vertex_buffer,
+                    .index_buffer = mesh.index_buffer,
+                    .indices_count = mesh.indices_count,
+                    .albedo_txt = model.albedo->get_object(),
+                    .normal_txt = model.normal->get_object(),
+                    .emission_txt = model.emission->get_object(),
+                    .metallic_roughness_txt = model.metallic_roughness->get_object(),
+                    .occlusion_txt = model.occlusion->get_object(),
+                    // Reflection probe data
+                    .irradiance = scene_data.default_reflection.second.irradiance,
+                    .radiance = scene_data.default_reflection.second.radiance,
+                    .reflection_probe_size = scene_data.default_reflection.second.size,
+                }
+            };
+            bvh.add({ collider.get_updated_box(), md });
         });
     bvh.create_nodes();
 }
@@ -411,6 +434,41 @@ void gearoenix::gl::SubmissionManager::update_scene_reflection_probes(SceneData&
             mm.radiance = reflection.second.radiance;
             mm.reflection_probe_size = reflection.second.size;
             mm.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z = reflection.second.radiance_mips_count;
+        }
+    });
+}
+
+void gearoenix::gl::SubmissionManager::update_scene_lights(SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept
+{
+    bvh.call_on_all([&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+        bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
+    });
+    for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
+        bvh.call_on_intersecting(shadow.second.frustum, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+            auto& m = bvh_node_data.user_data.model;
+            if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
+                return;
+            m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
+            m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
+            m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
+            m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
+            ++m.shadow_caster_directional_lights_count;
+        });
+    }
+
+    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& md, const unsigned int) noexcept {
+        auto& m = md.base.model;
+        m.shadow_caster_directional_lights_count = 0;
+        for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
+            if (!shadow.second.frustum.check_intersection(md.box))
+                return;
+            if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
+                return;
+            m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
+            m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
+            m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
+            m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
+            ++m.shadow_caster_directional_lights_count;
         }
     });
 }
@@ -522,12 +580,45 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
         });
 }
 
-void gearoenix::gl::SubmissionManager::fill_gbuffers(const std::size_t) noexcept
-{
-}
-
 void gearoenix::gl::SubmissionManager::render_shadows() noexcept
 {
+    GX_GL_CHECK_D;
+    glDisable(GL_BLEND);
+    for (auto& scene_layer_entity_id_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        render_shadows(scene);
+    }
+    GX_GL_CHECK_D;
+}
+
+void gearoenix::gl::SubmissionManager::render_shadows(const CameraData& camera) noexcept
+{
+    set_framebuffer(camera.framebuffer);
+    set_viewport_clip(camera.viewport_clip);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    shadow_caster_shader->bind();
+    const auto txt_index_albedo = static_cast<enumerated>(shadow_caster_shader->get_albedo_index());
+    for (auto& distance_model_data : camera.opaque_models_data) {
+        auto& model_data = distance_model_data.second;
+        const auto mvp = camera.vp * model_data.m;
+        shadow_caster_shader->set_mvp_data(reinterpret_cast<const float*>(&mvp));
+        const math::Vec2<float> alpha_factor_alpha_cutoff(model_data.albedo_factor.w, model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.x);
+        shadow_caster_shader->set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
+
+        glActiveTexture(GL_TEXTURE0 + txt_index_albedo);
+        glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
+
+        glBindVertexArray(model_data.vertex_object);
+        glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
+    }
+}
+
+void gearoenix::gl::SubmissionManager::render_shadows(const SceneData& scene) noexcept
+{
+    for (auto& camera_pool_index : scene.shadow_cameras) {
+        auto& camera = camera_pool[camera_pool_index.second];
+        render_shadows(camera);
+    }
 }
 
 void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
@@ -645,43 +736,71 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
     // Rendering forward pbr
-    forward_pbr_shader->bind();
-    const auto forward_pbr_txt_index_albedo = static_cast<enumerated>(forward_pbr_shader->get_albedo_index());
-    const auto forward_pbr_txt_index_normal = static_cast<enumerated>(forward_pbr_shader->get_normal_index());
-    const auto forward_pbr_txt_index_emission = static_cast<enumerated>(forward_pbr_shader->get_emission_index());
-    const auto forward_pbr_txt_index_metallic_roughness = static_cast<enumerated>(forward_pbr_shader->get_metallic_roughness_index());
-    const auto forward_pbr_txt_index_occlusion = static_cast<enumerated>(forward_pbr_shader->get_occlusion_index());
-    const auto forward_pbr_txt_index_irradiance = static_cast<enumerated>(forward_pbr_shader->get_irradiance_index());
-    const auto forward_pbr_txt_index_radiance = static_cast<enumerated>(forward_pbr_shader->get_radiance_index());
-    const auto forward_pbr_txt_index_brdflut = static_cast<enumerated>(forward_pbr_shader->get_brdflut_index());
-    forward_pbr_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+    ShaderForwardPbr* shader = nullptr;
+    auto ti_albedo = static_cast<enumerated>(-1);
+    auto ti_normal = static_cast<enumerated>(-1);
+    auto ti_emission = static_cast<enumerated>(-1);
+    auto ti_metallic_roughness = static_cast<enumerated>(-1);
+    auto ti_occlusion = static_cast<enumerated>(-1);
+    auto ti_irradiance = static_cast<enumerated>(-1);
+    auto ti_radiance = static_cast<enumerated>(-1);
+    auto ti_brdflut = static_cast<enumerated>(-1);
+    const sint* ti_shadow_caster_directional_lights = nullptr;
     const math::Vec4<float> camera_position_reserved(camera.pos, 0.0f);
-    forward_pbr_shader->set_camera_position_reserved_data(reinterpret_cast<const float*>(&camera_position_reserved));
     for (auto& distance_model_data : camera.opaque_models_data) {
         auto& model_data = distance_model_data.second;
-        forward_pbr_shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
-        forward_pbr_shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
-        forward_pbr_shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
-        forward_pbr_shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
-        forward_pbr_shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
-        forward_pbr_shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
 
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_albedo);
+        ShaderForwardPbr* const current_shader = forward_pbr_shader_combination[model_data.shadow_caster_directional_lights_count].get();
+        if (current_shader != shader) {
+            shader = current_shader;
+            shader->bind();
+            shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
+            shader->set_camera_position_reserved_data(reinterpret_cast<const float*>(&camera_position_reserved));
+            ti_albedo = static_cast<enumerated>(shader->get_albedo_index());
+            ti_normal = static_cast<enumerated>(shader->get_normal_index());
+            ti_emission = static_cast<enumerated>(shader->get_emission_index());
+            ti_metallic_roughness = static_cast<enumerated>(shader->get_metallic_roughness_index());
+            ti_occlusion = static_cast<enumerated>(shader->get_occlusion_index());
+            ti_irradiance = static_cast<enumerated>(shader->get_irradiance_index());
+            ti_radiance = static_cast<enumerated>(shader->get_radiance_index());
+            ti_brdflut = static_cast<enumerated>(shader->get_brdflut_index());
+            ti_shadow_caster_directional_lights = shader->get_shadow_caster_directional_light_shadow_map_indices();
+        }
+
+        shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
+        shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+        shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
+        shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
+        shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
+        shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
+
+        glActiveTexture(GL_TEXTURE0 + ti_albedo);
         glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_normal);
+        glActiveTexture(GL_TEXTURE0 + ti_normal);
         glBindTexture(GL_TEXTURE_2D, model_data.normal_txt);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_emission);
+        glActiveTexture(GL_TEXTURE0 + ti_emission);
         glBindTexture(GL_TEXTURE_2D, model_data.emission_txt);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_metallic_roughness);
+        glActiveTexture(GL_TEXTURE0 + ti_metallic_roughness);
         glBindTexture(GL_TEXTURE_2D, model_data.metallic_roughness_txt);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_occlusion);
+        glActiveTexture(GL_TEXTURE0 + ti_occlusion);
         glBindTexture(GL_TEXTURE_2D, model_data.occlusion_txt);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_irradiance);
+        glActiveTexture(GL_TEXTURE0 + ti_irradiance);
         glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.irradiance);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_radiance);
+        glActiveTexture(GL_TEXTURE0 + ti_radiance);
         glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.radiance);
-        glActiveTexture(GL_TEXTURE0 + forward_pbr_txt_index_brdflut);
+        glActiveTexture(GL_TEXTURE0 + ti_brdflut);
         glBindTexture(GL_TEXTURE_2D, brdflut->get_object());
+
+        if (0 < model_data.shadow_caster_directional_lights_count) {
+            shader->set_shadow_caster_directional_light_normalised_vp_data(model_data.shadow_caster_directional_lights_normalised_vp.data());
+            shader->set_shadow_caster_directional_light_direction_data(model_data.shadow_caster_directional_lights_direction.data());
+            shader->set_shadow_caster_directional_light_colour_data(model_data.shadow_caster_directional_lights_colour.data());
+
+            for (std::size_t ti = 0; ti < model_data.shadow_caster_directional_lights_count; ++ti) {
+                glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ti_shadow_caster_directional_lights[ti]));
+                glBindTexture(GL_TEXTURE_2D, model_data.shadow_caster_directional_lights_shadow_map_texture[ti]);
+            }
+        }
 
         glBindVertexArray(model_data.vertex_object);
         glDrawElements(GL_TRIANGLES, model_data.indices_count, GL_UNSIGNED_INT, nullptr);
@@ -885,11 +1004,11 @@ void gearoenix::gl::SubmissionManager::set_framebuffer(const uint framebuffer_ob
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
     , final_shader(e.get_specification().is_deferred_supported ? new ShaderFinal(e) : nullptr)
-    , forward_pbr_shader(new ShaderForwardPbr(e))
     , gbuffers_filler_shader(e.get_specification().is_deferred_supported ? new ShaderGBuffersFiller(e) : nullptr)
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbr(e) : nullptr)
     , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbrTransparent(e) : nullptr)
     , irradiance_shader(new ShaderIrradiance(e))
+    , shadow_caster_shader(new ShaderShadowCaster(e))
     , radiance_shader(new ShaderRadiance(e))
     , skybox_cube_shader(new ShaderSkyboxCube(e))
     , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
@@ -897,6 +1016,10 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {
+    for (std::size_t directional_shadow_caster_index = 0; directional_shadow_caster_index < forward_pbr_shader_combination.size(); ++directional_shadow_caster_index) {
+        forward_pbr_shader_combination[directional_shadow_caster_index] = std::make_unique<ShaderForwardPbr>(e, directional_shadow_caster_index);
+    }
+
     GX_LOG_D("Creating submission manager.");
     initialise_gbuffers();
     initialise_ssao();
@@ -926,7 +1049,7 @@ void gearoenix::gl::SubmissionManager::update() noexcept
     fill_scenes();
     update_scenes();
 
-    // render_shadows();
+    render_shadows();
     render_reflection_probes();
 
     if (e.get_specification().is_deferred_supported)

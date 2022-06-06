@@ -23,17 +23,16 @@ SET(GX_ENGINE_RENDER_SRC
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-cascade-info.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-light.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-light.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-light.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-light.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp

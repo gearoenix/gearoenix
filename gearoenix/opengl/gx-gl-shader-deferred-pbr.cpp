@@ -98,17 +98,17 @@ gearoenix::gl::ShaderDeferredPbr::ShaderDeferredPbr(Engine& e) noexcept
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(screen_uv_move_reserved)
-    GX_GL_THIS_GET_UNIFORM(camera_position)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo_metallic)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission_roughness)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(brdflut)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(screen_uv_move_reserved);
+    GX_GL_THIS_GET_UNIFORM(camera_position);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo_metallic);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission_roughness);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(brdflut);
 }
 
 gearoenix::gl::ShaderDeferredPbr::~ShaderDeferredPbr() noexcept = default;
@@ -116,14 +116,14 @@ gearoenix::gl::ShaderDeferredPbr::~ShaderDeferredPbr() noexcept = default;
 void gearoenix::gl::ShaderDeferredPbr::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission_roughness)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(ssao_resolved)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(brdflut)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission_roughness);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(ssao_resolved);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(brdflut);
 }
 
 #endif

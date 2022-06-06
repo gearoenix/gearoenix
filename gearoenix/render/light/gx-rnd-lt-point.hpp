@@ -1,22 +1,15 @@
 #ifndef GEAROENIX_RENDER_LIGHT_POINT_HPP
 #define GEAROENIX_RENDER_LIGHT_POINT_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "../../math/gx-math-vector-4d.hpp"
-#include "gx-rnd-lt-light.hpp"
+#include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../math/gx-math-vector-3d.hpp"
 
 namespace gearoenix::render::light {
-struct Point : public Light {
-private:
-    double min_radius = 0.001f;
-    math::Vec4<double> position_max_radius = math::Vec4(1.0, 1.0, 1.0, 5.0);
+struct Point final : public core::ecs::Component {
+    math::Vec3<float> position = { 0.0f, 0.0f, 0.0f };
 
-    void update_influence_area() noexcept;
-
-public:
-    Point(core::Id id, std::string name, platform::stream::Stream* f, engine::Engine* e) noexcept;
-    [[nodiscard]] const math::Vec4<double>& get_position_max_radius() const noexcept;
-    [[nodiscard]] double get_min_radius() const noexcept;
-    bool is_in_light(const model::Model*) const noexcept override;
+    Point() noexcept;
+    Point(Point&&) noexcept;
+    ~Point() noexcept;
 };
 }
 #endif

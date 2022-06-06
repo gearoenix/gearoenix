@@ -2,6 +2,7 @@
 #define GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include <boost/container/static_vector.hpp>
 
 namespace gearoenix::gl {
 struct ShaderForwardPbr final : public Shader {
@@ -24,11 +25,22 @@ struct ShaderForwardPbr final : public Shader {
     GX_GL_UNIFORM_TEXTURE(irradiance)
     GX_GL_UNIFORM_TEXTURE(radiance)
     GX_GL_UNIFORM_TEXTURE(brdflut)
-    // GX_GL_UNIFORM_TEXTURE(shadow) // TODO
 
-    ShaderForwardPbr(Engine& e) noexcept;
+private:
+    sint shadow_caster_directional_light_normalised_vp = GX_GL_UNIFORM_FAILED;
+    sint shadow_caster_directional_light_direction = GX_GL_UNIFORM_FAILED;
+    sint shadow_caster_directional_light_colour = GX_GL_UNIFORM_FAILED;
+    sint shadow_caster_directional_light_shadow_map = GX_GL_UNIFORM_FAILED;
+    boost::container::static_vector<sint, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_light_shadow_map_indices;
+
+public:
+    ShaderForwardPbr(Engine& e, std::size_t shadow_casters_directional_lights_count) noexcept;
     ~ShaderForwardPbr() noexcept final;
     void bind() const noexcept final;
+    void set_shadow_caster_directional_light_normalised_vp_data(const void* data) noexcept;
+    void set_shadow_caster_directional_light_direction_data(const void* data) noexcept;
+    void set_shadow_caster_directional_light_colour_data(const void* data) noexcept;
+    [[nodiscard]] const sint* get_shadow_caster_directional_light_shadow_map_indices() const noexcept;
 };
 }
 

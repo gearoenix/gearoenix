@@ -72,13 +72,13 @@ gearoenix::gl::ShaderDeferredPbrTransparent::ShaderDeferredPbrTransparent(Engine
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(screen_uv_move_reserved)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo_metallic)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission_roughness)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(screen_uv_move_reserved);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo_metallic);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(position_depth);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission_roughness);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved);
 }
 
 gearoenix::gl::ShaderDeferredPbrTransparent::~ShaderDeferredPbrTransparent() noexcept = default;
@@ -86,11 +86,11 @@ gearoenix::gl::ShaderDeferredPbrTransparent::~ShaderDeferredPbrTransparent() noe
 void gearoenix::gl::ShaderDeferredPbrTransparent::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission_roughness)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(ssao_resolved)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission_roughness);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(ssao_resolved);
 }
 
 #endif

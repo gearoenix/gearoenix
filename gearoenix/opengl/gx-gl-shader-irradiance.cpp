@@ -65,9 +65,9 @@ gearoenix::gl::ShaderIrradiance::ShaderIrradiance(Engine& e) noexcept
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(m)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(environment)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(m);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(environment);
 }
 
 gearoenix::gl::ShaderIrradiance::~ShaderIrradiance() noexcept = default;
@@ -75,7 +75,7 @@ gearoenix::gl::ShaderIrradiance::~ShaderIrradiance() noexcept = default;
 void gearoenix::gl::ShaderIrradiance::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment);
 }
 
 #endif

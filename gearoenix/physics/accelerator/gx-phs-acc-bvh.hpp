@@ -343,6 +343,14 @@ public:
             return;
         call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[0]), cld, on_intersection);
     }
+
+    template <typename Function>
+    void call_on_all(Function&& function) noexcept
+    {
+        if (nodes.empty())
+            return;
+        call_on_all(reinterpret_cast<std::size_t>(&nodes[0]), function);
+    }
 };
 }
 #endif

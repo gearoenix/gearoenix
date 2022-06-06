@@ -42,11 +42,12 @@
         GX_LOG_F("Failed to locate the uniform " << #uniform); \
     }
 
-#define GX_GL_THIS_GET_UNIFORM(uniform) GX_GL_GET_UNIFORM(this, uniform)
+#define GX_GL_THIS_GET_UNIFORM(uniform) GX_GL_GET_UNIFORM(this, uniform) \
+static_assert(true, "")
 
 #define GX_GL_SHADER_SET_TEXTURE_INDEX(x) \
     x##_index = texture_index;            \
-    ++texture_index;
+    ++texture_index
 
 #define GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY(x) \
     for (auto& i : x##_indices) {               \
@@ -55,18 +56,23 @@
     }
 
 #define GX_GL_THIS_GET_UNIFORM_TEXTURE(uniform) \
-    GX_GL_THIS_GET_UNIFORM(uniform)             \
+    GX_GL_THIS_GET_UNIFORM(uniform);            \
     GX_GL_SHADER_SET_TEXTURE_INDEX(uniform)
 
 #define GX_GL_THIS_GET_UNIFORM_TEXTURE_ARRAY(uniform) \
-    GX_GL_GET_UNIFORM(this, uniform)                  \
-    GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY(uniform)
+    GX_GL_THIS_GET_UNIFORM(uniform);                  \
+    GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY(uniform)     \
+    static_assert(true, "")
 
-#define GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING sint texture_index = 0;
+#define GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING sint texture_index = 0
 
-#define GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(x) glUniform1i(x, x##_index);
+#define GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(x) glUniform1i(x, x##_index)
 
-#define GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(x) glUniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices);
+#define GX_GL_SHADER_SET_TEXTURE_INDEX_ARRAY_UNIFORM(x) glUniform1iv(x, GX_COUNT_OF(x##_indices), x##_indices)
+
+#define GX_GL_SHADER_SET_TEXTURE_INDEX_DYNAMIC_ARRAY_UNIFORM(x) \
+    if (!x##_indices.empty())                                   \
+    glUniform1iv(x, static_cast<sizei>(x##_indices.size()), x##_indices.data())
 
 namespace gearoenix::gl {
 struct Engine;

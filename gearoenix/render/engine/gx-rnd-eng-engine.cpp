@@ -4,6 +4,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../gx-rnd-gltf-loader.hpp"
+#include "../light/gx-rnd-lt-manager.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"

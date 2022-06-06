@@ -3,6 +3,8 @@
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../light/gx-rnd-lt-builder.hpp"
+#include "../light/gx-rnd-lt-light.hpp"
 #include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 #include "../reflection/gx-rnd-rfl-baked.hpp"
@@ -71,4 +73,18 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& s
     b.get_component<Scene>()->add_skybox(sb.get_id(), *s);
     s->set_scene_id(b.get_id());
     skybox_builders.push_back(std::move(skybox_builder));
+}
+
+void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& light_builder) noexcept
+{
+    auto& b = entity_builder->get_builder();
+    auto& lb = light_builder->get_entity_builder()->get_builder();
+    auto* l = lb.get_component<light::Light>();
+    GX_ASSERT_D(nullptr != l);
+    b.get_component<Scene>()->add_light(lb.get_id(), *l);
+    l->scene_id = b.get_id();
+    for (const auto& camera_builder : light_builder->get_cameras())
+        if (nullptr != camera_builder)
+            add(std::shared_ptr<camera::Builder>(camera_builder));
+    light_builders.push_back(std::move(light_builder));
 }

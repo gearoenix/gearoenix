@@ -54,10 +54,10 @@ gearoenix::gl::ShaderSkyboxCube::ShaderSkyboxCube(Engine& e) noexcept
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(vp)
-    GX_GL_THIS_GET_UNIFORM(camera_position_box_scale)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(vp);
+    GX_GL_THIS_GET_UNIFORM(camera_position_box_scale);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
 gearoenix::gl::ShaderSkyboxCube::~ShaderSkyboxCube() noexcept = default;
@@ -65,7 +65,7 @@ gearoenix::gl::ShaderSkyboxCube::~ShaderSkyboxCube() noexcept = default;
 void gearoenix::gl::ShaderSkyboxCube::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }
 
 #endif

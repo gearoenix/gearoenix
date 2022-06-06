@@ -105,22 +105,22 @@ gearoenix::gl::ShaderGBuffersFiller::ShaderGBuffersFiller(Engine& e) noexcept
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
     link();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING
-    GX_GL_THIS_GET_UNIFORM(m)
-    GX_GL_THIS_GET_UNIFORM(inv_m)
-    GX_GL_THIS_GET_UNIFORM(vp)
-    GX_GL_THIS_GET_UNIFORM(albedo_factor)
-    GX_GL_THIS_GET_UNIFORM(camera_position)
-    GX_GL_THIS_GET_UNIFORM(normal_metallic_factor)
-    GX_GL_THIS_GET_UNIFORM(emission_roughness_factor)
-    GX_GL_THIS_GET_UNIFORM(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance)
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(m);
+    GX_GL_THIS_GET_UNIFORM(inv_m);
+    GX_GL_THIS_GET_UNIFORM(vp);
+    GX_GL_THIS_GET_UNIFORM(albedo_factor);
+    GX_GL_THIS_GET_UNIFORM(camera_position);
+    GX_GL_THIS_GET_UNIFORM(normal_metallic_factor);
+    GX_GL_THIS_GET_UNIFORM(emission_roughness_factor);
+    GX_GL_THIS_GET_UNIFORM(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(normal);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(emission);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
 }
 
 gearoenix::gl::ShaderGBuffersFiller::~ShaderGBuffersFiller() noexcept = default;
@@ -128,13 +128,13 @@ gearoenix::gl::ShaderGBuffersFiller::~ShaderGBuffersFiller() noexcept = default;
 void gearoenix::gl::ShaderGBuffersFiller::bind() const noexcept
 {
     Shader::bind();
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance)
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance)
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance);
 }
 
 #endif

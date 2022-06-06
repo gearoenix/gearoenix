@@ -43,6 +43,7 @@ public:
     [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;
     [[nodiscard]] Camera& get_camera() noexcept;
     [[nodiscard]] const Camera& get_camera() const noexcept;
+    // It is needed because the target must not be changed directly
     virtual void set_target(std::shared_ptr<texture::Target>&& target) noexcept;
 };
 }

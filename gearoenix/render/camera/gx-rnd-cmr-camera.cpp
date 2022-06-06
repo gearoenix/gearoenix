@@ -95,7 +95,16 @@ void gearoenix::render::camera::Camera::set_yfov(const float f) noexcept
     update_projection();
 }
 
+void gearoenix::render::camera::Camera::set_scale(const float f) noexcept
+{
+    GX_ASSERT_D(Projection::Orthographic == projection_type);
+    scale_fovy = f;
+    update_projection();
+}
+
 void gearoenix::render::camera::Camera::set_target(std::shared_ptr<texture::Target>&& t) noexcept
 {
+    const auto d = t->get_dimension();
+    set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
     target = std::move(t);
 }
