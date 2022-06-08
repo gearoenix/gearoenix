@@ -56,7 +56,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& z,
     std::array<math::Vec3<double>, 8>& points) const noexcept
 {
-    const auto scale = Projection::Perspective == projection_type ? near * std::tanf(scale_fovy) : scale_fovy;
+    const auto scale = Projection::Perspective == projection_type ? near * std::tanf(scale_fovy) : scale_fovy * 0.5f;
     const auto fpn = Projection::Perspective == projection_type ? (static_cast<double>(far) + static_cast<double>(near)) * static_cast<double>(scale) / static_cast<double>(near) : static_cast<double>(scale);
     const auto far_x = static_cast<double>(target_aspect_ratio) * fpn;
     const auto far_y = fpn;

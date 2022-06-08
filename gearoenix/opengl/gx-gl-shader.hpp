@@ -42,8 +42,9 @@
         GX_LOG_F("Failed to locate the uniform " << #uniform); \
     }
 
-#define GX_GL_THIS_GET_UNIFORM(uniform) GX_GL_GET_UNIFORM(this, uniform) \
-static_assert(true, "")
+#define GX_GL_THIS_GET_UNIFORM(uniform) \
+    GX_GL_GET_UNIFORM(this, uniform)    \
+    static_assert(true, "")
 
 #define GX_GL_SHADER_SET_TEXTURE_INDEX(x) \
     x##_index = texture_index;            \

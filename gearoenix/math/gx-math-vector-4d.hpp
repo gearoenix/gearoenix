@@ -182,7 +182,7 @@ struct Vec4 {
 
     [[nodiscard]] constexpr Element dot(const Vec4<Element>& o) const noexcept
     {
-        return x * o.x + y * o.y + z * o.z + w + o.w;
+        return x * o.x + y * o.y + z * o.z + w * o.w;
     }
 
     [[nodiscard]] constexpr Vec4<Element> cross(const Vec4<Element>& o) const noexcept
