@@ -1,0 +1,64 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+.DS_store
+
+webassembly-build/
+build/
+build-debug/
+build-coverage/
+cmake-build-*/
+.vscode/
+.settings
+.idea/
+sdk/
+/assets/
+assets/
+
+*.jar
+*.iml
+.gradle
+gradle.properties
+gradlew
+gradlew.bat
+local.properties
+.idea/*
+.idea
+captures
+.externalNativeBuild
+.cpp
+.cpp/
+.cxx
+.cxx/
+.project
+proguard-rules.pro
