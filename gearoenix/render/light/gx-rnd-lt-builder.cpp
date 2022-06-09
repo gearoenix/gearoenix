@@ -45,3 +45,8 @@ gearoenix::physics::Transformation& gearoenix::render::light::Builder::get_trans
 {
     return cameras[camera_index]->get_transformation();
 }
+
+gearoenix::render::light::Light& gearoenix::render::light::Builder::get_light() noexcept
+{
+    return *entity_builder->get_builder().get_component<Light>();
+}

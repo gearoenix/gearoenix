@@ -1,5 +1,33 @@
 SET(GX_ENGINE_OPENGL_SRC_DIR ${GX_ENGINE_SRC_DIR}/opengl)
 SET(GX_ENGINE_OPENGL_SRC
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bgcaa.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bgcaa.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr-transparent.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr-transparent.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-final.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-final.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr-transparent.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr-transparent.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gbuffers-filler.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gbuffers-filler.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-radiance.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-radiance.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-shadow-caster.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-shadow-caster.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-skybox-cube.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-skybox-cube.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-skybox-equirectangular.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-skybox-equirectangular.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-ssao-resolve.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-ssao-resolve.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-check.cpp
@@ -17,32 +45,6 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr-transparent.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr-transparent.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-deferred-pbr.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-final.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr-transparent.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr-transparent.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-forward-pbr.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-gbuffers-filler.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-irradiance.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-irradiance.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-radiance.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-shadow-caster.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-shadow-caster.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-cube.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-cube.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-skybox-equirectangular.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader-ssao-resolve.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp

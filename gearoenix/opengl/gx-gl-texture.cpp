@@ -204,6 +204,13 @@ void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) noexcept
     glBindTexture(GL_TEXTURE_2D, object);
 }
 
+void gearoenix::gl::Texture2D::generate_mipmaps() noexcept
+{
+    glBindTexture(GL_TEXTURE_2D, object);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept
 {
     render::texture::TextureCube::write(s, c);

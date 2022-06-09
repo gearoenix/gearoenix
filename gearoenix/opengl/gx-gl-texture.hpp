@@ -36,6 +36,7 @@ public:
         std::string name) noexcept;
     ~Texture2D() noexcept final;
     void bind(enumerated texture_unit) noexcept;
+    void generate_mipmaps() noexcept;
 };
 
 struct TextureCube final : public render::texture::TextureCube {

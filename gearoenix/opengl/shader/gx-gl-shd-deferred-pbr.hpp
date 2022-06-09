@@ -3,8 +3,8 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-namespace gearoenix::gl {
-struct ShaderDeferredPbr final : public Shader {
+namespace gearoenix::gl::shader {
+struct DeferredPbr final : public Shader {
     GX_GL_UNIFORM_VECTOR(screen_uv_move_reserved, 4, 1)
     GX_GL_UNIFORM_VECTOR(camera_position, 3, 1)
     GX_GL_UNIFORM_TEXTURE(albedo_metallic)
@@ -16,8 +16,8 @@ struct ShaderDeferredPbr final : public Shader {
     GX_GL_UNIFORM_TEXTURE(radiance)
     GX_GL_UNIFORM_TEXTURE(brdflut)
 
-    ShaderDeferredPbr(Engine& e) noexcept;
-    ~ShaderDeferredPbr() noexcept final;
+    DeferredPbr(Engine& e) noexcept;
+    ~DeferredPbr() noexcept final;
     void bind() const noexcept final;
 };
 }

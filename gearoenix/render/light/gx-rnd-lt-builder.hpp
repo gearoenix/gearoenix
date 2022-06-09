@@ -17,6 +17,7 @@ struct Engine;
 }
 
 namespace gearoenix::render::light {
+struct Light;
 struct Directional;
 struct ShadowCasterDirectional;
 struct Point;
@@ -71,6 +72,7 @@ public:
     virtual ~Builder() noexcept;
     [[nodiscard]] const ShadowCasterDirectional* get_shadow_caster_directional() const noexcept;
     [[nodiscard]] physics::Transformation& get_transformation(std::size_t camera_index = 0) noexcept;
+    [[nodiscard]] Light& get_light() noexcept;
 };
 }
 #endif

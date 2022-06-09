@@ -3,14 +3,14 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-namespace gearoenix::gl {
-struct ShaderSkyboxEquirectangular final : public Shader {
+namespace gearoenix::gl::shader {
+struct SkyboxEquirectangular final : public Shader {
     GX_GL_UNIFORM_MATRIX(vp, 4, 1)
     GX_GL_UNIFORM_VECTOR(camera_position_box_scale, 4, 1)
     GX_GL_UNIFORM_TEXTURE(albedo)
 
-    ShaderSkyboxEquirectangular(Engine& e) noexcept;
-    ~ShaderSkyboxEquirectangular() noexcept final;
+    SkyboxEquirectangular(Engine& e) noexcept;
+    ~SkyboxEquirectangular() noexcept final;
     void bind() const noexcept final;
 };
 }

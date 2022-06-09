@@ -3,15 +3,15 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-namespace gearoenix::gl {
-struct ShaderSsaoResolve final : public Shader {
+namespace gearoenix::gl::shader {
+struct SsaoResolve final : public Shader {
     GX_GL_UNIFORM_MATRIX(vp, 4, 1)
     GX_GL_UNIFORM_VECTOR(ssao_radius_move_start_end, 4, 1)
     GX_GL_UNIFORM_TEXTURE(position_depth)
     GX_GL_UNIFORM_TEXTURE(normal_ao)
 
-    ShaderSsaoResolve(Engine& e) noexcept;
-    ~ShaderSsaoResolve() noexcept final;
+    SsaoResolve(Engine& e) noexcept;
+    ~SsaoResolve() noexcept final;
     void bind() const noexcept final;
 };
 }

@@ -8,6 +8,7 @@
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
@@ -88,6 +89,7 @@ struct GameApp final : public gearoenix::core::Application {
             35.0f,
             end_callback);
         light_builder_0->get_transformation().look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
         scene_builder->add(std::move(light_builder_0));
 
         GX_LOG_D("Initialised");

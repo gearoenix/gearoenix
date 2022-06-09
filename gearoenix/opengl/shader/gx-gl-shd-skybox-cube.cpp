@@ -1,4 +1,4 @@
-#include "gx-gl-shader-skybox-cube.hpp"
+#include "gx-gl-shd-skybox-cube.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -48,7 +48,7 @@ void main() {\n\
     frag_colour = texture(albedo, normalize(out_uv));\n\
 }\n";
 
-gearoenix::gl::ShaderSkyboxCube::ShaderSkyboxCube(Engine& e) noexcept
+gearoenix::gl::shader::SkyboxCube::SkyboxCube(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -60,9 +60,9 @@ gearoenix::gl::ShaderSkyboxCube::ShaderSkyboxCube(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::ShaderSkyboxCube::~ShaderSkyboxCube() noexcept = default;
+gearoenix::gl::shader::SkyboxCube::~SkyboxCube() noexcept = default;
 
-void gearoenix::gl::ShaderSkyboxCube::bind() const noexcept
+void gearoenix::gl::shader::SkyboxCube::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);

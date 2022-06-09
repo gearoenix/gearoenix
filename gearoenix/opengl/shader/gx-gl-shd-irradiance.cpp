@@ -1,7 +1,7 @@
-#include "gx-gl-shader-irradiance.hpp"
+#include "gx-gl-shd-irradiance.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-stringifier.hpp"
-#include "gx-gl-engine.hpp"
+#include "../../core/macro/gx-cr-mcr-stringifier.hpp"
+#include "../gx-gl-engine.hpp"
 
 static constexpr const char* const vertex_shader_src = "\
 #version 300 es\n\
@@ -59,7 +59,7 @@ void main() {\n\
     frag_out = vec4(irradiance, 1.0);\n\
 }\n";
 
-gearoenix::gl::ShaderIrradiance::ShaderIrradiance(Engine& e) noexcept
+gearoenix::gl::shader::Irradiance::Irradiance(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -70,9 +70,9 @@ gearoenix::gl::ShaderIrradiance::ShaderIrradiance(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(environment);
 }
 
-gearoenix::gl::ShaderIrradiance::~ShaderIrradiance() noexcept = default;
+gearoenix::gl::shader::Irradiance::~Irradiance() noexcept = default;
 
-void gearoenix::gl::ShaderIrradiance::bind() const noexcept
+void gearoenix::gl::shader::Irradiance::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment);

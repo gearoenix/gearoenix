@@ -3,12 +3,12 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-namespace gearoenix::gl {
-struct ShaderFinal final : public Shader {
+namespace gearoenix::gl::shader {
+struct Final final : public Shader {
     GX_GL_UNIFORM_TEXTURE(albedo)
 
-    ShaderFinal(Engine& e) noexcept;
-    ~ShaderFinal() noexcept final;
+    Final(Engine& e) noexcept;
+    ~Final() noexcept final;
     void bind() const noexcept final;
 };
 }

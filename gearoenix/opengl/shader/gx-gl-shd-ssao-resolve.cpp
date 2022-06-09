@@ -1,4 +1,4 @@
-#include "gx-gl-shader-ssao-resolve.hpp"
+#include "gx-gl-shd-ssao-resolve.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -148,7 +148,7 @@ void main() {\n\
     ssao_value = smoothstep(0.0, 1.0, ssao_value * ssao_samples_weight);\n\
 }\n";
 
-gearoenix::gl::ShaderSsaoResolve::ShaderSsaoResolve(Engine& e) noexcept
+gearoenix::gl::shader::SsaoResolve::SsaoResolve(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -161,9 +161,9 @@ gearoenix::gl::ShaderSsaoResolve::ShaderSsaoResolve(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao);
 }
 
-gearoenix::gl::ShaderSsaoResolve::~ShaderSsaoResolve() noexcept = default;
+gearoenix::gl::shader::SsaoResolve::~SsaoResolve() noexcept = default;
 
-void gearoenix::gl::ShaderSsaoResolve::bind() const noexcept
+void gearoenix::gl::shader::SsaoResolve::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth);

@@ -18,19 +18,23 @@ namespace gearoenix::render::scene {
 struct Scene;
 }
 
+namespace gearoenix::gl::shader {
+struct BGCAA;
+struct DeferredPbr;
+struct DeferredPbrTransparent;
+struct Final;
+struct ForwardPbr;
+struct GBuffersFiller;
+struct Irradiance;
+struct Radiance;
+struct ShadowCaster;
+struct SkyboxCube;
+struct SkyboxEquirectangular;
+struct SsaoResolve;
+}
+
 namespace gearoenix::gl {
 struct Engine;
-struct ShaderFinal;
-struct ShaderForwardPbr;
-struct ShaderGBuffersFiller;
-struct ShaderDeferredPbr;
-struct ShaderDeferredPbrTransparent;
-struct ShaderIrradiance;
-struct ShaderRadiance;
-struct ShaderShadowCaster;
-struct ShaderSkyboxCube;
-struct ShaderSkyboxEquirectangular;
-struct ShaderSsaoResolve;
 struct Target;
 struct Texture2D;
 struct TextureCube;
@@ -124,26 +128,24 @@ struct SubmissionManager final {
         std::vector<DynamicModelData> dynamic_models;
     };
 
-    typedef std::array<std::unique_ptr<ShaderForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> DirectionalLightShaderForwardPbr;
+    typedef std::array<std::unique_ptr<shader::ForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> DirectionalLightShaderForwardPbr;
     typedef DirectionalLightShaderForwardPbr ShaderForwardPbrCombination;
 
 private:
     Engine& e;
-    const std::unique_ptr<ShaderFinal> final_shader;
-    const std::unique_ptr<ShaderGBuffersFiller> gbuffers_filler_shader;
-    const std::unique_ptr<ShaderDeferredPbr> deferred_pbr_shader;
-    const std::unique_ptr<ShaderDeferredPbrTransparent> deferred_pbr_transparent_shader;
-    const std::unique_ptr<ShaderIrradiance> irradiance_shader;
-    const std::unique_ptr<ShaderShadowCaster> shadow_caster_shader;
-    const std::unique_ptr<ShaderRadiance> radiance_shader;
-    const std::unique_ptr<ShaderSkyboxCube> skybox_cube_shader;
-    const std::unique_ptr<ShaderSkyboxEquirectangular> skybox_equirectangular_shader;
-    const std::unique_ptr<ShaderSsaoResolve> ssao_resolve_shader;
+    const std::unique_ptr<shader::BGCAA> bgcaa_shader;
+    const std::unique_ptr<shader::Final> final_shader;
+    const std::unique_ptr<shader::GBuffersFiller> gbuffers_filler_shader;
+    const std::unique_ptr<shader::DeferredPbr> deferred_pbr_shader;
+    const std::unique_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
+    const std::unique_ptr<shader::Irradiance> irradiance_shader;
+    const std::unique_ptr<shader::ShadowCaster> shadow_caster_shader;
+    const std::unique_ptr<shader::Radiance> radiance_shader;
+    const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
+    const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
+    const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
     ShaderForwardPbrCombination forward_pbr_shader_combination;
-    uint gbuffer_width, gbuffer_height;
-    float gbuffer_aspect_ratio = 1.2f;
-    float gbuffer_uv_move_x = 0.001f;
-    float gbuffer_uv_move_y = 0.001f;
+
     std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
     std::shared_ptr<Texture2D> gbuffers_position_depth_texture;
     std::shared_ptr<Texture2D> gbuffers_normal_ao_texture;
@@ -158,6 +160,18 @@ private:
     std::shared_ptr<Target> final_target;
     std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
+
+    // BGCAAS: Bloom Gamma-correction Colour-tuning Anti-Alaising Source
+    std::shared_ptr<Texture2D> high_bgcaas_texture;
+    std::shared_ptr<Texture2D> low_bgcaas_texture;
+    std::shared_ptr<Texture2D> depth_bgcaas_texture;
+    std::shared_ptr<Target> bgcaas_target;
+
+    math::Vec2<uint> backbuffer_size { static_cast<uint>(-1) };
+    float backbuffer_aspect_ratio = 999.0f;
+    math::Vec2<float> backbuffer_uv_move { 0.001f };
+    math::Vec4<sizei> backbuffer_viewport_clip { static_cast<sizei>(-1) };
+
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
     boost::container::flat_map<core::ecs::Entity::id_t, physics::accelerator::Bvh<ModelBvhData>> scenes_bvhs;
@@ -165,13 +179,14 @@ private:
     core::Pool<SceneData> scene_pool;
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
     math::Vec4<sizei> current_viewport_clip;
-    math::Vec4<sizei> gbuffer_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
 
+    void initialise_backbuffer_sizes() noexcept;
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
     void initialise_screen_vertices() noexcept;
+    void initialise_bgcaas() noexcept;
 
     void fill_scenes() noexcept;
     void update_scenes() noexcept;
@@ -188,6 +203,7 @@ private:
     void render_reflection_probes(const SceneData& scene) noexcept;
     void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;
     void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
+    void render_bgcaa(const SceneData& scene) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;
     void render_imgui() noexcept;

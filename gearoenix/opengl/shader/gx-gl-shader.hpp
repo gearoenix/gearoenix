@@ -1,12 +1,12 @@
 #ifndef GEAROENIX_GL_SHADER_HPP
 #define GEAROENIX_GL_SHADER_HPP
-#include "../render/gx-rnd-build-configuration.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../platform/gx-plt-log.hpp"
-#include "gx-gl-constants.hpp"
-#include "gx-gl-loader.hpp"
-#include "gx-gl-types.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../../platform/gx-plt-log.hpp"
+#include "../gx-gl-constants.hpp"
+#include "../gx-gl-loader.hpp"
+#include "../gx-gl-types.hpp"
 #include <sstream>
 
 #define GX_GL_UNIFORM_FAILED -1
@@ -77,6 +77,9 @@
 
 namespace gearoenix::gl {
 struct Engine;
+}
+
+namespace gearoenix::gl::shader {
 struct Shader {
     GX_GET_CVAL_PRT(uint, shader_program)
 

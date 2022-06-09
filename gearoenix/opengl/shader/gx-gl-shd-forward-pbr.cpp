@@ -1,7 +1,7 @@
-#include "gx-gl-shader-forward-pbr.hpp"
+#include "gx-gl-shd-forward-pbr.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-stringifier.hpp"
-#include "gx-gl-engine.hpp"
+#include "../../core/macro/gx-cr-mcr-stringifier.hpp"
+#include "../gx-gl-engine.hpp"
 #include <sstream>
 #include <string>
 
@@ -40,7 +40,7 @@ void main() {\n\
     gl_Position = vp * pos;\n\
 }\n";
 
-gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(
+gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     Engine& e,
     const std::size_t shadow_casters_directional_lights_count) noexcept
     : Shader(e)
@@ -89,7 +89,8 @@ gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(
     ss << "in vec3 out_btg;\n";
     ss << "in vec2 out_uv;\n";
     ss << "\n";
-    ss << "out vec3 frag_colour;\n";
+    ss << "layout(location = " << GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW << ") out vec4 frag_out_low;\n";
+    ss << "layout(location = " << GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH << ") out vec4 frag_out_high;\n";
     ss << "\n";
     ss << "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness) {\n";
     ss << "    float inv = 1.0 - nv;\n";
@@ -205,13 +206,15 @@ gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(
         ss << "    }\n";
     }
     ss << "\n";
-    ss << "    vec3 irr = texture(irradiance, nrm).xyz; \n";
-    ss << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz; \n";
-    ss << "    vec3 ambient = irr * alb.xyz * kd; \n";
-    ss << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, mtr.y)).rg; \n";
-    ss << "    ambient += rad * ((fresnel * brdf.x) + brdf.y); \n";
-    ss << "    ambient *= ao; \n";
-    ss << "    frag_colour = vec4(ambient + ems + lumination, 1.0).xyz; \n";
+    ss << "    vec3 irr = texture(irradiance, nrm).xyz;\n";
+    ss << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
+    ss << "    vec3 ambient = irr * alb.xyz * kd;\n";
+    ss << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, mtr.y)).rg;\n";
+    ss << "    ambient += rad * ((fresnel * brdf.x) + brdf.y);\n";
+    ss << "    ambient *= ao;\n";
+    ss << "    vec3 frag_colour = ambient + ems + lumination;\n";
+    ss << "    frag_out_high = vec4(frag_colour * step(1.0, dot(frag_colour, vec3(0.2126, 0.7152, 0.0722))), 1.0);\n";
+    ss << "    frag_out_low = vec4(frag_colour - frag_out_high.xyz, 1.0);\n";
     ss << "}\n";
     set_fragment_shader(ss.str());
 
@@ -244,9 +247,9 @@ gearoenix::gl::ShaderForwardPbr::ShaderForwardPbr(
     }
 }
 
-gearoenix::gl::ShaderForwardPbr::~ShaderForwardPbr() noexcept = default;
+gearoenix::gl::shader::ForwardPbr::~ForwardPbr() noexcept = default;
 
-void gearoenix::gl::ShaderForwardPbr::bind() const noexcept
+void gearoenix::gl::shader::ForwardPbr::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
@@ -260,7 +263,7 @@ void gearoenix::gl::ShaderForwardPbr::bind() const noexcept
     GX_GL_SHADER_SET_TEXTURE_INDEX_DYNAMIC_ARRAY_UNIFORM(shadow_caster_directional_light_shadow_map);
 }
 
-void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data) noexcept
 {
     glUniformMatrix4fv(
         shadow_caster_directional_light_normalised_vp,
@@ -269,7 +272,7 @@ void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_normal
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data) noexcept
 {
     glUniform3fv(
         shadow_caster_directional_light_direction,
@@ -277,7 +280,7 @@ void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_direct
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data) noexcept
 {
     glUniform3fv(
         shadow_caster_directional_light_colour,
@@ -285,7 +288,7 @@ void gearoenix::gl::ShaderForwardPbr::set_shadow_caster_directional_light_colour
         reinterpret_cast<const float*>(data));
 }
 
-const gearoenix::gl::sint* gearoenix::gl::ShaderForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const noexcept
+const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const noexcept
 {
     if (shadow_caster_directional_light_shadow_map_indices.size() == 0)
         return nullptr;

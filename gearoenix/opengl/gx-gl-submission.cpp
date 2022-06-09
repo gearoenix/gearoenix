@@ -24,20 +24,21 @@
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
 #include "gx-gl-reflection.hpp"
-#include "gx-gl-shader-deferred-pbr-transparent.hpp"
-#include "gx-gl-shader-deferred-pbr.hpp"
-#include "gx-gl-shader-final.hpp"
-#include "gx-gl-shader-forward-pbr.hpp"
-#include "gx-gl-shader-gbuffers-filler.hpp"
-#include "gx-gl-shader-irradiance.hpp"
-#include "gx-gl-shader-radiance.hpp"
-#include "gx-gl-shader-shadow-caster.hpp"
-#include "gx-gl-shader-skybox-cube.hpp"
-#include "gx-gl-shader-skybox-equirectangular.hpp"
-#include "gx-gl-shader-ssao-resolve.hpp"
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
+#include "shader/gx-gl-shd-bgcaa.hpp"
+#include "shader/gx-gl-shd-deferred-pbr-transparent.hpp"
+#include "shader/gx-gl-shd-deferred-pbr.hpp"
+#include "shader/gx-gl-shd-final.hpp"
+#include "shader/gx-gl-shd-forward-pbr.hpp"
+#include "shader/gx-gl-shd-gbuffers-filler.hpp"
+#include "shader/gx-gl-shd-irradiance.hpp"
+#include "shader/gx-gl-shd-radiance.hpp"
+#include "shader/gx-gl-shd-shadow-caster.hpp"
+#include "shader/gx-gl-shd-skybox-cube.hpp"
+#include "shader/gx-gl-shd-skybox-equirectangular.hpp"
+#include "shader/gx-gl-shd-ssao-resolve.hpp"
 #include <algorithm>
 #include <imgui_impl_opengl3.h>
 
@@ -60,19 +61,22 @@ gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
 {
 }
 
+void gearoenix::gl::SubmissionManager::initialise_backbuffer_sizes() noexcept
+{
+    const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
+    backbuffer_size.x = cfg.get_runtime_resolution_width();
+    backbuffer_size.y = cfg.get_runtime_resolution_height();
+    backbuffer_aspect_ratio = static_cast<float>(backbuffer_size.x) / static_cast<float>(backbuffer_size.y);
+    backbuffer_uv_move.x = 1.0f / static_cast<float>(backbuffer_size.x);
+    backbuffer_uv_move.y = 1.0f / static_cast<float>(backbuffer_size.y);
+    backbuffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(backbuffer_size.x), static_cast<sizei>(backbuffer_size.y));
+}
+
 void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
 {
     if (!e.get_specification().is_deferred_supported)
         return;
     auto* const txt_mgr = e.get_texture_manager();
-    const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
-    gbuffer_width = cfg.get_runtime_resolution_width();
-    gbuffer_height = cfg.get_runtime_resolution_height();
-    gbuffer_aspect_ratio = static_cast<float>(gbuffer_width) / static_cast<float>(gbuffer_height);
-    gbuffer_uv_move_x = 1.0f / static_cast<float>(gbuffer_width);
-    gbuffer_uv_move_y = 1.0f / static_cast<float>(gbuffer_height);
-    gbuffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(gbuffer_width), static_cast<sizei>(gbuffer_height));
-
     const render::texture::TextureInfo position_depth_txt_info {
         .format = render::texture::TextureFormat::RgbaFloat32,
         .sampler_info = render::texture::SamplerInfo {
@@ -83,8 +87,8 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = gbuffer_width,
-        .height = gbuffer_height,
+        .width = backbuffer_size.x,
+        .height = backbuffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -150,8 +154,8 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = gbuffer_width,
-        .height = gbuffer_height,
+        .width = backbuffer_size.x,
+        .height = backbuffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -181,8 +185,8 @@ void gearoenix::gl::SubmissionManager::initialise_final() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = gbuffer_width,
-        .height = gbuffer_height,
+        .width = backbuffer_size.x,
+        .height = backbuffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -212,6 +216,45 @@ void gearoenix::gl::SubmissionManager::initialise_screen_vertices() noexcept
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
     glBindVertexArray(0);
+}
+
+void gearoenix::gl::SubmissionManager::initialise_bgcaas() noexcept
+{
+    auto* const txt_mgr = e.get_texture_manager();
+    const render::texture::TextureInfo colour_txt_info {
+        .format = render::texture::TextureFormat::RgbaUint8,
+        .sampler_info = render::texture::SamplerInfo {
+            .min_filter = render::texture::Filter::Nearest,
+            .mag_filter = render::texture::Filter::Nearest,
+            .wrap_s = render::texture::Wrap::ClampToEdge,
+            .wrap_t = render::texture::Wrap::ClampToEdge,
+            .wrap_r = render::texture::Wrap::ClampToEdge,
+            .anisotropic_level = 0,
+        },
+        .width = backbuffer_size.x,
+        .height = backbuffer_size.y,
+        .depth = 0,
+        .type = render::texture::Type::Texture2D,
+        .has_mipmap = false,
+    };
+    high_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-high-bgcaas", {}, colour_txt_info));
+
+    low_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-low-bgcaas", {}, colour_txt_info));
+
+    auto depth_txt_info = colour_txt_info;
+    depth_txt_info.format = render::texture::TextureFormat::D32;
+    depth_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-depth-bgcaas", {}, depth_txt_info));
+
+    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].var = render::texture::Attachment2D { .txt = low_bgcaas_texture };
+    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].var = render::texture::Attachment2D { .txt = high_bgcaas_texture };
+    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = depth_bgcaas_texture };
+    bgcaas_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bgcaas", std::move(attachments)));
+
+    GX_LOG_D("BGCAAS have been created.");
 }
 
 void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
@@ -257,12 +300,16 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
                 return;
             if (scene_id != l.scene_id)
                 return;
-            scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, DirectionalShadowCasterData { .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl.get_camera_id())->get_frustum(), .shadow_data = DirectionalShadowData {
-                                                                                                                                                                                                                        .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl.get_camera_id())->get_view_projection(),
-                                                                                                                                                                                                                        .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl.get_camera_id())->get_z_axis()),
-                                                                                                                                                                                                                        .colour = l.colour,
-                                                                                                                                                                                                                        .shadow_map_texture = gll.get_shadow_map_texture_v(),
-                                                                                                                                                                                                                    } });
+            DirectionalShadowCasterData scdld {
+                .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl.get_camera_id())->get_frustum(),
+                .shadow_data = DirectionalShadowData {
+                    .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl.get_camera_id())->get_view_projection(),
+                    .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl.get_camera_id())->get_z_axis()),
+                    .colour = l.colour,
+                    .shadow_map_texture = gll.get_shadow_map_texture_v(),
+                }
+            };
+            scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, scdld);
         });
         e.get_world()->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) noexcept {
             if (!render_skybox.enabled)
@@ -513,8 +560,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 camera_data.framebuffer = gbuffers_target->get_framebuffer();
                 target_dimension = gbuffers_target->get_dimension();
             } else {
-                camera_data.framebuffer = 0;
-                target_dimension = math::Vec2<std::size_t>(e.get_platform_application().get_base().get_window_size());
+                camera_data.framebuffer = bgcaas_target->get_framebuffer();
+                target_dimension = bgcaas_target->get_dimension();
             }
             camera_data.viewport_clip = math::Vec4<sizei>(render_camera.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
             camera_data.vp = render_camera.get_view_projection();
@@ -736,7 +783,7 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
     // Rendering forward pbr
-    ShaderForwardPbr* shader = nullptr;
+    shader::ForwardPbr* shader = nullptr;
     auto ti_albedo = static_cast<enumerated>(-1);
     auto ti_normal = static_cast<enumerated>(-1);
     auto ti_emission = static_cast<enumerated>(-1);
@@ -750,7 +797,7 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
     for (auto& distance_model_data : camera.opaque_models_data) {
         auto& model_data = distance_model_data.second;
 
-        ShaderForwardPbr* const current_shader = forward_pbr_shader_combination[model_data.shadow_caster_directional_lights_count].get();
+        shader::ForwardPbr* const current_shader = forward_pbr_shader_combination[model_data.shadow_caster_directional_lights_count].get();
         if (current_shader != shader) {
             shader = current_shader;
             shader->bind();
@@ -812,7 +859,7 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
 {
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
-    const float screen_uv_move_reserved[] = { gbuffer_uv_move_x, gbuffer_uv_move_y, 0.0f, 0.0f };
+    const float screen_uv_move_reserved[] { backbuffer_uv_move.x, backbuffer_uv_move.y, 0.0f, 0.0f };
     const auto* const gbuffers_attachments = gbuffers_target->get_gl_attachments().data();
     const auto* const ssao_resolved_attachments = ssao_resolve_target->get_gl_attachments().data();
     const auto* const final_attachments = final_target->get_gl_attachments().data();
@@ -870,7 +917,7 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
 
         // SSAO resolving -------------------------------------------------------------------------------------
         set_framebuffer(ssao_resolve_target->get_framebuffer());
-        set_viewport_clip(gbuffer_viewport_clip);
+        set_viewport_clip(backbuffer_viewport_clip);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         ssao_resolve_shader->bind();
@@ -934,12 +981,12 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
         set_framebuffer(0);
 
         const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
-        if (screen_ratio < gbuffer_aspect_ratio) {
-            const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / gbuffer_aspect_ratio + 0.1f);
+        if (screen_ratio < backbuffer_aspect_ratio) {
+            const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / backbuffer_aspect_ratio + 0.1f);
             const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
             set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
         } else {
-            const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * gbuffer_aspect_ratio + 0.1f);
+            const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * backbuffer_aspect_ratio + 0.1f);
             const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
             set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
         }
@@ -965,7 +1012,45 @@ void gearoenix::gl::SubmissionManager::render_with_forward() noexcept
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             render_forward_camera(scene, camera);
         }
+        render_bgcaa(scene);
     }
+}
+
+void gearoenix::gl::SubmissionManager::render_bgcaa(const SceneData& scene) noexcept
+{
+    high_bgcaas_texture->generate_mipmaps();
+    const auto& bgcaa_attachments = bgcaas_target->get_gl_attachments();
+
+    set_framebuffer(0);
+    auto& base_os_app = e.get_platform_application().get_base();
+    const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
+    if (screen_ratio < backbuffer_aspect_ratio) {
+        const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / backbuffer_aspect_ratio + 0.1f);
+        const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
+        set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
+    } else {
+        const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * backbuffer_aspect_ratio + 0.1f);
+        const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
+        set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
+    }
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    bgcaa_shader->bind();
+
+    bgcaa_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&backbuffer_uv_move));
+
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_low_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].texture_object);
+
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_high_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].texture_object);
+
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_depth_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].texture_object);
+
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void gearoenix::gl::SubmissionManager::render_imgui() noexcept
@@ -1003,28 +1088,31 @@ void gearoenix::gl::SubmissionManager::set_framebuffer(const uint framebuffer_ob
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
-    , final_shader(e.get_specification().is_deferred_supported ? new ShaderFinal(e) : nullptr)
-    , gbuffers_filler_shader(e.get_specification().is_deferred_supported ? new ShaderGBuffersFiller(e) : nullptr)
-    , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbr(e) : nullptr)
-    , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new ShaderDeferredPbrTransparent(e) : nullptr)
-    , irradiance_shader(new ShaderIrradiance(e))
-    , shadow_caster_shader(new ShaderShadowCaster(e))
-    , radiance_shader(new ShaderRadiance(e))
-    , skybox_cube_shader(new ShaderSkyboxCube(e))
-    , skybox_equirectangular_shader(new ShaderSkyboxEquirectangular(e))
-    , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new ShaderSsaoResolve(e) : nullptr)
+    , bgcaa_shader(new shader::BGCAA(e))
+    , final_shader(e.get_specification().is_deferred_supported ? new shader::Final(e) : nullptr)
+    , gbuffers_filler_shader(e.get_specification().is_deferred_supported ? new shader::GBuffersFiller(e) : nullptr)
+    , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
+    , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
+    , irradiance_shader(new shader::Irradiance(e))
+    , shadow_caster_shader(new shader::ShadowCaster(e))
+    , radiance_shader(new shader::Radiance(e))
+    , skybox_cube_shader(new shader::SkyboxCube(e))
+    , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
+    , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {
     for (std::size_t directional_shadow_caster_index = 0; directional_shadow_caster_index < forward_pbr_shader_combination.size(); ++directional_shadow_caster_index) {
-        forward_pbr_shader_combination[directional_shadow_caster_index] = std::make_unique<ShaderForwardPbr>(e, directional_shadow_caster_index);
+        forward_pbr_shader_combination[directional_shadow_caster_index] = std::make_unique<shader::ForwardPbr>(e, directional_shadow_caster_index);
     }
 
     GX_LOG_D("Creating submission manager.");
+    initialise_backbuffer_sizes();
     initialise_gbuffers();
     initialise_ssao();
     initialise_final();
     initialise_screen_vertices();
+    initialise_bgcaas();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings

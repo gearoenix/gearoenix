@@ -1,4 +1,4 @@
-#include "gx-gl-shader-skybox-equirectangular.hpp"
+#include "gx-gl-shd-skybox-equirectangular.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -49,7 +49,7 @@ void main() {\n\
     frag_colour = texture(albedo, (vec2(atan(v.y, v.x), asin(-v.z)) * inv_atan) + 0.5);\n\
 }\n";
 
-gearoenix::gl::ShaderSkyboxEquirectangular::ShaderSkyboxEquirectangular(Engine& e) noexcept
+gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -61,9 +61,9 @@ gearoenix::gl::ShaderSkyboxEquirectangular::ShaderSkyboxEquirectangular(Engine& 
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::ShaderSkyboxEquirectangular::~ShaderSkyboxEquirectangular() noexcept = default;
+gearoenix::gl::shader::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
 
-void gearoenix::gl::ShaderSkyboxEquirectangular::bind() const noexcept
+void gearoenix::gl::shader::SkyboxEquirectangular::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);

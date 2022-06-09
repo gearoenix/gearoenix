@@ -1,7 +1,7 @@
-#include "gx-gl-shader-radiance.hpp"
+#include "gx-gl-shd-radiance.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-stringifier.hpp"
-#include "gx-gl-engine.hpp"
+#include "../../core/macro/gx-cr-mcr-stringifier.hpp"
+#include "../gx-gl-engine.hpp"
 
 static constexpr const char* const vertex_shader_src = "\
 #version 300 es\n\
@@ -106,7 +106,7 @@ void main() {\n\
     frag_out = vec4(prefiltered_colour, 1.0);\n\
 }\n";
 
-gearoenix::gl::ShaderRadiance::ShaderRadiance(Engine& e) noexcept
+gearoenix::gl::shader::Radiance::Radiance(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -120,9 +120,9 @@ gearoenix::gl::ShaderRadiance::ShaderRadiance(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(environment);
 }
 
-gearoenix::gl::ShaderRadiance::~ShaderRadiance() noexcept = default;
+gearoenix::gl::shader::Radiance::~Radiance() noexcept = default;
 
-void gearoenix::gl::ShaderRadiance::bind() const noexcept
+void gearoenix::gl::shader::Radiance::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment);

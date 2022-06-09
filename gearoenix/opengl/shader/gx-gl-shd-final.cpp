@@ -1,4 +1,4 @@
-#include "gx-gl-shader-final.hpp"
+#include "gx-gl-shd-final.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -40,7 +40,7 @@ void main() {\n\
     frag_colour = texture(albedo, out_uv);\n\
 }\n";
 
-gearoenix::gl::ShaderFinal::ShaderFinal(Engine& e) noexcept
+gearoenix::gl::shader::Final::Final(Engine& e) noexcept
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -50,9 +50,9 @@ gearoenix::gl::ShaderFinal::ShaderFinal(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::ShaderFinal::~ShaderFinal() noexcept = default;
+gearoenix::gl::shader::Final::~Final() noexcept = default;
 
-void gearoenix::gl::ShaderFinal::bind() const noexcept
+void gearoenix::gl::shader::Final::bind() const noexcept
 {
     Shader::bind();
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
