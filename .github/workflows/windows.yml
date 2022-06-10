@@ -20,7 +20,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path build
           Set-Location -Path build
           $cmake_ver = "3.23.2"
-          $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip"
+          $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-windows-x86_64.zip"
           Write-Host "Going to download CMake from: ${cmake_address}."
           Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
           Write-Host "Going to uncompress the cmake.zip."
