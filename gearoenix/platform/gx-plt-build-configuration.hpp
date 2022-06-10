@@ -16,7 +16,7 @@
 #elif defined(__unix__)
 
 #define GX_PLATFORM_LINUX
-//#define GX_PLATFORM_INTERFACE_SDL2
+#define GX_PLATFORM_INTERFACE_SDL2
 #ifndef GX_PLATFORM_INTERFACE_SDL2
 #define GX_PLATFORM_INTERFACE_X11
 #endif
