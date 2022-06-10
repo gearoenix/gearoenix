@@ -42,7 +42,7 @@ void gearoenix::render::camera::Camera::set_projection_type(const Projection p) 
 void gearoenix::render::camera::Camera::update_projection() noexcept
 {
     if (Projection::Perspective == projection_type) {
-        const auto s = 2.0f * near * std::tanf(scale_fovy);
+        const auto s = 2.0f * near * tanf(scale_fovy);
         projection = math::Mat4x4<float>::perspective(target_aspect_ratio * s, s, near, far);
     } else
         projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * scale_fovy, scale_fovy, near, far);
@@ -56,7 +56,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& z,
     std::array<math::Vec3<double>, 8>& points) const noexcept
 {
-    const auto scale = Projection::Perspective == projection_type ? near * std::tanf(scale_fovy) : scale_fovy * 0.5f;
+    const auto scale = Projection::Perspective == projection_type ? near * tanf(scale_fovy) : scale_fovy * 0.5f;
     const auto fpn = Projection::Perspective == projection_type ? (static_cast<double>(far) + static_cast<double>(near)) * static_cast<double>(scale) / static_cast<double>(near) : static_cast<double>(scale);
     const auto far_x = static_cast<double>(target_aspect_ratio) * fpn;
     const auto far_y = fpn;
