@@ -1,6 +1,6 @@
-# Gearoenix (ray-tracing-backends)
+# Gearoenix
 
-Ray tracing backends of Gearoenix game engine.
+Gearoenix game engine.
 
 ![Ubuntu 20.04  ](https://github.com/Hossein-Noroozpour/gearoenix-ray-tracing/workflows/Ubuntu-20.04%20%20/badge.svg)
 ![Windows-2019  ](https://github.com/Hossein-Noroozpour/gearoenix-ray-tracing/workflows/Windows-2019%20%20/badge.svg)
