@@ -30,10 +30,10 @@ jobs:
         run: |
           CMAKE_VER="3.23.2" &&
           wget "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" &&
-          tar -xf "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
+          tar -xf "cmake-${CMAKE_VER}-linux-x86_64.tar.gz" &&
           ls &&
-          rm "cmake-${CMAKE_VER}-Linux-x86_64.tar.gz" &&
-          echo "`pwd`/cmake-${CMAKE_VER}-Linux-x86_64/bin" >> $GITHUB_PATH
+          rm "cmake-${CMAKE_VER}-linux-x86_64.tar.gz" &&
+          echo "`pwd`/cmake-${CMAKE_VER}-linux-x86_64/bin" >> $GITHUB_PATH
       - name: Building Release
         run: |
           mkdir build &&
