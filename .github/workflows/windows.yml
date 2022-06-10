@@ -1,4 +1,4 @@
-name: 'Windows-2019  '
+name: 'Windows-2022  '
 on:
   push:
     branches: [ master ]
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - name: Install CMake
@@ -19,7 +19,7 @@ jobs:
           Get-Content "$env:GITHUB_ENV"
           New-Item -ItemType Directory -Force -Path build
           Set-Location -Path build
-          $cmake_ver = "3.19.2"
+          $cmake_ver = "3.23.2"
           $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-win64-x64.zip"
           Write-Host "Going to download CMake from: ${cmake_address}."
           Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
