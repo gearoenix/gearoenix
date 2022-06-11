@@ -14,7 +14,7 @@ jobs:
         run: sudo apt-get update
       - name: Install dependancies
         run: |
-          sudo apt-get install clang++-14 clang-14 wget unzip libsdl2-dev libdrm-dev -y &&
+          sudo apt-get install clang-14 wget unzip libsdl2-dev libdrm-dev libgbm-dev -y &&
           echo "CC=/usr/bin/clang-14" >> $GITHUB_ENV &&
           echo "CXX=/usr/bin/clang++-14" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
