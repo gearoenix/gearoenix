@@ -537,3 +537,23 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     occlusion_box.update();
     return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
 }
+
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build(
+    std::string&& name,
+    std::vector<PbrVertexAnimated>&& vertices,
+    std::vector<std::uint32_t>&& indices,
+    core::sync::EndCallerIgnored&& end_callback) noexcept
+{
+    {
+        GX_GUARD_LOCK(meshes);
+        if (auto search = meshes.find(name); meshes.end() != search)
+            if (auto m = search->second.lock(); nullptr != m)
+                return m;
+    }
+    math::Aabb3<double> occlusion_box;
+    for (const auto& vertex : vertices) {
+        occlusion_box.put_without_update(math::Vec3<double>(vertex.base.position));
+    }
+    occlusion_box.update();
+    return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
+}

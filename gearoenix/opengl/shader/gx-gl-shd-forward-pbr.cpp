@@ -15,10 +15,10 @@ precision highp int;\n\
 precision highp sampler2D;\n\
 precision highp samplerCube;\n\
 \n\
-layout(location = 0) in vec3 position;\n\
-layout(location = 1) in vec3 normal;\n\
-layout(location = 2) in vec4 tangent;\n\
-layout(location = 3) in vec2 uv;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION) ") in vec3 position;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_NORMAL) ") in vec3 normal;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_TANGENT) ") in vec4 tangent;\n\
+layout(location = " GX_STRINGIFY(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_UV) ") in vec2 uv;\n\
 \n\
 uniform mat4 m;\n\
 uniform mat4 inv_m;\n\

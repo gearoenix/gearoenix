@@ -135,6 +135,11 @@ struct Vec4 {
         return w == o.w && z == o.z && y == o.y && x == o.x;
     }
 
+    [[nodiscard]] constexpr Vec4<Element> operator+(const Element o) const noexcept
+    {
+        return Vec4<Element>(x + o, y + o, z + o, w + o);
+    }
+
     [[nodiscard]] constexpr Vec4<Element> operator*(const Element o) const noexcept
     {
         return Vec4<Element>(x * o, y * o, z * o, w * o);

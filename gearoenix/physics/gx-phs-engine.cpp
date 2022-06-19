@@ -4,11 +4,15 @@
 #include "collider/gx-phs-cld-aabb.hpp"
 #include "collider/gx-phs-cld-frustum.hpp"
 #include "gx-phs-transformation.hpp"
+#include "animation/gx-phs-anm-manager.hpp"
 
 gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine) noexcept
     : render_engine(render_engine)
+    , animation_manager(new animation::Manager(render_engine))
 {
 }
+
+gearoenix::physics::Engine::~Engine() noexcept = default;
 
 void gearoenix::physics::Engine::start_frame() noexcept
 {
@@ -23,6 +27,7 @@ void gearoenix::physics::Engine::start_frame() noexcept
         [&](const core::ecs::Entity::id_t, Transformation& transform, const auto /*kernel_index*/) {
             transform.update();
         });
+    animation_manager->update();
 }
 
 void gearoenix::physics::Engine::end_frame() noexcept

@@ -44,6 +44,19 @@ public:
         std::vector<PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
         core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+
+    [[nodiscard]] virtual std::shared_ptr<Mesh> build(
+        std::string&& name,
+        std::vector<PbrVertexAnimated>&& vertices,
+        std::vector<std::uint32_t>&& indices,
+        math::Aabb3<double>&& occlusion_box,
+        core::sync::EndCallerIgnored&& end_callback) noexcept = 0;
+
+    [[nodiscard]] std::shared_ptr<Mesh> build(
+        std::string&& name,
+        std::vector<PbrVertexAnimated>&& vertices,
+        std::vector<std::uint32_t>&& indices,
+        core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 };
 }
 

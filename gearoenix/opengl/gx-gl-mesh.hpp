@@ -29,6 +29,12 @@ struct MeshManager final : render::mesh::Manager {
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
         core::sync::EndCallerIgnored&& end_callback) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
+        std::string&& name,
+        std::vector<render::PbrVertexAnimated>&& vertices,
+        std::vector<std::uint32_t>&& indices,
+        math::Aabb3<double>&& occlusion_box,
+        core::sync::EndCallerIgnored&& end_callback) noexcept final;
 };
 }
 

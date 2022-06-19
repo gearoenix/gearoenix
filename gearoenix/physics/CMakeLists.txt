@@ -3,8 +3,12 @@ SET(GX_ENGINE_PHYSICS_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.hpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.hpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.cpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.hpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.cpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.hpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
+       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-body.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-body.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-car.cpp
