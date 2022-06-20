@@ -11,15 +11,17 @@ struct GearoenixCoreSyncParallelForData final {
         gearoenix::core::sync::Semaphore* const signal;
     };
 
-    std::thread thread;
-    gearoenix::core::sync::Semaphore signal;
-    std::mutex jobs_lock;
+    gearoenix::core::sync::Semaphore signal {};
+    std::mutex jobs_lock {};
     std::vector<Job> jobs;
     bool is_running = true;
     bool terminated = false;
+    std::thread thread;
 
     GearoenixCoreSyncParallelForData(const unsigned int count, const unsigned int index) noexcept
-        : thread([count, index, this] {
+    {
+        // It was causing problem in linux in debug mode
+        thread = std::thread([count, index, this] {
             std::vector<Job> local_jobs;
             is_running = true;
             while (is_running) {
@@ -35,8 +37,7 @@ struct GearoenixCoreSyncParallelForData final {
                 local_jobs.clear();
             }
             terminated = true;
-        })
-    {
+        });
     }
 
     ~GearoenixCoreSyncParallelForData() noexcept

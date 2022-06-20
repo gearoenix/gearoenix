@@ -3,7 +3,11 @@
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include "../gx-plt-application.hpp"
+#ifdef GX_PLATFORM_LINUX
+#include <SDL2/SDL.h>
+#else
 #include <SDL.h>
+#endif
 #include <vector>
 
 namespace gearoenix::platform {

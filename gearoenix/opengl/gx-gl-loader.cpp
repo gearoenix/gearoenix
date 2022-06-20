@@ -6,7 +6,11 @@
 #include <boost/container/flat_set.hpp>
 
 #ifdef GX_PLATFORM_INTERFACE_SDL2
+#ifdef GX_PLATFORM_LINUX
+#include <SDL2/SDL.h>
+#else
 #include <SDL.h>
+#endif
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
 #include <EGL/egl.h>
 #else

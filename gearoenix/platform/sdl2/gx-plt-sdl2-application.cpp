@@ -4,8 +4,11 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-log.hpp"
 #include "gx-plt-sdl2-key.hpp"
+#ifdef GX_PLATFORM_LINUX
+#include <SDL2/SDL_vulkan.h>
+#else
 #include <SDL_vulkan.h>
-
+#endif
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #include <emscripten.h>
 #endif

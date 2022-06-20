@@ -88,20 +88,20 @@ SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
 
 SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
 
-SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
-GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.22.zip" "${GX_SDL2_PATH}")
-GX_COMPILE_LIB(${GX_SDL2_PATH})
-SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
-INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
-SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
+IF (NOT GX_IN_LINUX)
+    SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
+    GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.22.zip" "${GX_SDL2_PATH}")
+    GX_COMPILE_LIB(${GX_SDL2_PATH})
+    SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
+    INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
+    SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
+ENDIF()
 
 IF(GX_IN_LINUX)
     SET(GX_COMMON_LIBS
             ${GX_COMMON_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/libSDL2.a
-            ${GX_SDL2_BUILD_DIRS}/libSDL2main.a
-            m dl asound pthread pulse-simple pulse X11 Xext Xcursor Xinerama Xi Xrandr Xss Xxf86vm drm gbm
-            wayland-egl wayland-client wayland-cursor xkbcommon rt)
+            SDL2
+            libSDL2main.a)
 ELSEIF(MSVC)
     SET(GX_COMMON_LIBS 
             ${GX_COMMON_LIBS}
