@@ -1,11 +1,11 @@
 #ifndef GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
 #define GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
 #include "../../platform/macro/gx-plt-mcr-lock.hpp"
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace gearoenix::core::ecs {
-    struct EntityBuilder;
+struct EntityBuilder;
 }
 
 namespace gearoenix::render::engine {
@@ -16,6 +16,7 @@ namespace gearoenix::physics::animation {
 struct Animation;
 struct Manager final {
     render::engine::Engine& e;
+
 private:
     GX_CREATE_GUARD(bones);
     std::vector<std::uint8_t> bones;

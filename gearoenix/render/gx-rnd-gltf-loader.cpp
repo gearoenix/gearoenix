@@ -1,4 +1,7 @@
 #include "gx-rnd-gltf-loader.hpp"
+#include "../physics/animation/gx-phs-anm-bone.hpp"
+#include "../physics/animation/gx-phs-anm-manager.hpp"
+#include "../physics/gx-phs-engine.hpp"
 #include "../physics/gx-phs-transformation.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include "../platform/stream/gx-plt-stm-path.hpp"
@@ -7,6 +10,9 @@
 #include "camera/gx-rnd-cmr-camera.hpp"
 #include "camera/gx-rnd-cmr-manager.hpp"
 #include "engine/gx-rnd-eng-engine.hpp"
+#include "light/gx-rnd-lt-builder.hpp"
+#include "light/gx-rnd-lt-light.hpp"
+#include "light/gx-rnd-lt-manager.hpp"
 #include "mesh/gx-rnd-msh-manager.hpp"
 #include "mesh/gx-rnd-msh-mesh.hpp"
 #include "model/gx-rnd-mdl-builder.hpp"
@@ -15,14 +21,8 @@
 #include "scene/gx-rnd-scn-manager.hpp"
 #include "texture/gx-rnd-txt-manager.hpp"
 #include "texture/gx-rnd-txt-texture-2d.hpp"
-#include "../physics/animation/gx-phs-anm-bone.hpp"
-#include "../physics/animation/gx-phs-anm-manager.hpp"
-#include "../physics/gx-phs-engine.hpp"
-#include "light/gx-rnd-lt-manager.hpp"
-#include "light/gx-rnd-lt-builder.hpp"
-#include "light/gx-rnd-lt-light.hpp"
-#include <tuple>
 #include <functional>
+#include <tuple>
 
 #define TINYGLTF_NOEXCEPTION
 #define TINYGLTF_IMPLEMENTATION
@@ -223,7 +223,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             math::Vec3<double>(pos_min[0], pos_min[1], pos_min[2]));
 
         std::vector<PbrVertex> vertices(pos_a.count);
-        std::vector<PbrVertexAnimated> animated_vertices(is_animated? pos_a.count: 0);
+        std::vector<PbrVertexAnimated> animated_vertices(is_animated ? pos_a.count : 0);
         std::vector<std::uint32_t> indices(ids_a.count);
 
         const auto& pos_bv = bvs[pos_a.bufferView];
@@ -274,8 +274,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             }
         }
 
-        if (is_animated)
-        {
+        if (is_animated) {
             {
                 const auto* const bwt_b = &bfs[bwt_bv.buffer].data[bwt_bv.byteOffset];
                 const std::size_t bwt_bi_inc = bwt_bv.byteStride > 0 ? bwt_bv.byteStride : sizeof(math::Vec4<float>);
@@ -481,13 +480,13 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                 rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
                 rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
                 rnd_cmr.set_yfov(static_cast<float>(cmr.perspective.yfov));
-            }
-            else {
+            } else {
                 rnd_cmr.set_projection_type(camera::Projection::Orthographic);
                 rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
                 rnd_cmr.set_near(static_cast<float>(cmr.orthographic.znear));
             }
-            apply_transform(node_index, camera_builder->get_transformation());
+            auto& transform = camera_builder->get_transformation();
+            apply_transform(node_index, transform);
             scene_builder.add(std::move(camera_builder));
             return;
         }
@@ -501,15 +500,13 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                 gearoenix::core::sync::EndCallerIgnored(node_end_callback),
                 true);
             model_builder->set_material(gx_mat);
-            if (node.skin != -1)
-            {
+            if (node.skin != -1) {
                 bones_memory.clear();
                 bones_memory_indices.clear();
                 node_bone_memory_index.clear();
 
                 const auto& skin = data.skins[node.skin];
-                for (const auto joint_node_index : skin.joints)
-                {
+                for (const auto joint_node_index : skin.joints) {
                     const auto& bone_node = data.nodes[joint_node_index];
                     const auto bone_memory_index = physics::animation::Bone::construct(
                         bones_memory, bone_node.name,
@@ -519,12 +516,10 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                     apply_transform(joint_node_index, physics::animation::Bone::get_transformation(bones_memory, bone_memory_index));
                 }
                 std::size_t bones_memory_indices_index = 0;
-                for (const auto joint_node_index : skin.joints)
-                {
+                for (const auto joint_node_index : skin.joints) {
                     const auto& bone_node = data.nodes[joint_node_index];
                     bone_children_indices.clear();
-                    for (const auto child_index : bone_node.children)
-                    {
+                    for (const auto child_index : bone_node.children) {
                         bone_children_indices.push_back(node_bone_memory_index[child_index]);
                     }
                     const auto bone_memory_index = bones_memory_indices[bones_memory_indices_index];
@@ -561,9 +556,9 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             GX_ASSERT_D(0.0 <= json_light_colour.Get(2).GetNumberAsDouble());
             GX_ASSERT_D(1.0 >= json_light_colour.Get(2).GetNumberAsDouble());
             const auto colour = math::Vec3<float>(
-                static_cast<float>(json_light_colour.Get(0).GetNumberAsDouble()),
-                static_cast<float>(json_light_colour.Get(1).GetNumberAsDouble()),
-                static_cast<float>(json_light_colour.Get(2).GetNumberAsDouble()))
+                                    static_cast<float>(json_light_colour.Get(0).GetNumberAsDouble()),
+                                    static_cast<float>(json_light_colour.Get(1).GetNumberAsDouble()),
+                                    static_cast<float>(json_light_colour.Get(2).GetNumberAsDouble()))
                 * static_cast<float>(light_info.Get("intensity").GetNumberAsDouble());
             const auto light_type = light_info.Get("type").Get<std::string>();
             auto light_builder = e.get_light_manager()->build_shadow_caster_directional(
@@ -574,24 +569,22 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                 35.0f,
                 end_callback);
             light_builder->get_light().colour = colour;
-            apply_transform(node_index, light_builder->get_transformation());
+            auto& transform = light_builder->get_transformation();
+            apply_transform(node_index, transform);
             scene_builder.add(std::move(light_builder));
             return;
         }
-        if (node.children.size() == 2)
-        { // This is root armature
+        if (node.children.size() == 2) { // This is root armature
             GX_ASSERT_D(node.rotation.empty());
             GX_ASSERT_D(node.scale.empty());
             GX_ASSERT_D(node.translation.empty());
             auto mesh_node_index = node.children[0];
-            if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1)
-            {
+            if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1) {
                 process_node(mesh_node_index, node_end_callback, scene_builder);
                 return;
             }
             mesh_node_index = node.children[1];
-            if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1)
-            {
+            if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1) {
                 process_node(mesh_node_index, node_end_callback, scene_builder);
                 return;
             }

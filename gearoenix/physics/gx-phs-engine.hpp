@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace gearoenix::physics::animation {
- struct Manager;
+struct Manager;
 }
 
 namespace gearoenix::render::engine {

@@ -20,4 +20,5 @@ SET(GX_ENGINE_MATH_SRC
 
 SET(GX_ENGINE_MATH_TEST_SRC
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-matrix-4d-test.hpp
+        ${GX_ENGINE_MATH_SRC_DIR}/gx-math-quaternion-test.hpp
         PARENT_SCOPE)

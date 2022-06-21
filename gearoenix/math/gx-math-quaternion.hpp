@@ -6,7 +6,7 @@
 
 namespace gearoenix::math {
 template <typename Element>
-struct Quat {
+struct Quat final {
     Element x, y, z, w;
 
     constexpr explicit Quat(const Element e = static_cast<Element>(0)) noexcept
@@ -51,7 +51,7 @@ struct Quat {
 
     friend std::ostream& operator<<(std::ostream& os, const Quat& q)
     {
-        os << "\"Quat\" { \"x\": \"" << q.x << "\", \"y\": \"" << q.y << "\", \"z\": \"" << q.z << "\", \"w\": \"" << q.w << "\" }";
+        os << R"("Quat" { "x": ")" << q.x << R"(", "y": ")" << q.y << R"(", "z": ")" << q.z << R"(", "w": ")" << q.w << "\" }";
         return os;
     }
 };

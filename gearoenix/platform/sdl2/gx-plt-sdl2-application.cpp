@@ -69,16 +69,16 @@ void gearoenix::platform::Application::initialize_window() noexcept
 #endif
         SDL_GL_SetSwapInterval(1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-         if (create_gl_window(4, 4, flags))
-             return;
-         if (create_gl_window(4, 3, flags))
-             return;
-         if (create_gl_window(4, 2, flags))
-             return;
-         if (create_gl_window(4, 1, flags))
-             return;
-         if (create_gl_window(4, 0, flags))
-             return;
+        if (create_gl_window(4, 4, flags))
+            return;
+        if (create_gl_window(4, 3, flags))
+            return;
+        if (create_gl_window(4, 2, flags))
+            return;
+        if (create_gl_window(4, 1, flags))
+            return;
+        if (create_gl_window(4, 0, flags))
+            return;
         // if (create_gl_window(3, 3, flags))
         //     return;
         // if (create_gl_window(3, 2, flags))

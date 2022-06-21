@@ -44,7 +44,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
     m->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(sizeof(std::remove_reference_t<decltype(vertices)>::value_type) * vertices.size());
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
-    eng.todos.load([c = std::move(c), m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size]{
+    eng.todos.load([c = std::move(c), m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(m->vertex_object));
         glBindVertexArray(m->vertex_object);
@@ -64,7 +64,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
         GX_GL_CHECK_D;
-        });
+    });
     return m;
 }
 
@@ -80,7 +80,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
     m->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(sizeof(std::remove_reference_t<decltype(vertices)>::value_type) * vertices.size());
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
-    eng.todos.load([c = std::move(c), m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size]{
+    eng.todos.load([c = std::move(c), m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(m->vertex_object));
         glBindVertexArray(m->vertex_object);
@@ -104,7 +104,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
         GX_GL_CHECK_D;
-        });
+    });
     return m;
 }
 
