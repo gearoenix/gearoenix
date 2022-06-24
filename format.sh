@@ -1,23 +1,23 @@
 #!/bin/bash
 if [ "$(uname -s)" == "Darwin" ]
 then
-    np=`sysctl -n hw.physicalcpu`
+    np=$(sysctl -n hw.physicalcpu)
 else
-    np=`nproc --all`
+    np=$(nproc --all)
 fi
 
 pi=0
 
-for (( i = 0; i < $np; i++ )); do
+for (( i = 0; i < np; i++ )); do
 	pids[$i]=0
 done
 
 format_func() {
-	echo $1
-	clang-format-14 -i -style=WebKit $1 &
+	echo "$1"
+	clang-format-14 -i -style=WebKit "$1" &
 	pids[$pi]=$!
 	pi=$((pi + 1))
-	pi=$((pi % $np))
+	pi=$((pi % np))
 	if [[ ${pids[$pi]} -ne 0 ]]
 	then
 		wait ${pids[$pi]}

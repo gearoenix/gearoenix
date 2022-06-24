@@ -6,8 +6,8 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-cr-ecs-component.hpp"
+#include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-entity.hpp"
-#include "gx-cr-ecs-not.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
 #include <boost/container/flat_map.hpp>
@@ -24,6 +24,38 @@ struct Archetype final {
     friend struct World;
 
 private:
+    template <typename T>
+    struct ConditionCheck final {
+        [[nodiscard]] static bool match(const boost::container::flat_map<std::type_index, std::size_t>& components_indices) noexcept
+        {
+            return components_indices.contains(Component::create_type_index<T>());
+        }
+    };
+
+    template <typename Condition>
+    struct ConditionCheck<Not<Condition>> final {
+        [[nodiscard]] static bool match(const boost::container::flat_map<std::type_index, std::size_t>& components_indices) noexcept
+        {
+            return !ConditionCheck<Condition>::match(components_indices);
+        }
+    };
+
+    template <typename... Conditions>
+    struct ConditionCheck<And<Conditions...>> final {
+        [[nodiscard]] static bool match(const boost::container::flat_map<std::type_index, std::size_t>& components_indices) noexcept
+        {
+            return (ConditionCheck<Conditions>::match(components_indices) && ...);
+        }
+    };
+
+    template <typename... Conditions>
+    struct ConditionCheck<Or<Conditions...>> final {
+        [[nodiscard]] static bool match(const boost::container::flat_map<std::type_index, std::size_t>& components_indices) noexcept
+        {
+            return (ConditionCheck<Conditions>::match(components_indices) || ...);
+        }
+    };
+
     typedef boost::container::flat_set<std::type_index> id_t;
     typedef boost::container::flat_map<std::type_index, std::size_t> components_indices_t;
 
@@ -44,16 +76,10 @@ private:
         return id;
     }
 
-    template <typename... ComponentsTypes>
+    template <typename Condition>
     [[nodiscard]] bool satisfy() noexcept
     {
-        Component::query_types_check<ComponentsTypes...>();
-        bool result = true;
-        (([&]<typename T>(T*) constexpr noexcept {
-            result = result && (is_not<T> != components_indices.contains(Component::create_type_index<T>()));
-        }(reinterpret_cast<ComponentsTypes*>(0))),
-            ...);
-        return result;
+        return ConditionCheck<Condition>::match(components_indices);
     }
 
     template <typename... ComponentsTypes>
@@ -131,7 +157,7 @@ private:
     template <typename T>
     [[nodiscard]] std::size_t get_component_index() noexcept
     {
-        Component::query_type_check<T>();
+        Component::type_check<T>();
         const auto search = components_indices.find(Component::create_type_index<T>());
         if (components_indices.end() == search)
             return static_cast<std::size_t>(-1);
@@ -163,56 +189,44 @@ private:
 
     [[nodiscard]] std::optional<std::pair<Entity::id_t, std::size_t>> move_from_back(std::size_t index) noexcept;
 
-    template <typename... C, std::size_t... I, std::size_t N, typename F>
-    static inline void call_function(
-        std::index_sequence<I...> const&,
-        const Entity::id_t id,
-        std::uint8_t* const ptr,
-        const std::size_t (&indices)[N],
-        F&& f,
-        const unsigned int kernel_index) noexcept
-    {
-        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])..., kernel_index);
-    }
-
-    template <typename... C, std::size_t... I, std::size_t N, typename F>
-    static inline void call_function_sync(
-        std::index_sequence<I...> const&,
-        const Entity::id_t id,
-        std::uint8_t* const ptr,
-        const std::size_t (&indices)[N],
-        F&& f) noexcept
-    {
-        f(id, *reinterpret_cast<C*>(&ptr[indices[I]])...);
-    }
-
-    template <typename... ComponentsTypes, typename F>
-    void parallel_system(F&& fun) noexcept
+    template <typename ComponentsTypesTuple, std::size_t... I, typename F>
+    void parallel_system(std::index_sequence<I...> const&, F&& fun) noexcept
     {
         const std::size_t indices[] = {
-            (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
+            (sizeof(Entity::id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
         sync::ParallelFor::exec(range.begin(), range.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
-            call_function<ComponentsTypes...>(
-                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun, kernel_index);
+            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(Entity::id_t) ? &ptr[indices[I]] : nullptr)..., kernel_index);
         });
     }
 
-    template <typename... ComponentsTypes, typename F>
-    void synchronised_system(F&& fun) noexcept
+    template <typename Condition, typename F>
+    void parallel_system_conditioned(F&& fun) noexcept
+    {
+        parallel_system<typename ConditionTypesPack<Condition>::types>(
+            std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>(), fun);
+    }
+
+    template <typename ComponentsTypesTuple, std::size_t... I, typename F>
+    void synchronised_system(std::index_sequence<I...> const&, F&& fun) noexcept
     {
         const std::size_t indices[] = {
-            (is_not<ComponentsTypes> ? 0 : (sizeof(Entity::id_t) + get_component_index<ComponentsTypes>()))...,
+            (sizeof(Entity::id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
         auto range = PtrRange(data.data(), data.size(), entity_size);
-        for (auto iter = range.begin(); iter != range.end(); ++iter) {
-            std::uint8_t* const ptr = *iter;
+        for (auto ptr : range) {
             const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
-            call_function_sync<ComponentsTypes...>(
-                std::make_index_sequence<sizeof...(ComponentsTypes)> {}, id, ptr, indices, fun);
+            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(Entity::id_t) ? &ptr[indices[I]] : nullptr)...);
         }
+    }
+
+    template <typename Condition, typename F>
+    void synchronised_system_conditioned(F&& fun) noexcept
+    {
+        synchronised_system<typename ConditionTypesPack<Condition>::types>(
+            std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>(), fun);
     }
 
 public:

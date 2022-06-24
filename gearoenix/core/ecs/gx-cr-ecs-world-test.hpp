@@ -19,9 +19,6 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         }
 
         Position(Position&&) noexcept = default;
-        Position(const Position&) = delete;
-        Position& operator=(Position&&) = delete;
-        Position& operator=(const Position&) = delete;
     };
 
     struct Speed final : public Component {
@@ -36,9 +33,6 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         }
 
         Speed(Speed&&) noexcept = default;
-        Speed(const Speed&) = delete;
-        Speed& operator=(Speed&&) = delete;
-        Speed& operator=(const Speed&) = delete;
     };
 
     static Entity::id_t e1, e2, e3, e4, e5;
@@ -74,12 +68,12 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     const auto check_systems = [&]() noexcept {
         std::atomic<int> e1s = 0, e2s = 0, e3s = 0, e4s = 0, e5s = 0;
 
-        w.parallel_system<Position>([&](const Entity::id_t ent, Position& p, const unsigned int) noexcept {
-            if (e1 == ent && 2.0 == p.x && 3.0 == p.y) {
+        w.parallel_system<And<Position>>([&](const Entity::id_t ent, Position* const p, const unsigned int) noexcept {
+            if (e1 == ent && 2.0 == p->x && 3.0 == p->y) {
                 ++e1s;
-            } else if (e2 == ent && 6.0 == p.x && 7.0 == p.y) {
+            } else if (e2 == ent && 6.0 == p->x && 7.0 == p->y) {
                 ++e2s;
-            } else if (e3 == ent && 8.0 == p.x && 9.0 == p.y) {
+            } else if (e3 == ent && 8.0 == p->x && 9.0 == p->y) {
                 ++e3s;
             } else {
                 BOOST_TEST(false);
@@ -89,7 +83,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e1s == 1 && e2s == 1 && e3s == 1));
         e1s = e2s = e3s = 0;
 
-        w.parallel_system<Not<Speed>>([&](const Entity::id_t ent, Not<Speed>&, const unsigned int) noexcept {
+        w.parallel_system<Not<Speed>>([&](const Entity::id_t ent, Speed* const, const unsigned int) noexcept {
             if (ent == e2)
                 ++e2s;
             else if (ent == e5)
@@ -101,7 +95,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e2s == 1 && e5s == 1));
         e2s = e5s = 0;
 
-        w.parallel_system<Not<Position>>([&](const Entity::id_t ent, Not<Position>&, const unsigned int) noexcept {
+        w.parallel_system<Not<Position>>([&](const Entity::id_t ent, Position* const, const unsigned int) noexcept {
             if (ent == e4)
                 ++e4s;
             else if (ent == e5)
@@ -113,12 +107,12 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e4s == 1 && e5s == 1));
         e4s = e5s = 0;
 
-        w.parallel_system<Speed>([&](const Entity::id_t ent, Speed& s, const unsigned int) noexcept {
-            if (e1 == ent && 4.0 == s.x && 5.0 == s.y) {
+        w.parallel_system<Speed>([&](const Entity::id_t ent, Speed* const s, const unsigned int) noexcept {
+            if (e1 == ent && 4.0 == s->x && 5.0 == s->y) {
                 ++e1s;
-            } else if (e3 == ent && 10.0 == s.x && 11.0 == s.y) {
+            } else if (e3 == ent && 10.0 == s->x && 11.0 == s->y) {
                 ++e3s;
-            } else if (e4 == ent && 12.0 == s.x && 13.0 == s.y) {
+            } else if (e4 == ent && 12.0 == s->x && 13.0 == s->y) {
                 ++e4s;
             } else {
                 BOOST_TEST(false);
@@ -128,10 +122,10 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
         e1s = e3s = e4s = 0;
 
-        w.parallel_system<Speed, Position>([&](const Entity::id_t ent, Speed& s, Position& p, const unsigned int) noexcept {
-            if (e1 == ent && 2 == std::lround(p.x) && 3 == std::lround(p.y) && 4 == std::lround(s.x) && 5 == std::lround(s.y)) {
+        w.parallel_system<And<Speed, Position>>([&](const Entity::id_t ent, Speed* const s, Position* const p, const unsigned int) noexcept {
+            if (e1 == ent && 2 == std::lround(p->x) && 3 == std::lround(p->y) && 4 == std::lround(s->x) && 5 == std::lround(s->y)) {
                 ++e1s;
-            } else if (e3 == ent && 8 == std::lround(p.x) && 9 == std::lround(p.y) && 10 == std::lround(s.x) && 11 == std::lround(s.y)) {
+            } else if (e3 == ent && 8 == std::lround(p->x) && 9 == std::lround(p->y) && 10 == std::lround(s->x) && 11 == std::lround(s->y)) {
                 ++e3s;
             } else {
                 BOOST_TEST(false);
@@ -141,8 +135,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e1s == 1 && e3s == 1));
         e1s = e3s = 0;
 
-        w.parallel_system<Not<Speed>, Position>([&](const Entity::id_t ent, Not<Speed>&, Position& p, const unsigned int) noexcept {
-            if (e2 == ent && 6.0 == p.x && 7.0 == p.y) {
+        w.parallel_system<And<Not<Speed>, Position>>([&](const Entity::id_t ent, Speed*, Position* const p, const unsigned int) noexcept {
+            if (e2 == ent && 6.0 == p->x && 7.0 == p->y) {
                 ++e2s;
             } else {
                 BOOST_TEST(false);
@@ -152,8 +146,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST(e2s == 1);
         e2s = 0;
 
-        w.parallel_system<Speed, Not<Position>>([&](const Entity::id_t ent, Speed& s, Not<Position>&, const unsigned int) noexcept {
-            if (e4 == ent && 12.0 == s.x && 13.0 == s.y) {
+        w.parallel_system<And<Speed, Not<Position>>>([&](const Entity::id_t ent, Speed* const s, Position*, const unsigned int) noexcept {
+            if (e4 == ent && 12.0 == s->x && 13.0 == s->y) {
                 ++e4s;
             } else {
                 BOOST_TEST(false);
@@ -161,6 +155,22 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         });
 
         BOOST_TEST(e4s == 1);
+        e4s = 0;
+
+        w.parallel_system<Or<And<Speed, Position>, Speed>>([&](const Entity::id_t ent, Speed* const s, Position*, const unsigned int) noexcept {
+            if (e1 == ent && 4.0 == s->x && 5.0 == s->y) {
+                ++e1s;
+            } else if (e3 == ent && 10.0 == s->x && 11.0 == s->y) {
+                ++e3s;
+            } else if (e4 == ent && 12.0 == s->x && 13.0 == s->y) {
+                ++e4s;
+            } else {
+                BOOST_TEST(false);
+            }
+        });
+
+        BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
+        e1s = e3s = e4s = 0;
     };
 
     const auto& delete_entities = [&]() noexcept {

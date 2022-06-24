@@ -259,106 +259,111 @@ void gearoenix::gl::SubmissionManager::initialise_bgcaas() noexcept
 
 void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
 {
-    e.get_world()->synchronised_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
-        if (!scene.enabled)
-            return;
-        const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
-        auto& scene_pool_ref = scene_pool[scene_pool_index];
-        if (!scenes_bvhs.contains(scene_id))
-            scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<ModelBvhData>());
-        scene_pool_ref.skyboxes.clear();
-        scene_pool_ref.cameras.clear();
-        scene_pool_ref.reflections.clear();
-        scene_pool_ref.reflection_cameras.clear();
-        scene_pool_ref.shadow_cameras.clear();
-        scene_pool_ref.dynamic_models.clear();
-        scene_pool_ref.shadow_caster_directional_lights.clear();
-        e.get_world()->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
-            if (!camera.enabled)
+    e.get_world()->synchronised_system<render::scene::Scene>(
+        [&](const core::ecs::Entity::id_t scene_id, render::scene::Scene* const scene) noexcept {
+            if (!scene->enabled)
                 return;
-            if (camera.get_scene_id() != scene_id)
-                return;
-            const auto camera_pool_index = camera_pool.emplace([&] { return CameraData(); });
-            switch (camera.get_usage()) {
-            case render::camera::Camera::Usage::Main:
-                scene_pool_ref.cameras.emplace(std::make_pair(camera.get_layer(), camera_id), camera_pool_index);
-                break;
-            case render::camera::Camera::Usage::ReflectionProbe:
-                scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
-                break;
-            case render::camera::Camera::Usage::Shadow:
-                scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
-                break;
-            }
-        });
-        e.get_world()->synchronised_system<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDiractionaLight>([&](const core::ecs::Entity::id_t light_id, render::light::Light& l, render::light::ShadowCasterDirectional& rl, ShadowCasterDiractionaLight& gll) noexcept {
-            if (!l.enabled)
-                return;
-            if (!rl.enabled)
-                return;
-            if (!gll.enabled)
-                return;
-            if (scene_id != l.scene_id)
-                return;
-            DirectionalShadowCasterData scdld {
-                .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl.get_camera_id())->get_frustum(),
-                .shadow_data = DirectionalShadowData {
-                    .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl.get_camera_id())->get_view_projection(),
-                    .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl.get_camera_id())->get_z_axis()),
-                    .colour = l.colour,
-                    .shadow_map_texture = gll.get_shadow_map_texture_v(),
-                }
-            };
-            scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, scdld);
-        });
-        e.get_world()->synchronised_system<render::skybox::Skybox, Skybox>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox& render_skybox, Skybox& gl_skybox) noexcept {
-            if (!render_skybox.enabled)
-                return;
-            if (render_skybox.get_scene_id() != scene_id)
-                return;
-            scene_pool_ref.skyboxes.emplace(
-                std::make_tuple(render_skybox.get_layer(), skybox_id, render_skybox.is_equirectangular()),
-                SkyboxData {
-                    .vertex_object = gl_skybox.get_vertex_object(),
-                    .albedo_txt = gl_skybox.get_texture_object(),
+            const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
+            auto& scene_pool_ref = scene_pool[scene_pool_index];
+            if (!scenes_bvhs.contains(scene_id))
+                scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<ModelBvhData>());
+            scene_pool_ref.skyboxes.clear();
+            scene_pool_ref.cameras.clear();
+            scene_pool_ref.reflections.clear();
+            scene_pool_ref.reflection_cameras.clear();
+            scene_pool_ref.shadow_cameras.clear();
+            scene_pool_ref.dynamic_models.clear();
+            scene_pool_ref.shadow_caster_directional_lights.clear();
+            e.get_world()->synchronised_system<render::camera::Camera>(
+                [&](const core::ecs::Entity::id_t camera_id, render::camera::Camera* const camera) noexcept {
+                    if (!camera->enabled)
+                        return;
+                    if (camera->get_scene_id() != scene_id)
+                        return;
+                    const auto camera_pool_index = camera_pool.emplace([&] { return CameraData(); });
+                    switch (camera->get_usage()) {
+                    case render::camera::Camera::Usage::Main:
+                        scene_pool_ref.cameras.emplace(std::make_pair(camera->get_layer(), camera_id), camera_pool_index);
+                        break;
+                    case render::camera::Camera::Usage::ReflectionProbe:
+                        scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
+                        break;
+                    case render::camera::Camera::Usage::Shadow:
+                        scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
+                        break;
+                    }
                 });
-        });
-        if (scene.get_reflection_probs_changed()) {
-            scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
-            scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
-            scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
-            scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-            e.get_world()->synchronised_system<render::reflection::Baked, Reflection>([&](const core::ecs::Entity::id_t reflection_id, render::reflection::Baked& render_baked, Reflection& gl_baked) noexcept {
-                if (!render_baked.enabled)
+            e.get_world()->synchronised_system<core::ecs::And<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDiractionaLight>>(
+                [&](const core::ecs::Entity::id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDiractionaLight* const gll) noexcept {
+                    if (!l->enabled)
+                        return;
+                    if (!rl->enabled)
+                        return;
+                    if (!gll->enabled)
+                        return;
+                    if (scene_id != l->scene_id)
+                        return;
+                    DirectionalShadowCasterData scdld {
+                        .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl->get_camera_id())->get_frustum(),
+                        .shadow_data = DirectionalShadowData {
+                            .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl->get_camera_id())->get_view_projection(),
+                            .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl->get_camera_id())->get_z_axis()),
+                            .colour = l->colour,
+                            .shadow_map_texture = gll->get_shadow_map_texture_v(),
+                        }
+                    };
+                    scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, scdld);
+                });
+            e.get_world()->synchronised_system<core::ecs::And<render::skybox::Skybox, Skybox>>([&](const core::ecs::Entity::id_t skybox_id, render::skybox::Skybox* const render_skybox, Skybox* const gl_skybox) noexcept {
+                if (!render_skybox->enabled)
                     return;
-                if (render_baked.get_scene_id() != scene_id)
+                if (render_skybox->get_scene_id() != scene_id)
                     return;
-                const ReflectionData r {
-                    .irradiance = gl_baked.get_irradiance_v(),
-                    .radiance = gl_baked.get_radiance_v(),
-                    .box = render_baked.get_include_box(),
-                    .size = render_baked.get_include_box().get_diameter().square_length(),
-                    .radiance_mips_count = static_cast<float>(render_baked.get_radiance_mips_count() - 1),
-                };
-                scene_pool_ref.reflections.emplace(reflection_id, r);
-                if (r.size > scene_pool_ref.default_reflection.second.size) {
-                    scene_pool_ref.default_reflection.first = reflection_id;
-                    scene_pool_ref.default_reflection.second = r;
-                }
+                scene_pool_ref.skyboxes.emplace(
+                    std::make_tuple(render_skybox->get_layer(), skybox_id, render_skybox->is_equirectangular()),
+                    SkyboxData {
+                        .vertex_object = gl_skybox->get_vertex_object(),
+                        .albedo_txt = gl_skybox->get_texture_object(),
+                    });
             });
-        }
-        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
-    });
+            if (scene->get_reflection_probs_changed()) {
+                scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
+                scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
+                scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
+                scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
+                e.get_world()->synchronised_system<core::ecs::And<render::reflection::Baked, Reflection>>(
+                    [&](const core::ecs::Entity::id_t reflection_id, render::reflection::Baked* const render_baked, Reflection* const gl_baked) noexcept {
+                        if (!render_baked->enabled)
+                            return;
+                        if (render_baked->get_scene_id() != scene_id)
+                            return;
+                        const ReflectionData r {
+                            .irradiance = gl_baked->get_irradiance_v(),
+                            .radiance = gl_baked->get_radiance_v(),
+                            .box = render_baked->get_include_box(),
+                            .size = render_baked->get_include_box().get_diameter().square_length(),
+                            .radiance_mips_count = static_cast<float>(render_baked->get_radiance_mips_count() - 1),
+                        };
+                        scene_pool_ref.reflections.emplace(reflection_id, r);
+                        if (r.size > scene_pool_ref.default_reflection.second.size) {
+                            scene_pool_ref.default_reflection.first = reflection_id;
+                            scene_pool_ref.default_reflection.second = r;
+                        }
+                    });
+            }
+            scenes.emplace(std::make_pair(scene->get_layer(), scene_id), scene_pool_index);
+        });
 }
 
 void gearoenix::gl::SubmissionManager::update_scenes() noexcept
 {
-    e.get_world()->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& render_scene, const unsigned int /*kernel_index*/) noexcept {
-        if (!render_scene.enabled)
-            return;
-        auto& scene_data = scene_pool[scenes[std::make_pair(render_scene.get_layer(), scene_id)]];
-        update_scene(scene_id, scene_data, render_scene);
-    });
+    e.get_world()->parallel_system<render::scene::Scene>(
+        [&](const core::ecs::Entity::id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) noexcept {
+            if (!render_scene->enabled)
+                return;
+            auto& scene_data = scene_pool[scenes[std::make_pair(render_scene->get_layer(), scene_id)]];
+            update_scene(scene_id, scene_data, *render_scene);
+        });
 }
 
 void gearoenix::gl::SubmissionManager::update_scene(const core::ecs::Entity::id_t scene_id, SceneData& scene_data, render::scene::Scene& render_scene) noexcept
@@ -377,79 +382,84 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
     if (!render_scene.get_recreate_bvh())
         return;
     bvh.reset();
-    e.get_world()->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
-        [&](const core::ecs::Entity::id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
-            if (!render_model.enabled || render_model.is_transformable || render_model.scene_id != scene_id)
+    e.get_world()->synchronised_system<core::ecs::And<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>>(
+        [&](
+            const core::ecs::Entity::id_t,
+            physics::collider::Aabb3* const collider,
+            render::model::Model* const render_model,
+            Model* const model,
+            physics::Transformation* const model_transform) noexcept {
+            if (!render_model->enabled || render_model->is_transformable || render_model->scene_id != scene_id)
                 return;
-            auto& mesh = *model.bound_mesh;
+            auto& mesh = *model->bound_mesh;
             ModelBvhData md {
-                .blocked_cameras_flags = render_model.block_cameras_flags,
+                .blocked_cameras_flags = render_model->block_cameras_flags,
                 .model = ModelData {
-                    .m = math::Mat4x4<float>(model_transform.get_matrix()),
-                    .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
-                    .albedo_factor = model.material.get_albedo_factor(),
-                    .normal_metallic_factor = model.material.get_normal_metallic_factor(),
-                    .emission_roughness_factor = model.material.get_emission_roughness_factor(),
-                    .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
+                    .m = math::Mat4x4<float>(model_transform->get_matrix()),
+                    .inv_m = math::Mat4x4<float>(model_transform->get_inverted_matrix().transposed()),
+                    .albedo_factor = model->material.get_albedo_factor(),
+                    .normal_metallic_factor = model->material.get_normal_metallic_factor(),
+                    .emission_roughness_factor = model->material.get_emission_roughness_factor(),
+                    .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model->material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                     .vertex_object = mesh.vertex_object,
                     .vertex_buffer = mesh.vertex_buffer,
                     .index_buffer = mesh.index_buffer,
                     .indices_count = mesh.indices_count,
-                    .albedo_txt = model.albedo->get_object(),
-                    .normal_txt = model.normal->get_object(),
-                    .emission_txt = model.emission->get_object(),
-                    .metallic_roughness_txt = model.metallic_roughness->get_object(),
-                    .occlusion_txt = model.occlusion->get_object(),
+                    .albedo_txt = model->albedo->get_object(),
+                    .normal_txt = model->normal->get_object(),
+                    .emission_txt = model->emission->get_object(),
+                    .metallic_roughness_txt = model->metallic_roughness->get_object(),
+                    .occlusion_txt = model->occlusion->get_object(),
                     // Reflection probe data
                     .irradiance = scene_data.default_reflection.second.irradiance,
                     .radiance = scene_data.default_reflection.second.radiance,
                     .reflection_probe_size = scene_data.default_reflection.second.size,
                 }
             };
-            bvh.add({ collider.get_updated_box(), md });
+            bvh.add({ collider->get_updated_box(), md });
         });
     bvh.create_nodes();
 }
 
 void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::ecs::Entity::id_t scene_id, SceneData& scene_data) noexcept
 {
-    e.get_world()->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
+    e.get_world()->synchronised_system<core::ecs::And<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>>(
         [&](
             const core::ecs::Entity::id_t,
-            physics::collider::Aabb3& collider,
-            render::model::Model& render_model,
-            Model& gl_model,
-            physics::Transformation& model_transform) noexcept {
-            if (!render_model.enabled || !render_model.is_transformable || render_model.scene_id != scene_id)
+            physics::collider::Aabb3* const collider,
+            render::model::Model* const render_model,
+            Model* const gl_model,
+            physics::Transformation* const model_transform) noexcept {
+            if (!render_model->enabled || !render_model->is_transformable || render_model->scene_id != scene_id)
                 return;
-            const auto& mesh = *gl_model.bound_mesh;
+            const auto& mesh = *gl_model->bound_mesh;
             scene_data.dynamic_models.push_back(
                 DynamicModelData {
                     .base = ModelBvhData {
-                        .blocked_cameras_flags = render_model.block_cameras_flags,
+                        .blocked_cameras_flags = render_model->block_cameras_flags,
                         .model = ModelData {
-                            .m = math::Mat4x4<float>(model_transform.get_matrix()),
-                            .inv_m = math::Mat4x4<float>(model_transform.get_inverted_matrix().transposed()),
-                            .albedo_factor = gl_model.material.get_albedo_factor(),
-                            .normal_metallic_factor = gl_model.material.get_normal_metallic_factor(),
-                            .emission_roughness_factor = gl_model.material.get_emission_roughness_factor(),
-                            .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(gl_model.material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
+                            .m = math::Mat4x4<float>(model_transform->get_matrix()),
+                            .inv_m = math::Mat4x4<float>(model_transform->get_inverted_matrix().transposed()),
+                            .albedo_factor = gl_model->material.get_albedo_factor(),
+                            .normal_metallic_factor = gl_model->material.get_normal_metallic_factor(),
+                            .emission_roughness_factor = gl_model->material.get_emission_roughness_factor(),
+                            .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(gl_model->material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                             .vertex_object = mesh.vertex_object,
                             .vertex_buffer = mesh.vertex_buffer,
                             .index_buffer = mesh.index_buffer,
                             .indices_count = mesh.indices_count,
-                            .albedo_txt = gl_model.albedo->get_object(),
-                            .normal_txt = gl_model.normal->get_object(),
-                            .emission_txt = gl_model.emission->get_object(),
-                            .metallic_roughness_txt = gl_model.metallic_roughness->get_object(),
-                            .occlusion_txt = gl_model.occlusion->get_object(),
+                            .albedo_txt = gl_model->albedo->get_object(),
+                            .normal_txt = gl_model->normal->get_object(),
+                            .emission_txt = gl_model->emission->get_object(),
+                            .metallic_roughness_txt = gl_model->metallic_roughness->get_object(),
+                            .occlusion_txt = gl_model->occlusion->get_object(),
                             // Reflection probe data
                             .irradiance = scene_data.default_reflection.second.irradiance,
                             .radiance = scene_data.default_reflection.second.radiance,
                             .reflection_probe_size = scene_data.default_reflection.second.size,
                         },
                     },
-                    .box = collider.get_updated_box(),
+                    .box = collider->get_updated_box(),
                 });
         });
 }
@@ -522,27 +532,27 @@ void gearoenix::gl::SubmissionManager::update_scene_lights(SceneData& scene_data
 
 void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Entity::id_t scene_id, SceneData& scene_data, physics::accelerator::Bvh<ModelBvhData>& bvh) noexcept
 {
-    e.get_world()->parallel_system<render::camera::Camera, Camera, physics::collider::Frustum, physics::Transformation>(
+    e.get_world()->parallel_system<core::ecs::And<render::camera::Camera, Camera, physics::collider::Frustum, physics::Transformation>>(
         [&](
             const core::ecs::Entity::id_t camera_id,
-            render::camera::Camera& render_camera,
-            Camera& gl_camera,
-            physics::collider::Frustum& frustum,
-            physics::Transformation& transform,
+            render::camera::Camera* const render_camera,
+            Camera* const gl_camera,
+            physics::collider::Frustum* const frustum,
+            physics::Transformation* const transform,
             const unsigned int /*kernel_index*/) noexcept {
-            if (!render_camera.enabled || scene_id != render_camera.get_scene_id())
+            if (!render_camera->enabled || scene_id != render_camera->get_scene_id())
                 return;
-            const auto camera_location = transform.get_location();
-            std::size_t camera_pool_index = static_cast<std::size_t>(-1);
+            const auto camera_location = transform->get_location();
+            auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
-            switch (render_camera.get_usage()) {
+            switch (render_camera->get_usage()) {
             case render::camera::Camera::Usage::Main:
-                camera_pool_index = scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)];
+                camera_pool_index = scene_data.cameras[std::make_pair(render_camera->get_layer(), camera_id)];
                 break;
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
-                auto& reflection = scene_data.reflections[render_camera.get_reference_id()];
+                auto& reflection = scene_data.reflections[render_camera->get_reference_id()];
                 self_irradiance = reflection.irradiance;
                 self_radiance = reflection.radiance;
                 break;
@@ -553,9 +563,9 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             }
             auto& camera_data = camera_pool[camera_pool_index];
             math::Vec2<std::size_t> target_dimension;
-            if (nullptr != gl_camera.target) {
-                camera_data.framebuffer = gl_camera.target->get_framebuffer();
-                target_dimension = render_camera.get_target()->get_dimension();
+            if (nullptr != gl_camera->target) {
+                camera_data.framebuffer = gl_camera->target->get_framebuffer();
+                target_dimension = render_camera->get_target()->get_dimension();
             } else if (e.get_specification().is_deferred_supported) {
                 camera_data.framebuffer = gbuffers_target->get_framebuffer();
                 target_dimension = gbuffers_target->get_dimension();
@@ -563,13 +573,13 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 camera_data.framebuffer = bgcaas_target->get_framebuffer();
                 target_dimension = bgcaas_target->get_dimension();
             }
-            camera_data.viewport_clip = math::Vec4<sizei>(render_camera.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
-            camera_data.vp = render_camera.get_view_projection();
+            camera_data.viewport_clip = math::Vec4<sizei>(render_camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
+            camera_data.vp = render_camera->get_view_projection();
             camera_data.pos = math::Vec3<float>(camera_location);
-            camera_data.skybox_scale = render_camera.get_far() / 1.732051f;
+            camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
             camera_data.opaque_models_data.clear();
             camera_data.tranclucent_models_data.clear();
-            camera_data.out_reference = render_camera.get_reference_id();
+            camera_data.out_reference = render_camera->get_reference_id();
 
             for (auto& v : camera_data.threads_opaque_models_data)
                 v.clear();
@@ -577,8 +587,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 v.clear();
 
             // Recoding static models
-            bvh.call_on_intersecting(frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
+            bvh.call_on_intersecting(*frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+                if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera->get_flag()) == 0)
                     return;
                 const auto dir = camera_location - bvh_node_data.box.get_center();
                 const auto dis = dir.square_length();
@@ -593,9 +603,9 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
 
             // Recording dynamic models
             core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& m, const unsigned int kernel_index) noexcept {
-                if ((m.base.blocked_cameras_flags & render_camera.get_flag()) == 0)
+                if ((m.base.blocked_cameras_flags & render_camera->get_flag()) == 0)
                     return;
-                if (!frustum.check_intersection(m.box))
+                if (!frustum->check_intersection(m.box))
                     return;
                 const auto dir = camera_location - m.box.get_center();
                 const auto dis = dir.square_length();
@@ -670,64 +680,65 @@ void gearoenix::gl::SubmissionManager::render_shadows(const SceneData& scene) no
 
 void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
 {
-    e.get_world()->synchronised_system<Reflection, ReflectionRuntime, render::reflection::Runtime>([&](const core::ecs::Entity::id_t, Reflection& r, ReflectionRuntime& rr, render::reflection::Runtime& rrr) noexcept {
-        constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
-            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
-            std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
-            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
-            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
-            std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
-            std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
-        };
-        switch (rrr.get_state()) {
-        case render::reflection::Runtime::State::EnvironmentCubeMipMap:
-            glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
-            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-            return;
-        case render::reflection::Runtime::State::IrradianceFace: {
-            const auto fi = rrr.get_state_irradiance_face();
-            auto& target = *rr.get_irradiance_targets()[fi];
-            set_framebuffer(target.get_framebuffer());
-            const auto w = static_cast<sizei>(rrr.get_irradiance()->get_info().width);
-            set_viewport_clip({ 0, 0, w, w });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            irradiance_shader->bind();
-            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(irradiance_shader->get_environment_index()));
-            glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
-            irradiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            return;
-        }
-        case render::reflection::Runtime::State::IrradianceMipMap:
-            glBindTexture(GL_TEXTURE_CUBE_MAP, r.get_irradiance_v());
-            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-            return;
-        case render::reflection::Runtime::State::RadianceFaceLevel: {
-            const auto fi = rrr.get_state_radiance_face();
-            const auto li = rrr.get_state_radiance_level();
-            auto& target = *rr.get_radiance_targets()[fi][li];
-            set_framebuffer(target.get_framebuffer());
-            const auto w = static_cast<sizei>(rrr.get_radiance()->get_info().width >> li);
-            set_viewport_clip({ 0, 0, w, w });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            radiance_shader->bind();
-            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(radiance_shader->get_environment_index()));
-            glBindTexture(GL_TEXTURE_CUBE_MAP, rr.get_environment_v());
-            radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-            const auto roughness = static_cast<float>(rrr.get_roughnesses()[li]);
-            radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
-            const float roughness_p_4 = roughness * roughness * roughness * roughness;
-            radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
-            const float resolution = static_cast<float>(rrr.get_environment()->get_info().width);
-            const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
-            radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            return;
-        }
-        }
-    });
+    e.get_world()->synchronised_system<core::ecs::And<Reflection, ReflectionRuntime, render::reflection::Runtime>>(
+        [&](const core::ecs::Entity::id_t, Reflection* const r, ReflectionRuntime* const rr, render::reflection::Runtime* const rrr) noexcept {
+            constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
+                std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
+                std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
+                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
+                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
+                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
+                std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
+            };
+            switch (rrr->get_state()) {
+            case render::reflection::Runtime::State::EnvironmentCubeMipMap:
+                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+                return;
+            case render::reflection::Runtime::State::IrradianceFace: {
+                const auto fi = rrr->get_state_irradiance_face();
+                auto& target = *rr->get_irradiance_targets()[fi];
+                set_framebuffer(target.get_framebuffer());
+                const auto w = static_cast<sizei>(rrr->get_irradiance()->get_info().width);
+                set_viewport_clip({ 0, 0, w, w });
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                irradiance_shader->bind();
+                glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(irradiance_shader->get_environment_index()));
+                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                irradiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
+                glBindVertexArray(screen_vertex_object);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+                return;
+            }
+            case render::reflection::Runtime::State::IrradianceMipMap:
+                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_irradiance_v());
+                glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+                return;
+            case render::reflection::Runtime::State::RadianceFaceLevel: {
+                const auto fi = rrr->get_state_radiance_face();
+                const auto li = rrr->get_state_radiance_level();
+                auto& target = *rr->get_radiance_targets()[fi][li];
+                set_framebuffer(target.get_framebuffer());
+                const auto w = static_cast<sizei>(rrr->get_radiance()->get_info().width >> li);
+                set_viewport_clip({ 0, 0, w, w });
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+                radiance_shader->bind();
+                glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(radiance_shader->get_environment_index()));
+                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
+                const auto roughness = static_cast<float>(rrr->get_roughnesses()[li]);
+                radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
+                const float roughness_p_4 = roughness * roughness * roughness * roughness;
+                radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
+                const float resolution = static_cast<float>(rrr->get_environment()->get_info().width);
+                const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
+                radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
+                glBindVertexArray(screen_vertex_object);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+                return;
+            }
+            }
+        });
 }
 
 void gearoenix::gl::SubmissionManager::render_reflection_probes(const SceneData& scene) noexcept

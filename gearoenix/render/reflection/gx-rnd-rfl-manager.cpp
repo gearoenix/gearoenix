@@ -34,12 +34,13 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::refle
 
 void gearoenix::render::reflection::Manager::update() noexcept
 {
-    e.get_world()->parallel_system<Runtime>([this](
-                                                const core::ecs::Entity::id_t /*entity_id*/,
-                                                Runtime& runtime_probe,
-                                                const unsigned int /*kernel_index*/) {
-        if (runtime_probe.enabled) {
-            runtime_probe.update_state();
-        }
-    });
+    e.get_world()->parallel_system<Runtime>(
+        [this](
+            const core::ecs::Entity::id_t /*entity_id*/,
+            Runtime* const runtime_probe,
+            const unsigned int /*kernel_index*/) {
+            if (runtime_probe->enabled) {
+                runtime_probe->update_state();
+            }
+        });
 }

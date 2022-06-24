@@ -159,27 +159,27 @@ public:
     [[nodiscard]] const Entity* get_entity(Entity::id_t) const noexcept;
 
     /// Highly optimized way of system execution
-    template <typename... ComponentsTypes, typename F>
+    template <typename Condition, typename F>
     void parallel_system(F&& fun) noexcept
     {
-        Component::query_types_check<ComponentsTypes...>();
+        Component::condition_types_check<Condition>();
         for (auto& archetype : archetypes) {
-            if (!archetype.satisfy<ComponentsTypes...>())
+            if (!archetype.satisfy<Condition>())
                 continue;
-            archetype.parallel_system<ComponentsTypes...>(fun);
+            archetype.parallel_system_conditioned<Condition>(fun);
         }
     }
 
     /// Less performant way of system execution.
-    /// Good for highly confilicting systems that can not be executed in parallel way.
-    template <typename... ComponentsTypes, typename F>
+    /// Good for highly conflicting systems, can not be executed in parallel way.
+    template <typename Condition, typename F>
     void synchronised_system(F&& fun) noexcept
     {
-        Component::query_types_check<ComponentsTypes...>();
+        Component::condition_types_check<Condition>();
         for (auto& archetype : archetypes) {
-            if (!archetype.satisfy<ComponentsTypes...>())
+            if (!archetype.satisfy<Condition>())
                 continue;
-            archetype.synchronised_system<ComponentsTypes...>(fun);
+            archetype.synchronised_system_conditioned<Condition>(fun);
         }
     }
 

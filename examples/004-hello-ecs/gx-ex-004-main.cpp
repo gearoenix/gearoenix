@@ -28,6 +28,9 @@ static std::uniform_real_distribution<double> speed_distribution(-max_speed, max
 static std::uniform_real_distribution<float> colour_distribution(0.0f, 1.0f);
 
 struct GameApp final : public gearoenix::core::Application {
+    template <typename... Ts>
+    using And = gearoenix::core::ecs::And<Ts...>;
+
     struct Position;
     struct Speed final : public gearoenix::core::ecs::Component {
         gearoenix::math::Vec3<double> value;
@@ -144,11 +147,12 @@ struct GameApp final : public gearoenix::core::Application {
     {
         Application::update();
         camera_controller->update();
-        render_engine.get_world()->parallel_system<Speed, Position, gearoenix::physics::Transformation>([&](auto, Speed& speed, Position& position, gearoenix::physics::Transformation& trn, const auto /*kernel_index*/) noexcept {
-            position.update(render_engine.get_delta_time(), speed);
-            speed.update(position);
-            trn.set_location(position.value);
-        });
+        render_engine.get_world()->parallel_system<And<Speed, Position, gearoenix::physics::Transformation>>(
+            [&](auto, Speed* const speed, Position* const position, gearoenix::physics::Transformation* const trn, const auto /*kernel_index*/) noexcept {
+                position->update(render_engine.get_delta_time(), *speed);
+                speed->update(*position);
+                trn->set_location(position->value);
+            });
     }
 };
 

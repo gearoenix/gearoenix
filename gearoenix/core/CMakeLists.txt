@@ -7,9 +7,9 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-condition.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-not.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-types.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.hpp

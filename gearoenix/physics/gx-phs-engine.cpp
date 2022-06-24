@@ -17,15 +17,12 @@ gearoenix::physics::Engine::~Engine() noexcept = default;
 void gearoenix::physics::Engine::start_frame() noexcept
 {
     auto* const world = render_engine.get_world();
-    world->parallel_system<Transformation, collider::Aabb3>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform, collider::Aabb3& cld, const auto /*kernel_index*/) {
-            if (transform.get_changed())
-                cld.update(transform.get_matrix());
-        });
-    // No need for updating collider::Frustum, it will be updated in the render::camera::Manager
-    world->parallel_system<Transformation>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform, const auto /*kernel_index*/) {
-            transform.update();
+    world->parallel_system<core::ecs::Or<core::ecs::And<Transformation, collider::Aabb3>, Transformation>>(
+        [&](const core::ecs::Entity::id_t, Transformation* const transform, collider::Aabb3* const cld, const auto /*kernel_index*/) {
+            if (nullptr != cld && transform->get_changed())
+                cld->update(transform->get_matrix());
+            transform->update();
+            // No need for updating collider::Frustum, it will be updated in the render::camera::Manager
         });
     animation_manager->update();
 }
@@ -34,7 +31,7 @@ void gearoenix::physics::Engine::end_frame() noexcept
 {
     auto* const world = render_engine.get_world();
     world->parallel_system<Transformation>(
-        [&](const core::ecs::Entity::id_t, Transformation& transform, const auto /*kernel_index*/) {
-            transform.clear();
+        [&](const core::ecs::Entity::id_t, Transformation* const transform, const auto /*kernel_index*/) {
+            transform->clear();
         });
 }
