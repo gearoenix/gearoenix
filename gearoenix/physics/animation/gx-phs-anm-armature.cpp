@@ -5,6 +5,6 @@ gearoenix::physics::animation::Armature::Armature() noexcept
 {
 }
 
-gearoenix::physics::animation::Armature::Armature(Armature&&) noexcept = default;
+gearoenix::physics::animation::Armature::Armature(Armature&& o) noexcept = default;
 
 gearoenix::physics::animation::Armature::~Armature() noexcept = default;

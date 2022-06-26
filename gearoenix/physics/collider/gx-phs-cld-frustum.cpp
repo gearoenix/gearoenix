@@ -9,6 +9,8 @@ gearoenix::physics::collider::Frustum::Frustum(const std::array<math::Vec3<doubl
     surrounding_box.update();
 }
 
+gearoenix::physics::collider::Frustum::Frustum(Frustum&&) noexcept = default;
+
 void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<double>, 8>& points) noexcept
 {
     frustum = math::Frustum<double>(points);

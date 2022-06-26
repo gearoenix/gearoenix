@@ -33,15 +33,44 @@ private:
     sint shadow_caster_directional_light_shadow_map = GX_GL_UNIFORM_FAILED;
     boost::container::static_vector<sint, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_light_shadow_map_indices;
 
+    sint bones_m_inv_m = GX_GL_UNIFORM_FAILED;
+    sizei bones_matrices_count;
+
 public:
-    ForwardPbr(Engine& e, std::size_t shadow_casters_directional_lights_count) noexcept;
+    ForwardPbr(
+        Engine& e,
+        std::size_t shadow_casters_directional_lights_count,
+        std::size_t bones_count) noexcept;
+    ForwardPbr(ForwardPbr&&) noexcept;
     ~ForwardPbr() noexcept final;
     void bind() const noexcept final;
     void set_shadow_caster_directional_light_normalised_vp_data(const void* data) noexcept;
     void set_shadow_caster_directional_light_direction_data(const void* data) noexcept;
     void set_shadow_caster_directional_light_colour_data(const void* data) noexcept;
     [[nodiscard]] const sint* get_shadow_caster_directional_light_shadow_map_indices() const noexcept;
+
+    void set_bones_m_inv_m_data(const void* data) noexcept;
 };
+
+struct ForwardPbrShadowCastersDirectionalLightCountCombination final {
+private:
+    boost::container::static_vector<ForwardPbr, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> shaders;
+
+public:
+    ForwardPbrShadowCastersDirectionalLightCountCombination(Engine& e, std::size_t bones_count) noexcept;
+    [[nodiscard]] ForwardPbr* get_shader_for_shadow_caster_directional_lights_count(std::size_t c) noexcept;
+};
+
+struct ForwardPbrBonesCountCombination final {
+private:
+    boost::container::static_vector<ForwardPbrShadowCastersDirectionalLightCountCombination, GX_RENDER_MAX_BONES_COUNT + 1> shadow_caster_directional_lights_count_combination;
+
+public:
+    explicit ForwardPbrBonesCountCombination(Engine& e) noexcept;
+    [[nodiscard]] ForwardPbrShadowCastersDirectionalLightCountCombination& get_shader_for_bones_count_combination(std::size_t c) noexcept;
+};
+
+typedef ForwardPbrBonesCountCombination ForwardPbrCombination;
 }
 
 #endif

@@ -11,7 +11,7 @@ struct Aabb3 final : public core::ecs::Component {
 
 public:
     Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower) noexcept;
-    Aabb3(const math::Aabb3<double>& original_box) noexcept;
+    explicit Aabb3(const math::Aabb3<double>& original_box) noexcept;
     Aabb3(Aabb3&&) noexcept;
     ~Aabb3() noexcept final;
     void update(const math::Mat4x4<double>& transform) noexcept;

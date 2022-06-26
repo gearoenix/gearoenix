@@ -81,7 +81,7 @@ struct Engine;
 
 namespace gearoenix::gl::shader {
 struct Shader {
-    GX_GET_CVAL_PRT(uint, shader_program)
+    GX_GET_VAL_PRT(uint, shader_program, static_cast<uint>(-1))
 
 protected:
     Engine& e;
@@ -96,7 +96,9 @@ protected:
     void set_fragment_shader(const std::string& shd) noexcept;
 
 public:
-    Shader(Engine& e) noexcept;
+    explicit Shader(Engine& e) noexcept;
+    Shader(const Shader&) = delete;
+    Shader(Shader&&) noexcept;
     virtual ~Shader() noexcept;
     /// returns GX_SHADER_UNIFORM_FAILED when uniform not found.
     [[nodiscard]] sint get_uniform_location(const std::string& name) const noexcept;

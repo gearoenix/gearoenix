@@ -98,11 +98,25 @@ gearoenix::gl::shader::Shader::Shader(Engine& e) noexcept
     }
 }
 
+gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
+    : shader_program(o.shader_program)
+    , e(o.e)
+    , vertex_object(o.vertex_object)
+    , fragment_object(o.fragment_object)
+{
+    o.shader_program = static_cast<uint>(-1);
+    o.vertex_object = static_cast<uint>(-1);
+    o.fragment_object = static_cast<uint>(-1);
+}
+
 gearoenix::gl::shader::Shader::~Shader() noexcept
 {
-    glDeleteShader(vertex_object);
-    glDeleteShader(fragment_object);
-    glDeleteProgram(shader_program);
+    if (static_cast<uint>(-1) != vertex_object)
+        glDeleteShader(vertex_object);
+    if (static_cast<uint>(-1) != fragment_object)
+        glDeleteShader(fragment_object);
+    if (static_cast<uint>(-1) != shader_program)
+        glDeleteProgram(shader_program);
 }
 
 gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const noexcept
@@ -114,4 +128,5 @@ void gearoenix::gl::shader::Shader::bind() const noexcept
 {
     glUseProgram(shader_program);
 }
+
 #endif

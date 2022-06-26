@@ -18,29 +18,23 @@ void gearoenix::physics::animation::Manager::create_armature(
     const std::vector<std::uint8_t>& armature_bones) noexcept
 {
     GX_GUARD_LOCK(bones);
-    const auto root_bone_ptr = static_cast<Bone::Index>(bones.size());
-    const auto src_last_ptr = static_cast<Bone::Index>(armature_bones.size());
-    bones.resize(bones.size() + armature_bones.size());
-    for (Bone::Index src_ptr = 0, dst_ptr = root_bone_ptr; src_ptr < src_last_ptr;) {
-        bone_indices.push_back(dst_ptr);
-        auto* const bone_dst_ptr = &bones[dst_ptr];
-        std::memcpy(bone_dst_ptr, &armature_bones[src_ptr], sizeof(Bone));
-        auto& bone = *reinterpret_cast<Bone*>(bone_dst_ptr);
-        src_ptr += sizeof(Bone);
-        dst_ptr += sizeof(Bone);
-        const Bone::Index children_count = bone.children_count;
-        if (children_count > 0) {
-            const Bone::Index children_indices_count = children_count * sizeof(Bone::Index);
-            std::memcpy(&bones[dst_ptr], &armature_bones[src_ptr], static_cast<std::size_t>(children_indices_count));
-            src_ptr += children_indices_count;
-            dst_ptr += children_indices_count;
-        }
-    }
+
+    const auto root_bone_index = static_cast<Bone::Index>(bones.size());
 
     Armature arm;
-    arm.root_bone_index = root_bone_ptr;
+    arm.root_bone_index = root_bone_index;
     arm.name = name;
     builder.add_component(std::move(arm));
+
+    bones.resize(bones.size() + armature_bones.size());
+    std::memcpy(&bones[root_bone_index], armature_bones.data(), armature_bones.size());
+
+    const auto last_bone_index = static_cast<Bone::Index>(bones.size());
+
+    for (Bone::Index bone_index = root_bone_index; bone_index < last_bone_index; bone_index += sizeof(Bone)) {
+        bone_indices.push_back(bone_index);
+        bone_index += reinterpret_cast<const Bone*>(&bones[bone_index])->children_count * sizeof(Bone::Index);
+    }
 }
 
 void gearoenix::physics::animation::Manager::update() noexcept

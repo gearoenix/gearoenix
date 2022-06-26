@@ -2,10 +2,7 @@
 #include "../physics/animation/gx-phs-anm-bone.hpp"
 #include "../physics/animation/gx-phs-anm-manager.hpp"
 #include "../physics/gx-phs-engine.hpp"
-#include "../physics/gx-phs-transformation.hpp"
-#include "../platform/gx-plt-log.hpp"
 #include "../platform/stream/gx-plt-stm-path.hpp"
-#include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "camera/gx-rnd-cmr-builder.hpp"
 #include "camera/gx-rnd-cmr-camera.hpp"
 #include "camera/gx-rnd-cmr-manager.hpp"
@@ -22,7 +19,6 @@
 #include "texture/gx-rnd-txt-manager.hpp"
 #include "texture/gx-rnd-txt-texture-2d.hpp"
 #include <functional>
-#include <tuple>
 
 #define TINYGLTF_NOEXCEPTION
 #define TINYGLTF_IMPLEMENTATION
@@ -308,37 +304,37 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
                 switch (bin_a.componentType) {
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint32_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint32_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
                 case TINYGLTF_COMPONENT_TYPE_INT:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int32_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int32_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint16_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint16_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
                 case TINYGLTF_COMPONENT_TYPE_SHORT:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int16_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int16_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint8_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::uint8_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
                 case TINYGLTF_COMPONENT_TYPE_BYTE:
                     for (auto& vertex : animated_vertices) {
-                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int8_t>*>(&bin_b[bi])) + 0.1f;
+                        vertex.bone_indices = math::Vec4<float>(*reinterpret_cast<const math::Vec4<std::int8_t>*>(&bin_b[bi])) + 0.001f;
                         bi += bin_bi_inc;
                     }
                     break;
@@ -432,7 +428,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
         gx_mat.set_normal(create_texture2d(mat.normalTexture.index, mesh_end_callback, gx_mat.get_normal()));
         gx_mat.get_normal_metallic_factor().x = static_cast<float>(mat.normalTexture.scale);
         gx_mat.get_normal_metallic_factor().y = static_cast<float>(mat.normalTexture.scale);
-        gx_mat.get_normal_metallic_factor().z = 1.0f; // stange but tinygltf docs says that
+        gx_mat.get_normal_metallic_factor().z = 1.0f; // strange but tinygltf docs says that
         gx_mat.set_occlusion(create_texture2d(mat.occlusionTexture.index, mesh_end_callback, gx_mat.get_occlusion()));
         gx_mat.get_alpha_cutoff_occlusion_strength().y = static_cast<float>(mat.occlusionTexture.strength);
         gx_mat.set_albedo(create_texture2d(mat.pbrMetallicRoughness.baseColorTexture.index, mesh_end_callback, gx_mat.get_albedo()));
@@ -450,11 +446,11 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
     const auto apply_transform = [&](const int node_index, physics::Transformation& transform) noexcept {
         const auto& node = data.nodes[node_index];
         const std::vector<double>& rotation = node.rotation;
-        GX_ASSERT_D(rotation.size() == 0 || rotation.size() == 4);
+        GX_ASSERT_D(rotation.empty() || rotation.size() == 4);
         const std::vector<double>& scale = node.scale;
-        GX_ASSERT_D(scale.size() == 0 || scale.size() == 3);
+        GX_ASSERT_D(scale.empty() || scale.size() == 3);
         const std::vector<double>& translation = node.translation;
-        GX_ASSERT_D(translation.size() == 0 || translation.size() == 3);
+        GX_ASSERT_D(translation.empty() || translation.size() == 3);
         // const std::vector<double>& matrix = scene_node.matrix; // length must be 0 or 16
         // const std::vector<double>& weights = scene_node.weights;
         if (scale.size() == 3)
@@ -496,7 +492,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             auto gx_mesh = create_mesh(node.mesh, gx_mat, node_end_callback);
             auto model_builder = e.get_model_manager()->build(
                 std::string(node.name),
-                std::shared_ptr<gearoenix::render::mesh::Mesh>(gx_mesh),
+                std::move(gx_mesh),
                 gearoenix::core::sync::EndCallerIgnored(node_end_callback),
                 true);
             model_builder->set_material(gx_mat);

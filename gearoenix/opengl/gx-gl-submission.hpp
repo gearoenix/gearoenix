@@ -8,6 +8,7 @@
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
+#include "shader/gx-gl-shd-forward-pbr.hpp"
 #include <array>
 #include <limits>
 #include <memory>
@@ -23,7 +24,6 @@ struct BGCAA;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
 struct Final;
-struct ForwardPbr;
 struct GBuffersFiller;
 struct Irradiance;
 struct Radiance;
@@ -59,8 +59,6 @@ struct SubmissionManager final {
         std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_colour;
         std::array<uint, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_shadow_map_texture;
         uint vertex_object = 0;
-        uint vertex_buffer = 0;
-        uint index_buffer = 0;
         sizei indices_count = 0;
         uint albedo_txt = 0;
         uint normal_txt = 0;
@@ -71,6 +69,8 @@ struct SubmissionManager final {
         uint irradiance = static_cast<uint>(-1);
         uint radiance = static_cast<uint>(-1);
         double reflection_probe_size = std::numeric_limits<double>::max();
+        std::size_t bones_count = 0;
+        std::size_t first_bone_index = 0;
     };
 
     struct ModelBvhData final {
@@ -91,9 +91,9 @@ struct SubmissionManager final {
         core::ecs::Entity::id_t out_reference = 0;
         float skybox_scale = 1.0;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
-        std::vector<std::pair<double, ModelData>> tranclucent_models_data;
+        std::vector<std::pair<double, ModelData>> translucent_models_data;
         std::vector<std::vector<std::pair<double, ModelData>>> threads_opaque_models_data;
-        std::vector<std::vector<std::pair<double, ModelData>>> threads_tranclucent_models_data;
+        std::vector<std::vector<std::pair<double, ModelData>>> threads_translucent_models_data;
 
         CameraData() noexcept;
     };
@@ -116,6 +116,11 @@ struct SubmissionManager final {
         DirectionalShadowData shadow_data;
     };
 
+    struct BoneData final {
+        math::Mat4x4<float> m;
+        math::Mat4x4<float> inv_m;
+    };
+
     struct SceneData final {
         math::Vec4<float> ssao_settings;
         boost::container::flat_map<std::tuple<double /*layer*/, core::ecs::Entity::id_t /*skybox-entity-id*/, bool /*equirectangular*/>, SkyboxData> skyboxes;
@@ -126,10 +131,8 @@ struct SubmissionManager final {
         boost::container::flat_map<core::ecs::Entity::id_t /*light-id*/, DirectionalShadowCasterData> shadow_caster_directional_lights;
         std::pair<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> default_reflection;
         std::vector<DynamicModelData> dynamic_models;
+        std::vector<BoneData> bones_data;
     };
-
-    typedef std::array<std::unique_ptr<shader::ForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> DirectionalLightShaderForwardPbr;
-    typedef DirectionalLightShaderForwardPbr ShaderForwardPbrCombination;
 
 private:
     Engine& e;
@@ -144,7 +147,7 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
-    ShaderForwardPbrCombination forward_pbr_shader_combination;
+    shader::ForwardPbrCombination forward_pbr_shader_combination;
 
     std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
     std::shared_ptr<Texture2D> gbuffers_position_depth_texture;
@@ -161,16 +164,16 @@ private:
     std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
 
-    // BGCAAS: Bloom Gamma-correction Colour-tuning Anti-Alaising Source
+    // BGCAAS: Bloom Gamma-correction Colour-tuning Anti-Aliasing Source
     std::shared_ptr<Texture2D> high_bgcaas_texture;
     std::shared_ptr<Texture2D> low_bgcaas_texture;
     std::shared_ptr<Texture2D> depth_bgcaas_texture;
     std::shared_ptr<Target> bgcaas_target;
 
-    math::Vec2<uint> backbuffer_size { static_cast<uint>(-1) };
-    float backbuffer_aspect_ratio = 999.0f;
-    math::Vec2<float> backbuffer_uv_move { 0.001f };
-    math::Vec4<sizei> backbuffer_viewport_clip { static_cast<sizei>(-1) };
+    math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
+    float back_buffer_aspect_ratio = 999.0f;
+    math::Vec2<float> back_buffer_uv_move { 0.001f };
+    math::Vec4<sizei> back_buffer_viewport_clip { static_cast<sizei>(-1) };
 
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
@@ -181,7 +184,7 @@ private:
     math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
 
-    void initialise_backbuffer_sizes() noexcept;
+    void initialise_back_buffer_sizes() noexcept;
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
@@ -211,7 +214,7 @@ private:
     void set_framebuffer(uint framebuffer_object) noexcept;
 
 public:
-    SubmissionManager(Engine& e) noexcept;
+    explicit SubmissionManager(Engine& e) noexcept;
     ~SubmissionManager() noexcept;
     void update() noexcept;
 };

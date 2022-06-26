@@ -92,13 +92,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_TANGENT);
         glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_UV);
         glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_WEIGHTS);
-        glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDEDICES);
+        glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES);
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(0 * sizeof(float)));
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(3 * sizeof(float)));
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_TANGENT, 4, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(6 * sizeof(float)));
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_UV, 2, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(10 * sizeof(float)));
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_WEIGHTS, 4, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(12 * sizeof(float)));
-        glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDEDICES, 4, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(16 * sizeof(float)));
+        glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES, 4, GL_FLOAT, GL_FALSE, sizeof(std::remove_reference_t<decltype(vertices)>::value_type), reinterpret_cast<void*>(16 * sizeof(float)));
         glGenBuffers(1, &(m->index_buffer));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);

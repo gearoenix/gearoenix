@@ -2,11 +2,12 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/macro/gx-cr-mcr-profiler.hpp"
+#include "../physics/animation/gx-phs-anm-armature.hpp"
+#include "../physics/animation/gx-phs-anm-manager.hpp"
 #include "../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../physics/gx-phs-transformation.hpp"
+#include "../physics/gx-phs-engine.hpp"
 #include "../platform/gx-plt-application.hpp"
-#include "../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../render/light/gx-rnd-lt-directional.hpp"
 #include "../render/light/gx-rnd-lt-light.hpp"
@@ -31,7 +32,6 @@
 #include "shader/gx-gl-shd-deferred-pbr-transparent.hpp"
 #include "shader/gx-gl-shd-deferred-pbr.hpp"
 #include "shader/gx-gl-shd-final.hpp"
-#include "shader/gx-gl-shd-forward-pbr.hpp"
 #include "shader/gx-gl-shd-gbuffers-filler.hpp"
 #include "shader/gx-gl-shd-irradiance.hpp"
 #include "shader/gx-gl-shd-radiance.hpp"
@@ -57,19 +57,19 @@
 
 gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
     : threads_opaque_models_data(std::thread::hardware_concurrency())
-    , threads_tranclucent_models_data(std::thread::hardware_concurrency())
+    , threads_translucent_models_data(std::thread::hardware_concurrency())
 {
 }
 
-void gearoenix::gl::SubmissionManager::initialise_backbuffer_sizes() noexcept
+void gearoenix::gl::SubmissionManager::initialise_back_buffer_sizes() noexcept
 {
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
-    backbuffer_size.x = cfg.get_runtime_resolution_width();
-    backbuffer_size.y = cfg.get_runtime_resolution_height();
-    backbuffer_aspect_ratio = static_cast<float>(backbuffer_size.x) / static_cast<float>(backbuffer_size.y);
-    backbuffer_uv_move.x = 1.0f / static_cast<float>(backbuffer_size.x);
-    backbuffer_uv_move.y = 1.0f / static_cast<float>(backbuffer_size.y);
-    backbuffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(backbuffer_size.x), static_cast<sizei>(backbuffer_size.y));
+    back_buffer_size.x = cfg.get_runtime_resolution_width();
+    back_buffer_size.y = cfg.get_runtime_resolution_height();
+    back_buffer_aspect_ratio = static_cast<float>(back_buffer_size.x) / static_cast<float>(back_buffer_size.y);
+    back_buffer_uv_move.x = 1.0f / static_cast<float>(back_buffer_size.x);
+    back_buffer_uv_move.y = 1.0f / static_cast<float>(back_buffer_size.y);
+    back_buffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(back_buffer_size.x), static_cast<sizei>(back_buffer_size.y));
 }
 
 void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
@@ -87,8 +87,8 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = backbuffer_size.x,
-        .height = backbuffer_size.y,
+        .width = back_buffer_size.x,
+        .height = back_buffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -154,8 +154,8 @@ void gearoenix::gl::SubmissionManager::initialise_ssao() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = backbuffer_size.x,
-        .height = backbuffer_size.y,
+        .width = back_buffer_size.x,
+        .height = back_buffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -185,8 +185,8 @@ void gearoenix::gl::SubmissionManager::initialise_final() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = backbuffer_size.x,
-        .height = backbuffer_size.y,
+        .width = back_buffer_size.x,
+        .height = back_buffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -231,8 +231,8 @@ void gearoenix::gl::SubmissionManager::initialise_bgcaas() noexcept
             .wrap_r = render::texture::Wrap::ClampToEdge,
             .anisotropic_level = 0,
         },
-        .width = backbuffer_size.x,
-        .height = backbuffer_size.y,
+        .width = back_buffer_size.x,
+        .height = back_buffer_size.y,
         .depth = 0,
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
@@ -274,6 +274,7 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
             scene_pool_ref.shadow_cameras.clear();
             scene_pool_ref.dynamic_models.clear();
             scene_pool_ref.shadow_caster_directional_lights.clear();
+            scene_pool_ref.bones_data.clear();
             e.get_world()->synchronised_system<render::camera::Camera>(
                 [&](const core::ecs::Entity::id_t camera_id, render::camera::Camera* const camera) noexcept {
                     if (!camera->enabled)
@@ -402,8 +403,6 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
                     .emission_roughness_factor = model->material.get_emission_roughness_factor(),
                     .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(model->material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                     .vertex_object = mesh.vertex_object,
-                    .vertex_buffer = mesh.vertex_buffer,
-                    .index_buffer = mesh.index_buffer,
                     .indices_count = mesh.indices_count,
                     .albedo_txt = model->albedo->get_object(),
                     .normal_txt = model->normal->get_object(),
@@ -423,16 +422,33 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
 
 void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::ecs::Entity::id_t scene_id, SceneData& scene_data) noexcept
 {
-    e.get_world()->synchronised_system<core::ecs::And<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>>(
+    auto& anm_mgr = *e.get_physics_engine()->get_animation_manager();
+    e.get_world()->synchronised_system<core::ecs::Or<core::ecs::And<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>, physics::animation::Armature>>(
         [&](
             const core::ecs::Entity::id_t,
             physics::collider::Aabb3* const collider,
             render::model::Model* const render_model,
             Model* const gl_model,
-            physics::Transformation* const model_transform) noexcept {
+            physics::Transformation* const model_transform,
+            physics::animation::Armature* const armature) noexcept {
             if (!render_model->enabled || !render_model->is_transformable || render_model->scene_id != scene_id)
                 return;
             const auto& mesh = *gl_model->bound_mesh;
+            std::size_t first_bone_index;
+            std::size_t bones_count = 0;
+            if (nullptr != armature) {
+                first_bone_index = scene_data.bones_data.size();
+                anm_mgr.loop_over_bones([&](const physics::animation::Bone& bone) noexcept {
+                    ++bones_count;
+                    scene_data.bones_data.push_back(BoneData {
+                        .m = math::Mat4x4<float>(bone.transform.get_matrix()),
+                        .inv_m = math::Mat4x4<float>(bone.transform.get_inverted_matrix()),
+                    });
+                },
+                    *armature);
+            } else {
+                first_bone_index = 0;
+            }
             scene_data.dynamic_models.push_back(
                 DynamicModelData {
                     .base = ModelBvhData {
@@ -445,8 +461,6 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                             .emission_roughness_factor = gl_model->material.get_emission_roughness_factor(),
                             .alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved = math::Vec4(gl_model->material.get_alpha_cutoff_occlusion_strength(), scene_data.default_reflection.second.radiance_mips_count, 0.0f),
                             .vertex_object = mesh.vertex_object,
-                            .vertex_buffer = mesh.vertex_buffer,
-                            .index_buffer = mesh.index_buffer,
                             .indices_count = mesh.indices_count,
                             .albedo_txt = gl_model->albedo->get_object(),
                             .normal_txt = gl_model->normal->get_object(),
@@ -457,6 +471,8 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                             .irradiance = scene_data.default_reflection.second.irradiance,
                             .radiance = scene_data.default_reflection.second.radiance,
                             .reflection_probe_size = scene_data.default_reflection.second.size,
+                            .bones_count = bones_count,
+                            .first_bone_index = first_bone_index,
                         },
                     },
                     .box = collider->get_updated_box(),
@@ -578,12 +594,12 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             camera_data.pos = math::Vec3<float>(camera_location);
             camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
             camera_data.opaque_models_data.clear();
-            camera_data.tranclucent_models_data.clear();
+            camera_data.translucent_models_data.clear();
             camera_data.out_reference = render_camera->get_reference_id();
 
             for (auto& v : camera_data.threads_opaque_models_data)
                 v.clear();
-            for (auto& v : camera_data.threads_tranclucent_models_data)
+            for (auto& v : camera_data.threads_translucent_models_data)
                 v.clear();
 
             // Recoding static models
@@ -621,8 +637,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             for (auto& v : camera_data.threads_opaque_models_data)
                 std::move(v.begin(), v.end(), std::back_inserter(camera_data.opaque_models_data));
 
-            for (auto& v : camera_data.threads_tranclucent_models_data)
-                std::move(v.begin(), v.end(), std::back_inserter(camera_data.tranclucent_models_data));
+            for (auto& v : camera_data.threads_translucent_models_data)
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.translucent_models_data));
 
             std::sort(
                 GX_ALGORITHM_EXECUTION
@@ -631,8 +647,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
             std::sort(
                 GX_ALGORITHM_EXECUTION
-                    camera_data.tranclucent_models_data.begin(),
-                camera_data.tranclucent_models_data.end(),
+                    camera_data.translucent_models_data.begin(),
+                camera_data.translucent_models_data.end(),
                 [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
         });
 }
@@ -730,13 +746,15 @@ void gearoenix::gl::SubmissionManager::render_reflection_probes() noexcept
                 radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
                 const float roughness_p_4 = roughness * roughness * roughness * roughness;
                 radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
-                const float resolution = static_cast<float>(rrr->get_environment()->get_info().width);
+                const auto resolution = static_cast<float>(rrr->get_environment()->get_info().width);
                 const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
                 radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
                 glBindVertexArray(screen_vertex_object);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
                 return;
             }
+            default:
+                return;
             }
         });
 }
@@ -786,6 +804,7 @@ void gearoenix::gl::SubmissionManager::render_skyboxes(const SceneData& scene, c
 
 void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept
 {
+    GX_REACHED;
     GX_GL_CHECK_D;
     set_framebuffer(camera.framebuffer);
     set_viewport_clip(camera.viewport_clip);
@@ -808,7 +827,9 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
     for (auto& distance_model_data : camera.opaque_models_data) {
         auto& model_data = distance_model_data.second;
 
-        shader::ForwardPbr* const current_shader = forward_pbr_shader_combination[model_data.shadow_caster_directional_lights_count].get();
+        shader::ForwardPbr* const current_shader = forward_pbr_shader_combination
+                                                       .get_shader_for_bones_count_combination(model_data.bones_count)
+                                                       .get_shader_for_shadow_caster_directional_lights_count(model_data.shadow_caster_directional_lights_count);
         if (current_shader != shader) {
             shader = current_shader;
             shader->bind();
@@ -831,6 +852,7 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
         shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
         shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
         shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
+        shader->set_bones_m_inv_m_data(reinterpret_cast<const float*>(&scene.bones_data[model_data.first_bone_index]));
 
         glActiveTexture(GL_TEXTURE0 + ti_albedo);
         glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
@@ -870,7 +892,7 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
 {
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
-    const float screen_uv_move_reserved[] { backbuffer_uv_move.x, backbuffer_uv_move.y, 0.0f, 0.0f };
+    const float screen_uv_move_reserved[] { back_buffer_uv_move.x, back_buffer_uv_move.y, 0.0f, 0.0f };
     const auto* const gbuffers_attachments = gbuffers_target->get_gl_attachments().data();
     const auto* const ssao_resolved_attachments = ssao_resolve_target->get_gl_attachments().data();
     const auto* const final_attachments = final_target->get_gl_attachments().data();
@@ -928,7 +950,7 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
 
         // SSAO resolving -------------------------------------------------------------------------------------
         set_framebuffer(ssao_resolve_target->get_framebuffer());
-        set_viewport_clip(backbuffer_viewport_clip);
+        set_viewport_clip(back_buffer_viewport_clip);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         ssao_resolve_shader->bind();
@@ -992,12 +1014,12 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
         set_framebuffer(0);
 
         const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
-        if (screen_ratio < backbuffer_aspect_ratio) {
-            const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / backbuffer_aspect_ratio + 0.1f);
+        if (screen_ratio < back_buffer_aspect_ratio) {
+            const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / back_buffer_aspect_ratio + 0.1f);
             const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
             set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
         } else {
-            const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * backbuffer_aspect_ratio + 0.1f);
+            const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * back_buffer_aspect_ratio + 0.1f);
             const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
             set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
         }
@@ -1035,12 +1057,12 @@ void gearoenix::gl::SubmissionManager::render_bgcaa(const SceneData& scene) noex
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
     const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
-    if (screen_ratio < backbuffer_aspect_ratio) {
-        const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / backbuffer_aspect_ratio + 0.1f);
+    if (screen_ratio < back_buffer_aspect_ratio) {
+        const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / back_buffer_aspect_ratio + 0.1f);
         const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
         set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
     } else {
-        const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * backbuffer_aspect_ratio + 0.1f);
+        const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * back_buffer_aspect_ratio + 0.1f);
         const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
         set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
     }
@@ -1049,7 +1071,7 @@ void gearoenix::gl::SubmissionManager::render_bgcaa(const SceneData& scene) noex
 
     bgcaa_shader->bind();
 
-    bgcaa_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&backbuffer_uv_move));
+    bgcaa_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
 
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_low_texture_index()));
     glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].texture_object);
@@ -1080,10 +1102,10 @@ void gearoenix::gl::SubmissionManager::set_viewport_clip(const math::Vec4<sizei>
         return;
     current_viewport_clip = viewport_clip;
     glViewport(
-        current_viewport_clip.x, current_viewport_clip.y,
+        static_cast<sint>(current_viewport_clip.x), static_cast<sint>(current_viewport_clip.y),
         current_viewport_clip.z, current_viewport_clip.w);
     glScissor(
-        current_viewport_clip.x, current_viewport_clip.y,
+        static_cast<sint>(current_viewport_clip.x), static_cast<sint>(current_viewport_clip.y),
         current_viewport_clip.z, current_viewport_clip.w);
 }
 
@@ -1110,15 +1132,12 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , skybox_cube_shader(new shader::SkyboxCube(e))
     , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
+    , forward_pbr_shader_combination(e)
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {
-    for (std::size_t directional_shadow_caster_index = 0; directional_shadow_caster_index < forward_pbr_shader_combination.size(); ++directional_shadow_caster_index) {
-        forward_pbr_shader_combination[directional_shadow_caster_index] = std::make_unique<shader::ForwardPbr>(e, directional_shadow_caster_index);
-    }
-
     GX_LOG_D("Creating submission manager.");
-    initialise_backbuffer_sizes();
+    initialise_back_buffer_sizes();
     initialise_gbuffers();
     initialise_ssao();
     initialise_final();

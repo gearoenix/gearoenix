@@ -245,6 +245,9 @@
     GX_EXPAND(GX_LOOP_WI##n) \
     (a)
 #define GX_LOOP_WI_(n, a) GX_LOOP_WI__(n, a)
-#define GX_LOOP_WI(n, a) GX_LOOP_WI_(GX_EXPAND(n), a)
+#define GX_LOOP_WI_L1(n, a) GX_LOOP_WI_(GX_EXPAND(n), a)
+#define GX_LOOP_WI_L2(n, a) GX_LOOP_WI_L1(n, a)
+#define GX_LOOP_WI_L3(n, a) GX_LOOP_WI_L2(n, a)
+#define GX_LOOP_WI_L4(n, a) GX_LOOP_WI_L3(n, a)
 
 #endif
