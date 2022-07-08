@@ -10,25 +10,29 @@ struct Engine;
 
 namespace gearoenix::physics::animation {
 struct Manager;
-struct Bone final {
-    typedef std::uint32_t Index;
 
+struct BoneInfo final {
     Transformation transform;
     std::string name;
-    Index parent_index = static_cast<Index>(-1);
-    Index children_count = static_cast<Index>(-1);
+    std::string parent_name;
+    std::vector<BoneInfo> children;
+};
 
-    Bone() noexcept = default;
-    [[nodiscard]] static Index construct(std::vector<std::uint8_t>& memory, const std::string& name, Index children_count) noexcept;
-    Bone(const Bone&) = delete;
-    Bone(Bone&&) noexcept = default;
-    static void set_children(std::vector<std::uint8_t>& memory, Index this_index, const std::vector<Index>& children) noexcept;
-    [[nodiscard]] static Transformation& get_transformation(std::vector<std::uint8_t>& memory, Index this_index) noexcept;
-    void delete_children(Manager& manager) noexcept;
-    ~Bone() noexcept;
-    void operator=(const Bone& o) = delete;
-    void operator=(Bone&& o) = delete;
-    void update() noexcept;
+struct Bone final {
+    Transformation transform;
+    std::string name;
+    std::size_t parent_index = static_cast<std::size_t>(-1);
+    std::size_t children_count = 0;
+    std::size_t first_child_index = static_cast<std::size_t>(-1);
+    std::size_t end_child_index = static_cast<std::size_t>(-1);
+
+    Bone(
+        Transformation&& transform,
+        std::string&& name,
+        std::size_t parent_index,
+        std::size_t children_count,
+        std::size_t first_child_index,
+        std::size_t last_child_index) noexcept;
 };
 }
 #endif

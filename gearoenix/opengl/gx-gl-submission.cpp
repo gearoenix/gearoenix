@@ -396,8 +396,8 @@ void gearoenix::gl::SubmissionManager::update_scene_bvh(const core::ecs::Entity:
             ModelBvhData md {
                 .blocked_cameras_flags = render_model->block_cameras_flags,
                 .model = ModelData {
-                    .m = math::Mat4x4<float>(model_transform->get_matrix()),
-                    .inv_m = math::Mat4x4<float>(model_transform->get_inverted_matrix().transposed()),
+                    .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
+                    .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
                     .albedo_factor = model->material.get_albedo_factor(),
                     .normal_metallic_factor = model->material.get_normal_metallic_factor(),
                     .emission_roughness_factor = model->material.get_emission_roughness_factor(),
@@ -438,13 +438,14 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
             std::size_t bones_count = 0;
             if (nullptr != armature) {
                 first_bone_index = scene_data.bones_data.size();
-                anm_mgr.loop_over_bones([&](const physics::animation::Bone& bone) noexcept {
-                    ++bones_count;
-                    scene_data.bones_data.push_back(BoneData {
-                        .m = math::Mat4x4<float>(bone.transform.get_matrix()),
-                        .inv_m = math::Mat4x4<float>(bone.transform.get_inverted_matrix()),
-                    });
-                },
+                anm_mgr.loop_over_bones(
+                    [&](const physics::animation::Bone& bone) noexcept {
+                        ++bones_count;
+                        scene_data.bones_data.push_back(BoneData {
+                            .m = math::Mat4x4<float>(bone.transform.get_global_matrix()),
+                            .inv_m = math::Mat4x4<float>(bone.transform.get_inverted_global_matrix().transposed()),
+                        });
+                    },
                     *armature);
             } else {
                 first_bone_index = 0;
@@ -454,8 +455,8 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                     .base = ModelBvhData {
                         .blocked_cameras_flags = render_model->block_cameras_flags,
                         .model = ModelData {
-                            .m = math::Mat4x4<float>(model_transform->get_matrix()),
-                            .inv_m = math::Mat4x4<float>(model_transform->get_inverted_matrix().transposed()),
+                            .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
+                            .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
                             .albedo_factor = gl_model->material.get_albedo_factor(),
                             .normal_metallic_factor = gl_model->material.get_normal_metallic_factor(),
                             .emission_roughness_factor = gl_model->material.get_emission_roughness_factor(),
@@ -558,7 +559,7 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             const unsigned int /*kernel_index*/) noexcept {
             if (!render_camera->enabled || scene_id != render_camera->get_scene_id())
                 return;
-            const auto camera_location = transform->get_location();
+            const auto camera_location = transform->get_global_location();
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);

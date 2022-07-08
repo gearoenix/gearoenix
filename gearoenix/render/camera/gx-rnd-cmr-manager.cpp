@@ -20,10 +20,10 @@ void gearoenix::render::camera::Manager::update() noexcept
             physics::Transformation* const transform,
             physics::collider::Frustum* const collider,
             const unsigned int /*kernel_index*/) {
-            cam->set_view(math::Mat4x4<float>(transform->get_inverted_matrix()));
+            cam->set_view(math::Mat4x4<float>(transform->get_inverted_global_matrix()));
             std::array<math::Vec3<double>, 8> points;
             cam->generate_frustum_points(
-                transform->get_location(),
+                transform->get_global_location(),
                 transform->get_x_axis(),
                 transform->get_y_axis(),
                 transform->get_z_axis(),

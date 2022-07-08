@@ -122,6 +122,12 @@ public:
         const T r = value % alignment;
         return r != 0 ? value + (alignment - r) : value;
     }
+
+    template <typename T>
+    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = static_cast<T>(0.0001)) noexcept
+    {
+        return a == b || std::abs(a) + std::abs(b) < tolerance || std::abs(a - b) / (std::abs(a) + std::abs(b)) < tolerance;
+    }
 };
 }
 #endif

@@ -1,14 +1,16 @@
 SET(GX_ENGINE_PHYSICS_SRC_DIR ${GX_ENGINE_SRC_DIR}/physics)
 SET(GX_ENGINE_PHYSICS_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh.hpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.cpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.hpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.cpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.hpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.cpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.hpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
-       ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-animation.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-channel.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-channel.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-body.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-body.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-car.cpp
@@ -45,4 +47,5 @@ SET(GX_ENGINE_PHYSICS_SRC
 
 SET(GX_ENGINE_PHYSICS_TEST_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/accelerator/gx-phs-acc-bvh-test.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-transformation-test.hpp
         PARENT_SCOPE)

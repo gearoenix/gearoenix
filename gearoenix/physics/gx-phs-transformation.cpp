@@ -9,218 +9,294 @@ gearoenix::physics::Transformation::Transformation() noexcept
 {
 }
 
-gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_global_location() const noexcept
 {
-    return matrix.get_location();
+    return global_matrix.get_location();
 }
 
-void gearoenix::physics::Transformation::get_location(math::Vec3<double>& l) const noexcept
+void gearoenix::physics::Transformation::get_global_location(math::Vec3<double>& l) const noexcept
 {
-    matrix.get_location(l);
+    global_matrix.get_location(l);
 }
 
-void gearoenix::physics::Transformation::set_location(const math::Vec3<double>& l) noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_local_location() const noexcept
+{
+    return local_matrix.get_location();
+}
+
+void gearoenix::physics::Transformation::get_local_location(math::Vec3<double>& l) const noexcept
+{
+    local_matrix.get_location(l);
+}
+
+void gearoenix::physics::Transformation::set_local_location(const math::Vec3<double>& l) noexcept
 {
     changed = true;
-    matrix.set_location(l);
+    local_matrix.set_location(l);
 }
 
-void gearoenix::physics::Transformation::set_location(const double x, const double y, const double z) noexcept
+void gearoenix::physics::Transformation::local_translate(const math::Vec3<double>& t) noexcept
 {
     changed = true;
-    matrix.set_location(math::Vec3(x, y, z));
-}
-
-void gearoenix::physics::Transformation::translate(const math::Vec3<double>& t) noexcept
-{
-    changed = true;
-    matrix.translate(t);
+    local_matrix.translate(t);
 }
 
 void gearoenix::physics::Transformation::local_x_translate(const double v) noexcept
 {
     changed = true;
-    translate(x_axis * v);
+    local_translate(x_axis * v);
 }
 
 void gearoenix::physics::Transformation::local_y_translate(const double v) noexcept
 {
     changed = true;
-    translate(y_axis * v);
+    local_translate(y_axis * v);
 }
 
 void gearoenix::physics::Transformation::local_z_translate(const double v) noexcept
 {
     changed = true;
-    translate(z_axis * v);
+    local_translate(z_axis * v);
 }
 
-void gearoenix::physics::Transformation::global_rotate(const double d, const math::Vec3<double>& axis, const math::Vec3<double>& l) noexcept
+void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis, const math::Vec3<double>& l) noexcept
 {
     changed = true;
-    const auto loc = get_location();
-    translate(math::Vec3(0.0));
-    const auto r = decltype(matrix)::rotation(axis, d);
+    const auto loc = get_local_location();
+    local_translate(math::Origin3D<double>);
+    const auto r = decltype(local_matrix)::rotation(axis, d);
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    translate((r * math::Vec4(l - loc, 0.0)).xyz() + loc);
+    local_matrix = r * local_matrix;
+    local_translate((r * math::Vec4(l - loc, 0.0)).xyz() + loc);
 }
 
-void gearoenix::physics::Transformation::global_rotate(const double d, const math::Vec3<double>& axis) noexcept
+void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis) noexcept
 {
     changed = true;
-    const auto r = decltype(matrix)::rotation(axis, d);
+    const auto r = decltype(local_matrix)::rotation(axis, d);
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
+    local_matrix = r * local_matrix;
 }
 
 void gearoenix::physics::Transformation::local_rotate(const double d, const math::Vec3<double>& axis) noexcept
 {
     changed = true;
-    const auto loc = matrix.get_location();
-    matrix.set_location(math::Origin3D<double>);
-    const auto r = decltype(matrix)::rotation(axis, d);
+    const auto loc = local_matrix.get_location();
+    local_matrix.set_location(math::Origin3D<double>);
+    const auto r = decltype(local_matrix)::rotation(axis, d);
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    matrix.set_location(loc);
+    local_matrix = r * local_matrix;
+    local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::local_rotate_quaternion(const double x, const double y, const double z, const double w) noexcept
+void gearoenix::physics::Transformation::local_rotate(const math::Quat<double>& q) noexcept
 {
     changed = true;
-    const auto loc = matrix.get_location();
-    matrix.set_location(math::Origin3D<double>);
-    math::Quat q(x, y, z, w);
+    const auto loc = local_matrix.get_location();
+    local_matrix.set_location(math::Origin3D<double>);
     const auto r = q.to_mat();
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    matrix.set_location(loc);
+    local_matrix = r * local_matrix;
+    local_matrix.set_location(loc);
 }
 
 void gearoenix::physics::Transformation::local_x_rotate(const double d) noexcept
 {
     changed = true;
-    const auto loc = matrix.get_location();
-    matrix.set_location(math::Origin3D<double>);
-    const auto r = decltype(matrix)::rotation(x_axis, d);
+    const auto loc = local_matrix.get_location();
+    local_matrix.set_location(math::Origin3D<double>);
+    const auto r = decltype(local_matrix)::rotation(x_axis, d);
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    matrix.set_location(loc);
+    local_matrix = r * local_matrix;
+    local_matrix.set_location(loc);
 }
 
 void gearoenix::physics::Transformation::local_y_rotate(const double d) noexcept
 {
     changed = true;
-    const auto loc = matrix.get_location();
-    matrix.set_location(math::Origin3D<double>);
-    const auto r = decltype(matrix)::rotation(y_axis, d);
+    const auto loc = local_matrix.get_location();
+    local_matrix.set_location(math::Origin3D<double>);
+    const auto r = decltype(local_matrix)::rotation(y_axis, d);
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    matrix.set_location(loc);
+    local_matrix = r * local_matrix;
+    local_matrix.set_location(loc);
 }
 
 void gearoenix::physics::Transformation::local_z_rotate(const double d) noexcept
 {
     changed = true;
-    const auto loc = matrix.get_location();
-    matrix.set_location(math::Origin3D<double>);
-    const auto r = decltype(matrix)::rotation(z_axis, d);
+    const auto loc = local_matrix.get_location();
+    local_matrix.set_location(math::Origin3D<double>);
+    const auto r = decltype(local_matrix)::rotation(z_axis, d);
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    matrix.set_location(loc);
+    local_matrix = r * local_matrix;
+    local_matrix.set_location(loc);
 }
 
 void gearoenix::physics::Transformation::local_scale(const double s) noexcept
 {
     changed = true;
-    matrix.local_scale(s);
+    local_matrix.local_scale(s);
     scale *= s;
 }
 
 void gearoenix::physics::Transformation::local_scale(const math::Vec3<double>& s) noexcept
 {
     changed = true;
-    matrix.local_scale(s);
+    local_matrix.local_scale(s);
     scale *= s;
 }
 
 void gearoenix::physics::Transformation::local_x_scale(const double s) noexcept
 {
     changed = true;
-    matrix.local_x_scale(s);
+    local_matrix.local_x_scale(s);
     scale.x *= s;
 }
 
 void gearoenix::physics::Transformation::local_y_scale(const double s) noexcept
 {
     changed = true;
-    matrix.local_y_scale(s);
+    local_matrix.local_y_scale(s);
     scale.y *= s;
 }
 
 void gearoenix::physics::Transformation::local_z_scale(const double s) noexcept
 {
     changed = true;
-    matrix.local_z_scale(s);
+    local_matrix.local_z_scale(s);
     scale.z *= s;
 }
 
-void gearoenix::physics::Transformation::set_orientation(const math::Quat<double>& q) noexcept
+void gearoenix::physics::Transformation::set_local_orientation(const math::Quat<double>& q) noexcept
 {
     changed = true;
     const auto r = q.to_mat();
-    const auto l = get_location();
-    translate(math::Vec3(0.0));
+    const auto l = get_local_location();
+    local_translate(math::Vec3(0.0));
     x_axis = (r * math::Vec4(x_axis, 0.0)).xyz();
     y_axis = (r * math::Vec4(y_axis, 0.0)).xyz();
     z_axis = (r * math::Vec4(z_axis, 0.0)).xyz();
-    matrix = r * matrix;
-    translate(l);
+    local_matrix = r * local_matrix;
+    local_translate(l);
 }
 
-void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
+gearoenix::math::Quat<double> gearoenix::physics::Transformation::get_local_orientation() const noexcept
+{
+    const double trace = x_axis.x + y_axis.y + z_axis.z;
+    if (trace > 0.0) {
+        const double s = 0.5 / sqrt(trace + 1.0);
+        return {
+            (y_axis.z - z_axis.y) * s,
+            (z_axis.x - x_axis.z) * s,
+            (x_axis.y - y_axis.x) * s,
+            0.25 / s
+        };
+    }
+    if (x_axis.x > y_axis.y && x_axis.x > z_axis.z) {
+        const double s = 0.5 / sqrt(1.0 + x_axis.x - y_axis.y - z_axis.z);
+        return {
+            0.25 / s,
+            (y_axis.x + x_axis.y) * s,
+            (z_axis.x + x_axis.z) * s,
+            (y_axis.z - z_axis.y) * s,
+        };
+    }
+    if (y_axis.y > z_axis.z) {
+        const double s = 0.5 / sqrt(1.0 + y_axis.y - x_axis.x - z_axis.z);
+        return {
+            (y_axis.x + x_axis.y) * s,
+            0.25 / s,
+            (z_axis.y + y_axis.z) * s,
+            (z_axis.x - x_axis.z) * s
+        };
+    }
+    const double s = 0.5 / sqrt(1.0 + z_axis.z - x_axis.x - y_axis.y);
+    return {
+        (z_axis.x + x_axis.z) * s,
+        (z_axis.y + y_axis.z) * s,
+        0.25 / s,
+        (x_axis.y - y_axis.x) * s
+    };
+}
+
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
 {
     changed = true;
     z_axis = (location - target).normalised();
     x_axis = up.cross(z_axis).normalised();
     y_axis = z_axis.cross(x_axis).normalised();
-    inverted_matrix = math::Mat4x4<double>::look_at(location, -x_axis, y_axis, -z_axis);
-    matrix = inverted_matrix.inverted();
+    local_matrix = math::Mat4x4<double>::look_at(location, -x_axis, y_axis, -z_axis).inverted();
     scale = math::Vec3<double>(1.0);
 }
 
-void gearoenix::physics::Transformation::look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
 {
     changed = true;
     math::Vec3<double> l;
-    get_location(l);
+    get_local_location(l);
     z_axis = (l - target).normalised();
     x_axis = up.cross(z_axis).normalised();
     y_axis = z_axis.cross(x_axis).normalised();
-    inverted_matrix = math::Mat4x4<double>::look_at(l, -x_axis, y_axis, -z_axis);
-    matrix = inverted_matrix.inverted();
+    local_matrix = math::Mat4x4<double>::look_at(l, -x_axis, y_axis, -z_axis).inverted();
     scale = math::Vec3<double>(1.0);
 }
 
-void gearoenix::physics::Transformation::update() noexcept
+void gearoenix::physics::Transformation::local_update() noexcept
 {
     if (changed) {
-        inverted_matrix = matrix.inverted();
+        global_matrix = local_matrix;
+        inverted_global_matrix = global_matrix.inverted();
     }
 }
 
-void gearoenix::physics::Transformation::clear() noexcept
+void gearoenix::physics::Transformation::update(const Transformation& parent) noexcept
+{
+    if (parent.changed)
+        changed = true;
+    if (changed) {
+        global_matrix = parent.global_matrix * local_matrix;
+        inverted_global_matrix = global_matrix.inverted();
+    }
+}
+
+void gearoenix::physics::Transformation::clear_change() noexcept
 {
     changed = false;
+}
+
+void gearoenix::physics::Transformation::reset() noexcept
+{
+    global_matrix = local_matrix = inverted_global_matrix = math::Mat4x4<double>();
+    x_axis = math::X3D<double>;
+    y_axis = math::Y3D<double>;
+    z_axis = math::Z3D<double>;
+    scale = math::Vec3(1.0);
+    changed = false;
+}
+
+void gearoenix::physics::Transformation::reset(
+    const math::Vec3<double>& s,
+    const math::Quat<double>& r,
+    const math::Vec3<double>& l) noexcept
+{
+    local_matrix = r.to_mat();
+    x_axis = (local_matrix * math::Vec4(math::X3D<double>, 0.0)).xyz();
+    y_axis = (local_matrix * math::Vec4(math::Y3D<double>, 0.0)).xyz();
+    z_axis = (local_matrix * math::Vec4(math::Z3D<double>, 0.0)).xyz();
+    scale = s;
+    local_matrix.local_scale(s);
+    local_matrix.set_location(l);
+    changed = true;
 }

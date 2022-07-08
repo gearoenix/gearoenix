@@ -135,7 +135,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         transform.local_x_rotate(std::get<1>(face));
         transform.local_y_rotate(std::get<2>(face));
         transform.local_z_rotate(std::get<3>(face));
-        transform.set_location(receive_box.get_center());
+        transform.set_local_location(receive_box.get_center());
         builder.set_camera_builder(std::move(camera_builder), face_index);
         irradiance_targets[face_index] = txt_mgr->create_target(
             name + "-irradiance-target" + name_ext,
@@ -174,7 +174,7 @@ void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<doubl
     include_box.set_center(p);
     for (const auto id : cameras) {
         auto* const trn = e.get_world()->get_component<physics::Transformation>(id);
-        trn->set_location(p);
+        trn->set_local_location(p);
     }
 }
 

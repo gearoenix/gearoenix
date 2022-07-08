@@ -47,18 +47,18 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     vs << "    out_uv = uv;\n";
     if (0 < bones_count) {
         vs << "    ivec4 bone_index = ivec4(bones_indices * 2.0);\n";
-        vs << "    mat4 boned_m = bones_m_inv_m[bone_index.x] * bones_weight.x +\n";
-        vs << "        bones_m_inv_m[bone_index.y] * bones_weight.y +\n";
-        vs << "        bones_m_inv_m[bone_index.z] * bones_weight.z +\n";
-        vs << "        bones_m_inv_m[bone_index.w] * bones_weight.w;\n";
+        vs << "    mat4 boned_m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
+        vs << "        (bones_m_inv_m[bone_index.y] * bones_weight.y) +\n";
+        vs << "        (bones_m_inv_m[bone_index.z] * bones_weight.z) +\n";
+        vs << "        (bones_m_inv_m[bone_index.w] * bones_weight.w);\n";
         vs << "    bone_index += 1;\n";
-        vs << "    mat4 boned_inv_m = bones_m_inv_m[bone_index.x] * bones_weight.x +\n";
-        vs << "        bones_m_inv_m[bone_index.y] * bones_weight.y +\n";
-        vs << "        bones_m_inv_m[bone_index.z] * bones_weight.z +\n";
-        vs << "        bones_m_inv_m[bone_index.w] * bones_weight.w;\n";
+        vs << "    mat4 boned_inv_m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
+        vs << "        (bones_m_inv_m[bone_index.y] * bones_weight.y) +\n";
+        vs << "        (bones_m_inv_m[bone_index.z] * bones_weight.z) +\n";
+        vs << "        (bones_m_inv_m[bone_index.w] * bones_weight.w);\n";
         vs << "    vec4 pos = m * (boned_m * vec4(position, 1.0));\n";
-        vs << "    out_nrm = (boned_inv_m * (inv_m * vec4(normal, 0.0))).xyz;\n";
-        vs << "    out_tng = (boned_inv_m * (inv_m * vec4(tangent.xyz, 0.0))).xyz;\n";
+        vs << "    out_nrm = (inv_m * (boned_inv_m * vec4(normal, 0.0))).xyz;\n";
+        vs << "    out_tng = (inv_m * (boned_inv_m * vec4(tangent.xyz, 0.0))).xyz;\n";
     } else {
         vs << "    vec4 pos = m * vec4(position, 1.0);\n";
         vs << "    out_nrm = (inv_m * vec4(normal, 0.0)).xyz;\n";

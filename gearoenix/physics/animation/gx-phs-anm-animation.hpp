@@ -1,34 +1,36 @@
-#ifndef GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
-#define GEAROENIX_PHYSICS_ANIMATION_ANIMATION_HPP
-
-#include "../../core/asset/gx-cr-asset.hpp"
-#include "../../core/gx-cr-static.hpp"
-#include "../../core/gx-cr-types.hpp"
-#include <chrono>
-#include <functional>
+#ifndef GEAROENIX_PHYSICS_ANIMATION_HPP
+#define GEAROENIX_PHYSICS_ANIMATION_HPP
+#include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "gx-phs-anm-channel.hpp"
+#include <string>
+#include <typeindex>
+#include <vector>
 
 namespace gearoenix::physics::animation {
-struct Animation final : public core::asset::Asset {
-    GX_GETSET_VAL_PRV(bool, activity, true)
-    GX_GETSET_VAL_PRV(double, duration, 0.0)
-private:
-    // seconds from start, delta time
-    std::function<void(double, double)> action;
-    std::function<void(double)> on_delete;
-    const std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+struct Manager;
+struct ArmatureAnimationInfo final {
+    std::string name;
+    std::vector<BoneChannelBuilder> channels;
+};
 
-public:
-    Animation(
-        std::string name,
-        std::function<void(double, double)> action,
-        double duration,
-        std::function<void(double)> on_delete = [](double) noexcept {}) noexcept;
-    ~Animation() noexcept final;
-    Animation(const Animation& other) noexcept = delete;
-    void operator=(const Animation& other) noexcept = delete;
-    // true means: delete the animation and animation will not apply anymore
-    // false means: animation is working and active
-    bool apply(const std::chrono::high_resolution_clock::time_point& now, double delta_seconds) noexcept;
+struct ArmatureAnimation final {
+    std::string name;
+    std::size_t bones_channels_count = 0;
+    std::size_t bones_channels_first_index = 0;
+    std::size_t bones_channels_end_index = 0;
+};
+
+struct AnimationPlayer final : core::ecs::Component {
+    friend struct Manager;
+
+    GX_GET_VAL_PRV(std::size_t, index, static_cast<std::size_t>(-1));
+    GX_GET_VAL_PRV(double, time, 0.0)
+    GX_GET_VAL_PRV(std::type_index, animation_type, std::type_index(typeid(ArmatureAnimation)))
+
+    explicit AnimationPlayer(std::size_t index, std::type_index animation_type = std::type_index(typeid(ArmatureAnimation)), double starting_time = 0.0) noexcept;
+    AnimationPlayer(AnimationPlayer&&) noexcept;
+    ~AnimationPlayer() noexcept final;
 };
 }
 #endif

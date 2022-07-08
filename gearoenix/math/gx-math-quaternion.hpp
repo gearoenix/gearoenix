@@ -2,6 +2,7 @@
 #define GEAROENIX_MATH_QUATERNION_HPP
 #include "../core/gx-cr-types.hpp"
 #include "gx-math-matrix-4d.hpp"
+#include "gx-math-numeric.hpp"
 #include <ostream>
 
 namespace gearoenix::math {
@@ -23,6 +24,31 @@ struct Quat final {
         , z(z)
         , w(w)
     {
+    }
+
+    template <typename T>
+    constexpr explicit Quat(const Quat<T>& o) noexcept
+        : x(static_cast<Element>(o.x))
+        , y(static_cast<Element>(o.y))
+        , z(static_cast<Element>(o.z))
+        , w(static_cast<Element>(o.w))
+    {
+    }
+
+    constexpr void normalise() noexcept
+    {
+        const auto inv_length = (w > static_cast<Element>(0) ? static_cast<Element>(1) : static_cast<Element>(-1)) / std::sqrt(x * x + y * y + z * z + w * w);
+        x *= inv_length;
+        y *= inv_length;
+        z *= inv_length;
+        w *= inv_length;
+    }
+
+    [[nodiscard]] constexpr Quat normalised() const noexcept
+    {
+        Quat q = *this;
+        q.normalise();
+        return q;
     }
 
     constexpr Mat4x4<Element> to_mat() const noexcept
@@ -47,6 +73,23 @@ struct Quat final {
         m.data[2][1] = static_cast<Element>(2) * (yz - xw);
         m.data[2][2] = static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy);
         return m;
+    }
+
+    [[nodiscard]] constexpr bool safe_equal(const Quat& o) const noexcept
+    {
+        const auto nt = normalised();
+        const auto no = o.normalised();
+        return Numeric::equal(nt.x, no.x) && Numeric::equal(nt.y, no.y) && Numeric::equal(nt.z, no.z) && Numeric::equal(nt.w, no.w);
+    }
+
+    [[nodiscard]] constexpr Quat operator*(const Element v) const noexcept
+    {
+        return Quat(x * v, y * v, z * v, w * v);
+    }
+
+    [[nodiscard]] constexpr Quat operator+(const Quat o) const noexcept
+    {
+        return Quat(x + o.x, y + o.y, z + o.z, w + o.w);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Quat& q)

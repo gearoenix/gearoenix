@@ -20,8 +20,8 @@ void gearoenix::physics::Engine::start_frame() noexcept
     world->parallel_system<core::ecs::Or<core::ecs::And<Transformation, collider::Aabb3>, Transformation>>(
         [&](const core::ecs::Entity::id_t, Transformation* const transform, collider::Aabb3* const cld, const auto /*kernel_index*/) {
             if (nullptr != cld && transform->get_changed())
-                cld->update(transform->get_matrix());
-            transform->update();
+                cld->update(transform->get_local_matrix()); // TODO: Later, when I developed the parenting constraint, it must change to global_matrix
+            transform->local_update(); // TODO: Later, when I developed the parenting constraint, it must change to global_matrix
             // No need for updating collider::Frustum, it will be updated in the render::camera::Manager
         });
     animation_manager->update();
@@ -32,6 +32,6 @@ void gearoenix::physics::Engine::end_frame() noexcept
     auto* const world = render_engine.get_world();
     world->parallel_system<Transformation>(
         [&](const core::ecs::Entity::id_t, Transformation* const transform, const auto /*kernel_index*/) {
-            transform->clear();
+            transform->clear_change();
         });
 }

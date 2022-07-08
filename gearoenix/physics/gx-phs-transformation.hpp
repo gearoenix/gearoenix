@@ -7,10 +7,11 @@
 
 namespace gearoenix::physics {
 struct Transformation final : public core::ecs::Component {
-    GX_GET_CREF_PRV(math::Mat4x4<double>, matrix)
+    GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix)
+    GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix)
     /// This is useful for caching the calculation
     /// It gets updated in each loop so be careful and check the `changed` variable
-    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_matrix)
+    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix)
     GX_GET_CREF_PRV(math::Vec3<double>, x_axis)
     GX_GET_CREF_PRV(math::Vec3<double>, y_axis)
     GX_GET_CREF_PRV(math::Vec3<double>, z_axis)
@@ -21,18 +22,19 @@ public:
     Transformation() noexcept;
     ~Transformation() noexcept final = default;
     Transformation(Transformation&&) noexcept = default;
-    [[nodiscard]] math::Vec3<double> get_location() const noexcept;
-    void get_location(math::Vec3<double>& l) const noexcept;
-    void set_location(const math::Vec3<double>& l) noexcept;
-    void set_location(double x, double y, double z) noexcept;
-    void translate(const math::Vec3<double>& t) noexcept;
+    [[nodiscard]] math::Vec3<double> get_global_location() const noexcept;
+    void get_global_location(math::Vec3<double>& l) const noexcept;
+    [[nodiscard]] math::Vec3<double> get_local_location() const noexcept;
+    void get_local_location(math::Vec3<double>& l) const noexcept;
+    void set_local_location(const math::Vec3<double>& l) noexcept;
+    void local_translate(const math::Vec3<double>& t) noexcept;
     void local_x_translate(double v) noexcept;
     void local_y_translate(double v) noexcept;
     void local_z_translate(double v) noexcept;
-    void global_rotate(double d, const math::Vec3<double>& axis, const math::Vec3<double>& location) noexcept;
-    void global_rotate(double d, const math::Vec3<double>& axis) noexcept;
+    void local_outer_rotate(double d, const math::Vec3<double>& axis, const math::Vec3<double>& location) noexcept;
+    void local_outer_rotate(double d, const math::Vec3<double>& axis) noexcept;
     void local_rotate(double d, const math::Vec3<double>& axis) noexcept;
-    void local_rotate_quaternion(double x, double y, double z, double w) noexcept;
+    void local_rotate(const math::Quat<double>& q) noexcept;
     void local_x_rotate(double d) noexcept;
     void local_y_rotate(double d) noexcept;
     void local_z_rotate(double d) noexcept;
@@ -41,11 +43,15 @@ public:
     void local_x_scale(double s) noexcept;
     void local_y_scale(double s) noexcept;
     void local_z_scale(double s) noexcept;
-    void set_orientation(const math::Quat<double>& q) noexcept;
-    void look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
-    void look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
-    void update() noexcept;
-    void clear() noexcept;
+    void set_local_orientation(const math::Quat<double>& q) noexcept;
+    [[nodiscard]] math::Quat<double> get_local_orientation() const noexcept;
+    void local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
+    void local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
+    void local_update() noexcept;
+    void update(const Transformation& parent) noexcept;
+    void clear_change() noexcept;
+    void reset() noexcept;
+    void reset(const math::Vec3<double>& scale, const math::Quat<double>& rotation, const math::Vec3<double>& location) noexcept;
 };
 }
 #endif

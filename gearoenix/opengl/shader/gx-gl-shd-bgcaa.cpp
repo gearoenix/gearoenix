@@ -51,7 +51,7 @@ void main() {\n\
             bloom += texture(high_texture, br_uv).xyz * smoothstep(0.0, 1.0, 1.0 - length(br_uv - out_uv) / bloom_radius);\n\
         }\n\
     }\n\
-    frag_colour = texture(low_texture, out_uv) + vec4(bloom, 1.0) + 0.0001 * texture(depth_texture, out_uv);\n\
+    frag_colour = texture(low_texture, out_uv) + texture(high_texture, out_uv) + 0.001 * vec4(bloom, 1.0) + 0.0001 * texture(depth_texture, out_uv);\n\
     frag_colour.xyz = vec3(1.0) - exp(-frag_colour.xyz * exposure);\n\
     frag_colour.xyz = pow(frag_colour.xyz, vec3(1.0 / gamma));\n\
 }\n";
