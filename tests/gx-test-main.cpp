@@ -13,9 +13,9 @@
 // GX_TEST_PRINT_TYPE_VAL(math::IntersectionStatus)
 //  Test units
 
-#define GX_TEST_FLOAT_NEAR(x, y) \
-    if(x != y && std::abs(x) + std::abs(y) > 0.0001 && std::abs(x - y) / (std::abs(x) + std::abs(y)) > 0.0001)\
-        BOOST_TEST_CHECK(x == y)
+#define GX_TEST_FLOAT_NEAR(x, y)                                                                                \
+    if (x != y && std::abs(x) + std::abs(y) > 0.0001 && std::abs(x - y) / (std::abs(x) + std::abs(y)) > 0.0001) \
+    BOOST_TEST_CHECK(x == y)
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
 #include <gearoenix/core/gx-cr-allocator-test.hpp>

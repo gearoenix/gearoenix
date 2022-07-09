@@ -442,8 +442,8 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                     [&](const physics::animation::Bone& bone) noexcept {
                         ++bones_count;
                         scene_data.bones_data.push_back(BoneData {
-                            .m = math::Mat4x4<float>(bone.transform.get_global_matrix()),
-                            .inv_m = math::Mat4x4<float>(bone.transform.get_inverted_global_matrix().transposed()),
+                            .m = bone.m,
+                            .inv_m = bone.inv_m,
                         });
                     },
                     *armature);
@@ -456,7 +456,7 @@ void gearoenix::gl::SubmissionManager::update_scene_dynamic_models(const core::e
                         .blocked_cameras_flags = render_model->block_cameras_flags,
                         .model = ModelData {
                             .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
-                            .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
+                            .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
                             .albedo_factor = gl_model->material.get_albedo_factor(),
                             .normal_metallic_factor = gl_model->material.get_normal_metallic_factor(),
                             .emission_roughness_factor = gl_model->material.get_emission_roughness_factor(),
@@ -847,13 +847,16 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
             ti_shadow_caster_directional_lights = shader->get_shadow_caster_directional_light_shadow_map_indices();
         }
 
-        shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
-        shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+        if (model_data.bones_count > 0) {
+            shader->set_bones_m_inv_m_data(reinterpret_cast<const float*>(&scene.bones_data[model_data.first_bone_index]));
+        } else {
+            shader->set_m_data(reinterpret_cast<const float*>(&model_data.m));
+            shader->set_inv_m_data(reinterpret_cast<const float*>(&model_data.inv_m));
+        }
         shader->set_albedo_factor_data(reinterpret_cast<const float*>(&model_data.albedo_factor));
         shader->set_normal_metallic_factor_data(reinterpret_cast<const float*>(&model_data.normal_metallic_factor));
         shader->set_emission_roughness_factor_data(reinterpret_cast<const float*>(&model_data.emission_roughness_factor));
         shader->set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(reinterpret_cast<const float*>(&model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved));
-        shader->set_bones_m_inv_m_data(reinterpret_cast<const float*>(&scene.bones_data[model_data.first_bone_index]));
 
         glActiveTexture(GL_TEXTURE0 + ti_albedo);
         glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);

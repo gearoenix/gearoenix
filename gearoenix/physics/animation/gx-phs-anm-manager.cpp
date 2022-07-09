@@ -16,6 +16,7 @@ void gearoenix::physics::animation::Manager::insert_bones(
         bones_indices[child_bone.name] = bones.size();
         bones.emplace_back(
             std::move(child_bone.transform),
+            std::move(child_bone.inverse_bind),
             std::move(child_bone.name),
             current_index,
             child_bone.children.size(),
@@ -110,20 +111,20 @@ void gearoenix::physics::animation::Manager::animate(
             translation = interpolate_keyframes(*(translation_search - 1), *translation_search, time);
     }
 
-    // if(transformed)
-    bone.transform.reset(scale, rotation, translation);
+    if (transformed)
+        bone.transform.reset(scale, rotation, translation);
 }
 
-void gearoenix::physics::animation::Manager::update_bone(const std::size_t index) noexcept
+void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform) noexcept
 {
     auto& bone = bones[index];
-    if (static_cast<std::size_t>(-1) == bone.parent_index) {
-        bone.transform.local_update();
-    } else {
-        bone.transform.update(bones[bone.parent_index].transform);
+    bone.transform.update_without_inverse(parent_transform);
+    if (bone.transform.get_changed()) {
+        bone.m = math::Mat4x4<float>(bone.transform.get_global_matrix()) * bone.inverse_bind;
+        bone.inv_m = bone.m.inverted().transposed();
     }
     for (auto i = bone.first_child_index; i < bone.end_child_index; ++i) {
-        update_bone(i);
+        update_bone(i, bone.transform);
     }
     bone.transform.clear_change();
 }
@@ -152,6 +153,7 @@ void gearoenix::physics::animation::Manager::create_armature(
 
     bones.emplace_back(
         std::move(bones_info.transform),
+        std::move(bones_info.inverse_bind),
         std::move(bones_info.name),
         static_cast<std::size_t>(-1),
         bones_info.children.size(),
@@ -210,7 +212,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
 
 void gearoenix::physics::animation::Manager::update() noexcept
 {
-    e.get_world()->parallel_system<core::ecs::Or<AnimationPlayer, Armature>>([this](auto, AnimationPlayer* const player, Armature* const armature, auto) noexcept {
+    e.get_world()->parallel_system<core::ecs::And<core::ecs::Or<AnimationPlayer, Armature>, Transformation>>([this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) noexcept {
         if (nullptr != player) {
             if (std::type_index(typeid(ArmatureAnimation)) == player->get_animation_type()) {
                 player->time += e.get_delta_time();
@@ -221,7 +223,7 @@ void gearoenix::physics::animation::Manager::update() noexcept
             }
         }
         if (nullptr != armature) {
-            update_bone(armature->root_bone_index);
+            update_bone(armature->root_bone_index, *model_transform);
         }
     });
 }

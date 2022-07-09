@@ -123,7 +123,8 @@
     std::vector<std::shared_ptr<gearoenix::render::mesh::Mesh>>& gx_meshes,
     const tinygltf::Model& data,
     gearoenix::render::engine::Engine& e,
-    std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds) noexcept
+    std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
+    std::vector<int> bone_index_map) noexcept
 {
     auto& gx_mesh = gx_meshes[index];
     if (nullptr != gx_mesh)
@@ -291,40 +292,48 @@
                 }
             }();
             std::size_t bi = 0;
+            const auto convert_indices = [&]<typename T>() noexcept {
+                auto is = gearoenix::math::Vec4<int>(*reinterpret_cast<const gearoenix::math::Vec4<T>*>(&bin_b[bi]));
+                is.x = bone_index_map[is.x];
+                is.y = bone_index_map[is.y];
+                is.z = bone_index_map[is.z];
+                is.w = bone_index_map[is.w];
+                return gearoenix::math::Vec4<float>(is) + 0.001f;
+            };
             switch (bin_a.componentType) {
             case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::uint32_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::uint32_t>();
                     bi += bin_bi_inc;
                 }
                 break;
             case TINYGLTF_COMPONENT_TYPE_INT:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::int32_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::int32_t>();
                     bi += bin_bi_inc;
                 }
                 break;
             case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::uint16_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::uint16_t>();
                     bi += bin_bi_inc;
                 }
                 break;
             case TINYGLTF_COMPONENT_TYPE_SHORT:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::int16_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::int16_t>();
                     bi += bin_bi_inc;
                 }
                 break;
             case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::uint8_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::uint8_t>();
                     bi += bin_bi_inc;
                 }
                 break;
             case TINYGLTF_COMPONENT_TYPE_BYTE:
                 for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = gearoenix::math::Vec4<float>(*reinterpret_cast<const gearoenix::math::Vec4<std::int8_t>*>(&bin_b[bi])) + 0.001f;
+                    vertex.bone_indices = convert_indices.operator()<std::int8_t>();
                     bi += bin_bi_inc;
                 }
                 break;
@@ -457,16 +466,85 @@ static void load_bone_info(
     gearoenix::physics::animation::BoneInfo& bone_info,
     const int bone_node_index,
     const std::string& parent_name,
-    const tinygltf::Model& data) noexcept
+    const tinygltf::Model& data,
+    const std::map<std::string, int>& name_to_joint_index,
+    const gearoenix::math::Mat4x4<float>* inv_bind_mats) noexcept
 {
     const tinygltf::Node& bone_node = data.nodes[bone_node_index];
     bone_info.name = bone_node.name;
     bone_info.parent_name = parent_name;
+    {
+        const auto search = name_to_joint_index.find(bone_node.name);
+        GX_ASSERT_D(name_to_joint_index.end() != search);
+        bone_info.inverse_bind = inv_bind_mats[search->second];
+    }
     apply_transform(bone_node_index, bone_info.transform, data);
     bone_info.children.resize(bone_node.children.size());
     for (std::size_t child_index = 0; child_index < bone_node.children.size(); ++child_index) {
-        load_bone_info(bone_info.children[child_index], bone_node.children[child_index], bone_node.name, data);
+        load_bone_info(bone_info.children[child_index], bone_node.children[child_index], bone_node.name, data, name_to_joint_index, inv_bind_mats);
     }
+}
+
+static void set_bone_map(
+    const gearoenix::physics::animation::BoneInfo& bone_info,
+    const std::map<std::string, int>& name_to_joint_index,
+    std::vector<int>& bone_index_map,
+    int& index) noexcept
+{
+    for (const auto& child : bone_info.children) {
+        const auto search = name_to_joint_index.find(child.name);
+        GX_ASSERT_D(name_to_joint_index.end() != search);
+        ++index;
+        bone_index_map[search->second] = index;
+    }
+    for (const auto& child : bone_info.children) {
+        set_bone_map(child, name_to_joint_index, bone_index_map, index);
+    }
+}
+
+static std::pair<std::vector<int>, std::optional<gearoenix::physics::animation::BoneInfo>> process_skin(
+    const tinygltf::Node& node,
+    const tinygltf::Model& data) noexcept
+{
+    if (node.skin == -1)
+        return { {}, std::nullopt };
+    const auto& skin = data.skins[node.skin];
+    std::vector<int> bone_index_map(skin.joints.size());
+    GX_ASSERT_D(-1 != skin.inverseBindMatrices);
+    const auto& inv_bind_mat_acc = data.accessors[skin.inverseBindMatrices];
+    GX_ASSERT_D(inv_bind_mat_acc.count == skin.joints.size());
+    GX_ASSERT_D(inv_bind_mat_acc.type == TINYGLTF_TYPE_MAT4);
+    GX_ASSERT_D(inv_bind_mat_acc.bufferView != -1);
+    const auto& inv_bind_mat_bv = data.bufferViews[inv_bind_mat_acc.bufferView];
+    GX_ASSERT_D(inv_bind_mat_bv.byteLength == inv_bind_mat_acc.count * sizeof(gearoenix::math::Mat4x4<float>));
+    GX_ASSERT_D(inv_bind_mat_bv.byteStride == 0);
+    const auto inv_bind_mats = reinterpret_cast<const gearoenix::math::Mat4x4<float>*>(
+        &data.buffers[inv_bind_mat_bv.buffer].data[inv_bind_mat_bv.byteOffset]);
+    std::set<int> root_bones_nodes;
+    std::map<std::string, int> name_to_joint_index;
+    int joint_index = 0;
+    for (const auto bone_node_index : skin.joints) {
+        root_bones_nodes.emplace(bone_node_index);
+        name_to_joint_index[data.nodes[bone_node_index].name] = joint_index;
+        ++joint_index;
+    }
+    for (const auto bone_node_index : skin.joints) {
+        const auto& bone_node = data.nodes[bone_node_index];
+        for (const auto child_node_index : bone_node.children) {
+            root_bones_nodes.erase(child_node_index);
+        }
+    }
+    GX_ASSERT(root_bones_nodes.size() == 1);
+    gearoenix::physics::animation::BoneInfo bones_info;
+    load_bone_info(bones_info, *root_bones_nodes.begin(), "", data, name_to_joint_index, inv_bind_mats);
+    joint_index = 0;
+    {
+        const auto search = name_to_joint_index.find(bones_info.name);
+        GX_ASSERT_D(name_to_joint_index.end() != search);
+        bone_index_map[search->second] = joint_index;
+    }
+    set_bone_map(bones_info, name_to_joint_index, bone_index_map, joint_index);
+    return { std::move(bone_index_map), std::move(bones_info) };
 }
 
 static void process_node(
@@ -480,7 +558,6 @@ static void process_node(
     const std::map<int, gearoenix::physics::animation::BoneChannelBuilder>& bones_channels) noexcept
 {
     const auto& node = data.nodes[node_index];
-    gearoenix::physics::animation::ArmatureAnimationInfo animation_info;
     GX_LOG_D("Loading node: " << node.name);
     if (node.camera != -1) {
         GX_ASSERT_D(node.children.empty());
@@ -504,36 +581,22 @@ static void process_node(
         return;
     }
     if (node.mesh != -1) {
+        auto [bone_index_map, bones_info] = process_skin(node, data);
         GX_ASSERT_D(node.children.empty());
         gearoenix::render::material::Pbr gx_mat(e, node_end_callback);
-        auto gx_mesh = create_mesh(node.mesh, gx_mat, node_end_callback, gx_meshes, data, e, gx_txt2ds);
+        auto gx_mesh = create_mesh(node.mesh, gx_mat, node_end_callback, gx_meshes, data, e, gx_txt2ds, bone_index_map);
         auto model_builder = e.get_model_manager()->build(
             std::string(node.name),
             std::move(gx_mesh),
             gearoenix::core::sync::EndCallerIgnored(node_end_callback),
             true);
         model_builder->set_material(gx_mat);
-        if (node.skin != -1) {
-            const auto& skin = data.skins[node.skin];
-
-            std::set<int> root_bones_nodes;
-            for (const auto bone_node_index : skin.joints) {
-                root_bones_nodes.emplace(bone_node_index);
-            }
-            for (const auto bone_node_index : skin.joints) {
-                const auto& bone_node = data.nodes[bone_node_index];
-                for (const auto child_node_index : bone_node.children) {
-                    root_bones_nodes.erase(child_node_index);
-                }
-            }
-            GX_ASSERT(root_bones_nodes.size() == 1);
-            gearoenix::physics::animation::BoneInfo bones_info;
-            load_bone_info(bones_info, *root_bones_nodes.begin(), "", data);
+        if (bone_index_map.size() > 1) {
             e.get_physics_engine()->get_animation_manager()->create_armature(
                 model_builder->get_entity_builder()->get_builder(),
-                skin.name,
-                bones_info);
-
+                node.name,
+                bones_info.value());
+            const auto& skin = data.skins[node.skin];
             gearoenix::physics::animation::ArmatureAnimationInfo armature_animation_info;
             for (const auto bone_node_index : skin.joints) {
                 const auto& bone_node = data.nodes[bone_node_index];

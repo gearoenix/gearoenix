@@ -38,7 +38,7 @@ private:
     void insert_bones(BoneInfo& bones_info, std::size_t current_index) noexcept;
     void animate(ArmatureAnimation& armature_animation, double time) noexcept;
     void animate(const BoneChannel& bone_channel, double time) noexcept;
-    void update_bone(std::size_t index) noexcept;
+    void update_bone(std::size_t index, const Transformation& parent) noexcept;
 
 public:
     explicit Manager(render::engine::Engine& e) noexcept;

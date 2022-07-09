@@ -13,6 +13,7 @@ struct Manager;
 
 struct BoneInfo final {
     Transformation transform;
+    math::Mat4x4<float> inverse_bind;
     std::string name;
     std::string parent_name;
     std::vector<BoneInfo> children;
@@ -20,6 +21,9 @@ struct BoneInfo final {
 
 struct Bone final {
     Transformation transform;
+    math::Mat4x4<float> inverse_bind;
+    math::Mat4x4<float> m;
+    math::Mat4x4<float> inv_m;
     std::string name;
     std::size_t parent_index = static_cast<std::size_t>(-1);
     std::size_t children_count = 0;
@@ -28,6 +32,7 @@ struct Bone final {
 
     Bone(
         Transformation&& transform,
+        math::Mat4x4<float>&& inverse_bind,
         std::string&& name,
         std::size_t parent_index,
         std::size_t children_count,

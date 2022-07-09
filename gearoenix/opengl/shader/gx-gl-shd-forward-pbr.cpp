@@ -31,10 +31,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES << ") in vec4 bones_indices;\n";
         vs << "\n";
         vs << "uniform mat4 bones_m_inv_m[" << (bones_count * 2) << "];\n";
+    } else {
+        vs << "uniform mat4 m;\n";
+        vs << "uniform mat4 inv_m;\n";
     }
     vs << "\n";
-    vs << "uniform mat4 m;\n";
-    vs << "uniform mat4 inv_m;\n";
     vs << "uniform mat4 vp;\n";
     vs << "\n";
     vs << "out vec3 out_pos;\n";
@@ -46,24 +47,20 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     vs << "void main() {\n";
     vs << "    out_uv = uv;\n";
     if (0 < bones_count) {
-        vs << "    ivec4 bone_index = ivec4(bones_indices * 2.0);\n";
-        vs << "    mat4 boned_m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
+        vs << "    ivec4 bone_index = ivec4(bones_indices) * 2;\n";
+        vs << "    mat4 m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
         vs << "        (bones_m_inv_m[bone_index.y] * bones_weight.y) +\n";
         vs << "        (bones_m_inv_m[bone_index.z] * bones_weight.z) +\n";
         vs << "        (bones_m_inv_m[bone_index.w] * bones_weight.w);\n";
         vs << "    bone_index += 1;\n";
-        vs << "    mat4 boned_inv_m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
+        vs << "    mat4 inv_m = (bones_m_inv_m[bone_index.x] * bones_weight.x) +\n";
         vs << "        (bones_m_inv_m[bone_index.y] * bones_weight.y) +\n";
         vs << "        (bones_m_inv_m[bone_index.z] * bones_weight.z) +\n";
         vs << "        (bones_m_inv_m[bone_index.w] * bones_weight.w);\n";
-        vs << "    vec4 pos = m * (boned_m * vec4(position, 1.0));\n";
-        vs << "    out_nrm = (inv_m * (boned_inv_m * vec4(normal, 0.0))).xyz;\n";
-        vs << "    out_tng = (inv_m * (boned_inv_m * vec4(tangent.xyz, 0.0))).xyz;\n";
-    } else {
-        vs << "    vec4 pos = m * vec4(position, 1.0);\n";
-        vs << "    out_nrm = (inv_m * vec4(normal, 0.0)).xyz;\n";
-        vs << "    out_tng = (inv_m * vec4(tangent.xyz, 0.0)).xyz;\n";
     }
+    vs << "    vec4 pos = m * vec4(position, 1.0);\n";
+    vs << "    out_nrm = (inv_m * vec4(normal, 0.0)).xyz;\n";
+    vs << "    out_tng = (inv_m * vec4(tangent.xyz, 0.0)).xyz;\n";
     vs << "    out_pos = pos.xyz;\n";
     vs << "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n";
     vs << "    gl_Position = vp * pos;\n";
@@ -243,8 +240,6 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
     GX_GL_THIS_GET_UNIFORM(vp);
     GX_GL_THIS_GET_UNIFORM(camera_position_reserved);
-    GX_GL_THIS_GET_UNIFORM(m);
-    GX_GL_THIS_GET_UNIFORM(inv_m);
     GX_GL_THIS_GET_UNIFORM(albedo_factor);
     GX_GL_THIS_GET_UNIFORM(normal_metallic_factor);
     GX_GL_THIS_GET_UNIFORM(emission_roughness_factor);
@@ -268,6 +263,9 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
 
     if (bones_count > 0) {
         GX_GL_THIS_GET_UNIFORM(bones_m_inv_m);
+    } else {
+        GX_GL_THIS_GET_UNIFORM(m);
+        GX_GL_THIS_GET_UNIFORM(inv_m);
     }
 }
 

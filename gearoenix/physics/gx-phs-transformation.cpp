@@ -271,6 +271,22 @@ void gearoenix::physics::Transformation::update(const Transformation& parent) no
     }
 }
 
+void gearoenix::physics::Transformation::local_update_without_inverse() noexcept
+{
+    if (changed) {
+        global_matrix = local_matrix;
+    }
+}
+
+void gearoenix::physics::Transformation::update_without_inverse(const Transformation& parent) noexcept
+{
+    if (parent.changed)
+        changed = true;
+    if (changed) {
+        global_matrix = parent.global_matrix * local_matrix;
+    }
+}
+
 void gearoenix::physics::Transformation::clear_change() noexcept
 {
     changed = false;

@@ -49,6 +49,8 @@ public:
     void local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept;
     void local_update() noexcept;
     void update(const Transformation& parent) noexcept;
+    void local_update_without_inverse() noexcept;
+    void update_without_inverse(const Transformation& parent) noexcept;
     void clear_change() noexcept;
     void reset() noexcept;
     void reset(const math::Vec3<double>& scale, const math::Quat<double>& rotation, const math::Vec3<double>& location) noexcept;

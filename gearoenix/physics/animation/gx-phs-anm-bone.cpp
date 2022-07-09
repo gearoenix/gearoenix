@@ -2,12 +2,14 @@
 
 gearoenix::physics::animation::Bone::Bone(
     Transformation&& transform,
+    math::Mat4x4<float>&& inverse_bind,
     std::string&& name,
     const std::size_t parent_index,
     const std::size_t children_count,
     const std::size_t first_child_index,
     const std::size_t last_child_index) noexcept
     : transform(std::move(transform))
+    , inverse_bind(std::move(inverse_bind))
     , name(std::move(name))
     , parent_index(parent_index)
     , children_count(children_count)
