@@ -55,7 +55,7 @@ struct GameApp final : public gearoenix::core::Application {
                     gearoenix::core::sync::EndCallerIgnored(end_callback),
                     true);
                 model_builder->set_material(material);
-                model_builder->get_transformation().translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
+                model_builder->get_transformation().local_translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
                     static_cast<double>(roughness_i) * 3.0 - 15.0,
                     0.0 });
                 scene_builder->add(std::move(model_builder));
@@ -71,11 +71,11 @@ struct GameApp final : public gearoenix::core::Application {
             true);
         ground_model_builder->set_material(material);
         ground_model_builder->get_transformation().local_scale(30.0);
-        ground_model_builder->get_transformation().translate({ 0.0, 0.0, -5.0 });
+        ground_model_builder->get_transformation().local_translate({ 0.0, 0.0, -5.0 });
         scene_builder->add(std::move(ground_model_builder));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
-        camera_builder->get_transformation().look_at({ -19.0, -19.0, 5.0 }, { -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
+        camera_builder->get_transformation().local_look_at({ -19.0, -19.0, 5.0 }, { -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
@@ -88,7 +88,7 @@ struct GameApp final : public gearoenix::core::Application {
             1.0f,
             35.0f,
             end_callback);
-        light_builder_0->get_transformation().look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
         light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
         scene_builder->add(std::move(light_builder_0));
 

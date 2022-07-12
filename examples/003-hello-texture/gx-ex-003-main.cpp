@@ -72,7 +72,7 @@ struct GameApp final : public gearoenix::core::Application {
         scene_builder->add(std::move(model_builder));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
-        camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
+        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());

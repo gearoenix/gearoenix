@@ -664,9 +664,9 @@ static void process_node(
             process_node(mesh_node_index, node_end_callback, scene_builder, data, e, gx_meshes, gx_txt2ds, bones_channels);
             return;
         }
-        GX_UNEXPECTED;
+        GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
     }
-    GX_UNEXPECTED;
+    GX_LOG_F("Unexpected node in the scene nodes. Node: " << node.name);
 }
 
 template <template <typename> typename Value>

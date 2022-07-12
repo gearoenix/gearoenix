@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
     gearoenix::physics::Transformation transform;
 
-    glm::dmat4 glmm = glm::identity<glm::dmat4>();
+    auto glmm = glm::identity<glm::dmat4>();
 
     std::random_device rd;
     std::default_random_engine re(rd());
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             glmm = glm::rotate(glm::identity<glm::dmat4>(), d, glm::normalize(glm::dvec3(x, y, z))) * glmm;
         }
 
-        auto gxq = transform.get_orientation();
+        auto gxq = transform.get_local_orientation();
         auto glmq = glm::quat_cast(glmm);
 
         if (!gxq.safe_equal(gearoenix::math::Quat<double>(glmq.x, glmq.y, glmq.z, glmq.w))) {

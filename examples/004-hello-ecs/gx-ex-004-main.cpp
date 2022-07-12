@@ -2,7 +2,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
-#include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/gx-plt-main-entry.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
@@ -129,14 +128,14 @@ struct GameApp final : public gearoenix::core::Application {
             Speed speed;
             Position position;
             auto& model_transformation = model_builder->get_transformation();
-            model_transformation.set_location(position.value);
+            model_transformation.set_local_location(position.value);
             model_transformation.local_scale(cube_size);
             model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
             scene_builder->add(std::move(model_builder));
         }
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
-        camera_builder->get_transformation().set_location(0.0f, 0.0f, 5.0f);
+        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
@@ -151,7 +150,7 @@ struct GameApp final : public gearoenix::core::Application {
             [&](auto, Speed* const speed, Position* const position, gearoenix::physics::Transformation* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);
                 speed->update(*position);
-                trn->set_location(position->value);
+                trn->set_local_location(position->value);
             });
     }
 };

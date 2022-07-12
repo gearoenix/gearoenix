@@ -52,7 +52,7 @@ struct GameApp final : public gearoenix::core::Application {
                     gearoenix::core::sync::EndCallerIgnored(end_callback),
                     true);
                 model_builder->set_material(material);
-                model_builder->get_transformation().translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
+                model_builder->get_transformation().local_translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
                     static_cast<double>(roughness_i) * 3.0 - 15.0,
                     0.0 });
                 scene_builder->add(std::move(model_builder));
@@ -67,8 +67,8 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         auto& camera_transform = camera_builder->get_transformation();
-        camera_transform.translate({ -19.0, -19.0, 5.0 });
-        camera_transform.look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
+        camera_transform.local_translate({ -19.0, -19.0, 5.0 });
+        camera_transform.local_look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
