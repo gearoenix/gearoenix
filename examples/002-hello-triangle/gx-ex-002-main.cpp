@@ -36,7 +36,7 @@ struct GameApp final : public gearoenix::core::Application {
         model_builder->set_material(gearoenix::render::material::Pbr(render_engine));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
-        camera_builder->get_transformation().set_local_location({0.0f, 0.0f, 5.0f});
+        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
 
         scene_builder->add(std::move(model_builder));
         scene_builder->add(std::move(camera_builder));

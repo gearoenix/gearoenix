@@ -1,11 +1,11 @@
 #include "gx-phs-anm-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-phs-anm-animation.hpp"
 #include "gx-phs-anm-armature.hpp"
 #include "gx-phs-anm-bone.hpp"
+#include "gx-phs-anm-interpolation.hpp"
 
 void gearoenix::physics::animation::Manager::insert_bones(
     BoneInfo& bones_info,
@@ -67,10 +67,10 @@ void gearoenix::physics::animation::Manager::animate(
             scale = get_key(scale_begin_iter->second);
         else if (scale_search == scale_end_iter)
             scale = get_key((scale_end_iter - 1)->second);
-        if (scale_search->first == time)
+        else if (scale_search->first == time)
             scale = get_key(scale_search->second);
         else
-            scale = interpolate_keyframes(*(scale_search - 1), *scale_search, time);
+            scale = interpolate(*(scale_search - 1), *scale_search, time);
     }
 
     if (bone_channel.rotation_samples_count > 1) {
@@ -89,7 +89,7 @@ void gearoenix::physics::animation::Manager::animate(
         else if (rotation_search->first == time)
             rotation = get_key(rotation_search->second);
         else
-            rotation = interpolate_keyframes(*(rotation_search - 1), *rotation_search, time).normalised();
+            rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
     }
 
     if (bone_channel.translation_samples_count > 1) {
@@ -108,7 +108,7 @@ void gearoenix::physics::animation::Manager::animate(
         else if (translation_search->first == time)
             translation = get_key(translation_search->second);
         else
-            translation = interpolate_keyframes(*(translation_search - 1), *translation_search, time);
+            translation = interpolate(*(translation_search - 1), *translation_search, time);
     }
 
     if (transformed)
@@ -214,9 +214,8 @@ void gearoenix::physics::animation::Manager::update() noexcept
 {
     e.get_world()->parallel_system<core::ecs::And<core::ecs::Or<AnimationPlayer, Armature>, Transformation>>([this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) noexcept {
         if (nullptr != player) {
+            player->update_time(e.get_delta_time());
             if (std::type_index(typeid(ArmatureAnimation)) == player->get_animation_type()) {
-                player->time += e.get_delta_time();
-                player->time = std::fmod(player->time, 5.0416665077209473);
                 animate(armature_animations[player->get_index()], player->time);
             } else {
                 GX_UNEXPECTED;

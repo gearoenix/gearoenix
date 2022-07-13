@@ -1,5 +1,6 @@
 #include "gx-rnd-gltf-loader.hpp"
 #include "../physics/animation/gx-phs-anm-bone.hpp"
+#include "../physics/animation/gx-phs-anm-interpolation.hpp"
 #include "../physics/animation/gx-phs-anm-manager.hpp"
 #include "../physics/gx-phs-engine.hpp"
 #include "../platform/stream/gx-plt-stm-path.hpp"
@@ -675,13 +676,14 @@ static void read_output(
     const tinygltf::Accessor& input,
     const tinygltf::Accessor& output,
     const tinygltf::BufferView& output_bv,
-    const bool is_cubic_spline_interpolation,
+    const gearoenix::physics::animation::Interpolation interpolation,
     const std::size_t output_b_ptr,
     const std::vector<float>& times) noexcept
 {
     keyframes.reserve(input.count);
     GX_ASSERT_D(output.count * sizeof(Value<float>) == output_bv.byteLength);
-    if (is_cubic_spline_interpolation) {
+    switch (interpolation) {
+    case gearoenix::physics::animation::Interpolation::Gltf2CubicSPLine: {
         GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bv.byteLength);
         for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
              data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
@@ -696,13 +698,15 @@ static void read_output(
             keyframes.emplace_back(
                 times[data_i],
                 gearoenix::physics::animation::Keyframe<Value<double>> {
-                    gearoenix::physics::animation::KeyframeBezier<Value<double>> {
+                    gearoenix::physics::animation::KeyframeGltf2Bezier<Value<double>> {
                         .key = key,
                         .in = in,
                         .out = out,
                     } });
         }
-    } else {
+        break;
+    }
+    case gearoenix::physics::animation::Interpolation::Linear: {
         GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bv.byteLength);
         for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
              data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
@@ -711,7 +715,31 @@ static void read_output(
                 gearoenix::physics::animation::KeyframeLinear<Value<double>> {
                     Value<double>(*reinterpret_cast<const Value<float>*>(curr_output_ptr)) });
         }
+        break;
     }
+    case gearoenix::physics::animation::Interpolation::Step: {
+        GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bv.byteLength);
+        for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
+             data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
+            keyframes.emplace_back(
+                times[data_i],
+                gearoenix::physics::animation::KeyframeStep<Value<double>> {
+                    Value<double>(*reinterpret_cast<const Value<float>*>(curr_output_ptr)) });
+        }
+        break;
+    }
+    }
+}
+
+[[nodiscard]] static gearoenix::physics::animation::Interpolation convert_interpolation(const std::string& interpolation) noexcept
+{
+    if ("CUBICSPLINE" == interpolation)
+        return gearoenix::physics::animation::Interpolation::Gltf2CubicSPLine;
+    if ("LINEAR" == interpolation)
+        return gearoenix::physics::animation::Interpolation::Linear;
+    if ("STEP" == interpolation)
+        return gearoenix::physics::animation::Interpolation::Step;
+    GX_LOG_F("Unexpected interpolation " << interpolation);
 }
 
 std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::render::load_gltf(
@@ -747,21 +775,13 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             physics::animation::BoneChannelBuilder& bone_channels = bones_channels[chn.target_node];
             bone_channels.target_bone = bone_node.name;
             const tinygltf::AnimationSampler& smp = anm.samplers[chn.sampler];
-            const bool is_cubic_spline_interpolation = [&] {
-                if ("CUBICSPLINE" == smp.interpolation)
-                    return true;
-                if ("LINEAR" == smp.interpolation)
-                    return false;
-                GX_LOG_F("Engine for sake performance and better design does not implement other "
-                         "interpolations that cubic-spline and linear, other interpolations are "
-                         "special cases of these 2 and can be used instead.");
-            }();
+            const auto interpolation = convert_interpolation(smp.interpolation);
             const tinygltf::Accessor& input = data.accessors[smp.input];
             const tinygltf::Accessor& output = data.accessors[smp.output];
             GX_ASSERT(input.type == TINYGLTF_TYPE_SCALAR);
             GX_ASSERT_D(input.count > 0);
             GX_ASSERT_D(output.count > 0);
-            GX_ASSERT_D((!is_cubic_spline_interpolation && input.count == output.count) || (is_cubic_spline_interpolation && (input.count * 3) == output.count));
+            GX_ASSERT_D((interpolation != physics::animation::Interpolation::Gltf2CubicSPLine && input.count == output.count) || (interpolation == physics::animation::Interpolation::Gltf2CubicSPLine && (input.count * 3) == output.count));
             std::vector<float> times(input.count);
             const tinygltf::BufferView& input_bv = data.bufferViews[input.bufferView];
             const tinygltf::BufferView& output_bv = data.bufferViews[output.bufferView];
@@ -773,13 +793,13 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
             const auto output_b_ptr = reinterpret_cast<std::size_t>(&output_b[output_bv.byteOffset]);
             if ("translation" == chn.target_path) {
                 GX_ASSERT(output.type == TINYGLTF_TYPE_VEC3);
-                read_output(bone_channels.translation_samples, input, output, output_bv, is_cubic_spline_interpolation, output_b_ptr, times);
+                read_output(bone_channels.translation_samples, input, output, output_bv, interpolation, output_b_ptr, times);
             } else if ("rotation" == chn.target_path) {
                 GX_ASSERT(output.type == TINYGLTF_TYPE_VEC4);
-                read_output(bone_channels.rotation_samples, input, output, output_bv, is_cubic_spline_interpolation, output_b_ptr, times);
+                read_output(bone_channels.rotation_samples, input, output, output_bv, interpolation, output_b_ptr, times);
             } else if ("scale" == chn.target_path) {
                 GX_ASSERT(output.type == TINYGLTF_TYPE_VEC3);
-                read_output(bone_channels.scale_samples, input, output, output_bv, is_cubic_spline_interpolation, output_b_ptr, times);
+                read_output(bone_channels.scale_samples, input, output, output_bv, interpolation, output_b_ptr, times);
             } else
                 GX_UNEXPECTED;
         }
