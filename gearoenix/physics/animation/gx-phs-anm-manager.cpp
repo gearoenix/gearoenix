@@ -54,7 +54,7 @@ void gearoenix::physics::animation::Manager::animate(
 
     bool transformed = false;
 
-    if (bone_channel.scale_samples_count > 1) {
+    if (bone_channel.scale_samples_count > 0) {
         transformed = true;
         const auto scale_begin_iter = scale_keyframes.begin() + bone_channel.scale_samples_first_keyframe_index;
         const auto scale_end_iter = scale_keyframes.begin() + bone_channel.scale_samples_end_keyframe_index;
@@ -66,14 +66,14 @@ void gearoenix::physics::animation::Manager::animate(
         if (scale_search == scale_begin_iter)
             scale = get_key(scale_begin_iter->second);
         else if (scale_search == scale_end_iter)
-            scale = get_key((scale_end_iter - 1)->second);
+            scale = get_key((scale_begin_iter + (bone_channel.scale_samples_count - 1))->second);
         else if (scale_search->first == time)
             scale = get_key(scale_search->second);
         else
             scale = interpolate(*(scale_search - 1), *scale_search, time);
     }
 
-    if (bone_channel.rotation_samples_count > 1) {
+    if (bone_channel.rotation_samples_count > 0) {
         transformed = true;
         const auto rotation_begin_iter = rotation_keyframes.begin() + bone_channel.rotation_samples_first_keyframe_index;
         const auto rotation_end_iter = rotation_keyframes.begin() + bone_channel.rotation_samples_end_keyframe_index;
@@ -85,14 +85,14 @@ void gearoenix::physics::animation::Manager::animate(
         if (rotation_search == rotation_begin_iter)
             rotation = get_key(rotation_begin_iter->second);
         else if (rotation_search == rotation_end_iter)
-            rotation = get_key((rotation_end_iter - 1)->second);
+            rotation = get_key((rotation_begin_iter + (bone_channel.rotation_samples_count - 1))->second);
         else if (rotation_search->first == time)
             rotation = get_key(rotation_search->second);
         else
             rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
     }
 
-    if (bone_channel.translation_samples_count > 1) {
+    if (bone_channel.translation_samples_count > 0) {
         transformed = true;
         const auto translation_begin_iter = translation_keyframes.begin() + bone_channel.translation_samples_first_keyframe_index;
         const auto translation_end_iter = translation_keyframes.begin() + bone_channel.translation_samples_end_keyframe_index;
@@ -104,7 +104,7 @@ void gearoenix::physics::animation::Manager::animate(
         if (translation_search == translation_begin_iter)
             translation = get_key(translation_begin_iter->second);
         else if (translation_search == translation_end_iter)
-            translation = get_key((translation_end_iter - 1)->second);
+            translation = get_key((translation_begin_iter + (bone_channel.translation_samples_count - 1))->second);
         else if (translation_search->first == time)
             translation = get_key(translation_search->second);
         else
@@ -199,10 +199,6 @@ void gearoenix::physics::animation::Manager::create_animation_player(
         for (auto& k : bone_channel.translation_samples)
             translation_keyframes.push_back(k);
         bch.translation_samples_end_keyframe_index = translation_keyframes.size();
-
-        GX_ASSERT(bch.scale_samples_count != 1);
-        GX_ASSERT(bch.rotation_samples_count != 1);
-        GX_ASSERT(bch.translation_samples_count != 1);
 
         bones_channels.push_back(bch);
     }
