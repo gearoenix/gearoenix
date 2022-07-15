@@ -33,7 +33,23 @@ template <typename Value, typename T>
     }
     const auto& sk = get_key(start_keyframe.second);
     const auto& ek = get_key(end_keyframe.second);
-    return (sk * t) + (ek * (1.0 - t));
+    if constexpr (std::is_same_v<Value, math::Quat<double>> || std::is_same_v<Value, math::Quat<float>>) {
+        // It can become better.
+        auto dot = sk.dot(ek);
+        if (dot > 0.999)
+            dot = 0.999; // Preventing NaN in acos
+        if (dot < -0.999)
+            dot = -0.999; // Preventing NaN in acos
+        const auto arc_cosine = std::acos(std::abs(dot));
+        if (arc_cosine < 0.001)
+            return (sk * (1.0 - t)) + (ek * t); // Preventing NaN in slerp
+        const auto arc_cosine_t = arc_cosine * t;
+        const auto e_sin = dot > 0.0 ? std::sin(arc_cosine_t) : -std::sin(arc_cosine_t);
+        const auto dom = 1.0 / std::sin(arc_cosine);
+        return (sk * (std::sin(arc_cosine - arc_cosine_t) * dom)) + (ek * (e_sin * dom));
+    } else {
+        return (sk * (1.0 - t)) + (ek * t);
+    }
 }
 }
 

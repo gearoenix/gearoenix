@@ -92,6 +92,11 @@ struct Quat final {
         return Quat(x + o.x, y + o.y, z + o.z, w + o.w);
     }
 
+    [[nodiscard]] constexpr Element dot(const Quat& o) const noexcept
+    {
+        return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Quat& q)
     {
         os << R"("Quat" { "x": ")" << q.x << R"(", "y": ")" << q.y << R"(", "z": ")" << q.z << R"(", "w": ")" << q.w << "\" }";

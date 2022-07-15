@@ -88,8 +88,9 @@ void gearoenix::physics::animation::Manager::animate(
             rotation = get_key((rotation_begin_iter + (bone_channel.rotation_samples_count - 1))->second);
         else if (rotation_search->first == time)
             rotation = get_key(rotation_search->second);
-        else
+        else {
             rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
+        }
     }
 
     if (bone_channel.translation_samples_count > 0) {
