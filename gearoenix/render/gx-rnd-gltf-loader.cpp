@@ -595,12 +595,10 @@ static void process_node(
         if (bone_index_map.size() > 1) {
             e.get_physics_engine()->get_animation_manager()->create_armature(
                 model_builder->get_entity_builder()->get_builder(),
-                node.name,
                 bones_info.value());
             const auto& skin = data.skins[node.skin];
             gearoenix::physics::animation::ArmatureAnimationInfo armature_animation_info;
             for (const auto bone_node_index : skin.joints) {
-                const auto& bone_node = data.nodes[bone_node_index];
                 if (auto bone_channel_search = bones_channels.find(bone_node_index); bones_channels.end() != bone_channel_search)
                     armature_animation_info.channels.push_back(bone_channel_search->second);
             }

@@ -1,4 +1,5 @@
 #include "gx-plt-application.hpp"
+#include "../audio/gx-au-engine.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-parallel-for.hpp"
@@ -239,6 +240,7 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
 void gearoenix::platform::BaseApplication::initialize_engine(Application& app) noexcept
 {
     render_engine = render::engine::Engine::construct(app);
+    audio_engine = std::make_unique<audio::Engine>(app);
 }
 
 void gearoenix::platform::BaseApplication::initialize_core_application(
@@ -270,6 +272,7 @@ void gearoenix::platform::BaseApplication::update() noexcept
     update_window();
     render_engine->start_frame();
     core_application->update();
+    audio_engine->update();
     render_engine->end_frame();
 }
 

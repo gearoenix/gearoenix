@@ -38,13 +38,11 @@ struct Builder final {
     friend struct Manager;
 
     GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-
-private:
-    std::vector<std::shared_ptr<model::Builder>> model_builders;
-    std::vector<std::shared_ptr<camera::Builder>> camera_builders;
-    std::vector<std::shared_ptr<skybox::Builder>> skybox_builders;
-    std::vector<std::shared_ptr<reflection::Builder>> reflection_builders;
-    std::vector<std::shared_ptr<light::Builder>> light_builders;
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<model::Builder>>, model_builders)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<camera::Builder>>, camera_builders)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<skybox::Builder>>, skybox_builders)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<reflection::Builder>>, reflection_builders)
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<light::Builder>>, light_builders)
 
     Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 

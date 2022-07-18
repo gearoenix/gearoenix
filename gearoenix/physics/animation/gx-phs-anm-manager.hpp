@@ -47,7 +47,7 @@ public:
     ~Manager() noexcept;
     void operator=(const Manager& o) = delete;
     void operator=(Manager&& o) = delete;
-    void create_armature(core::ecs::EntityBuilder& builder, const std::string& name, BoneInfo& bones_info) noexcept;
+    void create_armature(core::ecs::EntityBuilder& builder, BoneInfo& bones_info) noexcept;
     void create_animation_player(core::ecs::EntityBuilder& builder, ArmatureAnimationInfo& info) noexcept;
     void update() noexcept;
 

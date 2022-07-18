@@ -24,3 +24,22 @@ void gearoenix::physics::animation::AnimationPlayer::update_time(const double de
         time += loop_start_time;
     }
 }
+
+void gearoenix::physics::animation::AnimationPlayer::set_loop_start_time(const double t) noexcept
+{
+    loop_start_time = t;
+    loop_length_time = loop_end_time - loop_start_time;
+}
+
+void gearoenix::physics::animation::AnimationPlayer::set_loop_end_time(const double t) noexcept
+{
+    loop_end_time = t;
+    loop_length_time = loop_end_time - loop_start_time;
+}
+
+void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const double start, const double end) noexcept
+{
+    loop_start_time = start;
+    loop_end_time = end;
+    loop_length_time = loop_end_time - loop_start_time;
+}

@@ -14,6 +14,10 @@
 #include <chrono>
 #include <memory>
 
+namespace gearoenix::audio {
+struct Engine;
+}
+
 namespace gearoenix::core {
 struct Application;
 }
@@ -50,6 +54,7 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position)
 
     GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
+    GX_GET_UPTR_PRV(audio::Engine, audio_engine)
     GX_GET_UPTR_PRV(core::event::Engine, event_engine)
     GX_GET_UPTR_PRV(core::Application, core_application)
 

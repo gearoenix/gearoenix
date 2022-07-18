@@ -21,7 +21,7 @@
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-cube.hpp>
 
-//#define GX_EXAMPLE_008_EXPORT_ENVIRONMENT
+#define GX_EXAMPLE_008_EXPORT_ENVIRONMENT
 #define GX_EXAMPLE_008_EXPORT_REFLECTION
 
 struct GameApp final : public gearoenix::core::Application {

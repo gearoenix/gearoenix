@@ -139,7 +139,6 @@ gearoenix::physics::animation::Manager::~Manager() noexcept = default;
 
 void gearoenix::physics::animation::Manager::create_armature(
     core::ecs::EntityBuilder& builder,
-    const std::string& name,
     BoneInfo& bones_info) noexcept
 {
     GX_GUARD_LOCK(this);
@@ -185,20 +184,32 @@ void gearoenix::physics::animation::Manager::create_animation_player(
 
         bch.scale_samples_count = bone_channel.scale_samples.size();
         bch.scale_samples_first_keyframe_index = scale_keyframes.size();
-        for (auto& k : bone_channel.scale_samples)
+        double last_time = -0.1e-10;
+        for (auto& k : bone_channel.scale_samples) {
+            GX_ASSERT(last_time < k.first);
+            last_time = k.first;
             scale_keyframes.push_back(k);
+        }
         bch.scale_samples_end_keyframe_index = scale_keyframes.size();
 
         bch.rotation_samples_count = bone_channel.rotation_samples.size();
         bch.rotation_samples_first_keyframe_index = rotation_keyframes.size();
-        for (auto& k : bone_channel.rotation_samples)
+        last_time = -0.1e-10;
+        for (auto& k : bone_channel.rotation_samples) {
+            GX_ASSERT(last_time < k.first);
+            last_time = k.first;
             rotation_keyframes.push_back(k);
+        }
         bch.rotation_samples_end_keyframe_index = rotation_keyframes.size();
 
         bch.translation_samples_count = bone_channel.translation_samples.size();
         bch.translation_samples_first_keyframe_index = translation_keyframes.size();
-        for (auto& k : bone_channel.translation_samples)
+        last_time = -0.1e-10;
+        for (auto& k : bone_channel.translation_samples) {
+            GX_ASSERT(last_time < k.first);
+            last_time = k.first;
             translation_keyframes.push_back(k);
+        }
         bch.translation_samples_end_keyframe_index = translation_keyframes.size();
 
         bones_channels.push_back(bch);
