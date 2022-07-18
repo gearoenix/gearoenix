@@ -7,6 +7,7 @@
 #else
 #include <SDL_audio.h>
 #endif
+#include <cstdint>
 #include <vector>
 
 namespace gearoenix::audio {
