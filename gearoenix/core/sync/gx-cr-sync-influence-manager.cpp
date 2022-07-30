@@ -1,13 +1,13 @@
 #include "gx-cr-sync-influence-manager.hpp"
-#include "../asset/gx-cr-asset-manager.hpp"
 
 gearoenix::core::Id gearoenix::core::sync::InfluenceManager::add(
     std::vector<Id> influenced_ids,
     const double priority,
     std::function<void()> function) noexcept
 {
-    GX_GUARD_LOCK(actions)
-    const auto id = asset::Manager::create_id();
+    std::lock_guard<std::mutex> _lg(actions_lock)
+        const auto id
+        = asset::Manager::create_id();
     actions.emplace_back(std::make_tuple(id, std::move(influenced_ids), priority, std::move(function)));
     return id;
 }

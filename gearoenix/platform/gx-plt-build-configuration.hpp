@@ -11,7 +11,6 @@
 
 #define GX_PLATFORM_WEBASSEMBLY
 #define GX_PLATFORM_INTERFACE_SDL2
-#define GX_PLATFORM_THREAD_NOT_SUPPORTED
 
 #elif defined(__unix__)
 

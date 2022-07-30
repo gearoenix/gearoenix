@@ -141,7 +141,7 @@ void gearoenix::physics::animation::Manager::create_armature(
     core::ecs::EntityBuilder& builder,
     BoneInfo& bones_info) noexcept
 {
-    GX_GUARD_LOCK(this);
+    std::lock_guard<std::mutex> _lg(this_lock);
 
     const auto root_index = bones.size();
 
@@ -167,7 +167,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     core::ecs::EntityBuilder& builder,
     ArmatureAnimationInfo& info) noexcept
 {
-    GX_GUARD_LOCK(this);
+    std::lock_guard<std::mutex> _lg(this_lock);
 
     builder.add_component(AnimationPlayer(armature_animations.size()));
     if (!info.name.empty())

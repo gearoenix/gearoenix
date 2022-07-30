@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
 #include "../gx-cr-build-configuration.hpp"
-#ifndef GX_THREAD_NOT_SUPPORTED
 #include <condition_variable>
 #include <mutex>
 
@@ -30,5 +29,4 @@ public:
     }
 };
 }
-#endif
 #endif

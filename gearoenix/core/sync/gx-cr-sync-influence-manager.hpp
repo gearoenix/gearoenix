@@ -2,7 +2,6 @@
 #define GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_HPP
 
 #include "../gx-cr-types.hpp"
-
 #include <functional>
 #include <map>
 #include <optional>
@@ -16,7 +15,7 @@ struct InfluenceManager {
     GX_GET_CREF_PRV(std::vector<std::size_t>, influencers_indices)
 private:
     std::map<Id, std::tuple<std::vector<Id>, double, std::function<void()>>> added_functions;
-    GX_CREATE_GUARD(actions);
+    std::mutex actions_lock;
     std::vector<std::variant<Id, std::tuple<Id, std::vector<Id>, double, std::function<void()>>>> actions;
 
 public:

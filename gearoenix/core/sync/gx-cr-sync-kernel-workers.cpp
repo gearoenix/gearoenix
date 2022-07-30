@@ -1,8 +1,6 @@
 #include "gx-cr-sync-kernel-workers.hpp"
-#include <utility>
-
-#ifndef GX_THREAD_NOT_SUPPORTED
 #include "gx-cr-sync-semaphore.hpp"
+#include <utility>
 
 void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel_index) noexcept
 {
@@ -27,12 +25,8 @@ void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel
     }
 #undef GX_HELPER
 }
-#endif
 
 gearoenix::core::sync::KernelWorkers::KernelWorkers() noexcept
-#ifdef GX_THREAD_NOT_SUPPORTED
-    = default;
-#else
 {
     const unsigned int kernels_count = std::thread::hardware_concurrency();
     signals.reserve(kernels_count);
@@ -44,12 +38,8 @@ gearoenix::core::sync::KernelWorkers::KernelWorkers() noexcept
         workers_syncers.push_back(std::make_shared<std::mutex>());
     }
 }
-#endif
 
 gearoenix::core::sync::KernelWorkers::~KernelWorkers() noexcept
-#ifdef GX_THREAD_NOT_SUPPORTED
-    = default;
-#else
 {
     state = State::Terminating;
     while (state != State::Terminated)
@@ -58,7 +48,6 @@ gearoenix::core::sync::KernelWorkers::~KernelWorkers() noexcept
     for (std::thread& t : threads)
         t.join();
 }
-#endif
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver) noexcept
 {
@@ -67,13 +56,6 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const uns
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver) noexcept
 {
-#ifdef GX_THREAD_NOT_SUPPORTED
-    workers.push_back(Worker {
-        .sender = std::move(sender),
-        .worker = std::move(worker),
-        .meanwhile = std::move(meanwhile),
-        .receiver = std::move(receiver) });
-#else
     const size_t kernels_count = threads.size();
     std::vector<std::shared_ptr<Semaphore>> waits;
     std::vector<std::shared_ptr<Semaphore>> worker_signals;
@@ -94,19 +76,10 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender
         .receiver = std::move(receiver) });
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->unlock();
-#endif
 }
 
 void gearoenix::core::sync::KernelWorkers::do_steps() noexcept
 {
-#ifdef GX_THREAD_NOT_SUPPORTED
-    for (Worker& worker : workers) {
-        worker.sender();
-        worker.worker(0);
-        worker.meanwhile();
-        worker.receiver();
-    }
-#else
     for (const std::shared_ptr<Semaphore>& signal : signals)
         signal->release();
     for (Worker& worker : workers) {
@@ -118,15 +91,9 @@ void gearoenix::core::sync::KernelWorkers::do_steps() noexcept
             signal->lock();
         worker.receiver();
     }
-#endif
 }
 
 unsigned int gearoenix::core::sync::KernelWorkers::get_threads_count() const noexcept
 {
-#ifdef GX_THREAD_NOT_SUPPORTED
-    (void)this;
-    return static_cast<unsigned int>(1);
-#else
     return static_cast<unsigned int>(threads.size());
-#endif
 }

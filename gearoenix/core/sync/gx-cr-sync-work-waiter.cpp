@@ -1,18 +1,4 @@
 #include "gx-cr-sync-work-waiter.hpp"
-
-#ifdef GX_THREAD_NOT_SUPPORTED
-
-gearoenix::core::sync::WorkWaiter::WorkWaiter() = default;
-gearoenix::core::sync::WorkWaiter::~WorkWaiter() = default;
-
-void gearoenix::core::sync::WorkWaiter::push(const std::function<void()>& f)
-{
-    f();
-    (void)this;
-}
-
-#else
-
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <utility>
 
@@ -49,5 +35,3 @@ void gearoenix::core::sync::WorkWaiter::push(std::function<void()>&& f) noexcept
     function_loader.load(std::move(f));
     semaphore.release();
 }
-
-#endif

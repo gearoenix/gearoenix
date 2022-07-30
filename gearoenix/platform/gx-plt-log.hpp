@@ -3,7 +3,6 @@
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/macro/gx-cr-mcr-concatenate.hpp"
 #include "gx-plt-build-configuration.hpp"
-#include "macro/gx-plt-mcr-lock.hpp"
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -25,7 +24,7 @@ struct Log {
     static std::ofstream file;
 #endif
 #endif
-    GX_CREATE_GUARD_S(log);
+    static std::mutex log_lock;
     static std::stringstream header(const char*, int, const char*);
 };
 }
@@ -34,7 +33,7 @@ struct Log {
 #define GX_PLT_LOG_STR_VAR GX_CONCAT_5(_gearoenix_platform_log_str_, __LINE__)
 
 #ifdef GX_DEBUG_MODE
-#define GX_PLT_LOG_FILE_LOCK_GUARD GX_GUARD_LOCK(gearoenix::platform::Log::log);
+#define GX_PLT_LOG_FILE_LOCK_GUARD std::lock_guard<std::mutex> GX_CONCAT_5(_gearoenix_platform_log_lock_guard_, __LINE__)(gearoenix::platform::Log::log_lock);
 #define GX_PLT_LOG_END_OF_MSG << std::flush
 #else
 #define GX_PLT_LOG_FILE_LOCK_GUARD

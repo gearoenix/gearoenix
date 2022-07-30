@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 #include <map>
@@ -25,15 +24,15 @@ struct Target;
 struct Manager {
 protected:
     engine::Engine& e;
-    GX_CREATE_GUARD(brdflut);
+    std::mutex brdflut_lock;
     std::shared_ptr<Texture2D> brdflut;
-    GX_CREATE_GUARD(checkers);
+    std::mutex checkers_lock;
     std::shared_ptr<Texture2D> checkers;
-    GX_CREATE_GUARD(textures_2d);
+    std::mutex textures_2d_lock;
     std::map<std::string, std::weak_ptr<Texture2D>> textures_2d;
-    GX_CREATE_GUARD(textures_cube);
+    std::mutex textures_cube_lock;
     std::map<std::string, std::weak_ptr<TextureCube>> textures_cube;
-    GX_CREATE_GUARD(targets);
+    std::mutex targets_lock;
     std::map<std::string, std::weak_ptr<Target>> targets;
 
     [[nodiscard]] virtual std::shared_ptr<Texture2D> create_2d_from_pixels_v(

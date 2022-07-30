@@ -1,17 +1,13 @@
 #ifndef GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
 #define GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
 #include "../gx-cr-build-configuration.hpp"
-
-#ifndef GX_THREAD_NOT_SUPPORTED
 #include <functional>
 #include <thread>
-#endif
 
 namespace gearoenix::core::sync {
 struct ParallelFor final {
-#ifndef GX_THREAD_NOT_SUPPORTED
+
     static void exec(const std::function<void(unsigned int, unsigned int)>& fun) noexcept;
-#endif
 
 public:
     ParallelFor() = delete;
@@ -20,10 +16,6 @@ public:
     template <typename Iter, typename Fun>
     static void exec(Iter first, Iter end, Fun&& f)
     {
-#ifdef GX_THREAD_NOT_SUPPORTED
-        for (; first != end; ++first)
-            f(*first, 0);
-#else
         exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
             Iter iter = first;
             for (unsigned int i = 0; i < kernel_index; ++i, ++iter)
@@ -36,16 +28,11 @@ public:
                         return;
             }
         });
-#endif
     }
 
     template <typename Iter, typename Fun>
     static void execi(Iter first, Iter end, Fun&& f)
     {
-#ifdef GX_THREAD_NOT_SUPPORTED
-        for (unsigned int index = 0; first != end; ++first, ++index)
-            f(*first, index, 0);
-#else
         exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
             unsigned int index = kernel_index;
             Iter iter = first;
@@ -59,16 +46,11 @@ public:
                         return;
             }
         });
-#endif
     }
 
     template <typename Iter, typename Fun>
     static void seq_ranges_exec(Iter first, Iter end, Fun&& f)
     {
-#ifdef GX_THREAD_NOT_SUPPORTED
-        for (unsigned int index = 0; first != end; ++first, ++index)
-            f(*first, index, 0);
-#else
         const auto threads_count = std::thread::hardware_concurrency();
         const auto count = static_cast<decltype(threads_count)>(end - first);
         const auto loop_count = threads_count - 1;
@@ -88,7 +70,6 @@ public:
                 f(*iter, kernel_index);
             }
         });
-#endif
     }
 };
 }

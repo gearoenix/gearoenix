@@ -13,7 +13,7 @@ gearoenix::core::Allocator::Allocator(
 
 void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexcept
 {
-    GX_GUARD_LOCK(this);
+    std::lock_guard<std::mutex> _lg(this_lock);
     auto* const child_previous = child->previous;
     auto* const child_next = child->next;
     const auto new_range = std::make_pair(child_previous, child_next);
@@ -56,7 +56,7 @@ gearoenix::core::Allocator::~Allocator() noexcept
 
 std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(const std::size_t sz) noexcept
 {
-    GX_GUARD_LOCK(this);
+    std::lock_guard<std::mutex> _lg(this_lock);
     auto search = std::upper_bound(
         ranges.begin(), ranges.end(), sz,
         [](const std::size_t a, const decltype(ranges)::value_type& b) {

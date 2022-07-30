@@ -3,25 +3,20 @@
 #include "../gx-cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
-#include <vector>
-
-#ifndef GX_THREAD_NOT_SUPPORTED
 #include <mutex>
 #include <thread>
+#include <vector>
 
 namespace gearoenix::core::sync {
 struct Semaphore;
 }
-#endif
 
 namespace gearoenix::core::sync {
 struct KernelWorkers final {
 private:
     struct Worker final {
-#ifndef GX_THREAD_NOT_SUPPORTED
         const std::vector<std::shared_ptr<Semaphore>> waits;
         const std::vector<std::shared_ptr<Semaphore>> signals;
-#endif
         const std::function<void()> sender;
         const std::function<void(const unsigned int)> worker;
         const std::function<void()> meanwhile;
@@ -29,7 +24,6 @@ private:
     };
     std::vector<Worker> workers;
 
-#ifndef GX_THREAD_NOT_SUPPORTED
     enum struct State : int {
         Running,
         Terminating,
@@ -43,7 +37,6 @@ private:
     std::vector<std::shared_ptr<std::mutex>> workers_syncers;
 
     void thread_loop(unsigned int) noexcept;
-#endif
 
 public:
     KernelWorkers() noexcept;

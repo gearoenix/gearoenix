@@ -117,7 +117,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
                                                                                      : colour.w * 255.0f + 0.51f);
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
-        GX_GUARD_LOCK(textures_2d);
+        std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -146,7 +146,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    GX_GUARD_LOCK(brdflut);
+    std::lock_guard<std::mutex> _lg(brdflut_lock);
     if (nullptr != brdflut)
         return brdflut;
     constexpr auto file_name = "default-brdflut.gx-2d-texture";
@@ -185,7 +185,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_checker(
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    GX_GUARD_LOCK(checkers);
+    std::lock_guard<std::mutex> _lg(checkers_lock);
     if (nullptr != checkers)
         return checkers;
     const TextureInfo texture_info {
@@ -216,7 +216,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name, std::vector<std::vector<std::uint8_t>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d);
+        std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -232,7 +232,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d);
+        std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -269,7 +269,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d);
+        std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -319,7 +319,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_2d);
+        std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -345,7 +345,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
                                                                                      : colour.w * 255.0f + 0.51f);
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
-        GX_GUARD_LOCK(textures_cube);
+        std::lock_guard<std::mutex> _lg(textures_cube_lock);
         if (const auto search = textures_cube.find(name); textures_cube.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -375,7 +375,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     std::string name, std::vector<std::vector<std::vector<std::uint8_t>>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(textures_cube);
+        std::lock_guard<std::mutex> _lg(textures_cube_lock);
         if (const auto search = textures_cube.find(name); textures_cube.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -387,7 +387,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
     std::string name, std::vector<Attachment>&& attachments, const core::sync::EndCallerIgnored& c) noexcept
 {
     {
-        GX_GUARD_LOCK(targets);
+        std::lock_guard<std::mutex> _lg(targets_lock);
         if (const auto search = targets.find(name); targets.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;

@@ -12,7 +12,7 @@ gearoenix::core::FunctionLoader::~FunctionLoader() noexcept
 
 void gearoenix::core::FunctionLoader::load(std::function<void()>&& fun) noexcept
 {
-    GX_GUARD_LOCK(load_functions);
+    std::lock_guard<std::mutex> _lg(load_functions_lock);
     load_functions.push_back(std::move(fun));
 }
 
@@ -21,7 +21,7 @@ void gearoenix::core::FunctionLoader::unload() noexcept
     while (!load_functions.empty()) {
         std::vector<std::function<void()>> functions;
         {
-            GX_GUARD_LOCK(load_functions);
+            std::lock_guard<std::mutex> _lg(load_functions_lock);
             std::swap(load_functions, functions);
         }
         for (const auto& f : functions) {

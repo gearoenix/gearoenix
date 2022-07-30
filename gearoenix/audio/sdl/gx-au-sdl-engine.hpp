@@ -22,6 +22,7 @@ struct SdlEngine final {
     SdlEngine(const SdlEngine&) = delete;
 
     void play(const std::vector<std::uint16_t>& samples) noexcept;
+    [[nodiscard]] int in_queue_samples_count() noexcept;
 };
 
 using PlatformEngine = SdlEngine;

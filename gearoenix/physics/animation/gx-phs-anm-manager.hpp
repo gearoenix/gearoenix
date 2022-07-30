@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
 #define GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-phs-anm-animation.hpp"
 #include "gx-phs-anm-armature.hpp"
 #include "gx-phs-anm-bone.hpp"
@@ -23,7 +22,7 @@ struct Manager final {
     render::engine::Engine& e;
 
 private:
-    GX_CREATE_GUARD(this);
+    std::mutex this_lock;
 
     std::vector<Bone> bones;
     std::map<std::string, std::size_t> bones_indices;

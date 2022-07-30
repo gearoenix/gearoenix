@@ -13,7 +13,6 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_MACOS_SRC}
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp
-        ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-lock.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-application.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/sdl2/gx-plt-sdl2-key.cpp

@@ -1,5 +1,4 @@
 #include "gx-cr-sync-parallel-for.hpp"
-#ifndef GX_THREAD_NOT_SUPPORTED
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-sync-semaphore.hpp"
 #include <map>
@@ -98,4 +97,3 @@ void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned 
         signal.lock();
     }
 }
-#endif

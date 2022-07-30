@@ -14,7 +14,7 @@ void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) 
 
 void gearoenix::core::ecs::World::delayed_create_entity_with_builder(EntityBuilder&& b) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions);
+    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::move(b));
 }
 
@@ -35,7 +35,7 @@ void gearoenix::core::ecs::World::remove_entity(const Entity::id_t id) noexcept
 
 void gearoenix::core::ecs::World::delayed_remove_entity(const Entity::id_t id) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions);
+    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(id);
 }
 
@@ -60,7 +60,7 @@ void gearoenix::core::ecs::World::add_components_map(const Entity::id_t id, Enti
 
 void gearoenix::core::ecs::World::delayed_add_components_map(const Entity::id_t ei, EntityBuilder::components_t&& cs) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions);
+    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -95,7 +95,7 @@ void gearoenix::core::ecs::World::delayed_remove_components_list(
     const Entity::id_t ei,
     std::vector<std::type_index>&& cs) noexcept
 {
-    GX_GUARD_LOCK(delayed_actions);
+    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -137,7 +137,7 @@ void gearoenix::core::ecs::World::update() noexcept
 {
     decltype(delayed_actions) actions;
     {
-        GX_GUARD_LOCK(delayed_actions);
+        std::lock_guard<std::mutex> _lg(delayed_actions_lock);
         std::swap(actions, delayed_actions);
     }
     for (auto& action : actions) {

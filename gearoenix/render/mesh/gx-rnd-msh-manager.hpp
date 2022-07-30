@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_MESH_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../texture/gx-rnd-txt-face.hpp"
 #include <map>
@@ -18,7 +17,7 @@ struct Mesh;
 struct Manager {
 protected:
     engine::Engine& e;
-    GX_CREATE_GUARD(meshes);
+    std::mutex meshes_lock;
     std::map<std::string, std::weak_ptr<Mesh>> meshes;
 
     explicit Manager(engine::Engine& e) noexcept;

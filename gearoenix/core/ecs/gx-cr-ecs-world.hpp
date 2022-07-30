@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_ECS_WORLD_HPP
 #define GEAROENIX_CORE_ECS_WORLD_HPP
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include <boost/container/flat_map.hpp>
@@ -19,7 +18,7 @@ private:
     boost::container::flat_map<Entity::id_t, Entity> entities;
     boost::container::flat_map<std::string, Entity::id_t> name_to_entity_id;
 
-    GX_CREATE_GUARD(delayed_actions);
+    std::mutex delayed_actions_lock;
     // 0 - Entity addition
     // 1 - Entity deletion
     // 2 - Component(s) addition

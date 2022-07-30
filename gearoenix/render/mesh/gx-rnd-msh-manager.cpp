@@ -12,7 +12,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     std::string name = "default-icosphere-" + std::to_string(subdivisions);
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
@@ -175,7 +175,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     std::string name = "default-plate-mesh";
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
@@ -212,7 +212,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     std::string name = "default-cube-mesh";
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
@@ -367,7 +367,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
 {
     std::string name = "default-cube-mesh";
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
@@ -525,7 +525,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     core::sync::EndCallerIgnored&& end_callback) noexcept
 {
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;
@@ -545,7 +545,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     core::sync::EndCallerIgnored&& end_callback) noexcept
 {
     {
-        GX_GUARD_LOCK(meshes);
+        std::lock_guard<std::mutex> _lg(meshes_lock);
         if (auto search = meshes.find(name); meshes.end() != search)
             if (auto m = search->second.lock(); nullptr != m)
                 return m;

@@ -42,7 +42,7 @@
 #include <algorithm>
 #include <imgui_impl_opengl3.h>
 
-#if defined(GX_PLATFORM_INTERFACE_ANDROID) || defined(GX_PLATFORM_THREAD_NOT_SUPPORTED)
+#if defined(GX_PLATFORM_INTERFACE_ANDROID)
 #define GX_ALGORITHM_EXECUTION
 #else
 #include <execution>

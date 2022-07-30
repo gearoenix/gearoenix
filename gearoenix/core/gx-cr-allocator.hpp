@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_CORE_ALLOCATOR_HPP
 #define GEAROENIX_CORE_ALLOCATOR_HPP
-#include "../platform/macro/gx-plt-mcr-lock.hpp"
 #include "macro/gx-cr-mcr-getter-setter.hpp"
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <set>
 
@@ -18,7 +18,7 @@ private:
     typedef std::pair<std::size_t, std::size_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space
     typedef std::pair<Allocator*, Allocator*> Range;
-    GX_CREATE_GUARD(this);
+    std::mutex this_lock;
     std::map<SizeOffset, Range> ranges;
     std::weak_ptr<Allocator> self;
     const std::shared_ptr<Allocator> parent;
