@@ -1,12 +1,14 @@
 #ifndef GEAROENIX_AUDIO_AUDIO_HPP
 #define GEAROENIX_AUDIO_AUDIO_HPP
-#include <memory>
 #include <string>
-#include <vector>
+
+namespace FMOD {
+class Sound;
+}
 
 namespace gearoenix::audio {
 struct Audio final {
-    const std::vector<std::uint16_t> samples;
+    FMOD::Sound* const sound = nullptr;
     const std::string name;
 };
 }

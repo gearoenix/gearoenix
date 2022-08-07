@@ -1,38 +1,15 @@
 #include "gx-au-manager.hpp"
+#include "../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-au-audio.hpp"
+#include "gx-au-engine.hpp"
+#include "gx-au-macros.hpp"
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
-#include "../platform/macro/gx-plt-mcr-disable-warnings.hpp"
-#include "../platform/macro/gx-plt-mcr-enable-warnings.hpp"
-#include <stb_vorbis.c>
-
-gearoenix::audio::Manager::Manager(platform::Application& platform_application) noexcept
-    : platform_application(platform_application)
+gearoenix::audio::Manager::Manager(Engine& engine) noexcept
+    : engine(engine)
 {
-}
-
-void gearoenix::audio::Manager::fill_samples(std::size_t player_index, std::vector<std::uint16_t>& samples) noexcept
-{
-    fill_samples(players[player_index], samples);
-}
-
-void gearoenix::audio::Manager::fill_samples(Player& player, std::vector<std::uint16_t>& samples) noexcept
-{
-    if (!player.enabled)
-        return;
-    auto& aud_samples = audios[player.audio_index].samples;
-    const double scale = player.channel_scale;
-    constexpr std::uint32_t dom = 10000;
-    const auto nom = static_cast<std::uint32_t>(scale * static_cast<double>(dom));
-    for (std::size_t sample_index = 0; sample_index < samples.size(); ++sample_index, ++player.sample_index) {
-        // Ugly but for now
-        if (aud_samples.size() <= player.sample_index) {
-            if (player.wrap == Wrap::Once)
-                return;
-            player.sample_index = 0;
-        }
-        samples[sample_index] += static_cast<std::uint16_t>((static_cast<std::uint32_t>(aud_samples[player.sample_index]) * nom) / dom);
-        samples[sample_index] = aud_samples[player.sample_index];
-    }
 }
 
 std::size_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name) noexcept
@@ -42,7 +19,7 @@ std::size_t gearoenix::audio::Manager::create_audio(const std::string& asset_pat
 
 std::size_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name) noexcept
 {
-    auto stream = platform::stream::Stream::open(asset_path, platform_application);
+    auto stream = platform::stream::Stream::open(asset_path, engine.get_platform_application());
     return create_audio(*stream, name);
 }
 
@@ -54,40 +31,31 @@ std::size_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& as
 
 std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name) noexcept
 {
-    int channels_count = 0, sample_rate = 0;
-    short* output = nullptr;
-    const auto result = stb_vorbis_decode_memory(
-        ogg_data.data(),
-        static_cast<int>(ogg_data.size()),
-        &channels_count,
-        &sample_rate,
-        &output);
-    GX_ASSERT(result > 0);
-    GX_ASSERT(output != nullptr);
-    std::vector<std::uint16_t> samples(result);
-    for (int sample_index = 0; sample_index < result; ++sample_index)
-        samples[sample_index] = static_cast<std::uint16_t>(static_cast<int>(output[sample_index]) + (1 << 15));
-    std::free(output);
+    FMOD_CREATESOUNDEXINFO info;
+    GX_SET_ZERO(info);
+    info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+    info.length = static_cast<decltype(info.length)>(ogg_data.size());
+    FMOD::Sound* sound = nullptr;
+    engine.get_system()->createSound(
+        reinterpret_cast<const char*>(ogg_data.data()),
+        FMOD_CREATESAMPLE | FMOD_OPENMEMORY | FMOD_LOOP_NORMAL,
+        &info,
+        &sound);
     std::lock_guard<std::mutex> _ignore_lg(this_lock);
     const auto audio_index = audios.size();
-    audios.emplace_back(samples, name);
+    audios.emplace_back(sound, name);
     audio_name_map.emplace(name, audio_index);
     return audio_index;
 }
 
-std::size_t gearoenix::audio::Manager::create_player(
-    const std::string& name,
-    const std::size_t audio_index,
-    const float channel_scale,
-    const Wrap wrap) noexcept
+std::size_t gearoenix::audio::Manager::create_player(const std::string& name, const std::size_t audio_index, const bool is_loop) noexcept
 {
+    FMOD::Channel* channel = nullptr;
+    GX_AUDIO_FMOD_RESULT_CHECK(engine.get_system()->playSound(audios[audio_index].sound, nullptr, false, &channel));
+    if (is_loop)
+        GX_AUDIO_FMOD_RESULT_CHECK(channel->setLoopCount(-1));
     std::lock_guard<std::mutex> _ignore_lg(this_lock);
     const auto player_index = players.size();
-    players.push_back(Player {
-        .name = name,
-        .audio_index = audio_index,
-        .channel_scale = channel_scale,
-        .wrap = wrap,
-    });
+    players.emplace_back(name, audio_index, channel, is_loop);
     return player_index;
 }
