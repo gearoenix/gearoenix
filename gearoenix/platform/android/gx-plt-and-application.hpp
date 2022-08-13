@@ -30,6 +30,7 @@ private:
     static int32_t handle_input(android_app* app, AInputEvent* e) noexcept;
     void on_check_ready_to_render(android_app*) noexcept;
     void on_not_ready_to_render() noexcept;
+    void make_thread_current_jni() noexcept;
 
 public:
     Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;

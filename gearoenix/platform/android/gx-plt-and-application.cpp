@@ -155,6 +155,7 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
             base.initialize_window_size(
                 ANativeWindow_getWidth(android_application->window),
                 ANativeWindow_getHeight(android_application->window));
+            make_thread_current_jni();
             base.initialize_engine(*this);
         }
 #endif
@@ -198,6 +199,14 @@ void gearoenix::platform::Application::on_not_ready_to_render() noexcept
         gl_context->suspend();
     }
 #endif
+}
+
+void gearoenix::platform::Application::make_thread_current_jni() noexcept
+{
+    JavaVM* const java_vm = android_application->activity->vm;
+    JNIEnv* java_env = nullptr;
+    GX_ASSERT(JNI_ERR != java_vm->GetEnv((void**)&java_env, JNI_VERSION_1_6));
+    GX_ASSERT(JNI_ERR != java_vm->AttachCurrentThread(&java_env, nullptr));
 }
 
 gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept

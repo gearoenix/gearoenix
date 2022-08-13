@@ -42,7 +42,7 @@ void gearoenix::render::camera::Camera::set_projection_type(const Projection p) 
 void gearoenix::render::camera::Camera::update_projection() noexcept
 {
     if (Projection::Perspective == projection_type) {
-        const auto s = 2.0f * near * tanf(scale_fovy);
+        const auto s = 2.0f * near * tanf(scale_fovy * 0.5f);
         projection = math::Mat4x4<float>::perspective(target_aspect_ratio * s, s, near, far);
     } else
         projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * scale_fovy, scale_fovy, near, far);

@@ -64,3 +64,5 @@ captures
 proguard-rules.pro
 
 games/
+android/app/release/
+android/app/debug/

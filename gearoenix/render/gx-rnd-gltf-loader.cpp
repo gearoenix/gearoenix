@@ -508,7 +508,7 @@ static std::pair<std::vector<int>, std::optional<gearoenix::physics::animation::
     const tinygltf::Model& data) noexcept
 {
     if (node.skin == -1)
-        return { {}, std::nullopt };
+        return std::make_pair(std::vector<int>(), std::nullopt);
     const auto& skin = data.skins[node.skin];
     std::vector<int> bone_index_map(skin.joints.size());
     GX_ASSERT_D(-1 != skin.inverseBindMatrices);

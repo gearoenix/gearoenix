@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import org.fmod.FMOD;
+
 public class MainActivity extends NativeActivity {
 
     final static int VISIBILITY_OPTS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -15,6 +17,7 @@ public class MainActivity extends NativeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FMOD.init(this);
         super.onCreate(savedInstanceState);
         setDecor();
     }
@@ -49,5 +52,9 @@ public class MainActivity extends NativeActivity {
         if (imm != null) {
             imm.hideSoftInputFromWindow( this.getWindow().getDecorView().getWindowToken(), 0 );
         }
+    }
+
+    static {
+        System.loadLibrary("fmodL");
     }
 }

@@ -43,7 +43,7 @@ std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::u
         &sound);
     std::lock_guard<std::mutex> _ignore_lg(this_lock);
     const auto audio_index = audios.size();
-    audios.emplace_back(sound, name);
+    audios.push_back(Audio { sound, name });
     audio_name_map.emplace(name, audio_index);
     return audio_index;
 }
@@ -56,6 +56,6 @@ std::size_t gearoenix::audio::Manager::create_player(const std::string& name, co
         GX_AUDIO_FMOD_RESULT_CHECK(channel->setLoopCount(-1));
     std::lock_guard<std::mutex> _ignore_lg(this_lock);
     const auto player_index = players.size();
-    players.emplace_back(name, audio_index, channel, is_loop);
+    players.push_back(Player { name, audio_index, channel, is_loop });
     return player_index;
 }

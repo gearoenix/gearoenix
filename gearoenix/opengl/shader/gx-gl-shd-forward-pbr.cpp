@@ -194,21 +194,21 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    float geometry_schlick_k_inv = 1.0 - geometry_schlick_k;\n";
     fs << "    float one_minus_metallic = 1.0 - mtr.x;\n";
     fs << "\n";
-    if (shadow_casters_directional_lights_count > 0) {
-        fs << "    for (int dir_i = 0; dir_i < " << shadow_casters_directional_lights_count << "; ++dir_i) {\n";
-        fs << "        float normal_dot_light = max(dot(nrm, shadow_caster_directional_light_direction[dir_i]), 0.00001);\n";
+    for (int dir_i = 0; dir_i < shadow_casters_directional_lights_count; ++dir_i) {
+        fs << "    {\n";
+        fs << "        float normal_dot_light = max(dot(nrm, shadow_caster_directional_light_direction[" << dir_i << "]), 0.00001);\n";
         fs << "        float shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);\n";
-        fs << "        vec4 light_uv_depth = shadow_caster_directional_light_normalised_vp[dir_i] * vec4(out_pos, 1.0);\n";
+        fs << "        vec4 light_uv_depth = shadow_caster_directional_light_normalised_vp[" << dir_i << "] * vec4(out_pos, 1.0);\n";
         fs << "        light_uv_depth.xyz /= light_uv_depth.w;\n";
         fs << "        light_uv_depth.xyz *= 0.5;\n";
         fs << "        light_uv_depth.xyz += 0.5;\n";
         fs << "        vec2 uv_bounds = step(vec2(0.0), light_uv_depth.xy) * step(light_uv_depth.xy, vec2(1.0));\n";
         fs << "        float shadow_w = uv_bounds.x * uv_bounds.y;\n";
-        fs << "        float depth = texture(shadow_caster_directional_light_shadow_map[dir_i], light_uv_depth.xy, 0.0).x;\n";
+        fs << "        float depth = texture(shadow_caster_directional_light_shadow_map[" << dir_i << "], light_uv_depth.xy, 0.0).x;\n";
         fs << "        float light_w = 1.0 - (step(depth + shadow_bias, light_uv_depth.z) * shadow_w);\n";
         fs << "        lumination += light_w * compute_light(\n";
-        fs << "            shadow_caster_directional_light_direction[dir_i],\n";
-        fs << "            shadow_caster_directional_light_colour[dir_i],\n";
+        fs << "            shadow_caster_directional_light_direction[" << dir_i << "],\n";
+        fs << "            shadow_caster_directional_light_colour[" << dir_i << "],\n";
         fs << "            -eye,\n";
         fs << "            nrm,\n";
         fs << "            normal_dot_view,\n";

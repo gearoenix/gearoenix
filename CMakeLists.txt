@@ -14,21 +14,31 @@ OPTION(GX_TEST_ENABLED "Enables test units" ON)
 # Test coverage
 OPTION(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
+MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
+
+SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
+
+SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2") # TODO: It'll be removed after new sdk design has been implemented.
+SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include") # TODO: It'll be removed after new sdk design has been implemented.
+SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build") # TODO: It'll be removed after new sdk design has been implemented.
+
 IF (CMAKE_SYSTEM_NAME MATCHES "Android")
+    MESSAGE(STATUS "Building for Android ${ANDROID_ABI}.")
     SET(GX_IN_ANDROID TRUE)
-    ADD_LIBRARY(native_app_glue
-            STATIC
-            ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/android)
+    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/lib/${ANDROID_ABI})
+    ADD_LIBRARY(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
     INCLUDE_DIRECTORIES(${ANDROID_NDK}/sources/android/native_app_glue)
-    SET(CMAKE_SHARED_LINKER_FLAGS
-            "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
-    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} android native_app_glue EGL log GLESv3)
+    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} android native_app_glue EGL log GLESv3 ${GX_SDK_LIBS_PATH}/libfmodL.so)
     ADD_DEFINITIONS(-DIMGUI_IMPL_OPENGL_ES3=1)
 ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     SET(GX_IN_WASM)
     MESSAGE(STATUS "Building for Emscripten.")
-    SET(GX_EMS_FLAGS "-s WASM=1 -s NO_EXIT_RUNTIME=1 -s BINARYEN=1 -s USE_SDL=2 --no-heap-copy -Os -s DISABLE_EXCEPTION_CATCHING=0")
-    SET(GX_EMS_FLAGS "${GX_EMS_FLAGS} -s INITIAL_MEMORY=268435456 -s ALLOW_MEMORY_GROWTH=1 -s MAX_WEBGL_VERSION=2 -s LLD_REPORT_UNDEFINED")
+    SET(GX_EMS_FLAGS "-s WASM=1 -s NO_EXIT_RUNTIME=1 -s BINARYEN=1 -s USE_SDL=2")
+    SET(GX_EMS_FLAGS "${GX_EMS_FLAGS} --no-heap-copy -Os -s DISABLE_EXCEPTION_CATCHING=0")
+    SET(GX_EMS_FLAGS "${GX_EMS_FLAGS} -s INITIAL_MEMORY=268435456 -s ALLOW_MEMORY_GROWTH=1")
+    SET(GX_EMS_FLAGS "${GX_EMS_FLAGS} -s MAX_WEBGL_VERSION=2 -s LLD_REPORT_UNDEFINED")
     SET(GX_EMS_FLAGS "${GX_EMS_FLAGS} --preload-file ${CMAKE_SOURCE_DIR}/assets@/")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GX_EMS_FLAGS}")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GX_EMS_FLAGS}")
@@ -37,9 +47,41 @@ ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     SET(CMAKE_EXECUTABLE_SUFFIX .html)
 ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
     SET(GX_IN_LINUX TRUE)
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} SDL2 libSDL2main.a)
+    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/libs)
 ELSEIF (MSVC)
     SET(GX_IN_WINDOWS TRUE)
     INCLUDE_DIRECTORIES(${GX_STB_INCLUDE_DIRS})
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+    SET(CMAKE_CXX_FLAGS "/std:c++latest /MP /arch:AVX2 /fp:fast /Oi ${CMAKE_CXX_FLAGS}")
+    ADD_COMPILE_OPTIONS("$<$<CONFIG:RELEASE>:/Ot>")
+    ADD_COMPILE_OPTIONS("$<$<CONFIG:RELEASE>:/Ox>")
+    SET(GEAROENIX_EXE_TARGET "WIN32")
+    SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/windows)
+    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/libs)
+    SET(GX_COMMON_LIBS
+            ${GX_COMMON_LIBS}
+            winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
+    SET(GX_DEBUG_LIBS # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_DEBUG_LIBS} # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2-staticd.lib # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2maind.lib) # TODO: It'll be removed after new sdk design has been implemented.
+    SET(GX_RELEASE_LIBS # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_RELEASE_LIBS} # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib # TODO: It'll be removed after new sdk design has been implemented.
+            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib) # TODO: It'll be removed after new sdk design has been implemented.
+ELSEIF (APPLE)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
+    IF (CMAKE_SYSTEM_NAME MATCHES "iOS")
+        SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/ios)
+        SET(GX_IN_IOS TRUE)
+    ELSE ()
+        SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/macos)
+        SET(GX_IN_MACOS TRUE)
+    ENDIF ()
+    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/libs)
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} iconv)
 ENDIF()
 
 IF (GX_COVERAGE_ENABLED AND GX_TEST_ENABLED)
@@ -57,77 +99,29 @@ INCLUDE(gx-download-file)
 INCLUDE(gx-flag-util)
 INCLUDE(gx-imgui)
 
-MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
-
-IF (MSVC)
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-    SET(CMAKE_CXX_FLAGS "/std:c++latest /MP /arch:AVX2 /fp:fast /Oi ${CMAKE_CXX_FLAGS}")
-    ADD_COMPILE_OPTIONS("$<$<CONFIG:RELEASE>:/Ot>")
-    ADD_COMPILE_OPTIONS("$<$<CONFIG:RELEASE>:/Ox>")
+IF (GX_IN_WINDOWS)
     GX_REPLACE_FLAG(CMAKE_CXX_FLAGS "/W3" "/W4")
-    SET(GEAROENIX_EXE_TARGET "WIN32")
 ELSE ()
     SET(CMAKE_CXX_FLAGS "-std=c++20 ${CMAKE_CXX_FLAGS}")
 ENDIF ()
 
-SET(GX_IN_IOS OFF)
-
-IF (APPLE)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
-    IF (CMAKE_SYSTEM_NAME MATCHES "iOS")
-        SET(GX_IN_IOS ON)
-    ENDIF (CMAKE_SYSTEM_NAME MATCHES "iOS")
-    MESSAGE(STATUS "Compilation for iOS activation status: ${GX_IN_IOS}")
-ENDIF (APPLE)
-
-IF (GX_IN_LINUX)
-    SET(GX_LIBS ${GX_LIBS} dl)
-ENDIF (GX_IN_LINUX)
-
-SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
-SET(GX_SDK_LIB_PATH "${GX_SDK_PATH}/libs/")
-
 SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
 
 IF (NOT GX_IN_LINUX)
-    SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2")
     GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.22.zip" "${GX_SDL2_PATH}")
     SET(GX_CMAKE_ARGS "-DSDL_LIBC=ON")
     GX_COMPILE_LIB(${GX_SDL2_PATH})
     SET(GX_CMAKE_ARGS "")
-    SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include")
     INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
-    SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build")
-ENDIF()
+ENDIF ()
 
-IF(GX_IN_LINUX)
-    SET(GX_COMMON_LIBS
-            ${GX_COMMON_LIBS}
-            SDL2
-            libSDL2main.a)
-ELSEIF(GX_IN_WINDOWS)
-    SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/windows)
-    SET(GX_COMMON_LIBS
-            ${GX_COMMON_LIBS}
-            winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
-    SET(GX_DEBUG_LIBS
-            ${GX_DEBUG_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2-staticd.lib
-            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2maind.lib)
-    SET(GX_RELEASE_LIBS
-            ${GX_RELEASE_LIBS}
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib)
-ELSEIF(APPLE)
-    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} iconv)
-ENDIF()
-
-SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/libs)
+INCLUDE_DIRECTORIES(${GX_SDK_PATH}/include)
 INCLUDE_DIRECTORIES(${GX_PLATFORM_SDK_PATH}/include)
-SET(GX_COMMON_LIBS
-        ${GX_COMMON_LIBS}
-        ${GX_SDK_LIBS_PATH}/fmod_vc.lib)
+
+IF(GX_IN_WINDOWS)
+    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} ${GX_SDK_LIBS_PATH}/fmod_vc.lib)
+ENDIF()
+
 SET(GX_DEBUG_LIBS ${GX_DEBUG_LIBS} ${GX_COMMON_LIBS})
 SET(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
