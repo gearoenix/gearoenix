@@ -5,9 +5,9 @@
 // This is a workaround for warnings in stb
 #include "../../platform/macro/gx-plt-mcr-disable-warnings.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <stb/stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include <stb/stb_image_write.h>
 // Returning to our warning level
 #include "../../platform/macro/gx-plt-mcr-enable-warnings.hpp"
 

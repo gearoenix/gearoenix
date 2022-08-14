@@ -1,4 +1,4 @@
-SET(GX_ENGINE_SRC_DIR "${CMAKE_SOURCE_DIR}/gearoenix")
+SET(GX_ENGINE_SRC_DIR ${CMAKE_SOURCE_DIR}/gearoenix)
 
 MESSAGE(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}.")
 
@@ -53,8 +53,7 @@ SET(GX_ENGINE_IMGUI_SRC
         ${GX_IMGUI_PATH}/imgui_widgets.cpp
         ${GX_IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
         ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp
-        ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp
-        ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
+        ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp)
 
 SOURCE_GROUP("imgui" FILES ${GX_ENGINE_IMGUI_SRC})
 
@@ -90,14 +89,25 @@ FUNCTION(GX_ENGINE_PREPARE_TARGET GX_CURRENT_TARGET)
     ENDIF(APPLE)
     TARGET_LINK_LIBRARIES(${GX_CURRENT_TARGET} GearoenixGameEngine)
     IF(GX_IN_WINDOWS)
+        SET(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
         ADD_CUSTOM_COMMAND(
             TARGET ${GX_CURRENT_TARGET} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/fmod.dll $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
     ELSEIF(GX_IN_ANDROID)
+        SET(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
         ADD_CUSTOM_COMMAND(
             TARGET ${GX_CURRENT_TARGET} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/libfmodL.so $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
     ENDIF()
+    ADD_CUSTOM_COMMAND(
+        TARGET ${GX_CURRENT_TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${GX_ASSET_DIR})
+    FILE(GLOB GX_ASSET_FILES ${CMAKE_SOURCE_DIR}/assets/*)
+    FOREACH(GX_ASSET_FILE ${GX_ASSET_FILES})
+        ADD_CUSTOM_COMMAND(
+            TARGET ${GX_CURRENT_TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_ASSET_FILE} ${GX_ASSET_DIR})
+    ENDFOREACH()
 ENDFUNCTION(GX_ENGINE_PREPARE_TARGET)
 
 SET(GX_ENGINE_SRC_DIR ${GX_ENGINE_SRC_DIR} PARENT_SCOPE)

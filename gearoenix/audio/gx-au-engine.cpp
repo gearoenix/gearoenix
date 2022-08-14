@@ -1,8 +1,8 @@
 #include "gx-au-engine.hpp"
 #include "../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-au-macros.hpp"
-#include <fmod.hpp>
-#include <fmod_errors.h>
+#include <fmod/fmod.hpp>
+#include <fmod/fmod_errors.h>
 #include <random>
 
 gearoenix::audio::Engine::Engine(platform::Application& app) noexcept

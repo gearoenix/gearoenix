@@ -42,6 +42,7 @@ cmake-build-*/
 .settings
 .idea/
 sdk/
+sdk.zip
 /assets/
 assets/
 

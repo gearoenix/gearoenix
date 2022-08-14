@@ -18,10 +18,6 @@ MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
 SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
 
-SET(GX_SDL2_PATH "${GX_SDK_PATH}/sdl2") # TODO: It'll be removed after new sdk design has been implemented.
-SET(GX_SDL2_INCLUDE_DIRS "${GX_SDL2_PATH}/include") # TODO: It'll be removed after new sdk design has been implemented.
-SET(GX_SDL2_BUILD_DIRS "${GX_SDL2_PATH}/gx-build") # TODO: It'll be removed after new sdk design has been implemented.
-
 IF (CMAKE_SYSTEM_NAME MATCHES "Android")
     MESSAGE(STATUS "Building for Android ${ANDROID_ABI}.")
     SET(GX_IN_ANDROID TRUE)
@@ -58,18 +54,13 @@ ELSEIF (MSVC)
     ADD_COMPILE_OPTIONS("$<$<CONFIG:RELEASE>:/Ox>")
     SET(GEAROENIX_EXE_TARGET "WIN32")
     SET(GX_PLATFORM_SDK_PATH ${GX_SDK_PATH}/windows)
-    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/libs)
+    SET(GX_SDK_LIBS_PATH ${GX_PLATFORM_SDK_PATH}/lib)
     SET(GX_COMMON_LIBS
             ${GX_COMMON_LIBS}
-            winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid)
-    SET(GX_DEBUG_LIBS # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_DEBUG_LIBS} # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2-staticd.lib # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_SDL2_BUILD_DIRS}/Debug/SDL2maind.lib) # TODO: It'll be removed after new sdk design has been implemented.
-    SET(GX_RELEASE_LIBS # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_RELEASE_LIBS} # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2-static.lib # TODO: It'll be removed after new sdk design has been implemented.
-            ${GX_SDL2_BUILD_DIRS}/Release/SDL2main.lib) # TODO: It'll be removed after new sdk design has been implemented.
+            winmm version oleaut32 imm32 setupapi d3d12 dxgi dxguid
+            ${GX_SDK_LIBS_PATH}/fmod_vc.lib
+            ${GX_SDK_LIBS_PATH}/SDL2-static.lib
+            ${GX_SDK_LIBS_PATH}/SDL2main.lib)
 ELSEIF (APPLE)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
@@ -105,82 +96,23 @@ ELSE ()
     SET(CMAKE_CXX_FLAGS "-std=c++20 ${CMAKE_CXX_FLAGS}")
 ENDIF ()
 
-SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
-
-IF (NOT GX_IN_LINUX)
-    GX_DOWNLOAD_FILE("https://www.libsdl.org/release/SDL2-2.0.22.zip" "${GX_SDL2_PATH}")
-    SET(GX_CMAKE_ARGS "-DSDL_LIBC=ON")
-    GX_COMPILE_LIB(${GX_SDL2_PATH})
-    SET(GX_CMAKE_ARGS "")
-    INCLUDE_DIRECTORIES(${GX_SDL2_INCLUDE_DIRS})
-ENDIF ()
-
+SET(GX_UNCOMPRESS_TOP_FOLDER FALSE)
+GX_DOWNLOAD_FILE("https://github.com/gearoenix/gearoenix-static-files/raw/master/sdk.zip" "${GX_SDK_PATH}")
 INCLUDE_DIRECTORIES(${GX_SDK_PATH}/include)
 INCLUDE_DIRECTORIES(${GX_PLATFORM_SDK_PATH}/include)
-
-IF(GX_IN_WINDOWS)
-    SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} ${GX_SDK_LIBS_PATH}/fmod_vc.lib)
-ENDIF()
 
 SET(GX_DEBUG_LIBS ${GX_DEBUG_LIBS} ${GX_COMMON_LIBS})
 SET(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
-SET(GX_STB_PATH "${GX_SDK_PATH}/stb")
-GX_DOWNLOAD_FILE("https://github.com/nothings/stb/archive/master.zip" "${GX_STB_PATH}")
-SET(GX_STB_INCLUDE_DIRS "${GX_STB_PATH}")
-INCLUDE_DIRECTORIES(${GX_STB_INCLUDE_DIRS})
-
-SET(GX_D3D_PATH "${GX_SDK_PATH}/d3d")
-GX_DOWNLOAD_FILE("https://github.com/microsoft/DirectX-Headers/archive/refs/heads/main.zip" "${GX_D3D_PATH}")
-SET(GX_D3D_INCLUDE_DIRS "${GX_D3D_PATH}/include/directx")
-INCLUDE_DIRECTORIES(${GX_D3D_INCLUDE_DIRS})
-
-SET(GX_VULKAN_HEADERS_PATH "${GX_SDK_PATH}/vulkan-headers")
-GX_DOWNLOAD_FILE("https://github.com/KhronosGroup/Vulkan-Headers/archive/master.zip" "${GX_VULKAN_HEADERS_PATH}")
-SET(GX_VULKAN_HEADERS_INCLUDE_DIRS "${GX_VULKAN_HEADERS_PATH}/include")
-INCLUDE_DIRECTORIES(${GX_VULKAN_HEADERS_INCLUDE_DIRS})
-
-#SET(GX_BULLET3_PATH "${GX_SDK_PATH}/bullet3")
-#GX_DOWNLOAD_FILE("https://github.com/bulletphysics/bullet3/archive/master.zip" "${GX_BULLET3_PATH}")
-#GX_COMPILE_LIB(${GX_BULLET3_PATH})
-
-SET(GX_IMGUI_PATH "${GX_SDK_PATH}/imgui")
-GX_DOWNLOAD_FILE("https://github.com/ocornut/imgui/archive/refs/tags/v1.87.zip" "${GX_IMGUI_PATH}")
+SET(GX_IMGUI_PATH ${GX_SDK_PATH}/include/imgui)
 GX_PREPARE_IMGUI(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH})
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/backends)
 INCLUDE_DIRECTORIES(${GX_IMGUI_PATH}/misc/cpp)
 
-SET(GX_IMGUI_FB_PATH "${GX_SDK_PATH}/imgui-fb")
-GX_DOWNLOAD_FILE("https://github.com/aiekick/ImGuiFileDialog/archive/Lib_Only.zip" "${GX_IMGUI_FB_PATH}")
-GX_PREPARE_IMGUI_FB(${GX_IMGUI_FB_PATH})
-INCLUDE_DIRECTORIES(${GX_IMGUI_FB_PATH})
-
-SET(GX_BOOST_PATH "${GX_SDK_PATH}/boost")
-GX_DOWNLOAD_FILE("https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.zip" "${GX_BOOST_PATH}")
-FILE(GLOB GX_BOOST_UNWANTED_FILES ${GX_BOOST_PATH}/*)
-LIST(REMOVE_ITEM GX_BOOST_UNWANTED_FILES "${GX_BOOST_PATH}/boost")
-FOREACH(GX_BOOST_UNWANTED ${GX_BOOST_UNWANTED_FILES})
-    FILE(REMOVE_RECURSE ${GX_BOOST_UNWANTED})
-ENDFOREACH()
-INCLUDE_DIRECTORIES(${GX_BOOST_PATH})
-
-SET(GX_TINYGLTF_PATH "${GX_SDK_PATH}/tinygltf")
-GX_DOWNLOAD_FILE("https://github.com/syoyo/tinygltf/archive/master.zip" "${GX_TINYGLTF_PATH}")
 ADD_COMPILE_DEFINITIONS("TINYGLTF_USE_CPP14")
-FILE(GLOB GX_TINYGLTF_UNWANTED_FILES ${GX_TINYGLTF_PATH}/*)
-LIST(REMOVE_ITEM GX_TINYGLTF_UNWANTED_FILES "${GX_TINYGLTF_PATH}/tiny_gltf.h")
-LIST(REMOVE_ITEM GX_TINYGLTF_UNWANTED_FILES "${GX_TINYGLTF_PATH}/json.hpp")
-FOREACH(GX_TINYGLTF_UNWANTED ${GX_TINYGLTF_UNWANTED_FILES})
-    FILE(REMOVE_RECURSE ${GX_TINYGLTF_UNWANTED})
-ENDFOREACH()
-INCLUDE_DIRECTORIES(${GX_TINYGLTF_PATH})
 
-SET(GX_DXC_PATH "${GX_SDK_PATH}/dxc")
-SET(GX_UNCOMPRESS_TOP_FOLDER "OFF")
-GX_DOWNLOAD_FILE("https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.6.2106/dxc_2021_07_01.zip" "${GX_DXC_PATH}")
-SET(GX_DXC_BINARY_DIR "${GX_DXC_PATH}/bin/x64")
-SET(GX_UNCOMPRESS_TOP_FOLDER "ON")
+SET(GX_DXC_BINARY_DIR "${GX_SDK_PATH}/windows/bin")
 
 ADD_SUBDIRECTORY(gearoenix)
 ADD_SUBDIRECTORY(editor)

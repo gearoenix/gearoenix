@@ -9,7 +9,6 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <ImGuiFileDialog.h>
 
 constexpr static const char *const key_gltf_file_chooser = "key_gltf_file_chooser";
 constexpr static const char *const  filter_gltf_file = ".gltf,.glb";
@@ -67,7 +66,7 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
         if (ImGui::MenuItem("New", "Alt+S,Alt+N", false, project.is_project_opened())) {}
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false, project.is_project_opened())) {
 //            show_scene_import_popup = true;
-            ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file, ".");
+            //ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file, ".");
         }
         if (ImGui::MenuItem("Delete", "Alt+S,Alt+Del", false, false)) {}
         if (ImGui::MenuItem("Settings", "Alt+S,Alt+S", false, false)) {}
@@ -76,20 +75,20 @@ void gearoenix::editor::ui::MenuBar::show_scene() noexcept {
 //    if(show_scene_import_popup) {
 
         // display
-        if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser))
-        {
-            // action if OK
-            if (ImGuiFileDialog::Instance()->IsOk())
-            {
-                std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-                GX_TODO;
-                // platform_application.get_base().get_render_engine()->get_scene_manager()->load_gltf(
-                //         platform::stream::AbsolutePath(file_path_name));
-            }
+        //if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser))
+        //{
+        //    // action if OK
+        //    if (ImGuiFileDialog::Instance()->IsOk())
+        //    {
+        //        std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
+        //        GX_TODO;
+        //        // platform_application.get_base().get_render_engine()->get_scene_manager()->load_gltf(
+        //        //         platform::stream::AbsolutePath(file_path_name));
+        //    }
 
-            // close
-            ImGuiFileDialog::Instance()->Close();
-        }
+        //    // close
+        //    ImGuiFileDialog::Instance()->Close();
+        //}
 //    }
 }
 

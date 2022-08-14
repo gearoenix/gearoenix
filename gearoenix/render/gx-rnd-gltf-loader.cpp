@@ -22,7 +22,7 @@
 
 #define TINYGLTF_NOEXCEPTION
 #define TINYGLTF_IMPLEMENTATION
-#include <tiny_gltf.h>
+#include <tinygltf/tiny_gltf.h>
 
 [[nodiscard]] static bool is_gltf_node_a_bone(const tinygltf::Node& n) noexcept
 {

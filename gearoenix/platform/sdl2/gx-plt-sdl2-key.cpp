@@ -1,11 +1,7 @@
 #include "gx-plt-sdl2-key.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include "../gx-plt-log.hpp"
-#ifdef GX_PLATFORM_LINUX
 #include <SDL2/SDL_mouse.h>
-#else
-#include <SDL_mouse.h>
-#endif
 #include <boost/container/flat_map.hpp>
 
 static const boost::container::flat_map<SDL_Keycode, gearoenix::platform::key::Id> gearoenix_sdl_keyboard_map {

@@ -4,8 +4,8 @@
 #include "gx-au-audio.hpp"
 #include "gx-au-engine.hpp"
 #include "gx-au-macros.hpp"
-#include <fmod.hpp>
-#include <fmod_errors.h>
+#include <fmod/fmod.hpp>
+#include <fmod/fmod_errors.h>
 
 gearoenix::audio::Manager::Manager(Engine& engine) noexcept
     : engine(engine)
