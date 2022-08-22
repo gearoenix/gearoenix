@@ -1,5 +1,11 @@
 #include "gx-phs-anm-animation.hpp"
 
+void gearoenix::physics::animation::ArmatureAnimationInfo::optimise() noexcept
+{
+    for (auto& c : channels)
+        c.optimise();
+}
+
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::size_t index,
     const std::type_index animation_type,

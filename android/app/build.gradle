@@ -25,8 +25,8 @@ android {
 //                        '-DGX_ENABLE_EXAMPLE_006_HELLO_GLTF=True'
 //                        '-DGX_ENABLE_EXAMPLE_007_HELLO_SKYBOX=True'
 //                        '-DGX_ENABLE_EXAMPLE_008_REFLECTION_PROBE=True'
-                        '-DGX_ENABLE_EXAMPLE_009_BAKED_REFLECTION_PROBE=True'
-//                        '-DGX_ENABLE_GAME_EXTO_DINO=True'
+//                        '-DGX_ENABLE_EXAMPLE_009_BAKED_REFLECTION_PROBE=True'
+                          '-DGX_ENABLE_GAME_EXTO_DINO=True'
             }
         }
     }

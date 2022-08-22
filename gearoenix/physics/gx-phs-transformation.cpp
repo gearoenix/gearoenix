@@ -308,9 +308,9 @@ void gearoenix::physics::Transformation::reset(
     const math::Vec3<double>& l) noexcept
 {
     local_matrix = r.to_mat();
-    x_axis = (local_matrix * math::Vec4(math::X3D<double>, 0.0)).xyz();
-    y_axis = (local_matrix * math::Vec4(math::Y3D<double>, 0.0)).xyz();
-    z_axis = (local_matrix * math::Vec4(math::Z3D<double>, 0.0)).xyz();
+    x_axis = { local_matrix.data[0][0], local_matrix.data[0][1], local_matrix.data[0][2] };
+    y_axis = { local_matrix.data[1][0], local_matrix.data[1][1], local_matrix.data[1][2] };
+    z_axis = { local_matrix.data[2][0], local_matrix.data[2][1], local_matrix.data[2][2] };
     scale = s;
     local_matrix.local_scale(s);
     local_matrix.set_location(l);

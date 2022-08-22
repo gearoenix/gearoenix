@@ -299,6 +299,12 @@ struct Vec3 final {
         return Vec3<Element>(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x);
     }
 
+    [[nodiscard]] constexpr bool equal(const Vec3<Element>& o, const Element tolerance) const noexcept
+    {
+        const auto a = (*this - o).abs();
+        return a.x < tolerance && a.y < tolerance && a.z < tolerance;
+    }
+
     [[nodiscard]] constexpr Vec3<Element> safe_minimum(const Vec3<Element>& o) const noexcept
     {
         return Vec3<Element>(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y), Numeric::safe_minimum(z, o.z));

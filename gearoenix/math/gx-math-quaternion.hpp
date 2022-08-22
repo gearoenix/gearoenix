@@ -87,9 +87,24 @@ struct Quat final {
         return Quat(x * v, y * v, z * v, w * v);
     }
 
-    [[nodiscard]] constexpr Quat operator+(const Quat o) const noexcept
+    [[nodiscard]] constexpr Quat operator+(const Quat& o) const noexcept
     {
         return Quat(x + o.x, y + o.y, z + o.z, w + o.w);
+    }
+
+    [[nodiscard]] constexpr Quat operator-(const Quat& o) const noexcept
+    {
+        return Quat(x - o.x, y - o.y, z - o.z, w - o.w);
+    }
+
+    [[nodiscard]] constexpr Quat operator-(const Element v) const noexcept
+    {
+        return Quat(x - v, y - v, z - v, w - v);
+    }
+
+    [[nodiscard]] constexpr Quat abs() const noexcept
+    {
+        return Quat(std::abs(x), std::abs(y), std::abs(z), std::abs(w));
     }
 
     [[nodiscard]] constexpr Element dot(const Quat& o) const noexcept
@@ -101,6 +116,12 @@ struct Quat final {
     {
         os << R"("Quat" { "x": ")" << q.x << R"(", "y": ")" << q.y << R"(", "z": ")" << q.z << R"(", "w": ")" << q.w << "\" }";
         return os;
+    }
+
+    [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance) const noexcept
+    {
+        const auto a = (*this - o).abs();
+        return a.x < tolerance && a.y < tolerance && a.z < tolerance && a.w < tolerance;
     }
 };
 }

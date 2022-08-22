@@ -12,6 +12,8 @@ struct Manager;
 struct ArmatureAnimationInfo final {
     std::string name;
     std::vector<BoneChannelBuilder> channels;
+
+    void optimise() noexcept;
 };
 
 struct ArmatureAnimation final {

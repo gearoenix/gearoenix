@@ -602,6 +602,7 @@ static void process_node(
                 if (auto bone_channel_search = bones_channels.find(bone_node_index); bones_channels.end() != bone_channel_search)
                     armature_animation_info.channels.push_back(bone_channel_search->second);
             }
+            armature_animation_info.optimise();
             e.get_physics_engine()->get_animation_manager()->create_animation_player(
                 model_builder->get_entity_builder()->get_builder(),
                 armature_animation_info);

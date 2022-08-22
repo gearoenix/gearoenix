@@ -16,7 +16,8 @@ OPTION(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
 MESSAGE(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
-SET(GX_SDK_PATH "${CMAKE_SOURCE_DIR}/sdk")
+SET(GX_SDK_PATH ${CMAKE_SOURCE_DIR}/sdk)
+SET(GX_MAIN_ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
 
 IF (CMAKE_SYSTEM_NAME MATCHES "Android")
     MESSAGE(STATUS "Building for Android ${ANDROID_ABI}.")
@@ -28,6 +29,7 @@ IF (CMAKE_SYSTEM_NAME MATCHES "Android")
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     SET(GX_COMMON_LIBS ${GX_COMMON_LIBS} android native_app_glue EGL log GLESv3 ${GX_SDK_LIBS_PATH}/libfmodL.so)
     ADD_DEFINITIONS(-DIMGUI_IMPL_OPENGL_ES3=1)
+    SET(CMAKE_CXX_FLAGS "-Ofast ${CMAKE_CXX_FLAGS}")
 ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     SET(GX_IN_WASM)
     MESSAGE(STATUS "Building for Emscripten.")

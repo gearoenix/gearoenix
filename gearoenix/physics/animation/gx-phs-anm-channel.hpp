@@ -11,6 +11,8 @@ struct BoneChannelBuilder final {
     std::vector<std::pair<double, Keyframe<math::Vec3<double>>>> scale_samples;
     std::vector<std::pair<double, Keyframe<math::Quat<double>>>> rotation_samples;
     std::vector<std::pair<double, Keyframe<math::Vec3<double>>>> translation_samples;
+
+    void optimise() noexcept;
 };
 
 struct BoneChannel final {

@@ -40,7 +40,7 @@ in vec2 out_uv;\n\
 \n\
 out vec4 frag_colour;\n\
 \n\
-const float bloom_radius = 0.01;\n\
+const float bloom_radius = 0.0001;\n\
 const float bloom_horizontal = 0.2;\n\
 const float exposure = 1.2;\n\
 const float gamma = 2.2;\n\
