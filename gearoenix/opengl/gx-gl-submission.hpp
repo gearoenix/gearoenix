@@ -4,15 +4,18 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../core/gx-cr-pool.hpp"
+#include "../math/gx-math-aabb.hpp"
 #include "../math/gx-math-frustum.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
 #include "shader/gx-gl-shd-forward-pbr.hpp"
 #include <array>
+#include <boost/container/flat_map.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace gearoenix::render::scene {
@@ -129,7 +132,7 @@ struct SubmissionManager final {
         boost::container::flat_map<core::ecs::Entity::id_t /*camera-id*/, std::size_t /*camera-pool-index*/> shadow_cameras;
         boost::container::flat_map<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> reflections;
         boost::container::flat_map<core::ecs::Entity::id_t /*light-id*/, DirectionalShadowCasterData> shadow_caster_directional_lights;
-        std::pair<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> default_reflection;
+        std::pair<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> default_reflection { 0, ReflectionData {} };
         std::vector<DynamicModelData> dynamic_models;
         std::vector<BoneData> bones_data;
     };

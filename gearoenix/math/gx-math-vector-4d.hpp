@@ -32,11 +32,19 @@ struct Vec4 {
     {
     }
 
-    constexpr explicit Vec4(const Element e = static_cast<Element>(0)) noexcept
+    constexpr explicit Vec4(const Element e) noexcept
         : x(e)
         , y(e)
         , z(e)
         , w(e)
+    {
+    }
+
+    constexpr Vec4() noexcept
+        : x(static_cast<Element>(0))
+        , y(static_cast<Element>(0))
+        , z(static_cast<Element>(0))
+        , w(static_cast<Element>(0))
     {
     }
 
