@@ -9,6 +9,7 @@
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "gx-gl-types.hpp"
+#include "shader/gx-gl-shd-bloom.hpp"
 #include "shader/gx-gl-shd-forward-pbr.hpp"
 #include <array>
 #include <boost/container/flat_map.hpp>
@@ -23,7 +24,7 @@ struct Scene;
 }
 
 namespace gearoenix::gl::shader {
-struct BGCAA;
+struct GamaCorrectionColourTuningAntiAliasing;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
 struct Final;
@@ -139,9 +140,9 @@ struct SubmissionManager final {
 
 private:
     Engine& e;
-    const std::unique_ptr<shader::BGCAA> bgcaa_shader;
     const std::unique_ptr<shader::Final> final_shader;
     const std::unique_ptr<shader::GBuffersFiller> gbuffers_filler_shader;
+    const std::unique_ptr<shader::GamaCorrectionColourTuningAntiAliasing> gama_correction_colour_tuning_anti_aliasing_shader;
     const std::unique_ptr<shader::DeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<shader::Irradiance> irradiance_shader;
@@ -150,6 +151,7 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
+    shader::BloomCombination bloom_shader_combination;
     shader::ForwardPbrCombination forward_pbr_shader_combination;
 
     std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
@@ -166,12 +168,13 @@ private:
     std::shared_ptr<Target> final_target;
     std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
-
-    // BGCAAS: Bloom Gamma-correction Colour-tuning Anti-Aliasing Source
-    std::shared_ptr<Texture2D> high_bgcaas_texture;
-    std::shared_ptr<Texture2D> low_bgcaas_texture;
-    std::shared_ptr<Texture2D> depth_bgcaas_texture;
-    std::shared_ptr<Target> bgcaas_target;
+    std::shared_ptr<Texture2D> bloom_source_texture;
+    std::shared_ptr<Texture2D> low_bloom_texture;
+    std::shared_ptr<Texture2D> depth_bloom_texture;
+    std::shared_ptr<Target> bloom_target;
+    std::shared_ptr<Texture2D> bloom_horizontal_texture;
+    std::shared_ptr<Target> bloom_horizontal_target;
+    std::shared_ptr<Target> bloom_vertical_target;
 
     math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
     float back_buffer_aspect_ratio = 999.0f;
@@ -192,7 +195,7 @@ private:
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
     void initialise_screen_vertices() noexcept;
-    void initialise_bgcaas() noexcept;
+    void initialise_bloom() noexcept;
 
     void fill_scenes() noexcept;
     void update_scenes() noexcept;
@@ -209,7 +212,7 @@ private:
     void render_reflection_probes(const SceneData& scene) noexcept;
     void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;
     void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
-    void render_bgcaa(const SceneData& scene) noexcept;
+    void render_bloom(const SceneData& scene) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;
     void render_imgui() noexcept;

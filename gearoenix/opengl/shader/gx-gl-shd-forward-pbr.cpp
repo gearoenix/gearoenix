@@ -106,8 +106,8 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "in vec3 out_btg;\n";
     fs << "in vec2 out_uv;\n";
     fs << "\n";
-    fs << "layout(location = " << GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW << ") out vec4 frag_out_low;\n";
-    fs << "layout(location = " << GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH << ") out vec4 frag_out_high;\n";
+    fs << "layout(location = " << GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_LOW << ") out vec4 frag_out_low;\n";
+    fs << "layout(location = " << GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH << ") out vec4 frag_out_high;\n";
     fs << "\n";
     fs << "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness) {\n";
     fs << "    float inv = 1.0 - nv;\n";
@@ -230,8 +230,8 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    ambient += rad * ((fresnel * brdf.x) + brdf.y);\n";
     fs << "    ambient *= ao;\n";
     fs << "    vec3 frag_colour = ambient + ems + lumination;\n";
-    fs << "    frag_out_high = vec4(frag_colour * step(1.0, dot(frag_colour, vec3(0.2126, 0.7152, 0.0722))), 1.0);\n";
-    fs << "    frag_out_low = vec4(frag_colour - frag_out_high.xyz, 1.0);\n";
+    fs << "    frag_out_high = vec4(clamp((frag_colour - 1.0), 0.0, 1.0), 1.0);\n";
+    fs << "    frag_out_low = vec4(frag_colour, 1.0);\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
 

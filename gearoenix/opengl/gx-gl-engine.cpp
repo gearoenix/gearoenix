@@ -23,7 +23,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     sint max_attach = 0;
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attach);
     specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);
-    specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT;
+    specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT;
     specification.is_raytracing_supported = false;
     specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
 

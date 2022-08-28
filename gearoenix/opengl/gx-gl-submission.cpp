@@ -28,11 +28,11 @@
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
-#include "shader/gx-gl-shd-bgcaa.hpp"
 #include "shader/gx-gl-shd-deferred-pbr-transparent.hpp"
 #include "shader/gx-gl-shd-deferred-pbr.hpp"
 #include "shader/gx-gl-shd-final.hpp"
 #include "shader/gx-gl-shd-gbuffers-filler.hpp"
+#include "shader/gx-gl-shd-gcaa.hpp"
 #include "shader/gx-gl-shd-irradiance.hpp"
 #include "shader/gx-gl-shd-radiance.hpp"
 #include "shader/gx-gl-shd-shadow-caster.hpp"
@@ -126,14 +126,14 @@ void gearoenix::gl::SubmissionManager::initialise_gbuffers() noexcept
     gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info));
 
-    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_position_depth_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = gbuffers_normal_ao_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = gbuffers_emission_roughness_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
-    attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
+    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_position_depth_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = gbuffers_normal_ao_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = gbuffers_emission_roughness_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
     gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments)));
 
     GX_LOG_D("GBuffers have been created.");
@@ -218,7 +218,7 @@ void gearoenix::gl::SubmissionManager::initialise_screen_vertices() noexcept
     glBindVertexArray(0);
 }
 
-void gearoenix::gl::SubmissionManager::initialise_bgcaas() noexcept
+void gearoenix::gl::SubmissionManager::initialise_bloom() noexcept
 {
     auto* const txt_mgr = e.get_texture_manager();
     const render::texture::TextureInfo colour_txt_info {
@@ -237,24 +237,35 @@ void gearoenix::gl::SubmissionManager::initialise_bgcaas() noexcept
         .type = render::texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    high_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-high-bgcaas", {}, colour_txt_info));
+    bloom_source_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-bloom-source", {}, colour_txt_info));
 
-    low_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-low-bgcaas", {}, colour_txt_info));
+    low_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-low-bloom", {}, colour_txt_info));
+
+    bloom_horizontal_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-bloom-horizontal", {}, colour_txt_info));
 
     auto depth_txt_info = colour_txt_info;
     depth_txt_info.format = render::texture::TextureFormat::D32;
-    depth_bgcaas_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-depth-bgcaas", {}, depth_txt_info));
+    depth_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-depth-bloom", {}, depth_txt_info));
 
-    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].var = render::texture::Attachment2D { .txt = low_bgcaas_texture };
-    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].var = render::texture::Attachment2D { .txt = high_bgcaas_texture };
-    attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = depth_bgcaas_texture };
-    bgcaas_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bgcaas", std::move(attachments)));
+    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].var = render::texture::Attachment2D { .txt = low_bloom_texture };
+    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].var = render::texture::Attachment2D { .txt = bloom_source_texture };
+    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = depth_bloom_texture };
+    bloom_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bloom", std::move(attachments)));
 
-    GX_LOG_D("BGCAAS have been created.");
+    std::vector<render::texture::Attachment> horizontal_attachments(GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    horizontal_attachments[GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_horizontal_texture };
+    bloom_horizontal_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-horizontal-bloom", std::move(horizontal_attachments)));
+
+    std::vector<render::texture::Attachment> vertical_attachments(GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
+    vertical_attachments[GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_source_texture };
+    bloom_vertical_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-vertical-bloom", std::move(vertical_attachments)));
+
+    GX_LOG_D("BLoom have been created.");
 }
 
 void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
@@ -587,8 +598,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                 camera_data.framebuffer = gbuffers_target->get_framebuffer();
                 target_dimension = gbuffers_target->get_dimension();
             } else {
-                camera_data.framebuffer = bgcaas_target->get_framebuffer();
-                target_dimension = bgcaas_target->get_dimension();
+                camera_data.framebuffer = bloom_target->get_framebuffer();
+                target_dimension = bloom_target->get_dimension();
             }
             camera_data.viewport_clip = math::Vec4<sizei>(render_camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
             camera_data.vp = render_camera->get_view_projection();
@@ -805,7 +816,6 @@ void gearoenix::gl::SubmissionManager::render_skyboxes(const SceneData& scene, c
 
 void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept
 {
-    GX_REACHED;
     GX_GL_CHECK_D;
     set_framebuffer(camera.framebuffer);
     set_viewport_clip(camera.viewport_clip);
@@ -960,10 +970,10 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
         ssao_resolve_shader->bind();
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_position_depth_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(ssao_resolve_shader->get_normal_ao_index()));
-        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
+        glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
 
         ssao_resolve_shader->set_ssao_radius_move_start_end_data(reinterpret_cast<const float*>(&scene.ssao_settings));
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
@@ -984,22 +994,22 @@ void gearoenix::gl::SubmissionManager::render_with_deferred() noexcept
             deferred_pbr_shader->bind();
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_position_depth_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_albedo_metallic_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_normal_ao_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_emission_roughness_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_irradiance_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_radiance_index()));
-            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].texture_object);
+            glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].texture_object);
 
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_ssao_resolved_index()));
             glBindTexture(GL_TEXTURE_2D, ssao_resolved_attachments[0].texture_object);
@@ -1049,14 +1059,32 @@ void gearoenix::gl::SubmissionManager::render_with_forward() noexcept
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             render_forward_camera(scene, camera);
         }
-        render_bgcaa(scene);
+        render_bloom(scene);
     }
 }
 
-void gearoenix::gl::SubmissionManager::render_bgcaa(const SceneData& scene) noexcept
+void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene) noexcept
 {
-    high_bgcaas_texture->generate_mipmaps();
-    const auto& bgcaa_attachments = bgcaas_target->get_gl_attachments();
+    GX_GL_CHECK_D;
+    set_framebuffer(bloom_horizontal_target->get_framebuffer());
+    set_viewport_clip(back_buffer_viewport_clip);
+    auto& horizontal_shader = bloom_shader_combination.get_shader(true);
+    horizontal_shader.bind();
+    horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    set_framebuffer(bloom_vertical_target->get_framebuffer());
+    set_viewport_clip(back_buffer_viewport_clip);
+    auto& vertical_shader = bloom_shader_combination.get_shader(false);
+    vertical_shader.bind();
+    vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
@@ -1070,24 +1098,17 @@ void gearoenix::gl::SubmissionManager::render_bgcaa(const SceneData& scene) noex
         const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
         set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
     }
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    bgcaa_shader->bind();
-
-    bgcaa_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_low_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].texture_object);
-
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_high_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].texture_object);
-
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bgcaa_shader->get_depth_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bgcaa_attachments[GEAROENIX_GL_BGCAAS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].texture_object);
-
+    gama_correction_colour_tuning_anti_aliasing_shader->bind();
+    gama_correction_colour_tuning_anti_aliasing_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_low_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, low_bloom_texture->get_object());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_high_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_depth_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, depth_bloom_texture->get_object());
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    GX_GL_CHECK_D;
 }
 
 void gearoenix::gl::SubmissionManager::render_imgui() noexcept
@@ -1125,9 +1146,9 @@ void gearoenix::gl::SubmissionManager::set_framebuffer(const uint framebuffer_ob
 
 gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     : e(e)
-    , bgcaa_shader(new shader::BGCAA(e))
     , final_shader(e.get_specification().is_deferred_supported ? new shader::Final(e) : nullptr)
     , gbuffers_filler_shader(e.get_specification().is_deferred_supported ? new shader::GBuffersFiller(e) : nullptr)
+    , gama_correction_colour_tuning_anti_aliasing_shader(new shader::GamaCorrectionColourTuningAntiAliasing(e))
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
     , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
     , irradiance_shader(new shader::Irradiance(e))
@@ -1136,6 +1157,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , skybox_cube_shader(new shader::SkyboxCube(e))
     , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
+    , bloom_shader_combination(e)
     , forward_pbr_shader_combination(e)
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
@@ -1146,7 +1168,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     initialise_ssao();
     initialise_final();
     initialise_screen_vertices();
-    initialise_bgcaas();
+    initialise_bloom();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings

@@ -2,8 +2,8 @@ SET(GX_ENGINE_OPENGL_SRC_DIR ${GX_ENGINE_SRC_DIR}/opengl)
 SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bgcaa.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bgcaa.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bloom.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bloom.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr-transparent.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr-transparent.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr.cpp
@@ -16,6 +16,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gbuffers-filler.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gbuffers-filler.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gcaa.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gcaa.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-radiance.cpp
