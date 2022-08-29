@@ -37,6 +37,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['../../sdk/android/lib']
+        }
+    }
     externalNativeBuild {
         cmake {
             path "../../CMakeLists.txt"

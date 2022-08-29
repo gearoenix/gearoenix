@@ -55,6 +55,6 @@ public class MainActivity extends NativeActivity {
     }
 
     static {
-        System.loadLibrary("fmodL");
+        System.loadLibrary("fmod");
     }
 }
