@@ -32,7 +32,12 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<model::Builder>&& mo
     GX_ASSERT_D(nullptr != m);
     b.get_component<Scene>()->add_model(mb.get_id(), *m);
     m->scene_id = b.get_id();
-    model_builders.push_back(std::move(model_builder));
+    const auto& name_opt = model_builder->get_entity_builder()->get_builder().get_name();
+    GX_ASSERT(name_opt.has_value());
+    std::string name = *name_opt;
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!model_builders.contains(name));
+    model_builders.emplace(std::move(name), std::move(model_builder));
 }
 
 void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& camera_builder) noexcept
@@ -43,7 +48,12 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& c
     GX_ASSERT_D(nullptr != c);
     b.get_component<Scene>()->add_camera(cb.get_id(), *c);
     c->set_scene_id(b.get_id());
-    camera_builders.push_back(std::move(camera_builder));
+    const auto& name_opt = camera_builder->get_entity_builder()->get_builder().get_name();
+    GX_ASSERT(name_opt.has_value());
+    std::string name = *name_opt;
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!camera_builders.contains(name));
+    camera_builders.emplace(std::move(name), std::move(camera_builder));
 }
 
 void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>&& reflection_builder) noexcept
@@ -61,7 +71,12 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>
     for (const auto& camera_builder : reflection_builder->get_faces_camera_builders())
         if (nullptr != camera_builder)
             add(std::shared_ptr<camera::Builder>(camera_builder));
-    reflection_builders.push_back(std::move(reflection_builder));
+    const auto& name_opt = reflection_builder->get_entity_builder()->get_builder().get_name();
+    GX_ASSERT(name_opt.has_value());
+    std::string name = *name_opt;
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!reflection_builders.contains(name));
+    reflection_builders.emplace(std::move(name), std::move(reflection_builder));
 }
 
 void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept
@@ -72,7 +87,12 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& s
     GX_ASSERT_D(nullptr != s);
     b.get_component<Scene>()->add_skybox(sb.get_id(), *s);
     s->set_scene_id(b.get_id());
-    skybox_builders.push_back(std::move(skybox_builder));
+    const auto& name_opt = skybox_builder->get_entity_builder()->get_builder().get_name();
+    GX_ASSERT(name_opt.has_value());
+    std::string name = *name_opt;
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!skybox_builders.contains(name));
+    skybox_builders.emplace(std::move(name), std::move(skybox_builder));
 }
 
 void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& light_builder) noexcept
@@ -86,5 +106,10 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& li
     for (const auto& camera_builder : light_builder->get_cameras())
         if (nullptr != camera_builder)
             add(std::shared_ptr<camera::Builder>(camera_builder));
-    light_builders.push_back(std::move(light_builder));
+    const auto& name_opt = light_builder->get_entity_builder()->get_builder().get_name();
+    GX_ASSERT(name_opt.has_value());
+    std::string name = *name_opt;
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!light_builders.contains(name));
+    light_builders.emplace(std::move(name), std::move(light_builder));
 }

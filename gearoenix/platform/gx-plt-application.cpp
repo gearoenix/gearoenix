@@ -4,7 +4,7 @@
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 constexpr double click_time_threshold = 0.3;
 constexpr double click_distance_threshold = 0.1;

@@ -28,7 +28,7 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 gearoenix::render::engine::Engine::Engine(
     const Type engine_type,

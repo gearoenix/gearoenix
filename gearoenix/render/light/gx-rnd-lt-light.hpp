@@ -13,6 +13,7 @@ struct Light final : public core::ecs::Component {
     Light() noexcept;
     Light(Light&&) noexcept;
     ~Light() noexcept final;
+    void show_gui() noexcept;
 };
 }
 #endif

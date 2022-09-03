@@ -35,12 +35,11 @@
 #include "shader/gx-gl-shd-gcaa.hpp"
 #include "shader/gx-gl-shd-irradiance.hpp"
 #include "shader/gx-gl-shd-radiance.hpp"
-#include "shader/gx-gl-shd-shadow-caster.hpp"
 #include "shader/gx-gl-shd-skybox-cube.hpp"
 #include "shader/gx-gl-shd-skybox-equirectangular.hpp"
 #include "shader/gx-gl-shd-ssao-resolve.hpp"
 #include <algorithm>
-#include <imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)
 #define GX_ALGORITHM_EXECUTION
@@ -58,6 +57,8 @@
 gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
     : threads_opaque_models_data(std::thread::hardware_concurrency())
     , threads_translucent_models_data(std::thread::hardware_concurrency())
+    , opaque_threads_mvps(std::thread::hardware_concurrency())
+    , translucent_threads_mvps(std::thread::hardware_concurrency())
 {
 }
 
@@ -662,6 +663,64 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                     camera_data.translucent_models_data.begin(),
                 camera_data.translucent_models_data.end(),
                 [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+
+            if (render_camera->get_usage() == render::camera::Camera::Usage::Shadow) {
+                for (auto& m : camera_data.opaque_threads_mvps)
+                    m.clear();
+                for (auto& m : camera_data.translucent_threads_mvps)
+                    m.clear();
+                core::sync::ParallelFor::execi(
+                    camera_data.opaque_models_data.begin(),
+                    camera_data.opaque_models_data.end(),
+                    [&](std::pair<double, ModelData>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
+                        auto& m = d_m.second;
+                        if (m.bones_count > 0) {
+                            const auto last_bone_index = m.first_bone_index + m.bones_count;
+                            for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
+                                auto& bone_data = scene_data.bones_data[i];
+                                camera_data.opaque_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
+                            }
+                        } else {
+                            camera_data.opaque_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
+                        }
+                    });
+                core::sync::ParallelFor::execi(
+                    camera_data.translucent_models_data.begin(),
+                    camera_data.translucent_models_data.end(),
+                    [&](std::pair<double, ModelData>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
+                        auto& m = d_m.second;
+                        if (m.bones_count > 0) {
+                            const auto last_bone_index = m.first_bone_index + m.bones_count;
+                            for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
+                                auto& bone_data = scene_data.bones_data[i];
+                                camera_data.translucent_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
+                            }
+                        } else {
+                            camera_data.translucent_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
+                        }
+                    });
+                camera_data.mvps.clear();
+                auto current_model_index = static_cast<std::size_t>(-1);
+                for (auto& ms : camera_data.opaque_threads_mvps) {
+                    for (auto& im : ms) {
+                        if (current_model_index != im.first) {
+                            camera_data.opaque_models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
+                            current_model_index = im.first;
+                        }
+                        camera_data.mvps.push_back(im.second);
+                    }
+                }
+                current_model_index = static_cast<std::size_t>(-1);
+                for (auto& ms : camera_data.translucent_threads_mvps) {
+                    for (auto& im : ms) {
+                        if (current_model_index != im.first) {
+                            camera_data.translucent_models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
+                            current_model_index = im.first;
+                        }
+                        camera_data.mvps.push_back(im.second);
+                    }
+                }
+            }
         });
 }
 
@@ -681,14 +740,18 @@ void gearoenix::gl::SubmissionManager::render_shadows(const CameraData& camera) 
     set_framebuffer(camera.framebuffer);
     set_viewport_clip(camera.viewport_clip);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    shadow_caster_shader->bind();
-    const auto txt_index_albedo = static_cast<enumerated>(shadow_caster_shader->get_albedo_index());
+    auto current_bound_shadow_caster = static_cast<uint>(-1);
+    auto txt_index_albedo = static_cast<enumerated>(-1);
     for (auto& distance_model_data : camera.opaque_models_data) {
         auto& model_data = distance_model_data.second;
-        const auto mvp = camera.vp * model_data.m;
-        shadow_caster_shader->set_mvp_data(reinterpret_cast<const float*>(&mvp));
+        auto& shadow_caster_shader = shadow_caster_shader_combination.get_shader(model_data.bones_count);
+        if (shadow_caster_shader.get_shader_program() != current_bound_shadow_caster) {
+            shadow_caster_shader.bind();
+            txt_index_albedo = shadow_caster_shader.get_albedo_index();
+        }
+        shadow_caster_shader.set_mvp_data(reinterpret_cast<const float*>(&camera.mvps[model_data.fist_mvp_index]));
         const math::Vec2<float> alpha_factor_alpha_cutoff(model_data.albedo_factor.w, model_data.alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.x);
-        shadow_caster_shader->set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
+        shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
 
         glActiveTexture(GL_TEXTURE0 + txt_index_albedo);
         glBindTexture(GL_TEXTURE_2D, model_data.albedo_txt);
@@ -1152,13 +1215,13 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
     , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
     , irradiance_shader(new shader::Irradiance(e))
-    , shadow_caster_shader(new shader::ShadowCaster(e))
     , radiance_shader(new shader::Radiance(e))
     , skybox_cube_shader(new shader::SkyboxCube(e))
     , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
     , bloom_shader_combination(e)
     , forward_pbr_shader_combination(e)
+    , shadow_caster_shader_combination(e)
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {

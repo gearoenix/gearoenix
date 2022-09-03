@@ -12,7 +12,8 @@
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-submission.hpp"
 #include "gx-gl-texture.hpp"
-#include <imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
 
 gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)

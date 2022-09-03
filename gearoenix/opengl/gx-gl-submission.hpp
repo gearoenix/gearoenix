@@ -11,6 +11,7 @@
 #include "gx-gl-types.hpp"
 #include "shader/gx-gl-shd-bloom.hpp"
 #include "shader/gx-gl-shd-forward-pbr.hpp"
+#include "shader/gx-gl-shd-shadow-caster.hpp"
 #include <array>
 #include <boost/container/flat_map.hpp>
 #include <limits>
@@ -31,7 +32,6 @@ struct Final;
 struct GBuffersFiller;
 struct Irradiance;
 struct Radiance;
-struct ShadowCaster;
 struct SkyboxCube;
 struct SkyboxEquirectangular;
 struct SsaoResolve;
@@ -75,6 +75,7 @@ struct SubmissionManager final {
         double reflection_probe_size = std::numeric_limits<double>::max();
         std::size_t bones_count = 0;
         std::size_t first_bone_index = 0;
+        std::size_t fist_mvp_index = 0; // It is used for shadow
     };
 
     struct ModelBvhData final {
@@ -98,6 +99,9 @@ struct SubmissionManager final {
         std::vector<std::pair<double, ModelData>> translucent_models_data;
         std::vector<std::vector<std::pair<double, ModelData>>> threads_opaque_models_data;
         std::vector<std::vector<std::pair<double, ModelData>>> threads_translucent_models_data;
+        std::vector<math::Mat4x4<float>> mvps;
+        std::vector<std::vector<std::pair<std::size_t, math::Mat4x4<float>>>> opaque_threads_mvps;
+        std::vector<std::vector<std::pair<std::size_t, math::Mat4x4<float>>>> translucent_threads_mvps;
 
         CameraData() noexcept;
     };
@@ -146,13 +150,13 @@ private:
     const std::unique_ptr<shader::DeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<shader::Irradiance> irradiance_shader;
-    const std::unique_ptr<shader::ShadowCaster> shadow_caster_shader;
     const std::unique_ptr<shader::Radiance> radiance_shader;
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
     shader::BloomCombination bloom_shader_combination;
     shader::ForwardPbrCombination forward_pbr_shader_combination;
+    shader::ShadowCasterCombination shadow_caster_shader_combination;
 
     std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
     std::shared_ptr<Texture2D> gbuffers_position_depth_texture;

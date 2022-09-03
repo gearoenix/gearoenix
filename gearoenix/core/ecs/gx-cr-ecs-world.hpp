@@ -152,6 +152,46 @@ public:
         return archetypes[e.archetype].get_component<ComponentType>(e.index_in_archetype);
     }
 
+    /// It is better to not use it very much.
+    /// It is recommended to design your code in a way that batches all of your uses and
+    /// use the system callers instead of one-by-one use of this function.
+    /// Returns nullptr if entity or component does not exist.
+    template <typename... ComponentTypes>
+    [[nodiscard]] std::tuple<ComponentTypes*...> get_components(const Entity::id_t id) noexcept
+    {
+        Component::types_check<ComponentTypes...>();
+        auto entity_search = entities.find(id);
+        if (entities.end() == entity_search)
+            return {
+                reinterpret_cast<ComponentTypes*>(0)...,
+            };
+        const auto& e = entity_search->second;
+        auto& a = archetypes[e.archetype];
+        return {
+            a.get_component<ComponentTypes>(e.index_in_archetype)...,
+        };
+    }
+
+    /// It is better to not use it very much.
+    /// It is recommended to design your code in a way that batches all of your uses and
+    /// use the system callers instead of one-by-one use of this function.
+    /// Returns nullptr if entity or component does not exist.
+    template <typename... ComponentTypes>
+    [[nodiscard]] std::tuple<const ComponentTypes*...> get_components(const Entity::id_t id) const noexcept
+    {
+        Component::types_check<ComponentTypes...>();
+        auto entity_search = entities.find(id);
+        if (entities.end() == entity_search)
+            return {
+                static_cast<const ComponentTypes*>(nullptr)...,
+            };
+        const auto& e = entity_search->second;
+        const auto& a = archetypes[e.archetype];
+        return {
+            a.get_component<ComponentTypes>(e.index_in_archetype)...,
+        };
+    }
+
     [[nodiscard]] std::size_t get_archetype_index(const EntityBuilder::components_t& cs) noexcept;
 
     [[nodiscard]] Entity* get_entity(Entity::id_t) noexcept;

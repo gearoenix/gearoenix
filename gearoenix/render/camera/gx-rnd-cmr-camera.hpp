@@ -70,6 +70,7 @@ struct Camera final : public core::ecs::Component {
     void set_far(float) noexcept;
     void set_yfov(float) noexcept;
     void set_scale(float) noexcept;
+    void show_gui() noexcept;
 
 private:
     /// It must be changed by Builder or Manager, because the other components must know about the change

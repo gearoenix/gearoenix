@@ -599,8 +599,9 @@ static void process_node(
             const auto& skin = data.skins[node.skin];
             gearoenix::physics::animation::ArmatureAnimationInfo armature_animation_info;
             for (const auto bone_node_index : skin.joints) {
-                if (auto bone_channel_search = bones_channels.find(bone_node_index); bones_channels.end() != bone_channel_search)
-                    armature_animation_info.channels.push_back(bone_channel_search->second);
+                auto bone_channel_search = bones_channels.find(bone_node_index);
+                GX_ASSERT(bones_channels.end() != bone_channel_search);
+                armature_animation_info.channels.push_back(bone_channel_search->second);
             }
             armature_animation_info.optimise();
             e.get_physics_engine()->get_animation_manager()->create_animation_player(

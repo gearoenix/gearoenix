@@ -1,4 +1,5 @@
 #include "gx-phs-transformation.hpp"
+#include <imgui/imgui.h>
 
 gearoenix::physics::Transformation::Transformation() noexcept
     : core::ecs::Component(this)
@@ -315,4 +316,21 @@ void gearoenix::physics::Transformation::reset(
     local_matrix.local_scale(s);
     local_matrix.set_location(l);
     changed = true;
+}
+
+void gearoenix::physics::Transformation::show_gui() noexcept
+{
+    if (ImGui::TreeNode("Transformation")) {
+        auto l = get_local_location();
+        bool input_changed = false;
+        if (ImGui::TreeNode("Position")) {
+            input_changed |= ImGui::InputDouble("x", &l.x, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("y", &l.y, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("z", &l.z, 0.01, 1.0, "%.3f");
+            ImGui::TreePop();
+        }
+        if (input_changed)
+            set_local_location(l);
+        ImGui::TreePop();
+    }
 }

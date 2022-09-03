@@ -1,6 +1,6 @@
 #include "gx-rnd-cmr-camera.hpp"
-#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
+#include <imgui/imgui.h>
 
 gearoenix::render::camera::Camera::Camera(
     const float target_aspect_ratio,
@@ -100,6 +100,20 @@ void gearoenix::render::camera::Camera::set_scale(const float f) noexcept
     GX_ASSERT_D(Projection::Orthographic == projection_type);
     scale_fovy = f;
     update_projection();
+}
+
+void gearoenix::render::camera::Camera::show_gui() noexcept
+{
+    if (ImGui::TreeNode("Camera")) {
+        bool input_changed = false;
+        input_changed |= ImGui::InputFloat("far", &far, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat("near", &near, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat("aspect ratio", &target_aspect_ratio, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "scale" : "field of view y", &scale_fovy, 0.01f, 1.0f, "%.3f");
+        if (input_changed)
+            update_projection();
+        ImGui::TreePop();
+    }
 }
 
 void gearoenix::render::camera::Camera::set_target(std::shared_ptr<texture::Target>&& t) noexcept

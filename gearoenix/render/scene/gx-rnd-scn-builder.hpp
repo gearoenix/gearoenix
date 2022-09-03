@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #define GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace gearoenix::core::ecs {
 struct EntitySharedBuilder;
@@ -37,12 +37,18 @@ namespace gearoenix::render::scene {
 struct Builder final {
     friend struct Manager;
 
+    typedef std::map<std::string, std::shared_ptr<model::Builder>> ModelBuildersMap;
+    typedef std::map<std::string, std::shared_ptr<camera::Builder>> CameraBuildersMap;
+    typedef std::map<std::string, std::shared_ptr<skybox::Builder>> SkyboxBuildersMap;
+    typedef std::map<std::string, std::shared_ptr<reflection::Builder>> ReflectionBuildersMap;
+    typedef std::map<std::string, std::shared_ptr<light::Builder>> LightBuildersMap;
+
     GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<model::Builder>>, model_builders)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<camera::Builder>>, camera_builders)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<skybox::Builder>>, skybox_builders)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<reflection::Builder>>, reflection_builders)
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<light::Builder>>, light_builders)
+    GX_GET_CREF_PRV(ModelBuildersMap, model_builders)
+    GX_GET_CREF_PRV(CameraBuildersMap, camera_builders)
+    GX_GET_CREF_PRV(SkyboxBuildersMap, skybox_builders)
+    GX_GET_CREF_PRV(ReflectionBuildersMap, reflection_builders)
+    GX_GET_CREF_PRV(LightBuildersMap, light_builders)
 
     Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 

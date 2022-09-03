@@ -19,7 +19,7 @@ struct Entity final {
     friend struct World;
     friend struct EntityBuilder;
 
-    typedef std::uint32_t id_t;
+    typedef entity_id_t id_t;
 
 private:
     Entity(std::size_t archetype, std::size_t index_in_archetype, std::optional<std::string> name) noexcept;
