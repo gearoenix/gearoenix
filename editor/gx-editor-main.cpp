@@ -1,6 +1,5 @@
 #include "ui/gx-editor-ui-manager.hpp"
 #include "control/gx-editor-ctrl-manager.hpp"
-
 #include <gearoenix/core/gx-cr-application.hpp>
 
 namespace gearoenix::editor {

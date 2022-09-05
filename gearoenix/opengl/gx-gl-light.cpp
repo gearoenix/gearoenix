@@ -7,14 +7,14 @@
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::ShadowCasterDiractionaLight::ShadowCasterDiractionaLight() noexcept
+gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight() noexcept
     : core::ecs::Component(this)
 {
 }
 
-gearoenix::gl::ShadowCasterDiractionaLight::~ShadowCasterDiractionaLight() noexcept = default;
+gearoenix::gl::ShadowCasterDirectionalLight::~ShadowCasterDirectionalLight() noexcept = default;
 
-gearoenix::gl::ShadowCasterDiractionaLight::ShadowCasterDiractionaLight(ShadowCasterDiractionaLight&&) noexcept = default;
+gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(ShadowCasterDirectionalLight&&) noexcept = default;
 
 gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
@@ -36,12 +36,12 @@ gearoenix::gl::LightBuilder::LightBuilder(
 {
     auto& b = entity_builder->get_builder();
     const auto* const rl = get_shadow_caster_directional();
-    ShadowCasterDiractionaLight l;
+    ShadowCasterDirectionalLight l;
     l.shadow_map_target = std::dynamic_pointer_cast<Target>(rl->get_shadow_map_target());
     l.shadow_map_texture = std::dynamic_pointer_cast<Texture2D>(rl->get_shadow_map());
     b.add_component(std::move(l));
     e.todos.load([e = entity_builder]() noexcept {
-        auto& l = *e->get_builder().get_component<ShadowCasterDiractionaLight>();
+        auto& l = *e->get_builder().get_component<ShadowCasterDirectionalLight>();
         l.shadow_map_target_v = l.shadow_map_target->get_framebuffer();
         l.shadow_map_texture_v = l.shadow_map_texture->get_object();
     });

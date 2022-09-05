@@ -38,6 +38,7 @@
 #include "shader/gx-gl-shd-skybox-cube.hpp"
 #include "shader/gx-gl-shd-skybox-equirectangular.hpp"
 #include "shader/gx-gl-shd-ssao-resolve.hpp"
+#include "shader/gx-gl-shd-unlit-coloured.hpp"
 #include <algorithm>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
@@ -59,6 +60,7 @@ gearoenix::gl::SubmissionManager::CameraData::CameraData() noexcept
     , threads_translucent_models_data(std::thread::hardware_concurrency())
     , opaque_threads_mvps(std::thread::hardware_concurrency())
     , translucent_threads_mvps(std::thread::hardware_concurrency())
+    , debug_meshes_threads(std::thread::hardware_concurrency())
 {
 }
 
@@ -287,8 +289,9 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
             scene_pool_ref.dynamic_models.clear();
             scene_pool_ref.shadow_caster_directional_lights.clear();
             scene_pool_ref.bones_data.clear();
-            e.get_world()->synchronised_system<render::camera::Camera>(
-                [&](const core::ecs::Entity::id_t camera_id, render::camera::Camera* const camera) noexcept {
+            scene_pool_ref.debug_mesh_data.clear();
+            e.get_world()->synchronised_system<core::ecs::And<render::camera::Camera, physics::Transformation>>(
+                [&](const core::ecs::Entity::id_t camera_id, render::camera::Camera* const camera, physics::Transformation* const transform) noexcept {
                     if (!camera->enabled)
                         return;
                     if (camera->get_scene_id() != scene_id)
@@ -305,9 +308,17 @@ void gearoenix::gl::SubmissionManager::fill_scenes() noexcept
                         scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
                         break;
                     }
+                    if (camera->get_debug_enabled()) {
+                        const auto* const mesh = dynamic_cast<const Mesh*>(camera->get_debug_mesh().get());
+                        scene_pool_ref.debug_mesh_data.push_back(DebugMeshData {
+                            .m = math::Mat4x4<float>(transform->get_global_matrix()),
+                            .colour = camera->get_debug_colour(),
+                            .vertex_object = mesh->vertex_object,
+                            .indices_count = mesh->indices_count });
+                    }
                 });
-            e.get_world()->synchronised_system<core::ecs::And<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDiractionaLight>>(
-                [&](const core::ecs::Entity::id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDiractionaLight* const gll) noexcept {
+            e.get_world()->synchronised_system<core::ecs::And<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDirectionalLight>>(
+                [&](const core::ecs::Entity::id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDirectionalLight* const gll) noexcept {
                     if (!l->enabled)
                         return;
                     if (!rl->enabled)
@@ -721,6 +732,18 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
                     }
                 }
             }
+            camera_data.debug_meshes.clear();
+            for (auto& v : camera_data.debug_meshes_threads)
+                v.clear();
+            core::sync::ParallelFor::exec(
+                scene_data.debug_mesh_data.begin(),
+                scene_data.debug_mesh_data.end(),
+                [&](DebugMeshData m, const unsigned int kernel_index) noexcept {
+                    m.m = camera_data.vp * m.m;
+                    camera_data.debug_meshes_threads[kernel_index].push_back(std::move(m));
+                });
+            for (auto& v : camera_data.debug_meshes_threads)
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.debug_meshes));
         });
 }
 
@@ -1123,6 +1146,7 @@ void gearoenix::gl::SubmissionManager::render_with_forward() noexcept
             render_forward_camera(scene, camera);
         }
         render_bloom(scene);
+        render_debug_meshes(scene);
     }
 }
 
@@ -1151,15 +1175,18 @@ void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene) noex
 
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
-    const float screen_ratio = static_cast<float>(base_os_app.get_window_size().x) / static_cast<float>(base_os_app.get_window_size().y);
+    const auto& window_size = base_os_app.get_window_size();
+    set_viewport_clip({ static_cast<sizei>(0), static_cast<sizei>(0), static_cast<sizei>(window_size.x), static_cast<sizei>(window_size.y) });
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    const float screen_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
     if (screen_ratio < back_buffer_aspect_ratio) {
-        const auto screen_height = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().x) / back_buffer_aspect_ratio + 0.1f);
-        const auto screen_y = (static_cast<sizei>(base_os_app.get_window_size().y) - screen_height) / 2;
-        set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(base_os_app.get_window_size().x), screen_height });
+        const auto screen_height = static_cast<sizei>(static_cast<float>(window_size.x) / back_buffer_aspect_ratio + 0.1f);
+        const auto screen_y = (static_cast<sizei>(window_size.y) - screen_height) / 2;
+        set_viewport_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(window_size.x), screen_height });
     } else {
-        const auto screen_width = static_cast<sizei>(static_cast<float>(base_os_app.get_window_size().y) * back_buffer_aspect_ratio + 0.1f);
-        const auto screen_x = (static_cast<sizei>(base_os_app.get_window_size().x) - screen_width) / 2;
-        set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(base_os_app.get_window_size().y) });
+        const auto screen_width = static_cast<sizei>(static_cast<float>(window_size.y) * back_buffer_aspect_ratio + 0.1f);
+        const auto screen_x = (static_cast<sizei>(window_size.x) - screen_width) / 2;
+        set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
     }
     gama_correction_colour_tuning_anti_aliasing_shader->bind();
     gama_correction_colour_tuning_anti_aliasing_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
@@ -1172,6 +1199,24 @@ void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene) noex
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     GX_GL_CHECK_D;
+}
+
+void gearoenix::gl::SubmissionManager::render_debug_meshes(const SceneData& scene) noexcept
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    unlit_coloured_shader->bind();
+    for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+        const auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+        for (const auto& mesh : camera.debug_meshes) {
+            unlit_coloured_shader->set_mvp_data(reinterpret_cast<const float*>(&mesh.m));
+            unlit_coloured_shader->set_colour_data(reinterpret_cast<const float*>(&mesh.colour));
+            glBindVertexArray(mesh.vertex_object);
+            glDrawElements(GL_LINES, mesh.indices_count, GL_UNSIGNED_INT, nullptr);
+        }
+    }
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }
 
 void gearoenix::gl::SubmissionManager::render_imgui() noexcept
@@ -1219,6 +1264,7 @@ gearoenix::gl::SubmissionManager::SubmissionManager(Engine& e) noexcept
     , skybox_cube_shader(new shader::SkyboxCube(e))
     , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
+    , unlit_coloured_shader(new shader::UnlitColoured(e))
     , bloom_shader_combination(e)
     , forward_pbr_shader_combination(e)
     , shadow_caster_shader_combination(e)

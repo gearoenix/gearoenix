@@ -1,5 +1,4 @@
 #include "gx-editor-ctrl-manager.hpp"
-
 #include <gearoenix/platform/gx-plt-application.hpp>
 
 gearoenix::editor::control::Manager::Manager(platform::Application& platform_application) noexcept

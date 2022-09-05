@@ -56,6 +56,8 @@ public:
         std::vector<PbrVertexAnimated>&& vertices,
         std::vector<std::uint32_t>&& indices,
         core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+
+    [[nodiscard]] bool remove_if_exist(const std::string& name) noexcept;
 };
 }
 

@@ -1,14 +1,11 @@
 #include "gx-editor-ui-menu-bar.hpp"
 #include "../control/gx-editor-ctrl-manager.hpp"
-
-#include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
-
-#include <imgui.h>
-#include <imgui_stdlib.h>
+#include <imgui/imgui.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 constexpr static const char *const key_gltf_file_chooser = "key_gltf_file_chooser";
 constexpr static const char *const  filter_gltf_file = ".gltf,.glb";

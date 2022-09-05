@@ -35,6 +35,7 @@ struct Radiance;
 struct SkyboxCube;
 struct SkyboxEquirectangular;
 struct SsaoResolve;
+struct UnlitColoured;
 }
 
 namespace gearoenix::gl {
@@ -88,6 +89,13 @@ struct SubmissionManager final {
         math::Aabb3<double> box;
     };
 
+    struct DebugMeshData final {
+        math::Mat4x4<float> m;
+        math::Vec3<float> colour;
+        uint vertex_object = 0;
+        sizei indices_count = 0;
+    };
+
     struct CameraData final {
         uint framebuffer = static_cast<uint>(-1);
         math::Vec4<sizei> viewport_clip;
@@ -102,6 +110,8 @@ struct SubmissionManager final {
         std::vector<math::Mat4x4<float>> mvps;
         std::vector<std::vector<std::pair<std::size_t, math::Mat4x4<float>>>> opaque_threads_mvps;
         std::vector<std::vector<std::pair<std::size_t, math::Mat4x4<float>>>> translucent_threads_mvps;
+        std::vector<DebugMeshData> debug_meshes;
+        std::vector<std::vector<DebugMeshData>> debug_meshes_threads;
 
         CameraData() noexcept;
     };
@@ -140,6 +150,7 @@ struct SubmissionManager final {
         std::pair<core::ecs::Entity::id_t /*reflection-id*/, ReflectionData> default_reflection { 0, ReflectionData {} };
         std::vector<DynamicModelData> dynamic_models;
         std::vector<BoneData> bones_data;
+        std::vector<DebugMeshData> debug_mesh_data;
     };
 
 private:
@@ -154,6 +165,8 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
+    const std::unique_ptr<shader::UnlitColoured> unlit_coloured_shader;
+
     shader::BloomCombination bloom_shader_combination;
     shader::ForwardPbrCombination forward_pbr_shader_combination;
     shader::ShadowCasterCombination shadow_caster_shader_combination;
@@ -217,6 +230,7 @@ private:
     void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;
     void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
     void render_bloom(const SceneData& scene) noexcept;
+    void render_debug_meshes(const SceneData& scene) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;
     void render_imgui() noexcept;

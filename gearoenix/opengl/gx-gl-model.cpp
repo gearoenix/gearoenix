@@ -2,7 +2,6 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
-#include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"

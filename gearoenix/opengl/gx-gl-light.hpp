@@ -12,7 +12,7 @@ struct Engine;
 struct Texture2D;
 struct Target;
 
-struct ShadowCasterDiractionaLight final : public core::ecs::Component {
+struct ShadowCasterDirectionalLight final : public core::ecs::Component {
     friend struct LightBuilder;
     friend struct LightManager;
 
@@ -21,9 +21,9 @@ struct ShadowCasterDiractionaLight final : public core::ecs::Component {
     GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1))
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1))
 
-    ShadowCasterDiractionaLight() noexcept;
-    ~ShadowCasterDiractionaLight() noexcept final;
-    ShadowCasterDiractionaLight(ShadowCasterDiractionaLight&&) noexcept;
+    ShadowCasterDirectionalLight() noexcept;
+    ~ShadowCasterDirectionalLight() noexcept final;
+    ShadowCasterDirectionalLight(ShadowCasterDirectionalLight&&) noexcept;
 };
 
 struct LightBuilder final : public render::light::Builder {

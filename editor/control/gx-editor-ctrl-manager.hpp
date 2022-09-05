@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_EDITOR_CONTROL_MANAGER_HPP
 #define GEAROENIX_EDITOR_CONTROL_MANAGER_HPP
-
 #include "gx-editor-ctrl-project.hpp"
 
 namespace gearoenix::platform {

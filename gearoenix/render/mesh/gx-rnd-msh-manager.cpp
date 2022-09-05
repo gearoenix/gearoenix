@@ -557,3 +557,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     occlusion_box.update();
     return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
 }
+
+bool gearoenix::render::mesh::Manager::remove_if_exist(const std::string& name) noexcept
+{
+    std::lock_guard<std::mutex> _lg(meshes_lock);
+    auto search = meshes.find(name);
+    if (meshes.end() == search)
+        return false;
+    meshes.erase(search);
+    return true;
+}

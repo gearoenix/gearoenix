@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_EDITOR_CONTROL_PROJECT_HPP
 #define GEAROENIX_EDITOR_CONTROL_PROJECT_HPP
-
 #include <gearoenix/core/gx-cr-project.hpp>
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
 #include <optional>

@@ -30,6 +30,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-skybox-equirectangular.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-ssao-resolve.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-ssao-resolve.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-unlit-coloured.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-unlit-coloured.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-check.cpp

@@ -11,6 +11,7 @@ namespace gearoenix::gl {
 struct Engine;
 struct Mesh;
 struct Texture2D;
+
 struct Model final : public core::ecs::Component {
     std::shared_ptr<Mesh> bound_mesh;
     render::material::Pbr material;
@@ -19,7 +20,7 @@ struct Model final : public core::ecs::Component {
     std::shared_ptr<Texture2D> emission;
     std::shared_ptr<Texture2D> metallic_roughness;
     std::shared_ptr<Texture2D> occlusion;
-    // TODO later we can inbring the actual opengl objects here to make it more cache friendly
+    // TODO later we can bring the actual opengl objects here to make it more cache friendly
 
     Model(
         Engine& e,

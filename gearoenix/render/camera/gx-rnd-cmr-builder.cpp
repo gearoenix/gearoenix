@@ -15,7 +15,7 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
     physics::Transformation transform;
     const auto& plt_app = e.get_platform_application().get_base();
     const auto& cfg = plt_app.get_configuration().get_render_configuration();
-    Camera cam(static_cast<float>(cfg.get_runtime_resolution_width()) / static_cast<float>(cfg.get_runtime_resolution_height()));
+    Camera cam(e, static_cast<float>(cfg.get_runtime_resolution_width()) / static_cast<float>(cfg.get_runtime_resolution_height()));
     cam.set_view(math::Mat4x4<float>(transform.get_inverted_global_matrix()));
     std::array<math::Vec3<double>, 8> frustum_points;
     cam.generate_frustum_points(
