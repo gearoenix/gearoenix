@@ -58,6 +58,9 @@ struct SubmissionManager final {
         math::Vec4<float> normal_metallic_factor;
         math::Vec4<float> emission_roughness_factor;
         math::Vec4<float> alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;
+        std::size_t directional_lights_count = 0;
+        std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_direction;
+        std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_colour;
         std::size_t shadow_caster_directional_lights_count = 0;
         std::array<math::Mat4x4<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_normalised_vp;
         std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_direction;

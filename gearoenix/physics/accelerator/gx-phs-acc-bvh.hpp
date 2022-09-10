@@ -19,7 +19,7 @@ struct Bvh final {
     constexpr static const std::size_t walls_count = bins_count - 1;
 
     static_assert(bins_count > 4 && bins_count % 2 == 0, "Bins count is unexpected.");
-    static_assert(std::is_trivially_destructible_v<UserData>, "Only trivially destructable data is accepted.");
+    static_assert(std::is_trivially_destructible_v<UserData>, "Only trivially destructible data is accepted.");
 
     struct Data final {
         math::Aabb3<double> box;
@@ -35,7 +35,7 @@ private:
     struct Leaf final {
         const bool leaf = true;
         math::Aabb3<double> volume;
-        std::size_t data_count; // there is an array of data after this
+        std::size_t data_count = static_cast<std::size_t>(-1); // there is an array of data after this
     };
 
     struct Node final {
@@ -304,6 +304,37 @@ private:
         }
     }
 
+    template <typename Collider, typename Function, typename ElseFunction>
+    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection) noexcept
+    {
+        const auto& node = *reinterpret_cast<const Node*>(ptr);
+        const auto intersection_status = cld.check_intersection_status(node.volume);
+        if (math::IntersectionStatus::Out == intersection_status) {
+            call_on_all(ptr, not_intersection);
+            return;
+        }
+        if (math::IntersectionStatus::In == intersection_status) {
+            call_on_all(ptr, on_intersection);
+            return;
+        }
+        if (node.leaf) {
+            const auto data_size = node.left;
+            for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
+                 data_index < data_size;
+                 ++data_index, data_ptr += sizeof(Data)) {
+                auto& d = *reinterpret_cast<Data*>(data_ptr);
+                const auto is = cld.check_intersection_status(d.box);
+                if (math::IntersectionStatus::Out == is)
+                    not_intersection(d);
+                else
+                    on_intersection(d);
+            }
+        } else {
+            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.left]), cld, on_intersection);
+            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.right]), cld, on_intersection);
+        }
+    }
+
 public:
     void reset() noexcept
     {
@@ -342,6 +373,14 @@ public:
         if (nodes.empty())
             return;
         call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[0]), cld, on_intersection);
+    }
+
+    template <typename Collider, typename Function, typename ElseFunction>
+    void call_on_intersecting(const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection) noexcept
+    {
+        if (nodes.empty())
+            return;
+        call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[0]), cld, on_intersection, not_intersection);
     }
 
     template <typename Function>

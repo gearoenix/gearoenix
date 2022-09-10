@@ -7,9 +7,11 @@
 
 gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     Engine& e,
+    const std::size_t directional_lights_count,
     const std::size_t shadow_casters_directional_lights_count,
     const std::size_t bones_count) noexcept
     : Shader(e)
+    , directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
     , bones_matrices_count(static_cast<sizei>(bones_count * 2))
 {
@@ -83,6 +85,10 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "uniform vec4 emission_roughness_factor;\n";
     fs << "uniform vec4 alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;\n";
     fs << "\n";
+    if (directional_lights_count > 0) {
+        fs << "uniform vec3 directional_light_direction[" << directional_lights_count << "];\n";
+        fs << "uniform vec3 directional_light_colour[" << directional_lights_count << "];\n";
+    }
     if (shadow_casters_directional_lights_count > 0) {
         fs << "uniform vec3 shadow_caster_directional_light_direction[" << shadow_casters_directional_lights_count << "];\n";
         fs << "uniform vec3 shadow_caster_directional_light_colour[" << shadow_casters_directional_lights_count << "];\n";
@@ -194,6 +200,25 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    float geometry_schlick_k_inv = 1.0 - geometry_schlick_k;\n";
     fs << "    float one_minus_metallic = 1.0 - mtr.x;\n";
     fs << "\n";
+    for (int dir_i = 0; dir_i < directional_lights_count; ++dir_i) {
+        fs << "    {\n";
+        fs << "        float normal_dot_light = max(dot(nrm, directional_light_direction[" << dir_i << "]), 0.00001);\n";
+        fs << "        lumination += compute_light(\n";
+        fs << "            directional_light_direction[" << dir_i << "],\n";
+        fs << "            directional_light_colour[" << dir_i << "],\n";
+        fs << "            -eye,\n";
+        fs << "            nrm,\n";
+        fs << "            normal_dot_view,\n";
+        fs << "            roughness_p2,\n";
+        fs << "            roughness_p2_minus_1,\n";
+        fs << "            geometry_schlick_k,\n";
+        fs << "            geometry_schlick_k_inv,\n";
+        fs << "            f0,\n";
+        fs << "            f0_inv,\n";
+        fs << "            one_minus_metallic,\n";
+        fs << "            alb.xyz);\n";
+        fs << "    }\n";
+    }
     for (int dir_i = 0; dir_i < shadow_casters_directional_lights_count; ++dir_i) {
         fs << "    {\n";
         fs << "        float normal_dot_light = max(dot(nrm, shadow_caster_directional_light_direction[" << dir_i << "]), 0.00001);\n";
@@ -253,6 +278,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(brdflut);
 
+    if (directional_lights_count > 0) {
+        GX_GL_THIS_GET_UNIFORM(directional_light_direction);
+        GX_GL_THIS_GET_UNIFORM(directional_light_colour);
+    }
+
     if (shadow_casters_directional_lights_count > 0) {
         GX_GL_THIS_GET_UNIFORM(shadow_caster_directional_light_direction);
         GX_GL_THIS_GET_UNIFORM(shadow_caster_directional_light_colour);
@@ -296,6 +326,22 @@ void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_norm
         reinterpret_cast<const float*>(data));
 }
 
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data) noexcept
+{
+    glUniform3fv(
+        directional_light_direction,
+        directional_lights_count,
+        reinterpret_cast<const float*>(data));
+}
+
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data) noexcept
+{
+    glUniform3fv(
+        directional_light_colour,
+        directional_lights_count,
+        reinterpret_cast<const float*>(data));
+}
+
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data) noexcept
 {
     glUniform3fv(
@@ -328,16 +374,32 @@ void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const
         reinterpret_cast<const float*>(data));
 }
 
-gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::ForwardPbrShadowCastersDirectionalLightCountCombination(Engine& e, const std::size_t bones_count) noexcept
+gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination::ForwardPbrDirectionalLightCountCombination(
+    Engine& e,
+    const std::size_t shadow_caster_directional_lights_count,
+    const std::size_t bones_count) noexcept
+{
+    for (std::size_t directional_lights_count = 0; directional_lights_count <= GX_RENDER_MAX_DIRECTIONAL_LIGHTS; ++directional_lights_count)
+        shaders.emplace_back(e, directional_lights_count, shadow_caster_directional_lights_count, bones_count);
+}
+
+gearoenix::gl::shader::ForwardPbr* gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination::get_shader_for_directional_lights_count(const std::size_t c) noexcept
+{
+    return &shaders[c];
+}
+
+gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::ForwardPbrShadowCastersDirectionalLightCountCombination(
+    Engine& e,
+    const std::size_t bones_count) noexcept
 {
     for (std::size_t shadow_caster_directional_lights_count = 0; shadow_caster_directional_lights_count <= GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++shadow_caster_directional_lights_count)
-        shaders.emplace_back(e, shadow_caster_directional_lights_count, bones_count);
+        directional_lights_count_combination.emplace_back(e, shadow_caster_directional_lights_count, bones_count);
     GX_GL_CHECK_D;
 }
 
-gearoenix::gl::shader::ForwardPbr* gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::get_shader_for_shadow_caster_directional_lights_count(const std::size_t c) noexcept
+gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination& gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::get_shader_for_shadow_caster_directional_lights_count(const std::size_t c) noexcept
 {
-    return &shaders[c];
+    return directional_lights_count_combination[c];
 }
 
 gearoenix::gl::shader::ForwardPbrBonesCountCombination::ForwardPbrBonesCountCombination(Engine& e) noexcept

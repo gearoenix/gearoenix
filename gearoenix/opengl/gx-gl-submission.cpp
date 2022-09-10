@@ -539,33 +539,51 @@ void gearoenix::gl::SubmissionManager::update_scene_lights(SceneData& scene_data
 {
     bvh.call_on_all([&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
         bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
+        bvh_node_data.user_data.model.directional_lights_count = 0;
     });
     for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
-        bvh.call_on_intersecting(shadow.second.frustum, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
-            auto& m = bvh_node_data.user_data.model;
-            if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
-                return;
-            m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
-            m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
-            m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
-            m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
-            ++m.shadow_caster_directional_lights_count;
-        });
+        bvh.call_on_intersecting(
+            shadow.second.frustum,
+            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+                auto& m = bvh_node_data.user_data.model;
+                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
+                    return;
+                m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
+                m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
+                m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
+                m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
+                ++m.shadow_caster_directional_lights_count;
+            },
+            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+                auto& m = bvh_node_data.user_data.model;
+                if (m.directional_lights_direction.size() == m.directional_lights_count)
+                    return;
+                m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
+                m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
+                ++m.directional_lights_count;
+            });
     }
 
     core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModelData& md, const unsigned int) noexcept {
         auto& m = md.base.model;
         m.shadow_caster_directional_lights_count = 0;
+        m.directional_lights_count = 0;
         for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
-            if (!shadow.second.frustum.check_intersection(md.box))
-                return;
-            if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
-                return;
-            m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
-            m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
-            m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
-            m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
-            ++m.shadow_caster_directional_lights_count;
+            if (shadow.second.frustum.check_intersection(md.box)) {
+                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
+                    return;
+                m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
+                m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
+                m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
+                m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
+                ++m.shadow_caster_directional_lights_count;
+            } else {
+                if (m.directional_lights_direction.size() == m.directional_lights_count)
+                    return;
+                m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
+                m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
+                ++m.directional_lights_count;
+            }
         }
     });
 }
@@ -926,7 +944,8 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
 
         shader::ForwardPbr* const current_shader = forward_pbr_shader_combination
                                                        .get_shader_for_bones_count_combination(model_data.bones_count)
-                                                       .get_shader_for_shadow_caster_directional_lights_count(model_data.shadow_caster_directional_lights_count);
+                                                       .get_shader_for_shadow_caster_directional_lights_count(model_data.shadow_caster_directional_lights_count)
+                                                       .get_shader_for_directional_lights_count(model_data.directional_lights_count);
         if (current_shader != shader) {
             shader = current_shader;
             shader->bind();
@@ -970,6 +989,11 @@ void gearoenix::gl::SubmissionManager::render_forward_camera(const SceneData& sc
         glBindTexture(GL_TEXTURE_CUBE_MAP, model_data.radiance);
         glActiveTexture(GL_TEXTURE0 + ti_brdflut);
         glBindTexture(GL_TEXTURE_2D, brdflut->get_object());
+
+        if (0 < model_data.directional_lights_count) {
+            shader->set_directional_light_direction_data(model_data.directional_lights_direction.data());
+            shader->set_directional_light_colour_data(model_data.directional_lights_colour.data());
+        }
 
         if (0 < model_data.shadow_caster_directional_lights_count) {
             shader->set_shadow_caster_directional_light_normalised_vp_data(model_data.shadow_caster_directional_lights_normalised_vp.data());

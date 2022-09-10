@@ -138,8 +138,10 @@ void gearoenix::render::camera::Camera::show_gui() noexcept
 
 void gearoenix::render::camera::Camera::set_target(std::shared_ptr<texture::Target>&& t) noexcept
 {
-    const auto d = t->get_dimension();
-    set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
+    if (use_target_aspect_ratio) {
+        const auto d = t->get_dimension();
+        set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
+    }
     target = std::move(t);
 }
 
@@ -179,4 +181,13 @@ void gearoenix::render::camera::Camera::enable_debug_mesh() noexcept
 void gearoenix::render::camera::Camera::disable_debug_mesh() noexcept
 {
     debug_enabled = false;
+}
+
+void gearoenix::render::camera::Camera::set_use_target_aspect_ratio(const bool b) noexcept
+{
+    if (use_target_aspect_ratio != b && b && nullptr != target) {
+        const auto d = target->get_dimension();
+        set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
+    }
+    use_target_aspect_ratio = b;
 }

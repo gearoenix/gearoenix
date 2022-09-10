@@ -57,6 +57,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_VAL_PRV(Projection, projection_type, Projection::Perspective)
     GX_GETSET_VAL_PRV(double, layer, 0.0)
     GX_GETSET_VAL_PRV(Usage, usage, Usage::Main)
+    GX_GET_VAL_PRV(bool, use_target_aspect_ratio, true)
     GX_GET_VAL_PRV(bool, debug_enabled, false)
     GX_GET_REFC_PRV(math::Vec3<float>, debug_colour)
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, debug_mesh)
@@ -86,6 +87,7 @@ struct Camera final : public core::ecs::Component {
     void show_gui() noexcept;
     void enable_debug_mesh() noexcept;
     void disable_debug_mesh() noexcept;
+    void set_use_target_aspect_ratio(bool b) noexcept;
 
 private:
     /// It must be changed by Builder or Manager, because the other components must know about the change
