@@ -127,7 +127,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         cam.set_target_aspect_ratio(1.0f);
         cam.set_near(std::get<4>(face));
         cam.set_far(std::get<5>(face));
-        cam.set_yfov(static_cast<float>(GX_PI * 0.25));
+        cam.set_yfov(static_cast<float>(GX_PI * 0.5));
         cam.set_usage(camera::Camera::Usage::ReflectionProbe);
         cam.set_reference_id(builder.get_entity_builder()->get_builder().get_id());
         cam.enabled = false;

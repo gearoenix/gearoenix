@@ -21,7 +21,7 @@ GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
 {
     auto scene_builders = gearoenix::render::load_gltf(
         render_engine,
-        gearoenix::platform::stream::Path::create_asset("1.glb"));
+        gearoenix::platform::stream::Path::create_asset("example-11.glb"));
     auto& scene_builder = scene_builders[0];
 
     gearoenix::core::sync::EndCallerIgnored end_callback([scene_builder] {});

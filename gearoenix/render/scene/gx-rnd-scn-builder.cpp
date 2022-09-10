@@ -113,3 +113,13 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& li
     GX_ASSERT(!light_builders.contains(name));
     light_builders.emplace(std::move(name), std::move(light_builder));
 }
+
+gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() noexcept
+{
+    return *entity_builder->get_builder().get_component<Scene>();
+}
+
+const gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() const noexcept
+{
+    return *entity_builder->get_builder().get_component<Scene>();
+}

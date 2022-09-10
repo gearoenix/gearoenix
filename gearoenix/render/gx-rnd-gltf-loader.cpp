@@ -17,6 +17,7 @@
 #include "model/gx-rnd-mdl-manager.hpp"
 #include "scene/gx-rnd-scn-builder.hpp"
 #include "scene/gx-rnd-scn-manager.hpp"
+#include "scene/gx-rnd-scn-scene.hpp"
 #include "texture/gx-rnd-txt-manager.hpp"
 #include "texture/gx-rnd-txt-texture-2d.hpp"
 
@@ -666,6 +667,14 @@ static void process_node(
             return;
         }
         GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
+    }
+    if (node.children.empty()) { // This is empty
+        GX_ASSERT_D(node.rotation.empty());
+        GX_ASSERT_D(node.scale.empty());
+        GX_ASSERT_D(3 == node.translation.size());
+        auto& s = scene_builder.get_scene();
+        s.empties.emplace(node.name, gearoenix::math::Vec3<double>(node.translation[0], node.translation[1], node.translation[2]));
+        return;
     }
     GX_LOG_F("Unexpected node in the scene nodes. Node: " << node.name);
 }

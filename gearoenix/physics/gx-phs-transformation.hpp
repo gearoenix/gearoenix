@@ -54,6 +54,12 @@ public:
     void clear_change() noexcept;
     void reset() noexcept;
     void reset(const math::Vec3<double>& scale, const math::Quat<double>& rotation, const math::Vec3<double>& location) noexcept;
+    void reset(
+        const math::Vec3<double>& scale,
+        const math::Vec3<double>& x_axis,
+        const math::Vec3<double>& y_axis,
+        const math::Vec3<double>& z_axis,
+        const math::Vec3<double>& location) noexcept;
     void show_gui() noexcept;
 };
 }

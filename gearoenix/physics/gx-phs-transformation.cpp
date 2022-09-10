@@ -334,3 +334,35 @@ void gearoenix::physics::Transformation::show_gui() noexcept
         ImGui::TreePop();
     }
 }
+
+void gearoenix::physics::Transformation::reset(
+    const math::Vec3<double>& s,
+    const math::Vec3<double>& x,
+    const math::Vec3<double>& y,
+    const math::Vec3<double>& z,
+    const math::Vec3<double>& l) noexcept
+{
+    x_axis = x;
+    y_axis = y;
+    z_axis = z;
+    local_matrix.data[0][0] = x.x;
+    local_matrix.data[0][1] = x.y;
+    local_matrix.data[0][2] = x.z;
+    local_matrix.data[0][3] = 0.0;
+    local_matrix.data[1][0] = y.x;
+    local_matrix.data[1][1] = y.y;
+    local_matrix.data[1][2] = y.z;
+    local_matrix.data[1][3] = 0.0;
+    local_matrix.data[2][0] = z.x;
+    local_matrix.data[2][1] = z.y;
+    local_matrix.data[2][2] = z.z;
+    local_matrix.data[2][3] = 0.0;
+    local_matrix.data[3][0] = 0.0;
+    local_matrix.data[3][1] = 0.0;
+    local_matrix.data[3][2] = 0.0;
+    local_matrix.data[3][3] = 1.0;
+    scale = s;
+    local_matrix.local_scale(s);
+    local_matrix.set_location(l);
+    changed = true;
+}

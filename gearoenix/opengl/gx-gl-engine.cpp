@@ -28,7 +28,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     specification.is_raytracing_supported = false;
     specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
 
-    // specification.is_float_texture_supported = true;
+    specification.is_float_texture_supported = false;
     specification.is_deferred_supported = false;
 
     camera_manager = std::make_unique<CameraManager>(*this);

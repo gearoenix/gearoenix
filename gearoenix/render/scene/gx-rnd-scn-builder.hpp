@@ -34,6 +34,7 @@ struct Builder;
 }
 
 namespace gearoenix::render::scene {
+struct Scene;
 struct Builder final {
     friend struct Manager;
 
@@ -64,6 +65,8 @@ public:
     void add(std::shared_ptr<reflection::Builder>&& reflection_builder) noexcept;
     void add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept;
     void add(std::shared_ptr<light::Builder>&& light_builder) noexcept;
+    [[nodiscard]] Scene& get_scene() noexcept;
+    [[nodiscard]] const Scene& get_scene() const noexcept;
 };
 }
 

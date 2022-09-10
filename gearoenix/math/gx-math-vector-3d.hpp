@@ -36,7 +36,7 @@ struct Vec3 final {
     {
     }
 
-    constexpr Vec3(const Vec3<Element>& o) noexcept = default;
+    constexpr Vec3(const Vec3& o) noexcept = default;
 
     template <typename T>
     constexpr explicit Vec3(const Vec3<T>& o) noexcept
@@ -95,13 +95,7 @@ struct Vec3 final {
         return Vec3<Element>(x * m, y * m, z * m);
     }
 
-    constexpr Vec3<Element>& operator=(const Vec3<Element>& o) noexcept
-    {
-        x = o.x;
-        y = o.y;
-        z = o.z;
-        return *this;
-    }
+    constexpr Vec3& operator=(const Vec3& o) noexcept = default;
 
     constexpr void operator+=(const Vec3<Element>& o) noexcept
     {

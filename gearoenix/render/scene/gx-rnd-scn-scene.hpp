@@ -46,7 +46,8 @@ struct Scene final : public core::ecs::Component {
     GX_GET_REF_PRV(math::Vec4<float>, ssao_settings)
     GX_GETSET_VAL_PRV(double, layer, 0.0)
     GX_GET_VAL_PRV(bool, recreate_bvh, true)
-    GX_GET_VAL_PRV(bool, reflection_probs_changed, true) // TODO: later must be a mechanisme to update it
+    GX_GET_VAL_PRV(bool, reflection_probs_changed, true) // TODO: later must be a mechanism to update it
+    boost::container::flat_map<std::string, math::Vec3<double>> empties;
 
 private:
     boost::container::flat_map<core::ecs::Entity::id_t, std::uint64_t> cameras_flags;
