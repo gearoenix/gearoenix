@@ -30,7 +30,7 @@ precision highp int;\n\
 precision highp sampler2D;\n\
 precision highp samplerCube;\n\
 \n\
-uniform vec2 screen_space_uv;\n\
+uniform vec4 screen_space_uv_exposure_gamma;\n\
 \n\
 uniform sampler2D low_texture;\n\
 uniform sampler2D high_texture;\n\
@@ -40,15 +40,10 @@ in vec2 out_uv;\n\
 \n\
 out vec4 frag_colour;\n\
 \n\
-const float bloom_radius = 0.0001;\n\
-const float bloom_horizontal = 0.2;\n\
-const float exposure = 1.2;\n\
-const float gamma = 2.2;\n\
-\n\
 void main() {\n\
     frag_colour.xyz = texture(low_texture, out_uv).xyz + texture(high_texture, out_uv).xyz;\n\
-    frag_colour.xyz = vec3(1.0) - exp(-frag_colour.xyz * exposure) + 0.0001 * texture(depth_texture, out_uv).xyz;\n\
-    frag_colour.xyz = pow(frag_colour.xyz, vec3(1.0 / gamma)) + 0.0001 * screen_space_uv.xyy;\n\
+    frag_colour.xyz = vec3(1.0) - exp(-frag_colour.xyz * screen_space_uv_exposure_gamma.z) + (0.0001 * texture(depth_texture, out_uv).xyz);\n\
+    frag_colour.xyz = pow(frag_colour.xyz, vec3(1.0 / screen_space_uv_exposure_gamma.w));\n\
     frag_colour.w = 1.0;\n\
 }\n";
 
@@ -59,7 +54,7 @@ gearoenix::gl::shader::GamaCorrectionColourTuningAntiAliasing::GamaCorrectionCol
     set_fragment_shader(fragment_shader_src);
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
-    GX_GL_THIS_GET_UNIFORM(screen_space_uv);
+    GX_GL_THIS_GET_UNIFORM(screen_space_uv_exposure_gamma);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(low_texture);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(high_texture);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(depth_texture);

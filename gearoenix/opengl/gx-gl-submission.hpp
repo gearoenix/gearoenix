@@ -106,6 +106,8 @@ struct SubmissionManager final {
         math::Vec3<float> pos;
         core::ecs::Entity::id_t out_reference = 0;
         float skybox_scale = 1.0;
+        float hdr_tune_mapping = 1.0f;
+        float gamma_correction = 2.2f;
         std::vector<std::pair<double, ModelData>> opaque_models_data;
         std::vector<std::pair<double, ModelData>> translucent_models_data;
         std::vector<std::vector<std::pair<double, ModelData>>> threads_opaque_models_data;
@@ -232,7 +234,7 @@ private:
     void render_reflection_probes(const SceneData& scene) noexcept;
     void render_skyboxes(const SceneData& scene, const CameraData& camera) noexcept;
     void render_forward_camera(const SceneData& scene, const CameraData& camera) noexcept;
-    void render_bloom(const SceneData& scene) noexcept;
+    void render_bloom(const SceneData& scene, const CameraData& camera) noexcept;
     void render_debug_meshes(const SceneData& scene) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;

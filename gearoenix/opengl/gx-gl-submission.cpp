@@ -635,6 +635,8 @@ void gearoenix::gl::SubmissionManager::update_scene_cameras(const core::ecs::Ent
             camera_data.vp = render_camera->get_view_projection();
             camera_data.pos = math::Vec3<float>(camera_location);
             camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
+            camera_data.hdr_tune_mapping = render_camera->get_hdr_tune_mapping();
+            camera_data.gamma_correction = render_camera->get_gamma_correction();
             camera_data.opaque_models_data.clear();
             camera_data.translucent_models_data.clear();
             camera_data.out_reference = render_camera->get_reference_id();
@@ -1168,13 +1170,13 @@ void gearoenix::gl::SubmissionManager::render_with_forward() noexcept
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             render_forward_camera(scene, camera);
+            render_bloom(scene, camera);
         }
-        render_bloom(scene);
         render_debug_meshes(scene);
     }
 }
 
-void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene) noexcept
+void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene, const CameraData& camera) noexcept
 {
     GX_GL_CHECK_D;
     set_framebuffer(bloom_horizontal_target->get_framebuffer());
@@ -1213,7 +1215,8 @@ void gearoenix::gl::SubmissionManager::render_bloom(const SceneData& scene) noex
         set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
     }
     gama_correction_colour_tuning_anti_aliasing_shader->bind();
-    gama_correction_colour_tuning_anti_aliasing_shader->set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    const math::Vec4<float> ssuv_htm_gc(back_buffer_uv_move, camera.hdr_tune_mapping, camera.gamma_correction);
+    gama_correction_colour_tuning_anti_aliasing_shader->set_screen_space_uv_exposure_gamma_data(reinterpret_cast<const float*>(&ssuv_htm_gc));
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_low_texture_index()));
     glBindTexture(GL_TEXTURE_2D, low_bloom_texture->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_high_texture_index()));

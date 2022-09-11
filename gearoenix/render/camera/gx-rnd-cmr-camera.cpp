@@ -125,11 +125,13 @@ void gearoenix::render::camera::Camera::show_gui() noexcept
 {
     if (ImGui::TreeNode("Camera")) {
         bool input_changed = false;
-        input_changed |= ImGui::InputFloat("far", &far, 0.01f, 1.0f, "%.3f");
-        input_changed |= ImGui::InputFloat("near", &near, 0.01f, 1.0f, "%.3f");
-        input_changed |= ImGui::InputFloat("aspect ratio", &target_aspect_ratio, 0.01f, 1.0f, "%.3f");
-        input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "scale" : "field of view y", &scale_fovy, 0.01f, 1.0f, "%.3f");
-        input_changed |= ImGui::Checkbox("show debug mesh", &debug_enabled);
+        input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat("Aspect Ratio", &target_aspect_ratio, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat("HDR Tune Mapping", &hdr_tune_mapping, 0.01f, 1.0f, "%.6f");
+        input_changed |= ImGui::InputFloat("Gamma Correction", &gamma_correction, 0.01f, 1.0f, "%.6f");
+        input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "Scale" : "Field Of View Y", &scale_fovy, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::Checkbox("Show debug mesh", &debug_enabled);
         if (input_changed)
             update_projection();
         ImGui::TreePop();
