@@ -79,7 +79,7 @@ struct GameApp final : public gearoenix::core::Application {
             gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
             gearoenix::math::Aabb3(gearoenix::math::Vec3(20.0), gearoenix::math::Vec3(-20.0)),
             gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
-            1024, 128, 256,
+            1024, 256, 512,
             end_callback);
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT) || defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
         const auto id = runtime_reflection_probe_builder->get_entity_builder()->get_builder().get_id();
