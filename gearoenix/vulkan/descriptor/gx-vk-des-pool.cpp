@@ -13,13 +13,13 @@ gearoenix::vulkan::descriptor::Pool::Pool(
     : logical_device(logical_device)
 {
     VkDescriptorPoolCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     info.poolSizeCount = count;
     info.pPoolSizes = pool_sizes;
     info.maxSets = 1000 * count;
     info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    GX_VK_CHK(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create_imgui(

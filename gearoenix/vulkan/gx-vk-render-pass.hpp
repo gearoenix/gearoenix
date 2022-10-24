@@ -9,8 +9,8 @@
 namespace gearoenix::vulkan {
 struct Swapchain;
 struct RenderPass final {
-    GX_GET_CRRF_PRV(Swapchain, swapchain)
-    GX_GET_VAL_PRV(VkRenderPass, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(Swapchain, swapchain);
+    GX_GET_VAL_PRV(VkRenderPass, vulkan_data, nullptr);
 
 public:
     RenderPass(const RenderPass&) = delete;

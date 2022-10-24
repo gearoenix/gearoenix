@@ -5,9 +5,6 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
-#include "../gx-vk-instance.hpp"
-#include "../gx-vk-surface.hpp"
 #include "gx-vk-mem-memory.hpp"
 
 gearoenix::vulkan::memory::Manager::Manager(const engine::Engine& e) noexcept
@@ -25,7 +22,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
     // | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     const auto index = std::make_pair(physical_device.get_memory_type_index(type_bits, memory_properties), place);
     std::shared_ptr<Memory> result;
-    GX_GUARD_LOCK(this)
+    std::lock_guard<std::mutex> _lg(this_lock);
     auto search = memories.find(index);
     if (memories.end() == search) {
         result = Memory::construct(e, place, index.first);

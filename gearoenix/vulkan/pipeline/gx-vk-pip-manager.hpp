@@ -24,15 +24,14 @@ namespace gearoenix::vulkan::pipeline {
 struct Cache;
 struct Pipeline;
 struct Manager final {
-    GX_GET_CREF_PRV(std::shared_ptr<Cache>, cache)
-    GX_GET_UCPTR_PRV(shader::Manager, shader_manager)
+    GX_GET_CREF_PRV(std::shared_ptr<Cache>, cache);
+    GX_GET_UCPTR_PRV(shader::Manager, shader_manager);
 
 private:
     std::shared_ptr<shader::Module> ray_gen_sm;
     std::shared_ptr<shader::Module> close_hit_sm;
     std::shared_ptr<shader::Module> shadow_miss_sm;
     std::shared_ptr<shader::Module> miss_sm;
-
     std::vector<VkPipelineShaderStageCreateInfo> stages_create_info;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> shader_group_create_info;
 

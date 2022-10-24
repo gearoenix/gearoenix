@@ -27,7 +27,7 @@ struct Camera;
 struct Builder {
     friend struct Manager;
 
-    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
 protected:
     Builder(engine::Engine& e, const std::string& name) noexcept;

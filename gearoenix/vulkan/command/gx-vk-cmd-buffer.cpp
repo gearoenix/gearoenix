@@ -21,12 +21,12 @@ gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexc
     , type(t)
 {
     VkCommandBufferAllocateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     info.commandPool = pool->get_vulkan_data();
     info.level = t == Type::Primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
     info.commandBufferCount = 1;
-    GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data))
+    GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data));
 }
 
 gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
@@ -50,14 +50,14 @@ gearoenix::vulkan::command::Buffer::~Buffer() noexcept
 void gearoenix::vulkan::command::Buffer::begin() noexcept
 {
     VkCommandBufferBeginInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &info))
+    GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &info));
 }
 
 void gearoenix::vulkan::command::Buffer::end() noexcept
 {
-    GX_VK_CHK(vkEndCommandBuffer(vulkan_data))
+    GX_VK_CHK(vkEndCommandBuffer(vulkan_data));
 }
 
 void gearoenix::vulkan::command::Buffer::copy(
@@ -88,7 +88,7 @@ void gearoenix::vulkan::command::Buffer::barrier(
 {
     const auto& alc = *buff.get_allocator();
     VkBufferMemoryBarrier info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     info.buffer = buff.get_vulkan_data();
     info.offset = alc.get_offset();
@@ -102,7 +102,7 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
 {
     const auto& img = framebuffer.get_depth()->get_image();
     VkRenderPassBeginInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     info.renderPass = render_pass.get_vulkan_data();
     info.framebuffer = framebuffer.get_vulkan_data();

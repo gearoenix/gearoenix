@@ -20,7 +20,7 @@ struct BindingsData;
 struct Set;
 struct Pool;
 struct Manager final {
-    GX_GET_UPTR_PRV(Pool, imgui)
+    GX_GET_UPTR_PRV(Pool, imgui);
 
 private:
     const device::Logical& logical_device;

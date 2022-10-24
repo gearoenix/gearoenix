@@ -15,9 +15,9 @@ namespace gearoenix::vulkan::device {
 struct Physical;
 struct Logical final {
 private:
-    GX_GET_CRRF_PRV(Physical, physical_device)
-    GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr)
-    GX_GET_VAL_PRV(bool, debug_marker_is_available, false)
+    GX_GET_CRRF_PRV(Physical, physical_device);
+    GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr);
+    GX_GET_VAL_PRV(bool, debug_marker_is_available, false);
 
 public:
     Logical(const Logical&) = delete;

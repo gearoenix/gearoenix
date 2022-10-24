@@ -1,8 +1,10 @@
 #include "gx-vk-swapchain.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../platform/gx-plt-application.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
+#include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
 #include "gx-vk-instance.hpp"
 #include "gx-vk-surface.hpp"
@@ -12,8 +14,9 @@
 #define GX_DEBUG_SWAPCHAIN
 #endif
 
-gearoenix::vulkan::Swapchain::Swapchain(const device::Logical& d) noexcept
-    : logical_device(d)
+gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e) noexcept
+    : e(e)
+    , logical_device(e.get_logical_device())
     , format {}
 {
     initialize();
@@ -38,7 +41,7 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
     case VK_SUCCESS:
         return image_index;
     default:
-        GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result))
+        GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result));
     }
 }
 
@@ -56,11 +59,11 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
             break;
     }
     if (chosen_format_index >= formats.size()) {
-        GX_LOG_D("VK_FORMAT_R8G8B8A8_UNORM not found in the surface.")
+        GX_LOG_D("VK_FORMAT_R8G8B8A8_UNORM not found in the surface.");
         chosen_format_index = 0;
     }
     format = formats[chosen_format_index];
-    std::uint32_t swapchain_images_count = caps.minImageCount > 2 ? 3 : 2;
+    std::uint32_t swapchain_images_count = caps.maxImageCount > 2 ? 3 : 2;
     if ((caps.maxImageCount > 0) && (swapchain_images_count > caps.maxImageCount)) {
         swapchain_images_count = caps.maxImageCount;
     }
@@ -71,13 +74,19 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
     VkSwapchainCreateInfoKHR info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     info.surface = surface.get_vulkan_data();
     info.minImageCount = swapchain_images_count;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    info.imageExtent = caps.currentExtent;
+    if (caps.currentExtent.width != static_cast<decltype(caps.currentExtent.width)>(-1) && caps.currentExtent.width != 0 && caps.currentExtent.height != static_cast<decltype(caps.currentExtent.height)>(-1) && caps.currentExtent.height != 0) {
+        info.imageExtent = caps.currentExtent;
+    } else {
+        const auto window_size = e.get_platform_application().get_base().get_window_size();
+        info.imageExtent.width = static_cast<decltype(caps.currentExtent.width)>(window_size.x);
+        info.imageExtent.height = static_cast<decltype(caps.currentExtent.height)>(window_size.y);
+    }
     info.imageUsage = image_usage;
     info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     info.imageArrayLayers = 1;
@@ -96,13 +105,13 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
         info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
     } else {
-        GX_LOG_F("Error composite is unknown.")
+        GX_LOG_F("Error composite is unknown.");
     }
-    GX_VK_CHK(vkCreateSwapchainKHR(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateSwapchainKHR(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
     std::uint32_t count = 0;
-    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, nullptr))
+    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, nullptr));
     std::vector<VkImage> images(count);
-    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()))
+    GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
     image_views.reserve(static_cast<std::size_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
         image_views.emplace_back(image::Image(

@@ -16,11 +16,12 @@ struct ShadowCasterDirectionalLight final : public core::ecs::Component {
     friend struct LightBuilder;
     friend struct LightManager;
 
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture)
-    GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target)
-    GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1))
-    GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1))
+    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture);
+    GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target);
+    GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1));
+    GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
 
+public:
     ShadowCasterDirectionalLight() noexcept;
     ~ShadowCasterDirectionalLight() noexcept final;
     ShadowCasterDirectionalLight(ShadowCasterDirectionalLight&&) noexcept;

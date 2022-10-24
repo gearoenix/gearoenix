@@ -2,10 +2,11 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../gx-vk-check.hpp"
+#include "../camera/gx-vk-cmr-manager.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
-#include "../queue/gx-vk-qu-queue.hpp"
+#include "../queue/gx-vk-qu-graphed-queue.hpp"
+#include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-eng-frame.hpp"
 
@@ -18,13 +19,18 @@ void gearoenix::vulkan::engine::Engine::initialize_frame() noexcept
     }
 }
 
-gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_application) noexcept
+void gearoenix::vulkan::engine::Engine::window_resized() noexcept
+{
+    GX_UNIMPLEMENTED;
+}
+
+gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
-    , instance(*Instance::construct(platform_application.get_base().get_configuration().get_application_name().c_str()))
+    , instance(*Instance::construct(&platform_application))
     , surface(instance, platform_application)
     , physical_device(surface)
     , logical_device(physical_device)
-    , swapchain(logical_device)
+    , swapchain(*this)
     , memory_manager(*this)
     , command_manager(*this)
     , descriptor_manager(logical_device)
@@ -32,10 +38,12 @@ gearoenix::vulkan::engine::Engine::Engine(const platform::Application& platform_
     , buffer_manager(memory_manager, *this)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
-    , graphic_queue(new queue::Queue(*this))
+    , graphed_queue(new queue::GraphedQueue(*this))
     , imgui_manager(new ImGuiManager(*this))
-    , mesh_manager(mesh::Manager::construct(*this))
+    , mesh_manager(new mesh::Manager(*this))
 {
+    camera_manager = std::make_unique<camera::Manager>(*this);
+    reflection_manager = std::make_unique<reflection::Manager>(*this);
     initialize_frame();
 }
 
@@ -61,10 +69,10 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
     }
     imgui_manager->start_frame();
     if (swapchain_image_is_valid) {
-        const auto next_image = swapchain.get_next_image_index(graphic_queue->get_present_semaphore());
+        const auto next_image = swapchain.get_next_image_index(graphed_queue->get_present_semaphore());
         if (next_image.has_value()) {
             swapchain_image_index = *next_image;
-            graphic_queue->start_frame();
+            graphed_queue->start_frame();
         } else {
             swapchain_image_is_valid = false;
         }
@@ -78,7 +86,7 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     if (swapchain_image_is_valid) {
         mesh_manager->update();
         imgui_manager->update();
-        swapchain_image_is_valid = graphic_queue->present(swapchain, swapchain_image_index);
+        // swapchain_image_is_valid = graphic_queue->present(swapchain, swapchain_image_index);
     }
 }
 
@@ -106,7 +114,7 @@ bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
 {
     if (!Loader::load())
         return false;
-    auto instance_result = Instance::construct(GX_APPLICATION_NAME);
+    auto instance_result = Instance::construct(nullptr);
     if (!instance_result.has_value())
         return false;
     auto& instance = instance_result.value();

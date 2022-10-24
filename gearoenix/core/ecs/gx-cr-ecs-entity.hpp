@@ -39,8 +39,8 @@ struct EntityBuilder final {
     friend struct World;
     typedef boost::container::flat_map<std::type_index, std::vector<std::uint8_t>> components_t;
 
-    GX_GET_CVAL_PRV(Entity::id_t, id)
-    GX_GETSET_CREF_PRV(std::optional<std::string>, name)
+    GX_GET_CVAL_PRV(Entity::id_t, id);
+    GX_GETSET_CREF_PRV(std::optional<std::string>, name);
 
 private:
     components_t components;
@@ -92,7 +92,7 @@ public:
 
 struct EntitySharedBuilder final {
     friend struct World;
-    GX_GET_REF_PRV(EntityBuilder, builder)
+    GX_GET_REF_PRV(EntityBuilder, builder);
 
 private:
     World* const world;

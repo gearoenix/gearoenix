@@ -16,9 +16,9 @@ struct Engine;
 
 namespace gearoenix::render::texture {
 struct Texture {
-    GX_GET_RRF_PRT(engine::Engine, e)
-    GX_GET_REFC_PRT(std::string, name)
-    GX_GET_CREF_PRT(TextureInfo, info)
+    GX_GET_RRF_PRT(engine::Engine, e);
+    GX_GET_REFC_PRT(std::string, name);
+    GX_GET_CREF_PRT(TextureInfo, info);
 
 protected:
     Texture(

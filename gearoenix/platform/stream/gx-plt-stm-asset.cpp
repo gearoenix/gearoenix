@@ -20,7 +20,7 @@ gearoenix::platform::stream::Asset::~Asset() noexcept = default;
 #endif
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(
-    platform::Application& platform_application, const std::string& name) noexcept
+    const platform::Application& platform_application, const std::string& name) noexcept
 {
     const std::string file_name = "assets/" + name;
     auto* const asset = new Asset();

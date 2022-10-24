@@ -13,7 +13,7 @@ struct PoolManager;
 struct Set final {
     friend struct PoolManager;
 
-    GX_GET_VAL_PRV(VkDescriptorSet, vulkan_data, nullptr)
+    GX_GET_VAL_PRV(VkDescriptorSet, vulkan_data, nullptr);
 
 private:
     Pool* const pool;

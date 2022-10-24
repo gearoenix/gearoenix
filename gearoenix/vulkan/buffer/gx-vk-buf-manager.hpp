@@ -23,21 +23,25 @@ namespace gearoenix::vulkan::memory {
 struct Manager;
 }
 
+namespace gearoenix::vulkan::queue {
+struct Queue;
+}
+
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
 struct Uniform;
 struct Manager final {
-    GX_GET_RRF_PRV(memory::Manager, memory_manager)
-    GX_GET_RRF_PRV(engine::Engine, e)
-    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer)
-    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer)
+    GX_GET_RRF_PRV(memory::Manager, memory_manager);
+    GX_GET_RRF_PRV(engine::Engine, e);
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer);
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer);
+    GX_GET_UCPTR_PRV(queue::Queue, uploader_queue);
 
 private:
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
     std::unique_ptr<core::sync::WorkWaiter> uploader;
-    std::unique_ptr<core::sync::WorkWaiter> waiter;
 
     [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const noexcept;
     [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const noexcept;
@@ -58,13 +62,13 @@ public:
         const std::string& name,
         const void* data,
         std::size_t size,
-        core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept;
+        core::sync::EndCallerIgnored&& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,
         const std::vector<T>& data,
-        core::sync::EndCaller<Buffer> end = GX_DEFAULT_END_CALLER(Buffer)) noexcept
+        core::sync::EndCallerIgnored end = GX_DEFAULT_IGNORED_END_CALLER) noexcept
     {
         return create(name, data.data(), data.size() * sizeof(T), std::move(end));
     }

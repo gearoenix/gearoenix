@@ -17,11 +17,12 @@ struct Application;
 
 namespace gearoenix::audio {
 struct Engine final {
-    GX_GET_RRF_PRV(platform::Application, platform_application)
-    GX_GET_REF_PRV(Manager, manager)
-    GX_GET_PTR_PRV(FMOD::System, system)
+    GX_GET_RRF_PRV(platform::Application, platform_application);
+    GX_GET_REF_PRV(Manager, manager);
+    GX_GET_PTR_PRV(FMOD::System, system);
 
-    Engine(platform::Application&) noexcept;
+public:
+    explicit Engine(platform::Application&) noexcept;
     ~Engine() noexcept;
 
     void update() noexcept;

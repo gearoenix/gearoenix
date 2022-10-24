@@ -9,10 +9,13 @@ namespace gearoenix::gl {
 struct PipelineManager;
 struct SubmissionManager;
 struct Engine final : public render::engine::Engine {
-    GX_GET_UPTR_PRV(SubmissionManager, submission_manager)
+    GX_GET_UPTR_PRV(SubmissionManager, submission_manager);
+
+public:
     core::FunctionLoader todos;
 
-    Engine(platform::Application& platform_application) noexcept;
+public:
+    explicit Engine(platform::Application& platform_application) noexcept;
     ~Engine() noexcept final;
     void start_frame() noexcept final;
     void end_frame() noexcept final;

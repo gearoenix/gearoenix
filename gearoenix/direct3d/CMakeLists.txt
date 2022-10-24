@@ -68,7 +68,7 @@ FUNCTION(GX_D3D_PREPARE_ASSETS)
         STRING(REGEX REPLACE "[^.]*\\." "" GX_D3D_SHADER_TYPE ${GX_D3D_FILE_NAME_WLE})
         SET(GX_D3D_SHADER_OUT ${GX_D3D_SHADER_LIB_DIR}/${GX_D3D_FILE_NAME_WLE}.cso)
         ADD_CUSTOM_COMMAND(
-            TARGET GearoenixAssets PRE_BUILD
+            OUTPUT ${GX_D3D_SHADER_OUT}
             COMMAND ${DXC} -Qembed_debug -Qstrip_reflect -nologo -Zi -Od -T ${GX_D3D_SHADER_TYPE}_6_5 -E main -Fo ${GX_D3D_SHADER_OUT} ${GX_D3D_SHADER_FILE}
             DEPENDS ${GX_D3D_SHADER_INCLUDES} ${GX_D3D_SHADER_FILE}
             COMMENT "Compiling shader ${GX_D3D_FILE_NAME}..."

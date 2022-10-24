@@ -11,7 +11,7 @@ gearoenix::vulkan::command::Manager::~Manager() noexcept = default;
 
 gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type t, const std::optional<std::size_t> thread_index) noexcept
 {
-    GX_GUARD_LOCK(this)
+    std::lock_guard<std::mutex> _lg(this_lock);
     Pool* pool;
     if (thread_index.has_value()) {
         auto search = indexed_pools.find(*thread_index);
@@ -29,7 +29,7 @@ gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(c
         }
         pool = &(search->second);
     }
-    return Buffer(pool, t);
+    return { pool, t };
 }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::command::Manager::create_frame_based() noexcept

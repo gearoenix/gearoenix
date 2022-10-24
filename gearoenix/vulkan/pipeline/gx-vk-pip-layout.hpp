@@ -12,11 +12,11 @@ struct SetLayout;
 
 namespace gearoenix::vulkan::pipeline {
 struct Layout final {
-    GX_GET_VAL_PRV(VkPipelineLayout, vulkan_data, nullptr)
-    GX_GET_CREF_PRV(std::shared_ptr<descriptor::SetLayout>, des_set_layout)
+    GX_GET_VAL_PRV(VkPipelineLayout, vulkan_data, nullptr);
+    GX_GET_CREF_PRV(std::shared_ptr<descriptor::SetLayout>, des_set_layout);
 
 public:
-    Layout(std::shared_ptr<descriptor::SetLayout> des_set_layout) noexcept;
+    explicit Layout(std::shared_ptr<descriptor::SetLayout> des_set_layout) noexcept;
     ~Layout() noexcept;
 };
 }

@@ -1,67 +1,121 @@
 #include "gx-vk-qu-graph.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "gx-vk-qu-queue.hpp"
 
-gearoenix::vulkan::queue::Graph::Graph(engine::Engine& e) noexcept
-    : start_semaphore(sync::Semaphore::create_frame_based(e))
-    , end_semaphore(sync::Semaphore::create_frame_based(e))
-    , fence(sync::Fence::create_frame_based(e, true))
-    , start(&nodes.emplace(Queue::START_FRAME, Node(e, Queue::START_FRAME, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT)).first->second)
-    , end(&nodes.emplace(Queue::END_FRAME, Node(e, Queue::END_FRAME, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT)).first->second)
+void gearoenix::vulkan::queue::Graph::SubmitData::FrameData::clear() noexcept
 {
-    Node::connect(start, end, e);
+    waits.clear();
+    cmd = nullptr;
+    signals.clear();
 }
 
-gearoenix::vulkan::queue::Graph::~Graph() noexcept = default;
+void gearoenix::vulkan::queue::Graph::SubmitData::clear() noexcept
+{
+    pipeline_stage = 0;
+    for (auto& frame : frame_data)
+        frame.clear();
+}
 
 void gearoenix::vulkan::queue::Graph::update_traversing_level() noexcept
 {
-    start->clear_traversing_level();
-    const auto max_tl = start->update_traversing_level(0);
+    auto& start_node = nodes.find(NodeLabel::Start)->second;
+    start_node.clear_traversing_level(nodes);
+    const auto max_tl = start_node.update_traversing_level(0, nodes);
     submit_data.resize(static_cast<std::size_t>(max_tl));
 }
 
 void gearoenix::vulkan::queue::Graph::clear_submit_data() noexcept
 {
     for (auto& d : submit_data) {
-        auto& [ws, ps, cs, ss] = d;
-        ws.clear();
-        ps.clear();
-        cs.clear();
-        ss.clear();
+        d.clear();
     }
 }
 
-void gearoenix::vulkan::queue::Graph::update_submit_data(Node& n, const std::size_t frame_number) noexcept
+void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node) noexcept
 {
-    if (n.traversed)
+    if (node.get_traversed())
         return;
-    n.traversed = true;
-    while (static_cast<std::size_t>(n.traversal_level) + 1 > submit_data.size())
+    node.set_traversed(true);
+    while (static_cast<std::size_t>(node.get_traversal_level()) + 1 > submit_data.size())
         submit_data.emplace_back();
-    auto& [ws, ps, cs, ss] = submit_data[n.traversal_level];
-    for (auto& p : n.providers) {
-        auto& pd = p.second;
-        ws.emplace_back(pd.second[frame_number]->get_vulkan_data());
-        ps.push_back(pd.first->stage);
+    auto& sd = submit_data[node.get_traversal_level()];
+    for (const NodeLabel provider_label : node.get_providers()) {
+        const auto& provider_semaphores = nodes.find(provider_label)->second.get_consumers().find(node.get_node_label())->second;
+        sd.add_provider(provider);
     }
-    cs.emplace_back(n.cmds[frame_number]->get_vulkan_data());
-    for (auto& c : n.consumers) {
-        ss.emplace_back(c.second.second[frame_number]->get_vulkan_data());
-    }
-    for (auto& c : n.consumers) {
-        update_submit_data(*c.second.first, frame_number);
+    for (const auto& consumer_label_semaphores : node.get_consumers()) {
+        sd.add_consumer(consumer_label_semaphores.second);
     }
 }
 
-void gearoenix::vulkan::queue::Graph::update(const std::size_t frame_number) noexcept
+void gearoenix::vulkan::queue::Graph::update() noexcept
 {
     update_traversing_level();
     clear_submit_data();
-    update_submit_data(*start, frame_number);
+    for (auto& node : nodes)
+        update_submit_data(node.second);
+    auto& front = submit_data.front();
+    auto& back = submit_data.back();
+    for (std::size_t frame_index = 0; frame_index < front.frame_data.size(); ++frame_index) {
+        auto& front_frame = front.frame_data[frame_index];
+        auto& back_frame = back.frame_data[frame_index];
+        front_frame.waits.insert(start_semaphore[frame_index]->get_vulkan_data());
+        back_frame.waits.insert(end_semaphore[frame_index]->get_vulkan_data());
+    }
+    front.pipeline_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+}
+
+gearoenix::vulkan::queue::Graph::Graph(engine::Engine& e) noexcept
+    : e(e)
+    , start_semaphore(sync::Semaphore::create_frame_based(e))
+    , end_semaphore(sync::Semaphore::create_frame_based(e))
+    , fence(sync::Fence::create_frame_based(e, true))
+{
+    nodes.emplace(NodeLabel::Start, Node(e, NodeLabel::Start, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT));
+    nodes.emplace(NodeLabel::End, Node(e, NodeLabel::End, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT));
+    Node::connect(nodes.find(NodeLabel::Start)->second, nodes.find(NodeLabel::End)->second, e);
+}
+
+gearoenix::vulkan::queue::Graph::~Graph() noexcept = default;
+
+std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::queue::Graph::place_node_between(
+    const NodeLabel provider_node_label,
+    const NodeLabel new_node_label,
+    const NodeLabel consumer_node_label,
+    const VkPipelineStageFlags wait_stage) noexcept
+{
+    GX_CHECK_EQUAL_D(nodes.end(), nodes.find(new_node_label));
+    auto& new_node = nodes.emplace(new_node_label, Node(e, new_node_label, wait_stage)).first->second;
+
+    auto provider_search = nodes.find(provider_node_label);
+    GX_CHECK_NOT_EQUAL_D(nodes.end(), provider_search);
+
+    auto consumer_search = nodes.find(consumer_node_label);
+    GX_CHECK_NOT_EQUAL_D(nodes.end(), consumer_search);
+
+    auto& provider_node = provider_search->second;
+    auto& consumer_node = consumer_search->second;
+    auto& provider_consumers = provider_node.get_consumers();
+    auto& consumer_providers = consumer_node.get_providers();
+
+    auto provider_old_consumer_search = provider_consumers.find(consumer_node_label);
+    GX_CHECK_NOT_EQUAL_D(provider_consumers.end(), provider_old_consumer_search);
+
+    auto consumer_old_provider_search = consumer_providers.find(provider_node_label);
+    GX_CHECK_NOT_EQUAL_D(consumer_providers.end(), consumer_old_provider_search);
+
+    provider_consumers.erase(provider_old_consumer_search);
+    consumer_providers.erase(consumer_old_provider_search);
+
+    Node::connect(provider_node, new_node, e);
+    Node::connect(new_node, consumer_node, e);
+
+    update();
+
+    return new_node.get_frame_commands();
 }
 
 #endif

@@ -27,13 +27,14 @@ struct AnimationPlayer final : core::ecs::Component {
     friend struct Manager;
 
     GX_GET_VAL_PRV(std::size_t, index, static_cast<std::size_t>(-1));
-    GX_GET_VAL_PRV(double, time, 0.0)
-    GX_GETSET_VAL_PRV(bool, is_loop, true)
-    GX_GET_VAL_PRV(double, loop_start_time, 0.1e-10)
-    GX_GET_VAL_PRV(double, loop_end_time, 1.0)
-    GX_GET_VAL_PRV(double, loop_length_time, loop_end_time - loop_start_time)
-    GX_GET_VAL_PRV(std::type_index, animation_type, std::type_index(typeid(ArmatureAnimation)))
+    GX_GET_VAL_PRV(double, time, 0.0);
+    GX_GETSET_VAL_PRV(bool, is_loop, true);
+    GX_GET_VAL_PRV(double, loop_start_time, 0.1e-10);
+    GX_GET_VAL_PRV(double, loop_end_time, 1.0);
+    GX_GET_VAL_PRV(double, loop_length_time, loop_end_time - loop_start_time);
+    GX_GET_VAL_PRV(std::type_index, animation_type, std::type_index(typeid(ArmatureAnimation)));
 
+public:
     explicit AnimationPlayer(std::size_t index, std::type_index animation_type = std::type_index(typeid(ArmatureAnimation)), double starting_time = 0.0) noexcept;
     AnimationPlayer(AnimationPlayer&&) noexcept;
     ~AnimationPlayer() noexcept final;

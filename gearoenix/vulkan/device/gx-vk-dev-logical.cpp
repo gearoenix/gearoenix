@@ -9,49 +9,49 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     : physical_device(p)
 {
     VkPhysicalDeviceFeatures device_features;
-    GX_SET_ZERO(device_features)
+    GX_SET_ZERO(device_features);
     device_features.samplerAnisotropy = VK_TRUE;
     device_features.shaderInt64 = VK_TRUE;
 
     VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing_features;
-    GX_SET_ZERO(descriptor_indexing_features)
+    GX_SET_ZERO(descriptor_indexing_features);
     descriptor_indexing_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
     descriptor_indexing_features.runtimeDescriptorArray = VK_TRUE;
     descriptor_indexing_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
 
     VkPhysicalDeviceShaderClockFeaturesKHR shader_clock_features;
-    GX_SET_ZERO(shader_clock_features)
+    GX_SET_ZERO(shader_clock_features);
     shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
     shader_clock_features.shaderSubgroupClock = VK_TRUE;
     shader_clock_features.pNext = &descriptor_indexing_features;
 
     VkPhysicalDeviceScalarBlockLayoutFeatures layout_features;
-    GX_SET_ZERO(layout_features)
+    GX_SET_ZERO(layout_features);
     layout_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES;
     layout_features.scalarBlockLayout = VK_TRUE;
     layout_features.pNext = &shader_clock_features;
 
     VkPhysicalDeviceBufferDeviceAddressFeatures device_features_bda;
-    GX_SET_ZERO(device_features_bda)
+    GX_SET_ZERO(device_features_bda);
     device_features_bda.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
     device_features_bda.bufferDeviceAddress = VK_TRUE;
     device_features_bda.pNext = &layout_features;
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR device_features_as;
-    GX_SET_ZERO(device_features_as)
+    GX_SET_ZERO(device_features_as);
     device_features_as.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
     device_features_as.accelerationStructure = VK_TRUE;
     device_features_as.pNext = &device_features_bda;
 
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR device_features_rtp;
-    GX_SET_ZERO(device_features_rtp)
+    GX_SET_ZERO(device_features_rtp);
     device_features_rtp.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
     device_features_rtp.rayTracingPipeline = VK_TRUE;
     device_features_rtp.rayTraversalPrimitiveCulling = VK_TRUE;
     device_features_rtp.pNext = &device_features_as;
 
     VkPhysicalDeviceFeatures2 device_features2;
-    GX_SET_ZERO(device_features2)
+    GX_SET_ZERO(device_features2);
     device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     device_features2.features = device_features;
     device_features2.pNext = &device_features_rtp;
@@ -90,15 +90,15 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
         if (q == UINT32_MAX)
             continue;
         auto& queue_create_info = queue_create_infos[queue_create_infos_index++];
-        GX_SET_ZERO(queue_create_info)
+        GX_SET_ZERO(queue_create_info);
         queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queue_create_info.queueCount = 1;
         queue_create_info.queueFamilyIndex = q;
         queue_create_info.pQueuePriorities = queue_priorities;
-        GX_LOG_D("queue node index added is " << q)
+        GX_LOG_D("queue node index added is " << q);
     }
     VkDeviceCreateInfo device_create_info;
-    GX_SET_ZERO(device_create_info)
+    GX_SET_ZERO(device_create_info);
     device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.queueCreateInfoCount = static_cast<std::uint32_t>(queue_create_infos.size());
     device_create_info.pQueueCreateInfos = queue_create_infos.data();
@@ -109,7 +109,7 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     } else {
         device_create_info.pEnabledFeatures = &device_features;
     }
-    GX_VK_CHK(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateDevice(physical_device.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data));
     Loader::load(vulkan_data);
 }
 

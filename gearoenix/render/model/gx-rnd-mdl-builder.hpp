@@ -24,9 +24,9 @@ struct Mesh;
 
 namespace gearoenix::render::model {
 struct Builder {
-    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh)
-    GX_GET_CVAL_PRT(bool, is_transformable)
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
+    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
+    GX_GET_CVAL_PRT(bool, is_transformable);
 
 private:
     void set_material_type_index(const std::type_index& in_material_type) noexcept;

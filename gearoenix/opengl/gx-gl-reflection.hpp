@@ -18,11 +18,12 @@ struct Reflection final : public core::ecs::Component {
     friend struct ReflectionBuilder;
     friend struct ReflectionManager;
 
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, irradiance)
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, radiance)
-    GX_GET_VAL_PRV(uint, irradiance_v, static_cast<uint>(-1))
-    GX_GET_VAL_PRV(uint, radiance_v, static_cast<uint>(-1))
+    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, irradiance);
+    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, radiance);
+    GX_GET_VAL_PRV(uint, irradiance_v, static_cast<uint>(-1));
+    GX_GET_VAL_PRV(uint, radiance_v, static_cast<uint>(-1));
 
+public:
     Reflection() noexcept;
     ~Reflection() noexcept final;
     Reflection(Reflection&&) noexcept;
@@ -37,16 +38,17 @@ struct ReflectionRuntime final : public core::ecs::Component {
     typedef std::array<uint, 6> GlCubeTarget;
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMipedCubeTarget;
 
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, environment)
-    GX_GET_CREF_PRV(CubeTarget, environment_targets)
-    GX_GET_CREF_PRV(CubeTarget, irradiance_targets)
-    GX_GET_CREF_PRV(MipedCubeTarget, radiance_targets)
+    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, environment);
+    GX_GET_CREF_PRV(CubeTarget, environment_targets);
+    GX_GET_CREF_PRV(CubeTarget, irradiance_targets);
+    GX_GET_CREF_PRV(MipedCubeTarget, radiance_targets);
 
-    GX_GET_VAL_PRV(uint, environment_v, {})
-    GX_GET_CREF_PRV(GlCubeTarget, environment_targets_v)
-    GX_GET_CREF_PRV(GlCubeTarget, irradiance_targets_v)
-    GX_GET_CREF_PRV(GlMipedCubeTarget, radiance_targets_v)
+    GX_GET_VAL_PRV(uint, environment_v, {});
+    GX_GET_CREF_PRV(GlCubeTarget, environment_targets_v);
+    GX_GET_CREF_PRV(GlCubeTarget, irradiance_targets_v);
+    GX_GET_CREF_PRV(GlMipedCubeTarget, radiance_targets_v);
 
+public:
     ReflectionRuntime() noexcept;
     ~ReflectionRuntime() noexcept final;
     ReflectionRuntime(ReflectionRuntime&&) noexcept;

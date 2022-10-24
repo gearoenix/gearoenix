@@ -6,8 +6,8 @@
 namespace gearoenix::physics::collider {
 struct Frustum final : public core::ecs::Component {
 public:
-    GX_GET_CREF_PRV(math::Aabb3<double>, surrounding_box)
-    GX_GET_CREF_PRV(math::Frustum<double>, frustum)
+    GX_GET_CREF_PRV(math::Aabb3<double>, surrounding_box);
+    GX_GET_CREF_PRV(math::Frustum<double>, frustum);
 
 public:
     explicit Frustum(const std::array<math::Vec3<double>, 8>& points = {

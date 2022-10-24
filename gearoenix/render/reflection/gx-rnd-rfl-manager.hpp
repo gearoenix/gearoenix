@@ -39,7 +39,8 @@ public:
         const std::shared_ptr<texture::TextureCube>& irradiance,
         const std::shared_ptr<texture::TextureCube>& radiance,
         const math::Aabb3<double>& include_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
+        const core::sync::EndCallerIgnored& end_callback) noexcept
+        = 0;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_runtime(
         const std::string& name,
@@ -49,7 +50,8 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
+        const core::sync::EndCallerIgnored& end_callback) noexcept
+        = 0;
 
     virtual void update() noexcept;
 };

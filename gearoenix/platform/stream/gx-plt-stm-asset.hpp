@@ -39,7 +39,7 @@ private:
 public:
     ~Asset() noexcept final;
     /// It will return null if file does not exist
-    [[nodiscard]] static Asset* construct(platform::Application& platform_application, const std::string& name) noexcept;
+    [[nodiscard]] static Asset* construct(const platform::Application& platform_application, const std::string& name) noexcept;
     [[nodiscard]] std::size_t read(void* data, std::size_t length) noexcept final;
     [[nodiscard]] std::size_t write(const void* data, std::size_t length) noexcept final;
     [[nodiscard]] std::size_t tell() noexcept final;

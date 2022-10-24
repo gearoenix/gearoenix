@@ -23,9 +23,9 @@ struct Buffer;
 namespace gearoenix::vulkan::command {
 struct Pool;
 struct Buffer final {
-    GX_GET_PTRC_PRV(Pool, pool)
-    GX_GET_CVAL_PRV(Type, type)
-    GX_GET_VAL_PRV(VkCommandBuffer, vulkan_data, nullptr)
+    GX_GET_PTRC_PRV(Pool, pool);
+    GX_GET_CVAL_PRV(Type, type);
+    GX_GET_VAL_PRV(VkCommandBuffer, vulkan_data, nullptr);
 
 public:
     Buffer(Pool* pool, Type t) noexcept;

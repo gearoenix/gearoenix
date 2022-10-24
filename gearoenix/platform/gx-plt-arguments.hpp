@@ -12,11 +12,12 @@ struct Arguments {
 public:
     typedef std::multimap<std::string, std::optional<std::string>> Map;
 
-    GX_GET_CREF_PRV(std::string, process_name)
-    GX_GET_CREF_PRV(std::string, process_directory)
-    GX_GET_CREF_PRV(std::vector<std::string>, tokens)
-    GX_GET_CREF_PRV(Map, map)
-    GX_GET_VAL_PRV(bool, has_tokens, false)
+    GX_GET_CREF_PRV(std::string, process_name);
+    GX_GET_CREF_PRV(std::string, process_directory);
+    GX_GET_CREF_PRV(std::vector<std::string>, tokens);
+    GX_GET_CREF_PRV(Map, map);
+    GX_GET_VAL_PRV(bool, has_tokens, false);
+
 private:
     [[nodiscard]] static std::string extract_process_directory(const std::string& s) noexcept;
 

@@ -7,24 +7,24 @@
 namespace gearoenix::gl::shader {
 struct ForwardPbr final : public Shader {
     // Camera data ---------------------------------------
-    GX_GL_UNIFORM_MATRIX(vp, 4, 1)
-    GX_GL_UNIFORM_VECTOR(camera_position_reserved, 4, 1)
+    GX_GL_UNIFORM_MATRIX(vp, 4, 1);
+    GX_GL_UNIFORM_VECTOR(camera_position_reserved, 4, 1);
     // Model data ----------------------------------------
-    GX_GL_UNIFORM_MATRIX(m, 4, 1)
-    GX_GL_UNIFORM_MATRIX(inv_m, 4, 1)
-    GX_GL_UNIFORM_VECTOR(albedo_factor, 4, 1)
-    GX_GL_UNIFORM_VECTOR(normal_metallic_factor, 4, 1)
-    GX_GL_UNIFORM_VECTOR(emission_roughness_factor, 4, 1)
-    GX_GL_UNIFORM_VECTOR(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved, 4, 1)
+    GX_GL_UNIFORM_MATRIX(m, 4, 1);
+    GX_GL_UNIFORM_MATRIX(inv_m, 4, 1);
+    GX_GL_UNIFORM_VECTOR(albedo_factor, 4, 1);
+    GX_GL_UNIFORM_VECTOR(normal_metallic_factor, 4, 1);
+    GX_GL_UNIFORM_VECTOR(emission_roughness_factor, 4, 1);
+    GX_GL_UNIFORM_VECTOR(alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved, 4, 1);
     // Textures ------------------------------------------
-    GX_GL_UNIFORM_TEXTURE(albedo)
-    GX_GL_UNIFORM_TEXTURE(normal)
-    GX_GL_UNIFORM_TEXTURE(emission)
-    GX_GL_UNIFORM_TEXTURE(metallic_roughness)
-    GX_GL_UNIFORM_TEXTURE(occlusion)
-    GX_GL_UNIFORM_TEXTURE(irradiance)
-    GX_GL_UNIFORM_TEXTURE(radiance)
-    GX_GL_UNIFORM_TEXTURE(brdflut)
+    GX_GL_UNIFORM_TEXTURE(albedo);
+    GX_GL_UNIFORM_TEXTURE(normal);
+    GX_GL_UNIFORM_TEXTURE(emission);
+    GX_GL_UNIFORM_TEXTURE(metallic_roughness);
+    GX_GL_UNIFORM_TEXTURE(occlusion);
+    GX_GL_UNIFORM_TEXTURE(irradiance);
+    GX_GL_UNIFORM_TEXTURE(radiance);
+    GX_GL_UNIFORM_TEXTURE(brdflut);
 
 private:
     sint directional_light_direction = GX_GL_UNIFORM_FAILED;

@@ -10,7 +10,7 @@
 #include <vector>
 
 #ifdef GX_DEBUG_MODE
-//#define GX_DEBUG_TEXTURE_WRITE
+// #define GX_DEBUG_TEXTURE_WRITE
 #endif
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept

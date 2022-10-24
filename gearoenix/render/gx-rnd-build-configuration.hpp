@@ -35,7 +35,7 @@
 #include "../platform/gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLATFORM_WINDOWS
-//#define GX_RENDER_VULKAN_ENABLED
+// #define GX_RENDER_VULKAN_ENABLED
 #ifndef GX_PLATFORM_INTERFACE_SDL2
 #define GX_RENDER_DIRECT3D_ENABLED
 #else
@@ -43,12 +43,12 @@
 #endif
 #elif defined(GX_PLATFORM_LINUX)
 #define GX_RENDER_OPENGL_ENABLED
-//#define GX_RENDER_VULKAN_ENABLED
+// #define GX_RENDER_VULKAN_ENABLED
 #elif defined(GX_PLATFORM_MACOS) || defined(GX_PLATFORM_IOS)
 #define GX_RENDER_METAL_ENABLED
 #elif defined(GX_PLATFORM_ANDROID)
 #define GX_RENDER_OPENGL_ENABLED
-//#define GX_RENDER_VULKAN_ENABLED
+// #define GX_RENDER_VULKAN_ENABLED
 #elif defined(GX_PLATFORM_WEBASSEMBLY)
 #define GX_RENDER_OPENGL_ENABLED
 #else

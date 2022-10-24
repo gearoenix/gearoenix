@@ -31,7 +31,7 @@ bool gearoenix::vulkan::Loader::load() noexcept
         ));
 
     if (nullptr == vulkan_lib) {
-        GX_LOG_D("Vulkan library is not available.")
+        GX_LOG_D("Vulkan library is not available.");
         return false;
     }
 

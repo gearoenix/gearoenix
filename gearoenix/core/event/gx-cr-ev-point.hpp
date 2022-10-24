@@ -6,22 +6,23 @@
 namespace gearoenix::core::event {
 
 struct Point2D final {
-    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time)
-    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, previous_time)
-    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, current_time)
-    GX_GET_CREF_PRV(math::Vec2<double>, start_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, previous_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, current_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_start_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_previous_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_start_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_previous_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_current_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_start_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_previous_position)
-    GX_GET_VAL_PRV(double, delta_start_time, 0.0)
-    GX_GET_VAL_PRV(double, delta_previous_time, 0.0)
+    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time);
+    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, previous_time);
+    GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, current_time);
+    GX_GET_CREF_PRV(math::Vec2<double>, start_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, previous_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, current_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, delta_start_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, delta_previous_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, raw_start_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, raw_previous_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, raw_current_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_start_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_previous_position);
+    GX_GET_VAL_PRV(double, delta_start_time, 0.0);
+    GX_GET_VAL_PRV(double, delta_previous_time, 0.0);
 
+public:
     Point2D(const math::Vec2<double>& raw, const math::Vec2<double>& p) noexcept
         : start_time(std::chrono::high_resolution_clock::now())
         , previous_time(start_time)

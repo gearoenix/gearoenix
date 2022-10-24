@@ -24,11 +24,11 @@ struct Sphere;
 
 template <typename Element>
 struct Aabb3 final {
-    GX_GET_CREF_PRV(Vec3<Element>, upper)
-    GX_GET_CREF_PRV(Vec3<Element>, lower)
-    GX_GET_CREF_PRV(Vec3<Element>, diameter)
-    GX_GET_CREF_PRV(Vec3<Element>, center)
-    GX_GET_VAL_PRV(Element, volume, static_cast<Element>(0))
+    GX_GET_CREF_PRV(Vec3<Element>, upper);
+    GX_GET_CREF_PRV(Vec3<Element>, lower);
+    GX_GET_CREF_PRV(Vec3<Element>, diameter);
+    GX_GET_CREF_PRV(Vec3<Element>, center);
+    GX_GET_VAL_PRV(Element, volume, static_cast<Element>(0));
 
 public:
     constexpr Aabb3() noexcept

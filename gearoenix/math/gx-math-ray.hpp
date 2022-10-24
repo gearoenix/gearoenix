@@ -6,9 +6,9 @@
 namespace gearoenix::math {
 template <typename Element>
 struct Ray3 {
-    GX_GET_REF_PRV(Vec3<Element>, origin)
-    GX_GET_REF_PRV(Vec3<Element>, normalized_direction)
-    GX_GET_REF_PRV(Vec3<Element>, reversed_normalized_direction)
+    GX_GET_REF_PRV(Vec3<Element>, origin);
+    GX_GET_REF_PRV(Vec3<Element>, normalized_direction);
+    GX_GET_REF_PRV(Vec3<Element>, reversed_normalized_direction);
 
 public:
     Ray3(const Vec3<Element>& o, const Vec3<Element>& nd) noexcept

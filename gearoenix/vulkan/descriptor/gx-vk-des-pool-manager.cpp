@@ -35,12 +35,12 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
     auto result = Set::construct(pool, s, layout.get_vulkan_data());
     if (result != nullptr)
         return result;
-    GX_UNEXPECTED
+    GX_UNEXPECTED;
 }
 
 void gearoenix::vulkan::descriptor::PoolManager::pool_freed(Pool* const p) noexcept
 {
-    GX_GUARD_LOCK(this)
+    std::lock_guard<std::mutex> _lg(this_lock);
     free_pools.emplace(p);
 }
 

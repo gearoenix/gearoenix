@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_POOL_HPP
 #define GEAROENIX_CORE_POOL_HPP
-
 #include "../platform/gx-plt-log.hpp"
 #include "gx-cr-build-configuration.hpp"
 #include <functional>
@@ -119,6 +118,11 @@ public:
     constexpr void clear() noexcept
     {
         size = 0;
+    }
+
+    [[nodiscard]] constexpr std::size_t get_size() noexcept
+    {
+        return size;
     }
 
     [[nodiscard]] constexpr iterator begin() noexcept

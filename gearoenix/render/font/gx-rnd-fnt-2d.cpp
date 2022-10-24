@@ -11,7 +11,7 @@
 #include <string>
 
 #ifdef GX_DEBUG_MODE
-//#define GX_DEBUG_FONT_IMAGE_CREATION
+// #define GX_DEBUG_FONT_IMAGE_CREATION
 #endif
 
 #ifdef GX_IN_WINDOWS

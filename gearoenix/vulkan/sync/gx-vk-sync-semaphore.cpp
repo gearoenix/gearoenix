@@ -17,9 +17,9 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcep
     : logical_device(ld)
 {
     VkSemaphoreCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    GX_VK_CHK(vkCreateSemaphore(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateSemaphore(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept

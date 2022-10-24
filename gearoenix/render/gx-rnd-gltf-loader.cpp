@@ -673,7 +673,7 @@ static void process_node(
         GX_ASSERT_D(node.scale.empty());
         GX_ASSERT_D(3 == node.translation.size());
         auto& s = scene_builder.get_scene();
-        s.empties.emplace(node.name, gearoenix::math::Vec3<double>(node.translation[0], node.translation[1], node.translation[2]));
+        s.add_empty(node.name, gearoenix::math::Vec3<double>(node.translation[0], node.translation[1], node.translation[2]));
         return;
     }
     GX_LOG_F("Unexpected node in the scene nodes. Node: " << node.name);

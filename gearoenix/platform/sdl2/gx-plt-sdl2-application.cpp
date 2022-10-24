@@ -1,9 +1,10 @@
 #include "gx-plt-sdl2-application.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
-#include "../../opengl/gx-gl-loader.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
-#include "../gx-plt-log.hpp"
 #include "gx-plt-sdl2-key.hpp"
+#ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../opengl/gx-gl-loader.hpp"
+#endif
 #include <SDL2/SDL_vulkan.h>
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #include <emscripten.h>
@@ -45,6 +46,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
         core_flags |= SDL_WINDOW_RESIZABLE;
     }
     const auto available_engines = render::engine::Engine::get_available_engines();
+#ifdef GX_RENDER_VULKAN_ENABLED
     if (available_engines.contains(render::engine::Type::Vulkan)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN;
         if (create_window(flags)) {
@@ -52,6 +54,8 @@ void gearoenix::platform::Application::initialize_window() noexcept
             return;
         }
     }
+#endif
+#ifdef GX_RENDER_OPENGL_ENABLED
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -91,6 +95,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
         if (create_gl_window(2, 0, flags))
             return;
     }
+#endif
     GX_LOG_F("Can not create window with minimum requirements");
 }
 
@@ -111,6 +116,7 @@ bool gearoenix::platform::Application::create_window(const std::uint32_t flags) 
     return window != nullptr;
 }
 
+#ifdef GX_RENDER_OPENGL_ENABLED
 bool gearoenix::platform::Application::create_gl_window(const int mj, const int mn, const std::uint32_t flags) noexcept
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, mj);
@@ -152,6 +158,7 @@ bool gearoenix::platform::Application::create_gl_depth_window(const int depth, c
     }
     return false;
 }
+#endif
 
 void gearoenix::platform::Application::fetch_events() noexcept
 {
@@ -223,9 +230,11 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
 gearoenix::platform::Application::~Application() noexcept
 {
     base.terminate();
+#ifdef GX_RENDER_OPENGL_ENABLED
     if (nullptr != gl_context) {
         SDL_GL_DeleteContext(gl_context);
     }
+#endif
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
@@ -267,7 +276,8 @@ void gearoenix::platform::Application::set_window_fullscreen(const bool b) noexc
     base.configuration.set_fullscreen(b);
 }
 
-std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() noexcept
+#ifdef GX_RENDER_VULKAN_ENABLED
+std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const noexcept
 {
     std::uint32_t extensions_count = 0;
     SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, nullptr);
@@ -283,8 +293,9 @@ void gearoenix::platform::Application::create_vulkan_surface(
             window,
             reinterpret_cast<VkInstance>(vulkan_instance),
             reinterpret_cast<VkSurfaceKHR*>(vulkan_data_ptr))
-        == 0)
+        == SDL_FALSE)
         GX_LOG_F("Failed to create Vulkan surface.");
 }
+#endif
 
 #endif

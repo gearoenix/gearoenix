@@ -12,8 +12,8 @@ struct Logical;
 
 namespace gearoenix::vulkan::descriptor {
 struct SetLayout final {
-    GX_GET_VAL_PRV(VkDescriptorSetLayout, vulkan_data, nullptr)
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_VAL_PRV(VkDescriptorSetLayout, vulkan_data, nullptr);
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
 
 public:
     SetLayout(SetLayout&&) = delete;

@@ -10,10 +10,10 @@
 #include <sstream>
 
 // You can uses it for enabling log print in the std out
-//#define GX_PLATFORM_LOG_STD_OUT_ENABLED
+// #define GX_PLATFORM_LOG_STD_OUT_ENABLED
 
 // You can uses it for appending to the log file
-//#define GX_PLATFORM_LOG_APPEND_FILE
+// #define GX_PLATFORM_LOG_APPEND_FILE
 
 namespace gearoenix::platform {
 struct Log {

@@ -59,29 +59,28 @@ struct Manager;
 
 namespace gearoenix::render::engine {
 struct Engine {
-    GX_GET_CVAL_PRT(Type, engine_type)
-    GX_GET_RRF_PRT(platform::Application, platform_application)
-    GX_GET_UPTR_PRT(physics::Engine, physics_engine)
-    GX_GET_CREF_PRT(Specification, specification)
-    GX_GET_VAL_PRT(std::size_t, frames_count, 2)
-    GX_GET_VAL_PRT(std::size_t, frame_number, 0)
-    GX_GET_VAL_PRT(std::size_t, next_frame_number, 1)
-    GX_GET_VAL_PRT(std::size_t, previous_frame_number, 1)
-    GX_GET_VAL_PRT(std::size_t, frame_number_from_start, static_cast<decltype(frame_number)>(-1))
-    GX_GET_VAL_PRT(double, delta_time, 0.0f)
-    GX_GET_UPTR_PRT(scene::Manager, scene_manager)
-    GX_GET_UPTR_PRT(mesh::Manager, mesh_manager)
-    GX_GET_UPTR_PRT(model::Manager, model_manager)
-    GX_GET_UPTR_PRT(camera::Manager, camera_manager)
-    GX_GET_UPTR_PRT(texture::Manager, texture_manager)
-    GX_GET_UPTR_PRT(skybox::Manager, skybox_manager)
-    GX_GET_UPTR_PRT(reflection::Manager, reflection_manager)
-    GX_GET_UPTR_PRT(light::Manager, light_manager)
-    GX_GET_UPTR_PRT(core::ecs::World, world)
+    GX_GET_CVAL_PRT(Type, engine_type);
+    GX_GET_RRF_PRT(platform::Application, platform_application);
+    GX_GET_UPTR_PRT(physics::Engine, physics_engine);
+    GX_GET_CREF_PRT(Specification, specification);
+    GX_GET_VAL_PRT(std::size_t, frames_count, 2);
+    GX_GET_VAL_PRT(std::size_t, frame_number, 0);
+    GX_GET_VAL_PRT(std::size_t, next_frame_number, 1);
+    GX_GET_VAL_PRT(std::size_t, previous_frame_number, 1);
+    GX_GET_VAL_PRT(std::size_t, frame_number_from_start, static_cast<decltype(frame_number)>(-1));
+    GX_GET_VAL_PRT(double, delta_time, 0.0f);
+    GX_GET_UPTR_PRT(scene::Manager, scene_manager);
+    GX_GET_UPTR_PRT(mesh::Manager, mesh_manager);
+    GX_GET_UPTR_PRT(model::Manager, model_manager);
+    GX_GET_UPTR_PRT(camera::Manager, camera_manager);
+    GX_GET_UPTR_PRT(texture::Manager, texture_manager);
+    GX_GET_UPTR_PRT(skybox::Manager, skybox_manager);
+    GX_GET_UPTR_PRT(reflection::Manager, reflection_manager);
+    GX_GET_UPTR_PRT(light::Manager, light_manager);
+    GX_GET_UPTR_PRT(core::ecs::World, world);
+    GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
 
 protected:
-    std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time = std::chrono::high_resolution_clock::now();
-
     Engine(Type engine_type, platform::Application& platform_application) noexcept;
 
 public:

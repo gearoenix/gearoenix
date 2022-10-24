@@ -5,13 +5,14 @@
 
 namespace gearoenix::gl::shader {
 struct Radiance final : public Shader {
-    GX_GL_UNIFORM_FLOAT(roughness, 1)
-    GX_GL_UNIFORM_FLOAT(roughness_p_4, 1)
-    GX_GL_UNIFORM_FLOAT(sa_texel, 1)
-    GX_GL_UNIFORM_MATRIX(m, 3, 1)
-    GX_GL_UNIFORM_TEXTURE(environment)
+    GX_GL_UNIFORM_FLOAT(roughness, 1);
+    GX_GL_UNIFORM_FLOAT(roughness_p_4, 1);
+    GX_GL_UNIFORM_FLOAT(sa_texel, 1);
+    GX_GL_UNIFORM_MATRIX(m, 3, 1);
+    GX_GL_UNIFORM_TEXTURE(environment);
 
-    Radiance(Engine& e) noexcept;
+public:
+    explicit Radiance(Engine& e) noexcept;
     ~Radiance() noexcept final;
     void bind() const noexcept final;
 };

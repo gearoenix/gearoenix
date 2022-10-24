@@ -9,11 +9,11 @@ gearoenix::vulkan::descriptor::SetLayout::SetLayout(
     : logical_device(logical_device)
 {
     VkDescriptorSetLayoutCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     info.bindingCount = static_cast<std::uint32_t>(data.size());
     info.pBindings = data.data();
-    GX_VK_CHK(vkCreateDescriptorSetLayout(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateDescriptorSetLayout(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::descriptor::SetLayout::~SetLayout() noexcept

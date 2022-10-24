@@ -31,7 +31,8 @@ public:
         std::string&& name,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         core::sync::EndCallerIgnored&& c,
-        bool is_transformable) noexcept = 0;
+        bool is_transformable) noexcept
+        = 0;
 };
 }
 #endif

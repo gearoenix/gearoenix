@@ -13,9 +13,9 @@ struct Engine;
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
 struct Uniform final {
-    GX_GET_CRRF_PRV(engine::Engine, e)
-    GX_GET_REFC_PRV(std::vector<std::shared_ptr<Buffer>>, cpu)
-    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu)
+    GX_GET_CRRF_PRV(engine::Engine, e);
+    GX_GET_REFC_PRV(std::vector<std::shared_ptr<Buffer>>, cpu);
+    GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu);
 
 public:
     Uniform(const engine::Engine& e, std::vector<std::shared_ptr<Buffer>> cpu, std::shared_ptr<Buffer> gpu) noexcept;

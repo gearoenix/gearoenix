@@ -27,9 +27,11 @@ namespace gearoenix::render::reflection {
 struct Runtime;
 struct Builder {
     typedef std::array<std::shared_ptr<camera::Builder>, 6> CameraBuilders;
-    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GET_CREF_PRT(CameraBuilders, faces_camera_builders)
 
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
+    GX_GET_CREF_PRT(CameraBuilders, faces_camera_builders);
+
+public:
     /// Creates static reflection probe
     Builder(
         engine::Engine& e,

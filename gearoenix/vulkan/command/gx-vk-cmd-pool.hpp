@@ -11,8 +11,8 @@ struct Logical;
 
 namespace gearoenix::vulkan::command {
 struct Pool final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
-    GX_GET_VAL_PRV(VkCommandPool, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
+    GX_GET_VAL_PRV(VkCommandPool, vulkan_data, nullptr);
 
 public:
     Pool(Pool&&) noexcept;

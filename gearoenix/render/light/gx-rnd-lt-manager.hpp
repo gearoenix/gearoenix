@@ -19,14 +19,16 @@ public:
     virtual ~Manager() noexcept;
     [[nodiscard]] virtual std::shared_ptr<Builder> build_directional(
         const std::string& name,
-        const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
+        const core::sync::EndCallerIgnored& end_callback) noexcept
+        = 0;
     [[nodiscard]] virtual std::shared_ptr<Builder> build_shadow_caster_directional(
         const std::string& name,
         std::size_t shadow_map_resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,
-        const core::sync::EndCallerIgnored& end_callback) noexcept = 0;
+        const core::sync::EndCallerIgnored& end_callback) noexcept
+        = 0;
     //[[nodiscard]] virtual std::shared_ptr<Builder> build_point(
     //    const std::string& name,
     //    const core::sync::EndCallerIgnored& end_callback) noexcept;

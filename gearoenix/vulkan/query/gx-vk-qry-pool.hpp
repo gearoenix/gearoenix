@@ -3,10 +3,10 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../gx-vk-loader.hpp"
 #include <cstdint>
 #include <map>
+#include <mutex>
 
 namespace gearoenix::vulkan::device {
 struct Logical;
@@ -18,10 +18,11 @@ struct Buffer;
 
 namespace gearoenix::vulkan::query {
 struct Pool final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
-    GX_GET_VAL_PRV(VkQueryPool, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
+    GX_GET_VAL_PRV(VkQueryPool, vulkan_data, nullptr);
+
 private:
-    GX_CREATE_GUARD(indices)
+    std::mutex indices_lock;
     std::uint32_t latest_id = 0;
     std::map<VkQueryType, std::map<std::uint32_t, std::uint32_t>> indices;
 

@@ -24,7 +24,7 @@ struct Texture2D final : public render::texture::Texture2D {
     friend struct TextureManager;
 
     Engine& e;
-    GX_GET_VAL_PRV(uint, object, 0)
+    GX_GET_VAL_PRV(uint, object, 0);
 
 private:
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
@@ -43,7 +43,7 @@ struct TextureCube final : public render::texture::TextureCube {
     friend struct TextureManager;
 
     Engine& e;
-    GX_GET_VAL_PRV(uint, object, 0)
+    GX_GET_VAL_PRV(uint, object, 0);
 
 private:
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
@@ -60,7 +60,7 @@ public:
 struct TextureManager final : public render::texture::Manager {
     Engine& eng;
 
-    TextureManager(Engine& e) noexcept;
+    explicit TextureManager(Engine& e) noexcept;
     ~TextureManager() noexcept final;
 
 private:

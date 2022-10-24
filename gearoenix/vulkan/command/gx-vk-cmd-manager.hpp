@@ -3,11 +3,11 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-vk-cmd-buffer.hpp"
 #include "gx-vk-cmd-pool.hpp"
 #include "gx-vk-cmd-type.hpp"
 #include <map>
+#include <memory>
 #include <optional>
 #include <thread>
 
@@ -17,10 +17,10 @@ struct Engine;
 
 namespace gearoenix::vulkan::command {
 struct Manager final {
-    GX_GET_CRRF_PRV(engine::Engine, e)
+    GX_GET_CRRF_PRV(engine::Engine, e);
 
 private:
-    GX_CREATE_GUARD(this)
+    std::mutex this_lock;
     std::map<std::size_t, Pool> indexed_pools;
     std::map<std::thread::id, Pool> threads_pools;
 

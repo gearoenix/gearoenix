@@ -5,22 +5,12 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-img-image.hpp"
 
-gearoenix::vulkan::image::Manager::Manager(engine::Engine* const e) noexcept
-    : frame_upload_images(e->get_frames_count())
-    , e(e)
+gearoenix::vulkan::image::Manager::Manager(engine::Engine& e) noexcept
+    : e(e)
 {
 }
 
 gearoenix::vulkan::image::Manager::~Manager() noexcept = default;
-
-void gearoenix::vulkan::image::Manager::upload(
-    std::shared_ptr<Image> img,
-    std::shared_ptr<buffer::Buffer> buff,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
-{
-    GX_GUARD_LOCK(upload_images)
-    upload_images.emplace_back(std::move(img), std::move(buff), call);
-}
 
 // void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
 //{

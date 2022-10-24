@@ -4,6 +4,10 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-x11-key.hpp"
 
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../vulkan/gx-vk-loader.hpp"
+#endif
+
 void gearoenix::platform::Application::fetch_events() noexcept
 {
     while (XPending(display) > 0) {
@@ -76,7 +80,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ExposureMask | StructureNotifyMask);
     XSetWMProtocols(display, window, &close_message, 1);
     XMapWindow(display, window);
-    XMoveWindow(display, window, base.window_x, base.window_y);
+    XMoveWindow(display, window, base.window_size.x, base.window_size.y);
 
     while (true) {
         XEvent e;
@@ -94,7 +98,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         base.initialize_mouse_position(pointer_x, pointer_y);
     }
 
-    base.render_engine = render::engine::Engine::construct(*this);
+    base.initialize_engine(*this);
 }
 
 gearoenix::platform::Application::~Application() noexcept
@@ -106,10 +110,17 @@ gearoenix::platform::Application::~Application() noexcept
 
 void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
 {
-    base.core_application = nullptr == core_app ? std::make_unique<core::Application>(this) : std::unique_ptr<core::Application>(core_app);
+    base.initialize_core_application(*this, core_app);
     for (fetch_events(); base.running; fetch_events()) {
         base.update();
     }
 }
+
+#ifdef GX_RENDER_VULKAN_ENABLED
+std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const noexcept
+{
+    return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME };
+}
+#endif
 
 #endif

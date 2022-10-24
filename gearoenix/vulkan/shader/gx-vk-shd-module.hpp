@@ -20,8 +20,8 @@ struct Engine;
 
 namespace gearoenix::vulkan::shader {
 struct Module final {
-    GX_GET_VAL_PRV(VkShaderModule, vulkan_data, nullptr)
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
+    GX_GET_VAL_PRV(VkShaderModule, vulkan_data, nullptr);
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
 
 public:
     Module(Module&&) = delete;

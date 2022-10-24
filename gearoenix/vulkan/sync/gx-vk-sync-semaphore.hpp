@@ -17,15 +17,14 @@ struct Engine;
 
 namespace gearoenix::vulkan::sync {
 struct Semaphore final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
-    GX_GET_VAL_PRV(VkSemaphore, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
+    GX_GET_VAL_PRV(VkSemaphore, vulkan_data, nullptr);
 
 public:
     Semaphore(Semaphore&&) noexcept;
     Semaphore(const Semaphore&) = delete;
     Semaphore& operator=(Semaphore&&) = delete;
     Semaphore& operator=(const Semaphore&) = delete;
-
     explicit Semaphore(const device::Logical& logical_device) noexcept;
     ~Semaphore() noexcept;
     [[nodiscard]] const VkSemaphore* get_vulkan_data_ptr() const noexcept;

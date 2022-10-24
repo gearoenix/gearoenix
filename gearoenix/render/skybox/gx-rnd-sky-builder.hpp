@@ -21,7 +21,7 @@ struct TextureCube;
 
 namespace gearoenix::render::skybox {
 struct Builder {
-    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
 protected:
     Builder(

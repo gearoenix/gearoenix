@@ -23,7 +23,7 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
 {
     VkDescriptorSet vulkan_data = nullptr;
     VkDescriptorSetAllocateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     info.descriptorPool = pool->get_vulkan_data();
     info.descriptorSetCount = 1;
@@ -33,13 +33,13 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
         return std::shared_ptr<Set>(new Set(pool, std::move(pool_manager), vulkan_data));
     else if (VK_ERROR_OUT_OF_POOL_MEMORY == state)
         return nullptr;
-    GX_LOG_F("Error in descriptor set allocation: " << result_to_string(state))
+    GX_LOG_F("Error in descriptor set allocation: " << result_to_string(state));
 }
 
 gearoenix::vulkan::descriptor::Set::~Set() noexcept
 {
     GX_VK_CHK(vkFreeDescriptorSets(
-        pool->get_logical_device().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data))
+        pool->get_logical_device().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data));
     pool_manager->pool_freed(pool);
 }
 

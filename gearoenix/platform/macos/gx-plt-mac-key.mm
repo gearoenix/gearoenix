@@ -4,8 +4,7 @@
 
 gearoenix::platform::key::Id gearoenix::platform::convert_key(const unsigned short key_code) noexcept
 {
-    static const std::array<key::Id, 0x80> ks = []() constexpr
-    {
+    static const std::array<key::Id, 0x80> ks = []() constexpr {
         std::array<key::Id, 0x80> ks = { key::Id::Unknown };
 #define GX_HELPER(ch, num) ks[num] = key::Id::ch
         GX_HELPER(A, 0x00);
@@ -121,8 +120,7 @@ gearoenix::platform::key::Id gearoenix::platform::convert_key(const unsigned sho
         GX_HELPER(Down, 0x7D);
         GX_HELPER(Up, 0x7E);
         return ks;
-    }
-    ();
+    }();
     if (ks.size() <= key_code)
         return key::Id::Unknown;
     return ks[key_code];

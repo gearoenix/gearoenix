@@ -45,28 +45,28 @@ struct Runtime final : public core::ecs::Component {
     typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MipedCubeTarget;
     typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MipedRoughness;
 
-    GX_GET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0)
-    GX_GET_RRF_PRV(engine::Engine, e)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, environment)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance)
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance)
-    GX_GET_CREF_PRV(CubeCamera, cameras)
-    GX_GET_CREF_PRV(CubeTarget, environment_targets)
-    GX_GET_CREF_PRV(CubeTarget, irradiance_targets)
-    GX_GET_CREF_PRV(MipedCubeTarget, radiance_targets)
-    GX_GET_CREF_PRV(MipedRoughness, roughnesses)
-    GX_GET_VAL_PRV(State, state, State::Uninitialized)
-    GX_GET_VAL_PRV(std::size_t, state_environment_face, 0)
-    GX_GET_VAL_PRV(std::size_t, state_irradiance_face, 0)
-    GX_GET_VAL_PRV(std::size_t, state_radiance_face, 0)
-    GX_GET_VAL_PRV(std::size_t, state_radiance_level, 0)
-    GX_GET_VAL_PRV(std::size_t, state_resting_frame, 0)
-    GX_GETSET_VAL_PRV(std::uint64_t, resting_frames_count, std::numeric_limits<std::uint64_t>::max())
-    GX_GET_CREF_PRV(std::unique_ptr<std::function<void()>>, on_rendered)
-    GX_GETSET_VAL_PRV(bool, pending_to_start, false)
-    GX_GET_CREF_PRV(math::Aabb3<double>, receive_box)
-    GX_GET_CREF_PRV(math::Aabb3<double>, exclude_box)
-    GX_GET_CREF_PRV(math::Aabb3<double>, include_box)
+    GX_GET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0);
+    GX_GET_RRF_PRV(engine::Engine, e);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, environment);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance);
+    GX_GET_CREF_PRV(CubeCamera, cameras);
+    GX_GET_CREF_PRV(CubeTarget, environment_targets);
+    GX_GET_CREF_PRV(CubeTarget, irradiance_targets);
+    GX_GET_CREF_PRV(MipedCubeTarget, radiance_targets);
+    GX_GET_CREF_PRV(MipedRoughness, roughnesses);
+    GX_GET_VAL_PRV(State, state, State::Uninitialized);
+    GX_GET_VAL_PRV(std::size_t, state_environment_face, 0);
+    GX_GET_VAL_PRV(std::size_t, state_irradiance_face, 0);
+    GX_GET_VAL_PRV(std::size_t, state_radiance_face, 0);
+    GX_GET_VAL_PRV(std::size_t, state_radiance_level, 0);
+    GX_GET_VAL_PRV(std::size_t, state_resting_frame, 0);
+    GX_GETSET_VAL_PRV(std::uint64_t, resting_frames_count, std::numeric_limits<std::uint64_t>::max());
+    GX_GET_CREF_PRV(std::unique_ptr<std::function<void()>>, on_rendered);
+    GX_GETSET_VAL_PRV(bool, pending_to_start, false);
+    GX_GET_CREF_PRV(math::Aabb3<double>, receive_box);
+    GX_GET_CREF_PRV(math::Aabb3<double>, exclude_box);
+    GX_GET_CREF_PRV(math::Aabb3<double>, include_box);
 
 public:
     Runtime(

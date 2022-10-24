@@ -6,9 +6,11 @@
 
 namespace gearoenix::gl::shader {
 struct ShadowCaster final : public Shader {
-    GX_GET_VAL_PRV(sint, mvp, GX_GL_UNIFORM_FAILED)
-    GX_GL_UNIFORM_VECTOR(alpha_factor_alpha_cutoff, 2, 1)
-    GX_GL_UNIFORM_TEXTURE(albedo)
+    GX_GET_VAL_PRV(sint, mvp, GX_GL_UNIFORM_FAILED);
+    GX_GL_UNIFORM_VECTOR(alpha_factor_alpha_cutoff, 2, 1);
+    GX_GL_UNIFORM_TEXTURE(albedo);
+
+public:
     const sizei mvp_count;
 
     explicit ShadowCaster(Engine& e, std::size_t bones_count = 0) noexcept;

@@ -35,63 +35,51 @@ struct Application;
 struct BaseApplication final {
     friend struct Application;
 
-    GX_GET_CREF_PRV(RuntimeConfiguration, configuration)
-    GX_GET_CREF_PRV(Arguments, arguments)
-
-    GX_GET_VAL_PRV(bool, running, true)
-
-    GX_GET_VAL_PRV(bool, window_resizing, false)
-    GX_GET_CREF_PRV(math::Vec2<int>, previous_window_size)
-    GX_GET_CREF_PRV(math::Vec2<int>, window_size)
-    GX_GET_CREF_PRV(math::Vec2<int>, window_position)
-    GX_GET_VAL_PRV(bool, window_is_up, false)
-
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_position)
-    /// {-window_aspect, -1.0} -> {+window_aspect, +1.0}
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position)
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_position)
-    /// {-window_aspect, -1.0} -> {+window_aspect, +1.0}
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position)
-
-    GX_GET_UPTR_PRV(render::engine::Engine, render_engine)
-    GX_GET_UPTR_PRV(audio::Engine, audio_engine)
-    GX_GET_UPTR_PRV(core::event::Engine, event_engine)
-    GX_GET_UPTR_PRV(core::Application, core_application)
-
     typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
-    GX_GET_CREF_PRV(TouchStateMap, touch_states)
-    GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons)
 
-    GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now())
+    GX_GET_CREF_PRV(RuntimeConfiguration, configuration);
+    GX_GET_CREF_PRV(Arguments, arguments);
+    GX_GET_VAL_PRV(bool, running, true);
+    GX_GET_VAL_PRV(bool, window_resizing, false);
+    GX_GET_CREF_PRV(math::Vec2<int>, previous_window_size);
+    GX_GET_CREF_PRV(math::Vec2<int>, window_size);
+    GX_GET_CREF_PRV(math::Vec2<int>, window_position);
+    GX_GET_VAL_PRV(bool, window_is_up, false);
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_position);
+    /// Its value is in range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position);
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_position);
+    /// Its value is in range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
+    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position);
+    GX_GET_UPTR_PRV(render::engine::Engine, render_engine);
+    GX_GET_UPTR_PRV(audio::Engine, audio_engine);
+    GX_GET_UPTR_PRV(core::event::Engine, event_engine);
+    GX_GET_UPTR_PRV(core::Application, core_application);
+    GX_GET_CREF_PRV(TouchStateMap, touch_states);
+    GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);
+    GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now());
 
+public:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
     ~BaseApplication() noexcept;
-
     void initialize_window_position(int x, int y) noexcept;
-
     void initialize_window_size(int w, int h) noexcept;
     void update_window_size(int w, int h) noexcept;
     void update_window() noexcept;
-
     void initialize_mouse_position(double x, double y) noexcept;
     void update_mouse_position(double x, double y) noexcept;
     void mouse_key(key::Id, key::Action) noexcept;
     void mouse_wheel(double v) noexcept;
-
     void keyboard_key(key::Id, key::Action) noexcept;
     void character_input(char16_t ch) noexcept;
-
     void touch_down(FingerId finger_id, double x, double y) noexcept;
     void touch_move(FingerId finger_id, double x, double y) noexcept;
     void touch_up(FingerId finger_id) noexcept;
     void touch_cancel(FingerId finger_id) noexcept;
-
     void initialize_engine(Application&) noexcept;
     void initialize_core_application(Application&, core::Application*) noexcept;
-
     void going_to_be_closed() noexcept;
     void terminate() noexcept;
-
     void update() noexcept;
 
 private:

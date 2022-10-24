@@ -8,7 +8,6 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
-#include "../memory/gx-vk-mem-manager.hpp"
 
 void gearoenix::vulkan::image::Image::terminate() noexcept
 {
@@ -79,7 +78,7 @@ gearoenix::vulkan::image::Image::Image(
     , usage(usage)
 {
     VkImageCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     info.imageType = image_depth <= 1 ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_3D;
     info.format = format;
@@ -93,16 +92,16 @@ gearoenix::vulkan::image::Image::Image(
     info.usage = usage;
     info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    GX_VK_CHK(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
     VkMemoryRequirements mem_req;
-    GX_SET_ZERO(mem_req)
+    GX_SET_ZERO(mem_req);
     vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
     allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
     GX_VK_CHK(vkBindImageMemory(
         logical_device->get_vulkan_data(),
         vulkan_data,
         allocated_memory->get_vulkan_data(),
-        allocated_memory->get_allocator()->get_offset()))
+        allocated_memory->get_allocator()->get_offset()));
 }
 
 gearoenix::vulkan::image::Image::~Image() noexcept

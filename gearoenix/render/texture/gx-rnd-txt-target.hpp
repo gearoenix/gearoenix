@@ -12,10 +12,10 @@ struct Engine;
 
 namespace gearoenix::render::texture {
 struct Target {
-    GX_GET_CREF_PRT(std::vector<Attachment>, attachments)
+    GX_GET_CREF_PRT(std::vector<Attachment>, attachments);
 
 protected:
-    Target(std::vector<Attachment>&& attachments) noexcept;
+    explicit Target(std::vector<Attachment>&& attachments) noexcept;
 
 public:
     virtual ~Target() noexcept;

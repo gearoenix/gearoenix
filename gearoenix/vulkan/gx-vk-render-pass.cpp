@@ -14,7 +14,7 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     const auto& p = d.get_physical_device();
 
     VkAttachmentDescription attachment_descriptions[2];
-    GX_SET_ZERO(attachment_descriptions)
+    GX_SET_ZERO(attachment_descriptions);
     attachment_descriptions[0].format = swapchain.get_format().format;
     attachment_descriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
     attachment_descriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -34,24 +34,24 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     attachment_descriptions[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentReference colour_reference;
-    GX_SET_ZERO(colour_reference)
+    GX_SET_ZERO(colour_reference);
     colour_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     colour_reference.attachment = 0;
 
     VkAttachmentReference depth_reference;
-    GX_SET_ZERO(depth_reference)
+    GX_SET_ZERO(depth_reference);
     depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     depth_reference.attachment = 1;
 
     VkSubpassDescription subpass_description;
-    GX_SET_ZERO(subpass_description)
+    GX_SET_ZERO(subpass_description);
     subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass_description.colorAttachmentCount = 1;
     subpass_description.pColorAttachments = &colour_reference;
     subpass_description.pDepthStencilAttachment = &depth_reference;
 
     VkSubpassDependency dependencies[2];
-    GX_SET_ZERO(dependencies)
+    GX_SET_ZERO(dependencies);
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
     dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
@@ -68,7 +68,7 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     VkRenderPassCreateInfo render_pass_create_info;
-    GX_SET_ZERO(render_pass_create_info)
+    GX_SET_ZERO(render_pass_create_info);
     render_pass_create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_create_info.attachmentCount = GX_COUNT_OF(attachment_descriptions);
     render_pass_create_info.pAttachments = attachment_descriptions;
@@ -77,7 +77,7 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     render_pass_create_info.dependencyCount = GX_COUNT_OF(dependencies);
     render_pass_create_info.pDependencies = dependencies;
 
-    GX_VK_CHK(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::RenderPass::~RenderPass() noexcept

@@ -29,9 +29,10 @@ struct Data final {
         int>
         DataVar;
 
-    GX_GET_CVAL_PRV(Id, source)
-    GX_GET_REFC_PRV(DataVar, data)
+    GX_GET_CVAL_PRV(Id, source);
+    GX_GET_REFC_PRV(DataVar, data);
 
+public:
     Data(const Id source, DataVar data) noexcept
         : source(source)
         , data(std::move(data))

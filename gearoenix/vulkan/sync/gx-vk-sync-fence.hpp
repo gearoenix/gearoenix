@@ -17,8 +17,8 @@ struct Engine;
 
 namespace gearoenix::vulkan::sync {
 struct Fence {
-    GX_GET_CRRF_PRV(device::Logical, logical_device)
-    GX_GET_VAL_PRV(VkFence, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(device::Logical, logical_device);
+    GX_GET_VAL_PRV(VkFence, vulkan_data, nullptr);
 
 public:
     Fence(const Fence&) = delete;

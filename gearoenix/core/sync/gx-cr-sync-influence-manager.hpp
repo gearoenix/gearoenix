@@ -11,8 +11,9 @@
 
 namespace gearoenix::core::sync {
 struct InfluenceManager {
-    GX_GET_CREF_PRV(std::vector<std::function<void()>>, influencers)
-    GX_GET_CREF_PRV(std::vector<std::size_t>, influencers_indices)
+    GX_GET_CREF_PRV(std::vector<std::function<void()>>, influencers);
+    GX_GET_CREF_PRV(std::vector<std::size_t>, influencers_indices);
+
 private:
     std::map<Id, std::tuple<std::vector<Id>, double, std::function<void()>>> added_functions;
     std::mutex actions_lock;

@@ -17,14 +17,14 @@ struct Engine;
 
 namespace gearoenix::vulkan::memory {
 struct Memory final {
-    GX_GET_CRRF_PRV(engine::Engine, e)
-    GX_GET_REFC_PRV(std::shared_ptr<Memory>, parent)
-    GX_GET_CREF_PRV(std::weak_ptr<Memory>, self)
-    GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, allocator)
-    GX_GET_PTRC_PRV(void, data)
-    GX_GET_CVAL_PRV(Place, place)
-    GX_GET_CVAL_PRV(std::uint32_t, type_index)
-    GX_GET_VAL_PRV(VkDeviceMemory, vulkan_data, nullptr)
+    GX_GET_CRRF_PRV(engine::Engine, e);
+    GX_GET_REFC_PRV(std::shared_ptr<Memory>, parent);
+    GX_GET_CREF_PRV(std::weak_ptr<Memory>, self);
+    GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, allocator);
+    GX_GET_PTRC_PRV(void, data);
+    GX_GET_CVAL_PRV(Place, place);
+    GX_GET_CVAL_PRV(std::uint32_t, type_index);
+    GX_GET_VAL_PRV(VkDeviceMemory, vulkan_data, nullptr);
 
 private:
     Memory(

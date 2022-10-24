@@ -14,7 +14,7 @@ void gearoenix::vulkan::mark(
     if (!d.get_debug_marker_is_available())
         return;
     VkDebugMarkerObjectNameInfoEXT info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
     info.objectType = t;
     info.object = o;

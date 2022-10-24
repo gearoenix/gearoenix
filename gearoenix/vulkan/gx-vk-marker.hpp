@@ -30,7 +30,7 @@ void mark(const std::string& name, T o, const device::Logical& dev) noexcept
 }
 }
 
-#define GX_VK_MARK(name, obj, logical_device) mark(name, obj, logical_device);
+#define GX_VK_MARK(name, obj, logical_device) mark(name, obj, logical_device)
 
 #else
 #define GX_VK_MARK(name, obj, logical_device)

@@ -30,10 +30,10 @@ struct Component {
     {
         static_assert(!std::is_reference_v<T>, "Component type can not be a reference type.");
         static_assert(!std::is_move_assignable_v<T>, "Component type can not be move assignable.");
-        static_assert(std::is_move_constructible_v<T>, "Component type must be move constructible.");
-        static_assert(std::is_nothrow_move_constructible_v<T>, "Component type must be nothrow move constructible.");
+        static_assert(std::is_move_constructible_v<T>, "Component type must be move constructable.");
+        static_assert(std::is_nothrow_move_constructible_v<T>, "Component type must be nothrow move constructable.");
         static_assert(!std::is_copy_assignable_v<T>, "Component type can not be copy assignable.");
-        static_assert(!std::is_copy_constructible_v<T>, "Component type can not be copy constructible.");
+        static_assert(!std::is_copy_constructible_v<T>, "Component type can not be copy constructable.");
         static_assert(std::is_final_v<T>, "Component type must be final and has no child");
         static_assert(std::is_base_of_v<Component, T>, "Component type must be inherited from gearoenix::core::ecs::Component");
         static_assert(!is_not_v<T>, "Component type can not be gearoenix::core::ecs::Not");

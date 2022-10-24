@@ -3,7 +3,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "gx-vk-mem-place.hpp"
 #include <map>
 #include <memory>
@@ -16,9 +15,10 @@ namespace gearoenix::vulkan::memory {
 struct Memory;
 struct Manager final {
 public:
-    GX_GET_CRRF_PRV(engine::Engine, e)
+    GX_GET_CRRF_PRV(engine::Engine, e);
+
 private:
-    GX_CREATE_GUARD(this)
+    std::mutex this_lock;
     /// type-index -> memory
     std::map<std::pair<std::uint32_t, Place>, std::weak_ptr<Memory>> memories;
 

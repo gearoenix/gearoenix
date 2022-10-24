@@ -14,7 +14,7 @@ struct Application;
 namespace gearoenix::platform::stream {
 struct Path;
 struct Stream {
-    GX_GETSET_VAL_PRT(bool, endian_compatibility, true)
+    GX_GETSET_VAL_PRT(bool, endian_compatibility, true);
 
 protected:
     Stream() noexcept = default;

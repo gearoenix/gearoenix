@@ -23,10 +23,10 @@ struct Manager;
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer final {
-    GX_GET_CREF_PRT(std::shared_ptr<core::Allocator>, allocator)
-    GX_GET_REFC_PRT(std::shared_ptr<const Buffer>, parent)
-    GX_GET_CREF_PRT(std::shared_ptr<memory::Memory>, allocated_memory)
-    GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr)
+    GX_GET_CREF_PRT(std::shared_ptr<core::Allocator>, allocator);
+    GX_GET_REFC_PRT(std::shared_ptr<const Buffer>, parent);
+    GX_GET_CREF_PRT(std::shared_ptr<memory::Memory>, allocated_memory);
+    GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr);
 
 private:
     std::weak_ptr<Buffer> self;

@@ -13,9 +13,9 @@ struct Application;
 namespace gearoenix::vulkan {
 struct Instance;
 struct Surface {
-    GX_GET_CRRF_PRV(Instance, instance)
+    GX_GET_CRRF_PRV(Instance, instance);
     GX_GET_CRRF_PRV(platform::Application, platform_application);
-    GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr)
+    GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr);
 
 public:
     Surface(const Surface&) = delete;

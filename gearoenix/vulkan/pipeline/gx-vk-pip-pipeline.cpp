@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info) noexcept
 {
     VkRayTracingPipelineCreateInfoKHR info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
     info.stageCount = static_cast<std::uint32_t>(stages_create_info.size());
     info.pStages = stages_create_info.data();
@@ -41,7 +41,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     VkPipeline vulkan_data = nullptr;
     GX_VK_CHK(vkCreateRayTracingPipelinesKHR(
         layout->get_des_set_layout()->get_logical_device().get_vulkan_data(),
-        nullptr, cache->get_vulkan_data(), 1, &info, nullptr, &vulkan_data))
+        nullptr, cache->get_vulkan_data(), 1, &info, nullptr, &vulkan_data));
     return std::shared_ptr<Pipeline>(new Pipeline(std::move(layout), std::move(cache), vulkan_data));
 }
 

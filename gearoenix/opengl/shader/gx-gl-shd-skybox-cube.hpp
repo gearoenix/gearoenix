@@ -5,11 +5,12 @@
 
 namespace gearoenix::gl::shader {
 struct SkyboxCube final : public Shader {
-    GX_GL_UNIFORM_MATRIX(vp, 4, 1)
-    GX_GL_UNIFORM_VECTOR(camera_position_box_scale, 4, 1)
-    GX_GL_UNIFORM_TEXTURE(albedo)
+    GX_GL_UNIFORM_MATRIX(vp, 4, 1);
+    GX_GL_UNIFORM_VECTOR(camera_position_box_scale, 4, 1);
+    GX_GL_UNIFORM_TEXTURE(albedo);
 
-    SkyboxCube(Engine& e) noexcept;
+public:
+    explicit SkyboxCube(Engine& e) noexcept;
     ~SkyboxCube() noexcept final;
     void bind() const noexcept final;
 };

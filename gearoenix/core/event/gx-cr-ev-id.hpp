@@ -1,5 +1,10 @@
 #ifndef GEAROENIX_CORE_EVENT_ID_HPP
 #define GEAROENIX_CORE_EVENT_ID_HPP
+
+#ifdef None
+#undef None
+#endif
+
 namespace gearoenix::core::event {
 enum struct Id : int {
     ButtonMouse,

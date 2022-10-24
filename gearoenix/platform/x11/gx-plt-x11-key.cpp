@@ -17,7 +17,7 @@ gearoenix::platform::key::Id gearoenix::platform::convert_mouse_to_key(const uns
     case Button5:
         return key::Id::Next;
     default:
-        GX_LOG_E("Unexpected mouse button: " << b)
+        GX_LOG_E("Unexpected mouse button: " << b);
         return key::Id::Unknown;
     }
 }

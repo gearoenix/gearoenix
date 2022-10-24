@@ -49,8 +49,6 @@ gearoenix::gl::LightBuilder::LightBuilder(
 
 gearoenix::gl::LightBuilder::~LightBuilder() noexcept = default;
 
-#endif
-
 std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::build_directional(
     const std::string& name, const core::sync::EndCallerIgnored& end_callback) noexcept
 {
@@ -84,3 +82,5 @@ gearoenix::gl::LightManager::LightManager(Engine& e) noexcept
 }
 
 gearoenix::gl::LightManager::~LightManager() noexcept = default;
+
+#endif

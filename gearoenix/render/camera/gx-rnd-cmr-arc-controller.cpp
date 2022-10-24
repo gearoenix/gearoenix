@@ -43,11 +43,11 @@
 //
 // void gearoenix::render::camera::ArcController::values_updated() noexcept
 //{
-//#ifdef GX_DEBUG_MODE
+// #ifdef GX_DEBUG_MODE
 //     const auto up_len = up.square_length() - 1;
 //     if (GX_IS_NOT_ZERO(up_len))
 //         GX_UNEXPECTED
-//#endif
+// #endif
 //     vertical_angle = math::Numeric::clamp(vertical_angle, max_vertical_angle, min_vertical_angle);
 //     distance = math::Numeric::clamp(distance, max_distance, min_distance);
 //     auto ppd = up.normalized_perpendicular(direction);

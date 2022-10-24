@@ -68,18 +68,18 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
             }
         }
     }
-    GX_LOG_E("Separate graphics and presenting queues are not supported yet!")
+    GX_LOG_E("Separate graphics and presenting queues are not supported yet!");
     return -1;
 }
 
 void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
 {
     std::uint32_t ext_count = 0;
-    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr))
+    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr));
     if (ext_count <= 0)
         return;
     std::vector<VkExtensionProperties> extensions(static_cast<std::size_t>(ext_count));
-    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, extensions.data()))
+    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, extensions.data()));
     for (auto& ext : extensions) {
         supported_extensions.emplace(ext.extensionName);
     }
@@ -90,9 +90,9 @@ void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
     if (supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_QUERY_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) && supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
         rtx_supported = true;
     }
-    GX_LOG_D("Supported extensions are:")
+    GX_LOG_D("Supported extensions are:");
     for (auto& s : supported_extensions) {
-        GX_LOG_D("    " << s)
+        GX_LOG_D("    " << s);
     }
 }
 
@@ -100,17 +100,17 @@ void gearoenix::vulkan::device::Physical::initialize_features() noexcept
 {
     vkGetPhysicalDeviceFeatures(vulkan_data, &features);
     VkPhysicalDeviceFeatures2 info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 
-    GX_SET_ZERO(shader_clock_features)
+    GX_SET_ZERO(shader_clock_features);
     shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
 
-    GX_SET_ZERO(ray_query_features)
+    GX_SET_ZERO(ray_query_features);
     ray_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
     ray_query_features.pNext = &shader_clock_features;
 
-    GX_SET_ZERO(ray_tracing_pipeline_features)
+    GX_SET_ZERO(ray_tracing_pipeline_features);
     ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
     ray_tracing_pipeline_features.pNext = &ray_query_features;
     info.pNext = &ray_tracing_pipeline_features;
@@ -123,20 +123,20 @@ void gearoenix::vulkan::device::Physical::initialize_features() noexcept
 void gearoenix::vulkan::device::Physical::initialize_properties() noexcept
 {
     vkGetPhysicalDeviceProperties(vulkan_data, &properties);
-    GX_LOG_D("Physical device name is: " << properties.deviceName)
+    GX_LOG_D("Physical device name is: " << properties.deviceName);
     vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
 
     std::uint32_t count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, nullptr);
-    GX_CHECK_NOT_EQUAL_D(0, count)
+    GX_CHECK_NOT_EQUAL_D(0, count);
     queue_family_properties.resize(count);
     vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, queue_family_properties.data());
 
     VkPhysicalDeviceProperties2 info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 
-    GX_SET_ZERO(ray_tracing_pipeline_properties)
+    GX_SET_ZERO(ray_tracing_pipeline_properties);
     ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
 
     if (rtx_supported) {
@@ -156,7 +156,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
     int best_device_point = -1;
     for (std::uint32_t i = 0; i < gpus.size(); ++i) {
         vkGetPhysicalDeviceProperties(gpus[i], &properties);
-        GX_LOG_D("GPU device " << i << ": " << properties.deviceName)
+        GX_LOG_D("GPU device " << i << ": " << properties.deviceName);
         if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
             continue;
         const auto device_point = is_good(gpus[i]);
@@ -175,10 +175,10 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
         }
     }
     if (best_device_index == -1 || best_device_point == -1) {
-        GX_LOG_F("Physical device minimum requirement is not satisfied.")
+        GX_LOG_F("Physical device minimum requirement is not satisfied.");
     }
     vulkan_data = gpus[best_device_index];
-    GX_LOG_D("Physical device point is: " << is_good(vulkan_data))
+    GX_LOG_D("Physical device point is: " << is_good(vulkan_data));
     initialize_extensions();
     initialize_features();
     initialize_properties();
@@ -195,7 +195,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
         }
     }
     if (VK_FORMAT_UNDEFINED == supported_depth_format)
-        GX_LOG_F("Error required depth format not found.")
+        GX_LOG_F("Error required depth format not found.");
     auto& limits = properties.limits;
     max_memory_alignment = static_cast<std::uint32_t>(std::max(
         std::max(
@@ -225,7 +225,7 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
         }
         type_bits >>= 1u;
     }
-    GX_LOG_F("Could not find the requested memory type.")
+    GX_LOG_F("Could not find the requested memory type.");
 }
 
 std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const noexcept
@@ -243,10 +243,10 @@ VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabi
 std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available_devices(VkInstance instance) noexcept
 {
     std::uint32_t gpu_count = 0;
-    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr))
+    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr));
     std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
-    GX_LOG_D(gpu_count << " GPU(s) are available.")
-    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, gpus.data()))
+    GX_LOG_D(gpu_count << " GPU(s) are available.");
+    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, gpus.data()));
     return gpus;
 }
 

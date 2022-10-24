@@ -9,11 +9,11 @@ gearoenix::vulkan::pipeline::Layout::Layout(std::shared_ptr<descriptor::SetLayou
     : des_set_layout(std::move(_des_set_lay))
 {
     VkPipelineLayoutCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     info.setLayoutCount = 1;
     info.pSetLayouts = des_set_layout->get_vulkan_data_ptr();
-    GX_VK_CHK(vkCreatePipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreatePipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::pipeline::Layout::~Layout() noexcept

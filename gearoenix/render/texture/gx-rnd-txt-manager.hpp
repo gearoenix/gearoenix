@@ -39,16 +39,19 @@ protected:
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
+        const core::sync::EndCallerIgnored& c) noexcept
+        = 0;
     [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels_v(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
+        const core::sync::EndCallerIgnored& c) noexcept
+        = 0;
     [[nodiscard]] virtual std::shared_ptr<Target> create_target_v(
         std::string name,
         std::vector<Attachment>&& attachments,
-        const core::sync::EndCallerIgnored& c) noexcept = 0;
+        const core::sync::EndCallerIgnored& c) noexcept
+        = 0;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;

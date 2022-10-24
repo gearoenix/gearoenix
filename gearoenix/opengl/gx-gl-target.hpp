@@ -25,10 +25,11 @@ struct Target final : public render::texture::Target {
         enumerated binding_index = static_cast<enumerated>(-1);
     };
 
-    GX_GET_RRF_PRV(Engine, e)
-    GX_GET_VAL_PRV(uint, framebuffer, static_cast<uint>(-1))
-    GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments)
+    GX_GET_RRF_PRV(Engine, e);
+    GX_GET_VAL_PRV(uint, framebuffer, static_cast<uint>(-1));
+    GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments);
 
+public:
     Target(Engine& e, std::vector<render::texture::Attachment>&& attachments, const core::sync::EndCallerIgnored& end_callback) noexcept;
     ~Target() noexcept final;
     void bind() noexcept;

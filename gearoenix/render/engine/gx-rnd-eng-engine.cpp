@@ -38,6 +38,7 @@ gearoenix::render::engine::Engine::Engine(
     , physics_engine(new physics::Engine(*this))
     , scene_manager(new scene::Manager(*this))
     , world(new core::ecs::World())
+    , last_frame_time(std::chrono::high_resolution_clock::now())
 {
 }
 

@@ -10,9 +10,10 @@
 namespace gearoenix::core {
 /// Allocator struct for memory management mechanisms
 struct Allocator final {
-    GX_GET_CVAL_PRV(std::size_t, size)
+    GX_GET_CVAL_PRV(std::size_t, size);
     /// It is the offset from the origin parent
-    GX_GET_VAL_PRV(std::size_t, offset, 0)
+    GX_GET_VAL_PRV(std::size_t, offset, 0);
+
 private:
     /// size, offset (within itself)
     typedef std::pair<std::size_t, std::size_t> SizeOffset;

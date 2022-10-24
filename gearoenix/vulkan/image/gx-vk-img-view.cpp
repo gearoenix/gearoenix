@@ -6,7 +6,6 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
-#include "../memory/gx-vk-mem-manager.hpp"
 
 void gearoenix::vulkan::image::View::terminate() noexcept
 {
@@ -20,7 +19,7 @@ gearoenix::vulkan::image::View::View(Image&& img) noexcept
     : image(std::move(img))
 {
     VkImageViewCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     info.image = image.get_vulkan_data();
     info.viewType = image.get_image_depth() > 1 ? VK_IMAGE_VIEW_TYPE_3D : VK_IMAGE_VIEW_TYPE_2D;
@@ -37,7 +36,7 @@ gearoenix::vulkan::image::View::View(Image&& img) noexcept
         info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     }
     GX_VK_CHK(vkCreateImageView(
-        image.get_logical_device()->get_vulkan_data(), &info, nullptr, &vulkan_data))
+        image.get_logical_device()->get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::image::View::View(View&& o) noexcept

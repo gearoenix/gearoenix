@@ -23,7 +23,8 @@ struct SetLayout;
 struct BindingsData final {
     friend struct Manager;
 
-    GX_GET_REFC_PRV(std::shared_ptr<SetLayout>, layout)
+    GX_GET_REFC_PRV(std::shared_ptr<SetLayout>, layout);
+
 private:
     const device::Logical& logical_device;
     const std::vector<VkDescriptorPoolSize> pool_sizes;

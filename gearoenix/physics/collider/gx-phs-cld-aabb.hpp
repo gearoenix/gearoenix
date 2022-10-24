@@ -6,8 +6,8 @@
 
 namespace gearoenix::physics::collider {
 struct Aabb3 final : public core::ecs::Component {
-    GX_GET_CREF_PRV(math::Aabb3<double>, original_box)
-    GX_GET_CREF_PRV(math::Aabb3<double>, updated_box)
+    GX_GET_CREF_PRV(math::Aabb3<double>, original_box);
+    GX_GET_CREF_PRV(math::Aabb3<double>, updated_box);
 
 public:
     Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower) noexcept;

@@ -6,9 +6,10 @@
 
 namespace gearoenix::gl::shader {
 struct Bloom final : public Shader {
-    GX_GL_UNIFORM_VECTOR(screen_space_uv, 2, 1)
-    GX_GL_UNIFORM_TEXTURE(source_texture)
+    GX_GL_UNIFORM_VECTOR(screen_space_uv, 2, 1);
+    GX_GL_UNIFORM_TEXTURE(source_texture);
 
+public:
     Bloom(Engine& e, bool is_horizontal) noexcept;
     ~Bloom() noexcept final;
     void bind() const noexcept final;

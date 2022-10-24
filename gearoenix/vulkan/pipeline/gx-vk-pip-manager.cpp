@@ -20,9 +20,9 @@ void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing() noexcept
     miss_sm = shader_manager->get("pbr-sky.rmiss");
 
     stages_create_info.resize(4);
-    GX_SET_VECTOR_ZERO(stages_create_info)
+    GX_SET_VECTOR_ZERO(stages_create_info);
     shader_group_create_info.resize(4);
-    GX_SET_VECTOR_ZERO(shader_group_create_info)
+    GX_SET_VECTOR_ZERO(shader_group_create_info);
 
     // Ray gen part -----------------------------------------------------------------------------------
     {
@@ -108,7 +108,7 @@ gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e) noexcept
     if (e.get_physical_device().get_rtx_supported())
         initialize_ray_tracing();
     else
-        GX_UNIMPLEMENTED
+        GX_UNIMPLEMENTED;
 }
 
 gearoenix::vulkan::pipeline::Manager::~Manager() noexcept = default;

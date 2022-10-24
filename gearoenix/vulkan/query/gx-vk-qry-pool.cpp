@@ -7,7 +7,7 @@
 
 std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType qt, const std::uint32_t ii) noexcept
 {
-    GX_GUARD_LOCK(indices)
+    std::lock_guard<std::mutex> _lg(indices_lock);
     auto q_search = indices.find(qt);
     if (indices.end() == q_search) {
         indices[qt][ii] = latest_id;
@@ -15,7 +15,7 @@ std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType
         auto& q_map = q_search->second;
         auto i_search = q_map.find(ii);
         if (q_map.end() != i_search)
-            GX_LOG_F("Query with type '" << qt << "' and request-id: '" << ii << "' already exists!")
+            GX_LOG_F("Query with type '" << qt << "' and request-id: '" << ii << "' already exists!");
         q_map.emplace(ii, latest_id);
     }
     const auto id = latest_id;
@@ -30,11 +30,11 @@ gearoenix::vulkan::query::Pool::Pool(
     : logical_device(logical_device)
 {
     VkQueryPoolCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
     info.queryCount = c;
     info.queryType = t;
-    GX_VK_CHK(vkCreateQueryPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateQueryPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::query::Pool::~Pool() noexcept
@@ -60,7 +60,7 @@ VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacte
     GX_VK_CHK(vkGetQueryPoolResults(
         logical_device.get_vulkan_data(), vulkan_data,
         indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1,
-        sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT))
+        sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT));
     return result;
 }
 

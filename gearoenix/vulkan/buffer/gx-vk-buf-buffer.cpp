@@ -32,7 +32,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     const auto aligned_size = physical_device.align_size(size);
     auto allocator = core::Allocator::construct(aligned_size);
     VkBufferCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     info.size = static_cast<VkDeviceSize>(aligned_size);
     if (memory::Place::Cpu == place) {
@@ -51,7 +51,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     }
     VkBuffer vulkan_data;
     VkDevice dev = logical_device.get_vulkan_data();
-    GX_VK_CHK(vkCreateBuffer(dev, &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateBuffer(dev, &info, nullptr, &vulkan_data));
     VkMemoryRequirements mem_req;
     vkGetBufferMemoryRequirements(dev, vulkan_data, &mem_req);
     auto allocated_memory = memory_manager.allocate(aligned_size, mem_req.memoryTypeBits, place);
@@ -60,8 +60,8 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
         return nullptr;
     }
     GX_VK_CHK(vkBindBufferMemory(
-        dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()))
-    GX_VK_MARK(name, vulkan_data, logical_device)
+        dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
+    GX_VK_MARK(name, vulkan_data, logical_device);
     std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
     result->self = result;
     return result;
@@ -92,14 +92,14 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
 
 void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size) noexcept
 {
-    GX_CHECK_NOT_EQUAL_D(nullptr, allocated_memory->get_data())
+    GX_CHECK_NOT_EQUAL_D(nullptr, allocated_memory->get_data());
     std::memcpy(allocated_memory->get_data(), data, size);
 }
 
 VkDeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const noexcept
 {
     VkBufferDeviceAddressInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
     info.buffer = vulkan_data;
     return vkGetBufferDeviceAddress(

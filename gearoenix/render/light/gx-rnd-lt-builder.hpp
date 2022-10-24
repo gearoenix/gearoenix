@@ -50,8 +50,8 @@ struct Builder {
     typedef std::array<std::shared_ptr<camera::Builder>, 6> Cameras;
 
     engine::Engine& e;
-    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GETSET_CREF_PRT(Cameras, cameras)
+    GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
+    GX_GETSET_CREF_PRT(Cameras, cameras);
 
 protected:
     Builder(

@@ -54,6 +54,11 @@ void gearoenix::render::scene::Scene::add_light(const core::ecs::Entity::id_t en
     entities.insert(entity);
 }
 
+void gearoenix::render::scene::Scene::add_empty(const std::string& name, const math::Vec3<double>& location) noexcept
+{
+    empties.emplace(name, location);
+}
+
 void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene_entity_id) noexcept
 {
     auto* const world = e.get_world();

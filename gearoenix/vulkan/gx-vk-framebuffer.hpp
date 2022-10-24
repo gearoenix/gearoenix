@@ -13,11 +13,11 @@ struct View;
 namespace gearoenix::vulkan {
 struct RenderPass;
 struct Framebuffer final {
-    GX_GET_CPTRC_PRV(image::View, view)
-    GX_GET_CPTRC_PRV(image::View, depth)
-    GX_GET_CPTRC_PRV(RenderPass, render_pass)
-    GX_GET_VAL_PRV(VkFramebuffer, vulkan_data, nullptr)
-    GX_GET_CREF_PRV(std::vector<VkClearValue>, clear_colors)
+    GX_GET_CPTRC_PRV(image::View, view);
+    GX_GET_CPTRC_PRV(image::View, depth);
+    GX_GET_CPTRC_PRV(RenderPass, render_pass);
+    GX_GET_VAL_PRV(VkFramebuffer, vulkan_data, nullptr);
+    GX_GET_CREF_PRV(std::vector<VkClearValue>, clear_colors);
 
 public:
     Framebuffer(const Framebuffer&) = delete;

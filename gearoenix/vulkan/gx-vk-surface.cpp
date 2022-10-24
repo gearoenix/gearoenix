@@ -15,24 +15,24 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
 {
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)
     VkAndroidSurfaceCreateInfoKHR info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
     info.window = platform_application->get_android_app()->window;
-    GX_VK_CHK(vkCreateAndroidSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateAndroidSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data));
 #elif defined(GX_PLATFORM_INTERFACE_X11)
     VkXlibSurfaceCreateInfoKHR info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
     info.dpy = const_cast<Display*>(platform_application.get_display());
     info.window = platform_application.get_window();
-    GX_VK_CHK(vkCreateXlibSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateXlibSurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data));
 #elif defined(GX_PLATFORM_INTERFACE_WIN32)
     VkWin32SurfaceCreateInfoKHR info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     info.hinstance = platform_application.get_instance();
     info.hwnd = platform_application.get_window();
-    GX_VK_CHK(vkCreateWin32SurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateWin32SurfaceKHR(instance.get_vulkan_data(), &info, nullptr, &vulkan_data));
 #elif defined(GX_PLATFORM_INTERFACE_SDL2)
     platform_application.create_vulkan_surface(instance.get_vulkan_data(), &vulkan_data);
 #else

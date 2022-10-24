@@ -44,13 +44,14 @@ struct Builder final {
     typedef std::map<std::string, std::shared_ptr<reflection::Builder>> ReflectionBuildersMap;
     typedef std::map<std::string, std::shared_ptr<light::Builder>> LightBuildersMap;
 
-    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder)
-    GX_GET_CREF_PRV(ModelBuildersMap, model_builders)
-    GX_GET_CREF_PRV(CameraBuildersMap, camera_builders)
-    GX_GET_CREF_PRV(SkyboxBuildersMap, skybox_builders)
-    GX_GET_CREF_PRV(ReflectionBuildersMap, reflection_builders)
-    GX_GET_CREF_PRV(LightBuildersMap, light_builders)
+    GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
+    GX_GET_CREF_PRV(ModelBuildersMap, model_builders);
+    GX_GET_CREF_PRV(CameraBuildersMap, camera_builders);
+    GX_GET_CREF_PRV(SkyboxBuildersMap, skybox_builders);
+    GX_GET_CREF_PRV(ReflectionBuildersMap, reflection_builders);
+    GX_GET_CREF_PRV(LightBuildersMap, light_builders);
 
+private:
     Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
 
 public:

@@ -2,13 +2,15 @@
 #define GEAROENIX_CORE_EVENT_GESTURE_HPP
 #include "gx-cr-ev-button.hpp"
 #include "gx-cr-ev-touch.hpp"
+#include <array>
 #include <chrono>
 #include <utility>
 
 namespace gearoenix::core::event::gesture {
 struct Click {
-    GX_GET_REFC_PRV(Point2D, point)
+    GX_GET_REFC_PRV(Point2D, point);
 
+public:
     explicit Click(const Point2D& p) noexcept
         : point(p)
     {
@@ -16,8 +18,9 @@ struct Click {
 };
 
 struct Drag2D {
-    GX_GET_REFC_PRV(Point2D, point)
+    GX_GET_REFC_PRV(Point2D, point);
 
+public:
     explicit Drag2D(const Point2D& p) noexcept
         : point(p)
     {
@@ -25,13 +28,14 @@ struct Drag2D {
 };
 
 struct Scale {
-    GX_GET_CARR_PRV(Point2D, points, 2)
-    GX_GET_CVAL_PRV(double, start_scale)
-    GX_GET_CVAL_PRV(double, previous_scale)
-    GX_GET_CVAL_PRV(double, current_scale)
-    GX_GET_CVAL_PRV(double, delta_previous_scale)
-    GX_GET_CVAL_PRV(double, delta_start_scale)
+    GX_GET_CARR_PRV(Point2D, points, 2);
+    GX_GET_CVAL_PRV(double, start_scale);
+    GX_GET_CVAL_PRV(double, previous_scale);
+    GX_GET_CVAL_PRV(double, current_scale);
+    GX_GET_CVAL_PRV(double, delta_previous_scale);
+    GX_GET_CVAL_PRV(double, delta_start_scale);
 
+public:
     Scale(const Point2D& p1, const Point2D& p2) noexcept
         : points { p1, p2 }
         , start_scale((p1.get_start_position() - p2.get_start_position()).length())
@@ -44,9 +48,10 @@ struct Scale {
 };
 
 struct MouseDrag {
-    GX_GET_REFC_PRV(Drag2D, base)
-    GX_GET_CVAL_PRV(platform::key::Id, key)
+    GX_GET_REFC_PRV(Drag2D, base);
+    GX_GET_CVAL_PRV(platform::key::Id, key);
 
+public:
     MouseDrag(Drag2D d, const platform::key::Id k) noexcept
         : base(std::move(d))
         , key(k)
@@ -55,9 +60,10 @@ struct MouseDrag {
 };
 
 struct TouchClick {
-    GX_GET_REFC_PRV(Click, base)
-    GX_GET_CVAL_PRV(platform::FingerId, finger_id)
+    GX_GET_REFC_PRV(Click, base);
+    GX_GET_CVAL_PRV(platform::FingerId, finger_id);
 
+public:
     TouchClick(Click c, const platform::FingerId fi) noexcept
         : base(std::move(c))
         , finger_id(fi)
@@ -66,9 +72,10 @@ struct TouchClick {
 };
 
 struct TouchDrag {
-    GX_GET_REFC_PRV(Drag2D, base)
-    GX_GET_CVAL_PRV(platform::FingerId, finger_id)
+    GX_GET_REFC_PRV(Drag2D, base);
+    GX_GET_CVAL_PRV(platform::FingerId, finger_id);
 
+public:
     TouchDrag(Drag2D d, const platform::FingerId fi) noexcept
         : base(std::move(d))
         , finger_id(fi)
@@ -77,9 +84,10 @@ struct TouchDrag {
 };
 
 struct TouchScale {
-    GX_GET_REFC_PRV(Scale, base)
-    GX_GET_CARR_PRV(platform::FingerId, finger_ids, 2)
+    GX_GET_REFC_PRV(Scale, base);
+    GX_GET_CARR_PRV(platform::FingerId, finger_ids, 2);
 
+public:
     TouchScale(Scale s, const platform::FingerId fi1, const platform::FingerId fi2) noexcept
         : base(std::move(s))
         , finger_ids { fi1, fi2 }

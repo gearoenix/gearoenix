@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_DESCRIPTOR_POOL_MANAGER_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../platform/macro/gx-plt-mcr-lock.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
 #include <set>
@@ -22,7 +21,7 @@ struct PoolManager final {
     friend struct Set;
 
 private:
-    GX_CREATE_GUARD(this)
+    std::mutex this_lock;
     const device::Logical& logical_device;
     std::vector<std::unique_ptr<Pool>> pools;
     std::set<Pool*> free_pools;

@@ -5,9 +5,10 @@
 
 namespace gearoenix::gl::shader {
 struct Final final : public Shader {
-    GX_GL_UNIFORM_TEXTURE(albedo)
+    GX_GL_UNIFORM_TEXTURE(albedo);
 
-    Final(Engine& e) noexcept;
+public:
+    explicit Final(Engine& e) noexcept;
     ~Final() noexcept final;
     void bind() const noexcept final;
 };

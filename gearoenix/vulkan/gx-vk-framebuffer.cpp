@@ -36,7 +36,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
         depth->get_vulkan_data(),
     };
     VkFramebufferCreateInfo info;
-    GX_SET_ZERO(info)
+    GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     info.renderPass = render_pass->get_vulkan_data();
     info.layers = 1;
@@ -44,7 +44,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     info.pAttachments = attachments;
     info.width = img.get_image_width();
     info.height = img.get_image_height();
-    GX_VK_CHK(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
+    GX_VK_CHK(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
