@@ -17,7 +17,8 @@ jobs:
           path: |
             ~/vulkan-sdk
             ~/cmake
-            build/
+            build-release/
+            build-debug/
           key: ${{ runner.os }}-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Update
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
@@ -65,14 +66,14 @@ jobs:
           cat $GITHUB_ENV
       - name: Building Release
         run: |
-          mkdir -p build &&
-          cd build &&
+          mkdir -p build-release &&
+          cd build-release &&
           cmake .. -DCMAKE_BUILD_TYPE=Release &&
           cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
-          mkdir -p build &&
-          cd build &&
+          mkdir -p build-debug &&
+          cd build-debug &&
           cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
           cmake --build . --config Debug &&
           cd tests &&
