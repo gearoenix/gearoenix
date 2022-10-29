@@ -7,12 +7,18 @@ on:
     
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@latest
+      - name: Setup Vulkan SDK
+        uses: humbletim/setup-vulkan-sdk@latest
+        with:
+          vulkan-query-version: latest
+          vulkan-components: Glslang
+          vulkan-use-cache: true
       - name: Update
         run: sudo apt-get update
-      - name: Install dependancies
+      - name: Install dependencies
         run: |
           sudo apt-get install clang-14 wget unzip libsdl2-dev libdrm-dev libgbm-dev -y &&
           echo "CC=/usr/bin/clang-14" >> $GITHUB_ENV &&
