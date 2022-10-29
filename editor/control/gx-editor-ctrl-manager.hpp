@@ -8,7 +8,8 @@ namespace gearoenix::platform {
 
 namespace gearoenix::editor::control {
     struct Manager final {
-        GX_GET_REF_PRV(Project, project)
+        GX_GET_REF_PRV(Project, project);
+
     private:
         platform::Application& platform_application;
 

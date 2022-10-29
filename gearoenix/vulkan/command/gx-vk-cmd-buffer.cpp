@@ -49,6 +49,7 @@ gearoenix::vulkan::command::Buffer::~Buffer() noexcept
 
 void gearoenix::vulkan::command::Buffer::begin() noexcept
 {
+    has_record = true;
     VkCommandBufferBeginInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

@@ -18,12 +18,12 @@ void gearoenix::vulkan::mesh::Mesh::initialize_blas() noexcept
 gearoenix::vulkan::mesh::Mesh::Mesh(
     engine::Engine& e,
     const std::string& name,
-    const std::vector<render::PbrVertex>& vertices,
+    const render::Vertices& vertices,
     const std::vector<std::uint32_t>& indices,
     math::Aabb3<double>&& occlusion_box,
     const core::sync::EndCallerIgnored& c) noexcept
     : render::mesh::Mesh(occlusion_box)
-    , vertex(e.get_buffer_manager().create(name + "-vertices", vertices, c))
+    , vertex(e.get_buffer_manager().create(name + "-vertices", render::get_data(vertices), core::bytes_count(vertices), c))
     , index(e.get_buffer_manager().create(name + "-indices", indices, c))
 {
 }

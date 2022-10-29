@@ -5,7 +5,7 @@
 #include "../camera/gx-vk-cmr-manager.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
-#include "../queue/gx-vk-qu-graphed-queue.hpp"
+#include "../queue/gx-vk-qu-graph.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-eng-frame.hpp"
@@ -38,10 +38,11 @@ gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_applic
     , buffer_manager(memory_manager, *this)
     , depth_stencil(image::View::create_depth_stencil(memory_manager))
     , render_pass(swapchain)
-    , graphed_queue(new queue::GraphedQueue(*this))
+    , graphed_queue(new queue::Graph(*this))
     , imgui_manager(new ImGuiManager(*this))
-    , mesh_manager(new mesh::Manager(*this))
+    , vulkan_mesh_manager(new mesh::Manager(*this))
 {
+    mesh_manager = std::unique_ptr<render::mesh::Manager>(vulkan_mesh_manager);
     camera_manager = std::make_unique<camera::Manager>(*this);
     reflection_manager = std::make_unique<reflection::Manager>(*this);
     initialize_frame();
@@ -84,9 +85,9 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     render::engine::Engine::end_frame();
     imgui_manager->end_frame();
     if (swapchain_image_is_valid) {
-        mesh_manager->update();
+        vulkan_mesh_manager->update();
         imgui_manager->update();
-        // swapchain_image_is_valid = graphic_queue->present(swapchain, swapchain_image_index);
+        swapchain_image_is_valid = graphed_queue->present(swapchain, swapchain_image_index);
     }
 }
 

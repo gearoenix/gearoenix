@@ -110,10 +110,8 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     query_pool->issue_acceleration_structure_compacted_size(*cmd, result->vulkan_data);
     cmd->end();
     std::shared_ptr<sync::Fence> fence(new sync::Fence(dev));
-    std::shared_ptr<queue::Queue> q(new queue::Queue(vk_e));
-    q->submit(*cmd, *fence);
-
-    waiter->push([this, q = std::move(q), name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable noexcept {
+    waiter_queue->submit(*cmd, *fence);
+    waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable noexcept {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
         waiter->push([cmd = std::move(cmd)] {});
     });
@@ -163,11 +161,9 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     copy_info.mode = VK_COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR;
     vkCmdCopyAccelerationStructureKHR(cmd->get_vulkan_data(), &copy_info);
     cmd->end();
-    std::shared_ptr<queue::Queue> q(new queue::Queue(vk_e));
-    q->submit(*cmd, *fence);
+    waiter_queue->submit(*cmd, *fence);
     waiter->push(
         [this,
-            q = std::move(q),
             old_accel = old_accel,
             old_accel_buff = std::move(old_accel_buff),
             vk_dev = vk_dev,
@@ -192,30 +188,19 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_blas_copy(
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager::build(
     std::string&& name,
-    std::vector<render::PbrVertex>&& vertices,
+    render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    core::sync::EndCallerIgnored&& end_callback) noexcept
+    const core::sync::EndCallerIgnored& end_callback) noexcept
 {
     std::shared_ptr<std::shared_ptr<Mesh>> result(new std::shared_ptr<Mesh>());
-    core::sync::EndCallerIgnored end([this, name = name, c = std::move(end_callback), vertices_count = vertices.size(), indices_count = indices.size(), result]() mutable noexcept -> void {
+    core::sync::EndCallerIgnored end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable noexcept -> void {
         waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable noexcept {
             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(*result));
         });
     });
     *result = std::make_shared<Mesh>(vk_e, name, vertices, indices, std::move(occlusion_box), end);
     return *result;
-}
-
-std::shared_ptr<gearoenix::render::mesh::Mesh>
-gearoenix::vulkan::mesh::Manager::build(
-    std::string&& name,
-    std::vector<render::PbrVertexAnimated>&& vertices,
-    std::vector<std::uint32_t>&& indices,
-    math::Aabb3<double>&& occlusion_box,
-    core::sync::EndCallerIgnored&& end_callback) noexcept
-{
-    GX_UNIMPLEMENTED;
 }
 
 gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
@@ -227,6 +212,10 @@ gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
     , vertex_descriptor_write_info(default_init_mesh_descriptor_count)
     , index_descriptor_write_info(default_init_mesh_descriptor_count)
 {
+    waiter->push([this] {
+        waiter_queue = std::make_unique<queue::Queue>(vk_e);
+    });
+
     GX_SET_VECTOR_ZERO(mesh_descriptor_write_info);
     GX_SET_VECTOR_ZERO(vertex_descriptor_write_info);
     GX_SET_VECTOR_ZERO(index_descriptor_write_info);

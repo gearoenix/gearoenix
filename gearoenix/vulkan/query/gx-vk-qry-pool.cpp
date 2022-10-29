@@ -5,7 +5,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType qt, const std::uint32_t ii) noexcept
+std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType qt, const std::size_t ii) noexcept
 {
     std::lock_guard<std::mutex> _lg(indices_lock);
     auto q_search = indices.find(qt);
@@ -18,9 +18,7 @@ std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType
             GX_LOG_F("Query with type '" << qt << "' and request-id: '" << ii << "' already exists!");
         q_map.emplace(ii, latest_id);
     }
-    const auto id = latest_id;
-    ++latest_id;
-    return id;
+    return latest_id++;
 }
 
 gearoenix::vulkan::query::Pool::Pool(
@@ -47,14 +45,16 @@ gearoenix::vulkan::query::Pool::~Pool() noexcept
 
 void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size(
     command::Buffer& cmd,
-    VkAccelerationStructureKHR accel, std::uint32_t issue_id) noexcept
+    VkAccelerationStructureKHR accel,
+    const std::size_t issue_id) noexcept
 {
     constexpr static const auto query_type = VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR;
-    vkCmdWriteAccelerationStructuresPropertiesKHR(
-        cmd.get_vulkan_data(), 1, &accel, query_type, vulkan_data, register_request(query_type, issue_id));
+    const auto qi = register_request(query_type, issue_id);
+    vkCmdResetQueryPool(cmd.get_vulkan_data(), vulkan_data, qi, 1);
+    vkCmdWriteAccelerationStructuresPropertiesKHR(cmd.get_vulkan_data(), 1, &accel, query_type, vulkan_data, qi);
 }
 
-VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::uint32_t id) noexcept
+VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::size_t id) noexcept
 {
     VkDeviceSize result = 0;
     GX_VK_CHK(vkGetQueryPoolResults(

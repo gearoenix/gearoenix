@@ -4,6 +4,7 @@
 #include "../gx-vk-check.hpp"
 #include "../gx-vk-instance.hpp"
 #include "gx-vk-dev-physical.hpp"
+#include <array>
 
 gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     : physical_device(p)
@@ -78,7 +79,7 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
         device_extensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
         device_extensions.push_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
     }
-    const float queue_priorities[] = { 1.0f };
+    const std::array<float, 8> queue_priorities { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     std::set<std::uint32_t> queue_index_set;
     queue_index_set.insert(physical_device.get_graphics_queue_node_index());
     queue_index_set.insert(physical_device.get_transfer_queue_node_index());
@@ -92,9 +93,9 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
         auto& queue_create_info = queue_create_infos[queue_create_infos_index++];
         GX_SET_ZERO(queue_create_info);
         queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_create_info.queueCount = 1;
+        queue_create_info.queueCount = queue_priorities.size();
         queue_create_info.queueFamilyIndex = q;
-        queue_create_info.pQueuePriorities = queue_priorities;
+        queue_create_info.pQueuePriorities = queue_priorities.data();
         GX_LOG_D("queue node index added is " << q);
     }
     VkDeviceCreateInfo device_create_info;

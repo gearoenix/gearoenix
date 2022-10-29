@@ -34,6 +34,10 @@ namespace gearoenix::vulkan::pipeline {
 struct Pipeline;
 }
 
+namespace gearoenix::vulkan::queue {
+struct Queue;
+}
+
 namespace gearoenix::vulkan::query {
 struct Pool;
 }
@@ -45,8 +49,6 @@ struct Fence;
 namespace gearoenix::vulkan::mesh {
 struct Mesh;
 struct Manager final : public render::mesh::Manager {
-    constexpr static const char SUBMIT_NODE_NAME[] = "mesh-manager";
-
     GX_GET_RRF_PRT(engine::Engine, vk_e);
 
 private:
@@ -70,6 +72,7 @@ private:
     //    };
 
     std::unique_ptr<core::sync::WorkWaiter> waiter;
+    std::unique_ptr<queue::Queue> waiter_queue;
     std::vector<VkAccelerationStructureInstanceKHR> instances;
     std::vector<VkDescriptorSetLayoutBinding> descriptor_bindings;
     std::vector<VkDescriptorBufferInfo> mesh_descriptor_write_info;
@@ -96,17 +99,10 @@ private:
 
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
         std::string&& name,
-        std::vector<render::PbrVertex>&& vertices,
+        render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCallerIgnored&& end_callback) noexcept final;
-
-    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
-        std::string&& name,
-        std::vector<render::PbrVertexAnimated>&& vertices,
-        std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCallerIgnored&& end_callback) noexcept final;
+        const core::sync::EndCallerIgnored& end_callback) noexcept final;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;

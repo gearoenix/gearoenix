@@ -15,6 +15,9 @@
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <random>
+#include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 
 constexpr static double position_limit = 2.0;
 constexpr static double cube_size = 0.05;
@@ -140,6 +143,17 @@ struct GameApp final : public gearoenix::core::Application {
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
         scene_builder->add(std::move(camera_builder));
+
+        auto light_builder_0 = render_engine.get_light_manager()->build_shadow_caster_directional(
+                "directional-light-0",
+                1024,
+                10.0f,
+                1.0f,
+                35.0f,
+                end_callback);
+        light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
+        scene_builder->add(std::move(light_builder_0));
     }
 
     void update() noexcept final

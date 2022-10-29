@@ -21,20 +21,16 @@ struct Mesh final : public render::mesh::Mesh {
 };
 
 struct MeshManager final : render::mesh::Manager {
+    Engine& gl_e;
+
     explicit MeshManager(Engine& e) noexcept;
     ~MeshManager() noexcept final;
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
         std::string&& name,
-        std::vector<render::PbrVertex>&& vertices,
+        render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCallerIgnored&& end_callback) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
-        std::string&& name,
-        std::vector<render::PbrVertexAnimated>&& vertices,
-        std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCallerIgnored&& end_callback) noexcept final;
+        const core::sync::EndCallerIgnored& end_callback) noexcept final;
 };
 }
 

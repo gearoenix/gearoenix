@@ -26,6 +26,7 @@ struct Buffer final {
     GX_GET_PTRC_PRV(Pool, pool);
     GX_GET_CVAL_PRV(Type, type);
     GX_GET_VAL_PRV(VkCommandBuffer, vulkan_data, nullptr);
+    GX_GETSET_VAL_PRV(bool, has_record, false);
 
 public:
     Buffer(Pool* pool, Type t) noexcept;

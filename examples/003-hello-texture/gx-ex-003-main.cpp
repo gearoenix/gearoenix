@@ -12,6 +12,9 @@
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 
 struct GameApp final : public gearoenix::core::Application {
     std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
@@ -20,12 +23,12 @@ struct GameApp final : public gearoenix::core::Application {
         : Application(plt_app)
     {
         std::vector<gearoenix::render::PbrVertex> vertices(3);
-        vertices[0].set_position(1.0f, -1.0f, 0.0f);
-        vertices[0].set_uv(1.0f, -1.0f);
-        vertices[1].set_position(0.0f, 1.0f, 0.0f);
-        vertices[1].set_uv(0.0f, 1.0f);
-        vertices[2].set_position(-1.0f, -1.0f, 0.0f);
-        vertices[2].set_uv(-1.0f, -1.0f);
+        vertices[0].position ={1.0f, -1.0f, 0.0f};
+        vertices[0].uv ={ 1.0f, -1.0f};
+        vertices[1].position={0.0f, 1.0f, 0.0f};
+        vertices[1].uv={0.0f, 1.0f};
+        vertices[2].position={-1.0f, -1.0f, 0.0f};
+        vertices[2].uv={-1.0f, -1.0f};
 
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
@@ -77,6 +80,18 @@ struct GameApp final : public gearoenix::core::Application {
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());
         scene_builder->add(std::move(camera_builder));
+
+        auto light_builder_0 = render_engine.get_light_manager()->build_shadow_caster_directional(
+                "directional-light-0",
+                1024,
+                10.0f,
+                1.0f,
+                35.0f,
+                end_callback);
+        light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
+        scene_builder->add(std::move(light_builder_0));
+
         GX_LOG_D("Initialised");
     }
 

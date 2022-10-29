@@ -33,7 +33,7 @@ public:
     Mesh(
         engine::Engine& e,
         const std::string& name,
-        const std::vector<render::PbrVertex>& vertices,
+        const render::Vertices& vertices,
         const std::vector<std::uint32_t>& indices,
         math::Aabb3<double>&& occlusion_box,
         const core::sync::EndCallerIgnored& end) noexcept;

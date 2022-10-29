@@ -44,7 +44,7 @@ struct Scene final : public core::ecs::Component {
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, runtime_reflection_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, skybox_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::Entity::id_t>, light_entities);
-    GX_GET_CREF_PRV(EmptyMap, empties);
+    GX_GET_REF_PRV(EmptyMap, empties);
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRV(math::Vec4<float>, ssao_settings);
     GX_GETSET_VAL_PRV(double, layer, 0.0);

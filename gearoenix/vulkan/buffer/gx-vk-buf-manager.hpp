@@ -35,7 +35,7 @@ struct Manager final {
     GX_GET_RRF_PRV(engine::Engine, e);
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer);
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer);
-    GX_GET_UCPTR_PRV(queue::Queue, uploader_queue);
+    GX_GET_UPTR_PRV(queue::Queue, uploader_queue);
 
 private:
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
@@ -62,15 +62,15 @@ public:
         const std::string& name,
         const void* data,
         std::size_t size,
-        core::sync::EndCallerIgnored&& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+        const core::sync::EndCallerIgnored& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,
         const std::vector<T>& data,
-        core::sync::EndCallerIgnored end = GX_DEFAULT_IGNORED_END_CALLER) noexcept
+        const core::sync::EndCallerIgnored& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept
     {
-        return create(name, data.data(), data.size() * sizeof(T), std::move(end));
+        return create(name, data.data(), data.size() * sizeof(T), end);
     }
 };
 }

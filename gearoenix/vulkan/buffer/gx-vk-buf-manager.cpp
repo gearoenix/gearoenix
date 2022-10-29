@@ -57,11 +57,13 @@ gearoenix::vulkan::buffer::Manager::Manager(
     , e(e)
     , upload_root_buffer(create_upload_root_buffer())
     , gpu_root_buffer(create_gpu_root_buffer())
-    , uploader_queue(new queue::Queue(e))
     , each_frame_upload_source(create_each_frame_upload_source())
     , each_frame_upload_destination(create_each_frame_upload_destination())
     , uploader(new core::sync::WorkWaiter())
 {
+    uploader->push([this] {
+        uploader_queue = std::make_unique<queue::Queue>(this->e);
+    });
 }
 
 gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;
@@ -89,7 +91,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     const std::string& name,
     const void* const data,
     const std::size_t size,
-    core::sync::EndCallerIgnored&& end) noexcept
+    const core::sync::EndCallerIgnored& end) noexcept
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu)
@@ -98,7 +100,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     if (nullptr == gpu)
         return nullptr;
     cpu->write(data, size);
-    uploader->push([this, name, cpu = std::move(cpu), gpu, end = std::move(end)]() mutable noexcept {
+    uploader->push([this, name, cpu = std::move(cpu), gpu, end = end]() mutable noexcept {
         auto cmd = std::make_shared<command::Buffer>(e.get_command_manager().create(command::Type::Primary));
         GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data(), e.get_logical_device());
         cmd->begin();
@@ -106,14 +108,14 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         cmd->end();
         auto fence = std::make_shared<sync::Fence>(e.get_logical_device());
         uploader_queue->submit(*cmd, *fence);
-        uploader->push(std::move(
+        uploader->push(
             [cpu = std::move(cpu),
                 gpu = std::move(gpu),
                 end = std::move(end),
                 cmd = std::move(cmd),
                 fence = std::move(fence)]() noexcept {
                 fence->wait();
-            }));
+            });
     });
     return gpu;
 }

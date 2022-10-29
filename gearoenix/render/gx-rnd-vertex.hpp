@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_VERTEX_HPP
 #define GEAROENIX_RENDER_VERTEX_HPP
 #include "../math/gx-math-vector-4d.hpp"
+#include <variant>
+#include <vector>
 
 namespace gearoenix::render {
 struct PbrVertex final {
@@ -30,28 +32,7 @@ struct PbrVertex final {
 
     explicit PbrVertex(platform::stream::Stream& f) noexcept;
     void read(platform::stream::Stream& f) noexcept;
-
-    constexpr void set_position(const float x, const float y, const float z) noexcept
-    {
-        position.x = x;
-        position.y = y;
-        position.z = z;
-    }
-
-    constexpr void set_uv(const float x, const float y) noexcept
-    {
-        uv.x = x;
-        uv.y = y;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const PbrVertex& v) noexcept
-    {
-        os << R"({ "type": "PbrVertex", "position": )" << v.position
-           << ", \"normal\": " << v.normal
-           << ", \"tangent\": " << v.tangent
-           << ", \"uv\": " << v.uv << "}";
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const PbrVertex& v) noexcept;
 };
 
 struct PbrVertexAnimated final {
@@ -59,5 +40,18 @@ struct PbrVertexAnimated final {
     math::Vec4<float> bone_weights;
     math::Vec4<float> bone_indices;
 };
+
+typedef std::variant<std::vector<PbrVertex>, std::vector<PbrVertexAnimated>> Vertices;
+
+[[nodiscard]] const void* get_data(const render::Vertices& vertices) noexcept;
+[[nodiscard]] std::size_t get_element_size(const render::Vertices& vertices) noexcept;
+[[nodiscard]] bool has_bone_weights(const render::Vertices& vertices) noexcept;
+[[nodiscard]] bool has_bone_indices(const render::Vertices& vertices) noexcept;
 }
+
+namespace gearoenix::core {
+[[nodiscard]] std::size_t count(const render::Vertices& vertices) noexcept;
+[[nodiscard]] std::size_t bytes_count(const render::Vertices& vertices) noexcept;
+}
+
 #endif

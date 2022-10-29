@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-qu-node-label.hpp"
 #include "gx-vk-qu-node.hpp"
+#include "gx-vk-qu-queue.hpp"
 #include <atomic>
 #include <boost/container/flat_set.hpp>
 #include <string>
@@ -18,15 +19,13 @@ struct Graph final {
 
     struct SubmitData final {
         struct FrameData final {
-            boost::container::flat_set<VkSemaphore> waits;
-            VkCommandBuffer cmd = nullptr;
-            boost::container::flat_set<VkSemaphore> signals;
+            std::vector<VkSemaphore> providers_waits;
+            std::vector<VkPipelineStageFlags> pipeline_stages;
+            std::shared_ptr<command::Buffer> cmd;
+            std::vector<VkSemaphore> consumers_signals;
 
             void clear() noexcept;
-            void add_provider(const Node& node) noexcept;
         };
-
-        VkPipelineStageFlags pipeline_stage = 0;
         std::vector<FrameData> frame_data;
 
         void clear() noexcept;
@@ -34,11 +33,11 @@ struct Graph final {
         void add_consumer(const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores) noexcept;
     };
 
-    engine::Engine& e;
     const std::vector<std::shared_ptr<sync::Semaphore>> start_semaphore;
     const std::vector<std::shared_ptr<sync::Semaphore>> end_semaphore;
     const std::vector<std::shared_ptr<sync::Fence>> fence;
 
+    GX_GET_CREF_PRV(Queue, q);
     GX_GET_CREF_PRV(NodeMap, nodes);
     GX_GET_CREF_PRV(std::vector<SubmitData>, submit_data);
 
@@ -47,6 +46,7 @@ private:
     void clear_submit_data() noexcept;
     void update_submit_data(Node& node) noexcept;
     void update() noexcept;
+    void submit() noexcept;
 
 public:
     explicit Graph(engine::Engine&) noexcept;
@@ -61,6 +61,9 @@ public:
         NodeLabel new_node_label,
         NodeLabel consumer_node_label,
         VkPipelineStageFlags wait_stage) noexcept;
+    void start_frame() noexcept;
+    [[nodiscard]] bool present(Swapchain& swapchain, std::uint32_t image_index) noexcept;
+    [[nodiscard]] const sync::Semaphore& get_present_semaphore() noexcept;
 };
 }
 

@@ -4,20 +4,21 @@
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
 #include "pipeline/gx-vk-pip-cache.hpp"
-#include "queue/gx-vk-qu-graphed-queue.hpp"
+#include "queue/gx-vk-qu-graph.hpp"
 #include "queue/gx-vk-qu-queue.hpp"
 #include "sync/gx-vk-sync-fence.hpp"
 #include <imgui/backends/imgui_impl_vulkan.h>
 
 gearoenix::vulkan::ImGuiManager::ImGuiManager(engine::Engine& e) noexcept
     : e(e)
+    , cmds(e.get_graphed_queue()->place_node_between(queue::NodeLabel::Start, queue::NodeLabel::ImGUI, queue::NodeLabel::End, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT))
 {
     ImGui_ImplVulkan_InitInfo info {};
     info.Instance = e.get_instance().get_vulkan_data();
     info.PhysicalDevice = e.get_physical_device().get_vulkan_data();
     info.Device = e.get_logical_device().get_vulkan_data();
     info.QueueFamily = e.get_physical_device().get_graphics_queue_node_index();
-    info.Queue = e.get_graphed_queue()->get_qu().get_vulkan_data();
+    info.Queue = e.get_graphed_queue()->get_q().get_vulkan_data();
     info.PipelineCache = e.get_pipeline_manager().get_cache()->get_vulkan_data();
     info.DescriptorPool = e.get_descriptor_manager().get_imgui()->get_vulkan_data();
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(e.get_swapchain().get_image_views().size());

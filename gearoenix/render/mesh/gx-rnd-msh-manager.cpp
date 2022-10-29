@@ -522,7 +522,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     std::string&& name,
     std::vector<PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    core::sync::EndCallerIgnored&& end_callback) noexcept
+    const core::sync::EndCallerIgnored& end_callback) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(meshes_lock);
@@ -542,7 +542,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     std::string&& name,
     std::vector<PbrVertexAnimated>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    core::sync::EndCallerIgnored&& end_callback) noexcept
+    const core::sync::EndCallerIgnored& end_callback) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(meshes_lock);

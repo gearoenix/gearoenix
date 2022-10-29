@@ -27,7 +27,7 @@ struct Manager;
 }
 
 namespace gearoenix::vulkan::queue {
-struct GraphedQueue;
+struct Graph;
 }
 
 namespace gearoenix::vulkan::engine {
@@ -45,9 +45,9 @@ struct Engine final : public render::engine::Engine {
     GX_GET_REF_PRV(buffer::Manager, buffer_manager);
     GX_GET_CREF_PRV(image::View, depth_stencil);
     GX_GET_CREF_PRV(RenderPass, render_pass);
-    GX_GET_UPTR_PRV(queue::GraphedQueue, graphed_queue);
+    GX_GET_UPTR_PRV(queue::Graph, graphed_queue);
     GX_GET_UPTR_PRV(ImGuiManager, imgui_manager);
-    GX_GET_CREF_PRV(std::shared_ptr<mesh::Manager>, mesh_manager);
+    GX_GET_PTRC_PRV(mesh::Manager, vulkan_mesh_manager);
     GX_GET_CREF_PRV(std::vector<std::unique_ptr<Frame>>, frames);
     GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0);
     GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true);
