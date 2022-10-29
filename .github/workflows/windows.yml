@@ -9,7 +9,13 @@ jobs:
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Setup Vulkan SDK
+        uses: humbletim/setup-vulkan-sdk@latest
+        with:
+          vulkan-query-version: latest
+          vulkan-components: Glslang
+          vulkan-use-cache: true
       - name: Install CMake
         shell: powershell
         run: |
