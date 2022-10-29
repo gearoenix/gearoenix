@@ -40,6 +40,10 @@ jobs:
           ls &&
           rm "cmake-${CMAKE_VER}-linux-x86_64.tar.gz" &&
           echo "`pwd`/cmake-${CMAKE_VER}-linux-x86_64/bin" >> $GITHUB_PATH
+      - uses: actions/cache@v3
+        with:
+          path: /
+          key: ${{ runner.os }}-gearoenix-${{ hashFiles('**/linux.yml') }}
       - name: Building Release
         run: |
           mkdir build &&
