@@ -18,7 +18,7 @@ jobs:
             ~/vulkan-sdk
             ~/cmake
             build/
-          key: ${{ runner.os }}-gearoenix-${{ hashFiles('./.github/linux.yml') }}
+          key: ${{ runner.os }}-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Update
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
       - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
           mkdir -p ~/vulkan-sdk &&
           tar -xf ~/vulkan-sdk.tar.gz -C ~/vulkan-sdk --strip-components=1 &&
           rm ~/vulkan-sdk.tar.gz &&
-          ls &&
+          ls ~ &&
           ls ~/vulkan-sdk/ &&
           . ~/vulkan-sdk/setup-sdk.sh &&
           echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV &&
