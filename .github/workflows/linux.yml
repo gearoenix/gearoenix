@@ -20,7 +20,7 @@ jobs:
             build-release/
             build-debug/
           key: ${{ runner.os }}-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
-      - name: Update
+      - name: Update OS
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
       - name: Install dependencies
         run: |
@@ -80,7 +80,7 @@ jobs:
           ctest &&
           llvm-profdata-14 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
           llvm-cov-14 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build-debug/tests/coverage.txt
