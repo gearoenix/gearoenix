@@ -71,7 +71,7 @@ jobs:
           cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
-          mkdir build &&
+          mkdir -p build &&
           cd build &&
           cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
           cmake --build . --config Debug &&
