@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@latest
+        uses: humbletim/setup-vulkan-sdk@1.2.0
         with:
           vulkan-query-version: latest
           vulkan-components: Glslang
