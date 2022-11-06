@@ -1,6 +1,5 @@
 #include "gx-gl-shd-forward-pbr.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../gx-gl-check.hpp"
 #include "../gx-gl-engine.hpp"
 #include <sstream>
 #include <string>
@@ -303,9 +302,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(ForwardPbr&&) noexcept = default;
 
 gearoenix::gl::shader::ForwardPbr::~ForwardPbr() noexcept = default;
 
-void gearoenix::gl::shader::ForwardPbr::bind() const noexcept
+void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);
@@ -372,45 +373,6 @@ void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const
         bones_matrices_count,
         GL_FALSE,
         reinterpret_cast<const float*>(data));
-}
-
-gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination::ForwardPbrDirectionalLightCountCombination(
-    Engine& e,
-    const std::size_t shadow_caster_directional_lights_count,
-    const std::size_t bones_count) noexcept
-{
-    for (std::size_t directional_lights_count = 0; directional_lights_count <= GX_RENDER_MAX_DIRECTIONAL_LIGHTS; ++directional_lights_count)
-        shaders.emplace_back(e, directional_lights_count, shadow_caster_directional_lights_count, bones_count);
-}
-
-gearoenix::gl::shader::ForwardPbr* gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination::get_shader_for_directional_lights_count(const std::size_t c) noexcept
-{
-    return &shaders[c];
-}
-
-gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::ForwardPbrShadowCastersDirectionalLightCountCombination(
-    Engine& e,
-    const std::size_t bones_count) noexcept
-{
-    for (std::size_t shadow_caster_directional_lights_count = 0; shadow_caster_directional_lights_count <= GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER; ++shadow_caster_directional_lights_count)
-        directional_lights_count_combination.emplace_back(e, shadow_caster_directional_lights_count, bones_count);
-    GX_GL_CHECK_D;
-}
-
-gearoenix::gl::shader::ForwardPbrDirectionalLightCountCombination& gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination::get_shader_for_shadow_caster_directional_lights_count(const std::size_t c) noexcept
-{
-    return directional_lights_count_combination[c];
-}
-
-gearoenix::gl::shader::ForwardPbrBonesCountCombination::ForwardPbrBonesCountCombination(Engine& e) noexcept
-{
-    for (std::size_t bones_count = 0; bones_count <= GX_RENDER_MAX_BONES_COUNT; ++bones_count)
-        shadow_caster_directional_lights_count_combination.push_back(ForwardPbrShadowCastersDirectionalLightCountCombination(e, bones_count));
-}
-
-gearoenix::gl::shader::ForwardPbrShadowCastersDirectionalLightCountCombination& gearoenix::gl::shader::ForwardPbrBonesCountCombination::get_shader_for_bones_count_combination(const std::size_t c) noexcept
-{
-    return shadow_caster_directional_lights_count_combination[c];
 }
 
 #endif

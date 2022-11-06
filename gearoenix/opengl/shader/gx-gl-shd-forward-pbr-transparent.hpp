@@ -23,7 +23,7 @@ struct ForwardPbrTransparent final : public Shader {
 public:
     explicit ForwardPbrTransparent(Engine& e) noexcept;
     ~ForwardPbrTransparent() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

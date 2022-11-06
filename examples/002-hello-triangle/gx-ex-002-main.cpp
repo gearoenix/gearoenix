@@ -6,6 +6,7 @@
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
@@ -37,12 +38,14 @@ struct GameApp final : public gearoenix::core::Application {
             std::move(indices),
             end_callback);
 
+        auto material = render_engine.get_material_manager()->get_pbr("material", end_callback);
+
         auto model_builder = render_engine.get_model_manager()->build(
             "triangle-model",
             std::move(mesh),
-            gearoenix::core::sync::EndCallerIgnored(end_callback),
+            std::move(material),
+            end_callback,
             true);
-        model_builder->set_material(gearoenix::render::material::Pbr(render_engine));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");
         camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });

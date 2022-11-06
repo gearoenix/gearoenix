@@ -2,7 +2,8 @@
 #define GEAROENIX_GL_SHADER_BLOOM_HPP
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include <boost/container/static_vector.hpp>
+#include <array>
+#include <optional>
 
 namespace gearoenix::gl::shader {
 struct Bloom final : public Shader {
@@ -12,19 +13,30 @@ struct Bloom final : public Shader {
 public:
     Bloom(Engine& e, bool is_horizontal) noexcept;
     ~Bloom() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 
-struct BoolHorizontalCombination final {
+struct BloomCombination final : public ShaderCombination {
+    friend struct Manager;
+
+    Engine& e;
+
 private:
-    boost::container::static_vector<Bloom, 2> bloom_combination;
+    std::array<std::optional<Bloom>, 2> bloom_combination;
+
+    explicit BloomCombination(Engine& e) noexcept;
 
 public:
-    explicit BoolHorizontalCombination(Engine& e) noexcept;
-    [[nodiscard]] Bloom& get_shader(bool is_horizontal) noexcept;
+    [[nodiscard]] Bloom& get(const bool is_horizontal) noexcept
+    {
+        auto& result = bloom_combination[is_horizontal ? 1 : 0];
+        if (result.has_value())
+            return result.value();
+        result.emplace(e, is_horizontal);
+        return result.value();
+    }
 };
 
-typedef BoolHorizontalCombination BloomCombination;
 }
 
 #endif

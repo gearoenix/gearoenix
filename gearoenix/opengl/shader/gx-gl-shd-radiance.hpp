@@ -14,7 +14,7 @@ struct Radiance final : public Shader {
 public:
     explicit Radiance(Engine& e) noexcept;
     ~Radiance() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

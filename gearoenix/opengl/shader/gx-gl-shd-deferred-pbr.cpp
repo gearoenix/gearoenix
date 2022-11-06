@@ -113,9 +113,11 @@ gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e) noexcept
 
 gearoenix::gl::shader::DeferredPbr::~DeferredPbr() noexcept = default;
 
-void gearoenix::gl::shader::DeferredPbr::bind() const noexcept
+void gearoenix::gl::shader::DeferredPbr::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo_metallic);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(position_depth);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal_ao);

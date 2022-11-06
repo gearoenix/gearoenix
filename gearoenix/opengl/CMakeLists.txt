@@ -1,5 +1,11 @@
 SET(GX_ENGINE_OPENGL_SRC_DIR ${GX_ENGINE_SRC_DIR}/opengl)
 SET(GX_ENGINE_OPENGL_SRC
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-manager.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-manager.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-pbr.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-material.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-material.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shader.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-bloom.cpp
@@ -20,6 +26,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-gcaa.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-irradiance.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-manager.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-manager.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-radiance.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-radiance.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-shadow-caster.cpp
@@ -32,6 +40,20 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-ssao-resolve.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-unlit-coloured.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-unlit-coloured.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-animation.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-animation.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-camera.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-camera.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-environment.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-environment.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-light.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-light.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-manager.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-manager.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-model.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-model.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-scene.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-scene.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-camera.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-check.cpp
@@ -51,8 +73,6 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.hpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.cpp
-        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-submission.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-texture.cpp

@@ -1,5 +1,9 @@
 SET(GX_ENGINE_CORE_SRC_DIR ${GX_ENGINE_SRC_DIR}/core)
 SET(GX_ENGINE_CORE_SRC
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-range.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-range.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-file.cpp
@@ -58,8 +62,6 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-update-manager.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.cpp
-        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-application.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-build-configuration.hpp
@@ -76,6 +78,6 @@ SET(GX_ENGINE_CORE_SRC
         PARENT_SCOPE)
 
 SET(GX_ENGINE_CORE_TEST_SRC
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-range-test.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world-test.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-allocator-test.hpp
         PARENT_SCOPE)

@@ -10,6 +10,7 @@
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
@@ -27,7 +28,7 @@ static std::random_device random_device;
 static std::default_random_engine random_engine;
 static std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
 static std::uniform_real_distribution<double> speed_distribution(-max_speed, max_speed);
-static std::uniform_real_distribution<float> colour_distribution(0.0f, 1.0f);
+static std::uniform_real_distribution<float> colour_distribution(0.5f, 1.0f);
 
 struct GameApp final : public gearoenix::core::Application {
     template <typename... Ts>
@@ -120,14 +121,20 @@ struct GameApp final : public gearoenix::core::Application {
         const auto threads_count = std::thread::hardware_concurrency();
         const auto models_count = threads_count * 1000;
         for (auto model_index = decltype(threads_count) { 0 }; model_index < models_count; ++model_index) {
+            auto material = render_engine.get_material_manager()->get_pbr(
+                "material" + std::to_string(model_index),
+                end_callback);
+            material->set_albedo(render_engine.get_texture_manager()->create_2d_from_colour({ colour_distribution(random_engine),
+                                                                                                colour_distribution(random_engine),
+                                                                                                colour_distribution(random_engine),
+                                                                                                1.0f },
+                end_callback));
             auto model_builder = render_engine.get_model_manager()->build(
                 "triangle" + std::to_string(model_index),
                 std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
+                std::move(material),
                 gearoenix::core::sync::EndCallerIgnored(end_callback),
                 true);
-            gearoenix::render::material::Pbr material(render_engine);
-            material.randomise_albedo();
-            model_builder->set_material(material);
             Speed speed;
             Position position;
             auto& model_transformation = model_builder->get_transformation();

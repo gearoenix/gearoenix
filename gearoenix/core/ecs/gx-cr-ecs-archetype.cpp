@@ -70,9 +70,11 @@ gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
 
 gearoenix::core::ecs::Archetype::~Archetype() noexcept
 {
-    for (std::size_t index = header_size; index < data.size(); index += entity_size)
-        for (const auto& ci : components_indices)
+    for (std::size_t index = header_size; index < data.size(); index += entity_size) {
+        for (const auto& ci : components_indices) {
             reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
+        }
+    }
 }
 
 void gearoenix::core::ecs::Archetype::move_out_entity(

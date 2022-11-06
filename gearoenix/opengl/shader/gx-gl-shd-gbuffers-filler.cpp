@@ -125,9 +125,11 @@ gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e) noexcept
 
 gearoenix::gl::shader::GBuffersFiller::~GBuffersFiller() noexcept = default;
 
-void gearoenix::gl::shader::GBuffersFiller::bind() const noexcept
+void gearoenix::gl::shader::GBuffersFiller::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);

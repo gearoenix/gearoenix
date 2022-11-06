@@ -2,10 +2,14 @@
 #define GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include <array>
 #include <boost/container/static_vector.hpp>
+#include <optional>
 
 namespace gearoenix::gl::shader {
 struct ForwardPbr final : public Shader {
+    friend struct ForwardPbrCombination;
+
     // Camera data ---------------------------------------
     GX_GL_UNIFORM_MATRIX(vp, 4, 1);
     GX_GL_UNIFORM_VECTOR(camera_position_reserved, 4, 1);
@@ -48,7 +52,7 @@ public:
         std::size_t bones_count) noexcept;
     ForwardPbr(ForwardPbr&&) noexcept;
     ~ForwardPbr() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
     void set_shadow_caster_directional_light_normalised_vp_data(const void* data) noexcept;
     void set_shadow_caster_directional_light_direction_data(const void* data) noexcept;
     void set_shadow_caster_directional_light_colour_data(const void* data) noexcept;
@@ -60,34 +64,32 @@ public:
     void set_directional_light_colour_data(const void* data) noexcept;
 };
 
-struct ForwardPbrDirectionalLightCountCombination final {
+struct ForwardPbrCombination final : public ShaderCombination {
+    friend struct Manager;
+    Engine& e;
+
 private:
-    boost::container::static_vector<ForwardPbr, GX_RENDER_MAX_DIRECTIONAL_LIGHTS + 1> shaders;
+    typedef std::array<std::optional<ForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS + 1> directional_lights;
+    typedef std::array<directional_lights, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> shadow_caster_directional_lights;
+    typedef std::array<shadow_caster_directional_lights, GX_RENDER_MAX_BONES_COUNT + 1> bones;
+
+    bones combinations;
+
+    explicit ForwardPbrCombination(Engine& e) noexcept
+        : e(e)
+    {
+    }
 
 public:
-    ForwardPbrDirectionalLightCountCombination(Engine& e, std::size_t shadow_caster_directional_lights_count, std::size_t bones_count) noexcept;
-    [[nodiscard]] ForwardPbr* get_shader_for_directional_lights_count(std::size_t c) noexcept;
+    [[nodiscard]] ForwardPbr& get(const std::size_t bones_count, const std::size_t shadow_casters_directional_lights_count, const std::size_t directional_lights_count) noexcept
+    {
+        auto& s = combinations[bones_count][shadow_casters_directional_lights_count][directional_lights_count];
+        if (s.has_value())
+            return s.value();
+        s.emplace(e, directional_lights_count, shadow_casters_directional_lights_count, bones_count);
+        return s.value();
+    }
 };
-
-struct ForwardPbrShadowCastersDirectionalLightCountCombination final {
-private:
-    boost::container::static_vector<ForwardPbrDirectionalLightCountCombination, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER + 1> directional_lights_count_combination;
-
-public:
-    ForwardPbrShadowCastersDirectionalLightCountCombination(Engine& e, std::size_t bones_count) noexcept;
-    [[nodiscard]] ForwardPbrDirectionalLightCountCombination& get_shader_for_shadow_caster_directional_lights_count(std::size_t c) noexcept;
-};
-
-struct ForwardPbrBonesCountCombination final {
-private:
-    boost::container::static_vector<ForwardPbrShadowCastersDirectionalLightCountCombination, GX_RENDER_MAX_BONES_COUNT + 1> shadow_caster_directional_lights_count_combination;
-
-public:
-    explicit ForwardPbrBonesCountCombination(Engine& e) noexcept;
-    [[nodiscard]] ForwardPbrShadowCastersDirectionalLightCountCombination& get_shader_for_bones_count_combination(std::size_t c) noexcept;
-};
-
-typedef ForwardPbrBonesCountCombination ForwardPbrCombination;
 }
 
 #endif

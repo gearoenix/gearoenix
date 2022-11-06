@@ -1,9 +1,9 @@
-#include "gx-cr-allocator.hpp"
-#include "macro/gx-cr-mcr-assert.hpp"
+#include "gx-cr-alc-range.hpp"
+#include "../macro/gx-cr-mcr-assert.hpp"
 #include <algorithm>
 
-gearoenix::core::Allocator::Allocator(
-    const std::size_t size, const std::size_t offset, std::shared_ptr<Allocator> parent) noexcept
+gearoenix::core::allocator::Range::Range(
+    const std::size_t size, const std::size_t offset, std::shared_ptr<Range> parent) noexcept
     : size(size)
     , offset(offset)
     , parent(std::move(parent))
@@ -11,7 +11,7 @@ gearoenix::core::Allocator::Allocator(
 {
 }
 
-void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexcept
+void gearoenix::core::allocator::Range::deallocate(const Range* const child) noexcept
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     auto* const child_previous = child->previous;
@@ -40,21 +40,21 @@ void gearoenix::core::Allocator::deallocate(const Allocator* const child) noexce
     ranges.emplace(new_key, new_range);
 }
 
-std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::construct(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::size_t size) noexcept
 {
     GX_CHECK_NOT_EQUAL_D(size, 0);
-    std::shared_ptr<Allocator> result(new Allocator(size, 0));
+    std::shared_ptr<Range> result(new Range(size, 0));
     result->self = result;
     return result;
 }
 
-gearoenix::core::Allocator::~Allocator() noexcept
+gearoenix::core::allocator::Range::~Range() noexcept
 {
     if (nullptr != parent)
         parent->deallocate(this);
 }
 
-std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate(const std::size_t sz) noexcept
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::size_t sz) noexcept
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     auto search = std::upper_bound(
@@ -68,7 +68,7 @@ std::shared_ptr<gearoenix::core::Allocator> gearoenix::core::Allocator::allocate
     }
     const auto found_size = search->first.first;
     const auto found_offset = search->first.second;
-    std::shared_ptr<Allocator> result(new Allocator(sz, found_offset, self.lock()));
+    std::shared_ptr<Range> result(new Range(sz, found_offset, self.lock()));
     const auto del_range = search->second;
     ranges.erase(search);
     auto* const result_previous = del_range.first;

@@ -1,6 +1,6 @@
 #include "gx-vk-mem-memory.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../../platform/gx-plt-application.hpp"
@@ -12,7 +12,7 @@
 gearoenix::vulkan::memory::Memory::Memory(
     const engine::Engine& e,
     std::shared_ptr<Memory> parent,
-    std::shared_ptr<core::Allocator> allocator,
+    std::shared_ptr<core::allocator::Range> allocator,
     void* const data,
     const Place place,
     const std::uint32_t type_index,
@@ -81,7 +81,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
         GX_VK_CHK(vkMapMemory(vk_dev, vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data));
     }
     std::shared_ptr<Memory> result(new Memory(
-        e, nullptr, core::Allocator::construct(aligned_size), data, place, type_index, vulkan_data));
+        e, nullptr, core::allocator::Range::construct(aligned_size), data, place, type_index, vulkan_data));
     result->self = result;
     return result;
 }

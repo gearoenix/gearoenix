@@ -9,8 +9,8 @@
 #include "../gx-gl-types.hpp"
 #include <sstream>
 
-#define GX_GL_UNIFORM_FAILED -1
-#define GX_GL_TEXTURE_INDEX_FAILED -1
+#define GX_GL_UNIFORM_FAILED (-1)
+#define GX_GL_TEXTURE_INDEX_FAILED (-1)
 
 #define GX_GL_UNIFORM_TEXTURE_ARRAY(name, count)     \
     GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED) \
@@ -100,10 +100,15 @@ public:
     explicit Shader(Engine& e) noexcept;
     Shader(const Shader&) = delete;
     Shader(Shader&&) noexcept;
+    Shader& operator=(Shader&&) noexcept;
     virtual ~Shader() noexcept;
     /// returns GX_SHADER_UNIFORM_FAILED when uniform not found.
     [[nodiscard]] sint get_uniform_location(const std::string& name) const noexcept;
-    virtual void bind() const noexcept;
+    virtual void bind(uint& current_shader) const noexcept;
+};
+
+struct ShaderCombination {
+    virtual ~ShaderCombination() noexcept = default;
 };
 }
 

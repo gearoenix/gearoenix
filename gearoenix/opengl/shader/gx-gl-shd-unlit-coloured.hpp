@@ -11,7 +11,7 @@ struct UnlitColoured final : public Shader {
 public:
     explicit UnlitColoured(Engine& e) noexcept;
     ~UnlitColoured() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

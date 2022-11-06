@@ -1,10 +1,10 @@
-#ifndef GEAROENIX_CORE_ALLOCATOR_TEST_HPP
-#define GEAROENIX_CORE_ALLOCATOR_TEST_HPP
-#include "gx-cr-allocator.hpp"
+#ifndef GEAROENIX_CORE_ALLOCATOR_RANGE_TEST_HPP
+#define GEAROENIX_CORE_ALLOCATOR_RANGE_TEST_HPP
+#include "gx-cr-alc-range.hpp"
 
-BOOST_AUTO_TEST_CASE(gearoenix_core_allocator)
+BOOST_AUTO_TEST_CASE(gearoenix_core_allocator_range)
 {
-    auto root = gearoenix::core::Allocator::construct(1000);
+    auto root = gearoenix::core::allocator::Range::construct(1000);
     BOOST_TEST(root->get_size() == 1000);
     BOOST_TEST(root->get_offset() == 0);
 

@@ -69,9 +69,11 @@ gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::size_t b
 
 gearoenix::gl::shader::ShadowCaster::~ShadowCaster() noexcept = default;
 
-void gearoenix::gl::shader::ShadowCaster::bind() const noexcept
+void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }
 
@@ -80,15 +82,9 @@ void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const void* const data) c
     glUniformMatrix4fv(mvp, mvp_count, GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-gearoenix::gl::shader::ShadowCasterBoneCountCombination::ShadowCasterBoneCountCombination(Engine& e) noexcept
+gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination(Engine& e) noexcept
+    : e(e)
 {
-    for (std::size_t i = 0; i < decltype(shaders)::max_size(); ++i)
-        shaders.emplace_back(e, i);
-}
-
-const gearoenix::gl::shader::ShadowCaster& gearoenix::gl::shader::ShadowCasterBoneCountCombination::get_shader(const std::size_t bones_count) const noexcept
-{
-    return shaders[bones_count];
 }
 
 #endif

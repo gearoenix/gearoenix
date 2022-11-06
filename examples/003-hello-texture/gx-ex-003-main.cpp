@@ -8,6 +8,7 @@
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
@@ -36,16 +37,8 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
 
-        auto model_builder = render_engine.get_model_manager()->build(
-            "triangle",
-            render_engine.get_mesh_manager()->build(
-                "triangle-mesh",
-                std::move(vertices),
-                std::move(indices),
-                gearoenix::core::sync::EndCallerIgnored(end_callback)),
-            gearoenix::core::sync::EndCallerIgnored(end_callback),
-            true);
-        gearoenix::render::material::Pbr material(render_engine);
+        auto material = render_engine.get_material_manager()->get_pbr("material", end_callback);
+
         std::vector<std::vector<std::uint8_t>> pixels(3);
         for (int j = 64 * 64, k = 0; k < 3; j >>= 2, ++k)
             for (int i = 0; i < j; ++i) {
@@ -54,7 +47,7 @@ struct GameApp final : public gearoenix::core::Application {
                 pixels[k].push_back(k == 2 ? 255 : 0);
                 pixels[k].push_back(255);
             }
-        material.set_albedo(render_engine.get_texture_manager()->create_2d_from_pixels(
+        material->set_albedo(render_engine.get_texture_manager()->create_2d_from_pixels(
             "coloured-mipmaps",
             pixels,
             gearoenix::render::texture::TextureInfo {
@@ -71,7 +64,16 @@ struct GameApp final : public gearoenix::core::Application {
         //    gearoenix::platform::AssetPath(plt_app, "logo.png"),
         //    gearoenix::render::texture::TextureInfo(),
         //    end_callback));
-        model_builder->set_material(material);
+        auto model_builder = render_engine.get_model_manager()->build(
+            "triangle",
+            render_engine.get_mesh_manager()->build(
+                "triangle-mesh",
+                std::move(vertices),
+                std::move(indices),
+                gearoenix::core::sync::EndCallerIgnored(end_callback)),
+            std::move(material),
+            gearoenix::core::sync::EndCallerIgnored(end_callback),
+            true);
         scene_builder->add(std::move(model_builder));
 
         auto camera_builder = render_engine.get_camera_manager()->build("camera");

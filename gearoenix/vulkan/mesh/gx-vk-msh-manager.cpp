@@ -1,7 +1,7 @@
 #include "gx-vk-msh-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/gx-cr-allocator.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../physics/gx-phs-transformation.hpp"

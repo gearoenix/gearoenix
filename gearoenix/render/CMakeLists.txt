@@ -33,10 +33,16 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-point.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-id.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-material.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-material.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-transparency.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp

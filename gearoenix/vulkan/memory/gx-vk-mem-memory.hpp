@@ -7,8 +7,8 @@
 #include "gx-vk-mem-place.hpp"
 #include <memory>
 
-namespace gearoenix::core {
-struct Allocator;
+namespace gearoenix::core::allocator {
+struct Range;
 }
 
 namespace gearoenix::vulkan::engine {
@@ -20,7 +20,7 @@ struct Memory final {
     GX_GET_CRRF_PRV(engine::Engine, e);
     GX_GET_REFC_PRV(std::shared_ptr<Memory>, parent);
     GX_GET_CREF_PRV(std::weak_ptr<Memory>, self);
-    GX_GET_REFC_PRV(std::shared_ptr<core::Allocator>, allocator);
+    GX_GET_REFC_PRV(std::shared_ptr<core::allocator::Range>, allocator);
     GX_GET_PTRC_PRV(void, data);
     GX_GET_CVAL_PRV(Place, place);
     GX_GET_CVAL_PRV(std::uint32_t, type_index);
@@ -30,7 +30,7 @@ private:
     Memory(
         const engine::Engine& e,
         std::shared_ptr<Memory> parent,
-        std::shared_ptr<core::Allocator> allocator,
+        std::shared_ptr<core::allocator::Range> allocator,
         void* data,
         Place place,
         std::uint32_t type_index,

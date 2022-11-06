@@ -39,9 +39,11 @@ gearoenix::gl::shader::UnlitColoured::UnlitColoured(Engine& e) noexcept
 
 gearoenix::gl::shader::UnlitColoured::~UnlitColoured() noexcept = default;
 
-void gearoenix::gl::shader::UnlitColoured::bind() const noexcept
+void gearoenix::gl::shader::UnlitColoured::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
 }
 
 #endif

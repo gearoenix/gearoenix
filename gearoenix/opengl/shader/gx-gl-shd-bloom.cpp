@@ -77,21 +77,17 @@ gearoenix::gl::shader::Bloom::Bloom(Engine& e, const bool is_horizontal) noexcep
 
 gearoenix::gl::shader::Bloom::~Bloom() noexcept = default;
 
-void gearoenix::gl::shader::Bloom::bind() const noexcept
+void gearoenix::gl::shader::Bloom::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BoolHorizontalCombination::BoolHorizontalCombination(Engine& e) noexcept
+gearoenix::gl::shader::BloomCombination::BloomCombination(Engine& e) noexcept
+    : e(e)
 {
-    bloom_combination.emplace_back(e, false);
-    bloom_combination.emplace_back(e, true);
-}
-
-gearoenix::gl::shader::Bloom& gearoenix::gl::shader::BoolHorizontalCombination::get_shader(const bool is_horizontal) noexcept
-{
-    return bloom_combination[is_horizontal ? 1 : 0];
 }
 
 #endif

@@ -10,13 +10,16 @@
 #include "gx-gl-model.hpp"
 #include "gx-gl-reflection.hpp"
 #include "gx-gl-skybox.hpp"
-#include "gx-gl-submission.hpp"
 #include "gx-gl-texture.hpp"
+#include "material/gx-gl-mat-manager.hpp"
+#include "shader/gx-gl-shd-manager.hpp"
+#include "submission/gx-gl-sbm-manager.hpp"
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
 gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexcept
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
+    , shader_manager(new shader::Manager(*this))
 {
     ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
@@ -34,8 +37,9 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     camera_manager = std::make_unique<CameraManager>(*this);
     mesh_manager = std::make_unique<MeshManager>(*this);
     model_manager = std::make_unique<ModelManager>(*this);
+    material_manager = std::make_unique<material::Manager>(*this);
     texture_manager = std::make_unique<TextureManager>(*this);
-    submission_manager = std::make_unique<SubmissionManager>(*this);
+    submission_manager = std::make_unique<submission::Manager>(*this);
     skybox_manager = std::make_unique<SkyboxManager>(*this);
     reflection_manager = std::make_unique<ReflectionManager>(*this);
     light_manager = std::make_unique<LightManager>(*this);
@@ -51,6 +55,7 @@ gearoenix::gl::Engine::~Engine() noexcept
     model_manager = nullptr;
     mesh_manager = nullptr;
     camera_manager = nullptr;
+    material_manager = nullptr;
     todos.unload();
     ImGui_ImplOpenGL3_Shutdown();
 }
@@ -90,7 +95,7 @@ bool gearoenix::gl::Engine::is_supported() noexcept
 std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct(platform::Application& platform_application) noexcept
 {
     if (!is_supported())
-        return std::unique_ptr<gearoenix::gl::Engine>();
+        return {};
     return std::make_unique<gearoenix::gl::Engine>(platform_application);
 }
 

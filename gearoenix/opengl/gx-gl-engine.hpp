@@ -5,11 +5,18 @@
 #include "../core/gx-cr-function-loader.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 
+namespace gearoenix::gl::shader {
+struct Manager;
+}
+
+namespace gearoenix::gl::submission {
+struct Manager;
+}
+
 namespace gearoenix::gl {
-struct PipelineManager;
-struct SubmissionManager;
 struct Engine final : public render::engine::Engine {
-    GX_GET_UPTR_PRV(SubmissionManager, submission_manager);
+    GX_GET_UPTR_PRV(submission::Manager, submission_manager);
+    GX_GET_UPTR_PRV(shader::Manager, shader_manager);
 
 public:
     core::FunctionLoader todos;

@@ -10,7 +10,7 @@ struct Final final : public Shader {
 public:
     explicit Final(Engine& e) noexcept;
     ~Final() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

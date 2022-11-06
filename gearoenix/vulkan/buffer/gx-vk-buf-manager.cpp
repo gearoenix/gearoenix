@@ -1,6 +1,6 @@
 #include "gx-vk-buf-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../device/gx-vk-dev-logical.hpp"

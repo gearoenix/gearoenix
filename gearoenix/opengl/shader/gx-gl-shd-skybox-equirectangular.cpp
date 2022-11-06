@@ -63,9 +63,11 @@ gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e) n
 
 gearoenix::gl::shader::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
 
-void gearoenix::gl::shader::SkyboxEquirectangular::bind() const noexcept
+void gearoenix::gl::shader::SkyboxEquirectangular::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }
 

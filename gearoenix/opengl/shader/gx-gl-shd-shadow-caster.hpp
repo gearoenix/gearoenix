@@ -2,7 +2,8 @@
 #define GEAROENIX_GL_SHADER_SHADOW_CASTER_HPP
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include <boost/container/static_vector.hpp>
+#include <array>
+#include <optional>
 
 namespace gearoenix::gl::shader {
 struct ShadowCaster final : public Shader {
@@ -15,20 +16,30 @@ public:
 
     explicit ShadowCaster(Engine& e, std::size_t bones_count = 0) noexcept;
     ~ShadowCaster() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
     void set_mvp_data(const void* data) const noexcept;
 };
 
-struct ShadowCasterBoneCountCombination final {
+struct ShadowCasterCombination final : public ShaderCombination {
+    friend struct Manager;
+
+    Engine& e;
+
 private:
-    boost::container::static_vector<ShadowCaster, 64> shaders;
+    std::array<std::optional<ShadowCaster>, GX_RENDER_MAX_BONES_COUNT + 1> shaders;
+
+    explicit ShadowCasterCombination(Engine& e) noexcept;
 
 public:
-    explicit ShadowCasterBoneCountCombination(Engine& e) noexcept;
-    [[nodiscard]] const ShadowCaster& get_shader(std::size_t bones_count = 0) const noexcept;
+    ~ShadowCasterCombination() noexcept final = default;
+    [[nodiscard]] const ShadowCaster& get(std::size_t bones_count = 0) noexcept
+    {
+        auto& s = shaders[bones_count];
+        if (s.has_value())
+            return s.value();
+        return s.emplace(e, bones_count);
+    }
 };
-
-typedef ShadowCasterBoneCountCombination ShadowCasterCombination;
 }
 
 #endif

@@ -7,6 +7,7 @@
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
@@ -35,20 +36,21 @@ struct GameApp final : public gearoenix::core::Application {
             4,
             gearoenix::core::sync::EndCallerIgnored(end_callback));
 
-        gearoenix::render::material::Pbr material(render_engine);
-        material.get_albedo_factor().x = 0.999f;
-        material.get_albedo_factor().y = 0.1f;
-        material.get_albedo_factor().z = 0.4f;
         for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
-            material.get_normal_metallic_factor().w = static_cast<float>(metallic_i) * 0.1f;
             for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
-                material.get_emission_roughness_factor().w = static_cast<float>(roughness_i) * 0.1f;
+                auto material = render_engine.get_material_manager()->get_pbr(
+                    "metallic: " + std::to_string(metallic_i) + ", roughness: " + std::to_string(roughness_i), end_callback);
+                material->get_albedo_factor().x = 0.999f;
+                material->get_albedo_factor().y = 0.1f;
+                material->get_albedo_factor().z = 0.4f;
+                material->get_normal_metallic_factor().w = static_cast<float>(metallic_i) * 0.1f;
+                material->get_emission_roughness_factor().w = static_cast<float>(roughness_i) * 0.1f;
                 auto model_builder = render_engine.get_model_manager()->build(
                     "icosphere-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i),
                     std::shared_ptr(icosphere_mesh),
+                    std::move(material),
                     gearoenix::core::sync::EndCallerIgnored(end_callback),
                     true);
-                model_builder->set_material(material);
                 model_builder->get_transformation().local_translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
                     static_cast<double>(roughness_i) * 3.0 - 15.0,
                     0.0 });

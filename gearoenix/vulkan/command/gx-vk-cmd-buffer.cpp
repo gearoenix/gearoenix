@@ -1,6 +1,6 @@
 #include "gx-vk-cmd-buffer.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"

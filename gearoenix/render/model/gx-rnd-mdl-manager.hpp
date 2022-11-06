@@ -8,6 +8,10 @@ namespace gearoenix::render::engine {
 struct Engine;
 }
 
+namespace gearoenix::render::material {
+struct Material;
+}
+
 namespace gearoenix::render::mesh {
 struct Mesh;
 }
@@ -30,7 +34,8 @@ public:
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
-        core::sync::EndCallerIgnored&& c,
+        std::shared_ptr<material::Material>&& bound_material,
+        const core::sync::EndCallerIgnored& c,
         bool is_transformable) noexcept
         = 0;
 };

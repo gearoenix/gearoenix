@@ -11,6 +11,8 @@
 #include "light/gx-rnd-lt-builder.hpp"
 #include "light/gx-rnd-lt-light.hpp"
 #include "light/gx-rnd-lt-manager.hpp"
+#include "material/gx-rnd-mat-manager.hpp"
+#include "material/gx-rnd-mat-pbr.hpp"
 #include "mesh/gx-rnd-msh-manager.hpp"
 #include "mesh/gx-rnd-msh-mesh.hpp"
 #include "model/gx-rnd-mdl-builder.hpp"
@@ -120,12 +122,10 @@
 
 [[nodiscard]] static const std::shared_ptr<gearoenix::render::mesh::Mesh>& create_mesh(
     const int index,
-    gearoenix::render::material::Pbr& gx_mat,
     const gearoenix::core::sync::EndCallerIgnored& mesh_end_callback,
     std::vector<std::shared_ptr<gearoenix::render::mesh::Mesh>>& gx_meshes,
     const tinygltf::Model& data,
     gearoenix::render::engine::Engine& e,
-    std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
     std::vector<int> bone_index_map) noexcept
 {
     auto& gx_mesh = gx_meshes[index];
@@ -408,39 +408,6 @@
             std::move(box),
             gearoenix::core::sync::EndCallerIgnored(mesh_end_callback));
 
-    const tinygltf::Material& mat = data.materials[primitive.material];
-    GX_LOG_D("Loading material: " << mat.name);
-    if (mat.doubleSided)
-        GX_UNIMPLEMENTED;
-    const auto& albedo_factor = mat.pbrMetallicRoughness.baseColorFactor;
-    GX_ASSERT(albedo_factor.size() == 4);
-    gx_mat.get_alpha_cutoff_occlusion_strength().x = static_cast<float>(mat.alphaCutoff);
-    if ("OPAQUE" == mat.alphaMode)
-        gx_mat.set_alpha_mode(gearoenix::render::material::AlphaMode::Opaque);
-    else if ("TRANSPARENT" == mat.alphaMode)
-        gx_mat.set_alpha_mode(gearoenix::render::material::AlphaMode::Transparent);
-    else
-        GX_UNEXPECTED;
-    GX_ASSERT(mat.emissiveFactor.size() == 3);
-    gx_mat.get_emission_roughness_factor().x = static_cast<float>(mat.emissiveFactor[0]);
-    gx_mat.get_emission_roughness_factor().y = static_cast<float>(mat.emissiveFactor[1]);
-    gx_mat.get_emission_roughness_factor().z = static_cast<float>(mat.emissiveFactor[2]);
-    gx_mat.set_emission(create_texture2d(mat.emissiveTexture.index, mesh_end_callback, gx_mat.get_emission(), gx_txt2ds, data, e));
-    gx_mat.set_normal(create_texture2d(mat.normalTexture.index, mesh_end_callback, gx_mat.get_normal(), gx_txt2ds, data, e));
-    gx_mat.get_normal_metallic_factor().x = static_cast<float>(mat.normalTexture.scale);
-    gx_mat.get_normal_metallic_factor().y = static_cast<float>(mat.normalTexture.scale);
-    gx_mat.get_normal_metallic_factor().z = 1.0f; // strange but tinygltf docs says that
-    gx_mat.set_occlusion(create_texture2d(mat.occlusionTexture.index, mesh_end_callback, gx_mat.get_occlusion(), gx_txt2ds, data, e));
-    gx_mat.get_alpha_cutoff_occlusion_strength().y = static_cast<float>(mat.occlusionTexture.strength);
-    gx_mat.set_albedo(create_texture2d(mat.pbrMetallicRoughness.baseColorTexture.index, mesh_end_callback, gx_mat.get_albedo(), gx_txt2ds, data, e));
-    gx_mat.get_albedo_factor() = gearoenix::math::Vec4<float>(
-        static_cast<float>(albedo_factor[0]),
-        static_cast<float>(albedo_factor[1]),
-        static_cast<float>(albedo_factor[2]),
-        static_cast<float>(albedo_factor[3]));
-    gx_mat.set_metallic_roughness(create_texture2d(mat.pbrMetallicRoughness.metallicRoughnessTexture.index, mesh_end_callback, gx_mat.get_metallic_roughness(), gx_txt2ds, data, e));
-    gx_mat.get_emission_roughness_factor().w = static_cast<float>(mat.pbrMetallicRoughness.roughnessFactor);
-    gx_mat.get_normal_metallic_factor().w = static_cast<float>(mat.pbrMetallicRoughness.metallicFactor);
     return gx_mesh;
 }
 
@@ -557,6 +524,7 @@ static void process_node(
     gearoenix::render::engine::Engine& e,
     std::vector<std::shared_ptr<gearoenix::render::mesh::Mesh>>& gx_meshes,
     std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
+    std::vector<std::shared_ptr<gearoenix::render::material::Pbr>>& gx_materials,
     const std::map<int, gearoenix::physics::animation::BoneChannelBuilder>& bones_channels) noexcept
 {
     const auto& node = data.nodes[node_index];
@@ -585,14 +553,13 @@ static void process_node(
     if (node.mesh != -1) {
         auto [bone_index_map, bones_info] = process_skin(node, data);
         GX_ASSERT_D(node.children.empty());
-        gearoenix::render::material::Pbr gx_mat(e, node_end_callback);
-        auto gx_mesh = create_mesh(node.mesh, gx_mat, node_end_callback, gx_meshes, data, e, gx_txt2ds, bone_index_map);
+        auto gx_mesh = create_mesh(node.mesh, node_end_callback, gx_meshes, data, e, bone_index_map);
         auto model_builder = e.get_model_manager()->build(
             std::string(node.name),
             std::move(gx_mesh),
+            gx_materials[data.meshes[node.mesh].primitives[0].material],
             gearoenix::core::sync::EndCallerIgnored(node_end_callback),
             true);
-        model_builder->set_material(gx_mat);
         if (bone_index_map.size() > 1) {
             e.get_physics_engine()->get_animation_manager()->create_armature(
                 model_builder->get_entity_builder()->get_builder(),
@@ -658,12 +625,12 @@ static void process_node(
         GX_ASSERT_D(node.translation.empty());
         auto mesh_node_index = node.children[0];
         if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1) {
-            process_node(mesh_node_index, node_end_callback, scene_builder, data, e, gx_meshes, gx_txt2ds, bones_channels);
+            process_node(mesh_node_index, node_end_callback, scene_builder, data, e, gx_meshes, gx_txt2ds, gx_materials, bones_channels);
             return;
         }
         mesh_node_index = node.children[1];
         if (data.nodes[mesh_node_index].mesh != -1 && data.nodes[mesh_node_index].skin != -1) {
-            process_node(mesh_node_index, node_end_callback, scene_builder, data, e, gx_meshes, gx_txt2ds, bones_channels);
+            process_node(mesh_node_index, node_end_callback, scene_builder, data, e, gx_meshes, gx_txt2ds, gx_materials, bones_channels);
             return;
         }
         GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
@@ -751,6 +718,52 @@ static void read_output(
     GX_LOG_F("Unexpected interpolation " << interpolation);
 }
 
+static void load_materials(
+    gearoenix::render::engine::Engine& e,
+    std::vector<std::shared_ptr<gearoenix::render::material::Pbr>>& materials,
+    const tinygltf::Model& data,
+    std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
+    const gearoenix::core::sync::EndCallerIgnored& end_callback) noexcept
+{
+    for (std::size_t material_id = 0; material_id < data.materials.size(); ++material_id) {
+        const tinygltf::Material& mat = data.materials[material_id];
+        materials[material_id] = e.get_material_manager()->get_pbr(mat.name, end_callback);
+        auto& gx_mat = *materials[material_id].get();
+        GX_LOG_D("Loading material: " << mat.name);
+        if (mat.doubleSided)
+            GX_UNIMPLEMENTED;
+        const auto& albedo_factor = mat.pbrMetallicRoughness.baseColorFactor;
+        GX_ASSERT(albedo_factor.size() == 4);
+        gx_mat.get_alpha_cutoff_occlusion_strength_reserved_reserved().x = static_cast<float>(mat.alphaCutoff);
+        if ("OPAQUE" == mat.alphaMode)
+            gx_mat.set_transparency(gearoenix::render::material::Transparency::Opaque);
+        else if ("TRANSPARENT" == mat.alphaMode)
+            gx_mat.set_transparency(gearoenix::render::material::Transparency::Transparent);
+        else
+            GX_UNEXPECTED;
+        GX_ASSERT(mat.emissiveFactor.size() == 3);
+        gx_mat.get_emission_roughness_factor().x = static_cast<float>(mat.emissiveFactor[0]);
+        gx_mat.get_emission_roughness_factor().y = static_cast<float>(mat.emissiveFactor[1]);
+        gx_mat.get_emission_roughness_factor().z = static_cast<float>(mat.emissiveFactor[2]);
+        gx_mat.set_emission(std::shared_ptr(create_texture2d(mat.emissiveTexture.index, end_callback, gx_mat.get_emission(), gx_txt2ds, data, e)));
+        gx_mat.set_normal(std::shared_ptr(create_texture2d(mat.normalTexture.index, end_callback, gx_mat.get_normal(), gx_txt2ds, data, e)));
+        gx_mat.get_normal_metallic_factor().x = static_cast<float>(mat.normalTexture.scale);
+        gx_mat.get_normal_metallic_factor().y = static_cast<float>(mat.normalTexture.scale);
+        gx_mat.get_normal_metallic_factor().z = 1.0f; // strange but tinygltf docs says that
+        gx_mat.set_occlusion(std::shared_ptr(create_texture2d(mat.occlusionTexture.index, end_callback, gx_mat.get_occlusion(), gx_txt2ds, data, e)));
+        gx_mat.get_alpha_cutoff_occlusion_strength_reserved_reserved().y = static_cast<float>(mat.occlusionTexture.strength);
+        gx_mat.set_albedo(std::shared_ptr(create_texture2d(mat.pbrMetallicRoughness.baseColorTexture.index, end_callback, gx_mat.get_albedo(), gx_txt2ds, data, e)));
+        gx_mat.get_albedo_factor() = gearoenix::math::Vec4<float>(
+            static_cast<float>(albedo_factor[0]),
+            static_cast<float>(albedo_factor[1]),
+            static_cast<float>(albedo_factor[2]),
+            static_cast<float>(albedo_factor[3]));
+        gx_mat.set_metallic_roughness(std::shared_ptr(create_texture2d(mat.pbrMetallicRoughness.metallicRoughnessTexture.index, end_callback, gx_mat.get_metallic_roughness(), gx_txt2ds, data, e)));
+        gx_mat.get_emission_roughness_factor().w = static_cast<float>(mat.pbrMetallicRoughness.roughnessFactor);
+        gx_mat.get_normal_metallic_factor().w = static_cast<float>(mat.pbrMetallicRoughness.metallicFactor);
+    }
+}
+
 std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::render::load_gltf(
     engine::Engine& e,
     const platform::stream::Path& file,
@@ -775,6 +788,9 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
 
     std::vector<std::shared_ptr<texture::Texture2D>> gx_txt2ds(data.textures.size());
     std::vector<std::shared_ptr<mesh::Mesh>> gx_meshes(data.meshes.size());
+    std::vector<std::shared_ptr<material::Pbr>> gx_materials(data.materials.size());
+
+    load_materials(e, gx_materials, data, gx_txt2ds, end_callback);
 
     std::map<int /*bone-node-index*/, physics::animation::BoneChannelBuilder> bones_channels;
     for (const tinygltf::Animation& anm : data.animations) {
@@ -819,7 +835,7 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
         auto scene_builder = e.get_scene_manager()->build(scn.name);
         auto scene_end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder, end_callback = end_callback] {});
         for (const int scene_node_index : scn.nodes) {
-            process_node(scene_node_index, scene_end_callback, *scene_builder, data, e, gx_meshes, gx_txt2ds, bones_channels);
+            process_node(scene_node_index, scene_end_callback, *scene_builder, data, e, gx_meshes, gx_txt2ds, gx_materials, bones_channels);
         }
         result.push_back(std::move(scene_builder));
     }

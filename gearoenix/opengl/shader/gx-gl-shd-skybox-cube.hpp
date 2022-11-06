@@ -12,7 +12,7 @@ struct SkyboxCube final : public Shader {
 public:
     explicit SkyboxCube(Engine& e) noexcept;
     ~SkyboxCube() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

@@ -54,6 +54,12 @@ SET(GX_ENGINE_VULKAN_SRC
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-manager.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/mesh/gx-vk-msh-mesh.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-builder.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-builder.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-manager.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-manager.hpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-model.cpp
+        ${GX_ENGINE_VULKAN_SRC_DIR}/model/gx-vk-mdl-model.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.cpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-cache.hpp
         ${GX_ENGINE_VULKAN_SRC_DIR}/pipeline/gx-vk-pip-layout.cpp

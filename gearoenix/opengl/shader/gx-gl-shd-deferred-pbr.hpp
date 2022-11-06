@@ -19,7 +19,7 @@ struct DeferredPbr final : public Shader {
 public:
     explicit DeferredPbr(Engine& e) noexcept;
     ~DeferredPbr() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

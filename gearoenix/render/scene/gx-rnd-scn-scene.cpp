@@ -4,7 +4,6 @@
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
-#include <algorithm>
 
 gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer) noexcept
     : core::ecs::Component(this)
@@ -76,16 +75,23 @@ void gearoenix::render::scene::Scene::update(const core::ecs::Entity::id_t scene
         [&](const core::ecs::Entity::id_t, model::Model* const mdl, physics::Transformation* const trn, const auto /*kernel_index*/) {
             if (!mdl->enabled || mdl->scene_id != scene_entity_id)
                 return;
-            mdl->block_cameras_flags = static_cast<std::uint64_t>(-1);
-            for (const auto blocked_camera : mdl->blocked_cameras)
-                if (auto blocked_camera_search = cameras_flags.find(blocked_camera); cameras_flags.end() != blocked_camera_search)
-                    mdl->block_cameras_flags &= ~blocked_camera_search->second;
-            if (!mdl->is_transformable && trn->get_changed()) {
+            if (mdl->cameras.has_value()) {
+                mdl->cameras_flags = 0;
+                const auto& cameras = mdl->cameras.value();
+                for (const auto camera_id : cameras) {
+                    if (auto camera_search = cameras_flags.find(camera_id); cameras_flags.end() != camera_search) {
+                        mdl->cameras_flags |= camera_search->second;
+                    }
+                }
+            } else {
+                mdl->cameras_flags = static_cast<std::uint64_t>(-1);
+            }
+            if (!mdl->get_is_transformable() && trn->get_changed()) {
                 refresh_bvh = true;
             }
         });
     if (refresh_bvh) {
-        GX_LOG_D("Warning, recreation of BVH, do not transfom static models,"
+        GX_LOG_D("Warning, recreation of BVH, do not transform static models,"
                  "if you are seeing this log only once for each scene it is ok,"
                  "otherwise you're going to have performance problem.");
         recreate_bvh = true;

@@ -122,9 +122,11 @@ gearoenix::gl::shader::Radiance::Radiance(Engine& e) noexcept
 
 gearoenix::gl::shader::Radiance::~Radiance() noexcept = default;
 
-void gearoenix::gl::shader::Radiance::bind() const noexcept
+void gearoenix::gl::shader::Radiance::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment);
 }
 

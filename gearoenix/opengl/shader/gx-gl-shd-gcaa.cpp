@@ -62,9 +62,11 @@ gearoenix::gl::shader::GamaCorrectionColourTuningAntiAliasing::GamaCorrectionCol
 
 gearoenix::gl::shader::GamaCorrectionColourTuningAntiAliasing::~GamaCorrectionColourTuningAntiAliasing() noexcept = default;
 
-void gearoenix::gl::shader::GamaCorrectionColourTuningAntiAliasing::bind() const noexcept
+void gearoenix::gl::shader::GamaCorrectionColourTuningAntiAliasing::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(low_texture);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(high_texture);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(depth_texture);

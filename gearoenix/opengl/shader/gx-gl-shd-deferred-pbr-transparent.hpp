@@ -15,7 +15,7 @@ struct DeferredPbrTransparent final : public Shader {
 public:
     explicit DeferredPbrTransparent(Engine& e) noexcept;
     ~DeferredPbrTransparent() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

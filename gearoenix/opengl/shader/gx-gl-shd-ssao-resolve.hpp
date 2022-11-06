@@ -13,7 +13,7 @@ struct SsaoResolve final : public Shader {
 public:
     explicit SsaoResolve(Engine& e) noexcept;
     ~SsaoResolve() noexcept final;
-    void bind() const noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 }
 

@@ -1,7 +1,6 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../gx-gl-engine.hpp"
-#include "../gx-gl-loader.hpp"
 #include <vector>
 
 void gearoenix::gl::shader::Shader::run() noexcept
@@ -109,6 +108,17 @@ gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
     o.fragment_object = static_cast<uint>(-1);
 }
 
+gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&& o) noexcept
+{
+    shader_program = o.shader_program;
+    vertex_object = o.vertex_object;
+    fragment_object = o.fragment_object;
+    o.shader_program = static_cast<uint>(-1);
+    o.vertex_object = static_cast<uint>(-1);
+    o.fragment_object = static_cast<uint>(-1);
+    return *this;
+}
+
 gearoenix::gl::shader::Shader::~Shader() noexcept
 {
     if (static_cast<uint>(-1) != vertex_object)
@@ -124,9 +134,10 @@ gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const st
     return glGetUniformLocation(shader_program, &(uname[0]));
 }
 
-void gearoenix::gl::shader::Shader::bind() const noexcept
+void gearoenix::gl::shader::Shader::bind(uint& current_shader) const noexcept
 {
     glUseProgram(shader_program);
+    current_shader = shader_program;
 }
 
 #endif

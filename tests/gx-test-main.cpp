@@ -17,8 +17,8 @@
     if (x != y && std::abs(x) + std::abs(y) > 0.0001 && std::abs(x - y) / (std::abs(x) + std::abs(y)) > 0.0001) \
     BOOST_TEST_CHECK(x == y)
 
+#include "gearoenix/core/allocator/gx-cr-alc-range-test.hpp"
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
-#include <gearoenix/core/gx-cr-allocator-test.hpp>
 #include <gearoenix/math/gx-math-matrix-4d-test.hpp>
 #include <gearoenix/math/gx-math-quaternion-test.hpp>
 #include <gearoenix/physics/accelerator/gx-phs-acc-bvh-test.hpp>

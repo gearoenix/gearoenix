@@ -115,9 +115,11 @@ gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e) n
 
 gearoenix::gl::shader::ForwardPbrTransparent::~ForwardPbrTransparent() noexcept = default;
 
-void gearoenix::gl::shader::ForwardPbrTransparent::bind() const noexcept
+void gearoenix::gl::shader::ForwardPbrTransparent::bind(uint& current_shader) const noexcept
 {
-    Shader::bind();
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);

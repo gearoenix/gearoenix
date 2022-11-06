@@ -1,6 +1,6 @@
 #include "gx-vk-buf-buffer.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -10,7 +10,7 @@
 #include "../gx-vk-marker.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
-    std::shared_ptr<core::Allocator> allocator,
+    std::shared_ptr<core::allocator::Range> allocator,
     std::shared_ptr<const Buffer> parent,
     std::shared_ptr<memory::Memory> allocated_memory,
     VkBuffer vulkan_data) noexcept
@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     const auto& logical_device = memory_manager.get_e().get_logical_device();
     const auto& physical_device = logical_device.get_physical_device();
     const auto aligned_size = physical_device.align_size(size);
-    auto allocator = core::Allocator::construct(aligned_size);
+    auto allocator = core::allocator::Range::construct(aligned_size);
     VkBufferCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
