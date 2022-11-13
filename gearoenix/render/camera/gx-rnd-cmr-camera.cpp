@@ -1,8 +1,10 @@
 #include "gx-rnd-cmr-camera.hpp"
+#include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
+#include <boost/mp11/algorithm.hpp>
 #include <imgui/imgui.h>
 #include <random>
 
@@ -13,6 +15,7 @@ static thread_local std::default_random_engine re(rd());
 gearoenix::render::camera::Camera::Camera(
     engine::Engine& e,
     const float target_aspect_ratio,
+    const std::size_t resolution_cfg_listener,
     const Projection projection_type,
     const float near,
     const float far) noexcept
@@ -22,19 +25,52 @@ gearoenix::render::camera::Camera::Camera(
     , target_aspect_ratio(target_aspect_ratio)
     , far(far)
     , near(near)
+    , colour_tuning(HdrTuneMappingGammaCorrection {})
     , projection_type(projection_type)
     , debug_colour {
         urd(re),
         urd(re),
-        urd(re)
+        urd(re),
+        urd(re),
     }
+    , resolution_cfg_listener(resolution_cfg_listener)
 {
     update_projection();
 }
 
-gearoenix::render::camera::Camera::Camera(Camera&&) noexcept = default;
+gearoenix::render::camera::Camera::Camera(Camera&& o) noexcept
+    : core::ecs::Component(this)
+    , e(o.e)
+    , view(o.view)
+    , projection(o.projection)
+    , view_projection(o.view_projection)
+    , starting_clip_ending_clip(o.starting_clip_ending_clip)
+    , target(std::move(o.target))
+    , reference_id(o.reference_id)
+    , scene_id(o.scene_id)
+    , flag(o.flag)
+    , target_aspect_ratio(o.target_aspect_ratio)
+    , far(o.far)
+    , near(o.near)
+    , scale_fovy(o.scale_fovy)
+    , colour_tuning(o.colour_tuning)
+    , projection_type(o.projection_type)
+    , layer(o.layer)
+    , usage(o.usage)
+    , use_target_aspect_ratio(o.use_target_aspect_ratio)
+    , debug_enabled(o.debug_enabled)
+    , debug_colour(o.debug_colour)
+    , debug_mesh(o.debug_mesh)
+    , has_bloom(o.has_bloom)
+    , resolution_cfg_listener(o.resolution_cfg_listener)
+{
+    o.resolution_cfg_listener = 0;
+}
 
-gearoenix::render::camera::Camera::~Camera() noexcept = default;
+gearoenix::render::camera::Camera::~Camera() noexcept
+{
+    e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_listener(resolution_cfg_listener);
+}
 
 void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v) noexcept
 {
@@ -128,8 +164,9 @@ void gearoenix::render::camera::Camera::show_gui() noexcept
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Aspect Ratio", &target_aspect_ratio, 0.01f, 1.0f, "%.3f");
-        input_changed |= ImGui::InputFloat("HDR Tune Mapping", &hdr_tune_mapping, 0.01f, 1.0f, "%.6f");
-        input_changed |= ImGui::InputFloat("Gamma Correction", &gamma_correction, 0.01f, 1.0f, "%.6f");
+        /// TODO
+        // input_changed |= ImGui::InputFloat("HDR Tune Mapping", &hdr_tune_mapping, 0.01f, 1.0f, "%.6f");
+        // input_changed |= ImGui::InputFloat("Gamma Correction", &gamma_correction, 0.01f, 1.0f, "%.6f");
         input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "Scale" : "Field Of View Y", &scale_fovy, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::Checkbox("Show debug mesh", &debug_enabled);
         if (input_changed)
@@ -192,4 +229,25 @@ void gearoenix::render::camera::Camera::set_use_target_aspect_ratio(const bool b
         set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
     }
     use_target_aspect_ratio = b;
+}
+
+void gearoenix::render::camera::Camera::set_resolution_config(const gearoenix::render::Resolution& resolution) noexcept
+{
+    if (nullptr != target)
+        return;
+    if (!use_target_aspect_ratio)
+        return;
+    switch (resolution.index()) {
+    case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
+        const auto& res = std::get<FixedResolution>(resolution);
+        set_target_aspect_ratio(static_cast<float>(res.width) / static_cast<float>(res.height));
+        break;
+    }
+    case boost::mp11::mp_find<Resolution, ScreenBasedResolution>::value: {
+        const auto& res = std::get<ScreenBasedResolution>(resolution);
+        const auto wh = (e.get_platform_application().get_base().get_window_size() * static_cast<int>(res.nom)) / static_cast<int>(res.dom);
+        set_target_aspect_ratio(static_cast<float>(wh.x) / static_cast<float>(wh.y));
+        break;
+    }
+    }
 }

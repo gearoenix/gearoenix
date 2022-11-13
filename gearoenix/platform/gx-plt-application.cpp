@@ -3,6 +3,7 @@
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-parallel-for.hpp"
+#include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include <imgui/imgui.h>
 
@@ -13,6 +14,7 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
     : configuration(configuration)
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
+    , asset_worker(new core::sync::WorkWaiter())
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -288,5 +290,5 @@ double gearoenix::platform::BaseApplication::normalise_y(const double y) const n
 
 gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const noexcept
 {
-    return math::Vec2<double>(normalise_x(x), normalise_y(y));
+    return { normalise_x(x), normalise_y(y) };
 }

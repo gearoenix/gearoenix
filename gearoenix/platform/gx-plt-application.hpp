@@ -22,6 +22,10 @@ namespace gearoenix::core {
 struct Application;
 }
 
+namespace gearoenix::core::sync {
+struct WorkWaiter;
+}
+
 namespace gearoenix::core::event {
 struct Engine;
 }
@@ -37,9 +41,10 @@ struct BaseApplication final {
 
     typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
 
-    GX_GET_CREF_PRV(RuntimeConfiguration, configuration);
+    GX_GET_REF_PRV(RuntimeConfiguration, configuration);
     GX_GET_CREF_PRV(Arguments, arguments);
     GX_GET_VAL_PRV(bool, running, true);
+    GX_GET_CREF_PRV(math::Vec2<int>, screen_size);
     GX_GET_VAL_PRV(bool, window_resizing, false);
     GX_GET_CREF_PRV(math::Vec2<int>, previous_window_size);
     GX_GET_CREF_PRV(math::Vec2<int>, window_size);
@@ -58,6 +63,7 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(TouchStateMap, touch_states);
     GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);
     GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now());
+    GX_GET_UCPTR_PRV(core::sync::WorkWaiter, asset_worker);
 
 public:
     BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;

@@ -11,6 +11,7 @@
 
 gearoenix::gl::material::Pbr::Pbr(Engine& e, const core::sync::EndCallerIgnored& c) noexcept
     : render::material::Pbr(e, c)
+    , gl::material::Material(false)
     , gl_albedo(std::dynamic_pointer_cast<Texture2D>(albedo))
     , gl_normal(std::dynamic_pointer_cast<Texture2D>(normal))
     , gl_emission(std::dynamic_pointer_cast<Texture2D>(emission))

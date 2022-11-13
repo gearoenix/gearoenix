@@ -11,6 +11,7 @@
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/light/gx-rnd-lt-directional.hpp"
 #include "../../render/light/gx-rnd-lt-light.hpp"
+#include "../../render/material/gx-rnd-mat-material.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
@@ -30,19 +31,19 @@
 #include "../gx-gl-texture.hpp"
 #include "../material/gx-gl-material.hpp"
 #include "../shader/gx-gl-shd-bloom.hpp"
+#include "../shader/gx-gl-shd-ctaa.hpp"
 #include "../shader/gx-gl-shd-deferred-pbr-transparent.hpp"
 #include "../shader/gx-gl-shd-deferred-pbr.hpp"
 #include "../shader/gx-gl-shd-final.hpp"
-#include "../shader/gx-gl-shd-gbuffers-filler.hpp"
-#include "../shader/gx-gl-shd-gcaa.hpp"
 #include "../shader/gx-gl-shd-irradiance.hpp"
 #include "../shader/gx-gl-shd-manager.hpp"
 #include "../shader/gx-gl-shd-radiance.hpp"
 #include "../shader/gx-gl-shd-skybox-cube.hpp"
 #include "../shader/gx-gl-shd-skybox-equirectangular.hpp"
 #include "../shader/gx-gl-shd-ssao-resolve.hpp"
-#include "../shader/gx-gl-shd-unlit-coloured.hpp"
+#include "../shader/gx-gl-shd-unlit.hpp"
 #include <algorithm>
+#include <boost/mp11/algorithm.hpp>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)
@@ -60,13 +61,39 @@
 
 void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes() noexcept
 {
-    const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
-    back_buffer_size.x = cfg.get_runtime_resolution_width();
-    back_buffer_size.y = cfg.get_runtime_resolution_height();
+    auto& plt = e.get_platform_application().get_base();
+    auto& cfg = plt.get_configuration().get_render_configuration();
+    back_buffer_size_changed();
+    resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) noexcept -> bool {
+        back_buffer_size_changed();
+        return true;
+    });
+}
+
+void gearoenix::gl::submission::Manager::back_buffer_size_changed() noexcept
+{
+    const auto& resolution = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get();
+    switch (resolution.index()) {
+    case boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value: {
+        const auto& res = std::get<render::FixedResolution>(resolution);
+        back_buffer_size = math::Vec2<uint>(res.width, res.height);
+        break;
+    }
+    case boost::mp11::mp_find<render::Resolution, render::ScreenBasedResolution>::value: {
+        const auto& res = std::get<render::ScreenBasedResolution>(resolution);
+        back_buffer_size = (math::Vec2<uint>(e.get_platform_application().get_base().get_window_size()) * static_cast<uint>(res.nom)) / static_cast<uint>(res.dom);
+        break;
+    }
+    }
+
     back_buffer_aspect_ratio = static_cast<float>(back_buffer_size.x) / static_cast<float>(back_buffer_size.y);
-    back_buffer_uv_move.x = 1.0f / static_cast<float>(back_buffer_size.x);
-    back_buffer_uv_move.y = 1.0f / static_cast<float>(back_buffer_size.y);
+    back_buffer_uv_move = math::Vec2(1.0f) / math::Vec2<float>(back_buffer_size);
     back_buffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(back_buffer_size.x), static_cast<sizei>(back_buffer_size.y));
+
+    initialise_gbuffers();
+    initialise_ssao();
+    initialise_final();
+    initialise_bloom();
 }
 
 void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
@@ -417,6 +444,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
                     .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                     .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
                     .material = model->get_mat().get(),
+                    .render_material = render_model->get_bound_material().get(),
                     .vertex_object = mesh.vertex_object,
                     .indices_count = mesh.indices_count,
                     // Reflection probe data
@@ -469,6 +497,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
                             .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                             .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
                             .material = gl_model->get_mat().get(),
+                            .render_material = render_model->get_bound_material().get(),
                             .vertex_object = mesh.vertex_object,
                             .indices_count = mesh.indices_count,
                             // Reflection probe data
@@ -578,7 +607,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             gl::Camera* const gl_camera,
             physics::collider::Frustum* const frustum,
             physics::Transformation* const transform,
-            const unsigned int /*kernel_index*/) noexcept {
+            const unsigned int /*kernel_index*/) noexcept -> void {
             if (!render_camera->enabled || scene_id != render_camera->get_scene_id())
                 return;
             const auto camera_location = transform->get_global_location();
@@ -601,6 +630,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 break;
             }
             auto& camera_data = camera_pool[camera_pool_index];
+            camera_data.clear();
             math::Vec2<std::size_t> target_dimension;
             if (nullptr != gl_camera->target) {
                 camera_data.framebuffer = gl_camera->target->get_framebuffer();
@@ -616,16 +646,9 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             camera_data.vp = render_camera->get_view_projection();
             camera_data.pos = math::Vec3<float>(camera_location);
             camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
-            camera_data.hdr_tune_mapping = render_camera->get_hdr_tune_mapping();
-            camera_data.gamma_correction = render_camera->get_gamma_correction();
-            camera_data.opaque_models_data.clear();
-            camera_data.translucent_models_data.clear();
+            camera_data.colour_tuning = render_camera->get_colour_tuning();
+            camera_data.has_bloom = render_camera->get_has_bloom();
             camera_data.out_reference = render_camera->get_reference_id();
-
-            for (auto& v : camera_data.threads_opaque_models_data)
-                v.clear();
-            for (auto& v : camera_data.threads_translucent_models_data)
-                v.clear();
 
             // Recoding static models
             bvh.call_on_intersecting(*frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
@@ -640,8 +663,11 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     m.radiance = black_cube->get_object();
                     m.radiance_lod_coefficient = 0.0f;
                 }
-                camera_data.opaque_models_data.emplace_back(dis, m);
-                // TODO opaque/translucent in ModelBvhData
+                if (m.render_material->get_transparency() == render::material::Transparency::Transparent) {
+                    camera_data.threads_translucent_models_data[0].emplace_back(dis, m);
+                } else {
+                    camera_data.threads_opaque_models_data[0].emplace_back(dis, m);
+                }
             });
 
             // Recording dynamic models
@@ -659,87 +685,59 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     md.radiance = black_cube->get_object();
                     md.radiance_lod_coefficient = 0.0f;
                 }
-                camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
-                // TODO opaque/translucent in ModelBvhData
+                if (md.render_material->get_transparency() == render::material::Transparency::Transparent) {
+                    camera_data.threads_translucent_models_data[kernel_index].emplace_back(dis, md);
+                } else {
+                    camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
+                }
             });
 
             for (auto& v : camera_data.threads_opaque_models_data)
-                std::move(v.begin(), v.end(), std::back_inserter(camera_data.opaque_models_data));
-
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.models_data));
+            const auto last_opaque_index = static_cast<decltype(camera_data.models_data)::difference_type>(camera_data.models_data.size());
             for (auto& v : camera_data.threads_translucent_models_data)
-                std::move(v.begin(), v.end(), std::back_inserter(camera_data.translucent_models_data));
+                std::move(v.begin(), v.end(), std::back_inserter(camera_data.models_data));
 
             std::sort(
                 GX_ALGORITHM_EXECUTION
-                    camera_data.opaque_models_data.begin(),
-                camera_data.opaque_models_data.end(),
+                    camera_data.models_data.begin(),
+                camera_data.models_data.begin() + last_opaque_index,
                 [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
             std::sort(
                 GX_ALGORITHM_EXECUTION
-                    camera_data.translucent_models_data.begin(),
-                camera_data.translucent_models_data.end(),
+                        camera_data.models_data.begin()
+                    + last_opaque_index,
+                camera_data.models_data.end(),
                 [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
 
-            if (render_camera->get_usage() == render::camera::Camera::Usage::Shadow) {
-                for (auto& m : camera_data.opaque_threads_mvps)
-                    m.clear();
-                for (auto& m : camera_data.translucent_threads_mvps)
-                    m.clear();
-                core::sync::ParallelFor::execi(
-                    camera_data.opaque_models_data.begin(),
-                    camera_data.opaque_models_data.end(),
-                    [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
-                        auto& m = d_m.second;
-                        if (m.bones_count > 0) {
-                            const auto last_bone_index = m.first_bone_index + m.bones_count;
-                            for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
-                                auto& bone_data = scene_data.bones_data[i];
-                                camera_data.opaque_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
-                            }
-                        } else {
-                            camera_data.opaque_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
+            core::sync::ParallelFor::execi(
+                camera_data.models_data.begin(),
+                camera_data.models_data.end(),
+                [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
+                    auto& m = d_m.second;
+                    if (!m.material->needs_mvp && render_camera->get_usage() != render::camera::Camera::Usage::Shadow)
+                        return;
+                    if (m.bones_count > 0) {
+                        const auto last_bone_index = m.first_bone_index + m.bones_count;
+                        for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
+                            auto& bone_data = scene_data.bones_data[i];
+                            camera_data.threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
                         }
-                    });
-                core::sync::ParallelFor::execi(
-                    camera_data.translucent_models_data.begin(),
-                    camera_data.translucent_models_data.end(),
-                    [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
-                        auto& m = d_m.second;
-                        if (m.bones_count > 0) {
-                            const auto last_bone_index = m.first_bone_index + m.bones_count;
-                            for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
-                                auto& bone_data = scene_data.bones_data[i];
-                                camera_data.translucent_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
-                            }
-                        } else {
-                            camera_data.translucent_threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
-                        }
-                    });
-                camera_data.mvps.clear();
-                auto current_model_index = static_cast<std::size_t>(-1);
-                for (auto& ms : camera_data.opaque_threads_mvps) {
-                    for (auto& im : ms) {
-                        if (current_model_index != im.first) {
-                            camera_data.opaque_models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
-                            current_model_index = im.first;
-                        }
-                        camera_data.mvps.push_back(im.second);
+                    } else {
+                        camera_data.threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
                     }
-                }
-                current_model_index = static_cast<std::size_t>(-1);
-                for (auto& ms : camera_data.translucent_threads_mvps) {
-                    for (auto& im : ms) {
-                        if (current_model_index != im.first) {
-                            camera_data.translucent_models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
-                            current_model_index = im.first;
-                        }
-                        camera_data.mvps.push_back(im.second);
+                });
+            auto current_model_index = static_cast<std::size_t>(-1);
+            for (auto& ms : camera_data.threads_mvps) {
+                for (auto& im : ms) {
+                    if (current_model_index != im.first) {
+                        camera_data.models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
+                        current_model_index = im.first;
                     }
+                    camera_data.mvps.push_back(im.second);
                 }
             }
-            camera_data.debug_meshes.clear();
-            for (auto& v : camera_data.debug_meshes_threads)
-                v.clear();
+
             core::sync::ParallelFor::exec(
                 scene_data.debug_mesh_data.begin(),
                 scene_data.debug_mesh_data.end(),
@@ -768,8 +766,7 @@ void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera) no
     set_framebuffer(camera.framebuffer);
     set_viewport_clip(camera.viewport_clip);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    auto txt_index_albedo = static_cast<enumerated>(-1);
-    for (auto& distance_model_data : camera.opaque_models_data) {
+    for (auto& distance_model_data : camera.models_data) {
         auto& model_data = distance_model_data.second;
         model_data.material->shadow(model_data, camera, current_shader);
     }
@@ -899,13 +896,14 @@ void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render_skyboxes(scene, camera);
     GX_GL_CHECK_D;
-    glDisable(GL_BLEND);
+    glEnable(GL_BLEND); /// TODO: take it into a context and material must decide
     // Rendering forward pbr
-    for (auto& distance_model_data : camera.opaque_models_data) {
+    for (auto& distance_model_data : camera.models_data) {
         auto& model_data = distance_model_data.second;
         model_data.material->forward_render(model_data, camera, scene, current_shader);
         GX_GL_CHECK_D;
     }
+    glDisable(GL_BLEND); /// TODO: take it into a context and material must decide
 }
 
 void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
@@ -924,7 +922,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             set_viewport_clip(camera.viewport_clip);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            for (auto& distance_model_data : camera.opaque_models_data) {
+            for (auto& distance_model_data : camera.models_data) {
                 auto& model_data = distance_model_data.second;
                 model_data.material->deferred_gbuffer_render(model_data, camera, scene, current_shader);
             }
@@ -1037,25 +1035,28 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
 void gearoenix::gl::submission::Manager::render_bloom(const Scene& scene, const Camera& camera) noexcept
 {
     GX_GL_CHECK_D;
-    set_framebuffer(bloom_horizontal_target->get_framebuffer());
-    set_viewport_clip(back_buffer_viewport_clip);
-    auto& horizontal_shader = bloom_shader_combination->get(true);
-    horizontal_shader.bind(current_shader);
-    horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
-    glBindVertexArray(screen_vertex_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    set_framebuffer(bloom_vertical_target->get_framebuffer());
-    set_viewport_clip(back_buffer_viewport_clip);
-    auto& vertical_shader = bloom_shader_combination->get(false);
-    vertical_shader.bind(current_shader);
-    vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
-    glBindVertexArray(screen_vertex_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    if (camera.has_bloom) {
+        set_framebuffer(bloom_horizontal_target->get_framebuffer());
+        set_viewport_clip(back_buffer_viewport_clip);
+        auto& horizontal_shader = bloom_shader_combination->get(true);
+        horizontal_shader.bind(current_shader);
+        horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
+        glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        set_framebuffer(bloom_vertical_target->get_framebuffer());
+        set_viewport_clip(back_buffer_viewport_clip);
+        auto& vertical_shader = bloom_shader_combination->get(false);
+        vertical_shader.bind(current_shader);
+        vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
+        glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
 
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
@@ -1072,14 +1073,16 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& scene, const 
         const auto screen_x = (static_cast<sizei>(window_size.x) - screen_width) / 2;
         set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
     }
-    gama_correction_colour_tuning_anti_aliasing_shader->bind(current_shader);
-    const math::Vec4<float> ssuv_htm_gc(back_buffer_uv_move, camera.hdr_tune_mapping, camera.gamma_correction);
-    gama_correction_colour_tuning_anti_aliasing_shader->set_screen_space_uv_exposure_gamma_data(reinterpret_cast<const float*>(&ssuv_htm_gc));
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_low_texture_index()));
+
+    auto& colour_tuning_anti_aliasing_shader = colour_tuning_anti_aliasing_shader_combination->get(camera.colour_tuning);
+    colour_tuning_anti_aliasing_shader.bind(current_shader);
+    colour_tuning_anti_aliasing_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    colour_tuning_anti_aliasing_shader.set(camera.colour_tuning);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_low_texture_index()));
     glBindTexture(GL_TEXTURE_2D, low_bloom_texture->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_high_texture_index()));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_high_texture_index()));
     glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(gama_correction_colour_tuning_anti_aliasing_shader->get_depth_texture_index()));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_depth_texture_index()));
     glBindTexture(GL_TEXTURE_2D, depth_bloom_texture->get_object());
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -1090,12 +1093,12 @@ void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-    unlit_coloured_shader->bind(current_shader);
+    unlit_coloured_shader.bind(current_shader);
     for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
         const auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
         for (const auto& mesh : camera.debug_meshes) {
-            unlit_coloured_shader->set_mvp_data(reinterpret_cast<const float*>(&mesh.m));
-            unlit_coloured_shader->set_colour_data(reinterpret_cast<const float*>(&mesh.colour));
+            unlit_coloured_shader.set_mvp_data(reinterpret_cast<const float*>(&mesh.m));
+            unlit_coloured_shader.set_albedo_factor_data(reinterpret_cast<const float*>(&mesh.colour));
             glBindVertexArray(mesh.vertex_object);
             glDrawElements(GL_LINES, mesh.indices_count, GL_UNSIGNED_INT, nullptr);
         }
@@ -1140,7 +1143,6 @@ void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_
 gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     : e(e)
     , final_shader(e.get_specification().is_deferred_supported ? new shader::Final(e) : nullptr)
-    , gama_correction_colour_tuning_anti_aliasing_shader(new shader::GamaCorrectionColourTuningAntiAliasing(e))
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
     , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
     , irradiance_shader(new shader::Irradiance(e))
@@ -1148,18 +1150,16 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , skybox_cube_shader(new shader::SkyboxCube(e))
     , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
-    , unlit_coloured_shader(new shader::UnlitColoured(e))
+    , unlit_shader_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
+    , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
     , bloom_shader_combination(e.get_shader_manager()->get<shader::BloomCombination>())
+    , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
 {
     GX_LOG_D("Creating submission manager.");
     initialise_back_buffer_sizes();
-    initialise_gbuffers();
-    initialise_ssao();
-    initialise_final();
     initialise_screen_vertices();
-    initialise_bloom();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Pipeline settings
@@ -1173,7 +1173,10 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     e.todos.unload();
 }
 
-gearoenix::gl::submission::Manager::~Manager() noexcept = default;
+gearoenix::gl::submission::Manager::~Manager() noexcept
+{
+    e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_listener(resolution_cfg_listener_id);
+}
 
 void gearoenix::gl::submission::Manager::update() noexcept
 {
@@ -1201,6 +1204,13 @@ void gearoenix::gl::submission::Manager::update() noexcept
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
     e.get_platform_application().get_gl_context()->swap();
 #endif
+}
+
+void gearoenix::gl::submission::Manager::window_resized() noexcept
+{
+    if (e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value)
+        return;
+    back_buffer_size_changed();
 }
 
 #endif

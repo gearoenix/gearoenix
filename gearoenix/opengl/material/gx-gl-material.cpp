@@ -2,6 +2,11 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../platform/gx-plt-log.hpp"
 
+gearoenix::gl::material::Material::Material(const bool needs_mvp) noexcept
+    : needs_mvp(needs_mvp)
+{
+}
+
 gearoenix::gl::material::Material::~Material() noexcept = default;
 
 void gearoenix::gl::material::Material::shadow(

@@ -24,6 +24,9 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
 
+    sint max_texture_size = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+    specification.texture_maximum_aspect = static_cast<unsigned int>(max_texture_size > 2048 ? max_texture_size : 2048);
     sint max_attach = 0;
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attach);
     specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);
@@ -57,6 +60,7 @@ gearoenix::gl::Engine::~Engine() noexcept
     camera_manager = nullptr;
     material_manager = nullptr;
     todos.unload();
+    ImGui_ImplOpenGL3_DestroyFontsTexture();
     ImGui_ImplOpenGL3_Shutdown();
 }
 
@@ -81,10 +85,13 @@ void gearoenix::gl::Engine::end_frame() noexcept
 
 void gearoenix::gl::Engine::window_resized() noexcept
 {
+    render::engine::Engine::window_resized();
+    submission_manager->window_resized();
 }
 
 void gearoenix::gl::Engine::upload_imgui_fonts() noexcept
 {
+    ImGui_ImplOpenGL3_CreateFontsTexture();
 }
 
 bool gearoenix::gl::Engine::is_supported() noexcept

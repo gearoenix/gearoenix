@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
-#include "gx-rnd-cmr-builder.hpp"
 #include <memory>
 
 namespace gearoenix::render::engine {
@@ -25,6 +24,7 @@ public:
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build(const std::string& name) noexcept = 0;
     virtual void update() noexcept;
+    virtual void window_resized() noexcept;
 };
 }
 #endif

@@ -4,14 +4,15 @@
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
-#include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
+#include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
@@ -45,7 +46,7 @@ struct GameApp final : public gearoenix::core::Application {
         for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
             for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
                 auto material = render_engine.get_material_manager()->get_pbr(
-                        "material-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i), end_callback);
+                    "material-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i), end_callback);
                 material->get_albedo_factor().x = 0.999f;
                 material->get_albedo_factor().y = 0.1f;
                 material->get_albedo_factor().z = 0.4f;

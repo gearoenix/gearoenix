@@ -7,6 +7,10 @@
 #include "../gx-gl-types.hpp"
 #include <array>
 
+namespace gearoenix::render::material {
+struct Material;
+}
+
 namespace gearoenix::gl::material {
 struct Material;
 }
@@ -16,6 +20,7 @@ struct Model final {
     math::Mat4x4<float> m;
     math::Mat4x4<float> inv_m;
     material::Material* material = nullptr;
+    render::material::Material* render_material = nullptr;
     std::size_t directional_lights_count = 0;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_direction;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_colour;
@@ -48,7 +53,7 @@ struct DynamicModel final {
 
 struct DebugModel final {
     math::Mat4x4<float> m;
-    math::Vec3<float> colour;
+    math::Vec4<float> colour;
     uint vertex_object = 0;
     sizei indices_count = 0;
 };

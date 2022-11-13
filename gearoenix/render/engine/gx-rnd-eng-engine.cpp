@@ -3,6 +3,7 @@
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
+#include "../font/gx-rnd-fnt-manager.hpp"
 #include "../gx-rnd-gltf-loader.hpp"
 #include "../light/gx-rnd-lt-manager.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
@@ -38,6 +39,7 @@ gearoenix::render::engine::Engine::Engine(
     , platform_application(platform_application)
     , physics_engine(new physics::Engine(*this))
     , scene_manager(new scene::Manager(*this))
+    , font_manager(new font::Manager(*this))
     , world(new core::ecs::World())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
@@ -110,9 +112,14 @@ void gearoenix::render::engine::Engine::start_frame() noexcept
 
 void gearoenix::render::engine::Engine::end_frame() noexcept
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame, in start_frame of Engine, we prepare every thing for user intraction
+    physics_engine->start_frame(); // Don't mistake this with the actual start of frame, in start_frame of Engine, we prepare every thing for user interaction
     camera_manager->update();
     scene_manager->update();
     reflection_manager->update();
     physics_engine->end_frame();
+}
+
+void gearoenix::render::engine::Engine::window_resized() noexcept
+{
+    camera_manager->window_resized();
 }

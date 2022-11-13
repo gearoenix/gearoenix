@@ -7,6 +7,8 @@
 #include "../gx-gl-constants.hpp"
 #include "../gx-gl-loader.hpp"
 #include "../gx-gl-types.hpp"
+#include <array>
+#include <optional>
 #include <sstream>
 
 #define GX_GL_UNIFORM_FAILED (-1)

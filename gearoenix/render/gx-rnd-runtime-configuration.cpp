@@ -2,6 +2,7 @@
 #include "../math/gx-math-numeric.hpp"
 
 gearoenix::render::RuntimeConfiguration::RuntimeConfiguration() noexcept
+    : runtime_resolution(FixedResolution {})
 {
     set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution);
 }

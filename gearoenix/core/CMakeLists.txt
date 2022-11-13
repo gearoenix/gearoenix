@@ -68,6 +68,7 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-language.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-observed.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-pool.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-project.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-project.hpp

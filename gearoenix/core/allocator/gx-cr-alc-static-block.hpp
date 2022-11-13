@@ -13,10 +13,7 @@ struct StaticBlock final {
     struct std_deleter {
         StaticBlock<Size>& ref;
 
-        void operator()(T const* p) noexcept
-        {
-            ref.template free(p);
-        }
+        void operator()(T const* p) noexcept;
     };
 
 private:
@@ -60,6 +57,13 @@ public:
         released_offsets.template emplace(sz, v);
     }
 };
+}
+
+template <std::size_t Size>
+template <typename T>
+void gearoenix::core::allocator::StaticBlock<Size>::std_deleter<T>::operator()(const T* p) noexcept
+{
+    ref.free(p);
 }
 
 #endif

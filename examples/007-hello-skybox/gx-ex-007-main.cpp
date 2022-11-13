@@ -1,6 +1,7 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>

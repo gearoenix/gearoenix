@@ -6,6 +6,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-colour-tuning.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp
@@ -16,13 +17,10 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-specification.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-type.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/engine/gx-rnd-eng-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-2d.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-2d.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-font.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-font.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-font.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-font.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
@@ -67,6 +65,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.cpp
@@ -115,6 +115,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-resolution.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-vertex.cpp

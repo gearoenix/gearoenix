@@ -5,10 +5,15 @@
 
 gearoenix::render::material::Unlit::Unlit(engine::Engine& e, const core::sync::EndCallerIgnored& c) noexcept
     : Material(Id::Unlit)
-    , albedo_factor(1.0f)
+    , albedo_factor(1.0f, 1.0f, 1.0f, 1.0f)
 {
     const auto& tm = e.get_texture_manager();
     albedo = tm->create_2d_from_colour(math::Vec4(1.0f, 1.0f, 1.0f, 1.0f), c);
 }
 
 gearoenix::render::material::Unlit::~Unlit() noexcept = default;
+
+void gearoenix::render::material::Unlit::set_albedo(const std::shared_ptr<texture::Texture2D>& t) noexcept
+{
+    albedo = t;
+}

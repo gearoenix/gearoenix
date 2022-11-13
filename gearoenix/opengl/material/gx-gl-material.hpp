@@ -17,6 +17,9 @@ struct Scene;
 
 namespace gearoenix::gl::material {
 struct Material {
+    const bool needs_mvp;
+
+    explicit Material(bool needs_mvp) noexcept;
     virtual ~Material() noexcept;
     virtual void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) noexcept;
     virtual void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) noexcept;

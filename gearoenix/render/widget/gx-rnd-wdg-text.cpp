@@ -3,7 +3,7 @@
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
-#include "../font/gx-rnd-fnt-2d.hpp"
+#include "../font/gx-rnd-fnt-font.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-builder.hpp"

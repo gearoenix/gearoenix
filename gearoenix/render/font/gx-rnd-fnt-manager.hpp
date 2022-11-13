@@ -1,12 +1,8 @@
 #ifndef GEAROENIX_RENDER_FONT_MANAGER_HPP
 #define GEAROENIX_RENDER_FONT_MANAGER_HPP
-#include "../../core/cache/gx-cr-cache-file.hpp"
-#include "../../core/gx-cr-types.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-
-namespace gearoenix::ystem::stream {
-struct Stream;
-}
+#include <boost/container/flat_map.hpp>
+#include <memory>
+#include <string>
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -14,18 +10,16 @@ struct Engine;
 
 namespace gearoenix::render::font {
 struct Font;
-struct Font2D;
-struct Manager {
-    GX_GET_CREF_PRV(core::cache::File<Font>, cache)
-protected:
-    engine::Engine* const e;
-    std::shared_ptr<Font2D> default_2d;
+struct Manager final {
+    engine::Engine& e;
+
+private:
+    boost::container::flat_map<std::string, std::shared_ptr<Font>> fonts;
 
 public:
-    Manager(std::unique_ptr<platform::stream::Stream> s, engine::Engine* e) noexcept;
-    ~Manager() noexcept = default;
-    std::shared_ptr<Font> get(core::Id mid, core::sync::EndCaller<Font> c) noexcept;
-    std::shared_ptr<Font2D> get_default_2d(core::sync::EndCaller<Font> c) noexcept;
+    explicit Manager(engine::Engine& e) noexcept;
+    ~Manager() noexcept;
+    [[nodiscard]] std::shared_ptr<Font> get(const std::string& name) noexcept;
 };
 }
 #endif

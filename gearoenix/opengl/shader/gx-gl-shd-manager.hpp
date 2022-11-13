@@ -16,6 +16,7 @@ struct Manager final {
     Engine& e;
 
 private:
+    /// TODO: use static-allocator in the core
     boost::container::flat_map<std::type_index, std::weak_ptr<ShaderCombination>> shaders;
 
 public:

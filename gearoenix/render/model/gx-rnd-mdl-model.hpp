@@ -3,7 +3,6 @@
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-aabb.hpp"
-#include "../gx-rnd-translucency-mode.hpp"
 #include "../texture/gx-rnd-txt-binding-point.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>

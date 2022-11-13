@@ -3,14 +3,17 @@
 #include "gx-rnd-mat-material.hpp"
 
 namespace gearoenix::render::material {
-struct Unlit final : public Material {
-    GX_GET_REF_PRV(math::Vec4<float>, albedo_factor);
-    GX_GETSET_VAL_PRV(float, alpha_cutoff, 0.0);
-    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, albedo);
+struct Unlit : public Material {
+    GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
+    GX_GETSET_VAL_PRT(float, alpha_cutoff, 0.0);
+    GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, albedo);
+
+protected:
+    Unlit(engine::Engine& e, const core::sync::EndCallerIgnored& c) noexcept;
 
 public:
-    explicit Unlit(engine::Engine& e, const core::sync::EndCallerIgnored& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    ~Unlit() noexcept final;
+    ~Unlit() noexcept override;
+    virtual void set_albedo(const std::shared_ptr<texture::Texture2D>& t) noexcept;
 };
 }
 #endif

@@ -2,6 +2,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../gx-gl-engine.hpp"
 #include "gx-gl-mat-pbr.hpp"
+#include "gx-gl-mat-unlit.hpp"
 
 std::shared_ptr<gearoenix::render::material::Pbr> gearoenix::gl::material::Manager::construct_pbr(
     const std::string& name,
@@ -14,7 +15,7 @@ std::shared_ptr<gearoenix::render::material::Unlit> gearoenix::gl::material::Man
     const std::string& name,
     const core::sync::EndCallerIgnored& c) noexcept
 {
-    GX_UNIMPLEMENTED;
+    return allocator.make_shared<Unlit>(gl_e, c);
 }
 
 gearoenix::gl::material::Manager::Manager(Engine& e) noexcept

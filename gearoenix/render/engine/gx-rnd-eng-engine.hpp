@@ -29,6 +29,10 @@ namespace gearoenix::render::camera {
 struct Manager;
 }
 
+namespace gearoenix::render::font {
+struct Manager;
+}
+
 namespace gearoenix::render::light {
 struct Manager;
 }
@@ -81,6 +85,7 @@ struct Engine {
     GX_GET_UPTR_PRT(texture::Manager, texture_manager);
     GX_GET_UPTR_PRT(skybox::Manager, skybox_manager);
     GX_GET_UPTR_PRT(reflection::Manager, reflection_manager);
+    GX_GET_UPTR_PRT(font::Manager, font_manager);
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_UPTR_PRT(core::ecs::World, world);
     GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
@@ -96,7 +101,7 @@ public:
     virtual ~Engine() noexcept;
     virtual void start_frame() noexcept;
     virtual void end_frame() noexcept;
-    virtual void window_resized() noexcept = 0;
+    virtual void window_resized() noexcept;
     virtual void upload_imgui_fonts() noexcept = 0;
 };
 }

@@ -3,6 +3,8 @@
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
+#include "../gx-rnd-resolution.hpp"
+#include "gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include <array>
 
@@ -52,20 +54,22 @@ struct Camera final : public core::ecs::Component {
     GX_GET_VAL_PRV(float, far, 100.0f);
     GX_GET_VAL_PRV(float, near, 1.0f);
     GX_GET_VAL_PRV(float, scale_fovy, 0.8f);
-    GX_GETSET_VAL_PRV(float, hdr_tune_mapping, 1.0f);
-    GX_GETSET_VAL_PRV(float, gamma_correction, 2.2f);
+    GX_GET_REF_PRV(ColourTuning, colour_tuning);
     GX_GET_VAL_PRV(Projection, projection_type, Projection::Perspective);
     GX_GETSET_VAL_PRV(double, layer, 0.0);
     GX_GETSET_VAL_PRV(Usage, usage, Usage::Main);
     GX_GET_VAL_PRV(bool, use_target_aspect_ratio, true);
     GX_GET_VAL_PRV(bool, debug_enabled, false);
-    GX_GET_REFC_PRV(math::Vec3<float>, debug_colour);
+    GX_GET_REFC_PRV(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, debug_mesh);
+    GX_GETSET_VAL_PRV(bool, has_bloom, true);
+    GX_GET_VAL_PRV(std::size_t, resolution_cfg_listener, 0);
 
 public:
     explicit Camera(
         engine::Engine& e,
         float target_aspect_ratio,
+        std::size_t resolution_cfg_listener,
         Projection projection_type = Projection::Perspective,
         float near = 1.0f,
         float far = 100.0f) noexcept;
@@ -89,6 +93,7 @@ public:
     void enable_debug_mesh() noexcept;
     void disable_debug_mesh() noexcept;
     void set_use_target_aspect_ratio(bool b) noexcept;
+    void set_resolution_config(const Resolution& res) noexcept;
 
 private:
     /// It must be changed by Builder or Manager, because the other components must know about the change

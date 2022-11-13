@@ -25,7 +25,7 @@ struct TextureCube;
 
 namespace gearoenix::gl::shader {
 struct BloomCombination;
-struct GamaCorrectionColourTuningAntiAliasing;
+struct ColourTuningAntiAliasingCombination;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
 struct Final;
@@ -34,15 +34,16 @@ struct Radiance;
 struct SkyboxCube;
 struct SkyboxEquirectangular;
 struct SsaoResolve;
-struct UnlitColoured;
+struct UnlitCombination;
+struct Unlit;
 }
 
 namespace gearoenix::gl::submission {
 struct Manager final {
 private:
     Engine& e;
+
     const std::unique_ptr<shader::Final> final_shader;
-    const std::unique_ptr<shader::GamaCorrectionColourTuningAntiAliasing> gama_correction_colour_tuning_anti_aliasing_shader;
     const std::unique_ptr<shader::DeferredPbr> deferred_pbr_shader;
     const std::unique_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
     const std::unique_ptr<shader::Irradiance> irradiance_shader;
@@ -50,8 +51,11 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
-    const std::unique_ptr<shader::UnlitColoured> unlit_coloured_shader;
+
     const std::shared_ptr<shader::BloomCombination> bloom_shader_combination;
+    const std::shared_ptr<shader::ColourTuningAntiAliasingCombination> colour_tuning_anti_aliasing_shader_combination;
+    const std::shared_ptr<shader::UnlitCombination> unlit_shader_combination;
+    shader::Unlit& unlit_coloured_shader;
 
     std::shared_ptr<Texture2D> gbuffers_albedo_metallic_texture;
     std::shared_ptr<Texture2D> gbuffers_position_depth_texture;
@@ -89,8 +93,10 @@ private:
     math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
+    std::size_t resolution_cfg_listener_id = 0;
 
     void initialise_back_buffer_sizes() noexcept;
+    void back_buffer_size_changed() noexcept;
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_final() noexcept;
@@ -124,6 +130,7 @@ public:
     explicit Manager(Engine& e) noexcept;
     ~Manager() noexcept;
     void update() noexcept;
+    void window_resized() noexcept;
 };
 }
 

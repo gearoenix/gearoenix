@@ -1,5 +1,6 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>

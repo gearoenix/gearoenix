@@ -24,10 +24,11 @@ void gearoenix::platform::Application::initialize_sdl() noexcept
 
 void gearoenix::platform::Application::initialize_screen() noexcept
 {
+    SDL_DisplayMode display_mode;
+    SDL_GetCurrentDisplayMode(0, &display_mode);
+    base.screen_size = math::Vec2<int>(static_cast<int>(display_mode.w), static_cast<int>(display_mode.h));
     if (base.configuration.get_fullscreen()) {
-        SDL_DisplayMode display_mode;
-        SDL_GetCurrentDisplayMode(0, &display_mode);
-        base.initialize_window_size(static_cast<int>(display_mode.w), static_cast<int>(display_mode.h));
+        base.initialize_window_size(base.screen_size.x, base.screen_size.y);
     }
     if (base.configuration.get_lanscape()) {
         SDL_SetHint(SDL_HINT_ORIENTATIONS, "Landscape");
@@ -68,6 +69,15 @@ void gearoenix::platform::Application::initialize_window() noexcept
         // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif
         SDL_GL_SetSwapInterval(1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        //        if (create_gl_window(3, 2, flags))
+        //            return;
+        if (create_gl_window(3, 1, flags))
+            return;
+        if (create_gl_window(3, 0, flags))
+            return;
+        if (create_gl_window(2, 0, flags))
+            return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         if (create_gl_window(4, 4, flags))
             return;
@@ -79,20 +89,7 @@ void gearoenix::platform::Application::initialize_window() noexcept
             return;
         if (create_gl_window(4, 0, flags))
             return;
-        // if (create_gl_window(3, 3, flags))
-        //     return;
-        // if (create_gl_window(3, 2, flags))
-        //     return;
-        // if (create_gl_window(3, 1, flags))
-        //     return;
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        if (create_gl_window(3, 2, flags))
-            return;
-        if (create_gl_window(3, 1, flags))
-            return;
-        if (create_gl_window(3, 0, flags))
-            return;
-        if (create_gl_window(2, 0, flags))
+        if (create_gl_window(3, 3, flags))
             return;
     }
 #endif
