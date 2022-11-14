@@ -26,7 +26,7 @@ public:
     virtual ~Manager() noexcept;
 
     [[nodiscard]] std::shared_ptr<Mesh> build_icosphere(std::size_t subdivisions = 3, core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_plate(core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_plate(const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> build_cube(core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> build_inward_cube(core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
     [[nodiscard]] std::shared_ptr<Mesh> build_face_square(texture::Face f, core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;

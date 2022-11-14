@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #include <memory>
+#include <string>
 
 namespace gearoenix::render::engine {
 struct Engine;

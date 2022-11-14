@@ -171,7 +171,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_plate(core::sync::EndCallerIgnored&& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_plate(const core::sync::EndCallerIgnored& c) noexcept
 {
     std::string name = "default-plate-mesh";
     {
@@ -205,7 +205,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
                 math::Vec2(1.0f, 1.0f)),
         },
         std::vector<std::uint32_t> { 0, 1, 2, 1, 3, 2 },
-        std::move(c));
+        c);
 }
 
 std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_cube(core::sync::EndCallerIgnored&& c) noexcept

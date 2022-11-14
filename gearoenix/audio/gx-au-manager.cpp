@@ -51,7 +51,7 @@ std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::u
 std::size_t gearoenix::audio::Manager::create_player(const std::string& name, const std::size_t audio_index, const bool is_loop) noexcept
 {
     FMOD::Channel* channel = nullptr;
-    GX_AUDIO_FMOD_RESULT_CHECK(engine.get_system()->playSound(audios[audio_index].sound, nullptr, false, &channel));
+    GX_AUDIO_FMOD_RESULT_CHECK(engine.get_system()->playSound(audios[audio_index].sound, nullptr, true, &channel));
     if (is_loop)
         GX_AUDIO_FMOD_RESULT_CHECK(channel->setLoopCount(-1));
     std::lock_guard<std::mutex> _ignore_lg(this_lock);
