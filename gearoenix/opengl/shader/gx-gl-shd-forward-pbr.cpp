@@ -199,7 +199,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    float geometry_schlick_k_inv = 1.0 - geometry_schlick_k;\n";
     fs << "    float one_minus_metallic = 1.0 - mtr.x;\n";
     fs << "\n";
-    for (int dir_i = 0; dir_i < directional_lights_count; ++dir_i) {
+    for (int dir_i = 0; dir_i < static_cast<int>(directional_lights_count); ++dir_i) {
         fs << "    {\n";
         fs << "        float normal_dot_light = max(dot(nrm, directional_light_direction[" << dir_i << "]), 0.00001);\n";
         fs << "        lumination += compute_light(\n";
@@ -218,7 +218,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "            alb.xyz);\n";
         fs << "    }\n";
     }
-    for (int dir_i = 0; dir_i < shadow_casters_directional_lights_count; ++dir_i) {
+    for (int dir_i = 0; dir_i < static_cast<int>(shadow_casters_directional_lights_count); ++dir_i) {
         fs << "    {\n";
         fs << "        float normal_dot_light = max(dot(nrm, shadow_caster_directional_light_direction[" << dir_i << "]), 0.00001);\n";
         fs << "        float shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);\n";

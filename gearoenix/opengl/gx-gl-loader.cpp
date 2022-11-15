@@ -92,7 +92,7 @@ bool gearoenix::gl::extension_exists(const std::string& ext_name) noexcept
 }
 
 #ifdef GX_DEBUG_MODE
-void gearoenix::gl::debug_callback(
+void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
     const enumerated source,
     const enumerated t,
     const uint id,

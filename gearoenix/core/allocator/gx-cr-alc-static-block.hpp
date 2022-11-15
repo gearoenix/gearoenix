@@ -54,7 +54,7 @@ public:
         std::lock_guard<std::mutex> _lg(released_offsets_lock);
         const auto sz = *(reinterpret_cast<const std::size_t*>(t) - 1);
         std::memset(v, 0, sz);
-        released_offsets.template emplace(sz, v);
+        released_offsets.emplace(sz, v);
     }
 };
 }

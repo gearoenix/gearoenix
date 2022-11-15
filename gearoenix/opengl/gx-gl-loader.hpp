@@ -7,10 +7,11 @@
 #include <string>
 
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
-#define GX_GL_APIENTRY __stdcall*
+#define GX_GL_APIENTRY_TYPE __stdcall
 #else
-#define GX_GL_APIENTRY *
+#define GX_GL_APIENTRY_TYPE
 #endif
+#define GX_GL_APIENTRY GX_GL_APIENTRY_TYPE *
 
 namespace gearoenix::gl {
 typedef void(GX_GL_APIENTRY GX_GL_DEBUG_PROC)(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);
@@ -179,7 +180,7 @@ void unload_library() noexcept;
 [[nodiscard]] bool extension_exists(const std::string& ext_name) noexcept;
 
 #ifdef GX_DEBUG_MODE
-void debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);
+void GX_GL_APIENTRY_TYPE debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);
 #endif
 }
 #endif

@@ -135,7 +135,7 @@ void gearoenix::gl::material::Pbr::forward_render(
 void gearoenix::gl::material::Pbr::deferred_gbuffer_render(
     const submission::Model& model,
     const submission::Camera& camera,
-    const submission::Scene& scene,
+    const submission::Scene&,
     uint& current_shader) noexcept
 {
     auto& shader = *gbuffers_filler_combination;

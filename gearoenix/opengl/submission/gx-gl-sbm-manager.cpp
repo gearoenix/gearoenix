@@ -1032,7 +1032,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
     }
 }
 
-void gearoenix::gl::submission::Manager::render_bloom(const Scene& scene, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera& camera) noexcept
 {
     GX_GL_CHECK_D;
 

@@ -41,7 +41,7 @@ void gearoenix::gl::material::Unlit::shadow(
 void gearoenix::gl::material::Unlit::forward_render(
     const submission::Model& model,
     const submission::Camera& camera,
-    const submission::Scene& scene,
+    const submission::Scene&,
     uint& current_shader) noexcept
 {
     auto& shader = unlit_combination->get(false, true, true, true);
