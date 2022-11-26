@@ -30,7 +30,7 @@ struct Target final : public render::texture::Target {
     GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments);
 
 public:
-    Target(Engine& e, std::vector<render::texture::Attachment>&& attachments, const core::sync::EndCallerIgnored& end_callback) noexcept;
+    Target(Engine& e, std::vector<render::texture::Attachment>&& attachments, const core::sync::EndCaller& end_callback) noexcept;
     ~Target() noexcept final;
     void bind() noexcept;
 };

@@ -27,7 +27,7 @@ struct Texture2D final : public render::texture::Texture2D {
     GX_GET_VAL_PRV(uint, object, 0);
 
 private:
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept final;
 
 public:
     Texture2D(
@@ -46,7 +46,7 @@ struct TextureCube final : public render::texture::TextureCube {
     GX_GET_VAL_PRV(uint, object, 0);
 
 private:
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept final;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept final;
 
 public:
     TextureCube(
@@ -68,16 +68,16 @@ private:
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept final;
+        const core::sync::EndCaller& c) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_cube_from_pixels_v(
         std::string name,
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept final;
+        const core::sync::EndCaller& c) noexcept final;
     [[nodiscard]] std::shared_ptr<render::texture::Target> create_target_v(
         std::string name,
         std::vector<render::texture::Attachment>&& attachments,
-        const core::sync::EndCallerIgnored& c) noexcept final;
+        const core::sync::EndCaller& c) noexcept final;
 };
 }
 

@@ -172,7 +172,7 @@ void gearoenix::core::ecs::World::update_entity(std::optional<std::pair<Entity::
     get_entity(id)->index_in_archetype = i;
 }
 
-std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder() noexcept
+std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder(sync::EndCaller&& end_caller) noexcept
 {
-    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this));
+    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this, std::move(end_caller)));
 }

@@ -39,7 +39,7 @@ public:
         const math::Aabb3<double>& include_box,
         const std::shared_ptr<texture::TextureCube>& irradiance_texture,
         const std::shared_ptr<texture::TextureCube>& radiance_texture,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
     /// Creates runtime reflection probe
     Builder(
         engine::Engine& e,
@@ -50,7 +50,7 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
     Builder(Builder&&) = delete;
     Builder(const Builder&) = delete;
     Builder& operator=(Builder&&) = delete;

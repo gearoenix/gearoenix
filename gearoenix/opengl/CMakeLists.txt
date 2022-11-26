@@ -4,6 +4,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-manager.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-pbr.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-sprite.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-sprite.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-unlit.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-mat-unlit.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/material/gx-gl-material.cpp

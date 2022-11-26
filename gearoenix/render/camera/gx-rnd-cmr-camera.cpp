@@ -1,4 +1,5 @@
 #include "gx-rnd-cmr-camera.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
@@ -203,10 +204,17 @@ void gearoenix::render::camera::Camera::create_debug_mesh() noexcept
     };
     std::string mesh_name = "camera-debug-mesh" + std::to_string(reinterpret_cast<std::size_t>(this));
     (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
-    debug_mesh = e.get_mesh_manager()->build(
+    std::shared_ptr<decltype(debug_mesh)> result_holder(new decltype(debug_mesh)());
+    *result_holder = e.get_mesh_manager()->build(
         std::move(mesh_name),
         std::move(vertices),
-        std::move(indices));
+        std::move(indices),
+        core::sync::EndCaller([this, result_holder] {
+            if (nullptr != *result_holder)
+                debug_mesh = *result_holder;
+        }));
+    if (nullptr != *result_holder)
+        debug_mesh = *result_holder;
 }
 
 void gearoenix::render::camera::Camera::enable_debug_mesh() noexcept
@@ -250,4 +258,14 @@ void gearoenix::render::camera::Camera::set_resolution_config(const gearoenix::r
         break;
     }
     }
+}
+
+gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(
+    const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const noexcept
+{
+    const auto scale = static_cast<double>(projection_type == Projection::Perspective ? (2.0f * near * tanf(scale_fovy * 0.5f)) : scale_fovy);
+    const auto near_plane_point = normalised_point * scale;
+    const auto direction = (transform.get_x_axis() * near_plane_point.x) + (transform.get_y_axis() * near_plane_point.y) + (transform.get_z_axis() * static_cast<double>(-near));
+    const auto origin = transform.get_local_location() + direction;
+    return { origin, projection_type == Projection::Perspective ? direction.normalised() : -transform.get_z_axis() };
 }

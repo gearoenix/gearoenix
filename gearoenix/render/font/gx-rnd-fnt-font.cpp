@@ -45,7 +45,7 @@ gearoenix::render::font::Font::Font(
     const std::string& name) noexcept
     : e(e)
     , stb_font(new stbtt_fontinfo())
-    , ttf_data(platform::stream::Asset::construct(e.get_platform_application(), name + ".ttf")->get_file_content())
+    , ttf_data(platform::stream::Asset::construct(e.get_platform_application(), "fonts/" + name + ".ttf")->get_file_content())
 {
     init();
 }
@@ -107,7 +107,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     const double img_width,
     const double img_height,
     const double img_start_skip,
-    const core::sync::EndCallerIgnored& end) const noexcept
+    const core::sync::EndCaller& end) const noexcept
 {
     const auto converter = [](const double v) {
         if (v >= 1.0f)
@@ -215,7 +215,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     const math::Vec4<double>& color,
     const double img_height,
     double& img_width,
-    const core::sync::EndCallerIgnored& end) const noexcept
+    const core::sync::EndCaller& end) const noexcept
 {
     if (text.empty()) {
         img_width = img_height;

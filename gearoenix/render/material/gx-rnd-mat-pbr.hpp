@@ -16,11 +16,11 @@ struct Pbr : public Material {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, brdflut);
 
 protected:
-    Pbr(engine::Engine& e, const core::sync::EndCallerIgnored& c) noexcept;
+    Pbr(engine::Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept;
 
 public:
     ~Pbr() noexcept override;
-    virtual void set_albedo(std::shared_ptr<texture::Texture2D>&&) noexcept;
+    void set_albedo(const std::shared_ptr<texture::Texture2D>&) noexcept override;
     virtual void set_normal(std::shared_ptr<texture::Texture2D>&&) noexcept;
     virtual void set_emission(std::shared_ptr<texture::Texture2D>&&) noexcept;
     virtual void set_metallic_roughness(std::shared_ptr<texture::Texture2D>&&) noexcept;

@@ -7,6 +7,7 @@
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 
 struct GameApp final : public gearoenix::core::Application {
@@ -15,9 +16,11 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+        auto end_callback = gearoenix::core::sync::EndCaller([] {});
 
-        auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
+        const auto scene_builder = render_engine.get_scene_manager()->build(
+            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+        scene_builder->get_scene().enabled = true;
 
         auto skybox_builder = render_engine.get_skybox_manager()->build(
             "hello-skybox",
@@ -25,7 +28,8 @@ struct GameApp final : public gearoenix::core::Application {
             end_callback);
         scene_builder->add(std::move(skybox_builder));
 
-        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto camera_builder = render_engine.get_camera_manager()->build(
+            "camera", gearoenix::core::sync::EndCaller(end_callback));
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,
             camera_builder->get_entity_builder()->get_builder().get_id());

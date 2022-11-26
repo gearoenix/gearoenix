@@ -23,7 +23,7 @@ struct CameraBuilder final : public render::camera::Builder {
     Engine& eng;
 
 private:
-    CameraBuilder(Engine& e, const std::string& name) noexcept;
+    CameraBuilder(Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept;
     void set_target(std::shared_ptr<render::texture::Target>&& target) noexcept final;
 
 public:
@@ -32,7 +32,7 @@ public:
 
 struct CameraManager final : public render::camera::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name, core::sync::EndCaller&& end_caller) noexcept final;
 
 public:
     explicit CameraManager(Engine& e) noexcept;

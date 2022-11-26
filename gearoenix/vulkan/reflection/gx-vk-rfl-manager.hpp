@@ -18,7 +18,7 @@ private:
         const std::shared_ptr<render::texture::TextureCube>& irradiance,
         const std::shared_ptr<render::texture::TextureCube>& radiance,
         const math::Aabb3<double>& include_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
     std::shared_ptr<render::reflection::Builder> build_runtime(
         const std::string& name,
         const math::Aabb3<double>& receive_box,
@@ -27,7 +27,7 @@ private:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
     void update() noexcept final;
 
 public:

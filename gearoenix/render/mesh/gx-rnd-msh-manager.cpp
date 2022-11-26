@@ -8,7 +8,7 @@ gearoenix::render::mesh::Manager::Manager(engine::Engine& e) noexcept
 
 gearoenix::render::mesh::Manager::~Manager() noexcept = default;
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_icosphere(std::size_t subdivisions, core::sync::EndCallerIgnored&& end_callback) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_icosphere(std::size_t subdivisions, core::sync::EndCaller&& end_callback) noexcept
 {
     std::string name = "default-icosphere-" + std::to_string(subdivisions);
     {
@@ -171,7 +171,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_plate(const core::sync::EndCallerIgnored& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_plate(const core::sync::EndCaller& c) noexcept
 {
     std::string name = "default-plate-mesh";
     {
@@ -208,7 +208,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         c);
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_cube(core::sync::EndCallerIgnored&& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_cube(core::sync::EndCaller&& c) noexcept
 {
     std::string name = "default-cube-mesh";
     {
@@ -363,7 +363,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::move(c));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_inward_cube(core::sync::EndCallerIgnored&& c) noexcept
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_inward_cube(core::sync::EndCaller&& c) noexcept
 {
     std::string name = "default-cube-mesh";
     {
@@ -522,7 +522,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     std::string&& name,
     std::vector<PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(meshes_lock);
@@ -542,7 +542,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     std::string&& name,
     std::vector<PbrVertexAnimated>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(meshes_lock);

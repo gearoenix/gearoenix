@@ -18,6 +18,7 @@
 #include <gearoenix/render/reflection/gx-rnd-rfl-runtime.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
@@ -32,13 +33,15 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+        gearoenix::core::sync::EndCaller end_callback([] {});
 
-        gearoenix::core::sync::EndCallerIgnored end_callback([scene_builder] {});
+        const auto scene_builder = render_engine.get_scene_manager()->build(
+            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+        scene_builder->get_scene().enabled = true;
 
         auto icosphere_mesh = render_engine.get_mesh_manager()->build_icosphere(
             4,
-            gearoenix::core::sync::EndCallerIgnored(end_callback));
+            gearoenix::core::sync::EndCaller(end_callback));
 
         for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
             for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
@@ -54,7 +57,7 @@ struct GameApp final : public gearoenix::core::Application {
                     "icosphere-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i),
                     std::shared_ptr(icosphere_mesh),
                     std::move(material),
-                    gearoenix::core::sync::EndCallerIgnored(end_callback),
+                    gearoenix::core::sync::EndCaller(end_callback),
                     true);
                 model_builder->get_transformation().local_translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
                     static_cast<double>(roughness_i) * 3.0 - 15.0,
@@ -69,7 +72,8 @@ struct GameApp final : public gearoenix::core::Application {
             end_callback);
         scene_builder->add(std::move(skybox_builder));
 
-        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto camera_builder = render_engine.get_camera_manager()->build(
+            "camera", gearoenix::core::sync::EndCaller(end_callback));
         auto& camera_transform = camera_builder->get_transformation();
         camera_transform.local_translate({ -19.0, -19.0, 5.0 });
         camera_transform.local_look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
@@ -90,12 +94,14 @@ struct GameApp final : public gearoenix::core::Application {
         runtime_reflection_probe_builder->get_runtime().set_on_rendered([id, this] {
             const auto* const r = render_engine.get_world()->get_component<gearoenix::render::reflection::Runtime>(id);
 #if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
-            std::shared_ptr<gearoenix::platform::stream::Stream> rl(new gearoenix::platform::stream::Local(platform_application, "exported.gx-reflection", true));
-            r->export_baked(rl);
+            std::shared_ptr<gearoenix::platform::stream::Stream> rl(
+                new gearoenix::platform::stream::Local(platform_application, "exported.gx-reflection", true));
+            r->export_baked(rl, gearoenix::core::sync::EndCaller([] {}));
 #endif
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT)
-            std::shared_ptr<gearoenix::platform::stream::Stream> tl(new gearoenix::platform::stream::Local(platform_application, "sky.gx-cube-texture", true));
-            r->get_environment()->write(tl, GX_DEFAULT_IGNORED_END_CALLER);
+            std::shared_ptr<gearoenix::platform::stream::Stream> tl(
+                new gearoenix::platform::stream::Local(platform_application, "sky.gx-cube-texture", true));
+            r->get_environment()->write(tl, gearoenix::core::sync::EndCaller([] {}));
 #endif
         });
 #endif

@@ -32,14 +32,14 @@ public:
     [[nodiscard]] std::shared_ptr<Builder> build_baked(
         const std::string& name,
         const platform::stream::Path& path,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCaller& c) noexcept;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_baked(
         const std::string& name,
         const std::shared_ptr<texture::TextureCube>& irradiance,
         const std::shared_ptr<texture::TextureCube>& radiance,
         const math::Aabb3<double>& include_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept
+        const core::sync::EndCaller& end_callback) noexcept
         = 0;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_runtime(
@@ -50,7 +50,7 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept
+        const core::sync::EndCaller& end_callback) noexcept
         = 0;
 
     virtual void update() noexcept;

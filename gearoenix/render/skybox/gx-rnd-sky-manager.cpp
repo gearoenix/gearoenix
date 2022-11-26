@@ -14,7 +14,7 @@ gearoenix::render::skybox::Manager::Manager(engine::Engine& e) noexcept
 gearoenix::render::skybox::Manager::~Manager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::render::skybox::Manager::build(
-    std::string&& name, platform::stream::Path&& texture_path, const core::sync::EndCallerIgnored& c) noexcept
+    std::string&& name, platform::stream::Path&& texture_path, const core::sync::EndCaller& c) noexcept
 {
     if (texture_path.get_raw_data().ends_with(".hdr") || texture_path.get_raw_data().ends_with(".png")) {
         auto txt = e.get_texture_manager()->create_2d_from_file(

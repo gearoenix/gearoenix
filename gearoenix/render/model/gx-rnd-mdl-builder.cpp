@@ -11,8 +11,9 @@ gearoenix::render::model::Builder::Builder(
     const std::string& name,
     std::shared_ptr<mesh::Mesh>&& bound_mesh,
     std::shared_ptr<material::Material>&& bound_material,
+    core::sync::EndCaller&& end_caller,
     bool is_transformable) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+    : entity_builder(e.get_world()->create_shared_builder(std::move(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
@@ -26,4 +27,9 @@ gearoenix::render::model::Builder::~Builder() noexcept = default;
 gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_transformation() noexcept
 {
     return *entity_builder->get_builder().get_component<physics::Transformation>();
+}
+
+gearoenix::core::ecs::entity_id_t gearoenix::render::model::Builder::get_id() const noexcept
+{
+    return entity_builder->get_id();
 }

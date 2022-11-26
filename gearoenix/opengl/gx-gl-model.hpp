@@ -39,6 +39,7 @@ private:
         const std::string& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
         std::shared_ptr<render::material::Material>&& mat,
+        core::sync::EndCaller&& end_caller,
         bool is_transformable) noexcept;
 
 public:
@@ -51,7 +52,7 @@ private:
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
         std::shared_ptr<render::material::Material>&& mat,
-        const core::sync::EndCallerIgnored& c,
+        core::sync::EndCaller&& c,
         bool is_transformable) noexcept final;
 
 public:

@@ -30,8 +30,8 @@ private:
 public:
     explicit Uploader(std::shared_ptr<Device> device) noexcept;
     ~Uploader() noexcept;
-    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<GpuBuffer>&& buffer, core::sync::EndCallerIgnored&& end) noexcept;
-    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<Texture2D>&& texture, UINT subresource, core::sync::EndCallerIgnored&& end) noexcept;
+    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<GpuBuffer>&& buffer, core::sync::EndCaller&& end) noexcept;
+    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<Texture2D>&& texture, UINT subresource, core::sync::EndCaller&& end) noexcept;
 };
 }
 

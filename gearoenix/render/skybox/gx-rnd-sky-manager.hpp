@@ -39,13 +39,13 @@ public:
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
         Texture&& bound_texture,
-        const core::sync::EndCallerIgnored& c) noexcept
+        const core::sync::EndCaller& c) noexcept
         = 0;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
         platform::stream::Path&& texture_path,
-        const core::sync::EndCallerIgnored& c) noexcept;
+        const core::sync::EndCaller& c) noexcept;
 };
 }
 #endif

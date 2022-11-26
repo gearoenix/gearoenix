@@ -20,7 +20,7 @@ gearoenix::render::texture::Manager::~Manager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
     const platform::stream::Path& path,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
     return read_gx3d(stream, c);
@@ -28,7 +28,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
 
 std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture::Manager::read_gx3d(
     const std::shared_ptr<platform::stream::Stream>& stream,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     std::string name;
     stream->read(name);
@@ -104,7 +104,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_colour(
-    const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
+    const math::Vec4<float>& colour, const core::sync::EndCaller& c) noexcept
 {
     std::vector<std::uint8_t> pixels0(4);
     pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
@@ -144,7 +144,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     std::lock_guard<std::mutex> _lg(brdflut_lock);
     if (nullptr != brdflut)
@@ -183,7 +183,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_checker(
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     std::lock_guard<std::mutex> _lg(checkers_lock);
     if (nullptr != checkers)
@@ -213,7 +213,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 }
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::create_2d_from_pixels(
-    std::string name, std::vector<std::vector<std::uint8_t>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
+    std::string name, std::vector<std::vector<std::uint8_t>> pixels, const TextureInfo& info, const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(textures_2d_lock);
@@ -229,7 +229,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const void* const data,
     const std::size_t size,
     const TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(textures_2d_lock);
@@ -266,7 +266,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const void* const data,
     std::size_t size,
     const TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(textures_2d_lock);
@@ -316,7 +316,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name,
     const platform::stream::Path& path,
     const TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(textures_2d_lock);
@@ -332,7 +332,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube_from_colour(
-    const math::Vec4<float>& colour, const core::sync::EndCallerIgnored& c) noexcept
+    const math::Vec4<float>& colour, const core::sync::EndCaller& c) noexcept
 {
     std::vector<std::uint8_t> pixels0(4);
     pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
@@ -372,7 +372,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 }
 
 std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::texture::Manager::create_cube_from_pixels(
-    std::string name, std::vector<std::vector<std::vector<std::uint8_t>>> pixels, const TextureInfo& info, const core::sync::EndCallerIgnored& c) noexcept
+    std::string name, std::vector<std::vector<std::vector<std::uint8_t>>> pixels, const TextureInfo& info, const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(textures_cube_lock);
@@ -384,7 +384,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::Manager::create_target(
-    std::string name, std::vector<Attachment>&& attachments, const core::sync::EndCallerIgnored& c) noexcept
+    std::string name, std::vector<Attachment>&& attachments, const core::sync::EndCaller& c) noexcept
 {
     {
         std::lock_guard<std::mutex> _lg(targets_lock);

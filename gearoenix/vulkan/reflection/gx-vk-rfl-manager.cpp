@@ -7,7 +7,7 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::vulkan::refle
     const std::shared_ptr<render::texture::TextureCube>& irradiance,
     const std::shared_ptr<render::texture::TextureCube>& radiance,
     const math::Aabb3<double>& include_box,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     GX_UNIMPLEMENTED;
     return {};
@@ -21,7 +21,7 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::vulkan::refle
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     GX_UNIMPLEMENTED;
     return {};

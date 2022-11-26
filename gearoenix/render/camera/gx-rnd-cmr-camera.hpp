@@ -3,6 +3,7 @@
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
+#include "../../math/gx-math-ray.hpp"
 #include "../gx-rnd-resolution.hpp"
 #include "gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-rnd-cmr-projection.hpp"
@@ -17,6 +18,10 @@
 #ifdef near
 #undef near
 #endif
+
+namespace gearoenix::physics {
+struct Transformation;
+}
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -94,6 +99,7 @@ public:
     void disable_debug_mesh() noexcept;
     void set_use_target_aspect_ratio(bool b) noexcept;
     void set_resolution_config(const Resolution& res) noexcept;
+    [[nodiscard]] math::Ray3<double> generate_ray(const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const noexcept;
 
 private:
     /// It must be changed by Builder or Manager, because the other components must know about the change

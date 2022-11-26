@@ -58,13 +58,13 @@ protected:
         engine::Engine& e,
         const std::string& name,
         const DirectionalInfo& info,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
     Builder(
         engine::Engine& e,
         const std::string& name,
         const ShadowCasterDirectionalInfo& info,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
 public:
     Builder(const Builder&) = delete;

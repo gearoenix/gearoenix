@@ -25,31 +25,31 @@ protected:
 public:
     virtual ~Manager() noexcept;
 
-    [[nodiscard]] std::shared_ptr<Mesh> build_icosphere(std::size_t subdivisions = 3, core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_plate(const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_cube(core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_inward_cube(core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_face_square(texture::Face f, core::sync::EndCallerIgnored&& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_icosphere(std::size_t subdivisions, core::sync::EndCaller&& end_callback) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_plate(const core::sync::EndCaller& end_callback) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_cube(core::sync::EndCaller&& end_callback) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_inward_cube(core::sync::EndCaller&& end_callback) noexcept;
+    [[nodiscard]] std::shared_ptr<Mesh> build_face_square(texture::Face f, core::sync::EndCaller&& end_callback) noexcept;
 
     [[nodiscard]] virtual std::shared_ptr<Mesh> build(
         std::string&& name,
         Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept
+        const core::sync::EndCaller& end_callback) noexcept
         = 0;
 
     [[nodiscard]] std::shared_ptr<Mesh> build(
         std::string&& name,
         std::vector<PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
     [[nodiscard]] std::shared_ptr<Mesh> build(
         std::string&& name,
         std::vector<PbrVertexAnimated>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
     [[nodiscard]] bool remove_if_exist(const std::string& name) noexcept;
 };

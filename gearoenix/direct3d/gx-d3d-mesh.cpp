@@ -48,7 +48,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::d3d::MeshManager::buil
     std::vector<render::PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    core::sync::EndCallerIgnored&& c) noexcept
+    core::sync::EndCaller&& c) noexcept
 {
     auto& eng = dynamic_cast<Engine&>(e);
     auto* const d = eng.get_device()->get_device().Get();
@@ -74,12 +74,12 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::d3d::MeshManager::buil
         static_cast<UINT>(vsz),
         static_cast<UINT>(indices.size()));
 
-    core::sync::EndCallerIgnored end([c, m]() noexcept -> void {
+    core::sync::EndCaller end([c, m]() noexcept -> void {
         (void)c;
         (void)m;
     });
 
-    u->upload(std::move(vbd), std::move(vb), core::sync::EndCallerIgnored(end));
+    u->upload(std::move(vbd), std::move(vb), core::sync::EndCaller(end));
     u->upload(std::move(ibd), std::move(ib), std::move(end));
 
     return m;

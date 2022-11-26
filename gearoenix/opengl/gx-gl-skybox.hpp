@@ -32,7 +32,7 @@ struct SkyboxBuilder final : public render::skybox::Builder {
         Engine& e,
         const std::string& name,
         std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& bound_texture,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
     ~SkyboxBuilder() noexcept final;
 };
 
@@ -44,7 +44,7 @@ struct SkyboxManager final : public render::skybox::Manager {
     [[nodiscard]] std::shared_ptr<render::skybox::Builder> build(
         std::string&& name,
         Texture&& bound_texture,
-        const core::sync::EndCallerIgnored& c) noexcept final;
+        const core::sync::EndCaller& c) noexcept final;
 };
 }
 

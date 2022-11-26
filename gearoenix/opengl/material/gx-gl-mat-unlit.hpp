@@ -17,7 +17,7 @@ struct Unlit final : public render::material::Unlit, public Material {
     GX_GET_REFC_PRV(std::shared_ptr<shader::UnlitCombination>, unlit_combination);
 
 public:
-    Unlit(Engine& e, const core::sync::EndCallerIgnored& c) noexcept;
+    Unlit(Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept;
     ~Unlit() noexcept final;
     void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) noexcept final;
     void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) noexcept final;

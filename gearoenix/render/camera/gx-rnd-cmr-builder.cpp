@@ -7,8 +7,8 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string& name) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept
+    : entity_builder(e.get_world()->create_shared_builder(std::move(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
@@ -64,4 +64,9 @@ const gearoenix::render::camera::Camera& gearoenix::render::camera::Builder::get
 void gearoenix::render::camera::Builder::set_target(std::shared_ptr<texture::Target>&& target) noexcept
 {
     entity_builder->get_builder().get_component<Camera>()->set_target(std::move(target));
+}
+
+gearoenix::core::ecs::entity_id_t gearoenix::render::camera::Builder::get_id() const noexcept
+{
+    return entity_builder->get_builder().get_id();
 }

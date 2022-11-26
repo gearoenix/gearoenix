@@ -55,7 +55,7 @@ public:
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCallerIgnored& c) noexcept final;
+        const core::sync::EndCaller& c) noexcept final;
 
     static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out) noexcept;
 };

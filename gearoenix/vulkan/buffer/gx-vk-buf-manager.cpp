@@ -91,7 +91,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     const std::string& name,
     const void* const data,
     const std::size_t size,
-    const core::sync::EndCallerIgnored& end) noexcept
+    const core::sync::EndCaller& end) noexcept
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu)

@@ -7,7 +7,7 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment>&& _attachments, const core::sync::EndCallerIgnored& end_callback) noexcept
+gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment>&& _attachments, const core::sync::EndCaller& end_callback) noexcept
     : render::texture::Target(std::move(_attachments))
     , e(e)
 {

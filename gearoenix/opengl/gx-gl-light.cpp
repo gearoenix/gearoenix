@@ -20,7 +20,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
     const render::light::Builder::DirectionalInfo& info,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : render::light::Builder(e, name, info, end_callback)
     , eng(e)
 {
@@ -30,7 +30,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
     const render::light::Builder::ShadowCasterDirectionalInfo& info,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : render::light::Builder(e, name, info, end_callback)
     , eng(e)
 {
@@ -50,7 +50,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
 gearoenix::gl::LightBuilder::~LightBuilder() noexcept = default;
 
 std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::build_directional(
-    const std::string& name, const core::sync::EndCallerIgnored& end_callback) noexcept
+    const std::string& name, const core::sync::EndCaller& end_callback) noexcept
 {
     return std::shared_ptr<render::light::Builder>(new LightBuilder(eng, name, render::light::Builder::DirectionalInfo {}, end_callback));
 }
@@ -61,7 +61,7 @@ std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::
     const float camera_far,
     const float camera_near,
     const float camera_aspect,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     return std::shared_ptr<render::light::Builder>(new LightBuilder(
         eng,

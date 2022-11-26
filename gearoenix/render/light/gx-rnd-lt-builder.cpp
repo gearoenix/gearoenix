@@ -4,15 +4,14 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
 #include "../light/gx-rnd-lt-light.hpp"
-#include "../light/gx-rnd-lt-point.hpp"
 
 gearoenix::render::light::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
     const DirectionalInfo&,
-    const core::sync::EndCallerIgnored&) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder())
+    , entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
 {
     auto& b = entity_builder->get_builder();
     b.set_name(name);
@@ -24,9 +23,9 @@ gearoenix::render::light::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
     const ShadowCasterDirectionalInfo& info,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder())
+    , entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
 {
     auto& b = entity_builder->get_builder();
     b.set_name(name);

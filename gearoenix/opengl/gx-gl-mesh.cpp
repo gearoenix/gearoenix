@@ -38,7 +38,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     auto m = std::make_shared<Mesh>(gl_e, occlusion_box);
     m->indices_count = static_cast<sizei>(indices.size());

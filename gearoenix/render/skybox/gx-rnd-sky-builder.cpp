@@ -12,13 +12,13 @@ gearoenix::render::skybox::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
     std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>>&& bound_texture,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+    const core::sync::EndCaller& end_callback) noexcept
+    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
     builder.add_component(Skybox(
-        e.get_mesh_manager()->build_inward_cube(core::sync::EndCallerIgnored(end_callback)),
+        e.get_mesh_manager()->build_inward_cube(core::sync::EndCaller(end_callback)),
         std::move(bound_texture)));
 }
 

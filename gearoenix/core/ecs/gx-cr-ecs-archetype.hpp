@@ -155,7 +155,7 @@ private:
 
     /// If it fails to find the the component it will return -1
     template <typename T>
-    [[nodiscard]] std::size_t get_component_index() noexcept
+    [[nodiscard]] std::size_t get_component_index() const noexcept
     {
         Component::type_check<T>();
         const auto search = components_indices.find(Component::create_type_index<T>());

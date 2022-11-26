@@ -9,8 +9,9 @@
 
 gearoenix::gl::material::Unlit::Unlit(
     Engine& e,
-    const core::sync::EndCallerIgnored& c) noexcept
-    : render::material::Unlit(e, c)
+    const std::string& name,
+    const core::sync::EndCaller& c) noexcept
+    : render::material::Unlit(e, name, c)
     , gl::material::Material(true)
     , gl_albedo(std::dynamic_pointer_cast<Texture2D>(albedo))
     , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())

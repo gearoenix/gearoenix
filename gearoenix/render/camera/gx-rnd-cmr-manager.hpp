@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
 #include <string>
 
@@ -23,7 +24,7 @@ public:
 
     virtual ~Manager() noexcept = default;
 
-    [[nodiscard]] virtual std::shared_ptr<Builder> build(const std::string& name) noexcept = 0;
+    [[nodiscard]] virtual std::shared_ptr<Builder> build(const std::string& name, core::sync::EndCaller&& end_caller) noexcept = 0;
     virtual void update() noexcept;
     virtual void window_resized() noexcept;
 };

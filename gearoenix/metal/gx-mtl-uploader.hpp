@@ -16,14 +16,14 @@ private:
     core::sync::WorkWaiter uploader;
     const id<MTLCommandQueue> queue;
 
-    void upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::sync::EndCallerIgnored&& c) noexcept;
+    void upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::sync::EndCaller&& c) noexcept;
 
 public:
     Uploader(Engine& e) noexcept;
     ~Uploader() noexcept;
 
     template <typename T>
-    void upload(id<MTLBuffer> destination, const std::vector<T>& data, core::sync::EndCallerIgnored&& c) noexcept
+    void upload(id<MTLBuffer> destination, const std::vector<T>& data, core::sync::EndCaller&& c) noexcept
     {
         upload(destination, data.data(), data.size() * sizeof(T), std::move(c));
     }
@@ -32,7 +32,7 @@ public:
         id<MTLTexture> destination,
         MTLTextureDescriptor* texture_descriptor,
         std::vector<std::vector<std::uint8_t>>&& pixels,
-        core::sync::EndCallerIgnored&& c) noexcept;
+        core::sync::EndCaller&& c) noexcept;
 };
 }
 

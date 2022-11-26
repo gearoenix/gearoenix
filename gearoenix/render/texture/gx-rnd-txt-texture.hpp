@@ -42,7 +42,7 @@ protected:
 
 public:
     virtual ~Texture() noexcept;
-    virtual void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept;
+    virtual void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept;
     [[nodiscard]] std::size_t get_mipmaps_count() const noexcept;
 
     [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(

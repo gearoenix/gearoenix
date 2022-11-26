@@ -38,6 +38,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-material.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-pbr.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-sprite.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-sprite.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-transparency.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
@@ -101,17 +103,21 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-wrap.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-alignment.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-layout.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-layout.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-size.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-size.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.cpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-type.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-type.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.hpp

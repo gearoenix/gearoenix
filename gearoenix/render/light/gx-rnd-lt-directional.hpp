@@ -39,7 +39,7 @@ public:
         float camera_aspect,
         engine::Engine&,
         Builder& builder,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
     ShadowCasterDirectional(ShadowCasterDirectional&&) noexcept;
     ~ShadowCasterDirectional() noexcept final;
 };

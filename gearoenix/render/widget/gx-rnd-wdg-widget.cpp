@@ -1,75 +1,199 @@
 #include "gx-rnd-wdg-widget.hpp"
-#include "gx-rnd-wdg-button.hpp"
-#include "gx-rnd-wdg-text.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/event/gx-cr-ev-engine.hpp"
+#include "../../physics/collider/gx-phs-cld-aabb.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../camera/gx-rnd-cmr-camera.hpp"
+#include "../engine/gx-rnd-eng-engine.hpp"
+#include "gx-rnd-wdg-layout.hpp"
+#include <array>
 
-gearoenix::render::widget::Widget::Widget(
-    const core::Id my_id,
-    std::string name,
-    const Type t,
-    platform::stream::Stream* const s,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : model::Model(my_id, std::move(name), model::Type::Widget, s, e, c)
-    , widget_type(t)
+std::array<gearoenix::core::event::Id, 5> default_event_ids {
+    gearoenix::core::event::Id::GestureClick,
+    gearoenix::core::event::Id::GestureDrag2D,
+    gearoenix::core::event::Id::ButtonMouse,
+    gearoenix::core::event::Id::MovementMouse,
+    gearoenix::core::event::Id::PlatformWindowSizeChange,
+};
+
+std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const noexcept
 {
+    const auto* const world = e.get_world();
+    if (0 == model_entity_id)
+        return std::nullopt;
+    const auto* const collider = world->get_component<physics::collider::Aabb3>(model_entity_id);
+    if (nullptr == collider)
+        return std::nullopt;
+    if (0 == camera_entity_id)
+        return std::nullopt;
+    const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
+    if (nullptr == camera_transform || nullptr == camera)
+        return std::nullopt;
+    const auto ray = camera->generate_ray(*camera_transform, normalised_point);
+    if (auto dis = collider->get_updated_box().hit(ray, std::numeric_limits<double>::max()); dis.has_value()) {
+        return ray.get_point(dis.value());
+    }
+    return std::nullopt;
 }
 
-gearoenix::render::widget::Widget::Widget(
-    const core::Id my_id,
-    std::string name,
-    const Type t,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : model::Model(my_id, std::move(name), model::Type::Widget, e, c)
-    , widget_type(t)
+void gearoenix::render::widget::Widget::handle_click_gesture(const core::event::Data& event_data) noexcept
 {
+    const auto& click = std::get<core::event::gesture::Click>(event_data.get_data());
+    const auto hit = get_hit_point(click.get_point().get_current_position());
+    if (!hit.has_value())
+        return;
+    on_click(hit.value());
 }
 
-gearoenix::render::widget::Widget::~Widget() noexcept = default;
-
-std::shared_ptr<gearoenix::render::widget::Widget> gearoenix::render::widget::Widget::read_gx3d(
-    const core::Id my_id,
-    std::string name,
-    platform::stream::Stream* const f,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::Data& event_data) noexcept
 {
-    const auto t = f->read<Type>();
-    switch (t) {
-    case Type::Text:
-        return Text::construct(my_id, std::move(name), f, e, c);
-    case Type::Button:
-        return Button::construct(my_id, std::move(name), f, e, c);
-    default:
-        GXLOGF("Unexpected widget type (" << static_cast<core::TypeId>(t) << ")  in: " << my_id)
+    const auto& mouse = std::get<core::event::button::Mouse>(event_data.get_data());
+    const auto hit = get_hit_point(mouse.get_position_normalised());
+    if (!hit.has_value()) {
+        handle_mouse_outside();
+        return;
+    }
+    if (mouse.get_key() == platform::key::Id::Left) {
+        if (mouse.get_action() == platform::key::Action::Press) {
+            is_pressed = true;
+            on_press(*hit);
+        } else if (is_pressed) {
+            on_release(*hit);
+        }
     }
 }
 
-bool gearoenix::render::widget::Widget::get_dynamicity() const noexcept
+void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event::Data& event_data) noexcept
 {
-    return true;
+    const auto& move = std::get<core::event::movement::Mouse>(event_data.get_data());
+    const auto hit = get_hit_point(move.get_current_normalised_position());
+    if (!hit.has_value()) {
+        handle_mouse_outside();
+        return;
+    }
 }
 
-void gearoenix::render::widget::Widget::selected(const math::Vec3<double>&) noexcept
+void gearoenix::render::widget::Widget::handle_mouse_outside() noexcept
+{
+    if (is_pressed) {
+        on_cancel();
+        is_pressed = false;
+    }
+}
+
+gearoenix::render::widget::Widget::Widget(
+    const std::string& name,
+    const Type widget_type,
+    engine::Engine& e) noexcept
+    : e(e)
+    , name(name)
+    , widget_type(widget_type)
+    , on_press([](const math::Vec3<double>&) noexcept -> void {})
+    , on_release([](const math::Vec3<double>&) noexcept -> void {})
+    , on_click([](const math::Vec3<double>&) noexcept -> void {})
+    , on_cancel([]() noexcept -> void {})
 {
 }
 
-void gearoenix::render::widget::Widget::selected_on(const math::Vec3<double>&, const std::vector<model::Model*>&) noexcept
+gearoenix::render::widget::Widget::~Widget() noexcept
 {
+    auto& ee = *e.get_platform_application().get_base().get_event_engine();
+    for (const auto event_id : default_event_ids) {
+        ee.remove_listener(event_id, this);
+    }
 }
 
-void gearoenix::render::widget::Widget::select_cancelled() noexcept
+void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
+    on_press = fun;
 }
 
-void gearoenix::render::widget::Widget::select_released() noexcept
+void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
+    on_release = fun;
 }
 
-void gearoenix::render::widget::Widget::dragged(const math::Vec3<double>&) noexcept
+void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun) noexcept
 {
+    on_cancel = fun;
 }
 
-void gearoenix::render::widget::Widget::dragged_on(const math::Vec3<double>&, const std::vector<model::Model*>&) noexcept
+void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
+    on_click = fun;
+}
+
+void gearoenix::render::widget::Widget::set_sensitivity(const bool b) noexcept
+{
+    sensitivity = b;
+}
+
+void gearoenix::render::widget::Widget::set_model_entity_id(const core::ecs::entity_id_t id) noexcept
+{
+    model_entity_id = id;
+}
+
+void gearoenix::render::widget::Widget::set_camera_entity_id(const core::ecs::entity_id_t id) noexcept
+{
+    camera_entity_id = id;
+}
+
+void gearoenix::render::widget::Widget::register_for_events() noexcept
+{
+    auto& ee = *e.get_platform_application().get_base().get_event_engine();
+    for (const auto event_id : default_event_ids) {
+        ee.add_listener(event_id, this);
+    }
+}
+
+void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l) noexcept
+{
+    layout = std::move(l);
+}
+
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority) noexcept
+{
+    children.emplace(std::make_pair(priority, child->name), std::move(child));
+}
+
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child) noexcept
+{
+    add_child(std::move(child), 0.0);
+}
+
+gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(
+    const core::event::Data& event_data) noexcept
+{
+    switch (event_data.get_source()) {
+    case core::event::Id::GestureClick: {
+        handle_click_gesture(event_data);
+        break;
+    }
+    case core::event::Id::GestureDrag2D: {
+        break;
+    }
+    case core::event::Id::MovementMouse: {
+        handle_movement_mouse(event_data);
+        break;
+    }
+    case core::event::Id::ButtonMouse: {
+        handle_button_mouse(event_data);
+        break;
+    }
+    case core::event::Id::PlatformWindowSizeChange: {
+        if (nullptr != layout)
+            (void)layout->on_event(event_data);
+        break;
+    }
+    default:
+        break;
+    }
+    for (const auto& child : children) {
+        const auto res = child.second->on_event(event_data);
+        if (res == core::event::Listener::Response::Continue)
+            continue;
+        return res;
+    }
+    return core::event::Listener::Response::Continue;
 }

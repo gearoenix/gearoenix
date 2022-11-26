@@ -14,8 +14,9 @@
 #include "../skybox/gx-rnd-sky-skybox.hpp"
 #include "gx-rnd-scn-scene.hpp"
 
-gearoenix::render::scene::Builder::Builder(engine::Engine& e, const std::string& name, const double layer) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+gearoenix::render::scene::Builder::Builder(
+    engine::Engine& e, const std::string& name, const double layer, core::sync::EndCaller&& end_callback) noexcept
+    : entity_builder(e.get_world()->create_shared_builder(std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
     b.add_component(Scene(e, layer));
@@ -122,4 +123,9 @@ gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() 
 const gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() const noexcept
 {
     return *entity_builder->get_builder().get_component<Scene>();
+}
+
+gearoenix::core::ecs::entity_id_t gearoenix::render::scene::Builder::get_id() const noexcept
+{
+    return entity_builder->get_id();
 }

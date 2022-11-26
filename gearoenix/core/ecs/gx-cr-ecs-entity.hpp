@@ -3,6 +3,7 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
+#include "../sync/gx-cr-sync-end-caller.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
@@ -44,11 +45,12 @@ struct EntityBuilder final {
 
 private:
     components_t components;
+    sync::EndCaller end_caller;
 
-    explicit EntityBuilder(Entity::id_t) noexcept;
+    EntityBuilder(Entity::id_t, sync::EndCaller&& end_caller) noexcept;
 
 public:
-    EntityBuilder() noexcept;
+    explicit EntityBuilder(sync::EndCaller&& end_caller) noexcept;
     EntityBuilder(EntityBuilder&&) noexcept;
     EntityBuilder(const EntityBuilder&) = delete;
     EntityBuilder& operator=(EntityBuilder&&) = delete;
@@ -97,10 +99,11 @@ struct EntitySharedBuilder final {
 private:
     World* const world;
 
-    explicit EntitySharedBuilder(World* world) noexcept;
+    EntitySharedBuilder(World* world, sync::EndCaller&& end_caller) noexcept;
 
 public:
     ~EntitySharedBuilder() noexcept;
+    [[nodiscard]] entity_id_t get_id() const noexcept { return builder.get_id(); }
 };
 }
 

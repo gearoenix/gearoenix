@@ -29,7 +29,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     std::string&& name,
     const std::size_t vertices_count,
     const std::size_t indices_count,
-    core::sync::EndCallerIgnored&& c,
+    core::sync::EndCaller&& c,
     std::shared_ptr<Mesh>&& result) noexcept
 {
     auto& dev = vk_e.get_logical_device();
@@ -120,7 +120,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
 void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     std::string&& name,
     std::shared_ptr<sync::Fence>&& fence,
-    core::sync::EndCallerIgnored&& c,
+    core::sync::EndCaller&& c,
     std::shared_ptr<Mesh>&& result,
     std::shared_ptr<query::Pool>&& query_pool) noexcept
 {
@@ -180,7 +180,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 }
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_blas_copy(
-    [[maybe_unused]] core::sync::EndCallerIgnored&& c,
+    [[maybe_unused]] core::sync::EndCaller&& c,
     std::shared_ptr<Mesh>&& result) noexcept
 {
     result->initialize_blas();
@@ -191,10 +191,10 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager:
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     std::shared_ptr<std::shared_ptr<Mesh>> result(new std::shared_ptr<Mesh>());
-    core::sync::EndCallerIgnored end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable noexcept -> void {
+    core::sync::EndCaller end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable noexcept -> void {
         waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable noexcept {
             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(*result));
         });

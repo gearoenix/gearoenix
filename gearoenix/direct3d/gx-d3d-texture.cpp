@@ -87,7 +87,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     GX_GUARD_LOCK(textures_2d);
     if (auto textures_2d_search = textures_2d.find(name); textures_2d.end() != textures_2d_search)
@@ -136,7 +136,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     GX_D3D_CHECK(resource->SetName(w_name.c_str()));
     auto t = std::make_shared<Texture2D>(name, info, e, sampler_search->second, std::move(resource), std::move(descriptor));
 
-    core::sync::EndCallerIgnored on_mipmap_complete([this, t, desc, c]() {
+    core::sync::EndCaller on_mipmap_complete([this, t, desc, c]() {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc;
         GX_SET_ZERO(srv_desc);
         srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -146,7 +146,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     });
 
-    const core::sync::EndCallerIgnored on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() mutable noexcept {
+    const core::sync::EndCaller on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() mutable noexcept {
         if (!needs_mipmap_generator)
             return;
         worker.push([this, t = std::move(t), desc, on_mipmap_complete = std::move(on_mipmap_complete)] {
@@ -242,7 +242,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
             std::move(pixels[mipmap_index]),
             std::shared_ptr<Texture2D>(t),
             static_cast<UINT>(mipmap_index),
-            core::sync::EndCallerIgnored(on_upload_complete));
+            core::sync::EndCaller(on_upload_complete));
     }
     textures_2d.emplace(std::move(name), t);
     return t;

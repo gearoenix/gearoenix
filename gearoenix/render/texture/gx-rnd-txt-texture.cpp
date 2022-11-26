@@ -55,7 +55,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
 
 gearoenix::render::texture::Texture::~Texture() noexcept = default;
 
-void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored&) const noexcept
+void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller&) const noexcept
 {
     s->write_fail_debug(name);
     info.write(*s);

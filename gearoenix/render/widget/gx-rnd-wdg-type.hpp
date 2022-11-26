@@ -5,10 +5,11 @@ namespace gearoenix::render::widget {
 enum struct Type : core::TypeId {
     Button = 1,
     Edit = 2,
-    Text = 3,
-    Modal = 4,
-    Label = 5,
-    ColorChooser = 6,
+    Empty = 3,
+    Text = 4,
+    Modal = 5,
+    Label = 6,
+    ColorChooser = 7,
 };
 }
 #endif

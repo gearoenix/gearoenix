@@ -125,7 +125,7 @@ gearoenix::metal::TextureManager::~TextureManager() noexcept
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     const auto sampler_search = samplers.find(info.sampler_info);
     if (samplers.end() == sampler_search)
@@ -141,7 +141,7 @@ gearoenix::metal::TextureManager::~TextureManager() noexcept
     texture_descriptor.mipmapLevelCount = pixels.size() == 1 && info.has_mipmap ? render::texture::Texture::compute_mipmaps_count(info.width, info.height) : pixels.size();
     id<MTLTexture> texture = [e.get_heap_manager()->gpu newTextureWithDescriptor:texture_descriptor];
     auto result = std::make_shared<Texture2D>(e, texture, sampler, info, std::move(name));
-    core::sync::EndCallerIgnored end([c, result] {});
+    core::sync::EndCaller end([c, result] {});
     e.get_uploader()->upload(texture, texture_descriptor, std::move(pixels), std::move(end));
     return result;
 }

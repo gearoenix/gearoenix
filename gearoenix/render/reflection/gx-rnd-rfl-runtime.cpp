@@ -24,7 +24,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : core::ecs::Component(this)
     , e(e)
     , receive_box(receive_box)
@@ -107,7 +107,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     for (std::size_t face_index = 0; face_index < 6; ++face_index) {
         const auto& face = faces[face_index];
         const auto name_ext = "-" + std::to_string(std::get<0>(face));
-        auto camera_builder = cam_mgr->build(name + "-camera" + name_ext);
+        auto camera_builder = cam_mgr->build(name + "-camera" + name_ext, core::sync::EndCaller(end_callback));
         cameras[face_index] = camera_builder->get_entity_builder()->get_builder().get_id();
         environment_targets[face_index] = txt_mgr->create_target(
             name + "-environment-target" + name_ext,
@@ -264,10 +264,10 @@ void gearoenix::render::reflection::Runtime::set_on_rendered(std::function<void(
     on_rendered = std::make_unique<std::function<void()>>(std::move(f));
 }
 
-void gearoenix::render::reflection::Runtime::export_baked(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& end_callback) const noexcept
+void gearoenix::render::reflection::Runtime::export_baked(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& end_callback) const noexcept
 {
     include_box.write(*s);
-    irradiance->write(s, core::sync::EndCallerIgnored([s, radiance = radiance, end_callback] {
+    irradiance->write(s, core::sync::EndCaller([s, radiance = radiance, end_callback] {
         radiance->write(s, end_callback);
     }));
 }

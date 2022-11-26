@@ -18,6 +18,7 @@
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <random>
 
@@ -108,16 +109,21 @@ struct GameApp final : public gearoenix::core::Application {
     };
 
     std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
+    gearoenix::core::ecs::entity_id_t scene_id;
 
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+        gearoenix::core::sync::EndCaller end_callback([this] {
+            render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->enabled = true;
+        });
 
-        auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
+        const auto scene_builder = render_engine.get_scene_manager()->build(
+            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+        scene_id = scene_builder->get_id();
 
         auto cube_mesh = render_engine.get_mesh_manager()->build_cube(
-            gearoenix::core::sync::EndCallerIgnored(end_callback));
+            gearoenix::core::sync::EndCaller(end_callback));
 
         const auto threads_count = std::thread::hardware_concurrency();
         const auto models_count = threads_count * 1000;
@@ -125,16 +131,17 @@ struct GameApp final : public gearoenix::core::Application {
             auto material = render_engine.get_material_manager()->get_pbr(
                 "material" + std::to_string(model_index),
                 end_callback);
-            material->set_albedo(render_engine.get_texture_manager()->create_2d_from_colour({ colour_distribution(random_engine),
-                                                                                                colour_distribution(random_engine),
-                                                                                                colour_distribution(random_engine),
-                                                                                                1.0f },
+            material->set_albedo(render_engine.get_texture_manager()->create_2d_from_colour(
+                { colour_distribution(random_engine),
+                    colour_distribution(random_engine),
+                    colour_distribution(random_engine),
+                    1.0f },
                 end_callback));
             auto model_builder = render_engine.get_model_manager()->build(
                 "triangle" + std::to_string(model_index),
                 std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
                 std::move(material),
-                gearoenix::core::sync::EndCallerIgnored(end_callback),
+                gearoenix::core::sync::EndCaller(end_callback),
                 true);
             Speed speed;
             Position position;
@@ -145,7 +152,8 @@ struct GameApp final : public gearoenix::core::Application {
             scene_builder->add(std::move(model_builder));
         }
 
-        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto camera_builder = render_engine.get_camera_manager()->build(
+            "camera", gearoenix::core::sync::EndCaller(end_callback));
         camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
         camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
             render_engine,

@@ -31,91 +31,6 @@ void gearoenix::physics::animation::Manager::insert_bones(
     }
 }
 
-void gearoenix::physics::animation::Manager::animate(
-    ArmatureAnimation& armature_animation,
-    const double time) noexcept
-{
-    for (std::size_t bone_channel_index = armature_animation.bones_channels_first_index;
-         bone_channel_index < armature_animation.bones_channels_end_index;
-         ++bone_channel_index) {
-        animate(bones_channels[bone_channel_index], time);
-    }
-}
-
-void gearoenix::physics::animation::Manager::animate(
-    const BoneChannel& bone_channel,
-    const double time) noexcept
-{
-    Bone& bone = bones[bone_channel.target_bone_index];
-
-    auto scale = bone.transform.get_scale();
-    auto rotation = bone.transform.get_local_orientation();
-    auto translation = bone.transform.get_local_location();
-
-    bool transformed = false;
-
-    if (bone_channel.scale_samples_count > 0) {
-        transformed = true;
-        const auto scale_begin_iter = scale_keyframes.begin() + bone_channel.scale_samples_first_keyframe_index;
-        const auto scale_end_iter = scale_keyframes.begin() + bone_channel.scale_samples_end_keyframe_index;
-        const auto scale_search = std::upper_bound(
-            scale_begin_iter,
-            scale_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (scale_search == scale_begin_iter)
-            scale = get_key(scale_begin_iter->second);
-        else if (scale_search == scale_end_iter)
-            scale = get_key((scale_begin_iter + (bone_channel.scale_samples_count - 1))->second);
-        else if (scale_search->first == time)
-            scale = get_key(scale_search->second);
-        else
-            scale = interpolate(*(scale_search - 1), *scale_search, time);
-    }
-
-    if (bone_channel.rotation_samples_count > 0) {
-        transformed = true;
-        const auto rotation_begin_iter = rotation_keyframes.begin() + bone_channel.rotation_samples_first_keyframe_index;
-        const auto rotation_end_iter = rotation_keyframes.begin() + bone_channel.rotation_samples_end_keyframe_index;
-        const auto rotation_search = std::upper_bound(
-            rotation_begin_iter,
-            rotation_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (rotation_search == rotation_begin_iter)
-            rotation = get_key(rotation_begin_iter->second);
-        else if (rotation_search == rotation_end_iter)
-            rotation = get_key((rotation_begin_iter + (bone_channel.rotation_samples_count - 1))->second);
-        else if (rotation_search->first == time)
-            rotation = get_key(rotation_search->second);
-        else {
-            rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
-        }
-    }
-
-    if (bone_channel.translation_samples_count > 0) {
-        transformed = true;
-        const auto translation_begin_iter = translation_keyframes.begin() + bone_channel.translation_samples_first_keyframe_index;
-        const auto translation_end_iter = translation_keyframes.begin() + bone_channel.translation_samples_end_keyframe_index;
-        const auto translation_search = std::upper_bound(
-            translation_begin_iter,
-            translation_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (translation_search == translation_begin_iter)
-            translation = get_key(translation_begin_iter->second);
-        else if (translation_search == translation_end_iter)
-            translation = get_key((translation_begin_iter + (bone_channel.translation_samples_count - 1))->second);
-        else if (translation_search->first == time)
-            translation = get_key(translation_search->second);
-        else
-            translation = interpolate(*(translation_search - 1), *translation_search, time);
-    }
-
-    if (transformed)
-        bone.transform.reset(scale, rotation, translation);
-}
-
 void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform) noexcept
 {
     auto& bone = bones[index];
@@ -168,20 +83,13 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     ArmatureAnimationInfo& info) noexcept
 {
     std::lock_guard<std::mutex> _lg(this_lock);
-
-    builder.add_component(AnimationPlayer(armature_animations.size()));
-    if (!info.name.empty())
-        armature_animations_indices[info.name] = armature_animations.size();
-    ArmatureAnimation anim;
-    anim.name = info.name;
-    anim.bones_channels_count = info.channels.size();
-    anim.bones_channels_first_index = bones_channels.size();
+    const std::size_t bones_channels_count = info.channels.size();
+    const std::size_t bones_channels_first_index = bones_channels.size();
     for (auto& bone_channel : info.channels) {
         BoneChannel bch;
         auto bone_search = bones_indices.find(bone_channel.target_bone);
         GX_ASSERT(bones_indices.end() != bone_search);
         bch.target_bone_index = bone_search->second;
-
         bch.scale_samples_count = bone_channel.scale_samples.size();
         bch.scale_samples_first_keyframe_index = scale_keyframes.size();
         double last_time = -0.1e-10;
@@ -191,7 +99,6 @@ void gearoenix::physics::animation::Manager::create_animation_player(
             scale_keyframes.push_back(k);
         }
         bch.scale_samples_end_keyframe_index = scale_keyframes.size();
-
         bch.rotation_samples_count = bone_channel.rotation_samples.size();
         bch.rotation_samples_first_keyframe_index = rotation_keyframes.size();
         last_time = -0.1e-10;
@@ -201,7 +108,6 @@ void gearoenix::physics::animation::Manager::create_animation_player(
             rotation_keyframes.push_back(k);
         }
         bch.rotation_samples_end_keyframe_index = rotation_keyframes.size();
-
         bch.translation_samples_count = bone_channel.translation_samples.size();
         bch.translation_samples_first_keyframe_index = translation_keyframes.size();
         last_time = -0.1e-10;
@@ -211,11 +117,30 @@ void gearoenix::physics::animation::Manager::create_animation_player(
             translation_keyframes.push_back(k);
         }
         bch.translation_samples_end_keyframe_index = translation_keyframes.size();
-
         bones_channels.push_back(bch);
     }
-    anim.bones_channels_end_index = bones_channels.size();
-    armature_animations.push_back(std::move(anim));
+    const std::size_t bones_channels_end_index = bones_channels.size();
+    auto anim = animation_allocator.make_shared<ArmatureAnimation>(info.name, bones_channels_count, bones_channels_first_index, bones_channels_end_index);
+    if (!info.name.empty()) {
+        animations_map.emplace(info.name, anim);
+    }
+    builder.add_component(AnimationPlayer(std::move(anim)));
+}
+
+void gearoenix::physics::animation::Manager::create_sprite_player(
+    core::ecs::EntityBuilder& builder,
+    std::string name,
+    std::shared_ptr<render::material::Sprite> sprite,
+    const std::size_t width,
+    const std::size_t height) noexcept
+{
+    auto anim = animation_allocator.make_shared<SpriteAnimation>(name, std::move(sprite), width, height);
+    if (!name.empty()) {
+        animations_map.emplace(std::move(name), anim);
+    }
+    AnimationPlayer player(std::move(anim));
+    player.set_loop_range_time(0.0, 0.999);
+    builder.add_component(std::move(player));
 }
 
 void gearoenix::physics::animation::Manager::update() noexcept
@@ -223,11 +148,7 @@ void gearoenix::physics::animation::Manager::update() noexcept
     e.get_world()->parallel_system<core::ecs::And<core::ecs::Or<AnimationPlayer, Armature>, Transformation>>([this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) noexcept {
         if (nullptr != player) {
             player->update_time(e.get_delta_time());
-            if (std::type_index(typeid(ArmatureAnimation)) == player->get_animation_type()) {
-                animate(armature_animations[player->get_index()], player->time);
-            } else {
-                GX_UNEXPECTED;
-            }
+            player->animate(*this);
         }
         if (nullptr != armature) {
             update_bone(armature->root_bone_index, *model_transform);

@@ -21,7 +21,7 @@ namespace gearoenix::render {
 [[nodiscard]] std::vector<std::shared_ptr<scene::Builder>> load_gltf(
     engine::Engine& e,
     const platform::stream::Path& file,
-    const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+    const core::sync::EndCaller& end_callback) noexcept;
 }
 
 #endif

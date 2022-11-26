@@ -9,11 +9,11 @@ struct Unlit : public Material {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, albedo);
 
 protected:
-    Unlit(engine::Engine& e, const core::sync::EndCallerIgnored& c) noexcept;
+    Unlit(engine::Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept;
 
 public:
     ~Unlit() noexcept override;
-    virtual void set_albedo(const std::shared_ptr<texture::Texture2D>& t) noexcept;
+    void set_albedo(const std::shared_ptr<texture::Texture2D>& t) noexcept override;
 };
 }
 #endif

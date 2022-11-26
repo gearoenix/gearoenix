@@ -24,7 +24,7 @@ gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
     const float camera_aspect,
     engine::Engine& e,
     Builder& builder,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : core::ecs::Component(this)
 {
     std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
@@ -55,7 +55,7 @@ gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
                 .txt = shadow_map,
             } } },
         end_callback);
-    auto camera_builder = e.get_camera_manager()->build(name + "-shadow-camera");
+    auto camera_builder = e.get_camera_manager()->build(name + "-shadow-camera", core::sync::EndCaller(end_callback));
     camera_id = camera_builder->get_entity_builder()->get_builder().get_id();
     camera_builder->set_target(std::shared_ptr(shadow_map_target));
     auto& cam = camera_builder->get_camera();

@@ -30,7 +30,7 @@ gearoenix::d3d::Uploader::~Uploader() noexcept = default;
 void gearoenix::d3d::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<GpuBuffer>&& buffer,
-    core::sync::EndCallerIgnored&& end) noexcept
+    core::sync::EndCaller&& end) noexcept
 {
     uploader.push([this, data = std::move(data), buffer = std::move(buffer), end = std::move(end)]() {
         const auto& dev = device->get_device();
@@ -70,7 +70,7 @@ void gearoenix::d3d::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<Texture2D>&& texture,
     const UINT subresource_index,
-    core::sync::EndCallerIgnored&& end) noexcept
+    core::sync::EndCaller&& end) noexcept
 {
     uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end), subresource_index]() {
         const auto desc = texture->get_resource()->GetDesc();

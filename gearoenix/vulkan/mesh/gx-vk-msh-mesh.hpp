@@ -36,7 +36,7 @@ public:
         const render::Vertices& vertices,
         const std::vector<std::uint32_t>& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCallerIgnored& end) noexcept;
+        const core::sync::EndCaller& end) noexcept;
     ~Mesh() noexcept final;
     [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const noexcept;
 };

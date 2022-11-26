@@ -14,6 +14,7 @@
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
@@ -21,17 +22,25 @@ struct GameApp final : public gearoenix::core::Application {
     {
         std::vector<gearoenix::render::PbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };
+        vertices[0].normal = { 0.0f, 0.0f, 1.0f };
+        vertices[0].tangent = { 0.0f, 1.0f, 0.0f, 1.0f };
         vertices[0].uv = { 1.0f, -1.0f };
         vertices[1].position = { 0.0f, 1.0f, 0.0f };
+        vertices[1].normal = { 0.0f, 0.0f, 1.0f };
+        vertices[1].tangent = { 0.0f, 1.0f, 0.0f, 1.0f };
         vertices[1].uv = { 0.0f, 1.0f };
         vertices[2].position = { -1.0f, -1.0f, 0.0f };
+        vertices[2].normal = { 0.0f, 0.0f, 1.0f };
+        vertices[2].tangent = { 0.0f, 1.0f, 0.0f, 1.0f };
         vertices[2].uv = { -1.0f, -1.0f };
 
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+        gearoenix::core::sync::EndCaller end_callback ([]{});
 
-        auto end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder] {});
+        const auto scene_builder = render_engine.get_scene_manager()->build(
+                "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+        scene_builder->get_scene().enabled = true;
 
         auto mesh = render_engine.get_mesh_manager()->build(
             "triangle-mesh",
@@ -45,10 +54,10 @@ struct GameApp final : public gearoenix::core::Application {
             "triangle-model",
             std::move(mesh),
             std::move(material),
-            end_callback,
+            gearoenix::core::sync::EndCaller(end_callback),
             true);
 
-        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto camera_builder = render_engine.get_camera_manager()->build("camera", gearoenix::core::sync::EndCaller(end_callback));
         camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
 
         auto light_builder_0 = render_engine.get_light_manager()->build_shadow_caster_directional(

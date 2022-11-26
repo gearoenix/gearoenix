@@ -14,8 +14,9 @@ struct Manager final : public render::material::Manager {
     Engine& gl_e;
 
 private:
-    [[nodiscard]] std::shared_ptr<render::material::Pbr> construct_pbr(const std::string& name, const core::sync::EndCallerIgnored& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::material::Unlit> construct_unlit(const std::string& name, const core::sync::EndCallerIgnored& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::material::Pbr> construct_pbr(const std::string& name, const core::sync::EndCaller& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::material::Unlit> construct_unlit(const std::string& name, const core::sync::EndCaller& c) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::material::Sprite> construct_sprite(const std::string& name, const core::sync::EndCaller& c) noexcept final;
 
 public:
     explicit Manager(Engine& e) noexcept;

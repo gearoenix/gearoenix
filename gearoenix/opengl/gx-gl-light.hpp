@@ -36,13 +36,13 @@ private:
         Engine& e,
         const std::string& name,
         const render::light::Builder::DirectionalInfo& info,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
     LightBuilder(
         Engine& e,
         const std::string& name,
         const render::light::Builder::ShadowCasterDirectionalInfo& info,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
 public:
     ~LightBuilder() noexcept final;
@@ -54,14 +54,14 @@ struct LightManager final : public render::light::Manager {
 private:
     [[nodiscard]] std::shared_ptr<render::light::Builder> build_directional(
         const std::string& name,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
     [[nodiscard]] std::shared_ptr<render::light::Builder> build_shadow_caster_directional(
         const std::string& name,
         std::size_t shadow_map_resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
 
 public:
     explicit LightManager(Engine& e) noexcept;

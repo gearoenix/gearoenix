@@ -1,187 +1,73 @@
 #include "gx-rnd-wdg-modal.hpp"
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../physics/collider/gx-phs-cld-aabb.hpp"
-#include "../../platform/gx-plt-application.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
-#include "../model/gx-rnd-mdl-dynamic.hpp"
+#include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
-#include "../model/gx-rnd-mdl-mesh.hpp"
-#include "../scene/gx-rnd-scn-ui.hpp"
+#include "../scene/gx-rnd-scn-builder.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
+#include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-wdg-button.hpp"
 
 gearoenix::render::widget::Modal::Modal(
-    const core::Id my_id,
-    std::string name,
-    platform::stream::Stream* const s,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, std::move(name), Type::Modal, s, e, c)
+    const std::string& name,
+    engine::Engine& e,
+    std::shared_ptr<Button>&& close,
+    std::shared_ptr<Button>&& cancel,
+    std::shared_ptr<Button>&& ok) noexcept
+    : Widget(name, Type::Modal, e)
+    , close(std::move(close))
+    , cancel(std::move(cancel))
+    , ok(std::move(ok))
 {
 }
 
-gearoenix::render::widget::Modal::Modal(
-    const core::Id my_id,
-    std::string name,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, std::move(name), Type::Modal, e, c)
+std::tuple<
+    std::shared_ptr<gearoenix::render::model::Builder>,
+    std::shared_ptr<gearoenix::render::model::Builder>,
+    std::shared_ptr<gearoenix::render::model::Builder>,
+    std::shared_ptr<gearoenix::render::model::Builder>,
+    std::shared_ptr<gearoenix::render::widget::Modal>>
+gearoenix::render::widget::Modal::construct(
+    const std::string& name,
+    engine::Engine& e,
+    const std::string& background_texture_asset,
+    const std::optional<std::pair<std::string, std::string>>& close_fs,
+    const std::optional<std::pair<std::string, std::string>>& cancel_fs,
+    const std::optional<std::pair<std::string, std::string>>& ok_fs,
+    core::ecs::entity_id_t camera_id,
+    Widget* const parent,
+    scene::Builder& scene_builder,
+    const core::sync::EndCaller& end_callback) noexcept
 {
-    core::sync::EndCaller<Button> btn_call([c](const std::shared_ptr<Button>&) {});
-    core::sync::EndCaller<model::Dynamic> mdl_call([c](const std::shared_ptr<model::Dynamic>&) {});
-    core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
-    auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
-    auto* const mdl_mgr = ast_mgr->get_model_manager();
-    auto* const msh_mgr = ast_mgr->get_mesh_manager();
-    auto plate_mesh = msh_mgr->create_plate(msh_call);
-
-    const std::vector<math::BasicVertex> close_vertices = {
-        math::BasicVertex {
-            math::Vec3(-1.0f, 1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.0f, 1.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(-0.8f, 1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.1f, 1.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(0.0f, 0.1f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.5f, 0.55f),
-        },
-        math::BasicVertex {
-            math::Vec3(-0.1f, 0.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.45f, 0.5f),
-        },
-        ////////////////////////////////////////////////////
-        math::BasicVertex {
-            math::Vec3(1.0f, 1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(1.0f, 1.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(0.8f, 1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.9f, 1.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(-0.8f, -1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.1f, 0.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(-1.0f, -1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.0f, 0.0f),
-        },
-        ////////////////////////////////////////////////////
-        math::BasicVertex {
-            math::Vec3(1.0f, -1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(1.0f, 0.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(0.8f, -1.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.9f, 0.0f),
-        },
-        math::BasicVertex {
-            math::Vec3(0.0f, -0.1f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.5f, 0.45f),
-        },
-        math::BasicVertex {
-            math::Vec3(0.1f, 0.0f, 0.0f),
-            math::Vec3(0.0f, 0.0f, 1.0f),
-            math::Vec4(1.0f, 0.0f, 0.0f, 1.0f),
-            math::Vec2(0.55f, 0.5f),
-        },
-    };
-
-    const std::vector<std::uint32_t> close_indices = {
-        0, 2, 1, 3, 2, 0,
-        ////////////////////////////////////////
-        5, 6, 4, 6, 5, 7,
-        ////////////////////////////////////////
-        11, 9, 8, 9, 11, 10
-    };
-
-    const math::Aabb3 close_ocr(math::Vec3(1.4), math::Vec3(-1.4));
-
-    auto close_mesh = msh_mgr->create(
-        "modal-" + this->name + "-close", close_vertices, close_indices, close_ocr, msh_call);
-
-    {
-        const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
-        mat->set_color(0.02f, 0.02f, 0.02f, c);
-        const auto mdl = mdl_mgr->create<model::Dynamic>("gx-modal-" + this->name + "-bg", mdl_call);
-        mdl->add_mesh(std::make_shared<model::Mesh>(plate_mesh, mat));
-        add_child(mdl);
-    }
-    {
-        const std::shared_ptr<material::Unlit> mat(new material::Unlit(e, c));
-        mat->set_color(0.9999f, 0.999f, 0.999f, c);
-        close_mdl = mdl_mgr->create<Button>("gx-modal-" + this->name + "-btn", btn_call);
-        close_mdl->add_mesh(std::make_shared<model::Mesh>(close_mesh, mat));
-        auto* tran = close_mdl->get_transformation();
-        const double scale = 0.05;
-        const math::Vec3 position(0.9, 0.9, 0.1);
-        tran->local_scale(scale);
-        tran->set_location(position);
-        add_child(close_mdl);
-        close_mdl->set_on_click([this] { on_close(); });
-    }
-}
-
-#define GX_MODAL_CONS(...)                               \
-    std::shared_ptr<Modal> self(new Modal(__VA_ARGS__)); \
-    self->model_self = self;                             \
-    self->widget_self = self;                            \
-    self->modal_self = self;                             \
-    return self
-
-std::shared_ptr<gearoenix::render::widget::Modal> gearoenix::render::widget::Modal::construct(
-    const core::Id id,
-    std::string name,
-    platform::stream::Stream* const s,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-{
-    GX_MODAL_CONS(id, std::move(name), s, e, c);
-}
-
-std::shared_ptr<gearoenix::render::widget::Modal> gearoenix::render::widget::Modal::construct(
-    const core::Id id,
-    std::string name,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-{
-    GX_MODAL_CONS(id, std::move(name), e, c);
+    auto result = std::make_shared<Modal>(name, e, nullptr, nullptr, nullptr);
+    auto mat = e.get_material_manager()->get_unlit(name + "-material", end_callback);
+    mat->set_transparency(render::material::Transparency::Transparent);
+    mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
+        background_texture_asset,
+        platform::stream::Path::create_asset(background_texture_asset),
+        render::texture::TextureInfo(),
+        end_callback));
+    auto bg_md = e.get_model_manager()->build(
+        name + "-background-model",
+        e.get_mesh_manager()->build_plate(end_callback),
+        std::move(mat),
+        core::sync::EndCaller(end_callback),
+        true);
+    result->set_model_entity_id(bg_md->get_id());
+    result->set_camera_entity_id(camera_id);
+    if (nullptr != parent)
+        parent->add_child(result);
+    scene_builder.add(std::shared_ptr(bg_md));
+    auto [close_md, close_button] = close_fs.has_value() ? Button::construct(name + "-close-button", e, close_fs->first, close_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    auto [cancel_md, cancel_button] = cancel_fs.has_value() ? Button::construct(name + "-cancel-button", e, cancel_fs->first, cancel_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    auto [ok_md, ok_button] = ok_fs.has_value() ? Button::construct(name + "-ok-button", e, ok_fs->first, ok_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    result->close = std::move(close_button);
+    result->cancel = std::move(cancel_button);
+    result->ok = std::move(ok_button);
+    return { std::move(bg_md), std::move(close_md), std::move(cancel_md), std::move(ok_md), std::move(result) };
 }
 
 gearoenix::render::widget::Modal::~Modal() noexcept = default;
-
-void gearoenix::render::widget::Modal::set_scene(scene::Scene* const s) noexcept
-{
-    Widget::set_scene(s);
-}
-
-void gearoenix::render::widget::Modal::set_on_close(const std::function<void()>& f) noexcept
-{
-    on_close = f;
-}

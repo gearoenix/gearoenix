@@ -1,7 +1,5 @@
 #include "gx-rnd-rfl-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/macro/gx-cr-mcr-assert.hpp"
-#include "../../math/gx-math-numeric.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
@@ -15,8 +13,8 @@ gearoenix::render::reflection::Builder::Builder(
     const math::Aabb3<double>& include_box,
     const std::shared_ptr<texture::TextureCube>& irradiance_texture,
     const std::shared_ptr<texture::TextureCube>& radiance_texture,
-    const core::sync::EndCallerIgnored&) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+    const core::sync::EndCaller& end_callback) noexcept
+    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
@@ -36,8 +34,8 @@ gearoenix::render::reflection::Builder::Builder(
     const std::size_t environment_resolution,
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
-    : entity_builder(e.get_world()->create_shared_builder())
+    const core::sync::EndCaller& end_callback) noexcept
+    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);

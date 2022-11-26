@@ -1,153 +1,106 @@
 #include "gx-rnd-wdg-button.hpp"
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../../physics/animation/gx-phs-anm-animation.hpp"
-#include "../../physics/animation/gx-phs-anm-manager.hpp"
-#include "../../physics/collider/gx-phs-cld-aabb.hpp"
-#include "../../physics/gx-phs-engine.hpp"
-#include "../../platform/gx-plt-application.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
-#include "../mesh/gx-rnd-msh-builder.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
+#include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
-#include "../model/gx-rnd-mdl-mesh.hpp"
-#include "../scene/gx-rnd-scn-scene.hpp"
-#include "gx-rnd-wdg-text.hpp"
+#include "../model/gx-rnd-mdl-model.hpp"
+#include "../scene/gx-rnd-scn-builder.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
+#include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::widget::Button::Button(
-    const core::Id my_id,
-    std::string name,
-    platform::stream::Stream* const f,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, std::move(name), Type::Button, f, e, c)
+void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
-    set_collider(std::make_unique<physics::collider::Aabb>(*collider));
+    on_press = [this, fun = fun](const math::Vec3<double>& p) noexcept -> void {
+        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(pressed_texture);
+        fun(p);
+    };
 }
 
-gearoenix::render::widget::Button::Button(
-    const core::Id my_id,
-    std::string name,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-    : Widget(my_id, std::move(name), Type::Button, e, c)
-    , background_material(new material::Unlit(e, c))
+void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
-    auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
-    auto* const mdl_mgr = ast_mgr->get_model_manager();
-    core::sync::EndCaller<Text> txt_call([c](const std::shared_ptr<Text>&) {});
-    text = mdl_mgr->create<Text>("button-" + this->name + "-text", txt_call);
-    text->set_text_color(theme.text_color, c);
-    auto* const txt_ran = text->get_transformation();
-    txt_ran->local_scale(theme.text_scale);
-    txt_ran->set_location(math::Vec3(0.0, 0.0, 0.01));
-    add_child(text);
-    background_material->set_color(0.9f, 0.075f, 0.05f, c);
-    core::sync::EndCaller<mesh::Mesh> msh_call([c](const std::shared_ptr<mesh::Mesh>&) {});
-    const auto plate_mesh = ast_mgr->get_mesh_manager()->create_plate(msh_call);
-    add_mesh(std::make_shared<model::Mesh>(plate_mesh, background_material));
+    on_release = [this, fun = fun](const math::Vec3<double>& p) noexcept -> void {
+        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(rest_texture);
+        fun(p);
+    };
 }
 
-#define GX_BUTTON_CONS(...)                                \
-    std::shared_ptr<Button> self(new Button(__VA_ARGS__)); \
-    self->model_self = self;                               \
-    self->widget_self = self;                              \
-    self->button_self = self;                              \
-    return self
-
-std::shared_ptr<gearoenix::render::widget::Button> gearoenix::render::widget::Button::construct(
-    const core::Id id,
-    std::string name,
-    platform::stream::Stream* const f,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<void()>& fun) noexcept
 {
-    GX_BUTTON_CONS(id, std::move(name), f, e, c);
+    on_cancel = [this, fun = fun]() noexcept -> void {
+        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(rest_texture);
+        fun();
+    };
 }
 
-std::shared_ptr<gearoenix::render::widget::Button> gearoenix::render::widget::Button::construct(
-    const core::Id id,
-    std::string name,
-    engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+gearoenix::render::widget::Button::Button(const std::string& name, engine::Engine& e) noexcept
+    : Widget(name, Type::Button, e)
 {
-    GX_BUTTON_CONS(id, std::move(name), e, c);
+    set_on_press_impl(on_press);
+    set_on_release_impl(on_release);
+    set_on_cancel_impl(on_cancel);
 }
 
-gearoenix::render::widget::Button::~Button() noexcept
+gearoenix::render::widget::Button::~Button() noexcept = default;
+
+std::pair<std::shared_ptr<gearoenix::render::model::Builder>, std::shared_ptr<gearoenix::render::widget::Button>>
+gearoenix::render::widget::Button::construct(
+    const std::string& name,
+    engine::Engine& e,
+    const std::string& pressed_texture_asset,
+    const std::string& rest_texture_asset,
+    const core::ecs::entity_id_t camera_id,
+    Widget& parent,
+    scene::Builder& scene_builder,
+    const core::sync::EndCaller& end_callback) noexcept
 {
-    if (auto a = animation.lock())
-        a->set_activity(false);
+    auto mat = e.get_material_manager()->get_unlit(name + "-material", end_callback);
+    mat->set_transparency(render::material::Transparency::Transparent);
+    auto rest_txt = e.get_texture_manager()->create_2d_from_file(
+        rest_texture_asset,
+        platform::stream::Path::create_asset(rest_texture_asset),
+        render::texture::TextureInfo(),
+        end_callback);
+    auto pressed_txt = e.get_texture_manager()->create_2d_from_file(
+        pressed_texture_asset,
+        platform::stream::Path::create_asset(pressed_texture_asset),
+        render::texture::TextureInfo(),
+        end_callback);
+    mat->set_albedo(rest_txt);
+    auto model_builder = e.get_model_manager()->build(
+        name + "-model",
+        e.get_mesh_manager()->build_plate(end_callback),
+        std::move(mat),
+        core::sync::EndCaller(end_callback),
+        true);
+    const auto id = model_builder->get_id();
+    auto but = std::make_shared<render::widget::Button>(name, e);
+    but->set_rest_texture(rest_txt);
+    but->set_pressed_texture(pressed_txt);
+    but->set_model_entity_id(id);
+    but->set_camera_entity_id(camera_id);
+    parent.add_child(but);
+    scene_builder.add(std::shared_ptr(model_builder));
+    return { std::move(model_builder), std::move(but) };
 }
 
-void gearoenix::render::widget::Button::selected(const math::Vec3<double>&) noexcept
+void gearoenix::render::widget::Button::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
-    if (auto a = animation.lock())
-        a->set_activity(false);
-    auto end = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_platform_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, end);
-    const auto a = std::make_shared<physics::animation::Animation>(
-        "button-" + name + "-select",
-        [this, myself](const double from_start, const double) noexcept {
-            const auto s = 1.0 - (1.0 - pressed_size) * from_start / animation_duration;
-            transformation->local_scale(s / scale_down_progress);
-            scale_down_progress = s;
-        },
-        animation_duration,
-        [this](const double) noexcept {
-            transformation->local_scale(pressed_size / scale_down_progress);
-            scale_down_progress = pressed_size;
-        });
-    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
-    animation = a;
-    on_press(true);
+    set_on_press_impl(fun);
 }
 
-void gearoenix::render::widget::Button::select_cancelled() noexcept
+void gearoenix::render::widget::Button::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
 {
-    if (auto a = animation.lock())
-        a->set_activity(false);
-    auto my_fun = core::sync::EndCaller<model::Model>([](const std::shared_ptr<model::Model>&) {});
-    auto myself = e->get_platform_application()->get_asset_manager()->get_model_manager()->get_gx3d(id, my_fun);
-    const auto a = std::make_shared<physics::animation::Animation>(
-        "button-" + name + "-up",
-        [this, myself](const double from_start, const double) noexcept {
-            const auto s = pressed_size + (1.0 - scale_down_progress) * (from_start / animation_duration);
-            transformation->local_scale(s / scale_down_progress);
-            scale_down_progress = s;
-        },
-        animation_duration,
-        [this](const double) noexcept {
-            transformation->local_scale(1.0 / scale_down_progress);
-            scale_down_progress = 1.0;
-        });
-    e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), a);
-    animation = a;
-    on_press(false);
+    set_on_release_impl(fun);
 }
 
-void gearoenix::render::widget::Button::select_released() noexcept
+void gearoenix::render::widget::Button::set_on_cancel(const std::function<void()>& fun) noexcept
 {
-    select_cancelled();
-    on_press(false);
-    on_click();
-}
-
-void gearoenix::render::widget::Button::set_on_click(const std::function<void()>& f) noexcept
-{
-    on_click = f;
-}
-
-void gearoenix::render::widget::Button::set_on_press(const std::function<void(bool)>& f) noexcept
-{
-    on_press = f;
-}
-
-void gearoenix::render::widget::Button::set_text(const std::wstring& t, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
-{
-    text->set_text(t, c);
-    const auto scale = text->get_text_width() * 0.5 / (theme.text_scale * collider->get_current_local_scale()[0]);
-    transformation->local_x_scale(scale);
-    text->get_transformation()->local_x_scale(1.0f / scale);
+    set_on_cancel_impl(fun);
 }

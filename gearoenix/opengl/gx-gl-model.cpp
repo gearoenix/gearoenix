@@ -27,11 +27,13 @@ gearoenix::gl::ModelBuilder::ModelBuilder(
     const std::string& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
     std::shared_ptr<render::material::Material>&& mat,
+    core::sync::EndCaller&& end_caller,
     bool is_transformable) noexcept
     : render::model::Builder(
         e, name,
         std::shared_ptr<render::mesh::Mesh>(mesh),
         std::shared_ptr<render::material::Material>(mat),
+        std::move(end_caller),
         is_transformable)
     , e(e)
 {
@@ -48,11 +50,11 @@ std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
     std::shared_ptr<render::material::Material>&& material,
-    const core::sync::EndCallerIgnored&,
+    core::sync::EndCaller&& end_caller,
     const bool is_transformable) noexcept
 {
     return std::shared_ptr<render::model::Builder>(new ModelBuilder(
-        dynamic_cast<Engine&>(e), name, std::move(mesh), std::move(material), is_transformable));
+        dynamic_cast<Engine&>(e), name, std::move(mesh), std::move(material), std::move(end_caller), is_transformable));
 }
 
 gearoenix::gl::ModelManager::ModelManager(Engine& e) noexcept

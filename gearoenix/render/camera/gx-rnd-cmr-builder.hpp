@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_CAMERA_BUILDER_HPP
 #define GEAROENIX_RENDER_CAMERA_BUILDER_HPP
+#include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include <memory>
 #include <string>
@@ -30,7 +32,7 @@ struct Builder {
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
 protected:
-    Builder(engine::Engine& e, const std::string& name) noexcept;
+    Builder(engine::Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept;
 
 public:
     Builder(Builder&&) = delete;
@@ -45,6 +47,7 @@ public:
     [[nodiscard]] const Camera& get_camera() const noexcept;
     // It is needed because the target must not be changed directly
     virtual void set_target(std::shared_ptr<texture::Target>&& target) noexcept;
+    [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
 };
 }
 #endif

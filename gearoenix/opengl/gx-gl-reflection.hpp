@@ -64,7 +64,7 @@ private:
         const math::Aabb3<double>& include_box,
         const std::shared_ptr<render::texture::TextureCube>& irradiance_texture,
         const std::shared_ptr<render::texture::TextureCube>& radiance_texture,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
     ReflectionBuilder(
         Engine& e,
@@ -75,7 +75,7 @@ private:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
 public:
     ~ReflectionBuilder() noexcept final;
@@ -90,7 +90,7 @@ private:
         const std::shared_ptr<render::texture::TextureCube>& irradiance,
         const std::shared_ptr<render::texture::TextureCube>& radiance,
         const math::Aabb3<double>& include_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
 
     [[nodiscard]] std::shared_ptr<render::reflection::Builder> build_runtime(
         const std::string& name,
@@ -100,7 +100,7 @@ private:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
 
 public:
     explicit ReflectionManager(Engine& e) noexcept;

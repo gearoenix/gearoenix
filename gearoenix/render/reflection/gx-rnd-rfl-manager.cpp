@@ -19,7 +19,7 @@ gearoenix::render::reflection::Manager::~Manager() noexcept = default;
 std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::reflection::Manager::build_baked(
     const std::string& name,
     const platform::stream::Path& path,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
     GX_ASSERT(nullptr != stream);

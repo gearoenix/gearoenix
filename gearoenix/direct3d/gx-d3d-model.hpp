@@ -47,7 +47,7 @@ private:
     [[nodiscard]] std::shared_ptr<render::model::Builder> build(
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
-        core::sync::EndCallerIgnored&& c,
+        core::sync::EndCaller&& c,
         bool is_transformable) noexcept final;
 
 public:

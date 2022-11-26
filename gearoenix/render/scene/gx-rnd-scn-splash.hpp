@@ -27,12 +27,12 @@ private:
     bool is_animating_text = false;
     double after_animation = 0.0;
     core::ecs::entity_id_t gearoenix_text = 0;
-    std::optional<core::sync::EndCallerIgnored> end_callback;
+    std::optional<core::sync::EndCaller> end_callback;
 
     [[nodiscard]] double calculate_scale() const noexcept;
 
 public:
-    Splash(engine::Engine& e, const core::sync::EndCallerIgnored& start_callback, const core::sync::EndCallerIgnored& end_callback) noexcept;
+    Splash(engine::Engine& e, const core::sync::EndCaller& start_callback, const core::sync::EndCaller& end_callback) noexcept;
     void update() noexcept;
     void hide() noexcept;
 };

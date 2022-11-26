@@ -21,7 +21,7 @@ public:
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     /// By layer you decide in what order scenes to be render on top of each other
-    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer = 0.0) noexcept;
+    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer, core::sync::EndCaller&& end_callback) noexcept;
     void update() noexcept;
 };
 }

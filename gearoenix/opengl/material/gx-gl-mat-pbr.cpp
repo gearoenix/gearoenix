@@ -9,8 +9,8 @@
 #include "../submission/gx-gl-sbm-camera.hpp"
 #include "../submission/gx-gl-sbm-scene.hpp"
 
-gearoenix::gl::material::Pbr::Pbr(Engine& e, const core::sync::EndCallerIgnored& c) noexcept
-    : render::material::Pbr(e, c)
+gearoenix::gl::material::Pbr::Pbr(Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept
+    : render::material::Pbr(e, name, c)
     , gl::material::Material(false)
     , gl_albedo(std::dynamic_pointer_cast<Texture2D>(albedo))
     , gl_normal(std::dynamic_pointer_cast<Texture2D>(normal))
@@ -41,10 +41,10 @@ void gearoenix::gl::material::Pbr::shadow(const submission::Model& model, const 
     glDrawElements(GL_TRIANGLES, model.indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Pbr::set_albedo(std::shared_ptr<render::texture::Texture2D>&& o) noexcept
+void gearoenix::gl::material::Pbr::set_albedo(const std::shared_ptr<render::texture::Texture2D>& o) noexcept
 {
+    render::material::Pbr::set_albedo(o);
     gl_albedo = std::dynamic_pointer_cast<Texture2D>(o);
-    render::material::Pbr::set_albedo(std::move(o));
 }
 
 void gearoenix::gl::material::Pbr::set_normal(std::shared_ptr<render::texture::Texture2D>&& o) noexcept

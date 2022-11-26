@@ -11,6 +11,7 @@ gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer) no
     , ssao_settings(0.08f, 0.001f, 0.000f, 0.003f)
     , layer(layer)
 {
+    enabled = false;
 }
 
 gearoenix::render::scene::Scene::~Scene() noexcept = default;

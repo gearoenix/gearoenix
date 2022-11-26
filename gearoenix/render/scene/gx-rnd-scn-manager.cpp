@@ -12,9 +12,9 @@ gearoenix::render::scene::Manager::Manager(engine::Engine& e) noexcept
 gearoenix::render::scene::Manager::~Manager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Manager::build(
-    const std::string& name, const double layer) noexcept
+    const std::string& name, const double layer, core::sync::EndCaller&& end_callback) noexcept
 {
-    return std::shared_ptr<Builder>(new Builder(e, name, layer));
+    return std::shared_ptr<Builder>(new Builder(e, name, layer, std::move(end_callback)));
 }
 
 void gearoenix::render::scene::Manager::update() noexcept

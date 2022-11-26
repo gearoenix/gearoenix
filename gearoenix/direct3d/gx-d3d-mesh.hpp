@@ -34,7 +34,7 @@ struct MeshManager final : render::mesh::Manager {
         std::vector<render::PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCallerIgnored&& end_callback) noexcept final;
+        core::sync::EndCaller&& end_callback) noexcept final;
 };
 }
 

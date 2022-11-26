@@ -118,37 +118,37 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
         .has_mipmap = false,
     };
     gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info));
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, core::sync::EndCaller([] {})));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info));
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, core::sync::EndCaller([] {})));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info));
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, core::sync::EndCaller([] {})));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info));
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, core::sync::EndCaller([] {})));
 
     auto irradiance_txt_info = position_depth_txt_info;
     irradiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
     gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info));
+        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info, core::sync::EndCaller([] {})));
 
     auto radiance_txt_info = position_depth_txt_info;
     radiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
     gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info));
+        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info, core::sync::EndCaller([] {})));
 
     auto depth_txt_info = position_depth_txt_info;
     depth_txt_info.format = render::texture::TextureFormat::D32;
     gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info));
+        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info, core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
@@ -158,7 +158,7 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
-    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments)));
+    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), core::sync::EndCaller([] {})));
 
     GX_LOG_D("GBuffers have been created.");
 }
@@ -185,11 +185,11 @@ void gearoenix::gl::submission::Manager::initialise_ssao() noexcept
         .has_mipmap = false,
     };
     ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(1);
     attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
-    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), core::sync::EndCaller([] {})));
 
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
@@ -216,11 +216,11 @@ void gearoenix::gl::submission::Manager::initialise_final() noexcept
         .has_mipmap = false,
     };
     final_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-final", {}, txt_info, GX_DEFAULT_IGNORED_END_CALLER));
+        "gearoenix-opengl-texture-final", {}, txt_info, core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(1);
     attachments[0].var = render::texture::Attachment2D { .txt = final_texture };
-    final_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-final", std::move(attachments), GX_DEFAULT_IGNORED_END_CALLER));
+    final_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-final", std::move(attachments), core::sync::EndCaller([] {})));
 
     GX_LOG_D("Final render target has been created.");
 }
@@ -262,32 +262,32 @@ void gearoenix::gl::submission::Manager::initialise_bloom() noexcept
         .has_mipmap = false,
     };
     bloom_source_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-bloom-source", {}, colour_txt_info));
+        "gearoenix-opengl-texture-bloom-source", {}, colour_txt_info, core::sync::EndCaller([] {})));
 
     low_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-low-bloom", {}, colour_txt_info));
+        "gearoenix-opengl-texture-low-bloom", {}, colour_txt_info, core::sync::EndCaller([] {})));
 
     bloom_horizontal_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-bloom-horizontal", {}, colour_txt_info));
+        "gearoenix-opengl-texture-bloom-horizontal", {}, colour_txt_info, core::sync::EndCaller([] {})));
 
     auto depth_txt_info = colour_txt_info;
     depth_txt_info.format = render::texture::TextureFormat::D32;
     depth_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-depth-bloom", {}, depth_txt_info));
+        "gearoenix-opengl-texture-depth-bloom", {}, depth_txt_info, core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
     attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].var = render::texture::Attachment2D { .txt = low_bloom_texture };
     attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].var = render::texture::Attachment2D { .txt = bloom_source_texture };
     attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = depth_bloom_texture };
-    bloom_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bloom", std::move(attachments)));
+    bloom_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bloom", std::move(attachments), core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> horizontal_attachments(GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
     horizontal_attachments[GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_horizontal_texture };
-    bloom_horizontal_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-horizontal-bloom", std::move(horizontal_attachments)));
+    bloom_horizontal_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-horizontal-bloom", std::move(horizontal_attachments), core::sync::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> vertical_attachments(GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
     vertical_attachments[GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_source_texture };
-    bloom_vertical_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-vertical-bloom", std::move(vertical_attachments)));
+    bloom_vertical_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-vertical-bloom", std::move(vertical_attachments), core::sync::EndCaller([] {})));
 
     GX_LOG_D("BLoom have been created.");
 }
@@ -1154,8 +1154,8 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
     , bloom_shader_combination(e.get_shader_manager()->get<shader::BloomCombination>())
     , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
-    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut()))
-    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f))))
+    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::sync::EndCaller([] {}))))
+    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::sync::EndCaller([] {}))))
 {
     GX_LOG_D("Creating submission manager.");
     initialise_back_buffer_sizes();

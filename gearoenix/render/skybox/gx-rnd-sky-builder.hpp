@@ -28,7 +28,7 @@ protected:
         engine::Engine& e,
         const std::string& name,
         std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>>&& bound_texture,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
 
 public:
     Builder(Builder&&) = delete;

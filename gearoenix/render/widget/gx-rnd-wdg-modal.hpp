@@ -1,43 +1,54 @@
 #ifndef GEAROENIX_RENDER_WIDGET_MODAL_HPP
 #define GEAROENIX_RENDER_WIDGET_MODAL_HPP
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-wdg-widget.hpp"
+
 #include <functional>
+#include <optional>
+#include <string>
+#include <tuple>
+
+namespace gearoenix::render::model {
+struct Builder;
+}
+
+namespace gearoenix::render::scene {
+struct Builder;
+}
 
 namespace gearoenix::render::widget {
 struct Button;
 struct Modal final : public Widget {
-    GX_GET_CREF_PRV(std::weak_ptr<Modal>, modal_self)
-private:
-    std::shared_ptr<Button> close_mdl;
-    std::function<void()> on_close = []() noexcept {};
-
-    Modal(
-        core::Id id,
-        std::string name,
-        platform::stream::Stream* s,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    Modal(
-        core::Id id,
-        std::string name,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    GX_GET_CREF_PRV(std::shared_ptr<Button>, close);
+    GX_GET_CREF_PRV(std::shared_ptr<Button>, cancel);
+    GX_GET_CREF_PRV(std::shared_ptr<Button>, ok);
+    GX_GETSET_CREF_PRV(std::function<void()>, on_closed);
 
 public:
-    [[nodiscard]] static std::shared_ptr<Modal> construct(
-        core::Id id,
-        std::string name,
-        platform::stream::Stream* s,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    [[nodiscard]] static std::shared_ptr<Modal> construct(
-        core::Id id,
-        std::string name,
-        engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    Modal(
+        const std::string& name,
+        engine::Engine& e,
+        std::shared_ptr<Button>&& close,
+        std::shared_ptr<Button>&& cancel,
+        std::shared_ptr<Button>&& ok) noexcept;
+    [[nodiscard]] static std::tuple<
+        std::shared_ptr<model::Builder> /*background-model-builder*/,
+        std::shared_ptr<model::Builder> /*close-button-model-builder*/,
+        std::shared_ptr<model::Builder> /*cancel-button-model-builder*/,
+        std::shared_ptr<model::Builder> /*ok-button-model-builder*/,
+        std::shared_ptr<Modal>>
+    construct(
+        const std::string& name,
+        engine::Engine& e,
+        const std::string& background_texture_asset,
+        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& close_button_texture_asset,
+        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& cancel_button_texture_asset,
+        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& ok_button_texture_asset,
+        core::ecs::entity_id_t camera_id,
+        Widget* parent,
+        scene::Builder& scene_builder,
+        const core::sync::EndCaller& end_callback) noexcept;
     ~Modal() noexcept final;
-    void set_scene(scene::Scene* s) noexcept final;
-    void set_on_close(const std::function<void()>& f) noexcept;
 };
 }
 #endif

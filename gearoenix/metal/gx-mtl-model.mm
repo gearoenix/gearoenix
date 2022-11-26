@@ -75,7 +75,7 @@ gearoenix::metal::ModelBuilder::~ModelBuilder() noexcept = default;
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::metal::ModelManager::build(
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    core::sync::EndCallerIgnored&&,
+    core::sync::EndCaller&&,
     const bool is_transformable) noexcept
 {
     return std::shared_ptr<render::model::Builder>(new ModelBuilder(

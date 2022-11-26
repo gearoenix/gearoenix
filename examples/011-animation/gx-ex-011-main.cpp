@@ -19,18 +19,20 @@ struct GameApp final : public gearoenix::core::Application {
 GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
     : Application(plt_app)
 {
+    gearoenix::core::sync::EndCaller end_callback([] {});
+
     auto scene_builders = gearoenix::render::load_gltf(
         render_engine,
-        gearoenix::platform::stream::Path::create_asset("example-11.glb"));
+        gearoenix::platform::stream::Path::create_asset("example-11.glb"),
+        gearoenix::core::sync::EndCaller(end_callback));
     auto& scene_builder = scene_builders[0];
-
-    gearoenix::core::sync::EndCallerIgnored end_callback([scene_builder] {});
 
     auto skybox_builder = render_engine.get_skybox_manager()->build(
         "hello-skybox",
         gearoenix::platform::stream::Path::create_asset("sky.gx-cube-texture"),
         end_callback);
     scene_builder->add(std::move(skybox_builder));
+    scene_builder->get_scene().enabled = true;
 
     auto baked_reflection_probe_builder = render_engine.get_reflection_manager()->build_baked(
         "baked-reflection",

@@ -3,8 +3,8 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const core::sync::EndCallerIgnored& c) noexcept
-    : Material(Id::Pbr)
+gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept
+    : Material(name, Id::Pbr)
     , albedo_factor(1.0f)
     , emission_roughness_factor(1.0f)
     , normal_metallic_factor(1.0f)
@@ -21,9 +21,9 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const core::sync::EndCa
 
 gearoenix::render::material::Pbr::~Pbr() noexcept = default;
 
-void gearoenix::render::material::Pbr::set_albedo(std::shared_ptr<texture::Texture2D>&& o) noexcept
+void gearoenix::render::material::Pbr::set_albedo(const std::shared_ptr<texture::Texture2D>& o) noexcept
 {
-    albedo = std::move(o);
+    albedo = o;
 }
 
 void gearoenix::render::material::Pbr::set_normal(std::shared_ptr<texture::Texture2D>&& o) noexcept

@@ -34,7 +34,7 @@
 
 [[nodiscard]] static const std::shared_ptr<gearoenix::render::texture::Texture2D>& create_texture2d(
     const int index,
-    const gearoenix::core::sync::EndCallerIgnored& txt_end_callback,
+    const gearoenix::core::sync::EndCaller& txt_end_callback,
     const std::shared_ptr<gearoenix::render::texture::Texture2D>& default_value,
     std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
     const tinygltf::Model& data,
@@ -122,7 +122,7 @@
 
 [[nodiscard]] static const std::shared_ptr<gearoenix::render::mesh::Mesh>& create_mesh(
     const int index,
-    const gearoenix::core::sync::EndCallerIgnored& mesh_end_callback,
+    const gearoenix::core::sync::EndCaller& mesh_end_callback,
     std::vector<std::shared_ptr<gearoenix::render::mesh::Mesh>>& gx_meshes,
     const tinygltf::Model& data,
     gearoenix::render::engine::Engine& e,
@@ -399,14 +399,14 @@
             std::move(animated_vertices),
             std::move(indices),
             std::move(box),
-            gearoenix::core::sync::EndCallerIgnored(mesh_end_callback));
+            gearoenix::core::sync::EndCaller(mesh_end_callback));
     else
         gx_mesh = e.get_mesh_manager()->build(
             std::string(msh.name),
             std::move(vertices),
             std::move(indices),
             std::move(box),
-            gearoenix::core::sync::EndCallerIgnored(mesh_end_callback));
+            gearoenix::core::sync::EndCaller(mesh_end_callback));
 
     return gx_mesh;
 }
@@ -518,7 +518,7 @@ static std::pair<std::vector<int>, std::optional<gearoenix::physics::animation::
 
 static void process_node(
     const int node_index,
-    const gearoenix::core::sync::EndCallerIgnored& node_end_callback,
+    const gearoenix::core::sync::EndCaller& node_end_callback,
     gearoenix::render::scene::Builder& scene_builder,
     const tinygltf::Model& data,
     gearoenix::render::engine::Engine& e,
@@ -533,7 +533,7 @@ static void process_node(
         GX_ASSERT_D(node.children.empty());
         const tinygltf::Camera& cmr = data.cameras[node.camera];
         GX_LOG_D("Loading camera: " << cmr.name);
-        auto camera_builder = e.get_camera_manager()->build(cmr.name);
+        auto camera_builder = e.get_camera_manager()->build(cmr.name, gearoenix::core::sync::EndCaller(node_end_callback));
         auto& rnd_cmr = camera_builder->get_camera();
         if ("perspective" == cmr.type) {
             rnd_cmr.set_projection_type(gearoenix::render::camera::Projection::Perspective);
@@ -558,7 +558,7 @@ static void process_node(
             std::string(node.name),
             std::move(gx_mesh),
             gx_materials[data.meshes[node.mesh].primitives[0].material],
-            gearoenix::core::sync::EndCallerIgnored(node_end_callback),
+            gearoenix::core::sync::EndCaller(node_end_callback),
             true);
         if (bone_index_map.size() > 1) {
             e.get_physics_engine()->get_animation_manager()->create_armature(
@@ -723,7 +723,7 @@ static void load_materials(
     std::vector<std::shared_ptr<gearoenix::render::material::Pbr>>& materials,
     const tinygltf::Model& data,
     std::vector<std::shared_ptr<gearoenix::render::texture::Texture2D>>& gx_txt2ds,
-    const gearoenix::core::sync::EndCallerIgnored& end_callback) noexcept
+    const gearoenix::core::sync::EndCaller& end_callback) noexcept
 {
     for (std::size_t material_id = 0; material_id < data.materials.size(); ++material_id) {
         const tinygltf::Material& mat = data.materials[material_id];
@@ -767,7 +767,7 @@ static void load_materials(
 std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::render::load_gltf(
     engine::Engine& e,
     const platform::stream::Path& file,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
 {
     tinygltf::TinyGLTF context;
     tinygltf::Model data;
@@ -832,10 +832,9 @@ std::vector<std::shared_ptr<gearoenix::render::scene::Builder>> gearoenix::rende
 
     for (const tinygltf::Scene& scn : data.scenes) {
         GX_LOG_D("Loading scene: " << scn.name);
-        auto scene_builder = e.get_scene_manager()->build(scn.name);
-        auto scene_end_callback = gearoenix::core::sync::EndCallerIgnored([scene_builder, end_callback = end_callback] {});
+        auto scene_builder = e.get_scene_manager()->build(scn.name, 0.0, gearoenix::core::sync::EndCaller(end_callback));
         for (const int scene_node_index : scn.nodes) {
-            process_node(scene_node_index, scene_end_callback, *scene_builder, data, e, gx_meshes, gx_txt2ds, gx_materials, bones_channels);
+            process_node(scene_node_index, end_callback, *scene_builder, data, e, gx_meshes, gx_txt2ds, gx_materials, bones_channels);
         }
         result.push_back(std::move(scene_builder));
     }

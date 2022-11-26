@@ -11,7 +11,7 @@
 #else
 #define GX_GL_APIENTRY_TYPE
 #endif
-#define GX_GL_APIENTRY GX_GL_APIENTRY_TYPE *
+#define GX_GL_APIENTRY GX_GL_APIENTRY_TYPE*
 
 namespace gearoenix::gl {
 typedef void(GX_GL_APIENTRY GX_GL_DEBUG_PROC)(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);

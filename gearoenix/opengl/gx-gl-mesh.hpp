@@ -30,7 +30,7 @@ struct MeshManager final : render::mesh::Manager {
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
 };
 }
 

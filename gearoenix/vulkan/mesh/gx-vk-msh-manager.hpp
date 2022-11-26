@@ -83,18 +83,18 @@ private:
         std::string&& name,
         std::size_t vertices_count,
         std::size_t indices_count,
-        core::sync::EndCallerIgnored&& c,
+        core::sync::EndCaller&& c,
         std::shared_ptr<Mesh>&& result) noexcept;
 
     void create_accel_after_query_ready(
         std::string&& name,
         std::shared_ptr<sync::Fence>&& fence,
-        core::sync::EndCallerIgnored&& c,
+        core::sync::EndCaller&& c,
         std::shared_ptr<Mesh>&& result,
         std::shared_ptr<query::Pool>&& query_pool) noexcept;
 
     void create_accel_after_blas_copy(
-        core::sync::EndCallerIgnored&& c,
+        core::sync::EndCaller&& c,
         std::shared_ptr<Mesh>&& result) noexcept;
 
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
@@ -102,7 +102,7 @@ private:
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCallerIgnored& end_callback) noexcept final;
+        const core::sync::EndCaller& end_callback) noexcept final;
 
 public:
     explicit Manager(engine::Engine& e) noexcept;

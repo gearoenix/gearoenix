@@ -62,13 +62,13 @@ public:
         const std::string& name,
         const void* data,
         std::size_t size,
-        const core::sync::EndCallerIgnored& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+        const core::sync::EndCaller& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,
         const std::vector<T>& data,
-        const core::sync::EndCallerIgnored& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept
+        const core::sync::EndCaller& end = GX_DEFAULT_IGNORED_END_CALLER) noexcept
     {
         return create(name, data.data(), data.size() * sizeof(T), end);
     }

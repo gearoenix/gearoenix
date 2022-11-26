@@ -1,6 +1,7 @@
 #include "gx-gl-engine.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
+#include "../physics/gx-phs-engine.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-constants.hpp"
@@ -58,6 +59,7 @@ gearoenix::gl::Engine::~Engine() noexcept
     model_manager = nullptr;
     mesh_manager = nullptr;
     camera_manager = nullptr;
+    physics_engine = nullptr;
     material_manager = nullptr;
     todos.unload();
     ImGui_ImplOpenGL3_DestroyFontsTexture();

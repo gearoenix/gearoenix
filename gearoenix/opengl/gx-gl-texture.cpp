@@ -13,6 +13,30 @@
 // #define GX_DEBUG_TEXTURE_WRITE
 #endif
 
+static void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t height) noexcept
+{
+    for (auto& mip_pixels : pixels) {
+        GX_ASSERT_D(!mip_pixels.empty());
+        GX_ASSERT_D(height > 0);
+        const auto columns_count = mip_pixels.size() / height;
+        for (std::size_t top = 0, top_index = 0, bottom = height - 1, bottom_index = mip_pixels.size() - columns_count; top < bottom; ++top, --bottom) {
+            const auto next_top_index = top_index + columns_count;
+            const auto next_bottom_index = bottom_index - columns_count;
+            for (; top_index < next_top_index; ++top_index, ++bottom_index) {
+                std::swap(mip_pixels[top_index], mip_pixels[bottom_index]);
+            }
+            bottom_index = next_bottom_index;
+        }
+        height >>= 1;
+    }
+}
+
+static void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::size_t height) noexcept
+{
+    for (auto& p : pixels)
+        flip_texture(p, height);
+}
+
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
 {
     switch (f) {
@@ -151,7 +175,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f) noexce
     }
 }
 
-void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept
+void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept
 {
     render::texture::Texture2D::write(s, c);
     e.todos.load([this, s, c] {
@@ -211,7 +235,7 @@ void gearoenix::gl::Texture2D::generate_mipmaps() noexcept
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCallerIgnored& c) const noexcept
+void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept
 {
     render::texture::TextureCube::write(s, c);
     e.todos.load([this, s, c] {
@@ -277,8 +301,9 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
+    flip_texture(pixels, info.height);
     std::shared_ptr<Texture2D> result(new Texture2D(eng, info, std::move(name)));
     const bool needs_mipmap_generation = info.has_mipmap && pixels.size() < 2;
     const auto internal_format = convert_internal_format(info.format);
@@ -332,7 +357,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
     std::string name,
     std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     std::shared_ptr<TextureCube> result(new TextureCube(eng, info, std::move(name)));
     const bool needs_mipmap_generation = info.has_mipmap && (pixels.empty() || pixels[0].size() < 2);
@@ -341,6 +366,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
     const auto data_format = convert_data_format(info.format);
     const auto gl_img_width = static_cast<gl::sizei>(info.width);
     const auto gl_img_height = static_cast<gl::sizei>(info.height);
+    flip_texture(pixels, info.height);
     eng.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
@@ -390,7 +416,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gl::TextureManager::create_target_v(
     std::string name,
     std::vector<render::texture::Attachment>&& attachments,
-    const core::sync::EndCallerIgnored& c) noexcept
+    const core::sync::EndCaller& c) noexcept
 {
     return std::make_shared<Target>(eng, std::move(attachments), c);
 }

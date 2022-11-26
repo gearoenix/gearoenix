@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
 #define GEAROENIX_RENDER_SCENE_BUILDER_HPP
+#include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <map>
 #include <memory>
 #include <string>
@@ -52,7 +54,7 @@ struct Builder final {
     GX_GET_CREF_PRV(LightBuildersMap, light_builders);
 
 private:
-    Builder(engine::Engine& e, const std::string& name, double layer) noexcept;
+    Builder(engine::Engine& e, const std::string& name, double layer, core::sync::EndCaller&& end_callback) noexcept;
 
 public:
     Builder(Builder&&) = delete;
@@ -68,6 +70,7 @@ public:
     void add(std::shared_ptr<light::Builder>&& light_builder) noexcept;
     [[nodiscard]] Scene& get_scene() noexcept;
     [[nodiscard]] const Scene& get_scene() const noexcept;
+    [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
 };
 }
 

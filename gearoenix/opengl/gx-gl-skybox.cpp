@@ -37,7 +37,7 @@ gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
     Engine& e,
     const std::string& name,
     std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& bound_texture,
-    const core::sync::EndCallerIgnored& end_callback) noexcept
+    const core::sync::EndCaller& end_callback) noexcept
     : render::skybox::Builder(
         e,
         name,
@@ -61,7 +61,7 @@ gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e) noexcept
 gearoenix::gl::SkyboxManager::~SkyboxManager() noexcept = default;
 
 std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::gl::SkyboxManager::build(
-    std::string&& name, Texture&& bound_texture, const core::sync::EndCallerIgnored& c) noexcept
+    std::string&& name, Texture&& bound_texture, const core::sync::EndCaller& c) noexcept
 {
     std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
     if (bound_texture.index() == 0)

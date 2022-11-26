@@ -13,8 +13,8 @@ gearoenix::gl::Camera::~Camera() noexcept = default;
 
 gearoenix::gl::Camera::Camera(Camera&&) noexcept = default;
 
-gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name) noexcept
-    : render::camera::Builder(e, name)
+gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept
+    : render::camera::Builder(e, name, std::move(end_caller))
     , eng(e)
 {
     auto& builder = entity_builder->get_builder();
@@ -29,9 +29,9 @@ void gearoenix::gl::CameraBuilder::set_target(std::shared_ptr<render::texture::T
 
 gearoenix::gl::CameraBuilder::~CameraBuilder() noexcept = default;
 
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::gl::CameraManager::build(const std::string& name) noexcept
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::gl::CameraManager::build(const std::string& name, core::sync::EndCaller&& end_caller) noexcept
 {
-    return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name));
+    return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name, std::move(end_caller)));
 }
 
 gearoenix::gl::CameraManager::CameraManager(Engine& e) noexcept

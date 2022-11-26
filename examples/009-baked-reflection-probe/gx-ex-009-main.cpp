@@ -18,6 +18,7 @@
 #include <gearoenix/render/reflection/gx-rnd-rfl-runtime.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
@@ -29,13 +30,15 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        const auto scene_builder = render_engine.get_scene_manager()->build("scene");
+        gearoenix::core::sync::EndCaller end_callback([] {});
 
-        gearoenix::core::sync::EndCallerIgnored end_callback([scene_builder] {});
+        const auto scene_builder = render_engine.get_scene_manager()->build(
+            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+        scene_builder->get_scene().enabled = true;
 
         auto icosphere_mesh = render_engine.get_mesh_manager()->build_icosphere(
             4,
-            gearoenix::core::sync::EndCallerIgnored(end_callback));
+            gearoenix::core::sync::EndCaller(end_callback));
 
         for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
             for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
@@ -50,7 +53,7 @@ struct GameApp final : public gearoenix::core::Application {
                     "icosphere-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i),
                     std::shared_ptr(icosphere_mesh),
                     std::move(material),
-                    gearoenix::core::sync::EndCallerIgnored(end_callback),
+                    gearoenix::core::sync::EndCaller(end_callback),
                     true);
                 model_builder->get_transformation().local_translate({ static_cast<double>(metallic_i) * 3.0 - 15.0,
                     static_cast<double>(roughness_i) * 3.0 - 15.0,
@@ -65,7 +68,8 @@ struct GameApp final : public gearoenix::core::Application {
             end_callback);
         scene_builder->add(std::move(skybox_builder));
 
-        auto camera_builder = render_engine.get_camera_manager()->build("camera");
+        auto camera_builder = render_engine.get_camera_manager()->build(
+            "camera", gearoenix::core::sync::EndCaller(end_callback));
         auto& camera_transform = camera_builder->get_transformation();
         camera_transform.local_translate({ -19.0, -19.0, 5.0 });
         camera_transform.local_look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });

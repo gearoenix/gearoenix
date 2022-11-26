@@ -285,7 +285,7 @@ double gearoenix::platform::BaseApplication::normalise_x(const double x) const n
 
 double gearoenix::platform::BaseApplication::normalise_y(const double y) const noexcept
 {
-    return y / static_cast<double>(window_size.y) - 0.5;
+    return 0.5 - (y / static_cast<double>(window_size.y));
 }
 
 gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const noexcept

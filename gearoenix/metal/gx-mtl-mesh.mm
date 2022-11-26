@@ -37,7 +37,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::metal::MeshManager::bu
     std::vector<render::PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    core::sync::EndCallerIgnored&& c) noexcept
+    core::sync::EndCaller&& c) noexcept
 {
     auto& eng = dynamic_cast<Engine&>(e);
     auto* const gpu_heap = eng.get_heap_manager()->gpu;
@@ -55,9 +55,9 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::metal::MeshManager::bu
         vb, ib, std::move(occlusion_box),
         static_cast<NSUInteger>(sizeof(render::PbrVertex)),
         vsz, static_cast<NSUInteger>(indices.size()));
-    core::sync::EndCallerIgnored end([c, m] {});
+    core::sync::EndCaller end([c, m] {});
     auto* const u = eng.get_uploader();
-    u->upload(vb, vertices, core::sync::EndCallerIgnored(end));
+    u->upload(vb, vertices, core::sync::EndCaller(end));
     u->upload(ib, indices, std::move(end));
     return m;
 }

@@ -47,14 +47,14 @@ public:
         double img_width,
         double img_height,
         double img_start_skip,
-        const core::sync::EndCallerIgnored& end) const noexcept;
+        const core::sync::EndCaller& end) const noexcept;
     /// This function is a simple and fast way to only render a one-line text to a texture.
     [[nodiscard]] std::shared_ptr<texture::Texture2D> bake(
         const std::wstring& text,
         const math::Vec4<double>& color,
         double img_height,
         double& img_width,
-        const core::sync::EndCallerIgnored& end) const noexcept;
+        const core::sync::EndCaller& end) const noexcept;
 };
 }
 #endif

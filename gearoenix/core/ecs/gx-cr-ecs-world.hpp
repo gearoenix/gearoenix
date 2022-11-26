@@ -61,10 +61,10 @@ public:
     void delayed_create_entity_with_builder(EntityBuilder&&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] Entity::id_t delayed_create_entity(ComponentsTypes&&... components) noexcept
+    [[nodiscard]] Entity::id_t delayed_create_entity(sync::EndCaller&& end_caller, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b;
+        EntityBuilder b(std::move(end_caller));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         const auto id = b.get_id();
         delayed_create_entity_with_builder(std::move(b));
@@ -81,7 +81,7 @@ public:
     void add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b(ei);
+        EntityBuilder b(ei, sync::EndCaller([] {}));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         add_components_map(ei, std::move(b.components));
     }
@@ -89,10 +89,10 @@ public:
     void delayed_add_components_map(Entity::id_t, EntityBuilder::components_t&&) noexcept;
 
     template <typename... ComponentsTypes>
-    void delayed_add_components(const Entity::id_t ei, ComponentsTypes&&... components) noexcept
+    void delayed_add_components(const Entity::id_t ei, sync::EndCaller&& end_caller, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b(ei);
+        EntityBuilder b(ei, std::move(end_caller));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         delayed_add_components_map(ei, std::move(b.components));
     }
@@ -227,7 +227,7 @@ public:
 
     void update_entity(std::optional<std::pair<Entity::id_t, std::size_t>>&&) noexcept;
 
-    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder() noexcept;
+    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(sync::EndCaller&& end_caller) noexcept;
 };
 }
 

@@ -19,19 +19,22 @@ gearoenix::core::ecs::Entity::Entity(Entity&& o) noexcept
 
 std::atomic<gearoenix::core::ecs::Entity::id_t> gearoenix::core::ecs::Entity::last_id(1028);
 
-gearoenix::core::ecs::EntityBuilder::EntityBuilder(const Entity::id_t id) noexcept
+gearoenix::core::ecs::EntityBuilder::EntityBuilder(const Entity::id_t id, sync::EndCaller&& end_caller) noexcept
     : id(id)
+    , end_caller(std::move(end_caller))
 {
 }
 
-gearoenix::core::ecs::EntityBuilder::EntityBuilder() noexcept
+gearoenix::core::ecs::EntityBuilder::EntityBuilder(sync::EndCaller&& end_caller) noexcept
     : id(++Entity::last_id)
+    , end_caller(std::move(end_caller))
 {
 }
 
 gearoenix::core::ecs::EntityBuilder::EntityBuilder(EntityBuilder&& o) noexcept
     : id(o.id)
     , components(std::move(o.components))
+    , end_caller(std::move(o.end_caller))
 {
 }
 
@@ -51,8 +54,9 @@ void* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index c
     return search->second.data();
 }
 
-gearoenix::core::ecs::EntitySharedBuilder::EntitySharedBuilder(World* const world) noexcept
+gearoenix::core::ecs::EntitySharedBuilder::EntitySharedBuilder(World* const world, sync::EndCaller&& end_caller) noexcept
     : world(world)
+    , builder(std::move(end_caller))
 {
 }
 

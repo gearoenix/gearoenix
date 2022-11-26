@@ -6,7 +6,7 @@
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::vulkan::model::Manager::build(
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    const core::sync::EndCallerIgnored& c,
+    const core::sync::EndCaller& c,
     const bool is_transformable) noexcept
 {
     return std::shared_ptr<Builder>(new Builder(vk_e, name, std::move(mesh), is_transformable));

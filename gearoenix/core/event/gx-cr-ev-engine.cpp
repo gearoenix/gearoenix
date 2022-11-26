@@ -2,7 +2,7 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-ev-listener.hpp"
 
-gearoenix::core::event::Engine::Engine() noexcept { }
+gearoenix::core::event::Engine::Engine() noexcept = default;
 
 gearoenix::core::event::Engine::~Engine() noexcept
 {
@@ -22,27 +22,33 @@ void gearoenix::core::event::Engine::remove_listener(const Id event_id, const do
 
 void gearoenix::core::event::Engine::remove_listener(const Id event_id, Listener* const listener) noexcept
 {
-    for (
-        auto search = events_id_priority_listeners.upper_bound(std::make_tuple(event_id, -std::numeric_limits<double>::min(), listener));
-        std::get<0>(*search) == event_id;
-        std::get<2>(*search) == listener ? (search = events_id_priority_listeners.erase(search)) : ++search)
-        ;
+    auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_id, -std::numeric_limits<double>::max(), listener));
+    while (events_id_priority_listeners.end() != search && std::get<0>(*search) == event_id) {
+        if (std::get<2>(*search) == listener) {
+            search = events_id_priority_listeners.erase(search);
+        } else {
+            ++search;
+        }
+    }
 }
 
-void gearoenix::core::event::Engine::remove_listener(Listener* listener) noexcept
+void gearoenix::core::event::Engine::remove_listener(Listener* const listener) noexcept
 {
-    for (
-        auto search = events_id_priority_listeners.begin();
-        search != events_id_priority_listeners.end();
-        std::get<2>(*search) == listener ? (search = events_id_priority_listeners.erase(search)) : ++search)
-        ;
+    auto search = events_id_priority_listeners.begin();
+    while (search != events_id_priority_listeners.end()) {
+        if (std::get<2>(*search) == listener) {
+            search = events_id_priority_listeners.erase(search);
+        } else {
+            ++search;
+        }
+    }
 }
 
 void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
 {
     bool keep_continuing = true;
     for (
-        auto search = events_id_priority_listeners.upper_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<double>::min(), nullptr));
+        auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<double>::max(), nullptr));
         keep_continuing && search != events_id_priority_listeners.end() && std::get<0>(*search) == event_data.get_source();) {
         switch (std::get<2>(*search)->on_event(event_data)) {
         case Listener::Response::Erase:

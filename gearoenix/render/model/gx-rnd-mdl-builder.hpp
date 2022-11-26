@@ -1,5 +1,6 @@
 #ifndef GEAROENIX_RENDER_MODEL_BUILDER_HPP
 #define GEAROENIX_RENDER_MODEL_BUILDER_HPP
+#include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
@@ -35,6 +36,7 @@ protected:
         const std::string& name,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         std::shared_ptr<material::Material>&& bound_material,
+        core::sync::EndCaller&& end_caller,
         bool is_transformable = true) noexcept;
 
 public:
@@ -45,6 +47,7 @@ public:
     virtual ~Builder() noexcept;
 
     [[nodiscard]] physics::Transformation& get_transformation() noexcept;
+    [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
 };
 }
 #endif

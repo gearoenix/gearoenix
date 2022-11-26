@@ -79,7 +79,7 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCallerIgnored& end_callback) noexcept;
+        const core::sync::EndCaller& end_callback) noexcept;
     ~Runtime() noexcept final;
     Runtime(Runtime&&) noexcept;
     void set_location(const math::Vec3<double>& p) noexcept;
@@ -89,7 +89,7 @@ public:
     void set_on_rendered(std::function<void()>&&) noexcept;
     void export_baked(
         const std::shared_ptr<platform::stream::Stream>& s,
-        const core::sync::EndCallerIgnored& end_callback = GX_DEFAULT_IGNORED_END_CALLER) const noexcept;
+        const core::sync::EndCaller& end_callback) const noexcept;
 };
 }
 #endif
