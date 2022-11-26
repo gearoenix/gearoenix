@@ -7,6 +7,7 @@
 #include "gx-au-player.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/static_vector.hpp>
+#include <mutex>
 #include <string>
 #include <vector>
 
