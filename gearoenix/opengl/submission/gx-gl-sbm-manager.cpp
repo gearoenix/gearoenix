@@ -1157,6 +1157,7 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::sync::EndCaller([] {}))))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::sync::EndCaller([] {}))))
 {
+    GX_GL_CHECK_D;
     GX_LOG_D("Creating submission manager.");
     initialise_back_buffer_sizes();
     initialise_screen_vertices();

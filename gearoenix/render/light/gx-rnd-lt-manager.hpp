@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_LIGHT_MANAGER_HPP
 #include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include <memory>
+#include <string>
 
 namespace gearoenix::render::engine {
 struct Engine;

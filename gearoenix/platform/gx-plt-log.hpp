@@ -33,7 +33,7 @@ struct Log {
 #define GX_PLT_LOG_STR_VAR GX_CONCAT_5(_gearoenix_platform_log_str_, __LINE__)
 
 #ifdef GX_DEBUG_MODE
-#define GX_PLT_LOG_FILE_LOCK_GUARD std::lock_guard<std::mutex> GX_CONCAT_5(_gearoenix_platform_log_lock_guard_, __LINE__)(gearoenix::platform::Log::log_lock);
+#define GX_PLT_LOG_FILE_LOCK_GUARD const std::lock_guard<std::mutex> GX_CONCAT_5(_gearoenix_platform_log_lock_guard_, __LINE__)(gearoenix::platform::Log::log_lock);
 #define GX_PLT_LOG_END_OF_MSG << std::flush
 #else
 #define GX_PLT_LOG_FILE_LOCK_GUARD

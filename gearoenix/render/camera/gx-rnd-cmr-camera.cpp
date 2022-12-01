@@ -204,7 +204,7 @@ void gearoenix::render::camera::Camera::create_debug_mesh() noexcept
     };
     std::string mesh_name = "camera-debug-mesh" + std::to_string(reinterpret_cast<std::size_t>(this));
     (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
-    std::shared_ptr<decltype(debug_mesh)> result_holder(new decltype(debug_mesh)());
+    const std::shared_ptr<decltype(debug_mesh)> result_holder(new decltype(debug_mesh)());
     *result_holder = e.get_mesh_manager()->build(
         std::move(mesh_name),
         std::move(vertices),

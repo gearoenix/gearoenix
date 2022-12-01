@@ -13,14 +13,14 @@ gearoenix::gl::Mesh::Mesh(Engine& e, const math::Aabb3<double>& box) noexcept
 
 gearoenix::gl::Mesh::~Mesh() noexcept
 {
-    e.todos.load([=] {
+    e.todos.load([vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
         GX_GL_CHECK_D;
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteVertexArrays(1, &vertex_object);
-        glDeleteBuffers(1, &vertex_buffer);
+        glDeleteVertexArrays(1, &vo);
+        glDeleteBuffers(1, &vb);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &index_buffer);
+        glDeleteBuffers(1, &ib);
         GX_GL_CHECK_D;
     });
 }

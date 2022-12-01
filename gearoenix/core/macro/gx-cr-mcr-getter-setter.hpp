@@ -153,7 +153,7 @@ public:                                 \
 #define GX_GET_VAL_PRT(t, x, d) GX_GET_VAL(protected, t, x, d)
 #define GX_GET_VAL_PRV(t, x, d) GX_GET_VAL(private, t, x, d)
 #define GX_GETSET_VAL_PRT(t, x, d) GX_GETSET_VAL(protected, t, x, d)
-#define GX_GETSET_VAL_PRV(t, x, d) GX_GETSET_VAL(protected, t, x, d)
+#define GX_GETSET_VAL_PRV(t, x, d) GX_GETSET_VAL(private, t, x, d)
 #define GX_GET_AVAL(v, t, x, d)              \
 public:                                      \
     [[nodiscard]] t get_##x() const noexcept \
