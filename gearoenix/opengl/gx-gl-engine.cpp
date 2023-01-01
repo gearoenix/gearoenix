@@ -4,6 +4,7 @@
 #include "../physics/gx-phs-engine.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-gl-camera.hpp"
+#include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-light.hpp"
 #include "gx-gl-loader.hpp"
@@ -12,7 +13,6 @@
 #include "gx-gl-reflection.hpp"
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-texture.hpp"
-#include "gx-gl-check.hpp"
 #include "material/gx-gl-mat-manager.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
 #include "submission/gx-gl-sbm-manager.hpp"
@@ -23,7 +23,8 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
     , shader_manager(new shader::Manager(*this))
 {
-    while(GL_NO_ERROR != glGetError()) {/*ignoring some error that caused by caller*/}
+    while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by caller*/
+    }
     GX_GL_CHECK_D;
     ImGui_ImplOpenGL3_Init("#version 300 es");
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
@@ -32,7 +33,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
     constexpr sint min_supported_texture_size = 2048;
     specification.texture_maximum_aspect = static_cast<unsigned int>(
-            max_texture_size > min_supported_texture_size ? max_texture_size : min_supported_texture_size);
+        max_texture_size > min_supported_texture_size ? max_texture_size : min_supported_texture_size);
     sint max_attach = 0;
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attach);
     specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);

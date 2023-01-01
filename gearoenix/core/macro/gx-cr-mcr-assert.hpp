@@ -33,19 +33,9 @@
 #define GX_CHECK_NOT_EQUAL_D(x, y) GX_CHECK_NOT_EQUAL(x, y)
 #define GX_CHECK_EQUAL_D(x, y) GX_CHECK_EQUAL(x, y)
 #else
-#define GX_ASSERT_D(x) (void)(x)
-#define GX_CHECK_NOT_EQUAL_D(x, y) \
-    {                              \
-        ((void)(x));               \
-        ((void)(y));               \
-    }                              \
-    static_assert(true, "")
-#define GX_CHECK_EQUAL_D(x, y) \
-    {                          \
-        ((void)(x));           \
-        ((void)(y));           \
-    }                          \
-    static_assert(true, "")
+#define GX_ASSERT_D(x) static_assert(true, "")
+#define GX_CHECK_NOT_EQUAL_D(x, y) static_assert(true, "")
+#define GX_CHECK_EQUAL_D(x, y) static_assert(true, "")
 #endif
 
 #endif

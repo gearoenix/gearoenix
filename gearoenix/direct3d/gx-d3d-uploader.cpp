@@ -13,8 +13,10 @@ void gearoenix::d3d::Uploader::wait(const UINT64 fv) noexcept
     auto fence_event = CreateEventW(nullptr, false, false, nullptr);
     GX_ASSERT_D(NULL != fence_event);
     GX_D3D_CHECK(fence->SetEventOnCompletion(fv, fence_event));
-    GX_ASSERT_D(WAIT_OBJECT_0 == WaitForSingleObjectEx(fence_event, INFINITE, false));
-    GX_ASSERT_D(0 != CloseHandle(fence_event));
+    const auto wr = WaitForSingleObjectEx(fence_event, INFINITE, false);
+    GX_ASSERT_D(WAIT_OBJECT_0 == wr);
+    const auto ch = CloseHandle(fence_event);
+    GX_ASSERT_D(0 != ch);
 }
 
 gearoenix::d3d::Uploader::Uploader(std::shared_ptr<Device> _device) noexcept

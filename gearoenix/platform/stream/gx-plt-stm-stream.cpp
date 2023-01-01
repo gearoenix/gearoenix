@@ -22,12 +22,12 @@ std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream
         return std::shared_ptr<Stream>(Asset::construct(app, path.get_raw_data()));
     if (path.is_absolute())
         return std::shared_ptr<Stream>(Local::open(app, path.get_raw_data()));
-    return std::shared_ptr<Stream>();
+    return {};
 }
 
 void gearoenix::platform::stream::Stream::read(std::string& s) noexcept
 {
-    std::uint32_t sz;
+    std::uint32_t sz = 0;
     read(sz);
     s.resize(sz);
     GX_ASSERT(s.size() == read(s.data(), s.size()));
@@ -52,5 +52,6 @@ bool gearoenix::platform::stream::Stream::write(const std::string& s) noexcept
 
 void gearoenix::platform::stream::Stream::write_fail_debug(const std::string& s) noexcept
 {
-    GX_ASSERT_D(write(s));
+    [[maybe_unused]] const auto b = write(s);
+    GX_ASSERT_D(b);
 }

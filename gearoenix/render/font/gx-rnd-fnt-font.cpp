@@ -34,7 +34,8 @@ static int file_index = 0;
 
 void gearoenix::render::font::Font::init() noexcept
 {
-    GX_ASSERT_D(0 != stbtt_InitFont(stb_font.get(), ttf_data.data(), 0));
+    const auto init_result = stbtt_InitFont(stb_font.get(), ttf_data.data(), 0);
+    GX_ASSERT_D(0 != init_result);
     stbtt_GetFontVMetrics(stb_font.get(), &ascent, &descent, &line_gap);
     fnt_height = ascent - descent;
     line_growth = line_gap + fnt_height;
