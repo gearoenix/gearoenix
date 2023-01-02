@@ -539,7 +539,7 @@ static void process_node(
             rnd_cmr.set_projection_type(gearoenix::render::camera::Projection::Perspective);
             rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
             rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
-            rnd_cmr.set_yfov(static_cast<float>(cmr.perspective.yfov));
+            rnd_cmr.set_fov_y(static_cast<float>(cmr.perspective.yfov));
         } else {
             rnd_cmr.set_projection_type(gearoenix::render::camera::Projection::Orthographic);
             rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
@@ -728,7 +728,7 @@ static void load_materials(
     for (std::size_t material_id = 0; material_id < data.materials.size(); ++material_id) {
         const tinygltf::Material& mat = data.materials[material_id];
         materials[material_id] = e.get_material_manager()->get_pbr(mat.name, end_callback);
-        auto& gx_mat = *materials[material_id].get();
+        auto& gx_mat = *materials[material_id];
         GX_LOG_D("Loading material: " << mat.name);
         if (mat.doubleSided)
             GX_UNIMPLEMENTED;

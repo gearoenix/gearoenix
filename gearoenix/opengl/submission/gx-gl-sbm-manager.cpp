@@ -50,7 +50,6 @@
 #define GX_ALGORITHM_EXECUTION
 #else
 #include <execution>
-#include <thread>
 
 #define GX_ALGORITHM_EXECUTION std::execution::par_unseq,
 #endif
@@ -72,27 +71,13 @@ void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes() noexcept
 
 void gearoenix::gl::submission::Manager::back_buffer_size_changed() noexcept
 {
-    const auto& resolution = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get();
-    switch (resolution.index()) {
-    case boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value: {
-        const auto& res = std::get<render::FixedResolution>(resolution);
-        back_buffer_size = math::Vec2<uint>(res.width, res.height);
-        break;
-    }
-    case boost::mp11::mp_find<render::Resolution, render::ScreenBasedResolution>::value: {
-        const auto& res = std::get<render::ScreenBasedResolution>(resolution);
-        back_buffer_size = (math::Vec2<uint>(e.get_platform_application().get_base().get_window_size()) * static_cast<uint>(res.nom)) / static_cast<uint>(res.dom);
-        break;
-    }
-    }
-
+    back_buffer_size = math::Vec2<uint>(e.get_texture_manager()->get_default_camera_render_target_dimensions());
     back_buffer_aspect_ratio = static_cast<float>(back_buffer_size.x) / static_cast<float>(back_buffer_size.y);
     back_buffer_uv_move = math::Vec2(1.0f) / math::Vec2<float>(back_buffer_size);
     back_buffer_viewport_clip = math::Vec4<sizei>(0, 0, static_cast<sizei>(back_buffer_size.x), static_cast<sizei>(back_buffer_size.y));
 
     initialise_gbuffers();
     initialise_ssao();
-    initialise_final();
     initialise_bloom();
 }
 
@@ -194,40 +179,9 @@ void gearoenix::gl::submission::Manager::initialise_ssao() noexcept
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
 
-void gearoenix::gl::submission::Manager::initialise_final() noexcept
-{
-    if (!e.get_specification().is_deferred_supported)
-        return;
-    auto* const txt_mgr = e.get_texture_manager();
-    const render::texture::TextureInfo txt_info {
-        .format = render::texture::TextureFormat::RgbaFloat16,
-        .sampler_info = render::texture::SamplerInfo {
-            .min_filter = render::texture::Filter::Linear,
-            .mag_filter = render::texture::Filter::Linear,
-            .wrap_s = render::texture::Wrap::ClampToEdge,
-            .wrap_t = render::texture::Wrap::ClampToEdge,
-            .wrap_r = render::texture::Wrap::ClampToEdge,
-            .anisotropic_level = 0,
-        },
-        .width = back_buffer_size.x,
-        .height = back_buffer_size.y,
-        .depth = 0,
-        .type = render::texture::Type::Texture2D,
-        .has_mipmap = false,
-    };
-    final_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-final", {}, txt_info, core::sync::EndCaller([] {})));
-
-    std::vector<render::texture::Attachment> attachments(1);
-    attachments[0].var = render::texture::Attachment2D { .txt = final_texture };
-    final_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-final", std::move(attachments), core::sync::EndCaller([] {})));
-
-    GX_LOG_D("Final render target has been created.");
-}
-
 void gearoenix::gl::submission::Manager::initialise_screen_vertices() noexcept
 {
-    constexpr float screen_vertices[] = {
+    constexpr std::array<float, 6> screen_vertices = {
         -1.0f, 3.0f, // 1
         -1.0f, -1.0f, // 2
         3.0f, -1.0f, // 3
@@ -236,7 +190,7 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices() noexcept
     glBindVertexArray(screen_vertex_object);
     glGenBuffers(1, &screen_vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, screen_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
     glBindVertexArray(0);
@@ -438,7 +392,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
                 return;
             }
             auto& mesh = *model->get_mesh();
-            BvhNodeModel md {
+            const BvhNodeModel md {
                 .cameras_flags = render_model->cameras_flags,
                 .model = Model {
                     .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
@@ -473,7 +427,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             if (!render_model->enabled || !render_model->get_is_transformable() || render_model->scene_id != scene_id)
                 return;
             const auto& mesh = *gl_model->get_mesh();
-            std::size_t first_bone_index;
+            std::size_t first_bone_index = 0;
             std::size_t bones_count = 0;
             if (nullptr != armature) {
                 first_bone_index = scene_data.bones_data.size();
@@ -614,9 +568,11 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
+            bool is_main_camera = false;
             switch (render_camera->get_usage()) {
             case render::camera::Camera::Usage::Main:
                 camera_pool_index = scene_data.cameras[std::make_pair(render_camera->get_layer(), camera_id)];
+                is_main_camera = true;
                 break;
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
@@ -631,23 +587,16 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             }
             auto& camera_data = camera_pool[camera_pool_index];
             camera_data.clear();
-            math::Vec2<std::size_t> target_dimension;
-            if (nullptr != gl_camera->target) {
-                camera_data.framebuffer = gl_camera->target->get_framebuffer();
-                target_dimension = render_camera->get_target()->get_dimension();
-            } else if (e.get_specification().is_deferred_supported) {
-                camera_data.framebuffer = gbuffers_target->get_framebuffer();
-                target_dimension = gbuffers_target->get_dimension();
-            } else {
-                camera_data.framebuffer = bloom_target->get_framebuffer();
-                target_dimension = bloom_target->get_dimension();
-            }
+            const auto target_dimension = render_camera->get_target()->get_dimension();
+            camera_data.framebuffer = gl_camera->target->get_framebuffer();
+            camera_data.colour_attachment = gl_camera->target->get_gl_attachments()[0].texture_object;
             camera_data.viewport_clip = math::Vec4<sizei>(render_camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
             camera_data.vp = render_camera->get_view_projection();
             camera_data.pos = math::Vec3<float>(camera_location);
             camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
             camera_data.colour_tuning = render_camera->get_colour_tuning();
             camera_data.has_bloom = render_camera->get_has_bloom();
+            camera_data.is_main_camera = is_main_camera;
             camera_data.out_reference = render_camera->get_reference_id();
 
             // Recoding static models
@@ -891,8 +840,13 @@ void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, con
 void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scene, const Camera& camera) noexcept
 {
     GX_GL_CHECK_D;
-    set_framebuffer(camera.framebuffer);
-    set_viewport_clip(camera.viewport_clip);
+    if (camera.is_main_camera && camera.has_bloom) {
+        set_framebuffer(bloom_target->get_framebuffer());
+        set_viewport_clip(back_buffer_viewport_clip);
+    } else {
+        set_framebuffer(camera.framebuffer);
+        set_viewport_clip(camera.viewport_clip);
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render_skyboxes(scene, camera);
     GX_GL_CHECK_D;
@@ -910,10 +864,9 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
 {
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
-    const float screen_uv_move_reserved[] { back_buffer_uv_move.x, back_buffer_uv_move.y, 0.0f, 0.0f };
+    const std::array<float, 4> screen_uv_move_reserved { back_buffer_uv_move.x, back_buffer_uv_move.y, 0.0f, 0.0f };
     const auto* const gbuffers_attachments = gbuffers_target->get_gl_attachments().data();
     const auto* const ssao_resolved_attachments = ssao_resolve_target->get_gl_attachments().data();
-    const auto* const final_attachments = final_target->get_gl_attachments().data();
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         glDisable(GL_BLEND); // TODO find the best place for it
@@ -951,7 +904,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
         // PBR ------------------------------------------------------------------------------------------------
-        set_framebuffer(final_target->get_framebuffer());
+        // set_framebuffer(final_target->get_framebuffer()); TODO camera must do it
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
@@ -985,7 +938,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(deferred_pbr_shader->get_brdflut_index()));
             glBindTexture(GL_TEXTURE_2D, brdflut->get_object());
 
-            deferred_pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved);
+            deferred_pbr_shader->set_screen_uv_move_reserved_data(screen_uv_move_reserved.data());
             deferred_pbr_shader->set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));
 
             glBindVertexArray(screen_vertex_object);
@@ -1011,7 +964,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
         final_shader->bind(current_shader);
 
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
-        glBindTexture(GL_TEXTURE_2D, final_attachments[0].texture_object);
+        // glBindTexture(GL_TEXTURE_2D, final_attachments[0].texture_object); // TODO camera has the the target
 
         glBindVertexArray(screen_vertex_object);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -1030,33 +983,6 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
         }
         render_debug_meshes(scene);
     }
-}
-
-void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera& camera) noexcept
-{
-    GX_GL_CHECK_D;
-
-    if (camera.has_bloom) {
-        set_framebuffer(bloom_horizontal_target->get_framebuffer());
-        set_viewport_clip(back_buffer_viewport_clip);
-        auto& horizontal_shader = bloom_shader_combination->get(true);
-        horizontal_shader.bind(current_shader);
-        horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
-        glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
-        glBindVertexArray(screen_vertex_object);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        set_framebuffer(bloom_vertical_target->get_framebuffer());
-        set_viewport_clip(back_buffer_viewport_clip);
-        auto& vertical_shader = bloom_shader_combination->get(false);
-        vertical_shader.bind(current_shader);
-        vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
-        glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
-        glBindVertexArray(screen_vertex_object);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-    }
 
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
@@ -1074,6 +1000,50 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera
         set_viewport_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
     }
 
+    glEnable(GL_BLEND);
+    final_shader->bind(current_shader);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+    for (auto& scene_layer_entity_id_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+            glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
+            glBindVertexArray(screen_vertex_object);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+    }
+    glDisable(GL_BLEND);
+}
+
+void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera& camera) noexcept
+{
+    GX_GL_CHECK_D;
+
+    if (!camera.has_bloom)
+        return;
+
+    set_framebuffer(bloom_horizontal_target->get_framebuffer());
+    set_viewport_clip(back_buffer_viewport_clip);
+    auto& horizontal_shader = bloom_shader_combination->get(true);
+    horizontal_shader.bind(current_shader);
+    horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    set_framebuffer(bloom_vertical_target->get_framebuffer());
+    set_viewport_clip(back_buffer_viewport_clip);
+    auto& vertical_shader = bloom_shader_combination->get(false);
+    vertical_shader.bind(current_shader);
+    vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    set_framebuffer(camera.framebuffer);
+    set_viewport_clip(camera.viewport_clip);
     auto& colour_tuning_anti_aliasing_shader = colour_tuning_anti_aliasing_shader_combination->get(camera.colour_tuning);
     colour_tuning_anti_aliasing_shader.bind(current_shader);
     colour_tuning_anti_aliasing_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
@@ -1110,7 +1080,7 @@ void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
 void gearoenix::gl::submission::Manager::render_imgui() noexcept
 {
     ImGui::Render();
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO& io = ImGui::GetIO();
     set_viewport_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -1142,7 +1112,7 @@ void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_
 
 gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     : e(e)
-    , final_shader(e.get_specification().is_deferred_supported ? new shader::Final(e) : nullptr)
+    , final_shader(new shader::Final(e))
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
     , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
     , irradiance_shader(new shader::Irradiance(e))

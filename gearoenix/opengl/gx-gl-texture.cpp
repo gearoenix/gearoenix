@@ -1,7 +1,6 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../platform/stream/gx-plt-stm-local.hpp"
-#include "../render/texture/gx-rnd-txt-image.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
@@ -180,7 +179,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
     render::texture::Texture2D::write(s, c);
     e.todos.load([this, s, c] {
         GX_GL_CHECK_D;
-        gl::uint framebuffer;
+        gl::uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_2D, object);
@@ -240,7 +239,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
     render::texture::TextureCube::write(s, c);
     e.todos.load([this, s, c] {
         GX_GL_CHECK_D;
-        gl::uint framebuffer;
+        gl::uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
@@ -418,7 +417,9 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gl::TextureManage
     std::vector<render::texture::Attachment>&& attachments,
     const core::sync::EndCaller& c) noexcept
 {
-    return std::make_shared<Target>(eng, std::move(attachments), c);
+    auto result = std::make_shared<Target>(eng, std::move(attachments), c);
+    eng.todos.load([result] {}); // Keep the texture alive till then
+    return result;
 }
 
 #endif

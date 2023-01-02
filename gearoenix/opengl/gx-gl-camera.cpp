@@ -1,6 +1,7 @@
 #include "gx-gl-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 
@@ -18,13 +19,15 @@ gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, 
     , eng(e)
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(Camera());
+    Camera camera;
+    camera.target = std::dynamic_pointer_cast<Target>(entity_builder->get_builder().get_component<render::camera::Camera>()->get_target());
+    builder.add_component(std::move(camera));
 }
 
-void gearoenix::gl::CameraBuilder::set_target(std::shared_ptr<render::texture::Target>&& target) noexcept
+void gearoenix::gl::CameraBuilder::set_customised_target(std::shared_ptr<render::texture::Target>&& target) noexcept
 {
     entity_builder->get_builder().get_component<Camera>()->target = std::dynamic_pointer_cast<Target>(target);
-    render::camera::Builder::set_target(std::move(target));
+    render::camera::Builder::set_customised_target(std::move(target));
 }
 
 gearoenix::gl::CameraBuilder::~CameraBuilder() noexcept = default;

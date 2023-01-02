@@ -20,6 +20,7 @@ protected:
 public:
     virtual ~Target() noexcept;
     [[nodiscard]] math::Vec2<std::size_t> get_dimension() const noexcept;
+    [[nodiscard]] float get_aspect_ratio() const noexcept;
 };
 }
 #endif

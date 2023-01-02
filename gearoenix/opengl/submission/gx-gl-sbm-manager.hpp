@@ -67,8 +67,6 @@ private:
     std::shared_ptr<Target> gbuffers_target;
     std::shared_ptr<Texture2D> ssao_resolve_texture;
     std::shared_ptr<Target> ssao_resolve_target;
-    std::shared_ptr<Texture2D> final_texture;
-    std::shared_ptr<Target> final_target;
     std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
     std::shared_ptr<Texture2D> bloom_source_texture;
@@ -99,7 +97,6 @@ private:
     void back_buffer_size_changed() noexcept;
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
-    void initialise_final() noexcept;
     void initialise_screen_vertices() noexcept;
     void initialise_bloom() noexcept;
 

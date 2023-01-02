@@ -70,6 +70,16 @@ struct Vec4 {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
+    [[nodiscard]] constexpr Vec2<Element> xy() const noexcept
+    {
+        return { x, y };
+    }
+
+    [[nodiscard]] constexpr Vec2<Element> zw() const noexcept
+    {
+        return { z, w };
+    }
+
     [[nodiscard]] constexpr Vec3<Element> xyz() const noexcept
     {
         return Vec3<Element>(x, y, z);

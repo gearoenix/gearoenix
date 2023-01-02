@@ -2,7 +2,6 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
@@ -12,6 +11,7 @@
 #include "../texture/gx-rnd-txt-target.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-rnd-rfl-builder.hpp"
+#include <cstddef>
 #include <tuple>
 
 gearoenix::render::reflection::Runtime::Runtime(
@@ -36,20 +36,21 @@ gearoenix::render::reflection::Runtime::Runtime(
     const auto radiance_mipmap_levels = static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
     const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
     const auto fars = math::Vec3<float>(receive_box.get_diameter() * 0.5);
-    const std::tuple<texture::Face, double /*x-rotate*/, double /*y-rotate*/, double /*z-rotate*/, float /*near*/, float /*far*/> faces[6] = {
+    const std::array<std::tuple<texture::Face, double /*x-rotate*/, double /*y-rotate*/, double /*z-rotate*/, float /*near*/, float /*far*/>, 6> faces { {
         { texture::FACES[0], GX_PI * 0.0, GX_PI * 1.5, GX_PI * 1.0, nears.x, fars.x },
         { texture::FACES[1], GX_PI * 0.0, GX_PI * 0.5, GX_PI * 1.0, nears.x, fars.x },
         { texture::FACES[2], GX_PI * 0.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
         { texture::FACES[3], GX_PI * 1.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
         { texture::FACES[4], GX_PI * 1.0, GX_PI * 0.0, GX_PI * 0.0, nears.z, fars.z },
         { texture::FACES[5], GX_PI * 0.0, GX_PI * 0.0, GX_PI * 1.0, nears.z, fars.z },
-    };
+    } };
     auto* const txt_mgr = e.get_texture_manager();
     auto* const cam_mgr = e.get_camera_manager();
     const auto roughness_move = 1.0 / static_cast<double>(radiance_mipmap_levels - 1);
     double current_roughness = 0.0;
-    for (auto i = decltype(radiance_mipmap_levels) { 0 }; i < radiance_mipmap_levels; ++i, current_roughness += roughness_move) {
+    for (auto i = decltype(radiance_mipmap_levels) { 0 }; i < radiance_mipmap_levels; ++i) {
         roughnesses.push_back(current_roughness);
+        current_roughness += roughness_move;
     }
     const texture::TextureInfo environment_texture_info {
         .format = e.get_specification().is_float_texture_supported ? texture::TextureFormat::RgbaFloat32 : texture::TextureFormat::RgbaUint8,
@@ -74,7 +75,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     radiance_texture_info.width = radiance_resolution;
     radiance_texture_info.height = radiance_resolution;
     std::vector<std::vector<std::vector<std::uint8_t>>> radiance_pixels(6);
-    const std::size_t pixel_size = 4 * 4;
+    const auto pixel_size = static_cast<const std::size_t>(4) * static_cast<const std::size_t>(4);
     const std::size_t base_mipmap_radiance_size = pixel_size * radiance_resolution * radiance_resolution;
     for (auto& fp : radiance_pixels) {
         fp.resize(roughnesses.size());
@@ -107,10 +108,12 @@ gearoenix::render::reflection::Runtime::Runtime(
     for (std::size_t face_index = 0; face_index < 6; ++face_index) {
         const auto& face = faces[face_index];
         const auto name_ext = "-" + std::to_string(std::get<0>(face));
-        auto camera_builder = cam_mgr->build(name + "-camera" + name_ext, core::sync::EndCaller(end_callback));
+        auto camera_builder = cam_mgr->build(
+            std::string(name).append("-camera").append(name_ext),
+            core::sync::EndCaller(end_callback));
         cameras[face_index] = camera_builder->get_entity_builder()->get_builder().get_id();
         environment_targets[face_index] = txt_mgr->create_target(
-            name + "-environment-target" + name_ext,
+            std::string(name).append("-environment-target").append(name_ext),
             std::vector<texture::Attachment> {
                 texture::Attachment {
                     .var = texture::AttachmentCube {
@@ -122,12 +125,11 @@ gearoenix::render::reflection::Runtime::Runtime(
                                       } },
             },
             end_callback);
-        camera_builder->set_target(std::shared_ptr<texture::Target>(environment_targets[face_index]));
+        camera_builder->set_customised_target(std::shared_ptr<texture::Target>(environment_targets[face_index]));
         auto& cam = camera_builder->get_camera();
-        cam.set_target_aspect_ratio(1.0f);
         cam.set_near(std::get<4>(face));
         cam.set_far(std::get<5>(face));
-        cam.set_yfov(static_cast<float>(GX_PI * 0.5));
+        cam.set_fov_y(static_cast<float>(GX_PI * 0.5));
         cam.set_usage(camera::Camera::Usage::ReflectionProbe);
         cam.set_reference_id(builder.get_entity_builder()->get_builder().get_id());
         cam.enabled = false;
@@ -138,7 +140,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         transform.set_local_location(receive_box.get_center());
         builder.set_camera_builder(std::move(camera_builder), face_index);
         irradiance_targets[face_index] = txt_mgr->create_target(
-            name + "-irradiance-target" + name_ext,
+            std::string(name).append("-irradiance-target").append(name_ext),
             std::vector<texture::Attachment> {
                 texture::Attachment {
                     .var = texture::AttachmentCube {
@@ -150,7 +152,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         radiance_face_targets.resize(roughnesses.size());
         for (std::size_t mip_index = 0; mip_index < roughnesses.size(); ++mip_index) {
             radiance_face_targets[mip_index] = txt_mgr->create_target(
-                name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
+                std::string(name).append("-radiance-target").append(name_ext).append("-").append(std::to_string(mip_index)),
                 std::vector<texture::Attachment> {
                     texture::Attachment {
                         .mipmap_level = static_cast<unsigned int>(mip_index),

@@ -4,6 +4,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
 #include <boost/mp11/algorithm.hpp>
 #include <imgui/imgui.h>
@@ -15,15 +16,19 @@ static thread_local std::default_random_engine re(rd());
 
 gearoenix::render::camera::Camera::Camera(
     engine::Engine& e,
-    const float target_aspect_ratio,
+    const std::string& name,
     const std::size_t resolution_cfg_listener,
+    const core::sync::EndCaller& end_caller,
+    std::shared_ptr<texture::Target>&& customised_target,
     const Projection projection_type,
     const float near,
     const float far) noexcept
     : core::ecs::Component(this)
     , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
-    , target_aspect_ratio(target_aspect_ratio)
+    , has_customised_target(nullptr == customised_target)
+    , target(nullptr == customised_target ? e.get_texture_manager()->create_default_camera_render_target(name, end_caller) : std::move(customised_target))
+    , target_aspect_ratio(target->get_aspect_ratio())
     , far(far)
     , near(near)
     , colour_tuning(HdrTuneMappingGammaCorrection {})
@@ -46,19 +51,20 @@ gearoenix::render::camera::Camera::Camera(Camera&& o) noexcept
     , projection(o.projection)
     , view_projection(o.view_projection)
     , starting_clip_ending_clip(o.starting_clip_ending_clip)
+    , has_customised_target(o.has_customised_target)
     , target(std::move(o.target))
+    , has_customised_target_aspect_ratio(o.has_customised_target_aspect_ratio)
+    , target_aspect_ratio(o.target_aspect_ratio)
     , reference_id(o.reference_id)
     , scene_id(o.scene_id)
     , flag(o.flag)
-    , target_aspect_ratio(o.target_aspect_ratio)
     , far(o.far)
     , near(o.near)
-    , scale_fovy(o.scale_fovy)
+    , scale_fov_y(o.scale_fov_y)
     , colour_tuning(o.colour_tuning)
     , projection_type(o.projection_type)
     , layer(o.layer)
     , usage(o.usage)
-    , use_target_aspect_ratio(o.use_target_aspect_ratio)
     , debug_enabled(o.debug_enabled)
     , debug_colour(o.debug_colour)
     , debug_mesh(o.debug_mesh)
@@ -73,38 +79,6 @@ gearoenix::render::camera::Camera::~Camera() noexcept
     e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_listener(resolution_cfg_listener);
 }
 
-void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v) noexcept
-{
-    view = v;
-    view_projection = projection * v;
-}
-
-void gearoenix::render::camera::Camera::set_target_aspect_ratio(const float tap) noexcept
-{
-    target_aspect_ratio = tap;
-    update_projection();
-}
-
-void gearoenix::render::camera::Camera::set_projection_type(const Projection p) noexcept
-{
-    projection_type = p;
-    update_projection();
-}
-
-void gearoenix::render::camera::Camera::update_projection() noexcept
-{
-    if (Projection::Perspective == projection_type) {
-        const auto s = 2.0f * near * tanf(scale_fovy * 0.5f);
-        projection = math::Mat4x4<float>::perspective(target_aspect_ratio * s, s, near, far);
-    } else
-        projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * scale_fovy, scale_fovy, near, far);
-    view_projection = projection * view;
-
-    if (debug_enabled) {
-        create_debug_mesh();
-    }
-}
-
 void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& l,
     const math::Vec3<double>& x,
@@ -112,7 +86,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& z,
     std::array<math::Vec3<double>, 8>& points) const noexcept
 {
-    const auto scale = Projection::Perspective == projection_type ? near * tanf(scale_fovy * 0.5f) : scale_fovy * 0.5f;
+    const auto scale = Projection::Perspective == projection_type ? near * tanf(scale_fov_y * 0.5f) : scale_fov_y * 0.5f;
     const auto fpn = Projection::Perspective == projection_type ? (static_cast<double>(far) + static_cast<double>(near)) * static_cast<double>(scale) / static_cast<double>(near) : static_cast<double>(scale);
     const auto far_x = static_cast<double>(target_aspect_ratio) * fpn;
     const auto far_y = fpn;
@@ -132,6 +106,38 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
     points[7] = l + nx - ny + nz;
 }
 
+void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v) noexcept
+{
+    view = v;
+    view_projection = projection * v;
+}
+
+void gearoenix::render::camera::Camera::set_customised_target_aspect_ratio(const float tar) noexcept
+{
+    has_customised_target_aspect_ratio = true;
+    set_target_aspect_ratio(tar);
+}
+
+void gearoenix::render::camera::Camera::set_projection_type(const Projection p) noexcept
+{
+    projection_type = p;
+    update_projection();
+}
+
+void gearoenix::render::camera::Camera::update_projection() noexcept
+{
+    if (Projection::Perspective == projection_type) {
+        const auto s = 2.0f * near * tanf(scale_fov_y * 0.5f);
+        projection = math::Mat4x4<float>::perspective(target_aspect_ratio * s, s, near, far);
+    } else
+        projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * scale_fov_y, scale_fov_y, near, far);
+    view_projection = projection * view;
+
+    if (debug_enabled) {
+        create_debug_mesh();
+    }
+}
+
 void gearoenix::render::camera::Camera::set_near(const float f) noexcept
 {
     near = f;
@@ -144,17 +150,17 @@ void gearoenix::render::camera::Camera::set_far(const float f) noexcept
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::set_yfov(const float f) noexcept
+void gearoenix::render::camera::Camera::set_fov_y(const float f) noexcept
 {
     GX_ASSERT_D(Projection::Perspective == projection_type);
-    scale_fovy = f;
+    scale_fov_y = f;
     update_projection();
 }
 
 void gearoenix::render::camera::Camera::set_scale(const float f) noexcept
 {
     GX_ASSERT_D(Projection::Orthographic == projection_type);
-    scale_fovy = f;
+    scale_fov_y = f;
     update_projection();
 }
 
@@ -168,7 +174,7 @@ void gearoenix::render::camera::Camera::show_gui() noexcept
         /// TODO
         // input_changed |= ImGui::InputFloat("HDR Tune Mapping", &hdr_tune_mapping, 0.01f, 1.0f, "%.6f");
         // input_changed |= ImGui::InputFloat("Gamma Correction", &gamma_correction, 0.01f, 1.0f, "%.6f");
-        input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "Scale" : "Field Of View Y", &scale_fovy, 0.01f, 1.0f, "%.3f");
+        input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "Scale" : "Field Of View Y", &scale_fov_y, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::Checkbox("Show debug mesh", &debug_enabled);
         if (input_changed)
             update_projection();
@@ -176,13 +182,64 @@ void gearoenix::render::camera::Camera::show_gui() noexcept
     }
 }
 
-void gearoenix::render::camera::Camera::set_target(std::shared_ptr<texture::Target>&& t) noexcept
+void gearoenix::render::camera::Camera::enable_debug_mesh() noexcept
 {
-    if (use_target_aspect_ratio) {
-        const auto d = t->get_dimension();
-        set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
+    if (!debug_enabled) {
+        debug_enabled = true;
+        create_debug_mesh();
     }
+}
+
+void gearoenix::render::camera::Camera::disable_debug_mesh() noexcept
+{
+    debug_enabled = false;
+}
+
+void gearoenix::render::camera::Camera::set_has_customised_target_aspect_ratio(const bool b) noexcept
+{
+    has_customised_target_aspect_ratio = b;
+    update_target_aspect_ratio();
+}
+
+gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(
+    const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const noexcept
+{
+    const auto scale = static_cast<double>(projection_type == Projection::Perspective ? (2.0f * near * tanf(scale_fov_y * 0.5f)) : scale_fov_y);
+    const auto near_plane_point = normalised_point * scale;
+    const auto direction = (transform.get_x_axis() * near_plane_point.x) + (transform.get_y_axis() * near_plane_point.y) + (transform.get_z_axis() * static_cast<double>(-near));
+    const auto origin = transform.get_local_location() + direction;
+    return { origin, projection_type == Projection::Perspective ? direction.normalised() : -transform.get_z_axis() };
+}
+
+void gearoenix::render::camera::Camera::update_target_aspect_ratio() noexcept
+{
+    if (!has_customised_target_aspect_ratio) {
+        auto td = target->get_aspect_ratio();
+        const auto clip = starting_clip_ending_clip.zw() - starting_clip_ending_clip.xy();
+        set_target_aspect_ratio(td * clip.x / clip.y);
+    }
+}
+
+void gearoenix::render::camera::Camera::set_target_aspect_ratio(const float tap) noexcept
+{
+    target_aspect_ratio = tap;
+    update_projection();
+}
+
+void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<texture::Target>&& t) noexcept
+{
+    has_customised_target = true;
     target = std::move(t);
+    update_target_aspect_ratio();
+}
+
+void gearoenix::render::camera::Camera::update_target() noexcept
+{
+    if (has_customised_target)
+        return;
+    GX_TODO; // we need to be able to store name in the component and for that we need a virtual move function
+    target = e.get_texture_manager()->create_default_camera_render_target("camera", core::sync::EndCaller([] {}));
+    update_target_aspect_ratio();
 }
 
 void gearoenix::render::camera::Camera::create_debug_mesh() noexcept
@@ -215,57 +272,4 @@ void gearoenix::render::camera::Camera::create_debug_mesh() noexcept
         }));
     if (nullptr != *result_holder)
         debug_mesh = *result_holder;
-}
-
-void gearoenix::render::camera::Camera::enable_debug_mesh() noexcept
-{
-    if (!debug_enabled) {
-        debug_enabled = true;
-        create_debug_mesh();
-    }
-}
-
-void gearoenix::render::camera::Camera::disable_debug_mesh() noexcept
-{
-    debug_enabled = false;
-}
-
-void gearoenix::render::camera::Camera::set_use_target_aspect_ratio(const bool b) noexcept
-{
-    if (use_target_aspect_ratio != b && b && nullptr != target) {
-        const auto d = target->get_dimension();
-        set_target_aspect_ratio(static_cast<float>(d.x) / static_cast<float>(d.y));
-    }
-    use_target_aspect_ratio = b;
-}
-
-void gearoenix::render::camera::Camera::set_resolution_config(const gearoenix::render::Resolution& resolution) noexcept
-{
-    if (nullptr != target)
-        return;
-    if (!use_target_aspect_ratio)
-        return;
-    switch (resolution.index()) {
-    case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
-        const auto& res = std::get<FixedResolution>(resolution);
-        set_target_aspect_ratio(static_cast<float>(res.width) / static_cast<float>(res.height));
-        break;
-    }
-    case boost::mp11::mp_find<Resolution, ScreenBasedResolution>::value: {
-        const auto& res = std::get<ScreenBasedResolution>(resolution);
-        const auto wh = (e.get_platform_application().get_base().get_window_size() * static_cast<int>(res.nom)) / static_cast<int>(res.dom);
-        set_target_aspect_ratio(static_cast<float>(wh.x) / static_cast<float>(wh.y));
-        break;
-    }
-    }
-}
-
-gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(
-    const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const noexcept
-{
-    const auto scale = static_cast<double>(projection_type == Projection::Perspective ? (2.0f * near * tanf(scale_fovy * 0.5f)) : scale_fovy);
-    const auto near_plane_point = normalised_point * scale;
-    const auto direction = (transform.get_x_axis() * near_plane_point.x) + (transform.get_y_axis() * near_plane_point.y) + (transform.get_z_axis() * static_cast<double>(-near));
-    const auto origin = transform.get_local_location() + direction;
-    return { origin, projection_type == Projection::Perspective ? direction.normalised() : -transform.get_z_axis() };
 }

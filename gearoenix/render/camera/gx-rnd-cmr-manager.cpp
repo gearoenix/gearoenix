@@ -36,6 +36,6 @@ void gearoenix::render::camera::Manager::update() noexcept
 void gearoenix::render::camera::Manager::window_resized() noexcept
 {
     e.get_world()->parallel_system<core::ecs::And<Camera>>([this](const core::ecs::entity_id_t, Camera* const c, const unsigned int) noexcept -> void {
-        c->set_resolution_config(e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get());
+        c->update_target();
     });
 }

@@ -24,7 +24,7 @@ struct CameraBuilder final : public render::camera::Builder {
 
 private:
     CameraBuilder(Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept;
-    void set_target(std::shared_ptr<render::texture::Target>&& target) noexcept final;
+    void set_customised_target(std::shared_ptr<render::texture::Target>&& target) noexcept final;
 
 public:
     ~CameraBuilder() noexcept final;

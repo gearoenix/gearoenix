@@ -1,6 +1,5 @@
 #include "gx-gl-target.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
@@ -19,8 +18,8 @@ gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment
     for (const auto& a : attachments) {
         gl_attachments.emplace_back();
         auto& gla = gl_attachments.back();
-        gla.mipmap_level = a.mipmap_level;
-        render::texture::TextureFormat format;
+        gla.mipmap_level = static_cast<decltype(gla.mipmap_level)>(a.mipmap_level);
+        auto format = render::texture::TextureFormat::Unknown;
         if (a.var.index() == 0) {
             const auto& a2d = std::get<0>(a.var);
             format = a2d.txt->get_info().format;

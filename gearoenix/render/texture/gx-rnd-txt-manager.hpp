@@ -113,6 +113,10 @@ public:
         float roughness) noexcept;
     [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(
         std::size_t resolution = 256) noexcept;
+    [[nodiscard]] math::Vec2<std::size_t> get_default_camera_render_target_dimensions() const noexcept;
+    [[nodiscard]] std::shared_ptr<Target> create_default_camera_render_target(
+        const std::string& camera_name,
+        const core::sync::EndCaller& c) noexcept;
 };
 }
 

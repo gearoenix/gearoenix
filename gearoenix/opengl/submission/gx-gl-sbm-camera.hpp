@@ -9,6 +9,7 @@
 namespace gearoenix::gl::submission {
 struct Camera final {
     uint framebuffer = static_cast<uint>(-1);
+    uint colour_attachment = static_cast<uint>(-1);
     math::Vec4<sizei> viewport_clip;
     math::Mat4x4<float> vp;
     math::Vec3<float> pos;
@@ -16,6 +17,7 @@ struct Camera final {
     float skybox_scale = 1.0;
     render::camera::ColourTuning colour_tuning;
     bool has_bloom = true;
+    bool is_main_camera = true;
     std::vector<std::pair<double, Model>> models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_opaque_models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_translucent_models_data;

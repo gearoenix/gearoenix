@@ -46,7 +46,7 @@ public:
     [[nodiscard]] Camera& get_camera() noexcept;
     [[nodiscard]] const Camera& get_camera() const noexcept;
     // It is needed because the target must not be changed directly
-    virtual void set_target(std::shared_ptr<texture::Target>&& target) noexcept;
+    virtual void set_customised_target(std::shared_ptr<texture::Target>&& target) noexcept;
     [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
 };
 }

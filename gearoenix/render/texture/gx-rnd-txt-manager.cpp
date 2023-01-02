@@ -10,6 +10,7 @@
 #include "gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-txt-texture-cube.hpp"
 #include <array>
+#include <boost/mp11/algorithm.hpp>
 
 gearoenix::render::texture::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
@@ -56,7 +57,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
             stream->read(data);
             if (is_float) {
                 std::vector<float> float_pixels;
-                std::size_t decode_w, decode_h, ignored;
+                std::size_t decode_w = 0, decode_h = 0, ignored = 0;
                 Image::decode(data.data(), data.size(), comps_count, float_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
@@ -66,11 +67,12 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
                 } else {
                     GX_LOG_D("Loading float texture in a an unsupported engine, inefficient load of texture.");
                     mip_pixels.resize((float_pixels.size() * 4) / comps_count); // 4 is because we use RgbaUint8
-                    for (std::size_t pixel_index = 0, float_index = 0, comp_index = 0; pixel_index < mip_pixels.size();) {
-                        for (comp_index = 0; comp_index < comps_count; ++comp_index, ++pixel_index, ++float_index) {
+                    for (std::size_t pixel_index = 0, float_index = 0; pixel_index < mip_pixels.size();) {
+                        std::size_t comp_index = 0;
+                        for (; comp_index < comps_count; ++comp_index, ++pixel_index, ++float_index) {
                             const float f = float_pixels[float_index];
                             mip_pixels[pixel_index] = f >= 1.0f ? 225 : f <= 0.0f ? 0
-                                                                                  : static_cast<std::uint8_t>(f * 255.0f + 0.5f);
+                                                                                  : static_cast<std::uint8_t>(std::lroundf(f * 255.0f));
                         }
                         for (; comp_index < 3; ++comp_index, ++pixel_index)
                             mip_pixels[pixel_index] = 0;
@@ -81,7 +83,7 @@ std::shared_ptr<gearoenix::render::texture::Texture> gearoenix::render::texture:
                     }
                 }
             } else {
-                std::size_t decode_w, decode_h, ignored;
+                std::size_t decode_w = 0, decode_h = 0, ignored = 0;
                 Image::decode(data.data(), data.size(), comps_count, mip_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
@@ -117,7 +119,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
                                                                                      : colour.w * 255.0f + 0.51f);
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
-        std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -146,7 +148,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_brdflut(
     const core::sync::EndCaller& c) noexcept
 {
-    std::lock_guard<std::mutex> _lg(brdflut_lock);
+    const std::lock_guard<std::mutex> _lg(brdflut_lock);
     if (nullptr != brdflut)
         return brdflut;
     constexpr auto file_name = "default-brdflut.gx-2d-texture";
@@ -185,7 +187,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::texture::Manager::get_checker(
     const core::sync::EndCaller& c) noexcept
 {
-    std::lock_guard<std::mutex> _lg(checkers_lock);
+    const std::lock_guard<std::mutex> _lg(checkers_lock);
     if (nullptr != checkers)
         return checkers;
     const TextureInfo texture_info {
@@ -216,7 +218,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     std::string name, std::vector<std::vector<std::uint8_t>> pixels, const TextureInfo& info, const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (const auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -232,7 +234,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -240,14 +242,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     if (Type::Unknown != info.type)
         GX_UNIMPLEMENTED; // type converting is not implemented and is not going to be implemented in near future.
     if (TextureFormat::Unknown != info.format)
-        GX_UNIMPLEMENTED; // formate converting does not have a high priority
+        GX_UNIMPLEMENTED; // format converting does not have a high priority
     if (0 != info.width)
-        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+        GX_UNIMPLEMENTED; // dimension changing does not have a high priority
     if (0 != info.height)
-        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
-    std::size_t img_width;
-    std::size_t img_height;
-    std::size_t img_channels;
+        GX_UNIMPLEMENTED; // dimension changing does not have a high priority
+    std::size_t img_width = 0;
+    std::size_t img_height = 0;
+    std::size_t img_channels = 0;
     std::vector<std::uint8_t> pixels0;
     Image::decode(
         reinterpret_cast<const unsigned char*>(data), size, 4,
@@ -269,7 +271,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -277,14 +279,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     if (Type::Unknown != info.type)
         GX_UNIMPLEMENTED; // type converting is not implemented and is not going to be implemented in near future.
     if (TextureFormat::Unknown != info.format)
-        GX_UNIMPLEMENTED; // formate converting does not have a high priority
+        GX_UNIMPLEMENTED; // format converting does not have a high priority
     if (0 != info.width)
-        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
+        GX_UNIMPLEMENTED; // dimension changing does not have a high priority
     if (0 != info.height)
-        GX_UNIMPLEMENTED; // dimention changing does not have a high priority
-    std::size_t img_width;
-    std::size_t img_height;
-    std::size_t img_channels;
+        GX_UNIMPLEMENTED; // dimension changing does not have a high priority
+    std::size_t img_width = 0;
+    std::size_t img_height = 0;
+    std::size_t img_channels = 0;
     std::vector<float> pixels0f;
     Image::decode(
         reinterpret_cast<const unsigned char*>(data), size, 4,
@@ -319,7 +321,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::textur
     const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -345,7 +347,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
                                                                                      : colour.w * 255.0f + 0.51f);
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
-        std::lock_guard<std::mutex> _lg(textures_cube_lock);
+        const std::lock_guard<std::mutex> _lg(textures_cube_lock);
         if (const auto search = textures_cube.find(name); textures_cube.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -375,7 +377,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::render::text
     std::string name, std::vector<std::vector<std::vector<std::uint8_t>>> pixels, const TextureInfo& info, const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(textures_cube_lock);
+        const std::lock_guard<std::mutex> _lg(textures_cube_lock);
         if (const auto search = textures_cube.find(name); textures_cube.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -387,7 +389,7 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
     std::string name, std::vector<Attachment>&& attachments, const core::sync::EndCaller& c) noexcept
 {
     {
-        std::lock_guard<std::mutex> _lg(targets_lock);
+        const std::lock_guard<std::mutex> _lg(targets_lock);
         if (const auto search = targets.find(name); targets.end() != search)
             if (auto r = search->second.lock(); nullptr != r)
                 return r;
@@ -430,7 +432,7 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
     }
     a /= float(SAMPLE_COUNT);
     b /= float(SAMPLE_COUNT);
-    return math::Vec2<float>(a, b);
+    return { a, b };
 }
 
 std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution) noexcept
@@ -438,9 +440,10 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
     std::vector<math::Vec4<std::uint8_t>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / float(resolution);
     core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::size_t index, auto) {
+        const auto roughness_index = index / resolution;
         auto p = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
-            (static_cast<float>(index / resolution) + 0.5f) * inv_res);
+            (static_cast<float>(roughness_index) + 0.5f) * inv_res);
         p *= 255.0f;
         p += 0.5f;
         pixel.x = p.x >= 255.0f ? 255 : p.x <= 0.0f ? 0
@@ -451,4 +454,53 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
         pixel.w = 255;
     });
     return pixels;
+}
+
+gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const noexcept
+{
+    auto& resolution = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get();
+    switch (resolution.index()) {
+    case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
+        const auto& res = std::get<FixedResolution>(resolution);
+        return { res.width, res.height };
+    }
+    case boost::mp11::mp_find<Resolution, ScreenBasedResolution>::value: {
+        const auto& res = std::get<ScreenBasedResolution>(resolution);
+        const auto wh = (e.get_platform_application().get_base().get_window_size() * static_cast<int>(res.nom)) / static_cast<int>(res.dom);
+        return math::Vec2<size_t> { wh };
+    }
+    }
+}
+
+std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::Manager::create_default_camera_render_target(
+    const std::string& camera_name, const core::sync::EndCaller& c) noexcept
+{
+    const auto dim = get_default_camera_render_target_dimensions();
+    TextureInfo txt_info {
+        .format = TextureFormat::RgbaUint8,
+        .sampler_info = SamplerInfo {
+            .min_filter = Filter::Nearest,
+            .mag_filter = Filter::Nearest,
+            .wrap_s = Wrap::ClampToEdge,
+            .wrap_t = Wrap::ClampToEdge,
+            .wrap_r = Wrap::ClampToEdge,
+        },
+        .width = dim.x,
+        .height = dim.y,
+        .type = Type::Texture2D,
+        .has_mipmap = true,
+    };
+    std::vector<std::vector<std::uint8_t>> pixels;
+    auto colour = create_2d_from_pixels(camera_name + "-render-target-colour", pixels, txt_info, c);
+    txt_info.format = TextureFormat::D32;
+    txt_info.has_mipmap = false;
+    auto depth = create_2d_from_pixels(camera_name + "-render-target-depth", std::move(pixels), txt_info, c);
+    return create_target(
+        camera_name + "-render-target",
+        std::vector<Attachment> {
+            Attachment {
+                .var = Attachment2D {
+                    .txt = std::move(colour) } },
+            Attachment { .var = Attachment2D { .txt = std::move(depth) } } },
+        c);
 }
