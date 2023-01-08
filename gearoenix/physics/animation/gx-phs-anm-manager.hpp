@@ -59,7 +59,7 @@ public:
     template <typename Function>
     void loop_over_bones(Function&& function, const std::size_t bone_index) noexcept
     {
-        Bone& bone = bones[bone_index];
+        const Bone& bone = bones[bone_index];
         for (std::size_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
             function(bones[child_index]);
         for (std::size_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)

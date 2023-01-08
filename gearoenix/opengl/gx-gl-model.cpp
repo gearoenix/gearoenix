@@ -11,8 +11,8 @@ gearoenix::gl::Model::Model(
     Engine&,
     std::shared_ptr<Mesh>&& mesh,
     std::shared_ptr<material::Material>&& mat,
-    const std::string&) noexcept
-    : core::ecs::Component(this)
+    const std::string& name) noexcept
+    : core::ecs::Component(this, std::string(name))
     , mesh(std::move(mesh))
     , mat(std::move(mat))
 {

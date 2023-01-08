@@ -8,7 +8,7 @@ struct Boundary final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Aabb3<double>, box);
 
 public:
-    Boundary(const math::Vec3<double>& upper, const math::Vec3<double>& lower) noexcept;
+    Boundary(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name) noexcept;
     Boundary(Boundary&&) noexcept;
     Boundary(const Boundary&) = delete;
     Boundary& operator=(Boundary&&) = delete;

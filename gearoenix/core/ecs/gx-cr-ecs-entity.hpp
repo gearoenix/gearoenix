@@ -26,9 +26,9 @@ private:
 
     Archetype* archetype = nullptr;
     unsigned char* components = nullptr;
-    std::optional<std::string> name;
+    std::string name;
 
-    Entity(Archetype* archetype, unsigned char* components, std::optional<std::string> name) noexcept;
+    Entity(Archetype* archetype, unsigned char* components, std::string&& name) noexcept;
 
 public:
     Entity(Entity&&) noexcept;
@@ -42,16 +42,16 @@ struct EntityBuilder final {
     typedef boost::container::flat_map<std::type_index, std::unique_ptr<Component>> components_t;
 
     GX_GET_CVAL_PRV(entity_id_t, id);
-    GX_GETSET_CREF_PRV(std::optional<std::string>, name);
+    GX_GETSET_CREF_PRV(std::string, name);
 
 private:
     components_t components;
     sync::EndCaller end_caller;
 
-    EntityBuilder(entity_id_t, sync::EndCaller&& end_caller) noexcept;
+    EntityBuilder(entity_id_t, std::string&& name, sync::EndCaller&& end_caller) noexcept;
 
 public:
-    explicit EntityBuilder(sync::EndCaller&& end_caller) noexcept;
+    EntityBuilder(std::string&& name, sync::EndCaller&& end_caller) noexcept;
     EntityBuilder(EntityBuilder&&) noexcept;
     EntityBuilder(const EntityBuilder&) = delete;
     EntityBuilder& operator=(EntityBuilder&&) = delete;
@@ -99,7 +99,7 @@ struct EntitySharedBuilder final {
 private:
     World* const world;
 
-    EntitySharedBuilder(World* world, sync::EndCaller&& end_caller) noexcept;
+    EntitySharedBuilder(World* world, std::string&& name, sync::EndCaller&& end_caller) noexcept;
 
 public:
     ~EntitySharedBuilder() noexcept;

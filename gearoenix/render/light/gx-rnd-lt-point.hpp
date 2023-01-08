@@ -7,7 +7,7 @@ namespace gearoenix::render::light {
 struct Point final : public core::ecs::Component {
     math::Vec3<float> position = { 0.0f, 0.0f, 0.0f };
 
-    Point() noexcept;
+    explicit Point(std::string&& name) noexcept;
     Point(Point&&) noexcept;
     ~Point() noexcept final;
 };

@@ -129,7 +129,7 @@ void gearoenix::physics::animation::SpriteAnimation::animate(
 {
     GX_ASSERT_D(time <= 1.0);
     const auto pos = static_cast<std::size_t>(count * time);
-    math::Vec2 v(static_cast<double>(pos % width), static_cast<double>(pos / width));
+    const math::Vec2 v(static_cast<double>(pos % width), static_cast<double>(pos / width));
     sprite->get_uv_transform() = math::Vec4<float>(uv_scale, uv_scale * v);
 }
 
@@ -137,8 +137,9 @@ gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() noexcept = de
 
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::shared_ptr<Animation> animation,
+    std::string&& name,
     const double starting_time) noexcept
-    : core::ecs::Component(this)
+    : core::ecs::Component(this, std::move(name))
     , time(starting_time)
     , animation(std::move(animation))
 {

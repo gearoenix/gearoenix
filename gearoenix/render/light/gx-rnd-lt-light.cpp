@@ -1,8 +1,8 @@
 #include "gx-rnd-lt-light.hpp"
 #include <imgui/imgui.h>
 
-gearoenix::render::light::Light::Light() noexcept
-    : core::ecs::Component(this)
+gearoenix::render::light::Light::Light(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
 {
 }
 

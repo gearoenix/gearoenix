@@ -1,7 +1,7 @@
 #include "gx-phs-cld-frustum.hpp"
 
-gearoenix::physics::collider::Frustum::Frustum(const std::array<math::Vec3<double>, 8>& points) noexcept
-    : core::ecs::Component(this)
+gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points) noexcept
+    : core::ecs::Component(this, std::move(name))
     , frustum(points)
 {
     for (const auto& p : points)

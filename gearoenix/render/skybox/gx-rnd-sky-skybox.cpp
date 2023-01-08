@@ -4,8 +4,9 @@
 
 gearoenix::render::skybox::Skybox::Skybox(
     std::shared_ptr<mesh::Mesh>&& bound_mesh,
-    Texture&& bound_texture) noexcept
-    : core::ecs::Component(this)
+    Texture&& bound_texture,
+    std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , bound_mesh(std::move(bound_mesh))
     , bound_texture(std::move(bound_texture))
 {

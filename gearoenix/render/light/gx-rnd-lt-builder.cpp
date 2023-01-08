@@ -11,12 +11,12 @@ gearoenix::render::light::Builder::Builder(
     const DirectionalInfo&,
     const core::sync::EndCaller& end_callback) noexcept
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
+    , entity_builder(e.get_world()->create_shared_builder(std::string(name), core::sync::EndCaller(end_callback)))
 {
     auto& b = entity_builder->get_builder();
     b.set_name(name);
-    b.add_component(Light());
-    b.add_component(Directional());
+    b.add_component(Light(name + "-light"));
+    b.add_component(Directional(name + "-directional-light"));
 }
 
 gearoenix::render::light::Builder::Builder(
@@ -25,11 +25,11 @@ gearoenix::render::light::Builder::Builder(
     const ShadowCasterDirectionalInfo& info,
     const core::sync::EndCaller& end_callback) noexcept
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
+    , entity_builder(e.get_world()->create_shared_builder(std::string(name), core::sync::EndCaller(end_callback)))
 {
     auto& b = entity_builder->get_builder();
     b.set_name(name);
-    b.add_component(Light());
+    b.add_component(Light(name + "-light"));
     b.add_component(ShadowCasterDirectional(name, info.shadow_map_resolution, info.far, info.near, info.aspect, e, *this, end_callback));
 }
 

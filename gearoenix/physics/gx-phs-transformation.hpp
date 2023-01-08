@@ -19,7 +19,7 @@ struct Transformation final : public core::ecs::Component {
     GX_GET_VAL_PRV(bool, changed, true);
 
 public:
-    Transformation() noexcept;
+    explicit Transformation(std::string&& name) noexcept;
     ~Transformation() noexcept final = default;
     Transformation(Transformation&&) noexcept = default;
     [[nodiscard]] math::Vec3<double> get_global_location() const noexcept;

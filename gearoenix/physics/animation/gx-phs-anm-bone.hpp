@@ -14,9 +14,11 @@ struct Manager;
 struct BoneInfo final {
     Transformation transform;
     math::Mat4x4<float> inverse_bind;
-    std::string name;
     std::string parent_name;
     std::vector<BoneInfo> children;
+    std::string name;
+
+    explicit BoneInfo(std::string&& name) noexcept;
 };
 
 struct Bone final {

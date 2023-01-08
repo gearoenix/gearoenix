@@ -41,7 +41,7 @@ struct GameApp final : public gearoenix::core::Application {
         gearoenix::math::Vec3<double> value;
 
         Speed() noexcept
-            : gearoenix::core::ecs::Component(this)
+            : gearoenix::core::ecs::Component(this, "speed")
             , value(
                   speed_distribution(random_engine),
                   speed_distribution(random_engine),
@@ -91,7 +91,7 @@ struct GameApp final : public gearoenix::core::Application {
         gearoenix::math::Vec3<double> value;
 
         Position() noexcept
-            : gearoenix::core::ecs::Component(this)
+            : gearoenix::core::ecs::Component(this, "position")
             , value(
                   space_distribution(random_engine),
                   space_distribution(random_engine),

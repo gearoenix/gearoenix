@@ -23,7 +23,7 @@ gearoenix::render::camera::Camera::Camera(
     const Projection projection_type,
     const float near,
     const float far) noexcept
-    : core::ecs::Component(this)
+    : core::ecs::Component(this, std::string(name))
     , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , has_customised_target(nullptr == customised_target)
@@ -45,7 +45,7 @@ gearoenix::render::camera::Camera::Camera(
 }
 
 gearoenix::render::camera::Camera::Camera(Camera&& o) noexcept
-    : core::ecs::Component(this)
+    : core::ecs::Component(this, std::move(o.name))
     , e(o.e)
     , view(o.view)
     , projection(o.projection)

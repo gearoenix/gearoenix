@@ -1,7 +1,7 @@
 #include "gx-rnd-lt-point.hpp"
 
-gearoenix::render::light::Point::Point() noexcept
-    : core::ecs::Component(this)
+gearoenix::render::light::Point::Point(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
 {
 }
 

@@ -5,8 +5,9 @@
 gearoenix::render::model::Model::Model(
     const bool is_transformable,
     std::shared_ptr<mesh::Mesh>&& bound_mesh,
-    std::shared_ptr<material::Material>&& bound_material) noexcept
-    : core::ecs::Component(this)
+    std::shared_ptr<material::Material>&& bound_material,
+    std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , is_transformable(is_transformable)
     , bound_mesh(std::move(bound_mesh))
     , bound_material(std::move(bound_material))

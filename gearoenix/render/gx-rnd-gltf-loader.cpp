@@ -431,8 +431,7 @@ static void apply_transform(
         transform.set_local_location(gearoenix::math::Vec3<double>(translation[0], translation[1], translation[2]));
 }
 
-static void load_bone_info(
-    gearoenix::physics::animation::BoneInfo& bone_info,
+static gearoenix::physics::animation::BoneInfo load_bone_info(
     const int bone_node_index,
     const std::string& parent_name,
     const tinygltf::Model& data,
@@ -440,7 +439,7 @@ static void load_bone_info(
     const gearoenix::math::Mat4x4<float>* inv_bind_mats) noexcept
 {
     const tinygltf::Node& bone_node = data.nodes[bone_node_index];
-    bone_info.name = bone_node.name;
+    gearoenix::physics::animation::BoneInfo bone_info(std::string(bone_node.name));
     bone_info.parent_name = parent_name;
     {
         const auto search = name_to_joint_index.find(bone_node.name);
@@ -448,10 +447,11 @@ static void load_bone_info(
         bone_info.inverse_bind = inv_bind_mats[search->second];
     }
     apply_transform(bone_node_index, bone_info.transform, data);
-    bone_info.children.resize(bone_node.children.size());
-    for (std::size_t child_index = 0; child_index < bone_node.children.size(); ++child_index) {
-        load_bone_info(bone_info.children[child_index], bone_node.children[child_index], bone_node.name, data, name_to_joint_index, inv_bind_mats);
+    bone_info.children.reserve(bone_node.children.size());
+    for (auto child : bone_node.children) {
+        bone_info.children.push_back(load_bone_info(child, bone_node.name, data, name_to_joint_index, inv_bind_mats));
     }
+    return bone_info;
 }
 
 static void set_bone_map(
@@ -504,8 +504,7 @@ static std::pair<std::vector<int>, std::optional<gearoenix::physics::animation::
         }
     }
     GX_ASSERT(root_bones_nodes.size() == 1);
-    gearoenix::physics::animation::BoneInfo bones_info;
-    load_bone_info(bones_info, *root_bones_nodes.begin(), "", data, name_to_joint_index, inv_bind_mats);
+    auto bones_info = load_bone_info(*root_bones_nodes.begin(), "", data, name_to_joint_index, inv_bind_mats);
     joint_index = 0;
     {
         const auto search = name_to_joint_index.find(bones_info.name);

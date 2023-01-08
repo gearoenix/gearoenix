@@ -70,7 +70,7 @@ struct AnimationPlayer final : core::ecs::Component {
     GX_GET_REFC_PRV(std::shared_ptr<Animation>, animation);
 
 public:
-    explicit AnimationPlayer(std::shared_ptr<Animation> animation, double starting_time = 0.0) noexcept;
+    AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0) noexcept;
     AnimationPlayer(AnimationPlayer&&) noexcept;
     ~AnimationPlayer() noexcept final;
 

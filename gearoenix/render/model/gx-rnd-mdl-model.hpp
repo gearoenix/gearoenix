@@ -36,7 +36,8 @@ public:
     Model(
         bool is_transformable,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
-        std::shared_ptr<material::Material>&& bound_material) noexcept;
+        std::shared_ptr<material::Material>&& bound_material,
+        std::string&& name) noexcept;
     ~Model() noexcept final;
     Model(Model&&) noexcept;
 };

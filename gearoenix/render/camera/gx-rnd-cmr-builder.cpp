@@ -9,11 +9,11 @@
 #include "gx-rnd-cmr-camera.hpp"
 
 gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept
-    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_caller)))
+    : entity_builder(e.get_world()->create_shared_builder(std::string(name), core::sync::EndCaller(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
-    physics::Transformation transform;
+    physics::Transformation transform(name + "-transformation");
     auto& plt_app = e.get_platform_application().get_base();
     auto& cfg = plt_app.get_configuration().get_render_configuration();
     const auto entity_id = builder.get_id();
@@ -35,7 +35,7 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
         transform.get_y_axis(),
         transform.get_z_axis(),
         frustum_points);
-    builder.add_component(physics::collider::Frustum(frustum_points));
+    builder.add_component(physics::collider::Frustum(name + "-collider", frustum_points));
     builder.add_component(std::move(cam));
     builder.add_component(std::move(transform));
 }

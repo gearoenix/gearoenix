@@ -65,6 +65,7 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-constants.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-engine.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-label.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-light.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-light.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-loader.cpp

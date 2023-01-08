@@ -13,7 +13,7 @@ struct Target;
 struct Camera final : public core::ecs::Component {
     std::shared_ptr<Target> target;
 
-    Camera() noexcept;
+    explicit Camera(std::string&& name) noexcept;
     ~Camera() noexcept final;
     Camera(Camera&&) noexcept;
 };

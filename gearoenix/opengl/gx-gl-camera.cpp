@@ -5,8 +5,8 @@
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 
-gearoenix::gl::Camera::Camera() noexcept
-    : core::ecs::Component(this)
+gearoenix::gl::Camera::Camera(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
 {
 }
 
@@ -19,7 +19,7 @@ gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, 
     , eng(e)
 {
     auto& builder = entity_builder->get_builder();
-    Camera camera;
+    Camera camera(name + "-gl-camera");
     camera.target = std::dynamic_pointer_cast<Target>(entity_builder->get_builder().get_component<render::camera::Camera>()->get_target());
     builder.add_component(std::move(camera));
 }

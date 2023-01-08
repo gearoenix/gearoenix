@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
     gearoenix::core::ecs::Component::register_type<gearoenix::physics::Transformation>();
 
-    gearoenix::physics::Transformation transform;
+    gearoenix::physics::Transformation transform("transformation");
 
     auto glmm = glm::identity<glm::dmat4>();
 

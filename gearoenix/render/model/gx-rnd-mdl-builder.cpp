@@ -13,13 +13,13 @@ gearoenix::render::model::Builder::Builder(
     std::shared_ptr<material::Material>&& bound_material,
     core::sync::EndCaller&& end_caller,
     bool is_transformable) noexcept
-    : entity_builder(e.get_world()->create_shared_builder(std::move(end_caller)))
+    : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
-    builder.add_component(physics::collider::Aabb3(bound_mesh->box));
-    builder.add_component(physics::Transformation());
-    builder.add_component(Model(is_transformable, std::move(bound_mesh), std::move(bound_material)));
+    builder.add_component(physics::collider::Aabb3(bound_mesh->box, name + "-collider"));
+    builder.add_component(physics::Transformation(name + "-transformation"));
+    builder.add_component(Model(is_transformable, std::move(bound_mesh), std::move(bound_material), name + "-model"));
 }
 
 gearoenix::render::model::Builder::~Builder() noexcept = default;

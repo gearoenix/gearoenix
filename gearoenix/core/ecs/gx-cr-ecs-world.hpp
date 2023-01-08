@@ -36,21 +36,21 @@ public:
     void create_entity_with_builder(EntityBuilder&&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] entity_id_t create_entity(ComponentsTypes&&... components) noexcept
+    [[nodiscard]] entity_id_t create_entity(std::string&& name, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
         auto archetype_id = Archetype::create_id<ComponentsTypes...>();
         const auto id = ++Entity::last_id;
         auto search = archetypes.find(archetype_id);
         if (archetypes.end() == search) {
-            bool is_ok;
+            bool is_ok = false;
             std::tie(search, is_ok) = archetypes.emplace(std::move(archetype_id), std::unique_ptr<Archetype>(Archetype::create<ComponentsTypes...>()));
             if (!is_ok) {
                 GX_LOG_F("Problem in allocation of archetype");
             }
         }
         auto* const cs = search->second->allocate(id, std::move(components)...);
-        entities.emplace(id, Entity(search->second.get(), cs, std::nullopt));
+        entities.emplace(id, Entity(search->second.get(), cs, std::move(name)));
         return id;
     }
 
@@ -58,10 +58,10 @@ public:
     void delayed_create_entity_with_builder(EntityBuilder&&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] entity_id_t delayed_create_entity(sync::EndCaller&& end_caller, ComponentsTypes&&... components) noexcept
+    [[nodiscard]] entity_id_t delayed_create_entity(std::string&& name, sync::EndCaller&& end_caller, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b(std::move(end_caller));
+        EntityBuilder b(std::move(name), std::move(end_caller));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         const auto id = b.get_id();
         delayed_create_entity_with_builder(std::move(b));
@@ -78,7 +78,7 @@ public:
     void add_components(const entity_id_t ei, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b(ei, sync::EndCaller([] {}));
+        EntityBuilder b(ei, std::string(entities.find(ei)->second.name), sync::EndCaller([] {}));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         add_components_map(ei, std::move(b.components));
     }
@@ -89,7 +89,7 @@ public:
     void delayed_add_components(const entity_id_t ei, sync::EndCaller&& end_caller, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        EntityBuilder b(ei, std::move(end_caller));
+        EntityBuilder b(ei, std::string(entities.find(ei)->second.name), std::move(end_caller));
         b.add_components(std::forward<ComponentsTypes>(components)...);
         delayed_add_components_map(ei, std::move(b.components));
     }
@@ -98,10 +98,10 @@ public:
     void remove_components(const entity_id_t ei) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        const std::type_index ts[] = {
+        const std::array<std::type_index, sizeof...(ComponentsTypes)> ts = {
             Component::create_type_index<ComponentsTypes>()...,
         };
-        remove_components_list(ei, ts, sizeof...(ComponentsTypes));
+        remove_components_list(ei, ts.data(), ts.size());
     }
 
     void remove_components_list(entity_id_t, const std::type_index*, std::size_t) noexcept;
@@ -219,7 +219,7 @@ public:
     /// It will do all the delayed actions
     void update() noexcept;
 
-    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(sync::EndCaller&& end_caller) noexcept;
+    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, sync::EndCaller&& end_caller) noexcept;
 };
 }
 

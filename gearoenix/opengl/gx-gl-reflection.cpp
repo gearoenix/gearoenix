@@ -6,8 +6,8 @@
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Reflection::Reflection() noexcept
-    : core::ecs::Component(this)
+gearoenix::gl::Reflection::Reflection(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
 {
 }
 
@@ -15,8 +15,8 @@ gearoenix::gl::Reflection::~Reflection() noexcept = default;
 
 gearoenix::gl::Reflection::Reflection(Reflection&&) noexcept = default;
 
-gearoenix::gl::ReflectionRuntime::ReflectionRuntime() noexcept
-    : core::ecs::Component(this)
+gearoenix::gl::ReflectionRuntime::ReflectionRuntime(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , environment_targets_v()
     , irradiance_targets_v()
     , radiance_targets_v()
@@ -37,7 +37,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     : render::reflection::Builder(e, name, include_box, irradiance_texture, radiance_texture, end_callback)
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(Reflection());
+    builder.add_component(Reflection(name + "gl-reflection"));
     auto* const gb = builder.get_component<Reflection>();
     auto* const rb = builder.get_component<render::reflection::Baked>();
     gb->irradiance = std::dynamic_pointer_cast<TextureCube>(rb->get_irradiance());
@@ -70,7 +70,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
         end_callback)
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_components(ReflectionRuntime(), Reflection());
+    builder.add_components(ReflectionRuntime(name + "gl-runtime-reflection"), Reflection(name + "-gl-reflection"));
     auto* const gr = builder.get_component<ReflectionRuntime>();
     auto* const gb = builder.get_component<Reflection>();
     auto* const rr = builder.get_component<render::reflection::Runtime>();

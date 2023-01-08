@@ -1,14 +1,14 @@
 #include "gx-phs-cld-aabb.hpp"
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower) noexcept
-    : core::ecs::Component(this)
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , original_box(upper, lower)
     , updated_box(original_box)
 {
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box) noexcept
-    : core::ecs::Component(this)
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , original_box(original_box)
     , updated_box(original_box)
 {

@@ -14,7 +14,7 @@ gearoenix::render::reflection::Builder::Builder(
     const std::shared_ptr<texture::TextureCube>& irradiance_texture,
     const std::shared_ptr<texture::TextureCube>& radiance_texture,
     const core::sync::EndCaller& end_callback) noexcept
-    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
+    : entity_builder(e.get_world()->create_shared_builder(std::string(name), core::sync::EndCaller(end_callback)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
@@ -22,7 +22,8 @@ gearoenix::render::reflection::Builder::Builder(
         e,
         irradiance_texture,
         radiance_texture,
-        include_box));
+        include_box,
+        name + "-baked-reflection"));
 }
 
 gearoenix::render::reflection::Builder::Builder(
@@ -35,7 +36,7 @@ gearoenix::render::reflection::Builder::Builder(
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
     const core::sync::EndCaller& end_callback) noexcept
-    : entity_builder(e.get_world()->create_shared_builder(core::sync::EndCaller(end_callback)))
+    : entity_builder(e.get_world()->create_shared_builder(std::string(name), core::sync::EndCaller(end_callback)))
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
@@ -55,7 +56,8 @@ gearoenix::render::reflection::Builder::Builder(
         e,
         std::shared_ptr(r->get_irradiance()),
         std::shared_ptr(r->get_radiance()),
-        include_box));
+        include_box,
+        name + "-baked-reflection"));
 }
 
 const gearoenix::render::reflection::Runtime& gearoenix::render::reflection::Builder::get_runtime() const noexcept

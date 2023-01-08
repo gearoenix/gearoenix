@@ -3,6 +3,7 @@
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
+#include "gx-gl-label.hpp"
 #include "gx-gl-loader.hpp"
 
 gearoenix::gl::Mesh::Mesh(Engine& e, const math::Aabb3<double>& box) noexcept
@@ -44,7 +45,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
     m->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
-    gl_e.todos.load([c = end_callback, m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size] {
+    gl_e.todos.load([c = end_callback, m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(m->vertex_object));
         glBindVertexArray(m->vertex_object);
@@ -82,6 +83,9 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
+        set_buffer_label(m->vertex_buffer, name + "-vertex-buffer");
+        set_buffer_label(m->index_buffer, name + "-index-buffer");
+        set_vertex_array_label(m->vertex_object, name + "-vertex-array");
         GX_GL_CHECK_D;
     });
     return m;

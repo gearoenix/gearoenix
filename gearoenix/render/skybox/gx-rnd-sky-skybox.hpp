@@ -28,7 +28,8 @@ struct Skybox final : public core::ecs::Component {
 public:
     Skybox(
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
-        Texture&& bound_texture) noexcept;
+        Texture&& bound_texture,
+        std::string&& name) noexcept;
     ~Skybox() noexcept final;
     Skybox(Skybox&&) noexcept;
     [[nodiscard]] bool is_equirectangular() const noexcept { return bound_texture.index() == 0; }

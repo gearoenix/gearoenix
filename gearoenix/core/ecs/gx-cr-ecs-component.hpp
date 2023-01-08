@@ -30,7 +30,8 @@ struct Component {
         TypeInfo& operator=(TypeInfo&&) noexcept = default;
     };
 
-    GX_GET_CREF_PRV(std::type_index, type_index);
+    GX_GET_CREF_PRT(std::type_index, type_index);
+    GX_GET_CREF_PRT(std::string, name);
 
 public:
     bool enabled = true;
@@ -53,8 +54,9 @@ public:
     [[nodiscard]] static const TypeInfo& get_type_info(const std::type_index& ti) noexcept;
 
     template <typename T>
-    explicit Component(T* const) noexcept
+    explicit Component(T* const, std::string&& name) noexcept
         : type_index(Component::create_type_index<T>())
+        , name(std::move(name))
     {
 #ifdef GX_DEBUG_MODE
         (void)get_type_info(type_index);

@@ -55,7 +55,7 @@ private:
     boost::container::flat_map<core::ecs::entity_id_t, std::uint64_t> cameras_flags;
 
 public:
-    Scene(engine::Engine& e, double layer) noexcept;
+    Scene(engine::Engine& e, double layer, std::string&& name) noexcept;
     ~Scene() noexcept final;
     Scene(Scene&&) noexcept;
     void add_model(core::ecs::entity_id_t entity, model::Model& m) noexcept;

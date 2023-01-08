@@ -22,7 +22,7 @@ struct ShadowCasterDirectionalLight final : public core::ecs::Component {
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
 
 public:
-    ShadowCasterDirectionalLight() noexcept;
+    explicit ShadowCasterDirectionalLight(std::string&& name) noexcept;
     ~ShadowCasterDirectionalLight() noexcept final;
     ShadowCasterDirectionalLight(ShadowCasterDirectionalLight&&) noexcept;
 };

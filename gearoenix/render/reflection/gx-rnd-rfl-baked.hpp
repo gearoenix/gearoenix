@@ -27,7 +27,8 @@ public:
         engine::Engine& e,
         std::shared_ptr<texture::TextureCube> irradiance,
         std::shared_ptr<texture::TextureCube> radiance,
-        math::Aabb3<double> include_box) noexcept;
+        math::Aabb3<double> include_box,
+        std::string&& name) noexcept;
     ~Baked() noexcept final;
     Baked(Baked&&) noexcept;
 };

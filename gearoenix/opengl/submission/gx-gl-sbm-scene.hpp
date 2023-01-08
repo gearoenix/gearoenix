@@ -22,6 +22,7 @@ struct Scene final {
     std::vector<DynamicModel> dynamic_models;
     std::vector<DebugModel> debug_mesh_data;
     std::vector<Bone> bones_data;
+    const std::string* name = nullptr;
 };
 }
 

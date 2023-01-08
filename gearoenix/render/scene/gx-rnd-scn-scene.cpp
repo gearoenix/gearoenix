@@ -5,8 +5,8 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 
-gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer) noexcept
-    : core::ecs::Component(this)
+gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , e(e)
     , ssao_settings(0.08f, 0.001f, 0.000f, 0.003f)
     , layer(layer)
@@ -54,9 +54,9 @@ void gearoenix::render::scene::Scene::add_light(const core::ecs::entity_id_t ent
     entities.insert(entity);
 }
 
-void gearoenix::render::scene::Scene::add_empty(const std::string& name, const math::Vec3<double>& location) noexcept
+void gearoenix::render::scene::Scene::add_empty(const std::string& n, const math::Vec3<double>& location) noexcept
 {
-    empties.emplace(name, location);
+    empties.emplace(n, location);
 }
 
 void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_entity_id) noexcept

@@ -6,8 +6,8 @@
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight() noexcept
-    : core::ecs::Component(this)
+gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
 {
 }
 
@@ -35,7 +35,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
 {
     auto& b = entity_builder->get_builder();
     const auto* const rl = get_shadow_caster_directional();
-    ShadowCasterDirectionalLight l;
+    ShadowCasterDirectionalLight l(name + "-gl-directional-shadow-caster");
     l.shadow_map_target = std::dynamic_pointer_cast<Target>(rl->get_shadow_map_target());
     l.shadow_map_texture = std::dynamic_pointer_cast<Texture2D>(rl->get_shadow_map());
     b.add_component(std::move(l));

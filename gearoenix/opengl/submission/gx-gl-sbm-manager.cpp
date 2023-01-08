@@ -21,6 +21,7 @@
 #include "../gx-gl-check.hpp"
 #include "../gx-gl-constants.hpp"
 #include "../gx-gl-engine.hpp"
+#include "../gx-gl-label.hpp"
 #include "../gx-gl-light.hpp"
 #include "../gx-gl-loader.hpp"
 #include "../gx-gl-mesh.hpp"
@@ -265,6 +266,7 @@ void gearoenix::gl::submission::Manager::fill_scenes() noexcept
             scene_pool_ref.shadow_caster_directional_lights.clear();
             scene_pool_ref.bones_data.clear();
             scene_pool_ref.debug_mesh_data.clear();
+            scene_pool_ref.name = &scene->get_name();
             e.get_world()->synchronised_system<core::ecs::And<render::camera::Camera, physics::Transformation>>(
                 [&](const core::ecs::entity_id_t camera_id, render::camera::Camera* const camera, physics::Transformation* const transform) noexcept {
                     if (!camera->enabled)
@@ -589,6 +591,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             camera_data.clear();
             const auto target_dimension = render_camera->get_target()->get_dimension();
             camera_data.framebuffer = gl_camera->target->get_framebuffer();
+            camera_data.name = &gl_camera->get_name();
             camera_data.colour_attachment = gl_camera->target->get_gl_attachments()[0].texture_object;
             camera_data.viewport_clip = math::Vec4<sizei>(render_camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
             camera_data.vp = render_camera->get_view_projection();
@@ -701,6 +704,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
 
 void gearoenix::gl::submission::Manager::render_shadows() noexcept
 {
+    push_debug_group("render-shadows");
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
     for (auto& scene_layer_entity_id_pool_index : scenes) {
@@ -708,10 +712,12 @@ void gearoenix::gl::submission::Manager::render_shadows() noexcept
         render_shadows(scene);
     }
     GX_GL_CHECK_D;
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera) noexcept
 {
+    push_debug_group("render-shadows for camera " + *camera.name);
     set_framebuffer(camera.framebuffer);
     set_viewport_clip(camera.viewport_clip);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -719,18 +725,22 @@ void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera) no
         auto& model_data = distance_model_data.second;
         model_data.material->shadow(model_data, camera, current_shader);
     }
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene) noexcept
 {
+    push_debug_group("render-shadows for scene " + *scene.name);
     for (auto& camera_pool_index : scene.shadow_cameras) {
         auto& camera = camera_pool[camera_pool_index.second];
         render_shadows(camera);
     }
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_reflection_probes() noexcept
 {
+    push_debug_group("render-reflection-probes");
     e.get_world()->synchronised_system<core::ecs::And<gl::Reflection, ReflectionRuntime, render::reflection::Runtime>>(
         [&](const core::ecs::entity_id_t, gl::Reflection* const r, ReflectionRuntime* const rr, render::reflection::Runtime* const rrr) noexcept {
             constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
@@ -792,18 +802,22 @@ void gearoenix::gl::submission::Manager::render_reflection_probes() noexcept
                 return;
             }
         });
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_reflection_probes(const Scene& scene) noexcept
 {
+    push_debug_group("render-reflection-probes for scene " + *scene.name);
     for (auto& camera_pool_index : scene.reflection_cameras) {
         auto& camera = camera_pool[camera_pool_index.second];
         render_forward_camera(scene, camera);
     }
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, const Camera& camera) noexcept
 {
+    push_debug_group("render-skyboxes for scene " + *scene.name + " and for camera " + *camera.name);
     glDepthMask(GL_FALSE);
     // Rendering skyboxes
     const auto camera_pos_scale = math::Vec4(camera.pos, camera.skybox_scale);
@@ -835,10 +849,12 @@ void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, con
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }
     glDepthMask(GL_TRUE);
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scene, const Camera& camera) noexcept
 {
+    push_debug_group("render-forward-camera for scene " + *scene.name + " and for camera " + *camera.name);
     GX_GL_CHECK_D;
     if (camera.is_main_camera && camera.has_bloom) {
         set_framebuffer(bloom_target->get_framebuffer());
@@ -858,6 +874,7 @@ void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scen
         GX_GL_CHECK_D;
     }
     glDisable(GL_BLEND); /// TODO: take it into a context and material must decide
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
@@ -973,6 +990,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
 
 void gearoenix::gl::submission::Manager::render_with_forward() noexcept
 {
+    push_debug_group("render-forward");
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         render_reflection_probes(scene);
@@ -983,7 +1001,9 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
         }
         render_debug_meshes(scene);
     }
+    pop_debug_group();
 
+    push_debug_group("combine-all-cameras");
     set_framebuffer(0);
     auto& base_os_app = e.get_platform_application().get_base();
     const auto& window_size = base_os_app.get_window_size();
@@ -1013,15 +1033,15 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
         }
     }
     glDisable(GL_BLEND);
+    pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Camera& camera) noexcept
 {
-    GX_GL_CHECK_D;
-
     if (!camera.has_bloom)
         return;
-
+    push_debug_group("render-bloom in scene " + *s.name + " for camera " + *camera.name);
+    GX_GL_CHECK_D;
     set_framebuffer(bloom_horizontal_target->get_framebuffer());
     set_viewport_clip(back_buffer_viewport_clip);
     auto& horizontal_shader = bloom_shader_combination->get(true);
@@ -1057,10 +1077,12 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene&, const Camera
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     GX_GL_CHECK_D;
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene) noexcept
 {
+    push_debug_group("render-debug-meshes in scene " + *scene.name);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     unlit_coloured_shader.bind(current_shader);
@@ -1075,16 +1097,19 @@ void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
     }
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_imgui() noexcept
 {
+    push_debug_group("render-imgui");
     ImGui::Render();
     const ImGuiIO& io = ImGui::GetIO();
     set_viewport_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glGetError();
+    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept

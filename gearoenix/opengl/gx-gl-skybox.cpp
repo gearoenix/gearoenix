@@ -6,8 +6,12 @@
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Skybox::Skybox(std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& texture, std::shared_ptr<Mesh>&& mesh) noexcept
-    : core::ecs::Component(this)
+gearoenix::gl::Skybox::Skybox(
+    std::variant<std::shared_ptr<Texture2D>,
+        std::shared_ptr<TextureCube>>&& texture,
+    std::shared_ptr<Mesh>&& mesh,
+    std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , texture(std::move(texture))
     , mesh(std::move(mesh))
 {
@@ -45,8 +49,10 @@ gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
 {
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
-    builder.add_component(Skybox(std::move(bound_texture),
-        std::dynamic_pointer_cast<Mesh>(builder.get_component<render::skybox::Skybox>()->get_bound_mesh())));
+    builder.add_component(Skybox(
+        std::move(bound_texture),
+        std::dynamic_pointer_cast<Mesh>(builder.get_component<render::skybox::Skybox>()->get_bound_mesh()),
+        name + "-gl-skybox"));
 }
 
 gearoenix::gl::SkyboxBuilder::~SkyboxBuilder() noexcept = default;

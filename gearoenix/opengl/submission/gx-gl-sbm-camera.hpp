@@ -18,6 +18,7 @@ struct Camera final {
     render::camera::ColourTuning colour_tuning;
     bool has_bloom = true;
     bool is_main_camera = true;
+    const std::string* name = nullptr;
     std::vector<std::pair<double, Model>> models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_opaque_models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_translucent_models_data;

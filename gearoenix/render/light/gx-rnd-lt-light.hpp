@@ -10,7 +10,7 @@ struct Light final : public core::ecs::Component {
     core::ecs::entity_id_t scene_id = 0;
     bool is_shadow_caster = false;
 
-    Light() noexcept;
+    explicit Light(std::string&& name) noexcept;
     Light(Light&&) noexcept;
     ~Light() noexcept final;
     void show_gui() noexcept;

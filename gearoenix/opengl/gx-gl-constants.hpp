@@ -430,6 +430,14 @@
 #define GL_DEBUG_SEVERITY_MEDIUM 0x9147
 #define GL_DEBUG_SEVERITY_LOW 0x9148
 #define GL_DEBUG_SEVERITY_NOTIFICATION 0x826B
+#define GL_BUFFER 0x82E0
+#define GL_SHADER 0x82E1
+#define GL_PROGRAM 0x82E2
+#define GL_VERTEX_ARRAY 0x8074
+#define GL_QUERY 0x82E3
+#define GL_PROGRAM_PIPELINE 0x82E4
+#define GL_SAMPLER 0x82E6
+#define GL_MAX_LABEL_LENGTH 0x82E8
 
 // Gearoenix part ---------------------------------------------------------------------
 

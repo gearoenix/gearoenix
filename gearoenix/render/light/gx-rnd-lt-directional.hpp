@@ -20,7 +20,7 @@ struct Directional final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Vec3<float>, direction);
 
 public:
-    Directional() noexcept;
+    explicit Directional(std::string&& name) noexcept;
     Directional(Directional&&) noexcept;
     ~Directional() noexcept final;
 };

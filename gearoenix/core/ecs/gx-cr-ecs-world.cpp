@@ -4,17 +4,15 @@ void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) 
 {
     auto* const a = get_archetype(b.components);
     auto* const cs = a->allocate_entity(b.id, b.components);
-    entities.emplace(b.id, Entity(a, cs, b.name));
-    if (b.name.has_value()) {
-        if (name_to_entity_id.contains(*b.name))
-            GX_LOG_F("Entity with name `" << *b.name << "' is already in the world.");
-        name_to_entity_id.emplace(std::move(*b.name), b.id);
-    }
+    entities.emplace(b.id, Entity(a, cs, std::string(b.name)));
+    if (name_to_entity_id.contains(b.name))
+        GX_LOG_F("Entity with name `" << b.name << "' is already in the world.");
+    name_to_entity_id.emplace(std::move(b.name), b.id);
 }
 
 void gearoenix::core::ecs::World::delayed_create_entity_with_builder(EntityBuilder&& b) noexcept
 {
-    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
+    const std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::move(b));
 }
 
@@ -29,14 +27,13 @@ void gearoenix::core::ecs::World::remove_entity(const entity_id_t id) noexcept
 #endif
     auto& e = search->second;
     e.archetype->remove_entity(e.components);
-    if (e.name.has_value())
-        name_to_entity_id.erase(e.name.value());
+    name_to_entity_id.erase(e.name);
     entities.erase(search);
 }
 
 void gearoenix::core::ecs::World::delayed_remove_entity(const entity_id_t id) noexcept
 {
-    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
+    const std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(id);
 }
 
@@ -59,7 +56,7 @@ void gearoenix::core::ecs::World::add_components_map(const entity_id_t id, Entit
 
 void gearoenix::core::ecs::World::delayed_add_components_map(const entity_id_t ei, EntityBuilder::components_t&& cs) noexcept
 {
-    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
+    const std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -92,7 +89,7 @@ void gearoenix::core::ecs::World::delayed_remove_components_list(
     const entity_id_t ei,
     std::vector<std::type_index>&& cs) noexcept
 {
-    std::lock_guard<std::mutex> _lg(delayed_actions_lock);
+    const std::lock_guard<std::mutex> _lg(delayed_actions_lock);
     delayed_actions.emplace_back(std::make_pair(ei, std::move(cs)));
 }
 
@@ -105,7 +102,7 @@ gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(cons
     }
     auto search = archetypes.find(archetype_id);
     if (archetypes.end() == search) {
-        bool is_ok;
+        bool is_ok = false;
         std::tie(search, is_ok) = archetypes.emplace(archetype_id, std::unique_ptr<Archetype>(new Archetype(cs)));
         if (!is_ok)
             GX_LOG_F("Insertion in archetype map was not successful");
@@ -133,7 +130,7 @@ void gearoenix::core::ecs::World::update() noexcept
 {
     decltype(delayed_actions) actions;
     {
-        std::lock_guard<std::mutex> _lg(delayed_actions_lock);
+        const std::lock_guard<std::mutex> _lg(delayed_actions_lock);
         std::swap(actions, delayed_actions);
     }
     for (auto& action : actions) {
@@ -160,7 +157,7 @@ void gearoenix::core::ecs::World::update() noexcept
     }
 }
 
-std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder(sync::EndCaller&& end_caller) noexcept
+std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder(std::string&& name, sync::EndCaller&& end_caller) noexcept
 {
-    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this, std::move(end_caller)));
+    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this, std::move(name), std::move(end_caller)));
 }

@@ -6,8 +6,8 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "gx-rnd-lt-builder.hpp"
 
-gearoenix::render::light::Directional::Directional() noexcept
-    : core::ecs::Component(this)
+gearoenix::render::light::Directional::Directional(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , direction(0.0f, 0.0f, -1.0f)
 {
 }
@@ -25,7 +25,7 @@ gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
     engine::Engine& e,
     Builder& builder,
     const core::sync::EndCaller& end_callback) noexcept
-    : core::ecs::Component(this)
+    : core::ecs::Component(this, name + "-directional-shadow-caster")
 {
     std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
     std::memset(pixels0.data(), 0, pixels0.size());

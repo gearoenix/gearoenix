@@ -18,8 +18,10 @@ struct Skybox final : core::ecs::Component {
     std::shared_ptr<Mesh> mesh;
 
     Skybox(
-        std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& texture,
-        std::shared_ptr<Mesh>&& mesh) noexcept;
+        std::variant<std::shared_ptr<Texture2D>,
+            std::shared_ptr<TextureCube>>&& texture,
+        std::shared_ptr<Mesh>&& mesh,
+        std::string&& name) noexcept;
     ~Skybox() noexcept final;
     Skybox(Skybox&&) noexcept;
     [[nodiscard]] uint get_vertex_object() const noexcept;

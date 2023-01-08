@@ -1,8 +1,8 @@
 #include "gx-phs-transformation.hpp"
 #include <imgui/imgui.h>
 
-gearoenix::physics::Transformation::Transformation() noexcept
-    : core::ecs::Component(this)
+gearoenix::physics::Transformation::Transformation(std::string&& name) noexcept
+    : core::ecs::Component(this, std::move(name))
     , x_axis(1.0, 0.0, 0.0)
     , y_axis(0.0, 1.0, 0.0)
     , z_axis(0.0, 0.0, 1.0)

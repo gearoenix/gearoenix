@@ -43,7 +43,7 @@ typedef void(GX_GL_APIENTRY DeleteVertexArraysFnp)(sizei n, const uint* arrays);
 typedef void(GX_GL_APIENTRY DepthMaskFnp)(boolean flag);
 typedef void(GX_GL_APIENTRY DisableFnp)(enumerated cap);
 typedef void(GX_GL_APIENTRY DrawArraysFnp)(enumerated mode, sint first, sizei count);
-typedef void(GX_GL_APIENTRY DrawBuffersFnp)(sizei n, const enumerated* bufs);
+typedef void(GX_GL_APIENTRY DrawBuffersFnp)(sizei n, const enumerated* buffers);
 typedef void(GX_GL_APIENTRY DrawElementsFnp)(enumerated mode, sizei count, enumerated type, const void* indices);
 typedef void(GX_GL_APIENTRY EnableFnp)(enumerated);
 typedef void(GX_GL_APIENTRY EnableVertexAttribArrayFnp)(uint index);
@@ -91,6 +91,9 @@ typedef void(GX_GL_APIENTRY VertexAttribPointerFnp)(uint index, sint size, enume
 typedef void(GX_GL_APIENTRY ViewportFnp)(sint, sint, sizei, sizei);
 // Optional function types
 typedef void(GX_GL_APIENTRY DebugMessageCallbackFnp)(GX_GL_DEBUG_PROC callback, const void* userParam);
+typedef void(GX_GL_APIENTRY ObjectLabelFnp)(enumerated identifier, uint name, sizei length, const char* label);
+typedef void(GX_GL_APIENTRY PopDebugGroupFnp)();
+typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei length, const char* message);
 
 #define GX_GL_FUNCTION_MAP(gx_gl_function_map_arg)   \
     gx_gl_function_map_arg(ActiveTexture);           \
@@ -168,7 +171,10 @@ typedef void(GX_GL_APIENTRY DebugMessageCallbackFnp)(GX_GL_DEBUG_PROC callback, 
     gx_gl_function_map_arg(Viewport)
 
 #define GX_GL_OPTIONAL_FUNCTION_MAP(gx_gl_function_map_arg) \
-    gx_gl_function_map_arg(DebugMessageCallback)
+    gx_gl_function_map_arg(DebugMessageCallback);           \
+    gx_gl_function_map_arg(ObjectLabel);                    \
+    gx_gl_function_map_arg(PopDebugGroup);                  \
+    gx_gl_function_map_arg(PushDebugGroup)
 
 #define GX_GL_FUNCTION_DECL(gx_gl_function) extern gx_gl_function##Fnp gl##gx_gl_function
 

@@ -11,7 +11,6 @@
 #include "../texture/gx-rnd-txt-target.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-rnd-rfl-builder.hpp"
-#include <cstddef>
 #include <tuple>
 
 gearoenix::render::reflection::Runtime::Runtime(
@@ -25,8 +24,9 @@ gearoenix::render::reflection::Runtime::Runtime(
     const std::size_t irradiance_resolution,
     const std::size_t radiance_resolution,
     const core::sync::EndCaller& end_callback) noexcept
-    : core::ecs::Component(this)
+    : core::ecs::Component(this, std::string(name))
     , e(e)
+    , cameras()
     , receive_box(receive_box)
     , exclude_box(exclude_box)
     , include_box(include_box)

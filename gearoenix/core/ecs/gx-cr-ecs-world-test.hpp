@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         double y;
 
         Position(const double x, const double y) noexcept
-            : Component(this)
+            : Component(this, "position")
             , x(x)
             , y(y)
         {
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         double y;
 
         Speed(const double x, const double y) noexcept
-            : Component(this)
+            : Component(this, "speed")
             , x(x)
             , y(y)
         {
@@ -194,15 +194,19 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         delete_entities();
     };
 
-    e1 = w.create_entity(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
-    e2 = w.create_entity(Position { 6.0, 7.0 });
-    e3 = w.create_entity(Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
-    e4 = w.create_entity(Speed { 12.0, 13.0 });
-    e5 = w.create_entity();
+    e1 = w.create_entity("1", Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    e2 = w.create_entity("2", Position { 6.0, 7.0 });
+    e3 = w.create_entity("3", Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    e4 = w.create_entity("4", Speed { 12.0, 13.0 });
+    e5 = w.create_entity("5");
 
     end_of_step();
 
-    EntityBuilder b1(EndCaller([] {})), b2(EndCaller([] {})), b3(EndCaller([] {})), b4(EndCaller([] {})), b5(EndCaller([] {}));
+    EntityBuilder b1("1", EndCaller([] {})),
+        b2("2", EndCaller([] {})),
+        b3("3", EndCaller([] {})),
+        b4("4", EndCaller([] {})),
+        b5("5", EndCaller([] {}));
 
     b1.add_components(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     b2.add_component(Position { 6.0, 7.0 });
@@ -222,11 +226,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     end_of_step();
 
-    e1 = w.create_entity();
-    e2 = w.create_entity();
-    e3 = w.create_entity();
-    e4 = w.create_entity();
-    e5 = w.create_entity();
+    e1 = w.create_entity("1");
+    e2 = w.create_entity("2");
+    e3 = w.create_entity("3");
+    e4 = w.create_entity("4");
+    e5 = w.create_entity("5");
 
     w.add_components(e1, Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     w.add_components(e2, Position { 6.0, 7.0 });
@@ -235,11 +239,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     end_of_step();
 
-    e1 = w.create_entity();
-    e2 = w.create_entity();
-    e3 = w.create_entity();
-    e4 = w.create_entity();
-    e5 = w.create_entity();
+    e1 = w.create_entity("1");
+    e2 = w.create_entity("2");
+    e3 = w.create_entity("3");
+    e4 = w.create_entity("4");
+    e5 = w.create_entity("5");
 
     w.add_components(e1, Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     w.add_components(e2, Position { 6.0, 7.0 }, Speed { -1.0, -1.0 });
@@ -255,16 +259,20 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     // Delayed tests -------------------------------------------------------------
 
-    e1 = w.delayed_create_entity(EndCaller([] {}), Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
-    e2 = w.delayed_create_entity(EndCaller([] {}), Position { 6.0, 7.0 });
-    e3 = w.delayed_create_entity(EndCaller([] {}), Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
-    e4 = w.delayed_create_entity(EndCaller([] {}), Speed { 12.0, 13.0 });
-    e5 = w.delayed_create_entity(EndCaller([] {}));
+    e1 = w.delayed_create_entity("1", EndCaller([] {}), Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
+    e2 = w.delayed_create_entity("2", EndCaller([] {}), Position { 6.0, 7.0 });
+    e3 = w.delayed_create_entity("3", EndCaller([] {}), Speed { 10.0, 11.0 }, Position { 8.0, 9.0 });
+    e4 = w.delayed_create_entity("4", EndCaller([] {}), Speed { 12.0, 13.0 });
+    e5 = w.delayed_create_entity("5", EndCaller([] {}));
 
     w.update();
     end_of_step();
 
-    EntityBuilder b21(EndCaller([] {})), b22(EndCaller([] {})), b23(EndCaller([] {})), b24(EndCaller([] {})), b25(EndCaller([] {}));
+    EntityBuilder b21("21", EndCaller([] {})),
+        b22("22", EndCaller([] {})),
+        b23("23", EndCaller([] {})),
+        b24("24", EndCaller([] {})),
+        b25("25", EndCaller([] {}));
 
     b21.add_components(Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     b22.add_component(Position { 6.0, 7.0 });
@@ -285,11 +293,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.update();
     end_of_step();
 
-    e1 = w.delayed_create_entity(EndCaller([] {}));
-    e2 = w.delayed_create_entity(EndCaller([] {}));
-    e3 = w.delayed_create_entity(EndCaller([] {}));
-    e4 = w.delayed_create_entity(EndCaller([] {}));
-    e5 = w.delayed_create_entity(EndCaller([] {}));
+    e1 = w.delayed_create_entity("1", EndCaller([] {}));
+    e2 = w.delayed_create_entity("2", EndCaller([] {}));
+    e3 = w.delayed_create_entity("3", EndCaller([] {}));
+    e4 = w.delayed_create_entity("4", EndCaller([] {}));
+    e5 = w.delayed_create_entity("5", EndCaller([] {}));
 
     w.delayed_add_components(e1, EndCaller([] {}), Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     w.delayed_add_components(e2, EndCaller([] {}), Position { 6.0, 7.0 });
@@ -299,11 +307,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.update();
     end_of_step();
 
-    e1 = w.delayed_create_entity(EndCaller([] {}));
-    e2 = w.delayed_create_entity(EndCaller([] {}));
-    e3 = w.delayed_create_entity(EndCaller([] {}));
-    e4 = w.delayed_create_entity(EndCaller([] {}));
-    e5 = w.delayed_create_entity(EndCaller([] {}));
+    e1 = w.delayed_create_entity("1", EndCaller([] {}));
+    e2 = w.delayed_create_entity("2", EndCaller([] {}));
+    e3 = w.delayed_create_entity("3", EndCaller([] {}));
+    e4 = w.delayed_create_entity("4", EndCaller([] {}));
+    e5 = w.delayed_create_entity("5", EndCaller([] {}));
 
     w.delayed_add_components(e1, EndCaller([] {}), Position { 2.0, 3.0 }, Speed { 4.0, 5.0 });
     w.delayed_add_components(e2, EndCaller([] {}), Position { 6.0, 7.0 }, Speed { -1.0, -1.0 });

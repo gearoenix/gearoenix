@@ -24,7 +24,7 @@ struct Reflection final : public core::ecs::Component {
     GX_GET_VAL_PRV(uint, radiance_v, static_cast<uint>(-1));
 
 public:
-    Reflection() noexcept;
+    explicit Reflection(std::string&& name) noexcept;
     ~Reflection() noexcept final;
     Reflection(Reflection&&) noexcept;
 };
@@ -49,7 +49,7 @@ struct ReflectionRuntime final : public core::ecs::Component {
     GX_GET_CREF_PRV(GlMipedCubeTarget, radiance_targets_v);
 
 public:
-    ReflectionRuntime() noexcept;
+    explicit ReflectionRuntime(std::string&& name) noexcept;
     ~ReflectionRuntime() noexcept final;
     ReflectionRuntime(ReflectionRuntime&&) noexcept;
 };

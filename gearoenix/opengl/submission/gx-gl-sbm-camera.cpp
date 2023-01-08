@@ -15,6 +15,7 @@ void gearoenix::gl::submission::Camera::clear() noexcept
     models_data.clear();
     mvps.clear();
     debug_meshes.clear();
+    name = nullptr;
 
     for (auto& v : threads_opaque_models_data)
         v.clear();
