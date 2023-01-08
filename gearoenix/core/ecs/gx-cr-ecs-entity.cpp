@@ -2,8 +2,8 @@
 #include "gx-cr-ecs-world.hpp"
 
 gearoenix::core::ecs::Entity::Entity(
-    Archetype*const archetype,
-    unsigned char*const components,
+    Archetype* const archetype,
+    unsigned char* const components,
     std::optional<std::string> name) noexcept
     : archetype(archetype)
     , components(components)

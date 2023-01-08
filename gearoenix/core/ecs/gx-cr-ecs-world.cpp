@@ -29,7 +29,8 @@ void gearoenix::core::ecs::World::remove_entity(const entity_id_t id) noexcept
 #endif
     auto& e = search->second;
     e.archetype->remove_entity(e.components);
-    if(e.name.has_value()) name_to_entity_id.erase(e.name.value());
+    if (e.name.has_value())
+        name_to_entity_id.erase(e.name.value());
     entities.erase(search);
 }
 

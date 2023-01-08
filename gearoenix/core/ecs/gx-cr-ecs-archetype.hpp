@@ -1,6 +1,7 @@
 #ifndef GEAROENIX_CORE_ECS_ARCHETYPE_HPP
 #define GEAROENIX_CORE_ECS_ARCHETYPE_HPP
 #include "../../platform/gx-plt-log.hpp"
+#include "../allocator/gx-cr-alc-same-size-block.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "../gx-cr-range.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
@@ -9,7 +10,6 @@
 #include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-types.hpp"
-#include "../allocator/gx-cr-alc-same-size-block.hpp"
 #include <algorithm>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -159,7 +159,7 @@ private:
 
     /// Returns null if it fails to find the component
     template <typename ComponentType>
-    [[nodiscard]] ComponentType* get_component(unsigned char *const components) noexcept
+    [[nodiscard]] ComponentType* get_component(unsigned char* const components) noexcept
     {
         Component::type_check<ComponentType>();
         const auto search = components_indices.find(Component::create_type_index<ComponentType>());
@@ -169,7 +169,7 @@ private:
     }
 
     template <typename ComponentType>
-    [[nodiscard]] const ComponentType* get_component(const unsigned char *const components) const noexcept
+    [[nodiscard]] const ComponentType* get_component(const unsigned char* const components) const noexcept
     {
         Component::type_check<ComponentType>();
         const auto search = components_indices.find(Component::create_type_index<ComponentType>());
@@ -178,7 +178,7 @@ private:
         return reinterpret_cast<const ComponentType*>(components + search->second);
     }
 
-    void move_out_entity(unsigned char * cs, EntityBuilder::components_t& components) noexcept;
+    void move_out_entity(unsigned char* cs, EntityBuilder::components_t& components) noexcept;
 
     template <typename ComponentsTypesTuple, std::size_t... I, typename F>
     void parallel_system(std::index_sequence<I...> const&, F&& fun) noexcept

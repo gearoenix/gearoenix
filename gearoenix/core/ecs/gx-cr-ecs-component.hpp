@@ -1,25 +1,31 @@
 #ifndef GEAROENIX_CORE_ECS_COMPONENT_HPP
 #define GEAROENIX_CORE_ECS_COMPONENT_HPP
-#include "gx-cr-ecs-condition.hpp"
-#include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-cr-build-configuration.hpp"
+#include "../macro/gx-cr-mcr-getter-setter.hpp"
+#include "gx-cr-ecs-condition.hpp"
+#include <boost/container/flat_map.hpp>
 #include <cstdint>
+#include <functional>
+#include <string>
 #include <type_traits>
 #include <typeindex>
-#include <boost/container/flat_map.hpp>
-#include <functional>
 
 namespace gearoenix::core::ecs {
 struct Component {
     struct TypeInfo final {
-        typedef std::function<void(void*/*dst*/, void*/*src*/)> MoveConstructor;
+        typedef std::function<void(void* /*dst*/, void* /*src*/)> MoveConstructor;
 
-        GX_GET_CREF_PRV(MoveConstructor , move_constructor);
+        GX_GET_CREF_PRV(MoveConstructor, move_constructor);
         GX_GET_VAL_PRV(std::size_t, size, static_cast<std::size_t>(-1));
         GX_GET_CREF_PRV(std::string, name);
 
     public:
-        TypeInfo(MoveConstructor&& move_constructor, const std::size_t size, std::string&& name) noexcept: move_constructor(std::move(move_constructor)), size(size), name(std::move(name)) {}
+        TypeInfo(MoveConstructor&& move_constructor, const std::size_t size, std::string&& name) noexcept
+            : move_constructor(std::move(move_constructor))
+            , size(size)
+            , name(std::move(name))
+        {
+        }
         TypeInfo(TypeInfo&&) noexcept = default;
         TypeInfo& operator=(TypeInfo&&) noexcept = default;
     };
@@ -33,20 +39,21 @@ private:
     static boost::container::flat_map<std::type_index, TypeInfo> type_infos;
 
 public:
-    template<typename T>
-    static void register_type() noexcept {
+    template <typename T>
+    static void register_type() noexcept
+    {
         type_infos.emplace(
             Component::create_type_index<T>(),
             TypeInfo(
-                    [](void *const d, void *const s) noexcept { new(d) T(std::move(*reinterpret_cast<T *>(s))); },
-                    sizeof(T),
-                    std::string(typeid(T).name())));
+                [](void* const d, void* const s) noexcept { new (d) T(std::move(*reinterpret_cast<T*>(s))); },
+                sizeof(T),
+                std::string(typeid(T).name())));
     }
 
     [[nodiscard]] static const TypeInfo& get_type_info(const std::type_index& ti) noexcept;
 
     template <typename T>
-    explicit Component(T*const) noexcept
+    explicit Component(T* const) noexcept
         : type_index(Component::create_type_index<T>())
     {
 #ifdef GX_DEBUG_MODE

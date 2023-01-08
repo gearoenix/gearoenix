@@ -6,9 +6,9 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
+#include "gx-rnd-rfl-baked.hpp"
 #include "gx-rnd-rfl-builder.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
-#include "gx-rnd-rfl-baked.hpp"
 
 gearoenix::render::reflection::Manager::Manager(engine::Engine& e) noexcept
     : e(e)

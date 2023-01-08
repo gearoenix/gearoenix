@@ -1,8 +1,8 @@
 #include "gx-rnd-lt-manager.hpp"
 #include "gx-rnd-lt-builder.hpp"
 #include "gx-rnd-lt-directional.hpp"
-#include "gx-rnd-lt-point.hpp"
 #include "gx-rnd-lt-light.hpp"
+#include "gx-rnd-lt-point.hpp"
 
 gearoenix::render::light::Manager::Manager(engine::Engine& e) noexcept
     : e(e)

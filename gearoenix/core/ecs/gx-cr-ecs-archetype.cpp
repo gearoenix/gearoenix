@@ -42,7 +42,7 @@ unsigned char* gearoenix::core::ecs::Archetype::allocate_entity(
     const entity_id_t ei,
     const EntityBuilder::components_t& cs) noexcept
 {
-    auto *const ptr = allocate_entity(ei);
+    auto* const ptr = allocate_entity(ei);
     for (const auto& c : cs) {
         auto search = components_indices.find(c.first);
         GX_ASSERT_D(components_indices.end() != search);
@@ -62,8 +62,8 @@ void gearoenix::core::ecs::Archetype::remove_entity(unsigned char* const cs) noe
 
 gearoenix::core::ecs::Archetype::~Archetype() noexcept
 {
-    for (auto*const entity: entities) {
-        auto*const ptr = entity + sizeof(entity_id_t);
+    for (auto* const entity : entities) {
+        auto* const ptr = entity + sizeof(entity_id_t);
         for (const auto& ci : components_indices) {
             reinterpret_cast<Component*>(&ptr[ci.second])->~Component();
         }
@@ -77,7 +77,7 @@ void gearoenix::core::ecs::Archetype::move_out_entity(
     unsigned char* const cs,
     EntityBuilder::components_t& components) noexcept
 {
-    for (const auto& ci: components_indices) {
+    for (const auto& ci : components_indices) {
         const auto& ti = Component::get_type_info(ci.first);
         std::unique_ptr<Component> dst(reinterpret_cast<Component*>(std::malloc(ti.get_size())));
         auto* const src = reinterpret_cast<Component*>(&cs[ci.second]);

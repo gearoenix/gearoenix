@@ -22,7 +22,7 @@ struct Entity final {
     friend struct EntityBuilder;
 
 private:
-    static std::atomic<id_t> last_id;
+    static std::atomic<entity_id_t> last_id;
 
     Archetype* archetype = nullptr;
     unsigned char* components = nullptr;
