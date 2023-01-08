@@ -54,14 +54,14 @@ void gearoenix::metal::SubmissionManager::update() noexcept
     scene_pool.clear();
     scenes.clear();
 
-    world->synchronised_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
+    world->synchronised_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene) {
         if (!scene.enabled)
             return;
         const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
         auto& scene_pool_ref = scene_pool[scene_pool_index];
         scene_pool_ref.bvh_pool_index = bvh_pool.emplace([] { return physics::accelerator::Bvh<ModelBvhData>(); });
         scene_pool_ref.cameras.clear();
-        world->synchronised_system<render::camera::Camera, Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera, Camera& metal_camera) {
+        world->synchronised_system<render::camera::Camera, Camera>([&](const core::ecs::entity_id_t camera_id, render::camera::Camera& camera, Camera& metal_camera) {
             if (!camera.enabled)
                 return;
             if (camera.get_scene_id() != scene_id)
@@ -77,13 +77,13 @@ void gearoenix::metal::SubmissionManager::update() noexcept
         scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
     });
 
-    world->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene, const unsigned int) {
+    world->parallel_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene, const unsigned int) {
         if (!scene.enabled)
             return;
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
         auto& bvh = bvh_pool[scene_data.bvh_pool_index];
         bvh.reset();
-        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>([&](const core::ecs::Entity::id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
+        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>([&](const core::ecs::entity_id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
             if (!render_model.enabled)
                 return;
             if (render_model.scene_id != scene_id)
@@ -103,7 +103,7 @@ void gearoenix::metal::SubmissionManager::update() noexcept
                     } } });
         });
         bvh.create_nodes();
-        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& metal_camera, const unsigned int) {
+        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>([&](const core::ecs::entity_id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& metal_camera, const unsigned int) {
             if (!render_camera.get_is_enabled())
                 return;
             if (scene_id != render_camera.get_scene_id())

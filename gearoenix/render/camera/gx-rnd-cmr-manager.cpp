@@ -9,6 +9,7 @@
 gearoenix::render::camera::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
 {
+    core::ecs::Component::register_type<Camera>();
 }
 
 void gearoenix::render::camera::Manager::update() noexcept
@@ -16,7 +17,7 @@ void gearoenix::render::camera::Manager::update() noexcept
     auto* const world = e.get_world();
     world->parallel_system<core::ecs::And<Camera, physics::Transformation, physics::collider::Frustum>>(
         [](
-            const core::ecs::Entity::id_t /*entity-id*/,
+            const core::ecs::entity_id_t /*entity-id*/,
             Camera* const cam,
             physics::Transformation* const transform,
             physics::collider::Frustum* const collider,

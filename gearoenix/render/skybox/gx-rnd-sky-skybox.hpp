@@ -22,7 +22,7 @@ struct Skybox final : public core::ecs::Component {
 
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
     GX_GET_CREF_PRT(Texture, bound_texture);
-    GX_GETSET_VAL_PRT(core::ecs::Entity::id_t, scene_id, 0);
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, 0);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
 
 public:

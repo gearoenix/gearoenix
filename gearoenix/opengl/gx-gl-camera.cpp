@@ -40,6 +40,7 @@ std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::gl::CameraManager
 gearoenix::gl::CameraManager::CameraManager(Engine& e) noexcept
     : render::camera::Manager(e)
 {
+    core::ecs::Component::register_type<Camera>();
 }
 
 gearoenix::gl::CameraManager::~CameraManager() noexcept = default;

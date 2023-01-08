@@ -82,7 +82,7 @@ gearoenix::core::event::Listener::Response gearoenix::render::camera::JetControl
     return Response::Continue;
 }
 
-gearoenix::render::camera::JetController::JetController(engine::Engine& e, const core::ecs::Entity::id_t camera_entity_id) noexcept
+gearoenix::render::camera::JetController::JetController(engine::Engine& e, const core::ecs::entity_id_t camera_entity_id) noexcept
     : camera_entity_id(camera_entity_id)
     , e(e)
 {

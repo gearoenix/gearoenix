@@ -17,6 +17,9 @@ gearoenix::gl::Reflection::Reflection(Reflection&&) noexcept = default;
 
 gearoenix::gl::ReflectionRuntime::ReflectionRuntime() noexcept
     : core::ecs::Component(this)
+    , environment_targets_v()
+    , irradiance_targets_v()
+    , radiance_targets_v()
 {
 }
 
@@ -143,6 +146,8 @@ gearoenix::gl::ReflectionManager::ReflectionManager(Engine& e) noexcept
     : render::reflection::Manager(e)
     , eng(e)
 {
+    core::ecs::Component::register_type<Reflection>();
+    core::ecs::Component::register_type<ReflectionRuntime>();
 }
 
 gearoenix::gl::ReflectionManager::~ReflectionManager() noexcept = default;

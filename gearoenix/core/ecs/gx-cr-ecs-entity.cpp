@@ -2,24 +2,25 @@
 #include "gx-cr-ecs-world.hpp"
 
 gearoenix::core::ecs::Entity::Entity(
-    std::size_t archetype,
-    const std::size_t index_in_archetype,
+    Archetype*const archetype,
+    unsigned char*const components,
     std::optional<std::string> name) noexcept
     : archetype(archetype)
-    , index_in_archetype(index_in_archetype)
+    , components(components)
     , name(std::move(name))
 {
 }
 
 gearoenix::core::ecs::Entity::Entity(Entity&& o) noexcept
     : archetype(o.archetype)
-    , index_in_archetype(o.index_in_archetype)
+    , components(o.components)
+    , name(std::move(o.name))
 {
 }
 
-std::atomic<gearoenix::core::ecs::Entity::id_t> gearoenix::core::ecs::Entity::last_id(1028);
+std::atomic<gearoenix::core::ecs::entity_id_t> gearoenix::core::ecs::Entity::last_id(1028);
 
-gearoenix::core::ecs::EntityBuilder::EntityBuilder(const Entity::id_t id, sync::EndCaller&& end_caller) noexcept
+gearoenix::core::ecs::EntityBuilder::EntityBuilder(const entity_id_t id, sync::EndCaller&& end_caller) noexcept
     : id(id)
     , end_caller(std::move(end_caller))
 {
@@ -38,20 +39,20 @@ gearoenix::core::ecs::EntityBuilder::EntityBuilder(EntityBuilder&& o) noexcept
 {
 }
 
-const void* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index component_type) const noexcept
+const gearoenix::core::ecs::Component* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index component_type) const noexcept
 {
     const auto search = components.find(component_type);
     if (components.end() == search)
         return nullptr;
-    return search->second.data();
+    return search->second.get();
 }
 
-void* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index component_type) noexcept
+gearoenix::core::ecs::Component* gearoenix::core::ecs::EntityBuilder::get_component(const std::type_index component_type) noexcept
 {
     auto search = components.find(component_type);
     if (components.end() == search)
         return nullptr;
-    return search->second.data();
+    return search->second.get();
 }
 
 gearoenix::core::ecs::EntitySharedBuilder::EntitySharedBuilder(World* const world, sync::EndCaller&& end_caller) noexcept

@@ -24,9 +24,9 @@ struct Model final : public core::ecs::Component {
     GX_GET_CREF_PRV(std::shared_ptr<material::Material>, bound_material);
 
 public:
-    std::optional<boost::container::flat_set<core::ecs::Entity::id_t>> cameras;
+    std::optional<boost::container::flat_set<core::ecs::entity_id_t>> cameras;
     std::uint64_t cameras_flags = static_cast<std::uint64_t>(-1);
-    core::ecs::Entity::id_t scene_id = 0;
+    core::ecs::entity_id_t scene_id = 0;
 
     ///
     /// \param is_transformable It indicates whether the model is not static or dynamic.

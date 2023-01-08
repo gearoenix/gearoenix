@@ -55,8 +55,8 @@ struct Camera final : public core::ecs::Component {
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, target);
     GX_GET_VAL_PRV(bool, has_customised_target_aspect_ratio, false);
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f);
-    GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, reference_id, 0); // It can be light or reflection probe or any other owner entity TODO: remove this, all of the camera component users must maintain one entity
-    GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0);
+    GX_GETSET_VAL_PRV(core::ecs::entity_id_t, reference_id, 0); // It can be light or reflection probe or any other owner entity TODO: remove this, all of the camera component users must maintain one entity
+    GX_GETSET_VAL_PRV(core::ecs::entity_id_t, scene_id, 0);
     GX_GETSET_VAL_PRV(std::uint64_t, flag, 1);
     GX_GET_VAL_PRV(float, far, 100.0f);
     GX_GET_VAL_PRV(float, near, 1.0f);

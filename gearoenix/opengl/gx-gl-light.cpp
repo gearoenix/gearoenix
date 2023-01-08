@@ -1,7 +1,6 @@
 #include "gx-gl-light.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/light/gx-rnd-lt-directional.hpp"
-#include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-target.hpp"
@@ -79,6 +78,7 @@ gearoenix::gl::LightManager::LightManager(Engine& e) noexcept
     : render::light::Manager(e)
     , eng(e)
 {
+    core::ecs::Component::register_type<ShadowCasterDirectionalLight>();
 }
 
 gearoenix::gl::LightManager::~LightManager() noexcept = default;

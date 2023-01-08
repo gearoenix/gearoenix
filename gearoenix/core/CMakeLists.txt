@@ -2,6 +2,9 @@ SET(GX_ENGINE_CORE_SRC_DIR ${GX_ENGINE_SRC_DIR}/core)
 SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-range.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-range.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.cpp
@@ -10,6 +13,7 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-file.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-condition.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.cpp

@@ -8,10 +8,13 @@
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-rnd-rfl-builder.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
+#include "gx-rnd-rfl-baked.hpp"
 
 gearoenix::render::reflection::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
 {
+    core::ecs::Component::register_type<Baked>();
+    core::ecs::Component::register_type<Runtime>();
 }
 
 gearoenix::render::reflection::Manager::~Manager() noexcept = default;
@@ -36,7 +39,7 @@ void gearoenix::render::reflection::Manager::update() noexcept
 {
     e.get_world()->parallel_system<Runtime>(
         [this](
-            const core::ecs::Entity::id_t /*entity_id*/,
+            const core::ecs::entity_id_t /*entity_id*/,
             Runtime* const runtime_probe,
             const unsigned int /*kernel_index*/) {
             if (runtime_probe->enabled) {

@@ -9,7 +9,7 @@ struct Engine;
 
 namespace gearoenix::render::camera {
 struct JetController final : public core::event::Listener {
-    GX_GETSET_VAL_PRV(core::ecs::Entity::id_t, camera_entity_id, 0);
+    GX_GETSET_VAL_PRV(core::ecs::entity_id_t, camera_entity_id, 0);
     GX_GETSET_VAL_PRV(double, movement_speed, 0.5);
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
 
@@ -29,7 +29,7 @@ private:
     [[nodiscard]] Response on_event(const core::event::Data& event_data) noexcept final;
 
 public:
-    JetController(engine::Engine& e, core::ecs::Entity::id_t camera_entity_id) noexcept;
+    JetController(engine::Engine& e, core::ecs::entity_id_t camera_entity_id) noexcept;
     ~JetController() noexcept final;
     void update() noexcept;
 };

@@ -9,6 +9,7 @@
 #include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-types.hpp"
+#include "../allocator/gx-cr-alc-same-size-block.hpp"
 #include <algorithm>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -59,11 +60,12 @@ private:
     typedef boost::container::flat_set<std::type_index> id_t;
     typedef boost::container::flat_map<std::type_index, std::size_t> components_indices_t;
 
-    constexpr static std::size_t header_size = sizeof(Entity::id_t);
+    constexpr static std::size_t header_size = sizeof(entity_id_t);
 
     const components_indices_t components_indices;
     const std::size_t entity_size;
-    std::vector<std::uint8_t> data;
+    allocator::SameSizeBlock alc;
+    boost::container::flat_set<std::uint8_t*> entities;
 
     template <typename... ComponentsTypes>
     [[nodiscard]] static id_t create_id() noexcept
@@ -72,7 +74,7 @@ private:
         id_t id {
             Component::create_type_index<ComponentsTypes>()...,
         };
-        GX_ASSERT(id.size() == sizeof...(ComponentsTypes));
+        GX_ASSERT(id.size() == sizeof...(ComponentsTypes)); // TODO this can be done in compile time
         return id;
     }
 
@@ -116,42 +118,33 @@ private:
     Archetype(const std::size_t components_size, components_indices_t&& components_indices) noexcept
         : components_indices(std::move(components_indices))
         , entity_size(header_size + components_size)
+        , alc(entity_size, 2048)
     {
     }
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] static Archetype create() noexcept
+    [[nodiscard]] static Archetype* create() noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        return Archetype(get_components_size<ComponentsTypes...>(), get_components_indices<ComponentsTypes...>());
+        return new Archetype(get_components_size<ComponentsTypes...>(), get_components_indices<ComponentsTypes...>());
     }
 
-    [[nodiscard]] std::uint8_t* allocate_size(std::size_t) noexcept;
+    [[nodiscard]] unsigned char* allocate_entity(entity_id_t) noexcept;
 
-    template <typename T>
-    T& allocate() noexcept
-    {
-        return *reinterpret_cast<T*>(allocate_size(sizeof(T)));
-    }
-
-    void allocate_entity(Entity::id_t) noexcept;
-
-    [[nodiscard]] std::size_t allocate_entity(Entity::id_t, const EntityBuilder::components_t&) noexcept;
+    [[nodiscard]] unsigned char* allocate_entity(entity_id_t, const EntityBuilder::components_t&) noexcept;
 
     template <typename... ComponentsTypes>
-    [[nodiscard]] std::size_t allocate(const Entity::id_t id, ComponentsTypes&&... components) noexcept
+    [[nodiscard]] unsigned char* allocate(const entity_id_t id, ComponentsTypes&&... components) noexcept
     {
         Component::types_check<ComponentsTypes...>();
-        allocate_entity(id);
-        const auto result = data.size();
+        unsigned char* const ptr = allocate_entity(id);
         if constexpr (sizeof...(ComponentsTypes) > 0) {
-            auto* const ptr = allocate_size(get_components_size<ComponentsTypes...>());
-            ((new (&ptr[get_component_index<ComponentsTypes>()]) ComponentsTypes(std::move(components))), ...);
+            ((new (ptr + get_component_index<ComponentsTypes>()) ComponentsTypes(std::move(components))), ...);
         }
-        return result;
+        return ptr;
     }
 
-    std::optional<std::pair<Entity::id_t, std::size_t>> remove_entity(std::size_t index) noexcept;
+    void remove_entity(unsigned char* cs) noexcept;
 
     /// If it fails to find the the component it will return -1
     template <typename T>
@@ -166,39 +159,36 @@ private:
 
     /// Returns null if it fails to find the component
     template <typename ComponentType>
-    [[nodiscard]] ComponentType* get_component(const std::size_t index) noexcept
+    [[nodiscard]] ComponentType* get_component(unsigned char *const components) noexcept
     {
         Component::type_check<ComponentType>();
-        const auto ci = get_component_index<ComponentType>();
-        if (ci == static_cast<decltype(ci)>(-1))
+        const auto search = components_indices.find(Component::create_type_index<ComponentType>());
+        if (components_indices.end() == search)
             return nullptr;
-        return reinterpret_cast<ComponentType*>(&data[index + ci]);
+        return reinterpret_cast<ComponentType*>(components + search->second);
     }
 
     template <typename ComponentType>
-    [[nodiscard]] const ComponentType* get_component(const std::size_t index) const noexcept
+    [[nodiscard]] const ComponentType* get_component(const unsigned char *const components) const noexcept
     {
         Component::type_check<ComponentType>();
-        const auto ci = get_component_index<ComponentType>();
-        if (ci == static_cast<decltype(ci)>(-1))
+        const auto search = components_indices.find(Component::create_type_index<ComponentType>());
+        if (components_indices.end() == search)
             return nullptr;
-        return reinterpret_cast<const ComponentType*>(&data[index + ci]);
+        return reinterpret_cast<const ComponentType*>(components + search->second);
     }
 
-    void move_out_entity(std::size_t index, EntityBuilder::components_t& components) noexcept;
-
-    [[nodiscard]] std::optional<std::pair<Entity::id_t, std::size_t>> move_from_back(std::size_t index) noexcept;
+    void move_out_entity(unsigned char * cs, EntityBuilder::components_t& components) noexcept;
 
     template <typename ComponentsTypesTuple, std::size_t... I, typename F>
     void parallel_system(std::index_sequence<I...> const&, F&& fun) noexcept
     {
         const std::size_t indices[] = {
-            (sizeof(Entity::id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
+            (sizeof(entity_id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
-        auto range = PtrRange(data.data(), data.size(), entity_size);
-        sync::ParallelFor::exec(range.begin(), range.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
-            const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
-            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(Entity::id_t) ? &ptr[indices[I]] : nullptr)..., kernel_index);
+        sync::ParallelFor::exec(entities.begin(), entities.end(), [&](std::uint8_t* const ptr, const auto kernel_index) noexcept {
+            const auto id = *reinterpret_cast<const entity_id_t*>(ptr);
+            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(entity_id_t) ? &ptr[indices[I]] : nullptr)..., kernel_index);
         });
     }
 
@@ -213,12 +203,11 @@ private:
     void synchronised_system(std::index_sequence<I...> const&, F&& fun) noexcept
     {
         const std::size_t indices[] = {
-            (sizeof(Entity::id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
+            (sizeof(entity_id_t) + get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
-        auto range = PtrRange(data.data(), data.size(), entity_size);
-        for (auto ptr : range) {
-            const auto id = *reinterpret_cast<const Entity::id_t*>(ptr);
-            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(Entity::id_t) ? &ptr[indices[I]] : nullptr)...);
+        for (auto ptr : entities) {
+            const auto id = *reinterpret_cast<const entity_id_t*>(ptr);
+            fun(id, reinterpret_cast<std::tuple_element_t<I, ComponentsTypesTuple>*>(indices[I] >= sizeof(entity_id_t) ? &ptr[indices[I]] : nullptr)...);
         }
     }
 
@@ -230,7 +219,6 @@ private:
     }
 
 public:
-    Archetype(Archetype&&) noexcept;
     Archetype(const Archetype&) = delete;
     ~Archetype() noexcept;
 };

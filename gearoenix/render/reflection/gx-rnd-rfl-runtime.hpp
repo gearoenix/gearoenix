@@ -40,13 +40,13 @@ struct Runtime final : public core::ecs::Component {
         Resting = 7,
     };
 
-    typedef std::array<core::ecs::Entity::id_t, 6> CubeCamera;
+    typedef std::array<core::ecs::entity_id_t, 6> CubeCamera;
     typedef std::array<std::shared_ptr<texture::Target>, 6> CubeTarget;
     typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MipedCubeTarget;
     typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MipedRoughness;
 
-    GX_GET_VAL_PRV(core::ecs::Entity::id_t, scene_id, 0);
-    GX_GET_RRF_PRV(engine::Engine, e);
+    engine::Engine& e;
+    GX_GET_VAL_PRV(core::ecs::entity_id_t, scene_id, 0);
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, environment);
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance);
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance);
@@ -85,7 +85,7 @@ public:
     void set_location(const math::Vec3<double>& p) noexcept;
     void update_state() noexcept;
     /// NOTE: This function must be called when the Component and other related entities (e.g. cameras) are completely placed in the world
-    void set_scene_id(core::ecs::Entity::id_t) noexcept;
+    void set_scene_id(core::ecs::entity_id_t) noexcept;
     void set_on_rendered(std::function<void()>&&) noexcept;
     void export_baked(
         const std::shared_ptr<platform::stream::Stream>& s,

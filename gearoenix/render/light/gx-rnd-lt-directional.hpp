@@ -28,7 +28,7 @@ public:
 struct ShadowCasterDirectional final : public core::ecs::Component {
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, shadow_map);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
-    GX_GET_VAL_PRV(core::ecs::Entity::id_t, camera_id, 0);
+    GX_GET_VAL_PRV(core::ecs::entity_id_t, camera_id, 0);
 
 public:
     ShadowCasterDirectional(

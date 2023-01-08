@@ -112,14 +112,14 @@ bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
     scene_pool.clear();
     scenes.clear();
 
-    world->synchronised_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene) {
+    world->synchronised_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene) {
         if (!scene.enabled)
             return;
         const auto scene_pool_index = scene_pool.emplace([] { return SceneData(); });
         auto& scene_pool_ref = scene_pool[scene_pool_index];
         scene_pool_ref.bvh_pool_index = bvh_pool.emplace([] { return physics::accelerator::Bvh<ModelBvhData>(); });
         scene_pool_ref.cameras.clear();
-        world->synchronised_system<render::camera::Camera>([&](const core::ecs::Entity::id_t camera_id, render::camera::Camera& camera) {
+        world->synchronised_system<render::camera::Camera>([&](const core::ecs::entity_id_t camera_id, render::camera::Camera& camera) {
             if (!camera.enabled)
                 return;
             if (camera.get_scene_id() != scene_id)
@@ -131,7 +131,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
         scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
     });
 
-    world->parallel_system<render::scene::Scene>([&](const core::ecs::Entity::id_t scene_id, render::scene::Scene& scene, const unsigned int) {
+    world->parallel_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene, const unsigned int) {
         if (!scene.enabled)
             return;
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
@@ -139,7 +139,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
         bvh.reset();
         world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
             [&](
-                const core::ecs::Entity::id_t,
+                const core::ecs::entity_id_t,
                 physics::collider::Aabb3& collider,
                 render::model::Model& render_model,
                 Model& model,
@@ -167,7 +167,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
         bvh.create_nodes();
         world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>(
             [&](
-                const core::ecs::Entity::id_t camera_id,
+                const core::ecs::entity_id_t camera_id,
                 render::camera::Camera& camera,
                 physics::collider::Frustum& frustum,
                 physics::Transformation& transform,

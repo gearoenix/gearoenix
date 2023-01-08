@@ -7,6 +7,7 @@
 gearoenix::render::scene::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
 {
+    core::ecs::Component::register_type<Scene>();
 }
 
 gearoenix::render::scene::Manager::~Manager() noexcept = default;
@@ -19,7 +20,7 @@ std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Man
 
 void gearoenix::render::scene::Manager::update() noexcept
 {
-    e.get_world()->parallel_system<Scene>([](const core::ecs::Entity::id_t scene_id, Scene* const s, const auto /*kernel_index*/) noexcept {
+    e.get_world()->parallel_system<Scene>([](const core::ecs::entity_id_t scene_id, Scene* const s, const auto /*kernel_index*/) noexcept {
         s->update(scene_id);
     });
 }

@@ -48,6 +48,8 @@ void gearoenix::physics::animation::Manager::update_bone(const std::size_t index
 gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e) noexcept
     : e(e)
 {
+    core::ecs::Component::register_type<AnimationPlayer>();
+    core::ecs::Component::register_type<Armature>();
 }
 
 gearoenix::physics::animation::Manager::~Manager() noexcept = default;

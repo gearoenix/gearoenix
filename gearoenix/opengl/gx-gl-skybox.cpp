@@ -1,7 +1,6 @@
 #include "gx-gl-skybox.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../platform/gx-plt-log.hpp"
 #include "../render/skybox/gx-rnd-sky-skybox.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
@@ -56,6 +55,7 @@ gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e) noexcept
     : render::skybox::Manager(e)
     , eng(e)
 {
+    core::ecs::Component::register_type<Skybox>();
 }
 
 gearoenix::gl::SkyboxManager::~SkyboxManager() noexcept = default;

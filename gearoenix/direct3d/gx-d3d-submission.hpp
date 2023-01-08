@@ -46,7 +46,7 @@ struct SubmissionManager final {
 
     struct SceneData final {
         std::size_t bvh_pool_index = 0;
-        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
+        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
     };
 
     GX_GET_RRF_PRV(Engine, e)
@@ -61,7 +61,7 @@ private:
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity::id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
 
     [[nodiscard]] bool fill_g_buffer(const std::size_t camera_pool_index) noexcept;
 

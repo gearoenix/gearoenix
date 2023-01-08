@@ -470,6 +470,7 @@ gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_c
         return math::Vec2<size_t> { wh };
     }
     }
+    GX_UNEXPECTED;
 }
 
 std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::Manager::create_default_camera_render_target(

@@ -5,7 +5,7 @@ std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBui
 {
     std::size_t s = 0;
     for (const auto& c : cs)
-        s += c.second.size();
+        s += Component::get_type_info(c.first).get_size();
     return s;
 }
 
@@ -18,7 +18,7 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     std::size_t index = 0;
     for (const auto& c : cs) {
         cis[c.first] = index;
-        index += c.second.size();
+        index += Component::get_type_info(c.first).get_size();
     }
     return cis;
 }
@@ -26,92 +26,63 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
 gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs) noexcept
     : components_indices(get_components_indices(cs))
     , entity_size(header_size + get_components_size(cs))
+    , alc(entity_size, 2048)
 {
 }
 
-std::uint8_t* gearoenix::core::ecs::Archetype::allocate_size(const std::size_t sz) noexcept
+unsigned char* gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id) noexcept
 {
-    const auto s = data.size();
-    for (std::size_t i = 0; i < sz; ++i)
-        data.push_back(0);
-    return &data[s];
+    unsigned char* const entity = alc.alloc();
+    entities.emplace(entity);
+    *reinterpret_cast<entity_id_t*>(entity) = id;
+    return entity + sizeof(entity_id_t);
 }
 
-void gearoenix::core::ecs::Archetype::allocate_entity(const Entity::id_t id) noexcept
-{
-    allocate<Entity::id_t>() = id;
-}
-
-std::size_t gearoenix::core::ecs::Archetype::allocate_entity(
-    const Entity::id_t ei,
+unsigned char* gearoenix::core::ecs::Archetype::allocate_entity(
+    const entity_id_t ei,
     const EntityBuilder::components_t& cs) noexcept
 {
-    allocate_entity(ei);
-    const std::size_t result = data.size();
-    for (const auto& c : cs)
-        data.insert(data.end(), c.second.begin(), c.second.end());
-    return result;
+    auto *const ptr = allocate_entity(ei);
+    for (const auto& c : cs) {
+        auto search = components_indices.find(c.first);
+        GX_ASSERT_D(components_indices.end() != search);
+        Component::get_type_info(c.first).get_move_constructor()(&ptr[search->second], c.second.get());
+    }
+    return ptr;
 }
 
-std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>> gearoenix::core::ecs::Archetype::remove_entity(
-    const std::size_t index) noexcept
+void gearoenix::core::ecs::Archetype::remove_entity(unsigned char* const cs) noexcept
 {
     for (const auto& ci : components_indices)
-        reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
-    return move_from_back(index);
-}
-
-gearoenix::core::ecs::Archetype::Archetype(Archetype&& o) noexcept
-    : components_indices(o.components_indices)
-    , entity_size(o.entity_size)
-    , data(std::move(o.data))
-{
+        reinterpret_cast<Component*>(cs + ci.second)->~Component();
+    unsigned char* const ptr = cs - sizeof(entity_id_t);
+    entities.erase(ptr);
+    alc.free(ptr);
 }
 
 gearoenix::core::ecs::Archetype::~Archetype() noexcept
 {
-    for (std::size_t index = header_size; index < data.size(); index += entity_size) {
+    for (auto*const entity: entities) {
+        auto*const ptr = entity + sizeof(entity_id_t);
         for (const auto& ci : components_indices) {
-            reinterpret_cast<Component*>(&data[index + ci.second])->~Component();
+            reinterpret_cast<Component*>(&ptr[ci.second])->~Component();
         }
+#ifdef GX_DEBUG_MODE
+        alc.free(entity);
+#endif
     }
 }
 
 void gearoenix::core::ecs::Archetype::move_out_entity(
-    const std::size_t index,
+    unsigned char* const cs,
     EntityBuilder::components_t& components) noexcept
 {
-    if (components_indices.empty())
-        return;
-    for (auto iter_first = components_indices.begin(), iter_second = iter_first + 1; iter_second != components_indices.end(); ++iter_first, ++iter_second) {
-        const auto ci = iter_first->second;
-        const auto csz = iter_second->second - ci;
-        std::vector<std::uint8_t> cd(csz);
-        std::memcpy(cd.data(), &data[index + ci], csz);
-        components.emplace(iter_first->first, std::move(cd));
+    for (const auto& ci: components_indices) {
+        const auto& ti = Component::get_type_info(ci.first);
+        std::unique_ptr<Component> dst(reinterpret_cast<Component*>(std::malloc(ti.get_size())));
+        auto* const src = reinterpret_cast<Component*>(&cs[ci.second]);
+        ti.get_move_constructor()(dst.get(), src);
+        components.emplace(ci.first, std::move(dst));
     }
-    auto back = components_indices.rbegin();
-    const auto ci = back->second;
-    const auto csz = (entity_size - header_size) - ci;
-    std::vector<std::uint8_t> cd(csz);
-    std::memcpy(cd.data(), &data[index + ci], csz);
-    components.emplace(back->first, std::move(cd));
-}
-
-std::optional<std::pair<gearoenix::core::ecs::Entity::id_t, std::size_t>> gearoenix::core::ecs::Archetype::move_from_back(
-    const std::size_t index) noexcept
-{
-    const auto start_index = index - header_size;
-    if (start_index + entity_size < data.size()) {
-        const auto end_index = data.size() - entity_size;
-        std::memcpy(&data[start_index], &data[end_index], entity_size);
-        data.resize(end_index);
-        return std::make_pair(*reinterpret_cast<Entity::id_t*>(&data[start_index]), start_index + header_size);
-    }
-#ifdef GX_DEBUG_MODE
-    if (start_index + entity_size != data.size())
-        GX_UNEXPECTED;
-#endif
-    data.resize(start_index);
-    return std::nullopt;
+    remove_entity(cs);
 }

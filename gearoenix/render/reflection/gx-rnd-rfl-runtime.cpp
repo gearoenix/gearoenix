@@ -253,7 +253,7 @@ void gearoenix::render::reflection::Runtime::update_state() noexcept
     }
 }
 
-void gearoenix::render::reflection::Runtime::set_scene_id(const core::ecs::Entity::id_t si) noexcept
+void gearoenix::render::reflection::Runtime::set_scene_id(const core::ecs::entity_id_t si) noexcept
 {
     scene_id = si;
     for (const auto camera_id : cameras)

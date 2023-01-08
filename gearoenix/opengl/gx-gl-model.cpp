@@ -60,6 +60,7 @@ std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::
 gearoenix::gl::ModelManager::ModelManager(Engine& e) noexcept
     : render::model::Manager(e)
 {
+    core::ecs::Component::register_type<Model>();
 }
 
 gearoenix::gl::ModelManager::~ModelManager() noexcept = default;

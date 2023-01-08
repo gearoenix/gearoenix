@@ -40,7 +40,7 @@ struct SkyboxManager final : public render::skybox::Manager {
     Engine& eng;
 
     explicit SkyboxManager(Engine& e) noexcept;
-    ~SkyboxManager() noexcept;
+    ~SkyboxManager() noexcept final;
     [[nodiscard]] std::shared_ptr<render::skybox::Builder> build(
         std::string&& name,
         Texture&& bound_texture,

@@ -5,10 +5,12 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
+#include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
 {
+    core::ecs::Component::register_type<Skybox>();
 }
 
 gearoenix::render::skybox::Manager::~Manager() noexcept = default;

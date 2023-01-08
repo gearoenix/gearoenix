@@ -9,7 +9,7 @@ struct Point final : public core::ecs::Component {
 
     Point() noexcept;
     Point(Point&&) noexcept;
-    ~Point() noexcept;
+    ~Point() noexcept final;
 };
 }
 #endif

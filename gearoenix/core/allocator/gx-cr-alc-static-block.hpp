@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_CORE_ALLOCATOR_RANGE_HPP
-#define GEAROENIX_CORE_ALLOCATOR_RANGE_HPP
+#ifndef GEAROENIX_CORE_ALLOCATOR_STATIC_BLOCK_HPP
+#define GEAROENIX_CORE_ALLOCATOR_STATIC_BLOCK_HPP
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <array>
 #include <cstring>

@@ -15,19 +15,20 @@
 
 namespace gearoenix::core::ecs {
 struct World;
+struct Archetype;
 struct EntityBuilder;
 struct Entity final {
     friend struct World;
     friend struct EntityBuilder;
 
-    typedef entity_id_t id_t;
-
 private:
-    Entity(std::size_t archetype, std::size_t index_in_archetype, std::optional<std::string> name) noexcept;
     static std::atomic<id_t> last_id;
-    std::size_t archetype = static_cast<std::size_t>(-1);
-    std::size_t index_in_archetype = static_cast<std::size_t>(-1);
+
+    Archetype* archetype = nullptr;
+    unsigned char* components = nullptr;
     std::optional<std::string> name;
+
+    Entity(Archetype* archetype, unsigned char* components, std::optional<std::string> name) noexcept;
 
 public:
     Entity(Entity&&) noexcept;
@@ -38,16 +39,16 @@ public:
 
 struct EntityBuilder final {
     friend struct World;
-    typedef boost::container::flat_map<std::type_index, std::vector<std::uint8_t>> components_t;
+    typedef boost::container::flat_map<std::type_index, std::unique_ptr<Component>> components_t;
 
-    GX_GET_CVAL_PRV(Entity::id_t, id);
+    GX_GET_CVAL_PRV(entity_id_t, id);
     GX_GETSET_CREF_PRV(std::optional<std::string>, name);
 
 private:
     components_t components;
     sync::EndCaller end_caller;
 
-    EntityBuilder(Entity::id_t, sync::EndCaller&& end_caller) noexcept;
+    EntityBuilder(entity_id_t, sync::EndCaller&& end_caller) noexcept;
 
 public:
     explicit EntityBuilder(sync::EndCaller&& end_caller) noexcept;
@@ -62,11 +63,10 @@ public:
         Component::types_check<ComponentType>();
         auto c = std::make_pair(
             Component::create_type_index<ComponentType>(),
-            std::vector<std::uint8_t>(sizeof(ComponentType)));
+            std::make_unique<ComponentType>(std::forward<ComponentType>(component)));
         const auto search = components.find(c.first);
         if (search != components.end())
             GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id);
-        new (c.second.data()) ComponentType(std::forward<ComponentType>(component));
         components.emplace(std::move(c));
     }
 
@@ -76,8 +76,8 @@ public:
         ((add_component(std::move(cs))), ...);
     }
 
-    [[nodiscard]] const void* get_component(std::type_index component_type) const noexcept;
-    [[nodiscard]] void* get_component(std::type_index component_type) noexcept;
+    [[nodiscard]] const Component* get_component(std::type_index component_type) const noexcept;
+    [[nodiscard]] Component* get_component(std::type_index component_type) noexcept;
 
     template <typename ComponentType>
     const ComponentType* get_component() const noexcept
