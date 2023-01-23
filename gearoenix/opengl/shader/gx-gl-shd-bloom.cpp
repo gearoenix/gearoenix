@@ -214,6 +214,7 @@ gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
     fs << "    vec4 src = textureLod(source_texture, out_uv, scatter_src_mip_index_low_mip_index.y);\n";
     fs << "    vec4 low = textureLod(low_texture, out_uv, scatter_src_mip_index_low_mip_index.z);\n";
     fs << "    frag_colour = mix(src, mix(src, src + low, scatter_src_mip_index_low_mip_index.x), scatter_src_mip_index_low_mip_index.x);\n";
+    fs << "    frag_colour.w = max(frag_colour.w, src.w);\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
 

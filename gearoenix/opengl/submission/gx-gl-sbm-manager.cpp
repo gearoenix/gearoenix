@@ -23,7 +23,6 @@
 #include "../gx-gl-engine.hpp"
 #include "../gx-gl-label.hpp"
 #include "../gx-gl-light.hpp"
-#include "../gx-gl-loader.hpp"
 #include "../gx-gl-mesh.hpp"
 #include "../gx-gl-model.hpp"
 #include "../gx-gl-reflection.hpp"
@@ -45,6 +44,7 @@
 #include "../shader/gx-gl-shd-unlit.hpp"
 #include <algorithm>
 #include <boost/mp11/algorithm.hpp>
+#include <format>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)

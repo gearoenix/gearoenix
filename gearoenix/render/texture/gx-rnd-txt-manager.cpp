@@ -492,8 +492,16 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
         .has_mipmap = false,
     };
     auto colour = create_2d_from_pixels(camera_name + "-render-target-colour", {}, txt_info, c);
+    auto depth_info = txt_info;
+    depth_info.format = TextureFormat::D32;
+    depth_info.sampler_info.min_filter = Filter::Nearest;
+    depth_info.sampler_info.mag_filter = Filter::Nearest;
+    auto depth = create_2d_from_pixels(camera_name + "-render-target-depth", {}, depth_info, c);
     return create_target(
         camera_name + "-render-target",
-        std::vector<Attachment> { Attachment { .var = Attachment2D { .txt = std::move(colour) } } },
+        std::vector<Attachment> {
+            Attachment { .var = Attachment2D { .txt = std::move(colour) } },
+            Attachment { .var = Attachment2D { .txt = std::move(depth) } },
+        },
         c);
 }
