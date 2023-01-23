@@ -79,7 +79,6 @@ void gearoenix::gl::submission::Manager::back_buffer_size_changed() noexcept
 
     initialise_gbuffers();
     initialise_ssao();
-    initialise_bloom();
 }
 
 void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
@@ -195,56 +194,6 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices() noexcept
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, reinterpret_cast<void*>(0));
     glBindVertexArray(0);
-}
-
-void gearoenix::gl::submission::Manager::initialise_bloom() noexcept
-{
-    auto* const txt_mgr = e.get_texture_manager();
-    const render::texture::TextureInfo colour_txt_info {
-        .format = render::texture::TextureFormat::RgbaUint8,
-        .sampler_info = render::texture::SamplerInfo {
-            .min_filter = render::texture::Filter::Nearest,
-            .mag_filter = render::texture::Filter::Nearest,
-            .wrap_s = render::texture::Wrap::ClampToEdge,
-            .wrap_t = render::texture::Wrap::ClampToEdge,
-            .wrap_r = render::texture::Wrap::ClampToEdge,
-            .anisotropic_level = 0,
-        },
-        .width = back_buffer_size.x,
-        .height = back_buffer_size.y,
-        .depth = 0,
-        .type = render::texture::Type::Texture2D,
-        .has_mipmap = false,
-    };
-    bloom_source_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-bloom-source", {}, colour_txt_info, core::sync::EndCaller([] {})));
-
-    low_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-low-bloom", {}, colour_txt_info, core::sync::EndCaller([] {})));
-
-    bloom_horizontal_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-bloom-horizontal", {}, colour_txt_info, core::sync::EndCaller([] {})));
-
-    auto depth_txt_info = colour_txt_info;
-    depth_txt_info.format = render::texture::TextureFormat::D32;
-    depth_bloom_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-depth-bloom", {}, depth_txt_info, core::sync::EndCaller([] {})));
-
-    std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_LOW].var = render::texture::Attachment2D { .txt = low_bloom_texture };
-    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_HIGH].var = render::texture::Attachment2D { .txt = bloom_source_texture };
-    attachments[GEAROENIX_GL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = depth_bloom_texture };
-    bloom_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-bloom", std::move(attachments), core::sync::EndCaller([] {})));
-
-    std::vector<render::texture::Attachment> horizontal_attachments(GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    horizontal_attachments[GEAROENIX_GL_HORIZONTAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_horizontal_texture };
-    bloom_horizontal_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-horizontal-bloom", std::move(horizontal_attachments), core::sync::EndCaller([] {})));
-
-    std::vector<render::texture::Attachment> vertical_attachments(GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    vertical_attachments[GEAROENIX_GL_VERTICAL_BLOOM_FRAMEBUFFER_ATTACHMENT_INDEX_SOURCE].var = render::texture::Attachment2D { .txt = bloom_source_texture };
-    bloom_vertical_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-vertical-bloom", std::move(vertical_attachments), core::sync::EndCaller([] {})));
-
-    GX_LOG_D("BLoom have been created.");
 }
 
 void gearoenix::gl::submission::Manager::fill_scenes() noexcept
@@ -570,11 +519,9 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
-            bool is_main_camera = false;
             switch (render_camera->get_usage()) {
             case render::camera::Camera::Usage::Main:
                 camera_pool_index = scene_data.cameras[std::make_pair(render_camera->get_layer(), camera_id)];
-                is_main_camera = true;
                 break;
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
@@ -588,19 +535,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 break;
             }
             auto& camera_data = camera_pool[camera_pool_index];
-            camera_data.clear();
-            const auto target_dimension = render_camera->get_target()->get_dimension();
-            camera_data.framebuffer = gl_camera->target->get_framebuffer();
-            camera_data.name = &gl_camera->get_name();
-            camera_data.colour_attachment = gl_camera->target->get_gl_attachments()[0].texture_object;
-            camera_data.viewport_clip = math::Vec4<sizei>(render_camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
-            camera_data.vp = render_camera->get_view_projection();
-            camera_data.pos = math::Vec3<float>(camera_location);
-            camera_data.skybox_scale = render_camera->get_far() / 1.732051f;
-            camera_data.colour_tuning = render_camera->get_colour_tuning();
-            camera_data.has_bloom = render_camera->get_has_bloom();
-            camera_data.is_main_camera = is_main_camera;
-            camera_data.out_reference = render_camera->get_reference_id();
+            camera_data.clear(*gl_camera, *render_camera, math::Vec3<float>(camera_location));
 
             // Recoding static models
             bvh.call_on_intersecting(*frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
@@ -856,13 +791,8 @@ void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scen
 {
     push_debug_group("render-forward-camera for scene " + *scene.name + " and for camera " + *camera.name);
     GX_GL_CHECK_D;
-    if (camera.is_main_camera && camera.has_bloom) {
-        set_framebuffer(bloom_target->get_framebuffer());
-        set_viewport_clip(back_buffer_viewport_clip);
-    } else {
-        set_framebuffer(camera.framebuffer);
-        set_viewport_clip(camera.viewport_clip);
-    }
+    set_framebuffer(camera.framebuffer);
+    set_viewport_clip(camera.viewport_clip);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     render_skyboxes(scene, camera);
     GX_GL_CHECK_D;
@@ -1038,44 +968,114 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
 
 void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Camera& camera) noexcept
 {
-    if (!camera.has_bloom)
+    if (!camera.bloom_data.has_value())
         return;
+
+    const auto& b = *camera.bloom_data;
+
     push_debug_group("render-bloom in scene " + *s.name + " for camera " + *camera.name);
     GX_GL_CHECK_D;
-    set_framebuffer(bloom_horizontal_target->get_framebuffer());
-    set_viewport_clip(back_buffer_viewport_clip);
-    auto& horizontal_shader = bloom_shader_combination->get(true);
-    horizontal_shader.bind(current_shader);
-    horizontal_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(horizontal_shader.get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
-    glBindVertexArray(screen_vertex_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    set_framebuffer(bloom_vertical_target->get_framebuffer());
-    set_viewport_clip(back_buffer_viewport_clip);
-    auto& vertical_shader = bloom_shader_combination->get(false);
-    vertical_shader.bind(current_shader);
-    vertical_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(vertical_shader.get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bloom_horizontal_texture->get_object());
-    glBindVertexArray(screen_vertex_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    push_debug_group("copy");
+    glDisable(GL_BLEND);
 
-    set_framebuffer(camera.framebuffer);
-    set_viewport_clip(camera.viewport_clip);
-    auto& colour_tuning_anti_aliasing_shader = colour_tuning_anti_aliasing_shader_combination->get(camera.colour_tuning);
-    colour_tuning_anti_aliasing_shader.bind(current_shader);
-    colour_tuning_anti_aliasing_shader.set_screen_space_uv_data(reinterpret_cast<const float*>(&back_buffer_uv_move));
-    colour_tuning_anti_aliasing_shader.set(camera.colour_tuning);
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_low_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, low_bloom_texture->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_high_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, bloom_source_texture->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(colour_tuning_anti_aliasing_shader.get_depth_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, depth_bloom_texture->get_object());
+    set_framebuffer(b.source_target);
+    set_viewport_clip(back_buffer_viewport_clip);
+    final_shader->bind(current_shader);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+    glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    pop_debug_group();
+
+    math::Vec3<float> texel_size_mip_index(back_buffer_uv_move, 0.0f);
+    auto viewport_clip = back_buffer_viewport_clip / 2;
+
+    push_debug_group("prefilter");
+    set_framebuffer(b.prefilter_target);
+    set_viewport_clip(viewport_clip);
+    bloom_prefilter_shader->bind(current_shader);
+    bloom_prefilter_shader->set_texel_size_data(texel_size_mip_index.data());
+    bloom_prefilter_shader->set_scatter_clamp_max_threshold_threshold_knee_data(b.scatter_clamp_max_threshold_threshold_knee.data());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_prefilter_shader->get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    pop_debug_group();
+
+    for (int layer_index = 0; layer_index < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1; ++layer_index) {
+        texel_size_mip_index = math::Vec3<float>(texel_size_mip_index.xy() * 2.0f, static_cast<float>(layer_index));
+
+        push_debug_group(std::format("horizontal-{}", layer_index));
+        set_framebuffer(b.horizontal_targets[layer_index]);
+        bloom_horizontal_shader->bind(current_shader);
+        bloom_horizontal_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_horizontal_shader->get_source_texture_index()));
+        glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        pop_debug_group();
+
+        texel_size_mip_index.z = static_cast<float>(layer_index + 1);
+        viewport_clip /= 2;
+
+        push_debug_group(std::format("vertical-{}", layer_index));
+        set_framebuffer(b.vertical_targets[layer_index]);
+        set_viewport_clip(viewport_clip);
+        bloom_vertical_shader->bind(current_shader);
+        bloom_vertical_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_vertical_shader->get_source_texture_index()));
+        glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        pop_debug_group();
+    }
+
+    texel_size_mip_index = math::Vec3<float>(texel_size_mip_index.xy() * 2.0f, texel_size_mip_index.z);
+
+    push_debug_group(std::format("horizontal-{}", GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1));
+    set_framebuffer(b.horizontal_targets[GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1]);
+    bloom_horizontal_shader->bind(current_shader);
+    bloom_horizontal_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_horizontal_shader->get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    pop_debug_group();
+
+    push_debug_group(std::format("upsampler-{}", 0));
+    math::Vec3<float> scatter_src_mip_index_low_mip_index_data(
+        b.scatter_clamp_max_threshold_threshold_knee.x,
+        static_cast<float>(GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1),
+        static_cast<float>(GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT));
+    viewport_clip *= 2;
+    set_framebuffer(b.upsampler_targets[0]);
+    set_viewport_clip(viewport_clip);
+    bloom_upsampler_shader->bind(current_shader);
+    bloom_upsampler_shader->set_scatter_src_mip_index_low_mip_index_data(scatter_src_mip_index_low_mip_index_data.data());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_upsampler_shader->get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_upsampler_shader->get_low_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
+    pop_debug_group();
+
+    for (int layer_index = 1; layer_index < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT; ++layer_index) {
+        push_debug_group(std::format("upsampler-{}", layer_index));
+        scatter_src_mip_index_low_mip_index_data.y -= 1.0f;
+        scatter_src_mip_index_low_mip_index_data.z = scatter_src_mip_index_low_mip_index_data.y;
+        viewport_clip *= 2;
+        set_framebuffer(b.upsampler_targets[layer_index]);
+        set_viewport_clip(viewport_clip);
+        bloom_upsampler_shader->bind(current_shader);
+        bloom_upsampler_shader->set_scatter_src_mip_index_low_mip_index_data(scatter_src_mip_index_low_mip_index_data.data());
+        glBindVertexArray(screen_vertex_object);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        pop_debug_group();
+    }
+
     GX_GL_CHECK_D;
     pop_debug_group();
 }
@@ -1147,7 +1147,10 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
     , unlit_shader_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
-    , bloom_shader_combination(e.get_shader_manager()->get<shader::BloomCombination>())
+    , bloom_prefilter_shader(new shader::BloomPrefilter(e))
+    , bloom_horizontal_shader(new shader::BloomHorizontal(e))
+    , bloom_vertical_shader(new shader::BloomVertical(e))
+    , bloom_upsampler_shader(new shader::BloomUpsampler(e))
     , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
     , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::sync::EndCaller([] {}))))
     , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::sync::EndCaller([] {}))))

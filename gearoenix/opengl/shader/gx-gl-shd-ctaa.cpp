@@ -47,7 +47,8 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
     fs << "out vec4 frag_colour;\n";
     fs << "\n";
     fs << "void main() {\n";
-    fs << "    frag_colour.xyz = texture(low_texture, out_uv).xyz + texture(high_texture, out_uv).xyz;\n";
+    fs << "    frag_colour = texture(low_texture, out_uv);\n";
+    fs << "    frag_colour.xyz += texture(high_texture, out_uv).xyz;\n";
     fs << "    frag_colour.xyz += 0.0001 * (texture(depth_texture, out_uv).xyz + screen_space_uv.xyx);\n";
     if (is_hdr_tune_mapping_gamma_correction_index) {
         fs << "    frag_colour.xyz = vec3(1.0) - exp(-frag_colour.xyz * exposure_gamma.x);\n";
@@ -55,7 +56,6 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
     } else if (is_colour_scale_index) {
         fs << "    frag_colour.xyz *= colour_scale;\n";
     }
-    fs << "    frag_colour.w = 1.0;\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
     link();

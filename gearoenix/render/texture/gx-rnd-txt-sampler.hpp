@@ -23,5 +23,9 @@ struct SamplerInfo final {
     [[nodiscard]] bool operator>(const SamplerInfo& o) const noexcept;
     [[nodiscard]] bool operator==(const SamplerInfo& o) const noexcept;
 };
+
+struct SamplerInfoHasher final {
+    [[nodiscard]] std::size_t operator()(const SamplerInfo& sampler) const noexcept;
+};
 }
 #endif

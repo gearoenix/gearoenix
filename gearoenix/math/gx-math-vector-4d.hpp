@@ -170,8 +170,12 @@ struct Vec4 {
 
     [[nodiscard]] constexpr Vec4<Element> operator/(const Element o) const noexcept
     {
-        const auto m = static_cast<Element>(1) / o;
-        return *this * m;
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / o;
+            return *this * m;
+        } else {
+            return Vec4<Element>(x / o, y / o, z / o, w / o);
+        }
     }
 
     constexpr void operator*=(const Element o) noexcept
@@ -184,8 +188,15 @@ struct Vec4 {
 
     constexpr void operator/=(const Element o) noexcept
     {
-        const auto m = static_cast<Element>(1) / o;
-        *this *= m;
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / o;
+            *this *= m;
+        } else {
+            x /= o;
+            y /= o;
+            z /= o;
+            w /= o;
+        }
     }
 
     [[nodiscard]] constexpr Vec4<Element> operator-(const Vec4<Element>& o) const noexcept

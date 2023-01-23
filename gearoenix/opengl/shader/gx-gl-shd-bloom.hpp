@@ -6,38 +6,47 @@
 #include <optional>
 
 namespace gearoenix::gl::shader {
-struct Bloom final : public Shader {
-    GX_GL_UNIFORM_VECTOR(screen_space_uv, 2, 1);
+struct BloomPrefilter final : public Shader {
+    GX_GL_UNIFORM_VECTOR(texel_size, 2, 1);
+    GX_GL_UNIFORM_VECTOR(scatter_clamp_max_threshold_threshold_knee, 4, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    Bloom(Engine& e, bool is_horizontal) noexcept;
-    ~Bloom() noexcept final;
+    explicit BloomPrefilter(Engine& e) noexcept;
+    ~BloomPrefilter() noexcept final;
     void bind(uint& current_shader) const noexcept final;
 };
 
-struct BloomCombination final : public ShaderCombination {
-    friend struct Manager;
-
-    Engine& e;
-
-private:
-    std::array<std::optional<Bloom>, 2> bloom_combination;
-
-    explicit BloomCombination(Engine& e) noexcept;
+struct BloomHorizontal final : public Shader {
+    GX_GL_UNIFORM_VECTOR(texel_size_mip_index, 3, 1);
+    GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    [[nodiscard]] Bloom& get(const bool is_horizontal) noexcept
-    {
-        auto& result = bloom_combination[is_horizontal ? 1 : 0];
-        if (result.has_value())
-            return result.value();
-        result.emplace(e, is_horizontal);
-        return result.value();
-    }
+    explicit BloomHorizontal(Engine& e) noexcept;
+    ~BloomHorizontal() noexcept final;
+    void bind(uint& current_shader) const noexcept final;
 };
 
-}
+struct BloomVertical final : public Shader {
+    GX_GL_UNIFORM_VECTOR(texel_size_mip_index, 3, 1);
+    GX_GL_UNIFORM_TEXTURE(source_texture);
 
+public:
+    explicit BloomVertical(Engine& e) noexcept;
+    ~BloomVertical() noexcept final;
+    void bind(uint& current_shader) const noexcept final;
+};
+
+struct BloomUpsampler final : public Shader {
+    GX_GL_UNIFORM_VECTOR(scatter_src_mip_index_low_mip_index, 3, 1);
+    GX_GL_UNIFORM_TEXTURE(source_texture);
+    GX_GL_UNIFORM_TEXTURE(low_texture);
+
+public:
+    explicit BloomUpsampler(Engine& e) noexcept;
+    ~BloomUpsampler() noexcept final;
+    void bind(uint& current_shader) const noexcept final;
+};
+}
 #endif
 #endif

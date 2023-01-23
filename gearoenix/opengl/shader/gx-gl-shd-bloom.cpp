@@ -1,39 +1,92 @@
 #include "gx-gl-shd-bloom.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/macro/gx-cr-mcr-counter.hpp"
 
-gearoenix::gl::shader::Bloom::Bloom(Engine& e, const bool is_horizontal) noexcept
+static constexpr const char* const vertex_shader_src = "#version 300 es\n"
+                                                       "\n"
+                                                       "precision highp float;\n"
+                                                       "\n"
+                                                       "layout(location = 0) in vec2 position;\n"
+                                                       "\n"
+                                                       "out vec2 out_uv;\n"
+                                                       "\n"
+                                                       "void main() {\n"
+                                                       "    gl_Position = vec4(position, 0.0, 1.0);\n"
+                                                       "    out_uv = position* 0.5 + 0.5;\n"
+                                                       "}";
+
+gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e) noexcept
     : Shader(e)
 {
-    constexpr double gaussian_weights[] {
-        0.19967562749792111542745942642795853316783905029296875,
-        0.1762131227885508633068667450061184354126453399658203125,
-        0.12110939007484812501846960230977856554090976715087890625,
-        0.06482518513852682240372615751766716130077838897705078125,
-        0.0270231576028795265898008182148259948007762432098388671875,
-        0.00877313479158838525895358628758913255296647548675537109375,
-        0.002218195854645765678625490835429445724003016948699951171875,
-    };
-    constexpr std::size_t gaussian_weights_count = GX_COUNT_OF(gaussian_weights);
-
     // Vertex Shader -----------------------------------------------------------------------------------
-    std::stringstream vs;
-    vs << "#version 300 es\n";
-    vs << "\n";
-    vs << "precision highp float;\n";
-    vs << "precision highp int;\n";
-    vs << "precision highp sampler2D;\n";
-    vs << "precision highp samplerCube;\n";
-    vs << "\n";
-    vs << "layout(location = 0) in vec2 position;\n";
-    vs << "\n";
-    vs << "out vec2 out_uv;\n";
-    vs << "\n";
-    vs << "void main() {\n";
-    vs << "    gl_Position = vec4(position, 0.0, 1.0);\n";
-    vs << "    out_uv = position* 0.5 + 0.5;\n";
-    vs << "}";
-    set_vertex_shader(vs.str());
+    set_vertex_shader(vertex_shader_src);
+
+    // Fragment Shader ---------------------------------------------------------------------------------
+    std::stringstream fs;
+    fs << "#version 300 es\n";
+    fs << "\n";
+    fs << "precision highp float;\n";
+    fs << "precision highp int;\n";
+    fs << "precision highp sampler2D;\n";
+    fs << "\n";
+    fs << "uniform vec2 texel_size;\n";
+    fs << "uniform vec4 scatter_clamp_max_threshold_threshold_knee;\n";
+    fs << "uniform sampler2D source_texture;\n";
+    fs << "\n";
+    fs << "in vec2 out_uv;\n";
+    fs << "\n";
+    fs << "layout(location = 0) out vec4 frag_colour;\n";
+    fs << "\n";
+    fs << "void main() {\n";
+    fs << "    vec4 a = textureLod(source_texture, out_uv + texel_size * vec2(-1.0, -1.0), 0.0);\n";
+    fs << "    vec4 b = textureLod(source_texture, out_uv + texel_size * vec2(0.0, -1.0), 0.0);\n";
+    fs << "    vec4 c = textureLod(source_texture, out_uv + texel_size * vec2(1.0, -1.0), 0.0);\n";
+    fs << "    vec4 d = textureLod(source_texture, out_uv + texel_size * vec2(-0.5, -0.5), 0.0);\n";
+    fs << "    vec4 e = textureLod(source_texture, out_uv + texel_size * vec2(0.5, -0.5), 0.0);\n"; // TODO I have to check to see if it needs to be doubled, and remove the mip map in that case
+    fs << "    vec4 f = textureLod(source_texture, out_uv + texel_size * vec2(-1.0, 0.0), 0.0);\n";
+    fs << "    vec4 g = textureLod(source_texture, out_uv, 0.0);\n";
+    fs << "    vec4 h = textureLod(source_texture, out_uv + texel_size * vec2(1.0, 0.0), 0.0);\n";
+    fs << "    vec4 i = textureLod(source_texture, out_uv + texel_size * vec2(-0.5, 0.5), 0.0);\n";
+    fs << "    vec4 j = textureLod(source_texture, out_uv + texel_size * vec2(0.5, 0.5), 0.0);\n";
+    fs << "    vec4 k = textureLod(source_texture, out_uv + texel_size * vec2(-1.0, 1.0), 0.0);\n";
+    fs << "    vec4 l = textureLod(source_texture, out_uv + texel_size * vec2(0.0, 1.0), 0.0);\n";
+    fs << "    vec4 m = textureLod(source_texture, out_uv + texel_size * vec2(1.0, 1.0), 0.0);\n";
+    fs << "    const vec2 div = (1.0 / 4.0) * vec2(0.5, 0.125);\n";
+    fs << "    frag_colour = (d + e + i + j) * div.x;\n";
+    fs << "    frag_colour += (a + b + g + f) * div.y;\n";
+    fs << "    frag_colour += (b + c + h + g) * div.y;\n";
+    fs << "    frag_colour += (f + g + l + k) * div.y;\n";
+    fs << "    frag_colour += (g + h + m + l) * div.y;\n";
+    fs << "    frag_colour = min(vec4(scatter_clamp_max_threshold_threshold_knee.y), frag_colour);\n";
+    fs << "    float brightness = max(frag_colour.x, max(frag_colour.y, frag_colour.z));\n";
+    fs << "    float softness = clamp(brightness - scatter_clamp_max_threshold_threshold_knee.z + scatter_clamp_max_threshold_threshold_knee.w, 0.0, 2.0 * scatter_clamp_max_threshold_threshold_knee.w);\n";
+    fs << "    softness = (softness * softness) / (4.0 * scatter_clamp_max_threshold_threshold_knee.w + 1e-4);\n";
+    fs << "    float multiplier = max(brightness - scatter_clamp_max_threshold_threshold_knee.z, softness) / max(brightness, 1e-4);\n";
+    fs << "    frag_colour *= multiplier;\n";
+    fs << "    frag_colour = max(frag_colour, vec4(0.0));\n";
+    fs << "}\n";
+    set_fragment_shader(fs.str());
+
+    link();
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(texel_size);
+    GX_GL_THIS_GET_UNIFORM(scatter_clamp_max_threshold_threshold_knee);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
+}
+
+gearoenix::gl::shader::BloomPrefilter::~BloomPrefilter() noexcept = default;
+
+void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const noexcept
+{
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
+}
+
+gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e) noexcept
+    : Shader(e)
+{
+    set_vertex_shader(vertex_shader_src);
 
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
@@ -46,38 +99,36 @@ gearoenix::gl::shader::Bloom::Bloom(Engine& e, const bool is_horizontal) noexcep
     fs << "precision highp sampler2D;\n";
     fs << "precision highp samplerCube;\n";
     fs << "\n";
-    fs << "uniform vec2 screen_space_uv;\n";
+    fs << "uniform vec3 texel_size_mip_index;\n";
     fs << "\n";
     fs << "uniform sampler2D source_texture;\n";
     fs << "\n";
     fs << "in vec2 out_uv;\n";
     fs << "\n";
-    fs << "out vec3 frag_colour;\n";
+    fs << "out vec4 frag_colour;\n";
     fs << "\n";
     fs << "void main() {\n";
-    fs << "    float tex_offset = 0.0;\n";
-    fs << "    frag_colour = texture(source_texture, out_uv).xyz * " << gaussian_weights[0] << ";\n";
-    for (std::size_t i = 1; i < gaussian_weights_count; ++i) {
-        fs << "    tex_offset += " << (is_horizontal ? "screen_space_uv.x" : "screen_space_uv.y") << ";\n";
-        fs << "    frag_colour += texture(source_texture, vec2("
-           << (is_horizontal ? "out_uv.x + tex_offset, out_uv.y" : "out_uv.x, out_uv.y + tex_offset") << ")).xyz * "
-           << gaussian_weights[i] << ";\n";
-        fs << "    frag_colour += texture(source_texture, vec2("
-           << (is_horizontal ? "out_uv.x - tex_offset, out_uv.y" : "out_uv.x, out_uv.y - tex_offset") << ")).xyz * "
-           << gaussian_weights[i] << ";\n";
-    }
+    fs << "    frag_colour = textureLod(source_texture, out_uv - vec2(texel_size_mip_index.x * 4.0, 0.0), texel_size_mip_index.z) * 0.01621622;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv - vec2(texel_size_mip_index.x * 3.0, 0.0), texel_size_mip_index.z) * 0.05405405;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv - vec2(texel_size_mip_index.x * 2.0, 0.0), texel_size_mip_index.z) * 0.12162162;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv - vec2(texel_size_mip_index.x * 1.0, 0.0), texel_size_mip_index.z) * 0.19459459;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv, texel_size_mip_index.z) * 0.22702703;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(texel_size_mip_index.x * 1.0, 0.0), texel_size_mip_index.z) * 0.19459459;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(texel_size_mip_index.x * 2.0, 0.0), texel_size_mip_index.z) * 0.12162162;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(texel_size_mip_index.x * 3.0, 0.0), texel_size_mip_index.z) * 0.05405405;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(texel_size_mip_index.x * 4.0, 0.0), texel_size_mip_index.z) * 0.01621622;\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
 
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
-    GX_GL_THIS_GET_UNIFORM(screen_space_uv);
+    GX_GL_THIS_GET_UNIFORM(texel_size_mip_index);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::Bloom::~Bloom() noexcept = default;
+gearoenix::gl::shader::BloomHorizontal::~BloomHorizontal() noexcept = default;
 
-void gearoenix::gl::shader::Bloom::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const noexcept
 {
     if (shader_program == current_shader)
         return;
@@ -85,9 +136,103 @@ void gearoenix::gl::shader::Bloom::bind(uint& current_shader) const noexcept
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomCombination::BloomCombination(Engine& e) noexcept
-    : e(e)
+gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e) noexcept
+    : Shader(e)
 {
+    set_vertex_shader(vertex_shader_src);
+
+    // Fragment Shader ---------------------------------------------------------------------------------
+    std::stringstream fs;
+    fs << "#version 300 es\n";
+    fs << "\n";
+    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "\n";
+    fs << "precision highp float;\n";
+    fs << "precision highp int;\n";
+    fs << "precision highp sampler2D;\n";
+    fs << "precision highp samplerCube;\n";
+    fs << "\n";
+    fs << "uniform vec3 texel_size_mip_index;\n";
+    fs << "\n";
+    fs << "uniform sampler2D source_texture;\n";
+    fs << "\n";
+    fs << "in vec2 out_uv;\n";
+    fs << "\n";
+    fs << "out vec4 frag_colour;\n";
+    fs << "\n";
+    fs << "void main() {\n";
+    fs << "    frag_colour = textureLod(source_texture, out_uv - vec2(0.0, texel_size_mip_index.y * 3.23076923), texel_size_mip_index.z) * 0.07027027;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv - vec2(0.0, texel_size_mip_index.y * 1.38461538), texel_size_mip_index.z) * 0.31621622;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv, texel_size_mip_index.z) * 0.22702703;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(0.0, texel_size_mip_index.y * 1.38461538), texel_size_mip_index.z) * 0.31621622;\n";
+    fs << "    frag_colour += textureLod(source_texture, out_uv + vec2(0.0, texel_size_mip_index.y * 3.23076923), texel_size_mip_index.z) * 0.07027027;\n";
+    fs << "}\n";
+    set_fragment_shader(fs.str());
+
+    link();
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(texel_size_mip_index);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
+}
+
+gearoenix::gl::shader::BloomVertical::~BloomVertical() noexcept = default;
+
+void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const noexcept
+{
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
+}
+
+gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
+    : Shader(e)
+{
+    set_vertex_shader(vertex_shader_src);
+
+    // Fragment Shader ---------------------------------------------------------------------------------
+    std::stringstream fs;
+    fs << "#version 300 es\n";
+    fs << "\n";
+    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "\n";
+    fs << "precision highp float;\n";
+    fs << "precision highp int;\n";
+    fs << "precision highp sampler2D;\n";
+    fs << "precision highp samplerCube;\n";
+    fs << "\n";
+    fs << "uniform vec3 scatter_src_mip_index_low_mip_index;\n";
+    fs << "\n";
+    fs << "uniform sampler2D source_texture;\n";
+    fs << "uniform sampler2D low_texture;\n";
+    fs << "\n";
+    fs << "in vec2 out_uv;\n";
+    fs << "\n";
+    fs << "out vec4 frag_colour;\n";
+    fs << "\n";
+    fs << "void main() {\n";
+    fs << "    vec4 src = textureLod(source_texture, out_uv, scatter_src_mip_index_low_mip_index.y);\n";
+    fs << "    vec4 low = textureLod(low_texture, out_uv, scatter_src_mip_index_low_mip_index.z);\n";
+    fs << "    frag_colour = mix(src, mix(src, src + low, scatter_src_mip_index_low_mip_index.x), scatter_src_mip_index_low_mip_index.x);\n";
+    fs << "}\n";
+    set_fragment_shader(fs.str());
+
+    link();
+    GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
+    GX_GL_THIS_GET_UNIFORM(scatter_src_mip_index_low_mip_index);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(low_texture);
+}
+
+gearoenix::gl::shader::BloomUpsampler::~BloomUpsampler() noexcept = default;
+
+void gearoenix::gl::shader::BloomUpsampler::bind(uint& current_shader) const noexcept
+{
+    if (shader_program == current_shader)
+        return;
+    Shader::bind(current_shader);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(low_texture);
 }
 
 #endif

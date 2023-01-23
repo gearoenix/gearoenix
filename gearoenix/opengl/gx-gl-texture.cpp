@@ -4,6 +4,7 @@
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
+#include "gx-gl-label.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-target.hpp"
 #include <vector>
@@ -347,6 +348,7 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         glBindTexture(GL_TEXTURE_2D, 0);
+        set_texture_label(result->object, result->name);
         GX_GL_CHECK_D;
     });
     return result;
@@ -407,6 +409,7 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         }
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        set_texture_label(result->object, result->name);
         GX_GL_CHECK_D;
     });
     return result;

@@ -5,9 +5,11 @@
 #include "../../math/gx-math-matrix-4d.hpp"
 #include "../../math/gx-math-ray.hpp"
 #include "../gx-rnd-resolution.hpp"
+#include "gx-rnd-cmr-bloom-data.hpp"
 #include "gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include <array>
+#include <optional>
 
 #ifdef projection
 #undef projection
@@ -23,16 +25,8 @@ namespace gearoenix::physics {
 struct Transformation;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::mesh {
 struct Mesh;
-}
-
-namespace gearoenix::render::texture {
-struct Target;
 }
 
 namespace gearoenix::render::camera {
@@ -51,7 +45,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Mat4x4<float>, projection);
     GX_GET_CREF_PRV(math::Mat4x4<float>, view_projection);
     GX_GET_CREF_PRV(math::Vec4<float>, starting_clip_ending_clip);
-    GX_GET_VAL_PRV(bool, has_customised_target, false);
+    GX_GET_VAL_PRV(bool, has_customised_target, false); //!< This is true when there is a target assigned to the camera, like
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, target);
     GX_GET_VAL_PRV(bool, has_customised_target_aspect_ratio, false);
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f);
@@ -68,7 +62,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_VAL_PRV(bool, debug_enabled, false);
     GX_GET_REFC_PRV(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, debug_mesh);
-    GX_GETSET_VAL_PRV(bool, has_bloom, true);
+    GX_GET_CREF_PRV(std::optional<BloomData>, bloom_data);
     GX_GET_VAL_PRV(std::size_t, resolution_cfg_listener, 0);
 
 public:
@@ -80,7 +74,8 @@ public:
         std::shared_ptr<texture::Target>&& customised_target = nullptr,
         Projection projection_type = Projection::Perspective,
         float near = 1.0f,
-        float far = 100.0f) noexcept;
+        float far = 100.0f,
+        bool has_bloom = true) noexcept;
     Camera(Camera&&) noexcept;
     ~Camera() noexcept final;
     void generate_frustum_points(
@@ -111,6 +106,7 @@ private:
     void set_customised_target(std::shared_ptr<texture::Target>&&) noexcept;
     void update_target() noexcept;
     void create_debug_mesh() noexcept;
+    void disable_bloom() noexcept;
 };
 }
 #endif

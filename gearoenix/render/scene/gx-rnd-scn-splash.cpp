@@ -221,7 +221,7 @@ gearoenix::render::scene::Splash::Splash(
     camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
     auto& camera = camera_builder->get_camera();
     camera.set_projection_type(camera::Projection::Orthographic);
-    camera.set_has_bloom(false);
+    camera_builder->disable_bloom();
     camera.get_colour_tuning() = camera::RawColour {};
     scene_builder->add(std::move(camera_builder));
 }

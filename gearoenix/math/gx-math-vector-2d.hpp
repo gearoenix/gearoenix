@@ -75,8 +75,12 @@ struct Vec2 {
 
     [[nodiscard]] constexpr Vec2<Element> operator/(const Element e) const noexcept
     {
-        const auto m = static_cast<Element>(1) / e;
-        return Vec2(x * m, y * m);
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / e;
+            return Vec2(x * m, y * m);
+        } else {
+            return Vec2(x / e, y / e);
+        }
     }
 
     [[nodiscard]] constexpr Vec2<Element> operator-() const noexcept
@@ -137,8 +141,13 @@ struct Vec2 {
 
     constexpr void operator/=(const Element e) noexcept
     {
-        const auto m = static_cast<Element>(1) / e;
-        *this *= m;
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / e;
+            *this *= m;
+        } else {
+            x /= e;
+            y /= e;
+        }
     }
 
     template <typename T>

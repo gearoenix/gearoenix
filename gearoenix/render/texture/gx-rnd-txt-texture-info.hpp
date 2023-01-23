@@ -18,8 +18,13 @@ struct TextureInfo final {
     Type type = Type::Unknown;
     bool has_mipmap = true;
 
+    [[nodiscard]] bool operator==(const TextureInfo& o) const noexcept;
     void read(platform::stream::Stream& s) noexcept;
     void write(platform::stream::Stream& s) const noexcept;
+};
+
+struct TextureInfoHasher final {
+    [[nodiscard]] std::size_t operator()(const TextureInfo&) const noexcept;
 };
 }
 #endif

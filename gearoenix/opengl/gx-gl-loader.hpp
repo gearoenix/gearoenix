@@ -47,6 +47,8 @@ typedef void(GX_GL_APIENTRY DrawBuffersFnp)(sizei n, const enumerated* buffers);
 typedef void(GX_GL_APIENTRY DrawElementsFnp)(enumerated mode, sizei count, enumerated type, const void* indices);
 typedef void(GX_GL_APIENTRY EnableFnp)(enumerated);
 typedef void(GX_GL_APIENTRY EnableVertexAttribArrayFnp)(uint index);
+typedef void(GX_GL_APIENTRY FinishFnp)();
+typedef void(GX_GL_APIENTRY FlushFnp)();
 typedef void(GX_GL_APIENTRY FramebufferRenderbufferFnp)(enumerated target, enumerated attachment, enumerated renderbuffer_target, uint renderbuffer);
 typedef void(GX_GL_APIENTRY FramebufferTexture2DFnp)(enumerated target, enumerated attachment, enumerated textarget, uint texture, sint level);
 typedef void(GX_GL_APIENTRY GenBuffersFnp)(sizei, uint*);
@@ -127,6 +129,8 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(DrawElements);            \
     gx_gl_function_map_arg(Enable);                  \
     gx_gl_function_map_arg(EnableVertexAttribArray); \
+    gx_gl_function_map_arg(Finish);                  \
+    gx_gl_function_map_arg(Flush);                   \
     gx_gl_function_map_arg(FramebufferRenderbuffer); \
     gx_gl_function_map_arg(FramebufferTexture2D);    \
     gx_gl_function_map_arg(GenBuffers);              \

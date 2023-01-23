@@ -477,11 +477,11 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
     const std::string& camera_name, const core::sync::EndCaller& c) noexcept
 {
     const auto dim = get_default_camera_render_target_dimensions();
-    TextureInfo txt_info {
-        .format = TextureFormat::RgbaUint8,
+    const TextureInfo txt_info {
+        .format = TextureFormat::RgbaFloat16,
         .sampler_info = SamplerInfo {
-            .min_filter = Filter::Nearest,
-            .mag_filter = Filter::Nearest,
+            .min_filter = Filter::Linear,
+            .mag_filter = Filter::Linear,
             .wrap_s = Wrap::ClampToEdge,
             .wrap_t = Wrap::ClampToEdge,
             .wrap_r = Wrap::ClampToEdge,
@@ -489,19 +489,11 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
         .width = dim.x,
         .height = dim.y,
         .type = Type::Texture2D,
-        .has_mipmap = true,
+        .has_mipmap = false,
     };
-    std::vector<std::vector<std::uint8_t>> pixels;
-    auto colour = create_2d_from_pixels(camera_name + "-render-target-colour", pixels, txt_info, c);
-    txt_info.format = TextureFormat::D32;
-    txt_info.has_mipmap = false;
-    auto depth = create_2d_from_pixels(camera_name + "-render-target-depth", std::move(pixels), txt_info, c);
+    auto colour = create_2d_from_pixels(camera_name + "-render-target-colour", {}, txt_info, c);
     return create_target(
         camera_name + "-render-target",
-        std::vector<Attachment> {
-            Attachment {
-                .var = Attachment2D {
-                    .txt = std::move(colour) } },
-            Attachment { .var = Attachment2D { .txt = std::move(depth) } } },
+        std::vector<Attachment> { Attachment { .var = Attachment2D { .txt = std::move(colour) } } },
         c);
 }

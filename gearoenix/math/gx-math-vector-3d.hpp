@@ -91,8 +91,12 @@ struct Vec3 final {
 
     constexpr Vec3<Element> operator/(const Element o) const noexcept
     {
-        const auto m = static_cast<Element>(1) / o;
-        return Vec3<Element>(x * m, y * m, z * m);
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / o;
+            return Vec3<Element>(x * m, y * m, z * m);
+        } else {
+            return Vec3<Element>(x / o, y / o, z / o);
+        }
     }
 
     constexpr Vec3& operator=(const Vec3& o) noexcept = default;
@@ -150,8 +154,14 @@ struct Vec3 final {
 
     constexpr void operator/=(const Element o) noexcept
     {
-        const auto m = static_cast<Element>(1) / o;
-        *this *= m;
+        if constexpr (std::is_floating_point_v<Element>) {
+            const auto m = static_cast<Element>(1) / o;
+            *this *= m;
+        } else {
+            x /= o;
+            y /= o;
+            z /= o;
+        }
     }
 
     template <typename T>
@@ -223,7 +233,7 @@ struct Vec3 final {
 
     [[nodiscard]] constexpr Element* data() noexcept
     {
-        reinterpret_cast<Element*>(this);
+        return reinterpret_cast<Element*>(this);
     }
 
     [[nodiscard]] constexpr Element dot(const Vec3<Element>& o) const noexcept

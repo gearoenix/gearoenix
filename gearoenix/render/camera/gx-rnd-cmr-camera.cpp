@@ -22,11 +22,12 @@ gearoenix::render::camera::Camera::Camera(
     std::shared_ptr<texture::Target>&& customised_target,
     const Projection projection_type,
     const float near,
-    const float far) noexcept
+    const float far,
+    const bool has_bloom) noexcept
     : core::ecs::Component(this, std::string(name))
     , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
-    , has_customised_target(nullptr == customised_target)
+    , has_customised_target(nullptr != customised_target)
     , target(nullptr == customised_target ? e.get_texture_manager()->create_default_camera_render_target(name, end_caller) : std::move(customised_target))
     , target_aspect_ratio(target->get_aspect_ratio())
     , far(far)
@@ -39,6 +40,7 @@ gearoenix::render::camera::Camera::Camera(
         urd(re),
         urd(re),
     }
+    , bloom_data(!has_customised_target && has_bloom ? std::make_optional<BloomData>(e, name, end_caller, target) : std::nullopt)
     , resolution_cfg_listener(resolution_cfg_listener)
 {
     update_projection();
@@ -68,7 +70,7 @@ gearoenix::render::camera::Camera::Camera(Camera&& o) noexcept
     , debug_enabled(o.debug_enabled)
     , debug_colour(o.debug_colour)
     , debug_mesh(o.debug_mesh)
-    , has_bloom(o.has_bloom)
+    , bloom_data(std::move(o.bloom_data))
     , resolution_cfg_listener(o.resolution_cfg_listener)
 {
     o.resolution_cfg_listener = 0;
@@ -237,8 +239,7 @@ void gearoenix::render::camera::Camera::update_target() noexcept
 {
     if (has_customised_target)
         return;
-    GX_TODO; // we need to be able to store name in the component and for that we need a virtual move function
-    target = e.get_texture_manager()->create_default_camera_render_target("camera", core::sync::EndCaller([] {}));
+    target = e.get_texture_manager()->create_default_camera_render_target(name, core::sync::EndCaller([] {}));
     update_target_aspect_ratio();
 }
 
@@ -272,4 +273,9 @@ void gearoenix::render::camera::Camera::create_debug_mesh() noexcept
         }));
     if (nullptr != *result_holder)
         debug_mesh = *result_holder;
+}
+
+void gearoenix::render::camera::Camera::disable_bloom() noexcept
+{
+    bloom_data = std::nullopt;
 }

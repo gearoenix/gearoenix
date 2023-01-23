@@ -24,7 +24,10 @@ struct TextureCube;
 }
 
 namespace gearoenix::gl::shader {
-struct BloomCombination;
+struct BloomHorizontal;
+struct BloomPrefilter;
+struct BloomUpsampler;
+struct BloomVertical;
 struct ColourTuningAntiAliasingCombination;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
@@ -51,8 +54,11 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
+    const std::unique_ptr<shader::BloomPrefilter> bloom_prefilter_shader;
+    const std::unique_ptr<shader::BloomHorizontal> bloom_horizontal_shader;
+    const std::unique_ptr<shader::BloomVertical> bloom_vertical_shader;
+    const std::unique_ptr<shader::BloomUpsampler> bloom_upsampler_shader;
 
-    const std::shared_ptr<shader::BloomCombination> bloom_shader_combination;
     const std::shared_ptr<shader::ColourTuningAntiAliasingCombination> colour_tuning_anti_aliasing_shader_combination;
     const std::shared_ptr<shader::UnlitCombination> unlit_shader_combination;
     shader::Unlit& unlit_coloured_shader;
@@ -69,13 +75,6 @@ private:
     std::shared_ptr<Target> ssao_resolve_target;
     std::shared_ptr<Texture2D> brdflut;
     std::shared_ptr<TextureCube> black_cube;
-    std::shared_ptr<Texture2D> bloom_source_texture;
-    std::shared_ptr<Texture2D> low_bloom_texture;
-    std::shared_ptr<Texture2D> depth_bloom_texture;
-    std::shared_ptr<Target> bloom_target;
-    std::shared_ptr<Texture2D> bloom_horizontal_texture;
-    std::shared_ptr<Target> bloom_horizontal_target;
-    std::shared_ptr<Target> bloom_vertical_target;
 
     math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
     float back_buffer_aspect_ratio = 999.0f;
@@ -98,7 +97,6 @@ private:
     void initialise_gbuffers() noexcept;
     void initialise_ssao() noexcept;
     void initialise_screen_vertices() noexcept;
-    void initialise_bloom() noexcept;
 
     void fill_scenes() noexcept;
     void update_scenes() noexcept;

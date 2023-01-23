@@ -1,5 +1,6 @@
 #include "gx-rnd-txt-sampler.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
+#include <boost/functional/hash.hpp>
 
 void gearoenix::render::texture::SamplerInfo::write(platform::stream::Stream& s) const noexcept
 {
@@ -63,4 +64,16 @@ bool gearoenix::render::texture::SamplerInfo::operator==(const SamplerInfo& o) c
 #define GX_HELPER(x) (x == o.x)
     return GX_HELPER(min_filter) || GX_HELPER(mag_filter) || GX_HELPER(wrap_s) || GX_HELPER(wrap_r) || GX_HELPER(wrap_t) || GX_HELPER(anisotropic_level);
 #undef GX_HELPER
+}
+
+std::size_t gearoenix::render::texture::SamplerInfoHasher::operator()(const SamplerInfo& sampler) const noexcept
+{
+    std::size_t seed = boost::hash_value(typeid(SamplerInfo));
+    boost::hash_combine(seed, boost::hash_value(sampler.min_filter));
+    boost::hash_combine(seed, boost::hash_value(sampler.mag_filter));
+    boost::hash_combine(seed, boost::hash_value(sampler.wrap_s));
+    boost::hash_combine(seed, boost::hash_value(sampler.wrap_t));
+    boost::hash_combine(seed, boost::hash_value(sampler.wrap_r));
+    boost::hash_combine(seed, boost::hash_value(sampler.anisotropic_level));
+    return seed;
 }

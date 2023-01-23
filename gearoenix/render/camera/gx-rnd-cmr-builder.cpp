@@ -67,6 +67,11 @@ void gearoenix::render::camera::Builder::set_customised_target(std::shared_ptr<t
     entity_builder->get_builder().get_component<Camera>()->set_customised_target(std::move(target));
 }
 
+void gearoenix::render::camera::Builder::disable_bloom() noexcept
+{
+    entity_builder->get_builder().get_component<Camera>()->disable_bloom();
+}
+
 gearoenix::core::ecs::entity_id_t gearoenix::render::camera::Builder::get_id() const noexcept
 {
     return entity_builder->get_builder().get_id();
