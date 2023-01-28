@@ -4,12 +4,36 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "gx-rnd-cmr-builder.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
 gearoenix::render::camera::Manager::Manager(engine::Engine& e) noexcept
     : e(e)
 {
     core::ecs::Component::register_type<Camera>();
+}
+
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::render::camera::Manager::build(
+    const std::string& name, core::sync::EndCaller&& end_caller) noexcept
+{
+    auto builder = build_v(name, std::move(end_caller));
+    builder->get_camera().resolution_cfg_listener = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().add_observer(
+        [entity_id = builder->get_id(), this, builder = std::weak_ptr(builder), failures_count = 0](const Resolution& r) mutable noexcept -> bool {
+            auto* c = e.get_world()->get_component<Camera>(entity_id);
+            if (nullptr == c) {
+                if (const auto b = builder.lock(); nullptr != b) {
+                    b->get_camera().update_target();
+                    resolution_cfg_listener_with_entity_builder_v(*b, r);
+                } else if (++failures_count > 100) {
+                    return false;
+                }
+            } else {
+                c->update_target();
+                resolution_cfg_listener_with_entity_id_v(entity_id, r);
+            }
+            return true;
+        });
+    return builder;
 }
 
 void gearoenix::render::camera::Manager::update() noexcept
@@ -36,7 +60,7 @@ void gearoenix::render::camera::Manager::update() noexcept
 
 void gearoenix::render::camera::Manager::window_resized() noexcept
 {
-    e.get_world()->parallel_system<core::ecs::And<Camera>>([this](const core::ecs::entity_id_t, Camera* const c, const unsigned int) noexcept -> void {
+    e.get_world()->parallel_system<core::ecs::And<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) noexcept -> void {
         c->update_target();
     });
 }

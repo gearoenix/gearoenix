@@ -438,6 +438,9 @@
 #define GL_PROGRAM_PIPELINE 0x82E4
 #define GL_SAMPLER 0x82E6
 #define GL_MAX_LABEL_LENGTH 0x82E8
+#define GL_DEBUG_SEVERITY_HIGH 0x9146
+#define GL_DEBUG_SEVERITY_MEDIUM 0x9147
+#define GL_DEBUG_SEVERITY_LOW 0x9148
 
 // Gearoenix part ---------------------------------------------------------------------
 

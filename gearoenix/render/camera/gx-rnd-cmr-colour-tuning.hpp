@@ -4,9 +4,8 @@
 #include <variant>
 
 namespace gearoenix::render::camera {
-struct HdrTuneMappingGammaCorrection final {
-    float hdr_tune_mapping = 1.0f;
-    float gamma_correction = 2.2f;
+struct GammaCorrection final {
+    math::Vec3<float> gamma_exponent = math::Vec3<float>(1.0f / 2.2f);
 };
 
 struct Multiply final {
@@ -15,7 +14,7 @@ struct Multiply final {
 
 struct RawColour final { };
 
-typedef std::variant<HdrTuneMappingGammaCorrection, Multiply, RawColour> ColourTuning;
+typedef std::variant<GammaCorrection, Multiply, RawColour> ColourTuning;
 }
 
 #endif

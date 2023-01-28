@@ -34,6 +34,7 @@
 #include "../shader/gx-gl-shd-ctaa.hpp"
 #include "../shader/gx-gl-shd-deferred-pbr-transparent.hpp"
 #include "../shader/gx-gl-shd-deferred-pbr.hpp"
+#include "../shader/gx-gl-shd-exposure.hpp"
 #include "../shader/gx-gl-shd-final.hpp"
 #include "../shader/gx-gl-shd-irradiance.hpp"
 #include "../shader/gx-gl-shd-manager.hpp"
@@ -44,7 +45,6 @@
 #include "../shader/gx-gl-shd-unlit.hpp"
 #include <algorithm>
 #include <boost/mp11/algorithm.hpp>
-#include <format>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)
@@ -56,7 +56,7 @@
 #endif
 
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
-#include "../platform/android/gx-plt-gl-context.hpp"
+#include "../../platform/android/gx-plt-gl-context.hpp"
 #endif
 
 void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes() noexcept
@@ -928,6 +928,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
             render_forward_camera(scene, camera);
             render_bloom(scene, camera);
+            render_colour_correction_anti_aliasing(scene, camera);
         }
         render_debug_meshes(scene);
     }
@@ -957,7 +958,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
         for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
             auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
-            glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
+            glBindTexture(GL_TEXTURE_2D, camera.second_colour_attachment);
             glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
@@ -979,17 +980,18 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Came
     push_debug_group("copy");
     glDisable(GL_BLEND);
 
-    set_framebuffer(b.source_target);
-    set_viewport_clip(back_buffer_viewport_clip);
-    final_shader->bind(current_shader);
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+    set_framebuffer(camera.second_framebuffer);
+    set_viewport_clip(camera.viewport_clip);
+    exposure_shader->bind(current_shader);
+    exposure_shader->set_value_data(&camera.exposure_value);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(exposure_shader->get_source_texture_index()));
     glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     pop_debug_group();
 
-    math::Vec3<float> texel_size_mip_index(back_buffer_uv_move, 0.0f);
-    auto viewport_clip = back_buffer_viewport_clip / 2;
+    math::Vec3<float> texel_size_mip_index(math::Vec2<float>(1.0f) / math::Vec2<float>(camera.viewport_clip.zw() - camera.viewport_clip.xy()), 0.0f);
+    auto viewport_clip = camera.viewport_clip / 2;
 
     push_debug_group("prefilter");
     set_framebuffer(b.prefilter_target);
@@ -998,86 +1000,91 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Came
     bloom_prefilter_shader->set_texel_size_data(texel_size_mip_index.data());
     bloom_prefilter_shader->set_scatter_clamp_max_threshold_threshold_knee_data(b.scatter_clamp_max_threshold_threshold_knee.data());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_prefilter_shader->get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glBindTexture(GL_TEXTURE_2D, camera.second_colour_attachment);
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     pop_debug_group();
 
-    for (int layer_index = 0; layer_index < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1; ++layer_index) {
-        texel_size_mip_index = math::Vec3<float>(texel_size_mip_index.xy() * 2.0f, static_cast<float>(layer_index));
+    for (int layer_index = 0; layer_index < b.horizontal_targets.size(); ++layer_index) {
+        texel_size_mip_index = math::Vec3<float>(texel_size_mip_index.xy() * 2.0f, static_cast<float>(layer_index + 1));
 
-        push_debug_group(std::format("horizontal-{}", layer_index));
+        push_debug_group("horizontal-" + std::to_string(layer_index));
         set_framebuffer(b.horizontal_targets[layer_index]);
         bloom_horizontal_shader->bind(current_shader);
         bloom_horizontal_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_horizontal_shader->get_source_texture_index()));
-        glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
+        glBindTexture(GL_TEXTURE_2D, camera.second_colour_attachment);
         glBindVertexArray(screen_vertex_object);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         pop_debug_group();
 
-        texel_size_mip_index.z = static_cast<float>(layer_index + 1);
         viewport_clip /= 2;
 
-        push_debug_group(std::format("vertical-{}", layer_index));
+        push_debug_group("vertical-" + std::to_string(layer_index));
         set_framebuffer(b.vertical_targets[layer_index]);
         set_viewport_clip(viewport_clip);
         bloom_vertical_shader->bind(current_shader);
         bloom_vertical_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_vertical_shader->get_source_texture_index()));
-        glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+        glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
         glBindVertexArray(screen_vertex_object);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         pop_debug_group();
     }
 
-    texel_size_mip_index = math::Vec3<float>(texel_size_mip_index.xy() * 2.0f, texel_size_mip_index.z);
-
-    push_debug_group(std::format("horizontal-{}", GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1));
-    set_framebuffer(b.horizontal_targets[GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1]);
-    bloom_horizontal_shader->bind(current_shader);
-    bloom_horizontal_shader->set_texel_size_mip_index_data(texel_size_mip_index.data());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_horizontal_shader->get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
-    glBindVertexArray(screen_vertex_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    pop_debug_group();
-
-    push_debug_group(std::format("upsampler-{}", 0));
-    math::Vec3<float> scatter_src_mip_index_low_mip_index_data(
+    push_debug_group("upsampler-0");
+    math::Vec2<float> scatter_src_mip_index(
         b.scatter_clamp_max_threshold_threshold_knee.x,
-        static_cast<float>(GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1),
-        static_cast<float>(GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT));
-    viewport_clip *= 2;
+        static_cast<float>(GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT) + 0.0001f);
+    viewport_clip = camera.viewport_clip / (1 << GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT);
     set_framebuffer(b.upsampler_targets[0]);
     set_viewport_clip(viewport_clip);
     bloom_upsampler_shader->bind(current_shader);
-    bloom_upsampler_shader->set_scatter_src_mip_index_low_mip_index_data(scatter_src_mip_index_low_mip_index_data.data());
+    bloom_upsampler_shader->set_scatter_src_mip_index_data(scatter_src_mip_index.data());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_upsampler_shader->get_source_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glBindTexture(GL_TEXTURE_2D, camera.second_colour_attachment);
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_upsampler_shader->get_low_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, b.horizontal_texture);
+    glBindTexture(GL_TEXTURE_2D, camera.second_colour_attachment);
     glBindVertexArray(screen_vertex_object);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindTexture(GL_TEXTURE_2D, b.vertical_texture);
+    glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
     pop_debug_group();
 
-    for (int layer_index = 1; layer_index < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT; ++layer_index) {
-        push_debug_group(std::format("upsampler-{}", layer_index));
-        scatter_src_mip_index_low_mip_index_data.y -= 1.0f;
-        scatter_src_mip_index_low_mip_index_data.z = scatter_src_mip_index_low_mip_index_data.y;
-        viewport_clip *= 2;
+    for (int layer_index = 1; layer_index < b.upsampler_targets.size(); ++layer_index) {
+        push_debug_group("upsampler-" + std::to_string(layer_index));
+        scatter_src_mip_index.y -= 1.0f;
+        viewport_clip = camera.viewport_clip / (1 << (GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - layer_index));
         set_framebuffer(b.upsampler_targets[layer_index]);
         set_viewport_clip(viewport_clip);
-        bloom_upsampler_shader->bind(current_shader);
-        bloom_upsampler_shader->set_scatter_src_mip_index_low_mip_index_data(scatter_src_mip_index_low_mip_index_data.data());
-        glBindVertexArray(screen_vertex_object);
+        bloom_upsampler_shader->set_scatter_src_mip_index_data(scatter_src_mip_index.data());
         glDrawArrays(GL_TRIANGLES, 0, 3);
         pop_debug_group();
     }
 
     GX_GL_CHECK_D;
     pop_debug_group();
+}
+
+void gearoenix::gl::submission::Manager::render_colour_correction_anti_aliasing(const Scene& s, const Camera& camera) noexcept
+{
+    GX_GL_CHECK_D;
+    push_debug_group("render-colour-correction-anti-aliasing in scene " + *s.name + " for camera " + *camera.name);
+    glDisable(GL_BLEND);
+    const auto texel_size = math::Vec2<float>(1.0f) / math::Vec2<float>(camera.viewport_clip.zw() - camera.viewport_clip.xy());
+    set_framebuffer(camera.second_framebuffer);
+    set_viewport_clip(camera.viewport_clip);
+    auto& shader = colour_tuning_anti_aliasing_shader_combination->get(camera.colour_tuning);
+    shader.bind(current_shader);
+    shader.set(camera.colour_tuning);
+    shader.set_screen_space_uv_data(texel_size.data());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_source_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, camera.colour_attachment);
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_depth_texture_index()));
+    glBindTexture(GL_TEXTURE_2D, camera.depth_attachment);
+    glBindVertexArray(screen_vertex_object);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    pop_debug_group();
+    GX_GL_CHECK_D;
 }
 
 void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene) noexcept
@@ -1147,6 +1154,7 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
     , unlit_shader_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
+    , exposure_shader(new shader::Exposure(e))
     , bloom_prefilter_shader(new shader::BloomPrefilter(e))
     , bloom_horizontal_shader(new shader::BloomHorizontal(e))
     , bloom_vertical_shader(new shader::BloomVertical(e))
@@ -1201,7 +1209,7 @@ void gearoenix::gl::submission::Manager::update() noexcept
 #ifdef GX_PLATFORM_INTERFACE_SDL2
     SDL_GL_SwapWindow(e.get_platform_application().get_window());
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
-    e.get_platform_application().get_gl_context()->swap();
+    (void)e.get_platform_application().get_gl_context()->swap(); // TODO handle the other states
 #endif
 }
 

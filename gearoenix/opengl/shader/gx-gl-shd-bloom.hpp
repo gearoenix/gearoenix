@@ -38,7 +38,7 @@ public:
 };
 
 struct BloomUpsampler final : public Shader {
-    GX_GL_UNIFORM_VECTOR(scatter_src_mip_index_low_mip_index, 3, 1);
+    GX_GL_UNIFORM_VECTOR(scatter_src_mip_index, 2, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
     GX_GL_UNIFORM_TEXTURE(low_texture);
 

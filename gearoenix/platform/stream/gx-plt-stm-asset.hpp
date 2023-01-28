@@ -28,7 +28,7 @@ private:
 #ifdef GX_USE_STD_FILE
     std::ifstream file;
 #elif defined(GX_PLATFORM_ANDROID)
-    platform::Application* platform_application = nullptr;
+    const platform::Application* platform_application = nullptr;
     AAsset* file = nullptr;
 #else
 #error "File usage is not specified!"

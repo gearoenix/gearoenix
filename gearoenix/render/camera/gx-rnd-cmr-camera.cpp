@@ -28,11 +28,10 @@ gearoenix::render::camera::Camera::Camera(
     , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , has_customised_target(nullptr != customised_target)
-    , target(nullptr == customised_target ? e.get_texture_manager()->create_default_camera_render_target(name, end_caller) : std::move(customised_target))
-    , target_aspect_ratio(target->get_aspect_ratio())
+    , target(std::move(customised_target))
     , far(far)
     , near(near)
-    , colour_tuning(HdrTuneMappingGammaCorrection {})
+    , colour_tuning(GammaCorrection {})
     , projection_type(projection_type)
     , debug_colour {
         urd(re),
@@ -40,9 +39,19 @@ gearoenix::render::camera::Camera::Camera(
         urd(re),
         urd(re),
     }
-    , bloom_data(!has_customised_target && has_bloom ? std::make_optional<BloomData>(e, name, end_caller, target) : std::nullopt)
     , resolution_cfg_listener(resolution_cfg_listener)
 {
+    if (!has_customised_target) {
+        auto default_targets = e.get_texture_manager()->create_default_camera_render_target(name, end_caller);
+        target = std::move(default_targets.colour);
+        second_target = std::move(default_targets.second_colour);
+        exposure_data = ExposureData();
+        /// @note: When bloom exists the auto-exposure must exist too.
+        if (has_bloom) {
+            bloom_data = BloomData(e, name, end_caller, target, second_target);
+        }
+    }
+    target_aspect_ratio = target->get_aspect_ratio();
     update_projection();
 }
 
@@ -55,6 +64,7 @@ gearoenix::render::camera::Camera::Camera(Camera&& o) noexcept
     , starting_clip_ending_clip(o.starting_clip_ending_clip)
     , has_customised_target(o.has_customised_target)
     , target(std::move(o.target))
+    , second_target(std::move(o.second_target))
     , has_customised_target_aspect_ratio(o.has_customised_target_aspect_ratio)
     , target_aspect_ratio(o.target_aspect_ratio)
     , reference_id(o.reference_id)
@@ -239,7 +249,9 @@ void gearoenix::render::camera::Camera::update_target() noexcept
 {
     if (has_customised_target)
         return;
-    target = e.get_texture_manager()->create_default_camera_render_target(name, core::sync::EndCaller([] {}));
+    auto ts = e.get_texture_manager()->create_default_camera_render_target(name, core::sync::EndCaller([] {}));
+    target = std::move(ts.colour);
+    second_target = std::move(ts.second_colour);
     update_target_aspect_ratio();
 }
 

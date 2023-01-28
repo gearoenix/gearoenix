@@ -20,6 +20,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr-transparent.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-deferred-pbr.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-exposure.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-exposure.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-final.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-final.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/shader/gx-gl-shd-forward-pbr-transparent.cpp

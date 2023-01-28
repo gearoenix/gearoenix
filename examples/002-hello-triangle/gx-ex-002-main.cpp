@@ -49,6 +49,8 @@ struct GameApp final : public gearoenix::core::Application {
             end_callback);
 
         auto material = render_engine.get_material_manager()->get_pbr("material", end_callback);
+        material->get_normal_metallic_factor().w = 0.01f;
+        material->get_emission_roughness_factor().w = 0.99f;
 
         auto model_builder = render_engine.get_model_manager()->build(
             "triangle-model",
@@ -68,7 +70,7 @@ struct GameApp final : public gearoenix::core::Application {
             35.0f,
             end_callback);
         light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
+        light_builder_0->get_light().colour = { 200.0f, 2.0f, 2.0f };
 
         scene_builder->add(std::move(light_builder_0));
         scene_builder->add(std::move(model_builder));

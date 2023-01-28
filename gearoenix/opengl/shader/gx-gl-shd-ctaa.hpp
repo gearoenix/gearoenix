@@ -7,10 +7,9 @@
 namespace gearoenix::gl::shader {
 struct ColourTuningAntiAliasing final : public Shader {
     GX_GL_UNIFORM_VECTOR(screen_space_uv, 2, 1);
-    GX_GL_UNIFORM_VECTOR(exposure_gamma, 2, 1);
+    GX_GL_UNIFORM_VECTOR(gamma_exponent, 3, 1);
     GX_GL_UNIFORM_VECTOR(colour_scale, 3, 1);
-    GX_GL_UNIFORM_TEXTURE(low_texture);
-    GX_GL_UNIFORM_TEXTURE(high_texture);
+    GX_GL_UNIFORM_TEXTURE(source_texture);
     GX_GL_UNIFORM_TEXTURE(depth_texture);
 
 public:

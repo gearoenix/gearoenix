@@ -4,7 +4,7 @@
 
 namespace gearoenix::math {
 template <typename Element>
-struct Vec4 {
+struct Vec4 final {
     Element x, y, z, w;
 
     constexpr Vec4(const Element x, const Element y, const Element z, const Element w) noexcept

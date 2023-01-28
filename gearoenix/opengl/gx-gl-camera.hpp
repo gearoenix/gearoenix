@@ -19,24 +19,18 @@ struct Texture2D;
 
 struct BloomData final {
     typedef std::array<std::shared_ptr<Target>, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT> Targets;
-    typedef std::array<std::shared_ptr<Target>, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1> TargetsLess;
+    typedef std::array<std::shared_ptr<Target>, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT + 1> UpTargets;
 
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, horizontal_texture);
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, vertical_texture);
-    GX_GET_CREF_PRV(std::shared_ptr<Target>, source_target);
     GX_GET_CREF_PRV(std::shared_ptr<Target>, prefilter_target);
     GX_GET_CREF_PRV(Targets, horizontal_targets);
-    GX_GET_CREF_PRV(TargetsLess, vertical_targets);
-    GX_GET_CREF_PRV(Targets, upsampler_targets);
+    GX_GET_CREF_PRV(Targets, vertical_targets);
+    GX_GET_CREF_PRV(UpTargets, upsampler_targets);
 
     BloomData(
-        std::shared_ptr<Texture2D>&& horizontal_texture,
-        std::shared_ptr<Texture2D>&& vertical_texture,
-        std::shared_ptr<Target>&& source_target,
         std::shared_ptr<Target>&& prefilter_target,
         Targets&& horizontal_targets,
-        TargetsLess&& vertical_targets,
-        Targets&& upsampler_targets) noexcept;
+        Targets&& vertical_targets,
+        UpTargets&& upsampler_targets) noexcept;
 
 public:
     ~BloomData() noexcept;
@@ -45,12 +39,15 @@ public:
 
 struct Camera final : public core::ecs::Component {
     friend struct CameraBuilder;
+    friend struct CameraManager;
 
     GX_GET_CREF_PRV(std::shared_ptr<Target>, target);
+    GX_GET_CREF_PRV(std::shared_ptr<Target>, second_target);
     GX_GET_CREF_PRV(std::optional<gl::BloomData>, bloom_data);
 
 private:
     void disable_bloom() noexcept;
+    void update(const render::camera::Camera& camera) noexcept;
 
 public:
     Camera(std::string&& name, const render::camera::Camera& camera) noexcept;
@@ -73,7 +70,8 @@ public:
 
 struct CameraManager final : public render::camera::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name, core::sync::EndCaller&& end_caller) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::camera::Builder> build_v(const std::string& name, core::sync::EndCaller&& end_caller) noexcept final;
+    void window_resized() noexcept final;
 
 public:
     explicit CameraManager(Engine& e) noexcept;

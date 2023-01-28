@@ -15,15 +15,12 @@ std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::B
         return std::nullopt;
     BloomData r;
     r.scatter_clamp_max_threshold_threshold_knee = rnd_bd->get_scatter_clamp_max_threshold_threshold_knee();
-    r.horizontal_texture = gl_bd->get_horizontal_texture()->get_object();
-    r.vertical_texture = gl_bd->get_vertical_texture()->get_object();
-    r.source_target = gl_bd->get_source_target()->get_framebuffer();
     r.prefilter_target = gl_bd->get_prefilter_target()->get_framebuffer();
-    for (std::size_t i = 0; i < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT; ++i)
+    for (std::size_t i = 0; i < r.horizontal_targets.size(); ++i)
         r.horizontal_targets[i] = gl_bd->get_horizontal_targets()[i]->get_framebuffer();
-    for (std::size_t i = 0; i < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT - 1; ++i)
+    for (std::size_t i = 0; i < r.vertical_targets.size(); ++i)
         r.vertical_targets[i] = gl_bd->get_vertical_targets()[i]->get_framebuffer();
-    for (std::size_t i = 0; i < GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT; ++i)
+    for (std::size_t i = 0; i < r.upsampler_targets.size(); ++i)
         r.upsampler_targets[i] = gl_bd->get_upsampler_targets()[i]->get_framebuffer();
     return r;
 }
@@ -57,12 +54,26 @@ void gearoenix::gl::submission::Camera::clear(
 
     const auto target_dimension = rnd_cam.get_target()->get_dimension();
     framebuffer = gl_cam.get_target()->get_framebuffer();
-    name = &gl_cam.get_name();
     colour_attachment = gl_cam.get_target()->get_gl_attachments()[0].texture_object;
+    if (gl_cam.get_target()->get_gl_attachments().size() == 2) {
+        // it means we have the main camera not shadow or reflection probe
+        depth_attachment = gl_cam.get_target()->get_gl_attachments()[1].texture_object;
+    } else {
+        depth_attachment = static_cast<uint>(-1);
+    }
+    if (nullptr != gl_cam.get_second_target()) {
+        second_framebuffer = gl_cam.get_second_target()->get_framebuffer();
+        second_colour_attachment = gl_cam.get_second_target()->get_gl_attachments()[0].texture_object;
+    } else {
+        second_framebuffer = static_cast<uint>(-1);
+        second_colour_attachment = static_cast<uint>(-1);
+    }
+    name = &gl_cam.get_name();
     viewport_clip = math::Vec4<sizei>(rnd_cam.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
     vp = rnd_cam.get_view_projection();
     pos = location;
     skybox_scale = rnd_cam.get_far() / 1.732051f;
+    exposure_value = rnd_cam.get_exposure_data().has_value() ? rnd_cam.get_exposure_data()->get_value() : 1.0f;
     colour_tuning = rnd_cam.get_colour_tuning();
     bloom_data = BloomData::construct(gl_cam.get_bloom_data(), rnd_cam.get_bloom_data());
     out_reference = rnd_cam.get_reference_id();

@@ -10,10 +10,10 @@
 
 namespace gearoenix::platform {
 struct GlContext final {
-    GX_GET_VAL_PRV(int, screen_width, -1)
-    GX_GET_VAL_PRV(int, screen_height, -1)
-    GX_GET_VAL_PRV(int, depth_size, -1)
-    GX_GET_VAL_PRV(int, samples_size, -1)
+    GX_GET_VAL_PRV(int, screen_width, -1);
+    GX_GET_VAL_PRV(int, screen_height, -1);
+    GX_GET_VAL_PRV(int, depth_size, -1);
+    GX_GET_VAL_PRV(int, samples_size, -1);
 
     enum struct State {
         RUNNING,
@@ -44,7 +44,7 @@ public:
     void operator=(GlContext const&) = delete;
 
     void init(ANativeWindow* window) noexcept;
-    State swap() noexcept;
+    [[nodiscard]] State swap() noexcept;
     void invalidate() noexcept;
     void suspend() noexcept;
     void resume(ANativeWindow* window) noexcept;

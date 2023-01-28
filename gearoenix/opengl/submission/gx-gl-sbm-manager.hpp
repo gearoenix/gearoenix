@@ -31,6 +31,7 @@ struct BloomVertical;
 struct ColourTuningAntiAliasingCombination;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
+struct Exposure;
 struct Final;
 struct Irradiance;
 struct Radiance;
@@ -54,6 +55,7 @@ private:
     const std::unique_ptr<shader::SkyboxCube> skybox_cube_shader;
     const std::unique_ptr<shader::SkyboxEquirectangular> skybox_equirectangular_shader;
     const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
+    const std::unique_ptr<shader::Exposure> exposure_shader;
     const std::unique_ptr<shader::BloomPrefilter> bloom_prefilter_shader;
     const std::unique_ptr<shader::BloomHorizontal> bloom_horizontal_shader;
     const std::unique_ptr<shader::BloomVertical> bloom_vertical_shader;
@@ -114,6 +116,7 @@ private:
     void render_skyboxes(const Scene& scene, const Camera& camera) noexcept;
     void render_forward_camera(const Scene& scene, const Camera& camera) noexcept;
     void render_bloom(const Scene& scene, const Camera& camera) noexcept;
+    void render_colour_correction_anti_aliasing(const Scene& scene, const Camera& camera) noexcept;
     void render_debug_meshes(const Scene& scene) noexcept;
     void render_with_deferred() noexcept;
     void render_with_forward() noexcept;

@@ -12,7 +12,7 @@
 
 namespace gearoenix::math {
 template <typename Element>
-struct Vec2 {
+struct Vec2 final {
     Element x = static_cast<Element>(0);
     Element y = static_cast<Element>(0);
 
@@ -258,6 +258,11 @@ struct Vec2 {
     [[nodiscard]] constexpr Vec2<Element> normalized() const noexcept
     {
         return *this / length();
+    }
+
+    [[nodiscard]] constexpr const Element* data() const noexcept
+    {
+        return &x;
     }
 
     constexpr void normalize() noexcept

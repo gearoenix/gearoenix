@@ -7,6 +7,7 @@
 #include "../gx-rnd-resolution.hpp"
 #include "gx-rnd-cmr-bloom-data.hpp"
 #include "gx-rnd-cmr-colour-tuning.hpp"
+#include "gx-rnd-cmr-exposure.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include <array>
 #include <optional>
@@ -47,6 +48,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_CREF_PRV(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_VAL_PRV(bool, has_customised_target, false); //!< This is true when there is a target assigned to the camera, like
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, target);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, second_target);
     GX_GET_VAL_PRV(bool, has_customised_target_aspect_ratio, false);
     GX_GET_VAL_PRV(float, target_aspect_ratio, 1.7f);
     GX_GETSET_VAL_PRV(core::ecs::entity_id_t, reference_id, 0); // It can be light or reflection probe or any other owner entity TODO: remove this, all of the camera component users must maintain one entity
@@ -63,6 +65,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_REFC_PRV(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, debug_mesh);
     GX_GET_CREF_PRV(std::optional<BloomData>, bloom_data);
+    GX_GET_CREF_PRV(std::optional<ExposureData>, exposure_data);
     GX_GET_VAL_PRV(std::size_t, resolution_cfg_listener, 0);
 
 public:

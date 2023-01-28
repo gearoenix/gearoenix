@@ -17,16 +17,7 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
     auto& plt_app = e.get_platform_application().get_base();
     auto& cfg = plt_app.get_configuration().get_render_configuration();
     const auto entity_id = builder.get_id();
-    const auto resolution_cfg_listener = cfg.get_runtime_resolution().add_observer(
-        [entity_id, e = &e](const Resolution&) noexcept -> bool {
-            // TODO: move this somewhere that has access to weak pointer of builder and the entity id
-            auto* const c = e->get_world()->get_component<Camera>(entity_id);
-            if (nullptr == c)
-                return true;
-            // TODO: create the new target and assign it to the camera, again u need a new query or builder pointer lock
-            return true;
-        });
-    Camera cam(e, name, resolution_cfg_listener, end_caller);
+    Camera cam(e, name, 0, end_caller);
     cam.set_view(math::Mat4x4<float>(transform.get_inverted_global_matrix()));
     std::array<math::Vec3<double>, 8> frustum_points;
     cam.generate_frustum_points(

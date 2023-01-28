@@ -9,6 +9,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-colour-tuning.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-exposure.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-exposure.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-jet-controller.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-manager.cpp

@@ -473,14 +473,32 @@ gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_c
     GX_UNEXPECTED;
 }
 
-std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::Manager::create_default_camera_render_target(
+gearoenix::render::texture::Manager::DefaultCameraTargets gearoenix::render::texture::Manager::create_default_camera_render_target(
     const std::string& camera_name, const core::sync::EndCaller& c) noexcept
 {
+    const auto colour_name = camera_name + "-render-target-colour";
+    const auto second_colour_name = camera_name + "-render-target-second-colour";
+    const auto depth_name = camera_name + "-render-target-depth";
+    const auto target_name = camera_name + "-render-target";
+    const auto second_target_name = camera_name + "-render-second-target";
+
+    {
+        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
+        textures_2d.erase(colour_name);
+        textures_2d.erase(second_colour_name);
+        textures_2d.erase(depth_name);
+    }
+    {
+        const std::lock_guard<std::mutex> _lg(targets_lock);
+        targets.erase(target_name);
+        targets.erase(second_target_name);
+    }
+
     const auto dim = get_default_camera_render_target_dimensions();
     const TextureInfo txt_info {
         .format = TextureFormat::RgbaFloat16,
         .sampler_info = SamplerInfo {
-            .min_filter = Filter::Linear,
+            .min_filter = Filter::LinearMipmapLinear,
             .mag_filter = Filter::Linear,
             .wrap_s = Wrap::ClampToEdge,
             .wrap_t = Wrap::ClampToEdge,
@@ -489,19 +507,29 @@ std::shared_ptr<gearoenix::render::texture::Target> gearoenix::render::texture::
         .width = dim.x,
         .height = dim.y,
         .type = Type::Texture2D,
-        .has_mipmap = false,
+        .has_mipmap = true,
     };
-    auto colour = create_2d_from_pixels(camera_name + "-render-target-colour", {}, txt_info, c);
+    auto colour = create_2d_from_pixels(colour_name, {}, txt_info, c);
+    auto second_colour = create_2d_from_pixels(second_colour_name, {}, txt_info, c);
     auto depth_info = txt_info;
     depth_info.format = TextureFormat::D32;
     depth_info.sampler_info.min_filter = Filter::Nearest;
     depth_info.sampler_info.mag_filter = Filter::Nearest;
-    auto depth = create_2d_from_pixels(camera_name + "-render-target-depth", {}, depth_info, c);
-    return create_target(
-        camera_name + "-render-target",
-        std::vector<Attachment> {
-            Attachment { .var = Attachment2D { .txt = std::move(colour) } },
-            Attachment { .var = Attachment2D { .txt = std::move(depth) } },
-        },
-        c);
+    depth_info.has_mipmap = false;
+    auto depth = create_2d_from_pixels(depth_name, {}, depth_info, c);
+    return DefaultCameraTargets {
+        .colour = create_target(
+            target_name,
+            std::vector<Attachment> {
+                Attachment { .var = Attachment2D { .txt = std::move(colour) } },
+                Attachment { .var = Attachment2D { .txt = std::move(depth) } },
+            },
+            c),
+        .second_colour = create_target(
+            second_target_name,
+            std::vector<Attachment> {
+                Attachment { .var = Attachment2D { .txt = std::move(second_colour) } },
+            },
+            c),
+    };
 }

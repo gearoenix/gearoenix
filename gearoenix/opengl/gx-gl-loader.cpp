@@ -1,6 +1,5 @@
 #include "gx-gl-loader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include "gx-gl-constants.hpp"
 #include <boost/container/flat_set.hpp>
@@ -92,6 +91,20 @@ bool gearoenix::gl::extension_exists(const std::string& ext_name) noexcept
 }
 
 #ifdef GX_DEBUG_MODE
+static const char* severity_to_string(const gearoenix::gl::enumerated severity) noexcept
+{
+    switch (severity) {
+    case GL_DEBUG_SEVERITY_HIGH:
+        return "high-severity";
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        return "medium-severity";
+    case GL_DEBUG_SEVERITY_LOW:
+        return "low-severity";
+    default:
+        return "unknown";
+    }
+}
+
 void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
     const enumerated source,
     const enumerated t,
@@ -101,7 +114,8 @@ void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
     const char* const message,
     const void* const /*userParam*/)
 {
-    GX_LOG_E("source: " << source << ", type: " << t << ", id: " << id << ", severity: " << severity << ", length: " << length << ", message: " << message);
+    GX_LOG_E(
+        "source: " << source << ", type: " << t << ", id: " << id << ", severity: " << severity_to_string(severity) << ", length: " << length << ", message: " << message);
 }
 #endif
 

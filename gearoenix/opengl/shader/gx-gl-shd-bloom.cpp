@@ -201,7 +201,7 @@ gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
     fs << "precision highp sampler2D;\n";
     fs << "precision highp samplerCube;\n";
     fs << "\n";
-    fs << "uniform vec3 scatter_src_mip_index_low_mip_index;\n";
+    fs << "uniform vec2 scatter_src_mip_index;\n";
     fs << "\n";
     fs << "uniform sampler2D source_texture;\n";
     fs << "uniform sampler2D low_texture;\n";
@@ -211,16 +211,16 @@ gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
     fs << "out vec4 frag_colour;\n";
     fs << "\n";
     fs << "void main() {\n";
-    fs << "    vec4 src = textureLod(source_texture, out_uv, scatter_src_mip_index_low_mip_index.y);\n";
-    fs << "    vec4 low = textureLod(low_texture, out_uv, scatter_src_mip_index_low_mip_index.z);\n";
-    fs << "    frag_colour = mix(src, mix(src, src + low, scatter_src_mip_index_low_mip_index.x), scatter_src_mip_index_low_mip_index.x);\n";
+    fs << "    vec4 src = textureLod(source_texture, out_uv, scatter_src_mip_index.y);\n";
+    fs << "    vec4 low = textureLod(low_texture, out_uv, scatter_src_mip_index.y + 1.0f);\n";
+    fs << "    frag_colour = src + low * scatter_src_mip_index.x;\n";
     fs << "    frag_colour.w = max(frag_colour.w, src.w);\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
 
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
-    GX_GL_THIS_GET_UNIFORM(scatter_src_mip_index_low_mip_index);
+    GX_GL_THIS_GET_UNIFORM(scatter_src_mip_index);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(low_texture);
 }
