@@ -46,7 +46,7 @@ const vec2 inv_atan = vec2(0.1591, 0.3183);\n\
 \n\
 void main() {\n\
     vec3 v = normalize(out_uv);\n\
-    frag_colour = texture(albedo, (vec2(atan(v.y, v.x), asin(-v.z)) * inv_atan) + 0.5);\n\
+    frag_colour = texture(albedo, (vec2(atan(v.y, v.x), asin(v.z)) * inv_atan) + 0.5);\n\
 }\n";
 
 gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e) noexcept

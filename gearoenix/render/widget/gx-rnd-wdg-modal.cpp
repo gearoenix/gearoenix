@@ -12,12 +12,12 @@
 #include "gx-rnd-wdg-button.hpp"
 
 gearoenix::render::widget::Modal::Modal(
-    const std::string& name,
+    std::string&& name,
     engine::Engine& e,
     std::shared_ptr<Button>&& close,
     std::shared_ptr<Button>&& cancel,
     std::shared_ptr<Button>&& ok) noexcept
-    : Widget(name, Type::Modal, e)
+    : Widget(std::move(name), Type::Modal, e)
     , close(std::move(close))
     , cancel(std::move(cancel))
     , ok(std::move(ok))
@@ -31,7 +31,7 @@ std::tuple<
     std::shared_ptr<gearoenix::render::model::Builder>,
     std::shared_ptr<gearoenix::render::widget::Modal>>
 gearoenix::render::widget::Modal::construct(
-    const std::string& name,
+    std::string&& n,
     engine::Engine& e,
     const std::string& background_texture_asset,
     const std::optional<std::pair<std::string, std::string>>& close_fs,
@@ -42,8 +42,8 @@ gearoenix::render::widget::Modal::construct(
     scene::Builder& scene_builder,
     const core::sync::EndCaller& end_callback) noexcept
 {
-    auto result = std::make_shared<Modal>(name, e, nullptr, nullptr, nullptr);
-    auto mat = e.get_material_manager()->get_unlit(name + "-material", end_callback);
+    auto result = std::make_shared<Modal>(std::move(n), e, nullptr, nullptr, nullptr);
+    auto mat = e.get_material_manager()->get_unlit(result->name + "-material", end_callback);
     mat->set_transparency(render::material::Transparency::Transparent);
     mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
         background_texture_asset,
@@ -51,7 +51,7 @@ gearoenix::render::widget::Modal::construct(
         render::texture::TextureInfo(),
         end_callback));
     auto bg_md = e.get_model_manager()->build(
-        name + "-background-model",
+        result->name + "-background-model",
         e.get_mesh_manager()->build_plate(end_callback),
         std::move(mat),
         core::sync::EndCaller(end_callback),
@@ -61,9 +61,9 @@ gearoenix::render::widget::Modal::construct(
     if (nullptr != parent)
         parent->add_child(result);
     scene_builder.add(std::shared_ptr(bg_md));
-    auto [close_md, close_button] = close_fs.has_value() ? Button::construct(name + "-close-button", e, close_fs->first, close_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
-    auto [cancel_md, cancel_button] = cancel_fs.has_value() ? Button::construct(name + "-cancel-button", e, cancel_fs->first, cancel_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
-    auto [ok_md, ok_button] = ok_fs.has_value() ? Button::construct(name + "-ok-button", e, ok_fs->first, ok_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    auto [close_md, close_button] = close_fs.has_value() ? Button::construct(result->name + "-close-button", e, close_fs->first, close_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    auto [cancel_md, cancel_button] = cancel_fs.has_value() ? Button::construct(result->name + "-cancel-button", e, cancel_fs->first, cancel_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
+    auto [ok_md, ok_button] = ok_fs.has_value() ? Button::construct(result->name + "-ok-button", e, ok_fs->first, ok_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
     result->close = std::move(close_button);
     result->cancel = std::move(cancel_button);
     result->ok = std::move(ok_button);

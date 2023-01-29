@@ -14,9 +14,6 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
     auto& builder = entity_builder->get_builder();
     builder.set_name(name);
     physics::Transformation transform(name + "-transformation");
-    auto& plt_app = e.get_platform_application().get_base();
-    auto& cfg = plt_app.get_configuration().get_render_configuration();
-    const auto entity_id = builder.get_id();
     Camera cam(e, name, 0, end_caller);
     cam.set_view(math::Mat4x4<float>(transform.get_inverted_global_matrix()));
     std::array<math::Vec3<double>, 8> frustum_points;

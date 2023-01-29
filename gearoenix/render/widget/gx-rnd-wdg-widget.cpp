@@ -6,6 +6,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../model/gx-rnd-mdl-model.hpp"
 #include "gx-rnd-wdg-layout.hpp"
 #include <array>
 
@@ -83,11 +84,11 @@ void gearoenix::render::widget::Widget::handle_mouse_outside() noexcept
 }
 
 gearoenix::render::widget::Widget::Widget(
-    const std::string& name,
+    std::string&& n,
     const Type widget_type,
     engine::Engine& e) noexcept
     : e(e)
-    , name(name)
+    , name(std::move(n))
     , widget_type(widget_type)
     , on_press([](const math::Vec3<double>&) noexcept -> void {})
     , on_release([](const math::Vec3<double>&) noexcept -> void {})
@@ -127,6 +128,9 @@ void gearoenix::render::widget::Widget::set_on_click(const std::function<void(co
 void gearoenix::render::widget::Widget::set_sensitivity(const bool b) noexcept
 {
     sensitivity = b;
+    for (const auto& child : children) {
+        child.second->set_sensitivity(b);
+    }
 }
 
 void gearoenix::render::widget::Widget::set_model_entity_id(const core::ecs::entity_id_t id) noexcept
@@ -152,6 +156,28 @@ void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l) no
     layout = std::move(l);
 }
 
+void gearoenix::render::widget::Widget::show() noexcept
+{
+    auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
+    GX_ASSERT_D(nullptr != mdl);
+    mdl->enabled = true;
+    for (auto& child : children) {
+        child.second->show();
+    }
+    set_sensitivity(true);
+}
+
+void gearoenix::render::widget::Widget::hide() noexcept
+{
+    auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
+    GX_ASSERT_D(nullptr != mdl);
+    mdl->enabled = false;
+    for (auto& child : children) {
+        child.second->hide();
+    }
+    set_sensitivity(false);
+}
+
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority) noexcept
 {
     children.emplace(std::make_pair(priority, child->name), std::move(child));
@@ -167,17 +193,25 @@ gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on
 {
     switch (event_data.get_source()) {
     case core::event::Id::GestureClick: {
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
         handle_click_gesture(event_data);
         break;
     }
     case core::event::Id::GestureDrag2D: {
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
         break;
     }
     case core::event::Id::MovementMouse: {
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
         handle_movement_mouse(event_data);
         break;
     }
     case core::event::Id::ButtonMouse: {
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
         handle_button_mouse(event_data);
         break;
     }
@@ -187,6 +221,8 @@ gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on
         break;
     }
     default:
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
         break;
     }
     for (const auto& child : children) {

@@ -39,8 +39,8 @@ void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<v
     };
 }
 
-gearoenix::render::widget::Button::Button(const std::string& name, engine::Engine& e) noexcept
-    : Widget(name, Type::Button, e)
+gearoenix::render::widget::Button::Button(std::string&& name, engine::Engine& e) noexcept
+    : Widget(std::move(name), Type::Button, e)
 {
     set_on_press_impl(on_press);
     set_on_release_impl(on_release);
@@ -51,7 +51,7 @@ gearoenix::render::widget::Button::~Button() noexcept = default;
 
 std::pair<std::shared_ptr<gearoenix::render::model::Builder>, std::shared_ptr<gearoenix::render::widget::Button>>
 gearoenix::render::widget::Button::construct(
-    const std::string& name,
+    std::string&& name,
     engine::Engine& e,
     const std::string& pressed_texture_asset,
     const std::string& rest_texture_asset,
@@ -80,7 +80,7 @@ gearoenix::render::widget::Button::construct(
         core::sync::EndCaller(end_callback),
         true);
     const auto id = model_builder->get_id();
-    auto but = std::make_shared<render::widget::Button>(name, e);
+    auto but = std::make_shared<render::widget::Button>(std::move(name), e);
     but->set_rest_texture(rest_txt);
     but->set_pressed_texture(pressed_txt);
     but->set_model_entity_id(id);

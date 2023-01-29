@@ -29,6 +29,11 @@ gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_trans
     return *entity_builder->get_builder().get_component<physics::Transformation>();
 }
 
+gearoenix::render::model::Model& gearoenix::render::model::Builder::get_model() noexcept
+{
+    return *entity_builder->get_builder().get_component<model::Model>();
+}
+
 gearoenix::core::ecs::entity_id_t gearoenix::render::model::Builder::get_id() const noexcept
 {
     return entity_builder->get_id();

@@ -27,6 +27,7 @@ struct Mesh;
 }
 
 namespace gearoenix::render::model {
+struct Model;
 struct Builder {
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
@@ -47,6 +48,7 @@ public:
     virtual ~Builder() noexcept;
 
     [[nodiscard]] physics::Transformation& get_transformation() noexcept;
+    [[nodiscard]] Model& get_model() noexcept;
     [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
 };
 }

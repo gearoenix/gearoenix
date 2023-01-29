@@ -22,11 +22,10 @@ struct Modal final : public Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Button>, close);
     GX_GET_CREF_PRV(std::shared_ptr<Button>, cancel);
     GX_GET_CREF_PRV(std::shared_ptr<Button>, ok);
-    GX_GETSET_CREF_PRV(std::function<void()>, on_closed);
 
 public:
     Modal(
-        const std::string& name,
+        std::string&& name,
         engine::Engine& e,
         std::shared_ptr<Button>&& close,
         std::shared_ptr<Button>&& cancel,
@@ -38,7 +37,7 @@ public:
         std::shared_ptr<model::Builder> /*ok-button-model-builder*/,
         std::shared_ptr<Modal>>
     construct(
-        const std::string& name,
+        std::string&& name,
         engine::Engine& e,
         const std::string& background_texture_asset,
         const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& close_button_texture_asset,

@@ -259,6 +259,7 @@
         std::size_t bi = 0;
         for (auto& vertex : vertices) {
             vertex.uv = *reinterpret_cast<const gearoenix::math::Vec2<float>*>(&txc_b[bi]);
+            vertex.uv.y = 1.0f - vertex.uv.y;
             bi += txc_bi_inc;
         }
     }

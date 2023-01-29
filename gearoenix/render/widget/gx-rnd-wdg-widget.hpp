@@ -42,7 +42,7 @@ protected:
     void handle_mouse_outside() noexcept;
 
 public:
-    Widget(const std::string& name, Type t, engine::Engine& e) noexcept;
+    Widget(std::string&& name, Type t, engine::Engine& e) noexcept;
     ~Widget() noexcept override;
     virtual void set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept;
     virtual void set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept;
@@ -53,6 +53,8 @@ public:
     virtual void set_camera_entity_id(core::ecs::entity_id_t camera_entity_id) noexcept;
     virtual void register_for_events() noexcept;
     virtual void set_layout(std::shared_ptr<Layout> layout) noexcept;
+    virtual void show() noexcept;
+    virtual void hide() noexcept;
     virtual void add_child(std::shared_ptr<Widget>&& child, double priority) noexcept;
     void add_child(std::shared_ptr<Widget>&& child) noexcept;
     core::event::Listener::Response on_event(const core::event::Data& event_data) noexcept override;

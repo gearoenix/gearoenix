@@ -111,7 +111,7 @@ gearoenix::render::reflection::Runtime::Runtime(
         auto camera_builder = cam_mgr->build(
             std::string(name).append("-camera").append(name_ext),
             core::sync::EndCaller(end_callback));
-        cameras[face_index] = camera_builder->get_entity_builder()->get_builder().get_id();
+        cameras[face_index] = camera_builder->get_id();
         environment_targets[face_index] = txt_mgr->create_target(
             std::string(name).append("-environment-target").append(name_ext),
             std::vector<texture::Attachment> {

@@ -26,10 +26,10 @@ private:
     void set_on_cancel_impl(const std::function<void()>& fun) noexcept;
 
 public:
-    Button(const std::string& name, engine::Engine& e) noexcept;
+    Button(std::string&& name, engine::Engine& e) noexcept;
     ~Button() noexcept final;
     [[nodiscard]] static std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>> construct(
-        const std::string& name,
+        std::string&& name,
         engine::Engine& e,
         const std::string& pressed_texture_asset,
         const std::string& rest_texture_asset,

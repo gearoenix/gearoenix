@@ -13,20 +13,25 @@
 // #define GX_DEBUG_TEXTURE_WRITE
 #endif
 
+static void flip_texture(std::vector<std::uint8_t>& pixels, std::size_t height) noexcept
+{
+    GX_ASSERT_D(!pixels.empty());
+    GX_ASSERT_D(height > 0);
+    const auto columns_count = pixels.size() / height;
+    for (std::size_t top = 0, top_index = 0, bottom = height - 1, bottom_index = pixels.size() - columns_count; top < bottom; ++top, --bottom) {
+        const auto next_top_index = top_index + columns_count;
+        const auto next_bottom_index = bottom_index - columns_count;
+        for (; top_index < next_top_index; ++top_index, ++bottom_index) {
+            std::swap(pixels[top_index], pixels[bottom_index]);
+        }
+        bottom_index = next_bottom_index;
+    }
+}
+
 static void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t height) noexcept
 {
     for (auto& mip_pixels : pixels) {
-        GX_ASSERT_D(!mip_pixels.empty());
-        GX_ASSERT_D(height > 0);
-        const auto columns_count = mip_pixels.size() / height;
-        for (std::size_t top = 0, top_index = 0, bottom = height - 1, bottom_index = mip_pixels.size() - columns_count; top < bottom; ++top, --bottom) {
-            const auto next_top_index = top_index + columns_count;
-            const auto next_bottom_index = bottom_index - columns_count;
-            for (; top_index < next_top_index; ++top_index, ++bottom_index) {
-                std::swap(mip_pixels[top_index], mip_pixels[bottom_index]);
-            }
-            bottom_index = next_bottom_index;
-        }
+        flip_texture(mip_pixels, height);
         height >>= 1;
     }
 }
@@ -184,13 +189,16 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_2D, object);
-        std::vector<std::uint8_t> data(info.width * info.height * format_pixel_size(info.format));
+        auto pixel_element_size = format_pixel_size(info.format);
+        std::vector<std::uint8_t> data;
         auto level_width = static_cast<gl::sizei>(info.width);
         auto level_height = static_cast<gl::sizei>(info.height);
         const auto mips_count = get_mipmaps_count();
         for (gl::sint mip_index = 0; mip_index < static_cast<gl::sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
+            data.resize(pixel_element_size * static_cast<std::size_t>(level_width * level_height));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
             glReadPixels(0, 0, level_width, level_height, convert_format(info.format), convert_data_format(info.format), data.data());
+            flip_texture(data, static_cast<std::size_t>(level_height));
 #ifdef GX_DEBUG_TEXTURE_WRITE
             const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
             platform::stream::Local l(e.get_platform_application(),
@@ -244,13 +252,16 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
-        std::vector<std::uint8_t> data(info.width * info.width * format_pixel_size(info.format));
+        auto pixel_element_size = format_pixel_size(info.format);
+        std::vector<std::uint8_t> data;
         for (auto face : render::texture::FACES) {
             auto level_aspect = static_cast<gl::sizei>(info.width);
             const auto mips_count = get_mipmaps_count();
             for (gl::sint mipmap_index = 0; mipmap_index < static_cast<gl::sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
+                data.resize(static_cast<std::size_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.format), convert_data_format(info.format), data.data());
+                flip_texture(data, level_aspect);
 #ifdef GX_DEBUG_TEXTURE_WRITE
                 const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
                 platform::stream::Local l(e.get_platform_application(),
