@@ -95,7 +95,7 @@ public:
     void set_far(float) noexcept;
     void set_fov_y(float) noexcept;
     void set_scale(float) noexcept;
-    void show_gui() noexcept;
+    void show_debug_gui() noexcept final;
     void enable_debug_mesh() noexcept;
     void disable_debug_mesh() noexcept;
     void set_has_customised_target_aspect_ratio(bool b) noexcept;

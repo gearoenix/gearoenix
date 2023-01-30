@@ -318,7 +318,7 @@ void gearoenix::physics::Transformation::reset(
     changed = true;
 }
 
-void gearoenix::physics::Transformation::show_gui() noexcept
+void gearoenix::physics::Transformation::show_debug_gui() noexcept
 {
     if (ImGui::TreeNode("Transformation")) {
         auto l = get_local_location();

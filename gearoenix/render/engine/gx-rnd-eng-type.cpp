@@ -1,22 +1,24 @@
 #include "gx-rnd-eng-type.hpp"
 
 namespace gearoenix::render::engine {
-std::ostream& operator<<(std::ostream& os, const Type t) noexcept
+const char* to_string(const Type t) noexcept
 {
     switch (t) {
     case Type::Vulkan:
-        os << "Vulkan";
-        break;
+        return "Vulkan";
     case Type::OpenGL:
-        os << "OpenGL";
-        break;
+        return "OpenGL";
     case Type::Direct3D:
-        os << "Direct3D";
-        break;
+        return "Direct3D";
     case Type::Metal:
-        os << "Metal";
-        break;
+        return "Metal";
     }
+    return nullptr;
+}
+
+std::ostream& operator<<(std::ostream& os, const Type t) noexcept
+{
+    os << to_string(t);
     return os;
 }
 }

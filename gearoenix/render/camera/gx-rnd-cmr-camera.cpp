@@ -176,7 +176,7 @@ void gearoenix::render::camera::Camera::set_scale(const float f) noexcept
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::show_gui() noexcept
+void gearoenix::render::camera::Camera::show_debug_gui() noexcept
 {
     if (ImGui::TreeNode("Camera")) {
         bool input_changed = false;

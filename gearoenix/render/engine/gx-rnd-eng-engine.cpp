@@ -123,3 +123,14 @@ void gearoenix::render::engine::Engine::window_resized() noexcept
 {
     camera_manager->window_resized();
 }
+
+void gearoenix::render::engine::Engine::show_debug_gui() noexcept
+{
+    if (ImGui::TreeNode("Render Engine")) {
+        ImGui::Text("Type: %s", to_string(engine_type));
+        ImGui::Text("Frames Count: %zu", frames_count);
+        world->show_debug_gui();
+        // TODO: I have to show all other things
+        ImGui::TreePop();
+    }
+}

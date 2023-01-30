@@ -13,7 +13,7 @@ struct Light final : public core::ecs::Component {
     explicit Light(std::string&& name) noexcept;
     Light(Light&&) noexcept;
     ~Light() noexcept final;
-    void show_gui() noexcept;
+    void show_debug_gui() noexcept final;
 };
 }
 #endif

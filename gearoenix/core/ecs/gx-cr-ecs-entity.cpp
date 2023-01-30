@@ -1,5 +1,6 @@
 #include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-world.hpp"
+#include <imgui.h>
 
 gearoenix::core::ecs::Entity::Entity(
     Archetype* const archetype,
@@ -19,6 +20,16 @@ gearoenix::core::ecs::Entity::Entity(Entity&& o) noexcept
 }
 
 std::atomic<gearoenix::core::ecs::entity_id_t> gearoenix::core::ecs::Entity::last_id(1028);
+
+void gearoenix::core::ecs::Entity::show_debug_gui() noexcept
+{
+    if (ImGui::TreeNode(name.c_str())) {
+        for (const auto& ci : archetype->components_indices) {
+            reinterpret_cast<Component*>(components + ci.second)->show_debug_gui();
+        }
+        ImGui::TreePop();
+    }
+}
 
 gearoenix::core::ecs::EntityBuilder::EntityBuilder(const entity_id_t id, std::string&& name, sync::EndCaller&& end_caller) noexcept
     : id(id)

@@ -35,6 +35,7 @@ public:
     Entity(const Entity&) = delete;
     Entity& operator=(Entity&&) noexcept = default;
     Entity& operator=(const Entity&) = delete;
+    void show_debug_gui() noexcept;
 };
 
 struct EntityBuilder final {

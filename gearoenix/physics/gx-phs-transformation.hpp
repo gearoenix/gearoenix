@@ -60,7 +60,7 @@ public:
         const math::Vec3<double>& y_axis,
         const math::Vec3<double>& z_axis,
         const math::Vec3<double>& location) noexcept;
-    void show_gui() noexcept;
+    void show_debug_gui() noexcept final;
 };
 }
 #endif

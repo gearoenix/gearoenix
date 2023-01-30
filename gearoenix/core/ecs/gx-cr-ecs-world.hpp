@@ -219,6 +219,8 @@ public:
     /// It will do all the delayed actions
     void update() noexcept;
 
+    void show_debug_gui() noexcept;
+
     [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, sync::EndCaller&& end_caller) noexcept;
 };
 }

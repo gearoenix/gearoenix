@@ -69,7 +69,7 @@ public:
     Component& operator=(Component&&) = delete;
     Component& operator=(const Component&) = delete;
 
-    virtual void display() noexcept { }
+    virtual void show_debug_gui() noexcept { }
 
     template <typename T>
     constexpr static void type_check() noexcept

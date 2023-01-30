@@ -103,6 +103,7 @@ public:
     virtual void end_frame() noexcept;
     virtual void window_resized() noexcept;
     virtual void upload_imgui_fonts() noexcept = 0;
+    virtual void show_debug_gui() noexcept;
 };
 }
 #endif

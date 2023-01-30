@@ -1,4 +1,5 @@
 #include "gx-cr-ecs-world.hpp"
+#include <imgui.h>
 
 void gearoenix::core::ecs::World::create_entity_with_builder(EntityBuilder&& b) noexcept
 {
@@ -154,6 +155,24 @@ void gearoenix::core::ecs::World::update() noexcept
         default:
             GX_UNEXPECTED;
         }
+    }
+}
+
+void gearoenix::core::ecs::World::show_debug_gui() noexcept
+{
+    if (ImGui::TreeNode("ECS World")) {
+        ImGui::Text("Number of Archetypes: %zu", archetypes.size());
+        ImGui::Text("Number of Entities: %zu", entities.size());
+        ImGui::Text("Number of Entity Names: %zu", name_to_entity_id.size());
+        if (ImGui::TreeNode("Entities")) {
+            for (const auto& name_id : name_to_entity_id) {
+                auto search = entities.find(name_id.second);
+                GX_ASSERT_D(entities.end() != search);
+                search->second.show_debug_gui();
+            }
+            ImGui::TreePop();
+        }
+        ImGui::TreePop();
     }
 }
 

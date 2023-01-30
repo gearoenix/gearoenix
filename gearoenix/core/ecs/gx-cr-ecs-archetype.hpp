@@ -21,8 +21,10 @@
 
 namespace gearoenix::core::ecs {
 struct World;
+struct Entity;
 struct Archetype final {
     friend struct World;
+    friend struct Entity;
 
 private:
     template <typename T>
