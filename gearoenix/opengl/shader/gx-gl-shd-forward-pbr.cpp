@@ -113,14 +113,6 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "\n";
     fs << "layout(location = 0) out vec4 frag_out;\n";
     fs << "\n";
-    fs << "vec3 fresnel_schlick_roughness(const float nv, const vec3 f0, const float roughness) {\n";
-    fs << "    float inv = 1.0 - nv;\n";
-    fs << "    float inv2 = inv * inv;\n";
-    fs << "    float inv4 = inv2 * inv2;\n";
-    fs << "    float inv5 = inv4 * inv;\n";
-    fs << "    return f0 + ((max(vec3(1.0 - roughness), f0) - f0) * inv5);\n";
-    fs << "}\n";
-    fs << "\n";
     fs << "float distribution_ggx(const float normal_dot_half, const float roughness) {\n";
     fs << "    float a = normal_dot_half * roughness;\n";
     fs << "    float k = roughness / (1.0 - normal_dot_half * normal_dot_half + a * a);\n";
@@ -175,8 +167,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    vec3 eye = normalize(out_pos - camera_position_reserved.xyz);\n";
     fs << "    vec3 reflection = reflect(eye, nrm);\n";
     fs << "    float normal_dot_view = max(-dot(nrm, eye), 0.0001);\n";
-    fs << "    vec3 fresnel = fresnel_schlick_roughness(normal_dot_view, f0, f90);\n";
-    fs << "    vec3 kd = (vec3(1.0) - fresnel) * (1.0 - roughness);\n";
+    fs << "    vec3 fresnel = fresnel_schlick(normal_dot_view, f0, f90);\n";
     fs << "    vec3 illumination = vec3(0.0001);\n";
     fs << "\n";
     for (int dir_i = 0; dir_i < static_cast<int>(directional_lights_count); ++dir_i) {
@@ -222,9 +213,9 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "\n";
     fs << "    vec3 irr = texture(irradiance, nrm).xyz;\n";
     fs << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
-    fs << "    vec3 ambient = irr * alb.xyz * kd;\n";
-    fs << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, mtr.y)).rg;\n";
-    fs << "    ambient += rad * ((fresnel * brdf.x) + brdf.y);\n";
+    fs << "    vec3 ambient = irr * alb.xyz * (vec3(f90) - fresnel) * (f90 - metallic);\n";
+    fs << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, roughness)).rg;\n";
+    fs << "    ambient += rad * ((fresnel * brdf.x) + (f90 * brdf.y));\n";
     fs << "    ambient *= ao;\n";
     fs << "    vec3 frag_colour = ambient + ems + illumination;\n";
     fs << "    frag_out = vec4(frag_colour, 1.0);\n";

@@ -29,7 +29,7 @@ in vec2 out_uv;\n\
 layout(location = 0) out vec4 frag_colour;\n\
 \n\
 void main() {\n\
-    frag_colour = texture(source_texture, out_uv);\n\
+    frag_colour = textureLod(source_texture, out_uv, 0.0);\n\
     frag_colour.xyz *= value;\n\
 }";
 

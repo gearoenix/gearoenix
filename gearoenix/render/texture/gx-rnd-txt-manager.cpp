@@ -476,23 +476,14 @@ gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_c
 gearoenix::render::texture::Manager::DefaultCameraTargets gearoenix::render::texture::Manager::create_default_camera_render_target(
     const std::string& camera_name, const core::sync::EndCaller& c) noexcept
 {
-    const auto colour_name = camera_name + "-render-target-colour";
-    const auto second_colour_name = camera_name + "-render-target-second-colour";
-    const auto depth_name = camera_name + "-render-target-depth";
-    const auto target_name = camera_name + "-render-target";
-    const auto second_target_name = camera_name + "-render-second-target";
+    static std::atomic<int> unique_id = 0;
+    ++unique_id;
 
-    {
-        const std::lock_guard<std::mutex> _lg(textures_2d_lock);
-        textures_2d.erase(colour_name);
-        textures_2d.erase(second_colour_name);
-        textures_2d.erase(depth_name);
-    }
-    {
-        const std::lock_guard<std::mutex> _lg(targets_lock);
-        targets.erase(target_name);
-        targets.erase(second_target_name);
-    }
+    const auto colour_name = camera_name + "-render-target-colour-" + std::to_string(unique_id);
+    const auto second_colour_name = camera_name + "-render-target-second-colour-" + std::to_string(unique_id);
+    const auto depth_name = camera_name + "-render-target-depth-" + std::to_string(unique_id);
+    const auto target_name = camera_name + "-render-target-" + std::to_string(unique_id);
+    const auto second_target_name = camera_name + "-render-second-target-" + std::to_string(unique_id);
 
     const auto dim = get_default_camera_render_target_dimensions();
     const TextureInfo txt_info {

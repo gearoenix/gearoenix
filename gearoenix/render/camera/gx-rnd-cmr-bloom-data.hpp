@@ -40,6 +40,7 @@ public:
     BloomData(BloomData&&) noexcept;
     BloomData& operator=(BloomData&&) noexcept;
     ~BloomData() noexcept;
+    void show_debug_data() noexcept;
 };
 }
 

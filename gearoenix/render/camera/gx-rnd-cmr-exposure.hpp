@@ -3,19 +3,29 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 
 namespace gearoenix::render::camera {
-struct ExposureData final {
-    GX_GET_VAL_PRV(float, aperture, 4.0f);
-    GX_GET_VAL_PRV(float, shutter_time, aperture* aperture * 120.0f);
-    GX_GET_VAL_PRV(float, sensitivity, 1.0f);
-    GX_GET_VAL_PRV(float, value, 1.0f);
+struct Exposure final {
+    GX_GET_VAL_PRV(bool, enabled, true);
+
+private:
+    float aperture = 4.0f;
+    float shutter_speed = aperture * aperture / 120.0f;
+    float sensitivity = 1.0f;
+    float value = 1.0f;
 
     void update() noexcept;
 
 public:
-    ExposureData() noexcept;
+    Exposure() noexcept;
     void set_aperture(float) noexcept;
-    void set_shutter_time(float) noexcept;
+    [[nodiscard]] float get_aperture() const noexcept;
+    void set_shutter_speed(float) noexcept;
+    [[nodiscard]] float get_shutter_speed() const noexcept;
     void set_sensitivity(float) noexcept;
+    [[nodiscard]] float get_sensitivity() const noexcept;
+    [[nodiscard]] float get_value() const noexcept;
+    void enable() noexcept;
+    void disable() noexcept;
+    void show_debug_gui() noexcept;
 };
 }
 

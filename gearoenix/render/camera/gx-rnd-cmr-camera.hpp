@@ -65,7 +65,7 @@ struct Camera final : public core::ecs::Component {
     GX_GET_REFC_PRV(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRV(std::shared_ptr<mesh::Mesh>, debug_mesh);
     GX_GET_CREF_PRV(std::optional<BloomData>, bloom_data);
-    GX_GET_CREF_PRV(std::optional<ExposureData>, exposure_data);
+    GX_GET_CREF_PRV(Exposure, exposure);
     GX_GET_VAL_PRV(std::size_t, resolution_cfg_listener, 0);
 
 public:

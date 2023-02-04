@@ -45,11 +45,13 @@ gearoenix::render::camera::Camera::Camera(
         auto default_targets = e.get_texture_manager()->create_default_camera_render_target(name, end_caller);
         target = std::move(default_targets.colour);
         second_target = std::move(default_targets.second_colour);
-        exposure_data = ExposureData();
+        exposure.enable();
         /// @note: When bloom exists the auto-exposure must exist too.
         if (has_bloom) {
             bloom_data = BloomData(e, name, end_caller, target, second_target);
         }
+    } else {
+        exposure.disable();
     }
     target_aspect_ratio = target->get_aspect_ratio();
     update_projection();
@@ -183,13 +185,14 @@ void gearoenix::render::camera::Camera::show_debug_gui() noexcept
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Aspect Ratio", &target_aspect_ratio, 0.01f, 1.0f, "%.3f");
-        /// TODO
-        // input_changed |= ImGui::InputFloat("HDR Tune Mapping", &hdr_tune_mapping, 0.01f, 1.0f, "%.6f");
-        // input_changed |= ImGui::InputFloat("Gamma Correction", &gamma_correction, 0.01f, 1.0f, "%.6f");
         input_changed |= ImGui::InputFloat(Projection::Orthographic == projection_type ? "Scale" : "Field Of View Y", &scale_fov_y, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::Checkbox("Show debug mesh", &debug_enabled);
         if (input_changed)
             update_projection();
+        exposure.show_debug_gui();
+        if (bloom_data.has_value()) {
+            bloom_data->show_debug_data();
+        }
         ImGui::TreePop();
     }
 }
@@ -242,6 +245,7 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
 {
     has_customised_target = true;
     target = std::move(t);
+    second_target = nullptr;
     update_target_aspect_ratio();
 }
 
@@ -249,9 +253,14 @@ void gearoenix::render::camera::Camera::update_target() noexcept
 {
     if (has_customised_target)
         return;
-    auto ts = e.get_texture_manager()->create_default_camera_render_target(name, core::sync::EndCaller([] {}));
+    const core::sync::EndCaller end_caller([] {});
+    auto ts = e.get_texture_manager()->create_default_camera_render_target(name, end_caller);
     target = std::move(ts.colour);
     second_target = std::move(ts.second_colour);
+    exposure.enable();
+    if (bloom_data.has_value()) {
+        bloom_data = BloomData(e, name, end_caller, target, second_target);
+    }
     update_target_aspect_ratio();
 }
 

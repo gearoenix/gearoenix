@@ -33,7 +33,7 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        gearoenix::core::sync::EndCaller end_callback([] {});
+        const gearoenix::core::sync::EndCaller end_callback([] {});
 
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
@@ -49,8 +49,8 @@ struct GameApp final : public gearoenix::core::Application {
                     "material-" + std::to_string(metallic_i) + "-" + std::to_string(roughness_i),
                     end_callback);
                 material->get_albedo_factor().x = 0.999f;
-                material->get_albedo_factor().y = 0.1f;
-                material->get_albedo_factor().z = 0.4f;
+                material->get_albedo_factor().y = 0.999f;
+                material->get_albedo_factor().z = 0.999f;
                 material->get_normal_metallic_factor().w = static_cast<float>(metallic_i) * 0.1f;
                 material->get_emission_roughness_factor().w = static_cast<float>(roughness_i) * 0.1f;
                 auto model_builder = render_engine.get_model_manager()->build(
@@ -94,12 +94,12 @@ struct GameApp final : public gearoenix::core::Application {
         runtime_reflection_probe_builder->get_runtime().set_on_rendered([id, this] {
             const auto* const r = render_engine.get_world()->get_component<gearoenix::render::reflection::Runtime>(id);
 #if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
-            std::shared_ptr<gearoenix::platform::stream::Stream> rl(
+            const std::shared_ptr<gearoenix::platform::stream::Stream> rl(
                 new gearoenix::platform::stream::Local(platform_application, "exported.gx-reflection", true));
             r->export_baked(rl, gearoenix::core::sync::EndCaller([] {}));
 #endif
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT)
-            std::shared_ptr<gearoenix::platform::stream::Stream> tl(
+            const std::shared_ptr<gearoenix::platform::stream::Stream> tl(
                 new gearoenix::platform::stream::Local(platform_application, "sky.gx-cube-texture", true));
             r->get_environment()->write(tl, gearoenix::core::sync::EndCaller([] {}));
 #endif

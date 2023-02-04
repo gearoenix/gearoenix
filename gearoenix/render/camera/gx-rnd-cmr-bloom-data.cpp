@@ -3,6 +3,7 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
+#include <imgui.h>
 
 gearoenix::render::camera::BloomData::BloomData(
     engine::Engine& e,
@@ -70,3 +71,14 @@ gearoenix::render::camera::BloomData::BloomData(BloomData&&) noexcept = default;
 gearoenix::render::camera::BloomData& gearoenix::render::camera::BloomData::operator=(BloomData&&) noexcept = default;
 
 gearoenix::render::camera::BloomData::~BloomData() noexcept = default;
+
+void gearoenix::render::camera::BloomData::show_debug_data() noexcept
+{
+    if (ImGui::TreeNode("Bloom")) {
+        ImGui::InputFloat("Scatter", &scatter_clamp_max_threshold_threshold_knee.x, 0.01f, 1.0f, "%.3f");
+        ImGui::InputFloat("Clamp Max", &scatter_clamp_max_threshold_threshold_knee.y, 0.01f, 1.0f, "%.3f");
+        ImGui::InputFloat("Threshold", &scatter_clamp_max_threshold_threshold_knee.z, 0.01f, 1.0f, "%.3f");
+        ImGui::InputFloat("Threshold Knee", &scatter_clamp_max_threshold_threshold_knee.w, 0.01f, 1.0f, "%.3f");
+        ImGui::TreePop();
+    }
+}

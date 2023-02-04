@@ -37,7 +37,7 @@ in vec2 out_uv;\n\
 out vec4 frag_colour;\n\
 \n\
 void main() {\n\
-    frag_colour = texture(albedo, out_uv);\n\
+    frag_colour = textureLod(albedo, out_uv, 0.0);\n\
 }\n";
 
 gearoenix::gl::shader::Final::Final(Engine& e) noexcept

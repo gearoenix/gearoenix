@@ -56,6 +56,8 @@ void main() {\n\
         }\n\
     }\n\
     irradiance *= GX_PI / samples_count;\n\
+    irradiance /= irradiance + 1.0f;\n\
+    irradiance = pow(irradiance, vec3(1.0f / 2.2f));\n\
     frag_out = vec4(irradiance, 1.0);\n\
 }\n";
 

@@ -45,6 +45,25 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
     fs << "\n";
     fs << "out vec4 frag_colour;\n";
     fs << "\n";
+    fs << "vec3 uncharted2_tonemap_partial(vec3 x) {\n";
+    fs << "    const float a = 0.15f;\n";
+    fs << "    const float b = 0.50f;\n";
+    fs << "    const float c = 0.10f;\n";
+    fs << "    const float d = 0.20f;\n";
+    fs << "    const float e = 0.02f;\n";
+    fs << "    const float f = 0.30f;\n";
+    fs << "    return ((x * (a * x + c * b) + d * e) / (x * (a * x + b) + d * f)) - e / f;\n";
+    fs << "}\n";
+    fs << "\n";
+    fs << "vec3 uncharted2_filmic(vec3 v) {\n";
+    //    fs << "    const float exposure_bias = 2.0f;\n";
+    //    fs << "    vec3 curr = uncharted2_tonemap_partial(v * exposure_bias);\n";
+    //    fs << "    const vec3 W = vec3(11.2f);\n";
+    //    fs << "    vec3 white_scale = vec3(1.0f) / uncharted2_tonemap_partial(W);\n";
+    //    fs << "    return curr * white_scale;\n";
+    fs << "    return uncharted2_tonemap_partial(v * 2.0f) * 1.37906f;\n";
+    fs << "}\n";
+    fs << "\n";
     fs << "void main() {\n";
     fs << "    frag_colour = texture(source_texture, out_uv);\n";
 
@@ -52,24 +71,30 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
 
     if (is_gamma_correction_index) {
         // The code for ACES tone mapping is based on the code written by Stephen Hill (@self_shadow), who deserves all
-        //     credit for coming up with this fit and implementing it. Buy him a beer next time you see him. :)
+        // credit for coming up with this fit and implementing it. Buy him a beer next time you see him. :)
         // sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
-        fs << "    frag_colour.xyz = mat3(\n";
-        fs << "        0.59719, 0.35458, 0.04823,\n";
-        fs << "        0.07600, 0.90834, 0.01566,\n";
-        fs << "        0.02840, 0.13383, 0.83777) * frag_colour.xyz;\n";
+        // fs << "    frag_colour.xyz = mat3(\n";
+        // fs << "        0.59719, 0.35458, 0.04823,\n";
+        // fs << "        0.07600, 0.90834, 0.01566,\n";
+        // fs << "        0.02840, 0.13383, 0.83777) * frag_colour.xyz;\n";
         // RRT And ODT Fit
-        fs << "    {\n";
-        fs << "        vec3 a = frag_colour.xyz * (frag_colour.xyz + 0.0245786f) - 0.000090537f;\n";
-        fs << "        vec3 b = frag_colour.xyz * (0.983729f * frag_colour.xyz + 0.4329510f) + 0.238081f;\n";
-        fs << "        frag_colour.xyz = a / b;\n";
-        fs << "    }\n";
+        // fs << "    {\n";
+        // fs << "        vec3 a = frag_colour.xyz * (frag_colour.xyz + 0.0245786f) - 0.000090537f;\n";
+        // fs << "        vec3 b = frag_colour.xyz * (0.983729f * frag_colour.xyz + 0.4329510f) + 0.238081f;\n";
+        // fs << "        frag_colour.xyz = a / b;\n";
+        // fs << "    }\n";
         // ODT_SAT => XYZ => D60_2_D65 => sRGB
-        fs << "    frag_colour.xyz = mat3(\n";
-        fs << "        1.60475, -0.53108, -0.07367,\n";
-        fs << "        -0.10208,  1.10813, -0.00605,\n";
-        fs << "        -0.00327, -0.07276,  1.07602) * frag_colour.xyz;\n";
+        // fs << "    frag_colour.xyz = mat3(\n";
+        // fs << "        1.60475, -0.53108, -0.07367,\n";
+        // fs << "        -0.10208,  1.10813, -0.00605,\n";
+        // fs << "        -0.00327, -0.07276,  1.07602) * frag_colour.xyz;\n";
 
+        // fs << "    float c_max = max(frag_colour.x, max(frag_colour.y, frag_colour.z));\n";
+        // fs << "    frag_colour.xyz = frag_colour.xyz * (2.0 / (c_max * c_max + 1.0f));\n";
+
+        // fs << "    frag_colour.xyz = frag_colour.xyz / (frag_colour.xyz + 1.0f);\n";
+
+        fs << "    frag_colour.xyz = uncharted2_filmic(frag_colour.xyz);\n";
         fs << "    frag_colour.xyz = pow(frag_colour.xyz, gamma_exponent);\n";
     } else if (is_colour_scale_index) {
         fs << "    frag_colour.xyz *= colour_scale;\n";

@@ -73,7 +73,7 @@ void gearoenix::gl::submission::Camera::clear(
     vp = rnd_cam.get_view_projection();
     pos = location;
     skybox_scale = rnd_cam.get_far() / 1.732051f;
-    exposure_value = rnd_cam.get_exposure_data().has_value() ? rnd_cam.get_exposure_data()->get_value() : 1.0f;
+    exposure_value = rnd_cam.get_exposure().get_enabled() ? rnd_cam.get_exposure().get_value() : 1.0f;
     colour_tuning = rnd_cam.get_colour_tuning();
     bloom_data = BloomData::construct(gl_cam.get_bloom_data(), rnd_cam.get_bloom_data());
     out_reference = rnd_cam.get_reference_id();

@@ -113,10 +113,13 @@ gearoenix::gl::CameraManager::CameraManager(Engine& e) noexcept
     core::ecs::Component::register_type<Camera>();
     resolution_cfg_listener_with_entity_id_v = [this](core::ecs::entity_id_t id, const render::Resolution&) noexcept -> void {
         auto [c, rnd_c] = this->e.get_world()->get_components<Camera, render::camera::Camera>(id);
+        GX_ASSERT_D(c);
+        GX_ASSERT_D(rnd_c);
         c->update(*rnd_c);
     };
     resolution_cfg_listener_with_entity_builder_v = [](render::camera::Builder& b, const render::Resolution&) noexcept -> void {
         auto* const c = b.get_entity_builder()->get_builder().get_component<Camera>();
+        GX_ASSERT_D(c);
         c->update(b.get_camera());
     };
 }
