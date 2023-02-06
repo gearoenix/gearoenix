@@ -60,6 +60,7 @@ void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::D
             is_pressed = true;
             on_press(*hit);
         } else if (is_pressed) {
+            is_pressed = false;
             on_release(*hit);
         }
     }
@@ -78,8 +79,8 @@ void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event:
 void gearoenix::render::widget::Widget::handle_mouse_outside() noexcept
 {
     if (is_pressed) {
-        on_cancel();
         is_pressed = false;
+        on_cancel();
     }
 }
 

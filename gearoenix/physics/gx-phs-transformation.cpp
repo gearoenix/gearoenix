@@ -322,6 +322,8 @@ void gearoenix::physics::Transformation::show_debug_gui() noexcept
 {
     if (ImGui::TreeNode("Transformation")) {
         auto l = get_local_location();
+        auto q = get_local_orientation();
+        auto s = get_scale();
         bool input_changed = false;
         if (ImGui::TreeNode("Position")) {
             input_changed |= ImGui::InputDouble("x", &l.x, 0.01, 1.0, "%.3f");
@@ -329,8 +331,22 @@ void gearoenix::physics::Transformation::show_debug_gui() noexcept
             input_changed |= ImGui::InputDouble("z", &l.z, 0.01, 1.0, "%.3f");
             ImGui::TreePop();
         }
-        if (input_changed)
-            set_local_location(l);
+        if (ImGui::TreeNode("Quaternion")) {
+            input_changed |= ImGui::InputDouble("x", &q.x, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("y", &q.y, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("z", &q.z, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("z", &q.w, 0.01, 1.0, "%.3f");
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Scale")) {
+            input_changed |= ImGui::InputDouble("x", &s.x, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("y", &s.y, 0.01, 1.0, "%.3f");
+            input_changed |= ImGui::InputDouble("z", &s.z, 0.01, 1.0, "%.3f");
+            ImGui::TreePop();
+        }
+        if (input_changed) {
+            reset(s, q, l);
+        }
         ImGui::TreePop();
     }
 }

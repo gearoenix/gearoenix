@@ -9,7 +9,7 @@ enum struct Type : core::TypeId {
     Text = 4,
     Modal = 5,
     Label = 6,
-    ColorChooser = 7,
+    ColourChooser = 7,
 };
 }
 #endif

@@ -81,8 +81,8 @@ gearoenix::render::widget::Button::construct(
         true);
     const auto id = model_builder->get_id();
     auto but = std::make_shared<render::widget::Button>(std::move(name), e);
-    but->set_rest_texture(rest_txt);
-    but->set_pressed_texture(pressed_txt);
+    but->set_rest_texture(std::move(rest_txt));
+    but->set_pressed_texture(std::move(pressed_txt));
     but->set_model_entity_id(id);
     but->set_camera_entity_id(camera_id);
     parent.add_child(but);
@@ -103,4 +103,24 @@ void gearoenix::render::widget::Button::set_on_release(const std::function<void(
 void gearoenix::render::widget::Button::set_on_cancel(const std::function<void()>& fun) noexcept
 {
     set_on_cancel_impl(fun);
+}
+
+void gearoenix::render::widget::Button::set_rest_texture(std::shared_ptr<texture::Texture2D>&& t) noexcept
+{
+    rest_texture = std::move(t);
+    if (!is_pressed) {
+        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+            mdl->get_bound_material()->set_albedo(rest_texture);
+        }
+    }
+}
+
+void gearoenix::render::widget::Button::set_pressed_texture(std::shared_ptr<texture::Texture2D>&& t) noexcept
+{
+    pressed_texture = std::move(t);
+    if (is_pressed) {
+        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+            mdl->get_bound_material()->set_albedo(pressed_texture);
+        }
+    }
 }

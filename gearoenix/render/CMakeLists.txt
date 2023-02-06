@@ -106,7 +106,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-texture-info.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-wrap.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-alignment.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-alignment.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.hpp
 #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.cpp
@@ -117,8 +117,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-size.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-size.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-type.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp

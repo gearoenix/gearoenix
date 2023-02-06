@@ -210,9 +210,10 @@ gearoenix::render::scene::Splash::Splash(
             std::move(text_mat),
             core::sync::EndCaller(scene_callback),
             true);
-        model_builder->get_transformation().local_scale(scale);
-        model_builder->get_transformation().local_translate({ 0.0f, -0.25f, 0.5f });
-        gearoenix_text = model_builder->get_entity_builder()->get_builder().get_id();
+        auto& trn = model_builder->get_transformation();
+        trn.local_scale(scale);
+        trn.local_translate({ 0.0f, -0.25f, 0.5f });
+        gearoenix_text = model_builder->get_id();
         scene_builder->add(std::move(model_builder));
     }
 

@@ -17,8 +17,8 @@ struct Texture2D;
 
 namespace gearoenix::render::widget {
 struct Button final : public Widget {
-    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, rest_texture);
-    GX_GETSET_CREF_PRV(std::shared_ptr<texture::Texture2D>, pressed_texture);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, rest_texture);
+    GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, pressed_texture);
 
 private:
     void set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun) noexcept;
@@ -40,6 +40,8 @@ public:
     void set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept final;
     void set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept final;
     void set_on_cancel(const std::function<void()>& fun) noexcept final;
+    void set_rest_texture(std::shared_ptr<texture::Texture2D>&& rest_texture) noexcept;
+    void set_pressed_texture(std::shared_ptr<texture::Texture2D>&& pressed_texture) noexcept;
 };
 }
 #endif

@@ -1,12 +1,15 @@
 #ifndef GEAROENIX_RENDER_WIDGET_MODAL_HPP
 #define GEAROENIX_RENDER_WIDGET_MODAL_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
 #include "gx-rnd-wdg-widget.hpp"
 
 #include <functional>
 #include <optional>
 #include <string>
 #include <tuple>
+
+namespace gearoenix::core::sync {
+struct EndCaller;
+}
 
 namespace gearoenix::render::model {
 struct Builder;
