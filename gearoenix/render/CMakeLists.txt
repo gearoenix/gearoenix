@@ -109,8 +109,10 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-alignment.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-button.hpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.cpp
-#        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.hpp
+        #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.cpp
+        #        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-edit.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-label.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-label.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-layout.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-layout.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-modal.cpp

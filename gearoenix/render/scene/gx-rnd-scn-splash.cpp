@@ -206,7 +206,7 @@ gearoenix::render::scene::Splash::Splash(
         text_mat->set_albedo(text_texture);
         auto model_builder = e.get_model_manager()->build(
             "gearoenix-splash-text",
-            std::shared_ptr(plane_mesh),
+            e.get_mesh_manager()->build_plate(scene_callback),
             std::move(text_mat),
             core::sync::EndCaller(scene_callback),
             true);

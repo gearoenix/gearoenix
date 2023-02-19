@@ -145,6 +145,13 @@ void gearoenix::physics::Transformation::local_z_rotate(const double d) noexcept
     local_matrix.set_location(loc);
 }
 
+void gearoenix::physics::Transformation::set_local_scale(const gearoenix::math::Vec3<double>& s) noexcept
+{
+    changed = true;
+    local_matrix.local_scale(s / scale);
+    scale = s;
+}
+
 void gearoenix::physics::Transformation::local_scale(const double s) noexcept
 {
     changed = true;

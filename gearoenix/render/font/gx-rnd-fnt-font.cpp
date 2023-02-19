@@ -117,7 +117,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
             return static_cast<std::uint8_t>(0);
         return static_cast<std::uint8_t>(v * 255.0f + 0.5000001f);
     };
-    const std::uint8_t color_bytes[4] = {
+    const std::array<std::uint8_t, 4> color_bytes {
         converter(color_vector.x),
         converter(color_vector.y),
         converter(color_vector.z),
@@ -153,7 +153,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         if (txt_widths[index] > txt_end_width)
             break;
         const wchar_t next_c = text[index];
-        int advance, lsb, x0, y0, x1, y1;
+        int advance = 0, lsb = 0, x0 = 0, y0 = 0, x1 = 0, y1 = 0;
         const auto x_shift = x_pos - floor(x_pos);
         stbtt_GetCodepointHMetrics(stb_font.get(), c, &advance, &lsb);
         stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
@@ -162,7 +162,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
     }
     if (txt_widths[index] <= txt_end_width) {
         const wchar_t c = text[index];
-        int x0, y0, x1, y1;
+        int x0 = 0, y0 = 0, x1 = 0, y1 = 0;
         const auto x_shift = x_pos - floor(x_pos);
         stbtt_GetCodepointBitmapBoxSubpixel(stb_font.get(), c, static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), &x0, &y0, &x1, &y1);
         stbtt_MakeCodepointBitmapSubpixel(stb_font.get(), &rnd_data[get_index(x0, y0)], x1 - x0, y1 - y0, static_cast<int>(img_width_pixels), static_cast<float>(w_scale), static_cast<float>(h_scale), static_cast<float>(x_shift), static_cast<float>(y_shift), c);
@@ -174,21 +174,16 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
 
     const auto pixels_bytes_count = rnd_data.size() * 4;
     std::vector<std::uint8_t> img_pixels(pixels_bytes_count);
-    for (std::size_t i = 0, ti = 0, img_index = (static_cast<std::size_t>(img_height_pixels) - 1) * static_cast<std::size_t>(img_width_pixels) * 4;
-         i < static_cast<std::size_t>(img_height_pixels);
-         ++i, img_index -= (static_cast<std::size_t>(img_width_pixels) * 8)) {
-        for (std::size_t j = 0; j < static_cast<std::size_t>(img_width_pixels); ++j, ++ti) {
+    for (std::size_t i = 0, ti = 0, img_index = 0; i < static_cast<std::size_t>(img_height_pixels); ++i) {
+        for (std::size_t j = 0; j < static_cast<std::size_t>(img_width_pixels); ++j, ++ti, ++img_index) {
             const auto c = static_cast<unsigned int>(rnd_data[ti]);
+            img_pixels[img_index] = color_bytes[0];
+            img_pixels[++img_index] = color_bytes[1];
+            img_pixels[++img_index] = color_bytes[2];
             if (c == 0) {
-                img_pixels[img_index++] = 0;
-                img_pixels[img_index++] = 0;
-                img_pixels[img_index++] = 0;
-                img_pixels[img_index++] = 0;
+                img_pixels[++img_index] = 0;
             } else {
-                img_pixels[img_index++] = color_bytes[0];
-                img_pixels[img_index++] = color_bytes[1];
-                img_pixels[img_index++] = color_bytes[2];
-                img_pixels[img_index++] = static_cast<unsigned char>((c * static_cast<unsigned int>(color_bytes[3])) / 255);
+                img_pixels[++img_index] = static_cast<unsigned char>((c * static_cast<unsigned int>(color_bytes[3])) / 255);
             }
         }
     }

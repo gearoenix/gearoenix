@@ -37,7 +37,7 @@ gearoenix::render::widget::Modal::construct(
     const std::optional<std::pair<std::string, std::string>>& close_fs,
     const std::optional<std::pair<std::string, std::string>>& cancel_fs,
     const std::optional<std::pair<std::string, std::string>>& ok_fs,
-    core::ecs::entity_id_t camera_id,
+    const core::ecs::entity_id_t camera_id,
     Widget* const parent,
     scene::Builder& scene_builder,
     const core::sync::EndCaller& end_callback) noexcept

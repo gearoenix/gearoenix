@@ -952,6 +952,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
     }
 
     glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
     final_shader->bind(current_shader);
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
     for (auto& scene_layer_entity_id_pool_index : scenes) {
@@ -964,6 +965,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
         }
     }
     glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     pop_debug_group();
 }
 
@@ -1168,7 +1170,7 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     initialise_back_buffer_sizes();
     initialise_screen_vertices();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Pipeline settings
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
