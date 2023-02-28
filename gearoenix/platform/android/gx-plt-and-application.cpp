@@ -89,18 +89,16 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
         const auto flags = action & AMOTION_EVENT_ACTION_MASK;
         const auto pointer_index = static_cast<size_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
         const auto pointer_id = AMotionEvent_getPointerId(e, pointer_index);
-        const auto pointer_counts = AMotionEvent_getPointerCount(e);
-        const auto x = AMotionEvent_getRawX(e, pointer_index);
-        const auto y = AMotionEvent_getRawY(e, pointer_index);
         switch (flags) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN:
             base.touch_down(
                 static_cast<FingerId>(pointer_id),
-                static_cast<double>(x),
-                base.window_size.y - static_cast<double>(y));
+                static_cast<double>(AMotionEvent_getRawX(e, pointer_index)),
+                base.window_size.y - static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
             break;
-        case AMOTION_EVENT_ACTION_MOVE:
+        case AMOTION_EVENT_ACTION_MOVE: {
+            const auto pointer_counts = AMotionEvent_getPointerCount(e);
             for (auto pi = decltype(pointer_counts) { 0 }; pi < pointer_counts; ++pi) {
                 base.touch_move(
                     static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)),
@@ -108,6 +106,7 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
                     base.window_size.y - static_cast<double>(AMotionEvent_getRawY(e, pi)));
             }
             break;
+        }
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP:
             base.touch_up(static_cast<FingerId>(pointer_id));

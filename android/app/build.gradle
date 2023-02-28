@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    ndkVersion "25.1.8937393"
+    ndkVersion "25.2.9519653"
     compileSdk 33
     defaultConfig {
         applicationId "com.geareonix.engine_demo"
@@ -18,7 +18,7 @@ android {
                         '-DGX_ENABLE_TOOLS=OFF',
 //                        '-DGX_ENABLE_EXAMPLE_000_HELLO_WORLD=True'
 //                        '-DGX_ENABLE_EXAMPLE_001_EMPTY_WINDOW=True'
-                        '-DGX_ENABLE_EXAMPLE_002_HELLO_TRIANGLE=True'
+//                        '-DGX_ENABLE_EXAMPLE_002_HELLO_TRIANGLE=True'
 //                        '-DGX_ENABLE_EXAMPLE_003_HELLO_TEXTURE=True'
 //                        '-DGX_ENABLE_EXAMPLE_004_HELLO_ECS=True'
 //                        '-DGX_ENABLE_EXAMPLE_005_HELLO_IMGUI=True'
@@ -26,7 +26,7 @@ android {
 //                        '-DGX_ENABLE_EXAMPLE_007_HELLO_SKYBOX=True'
 //                        '-DGX_ENABLE_EXAMPLE_008_REFLECTION_PROBE=True'
 //                        '-DGX_ENABLE_EXAMPLE_009_BAKED_REFLECTION_PROBE=True'
-//                          '-DGX_ENABLE_GAME_EXTO_DINO=True'
+                        '-DGX_ENABLE_GAME_EXTO_DINO=True'
             }
         }
     }

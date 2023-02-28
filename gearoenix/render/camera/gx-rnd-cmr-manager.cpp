@@ -18,7 +18,7 @@ std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::render::camera::M
 {
     auto builder = build_v(name, std::move(end_caller));
     builder->get_camera().resolution_cfg_listener = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().add_observer(
-        [entity_id = builder->get_id(), this, builder = std::weak_ptr(builder), failures_count = 0](const Resolution& r) mutable noexcept -> bool {
+        [entity_id = builder->get_id(), this, builder = std::weak_ptr<Builder>(builder), failures_count = 0](const Resolution& r) mutable noexcept -> bool {
             auto* c = e.get_world()->get_component<Camera>(entity_id);
             if (nullptr == c) {
                 if (const auto b = builder.lock(); nullptr != b) {
