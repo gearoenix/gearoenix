@@ -100,6 +100,8 @@ static const char* severity_to_string(const gearoenix::gl::enumerated severity) 
         return "medium-severity";
     case GL_DEBUG_SEVERITY_LOW:
         return "low-severity";
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        return nullptr;
     default:
         return "unknown";
     }
@@ -114,8 +116,11 @@ void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
     const char* const message,
     const void* const /*userParam*/)
 {
+    const auto* const srv = severity_to_string(severity);
+    if (nullptr == srv)
+        return;
     GX_LOG_E(
-        "source: " << source << ", type: " << t << ", id: " << id << ", severity: " << severity_to_string(severity) << ", length: " << length << ", message: " << message);
+        "source: " << source << ", type: " << t << ", id: " << id << ", severity: " << srv << ", length: " << length << ", message: " << message);
 }
 #endif
 

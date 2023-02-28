@@ -10,12 +10,13 @@
 #include "gx-rnd-wdg-layout.hpp"
 #include <array>
 
-std::array<gearoenix::core::event::Id, 5> default_event_ids {
+constexpr std::array<gearoenix::core::event::Id, 6> default_event_ids {
     gearoenix::core::event::Id::GestureClick,
     gearoenix::core::event::Id::GestureDrag2D,
     gearoenix::core::event::Id::ButtonMouse,
     gearoenix::core::event::Id::MovementMouse,
     gearoenix::core::event::Id::PlatformWindowSizeChange,
+    gearoenix::core::event::Id::Touch,
 };
 
 std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const noexcept
@@ -52,16 +53,14 @@ void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::D
     const auto& mouse = std::get<core::event::button::Mouse>(event_data.get_data());
     const auto hit = get_hit_point(mouse.get_position_normalised());
     if (!hit.has_value()) {
-        handle_mouse_outside();
+        handle_cancel();
         return;
     }
     if (mouse.get_key() == platform::key::Id::Left) {
         if (mouse.get_action() == platform::key::Action::Press) {
-            is_pressed = true;
-            on_press(*hit);
-        } else if (is_pressed) {
-            is_pressed = false;
-            on_release(*hit);
+            handle_press(*hit);
+        } else if (mouse.get_action() == platform::key::Action::Release) {
+            handle_release(*hit);
         }
     }
 }
@@ -71,16 +70,50 @@ void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event:
     const auto& move = std::get<core::event::movement::Mouse>(event_data.get_data());
     const auto hit = get_hit_point(move.get_current_normalised_position());
     if (!hit.has_value()) {
-        handle_mouse_outside();
+        handle_cancel();
         return;
     }
 }
 
-void gearoenix::render::widget::Widget::handle_mouse_outside() noexcept
+void gearoenix::render::widget::Widget::handle_touch(const core::event::Data& event_data) noexcept
+{
+    if (e.get_platform_application().get_base().get_touch_states().size() > 1) {
+        handle_cancel();
+        return;
+    }
+    const auto& touch = std::get<core::event::touch::Data>(event_data.get_data());
+    const auto hit = get_hit_point(touch.get_point().get_current_position());
+    if (!hit.has_value()) {
+        handle_cancel();
+        return;
+    }
+    const auto action = touch.get_action();
+    if (core::event::touch::Action::Down == action) {
+        handle_press(*hit);
+    } else if (core::event::touch::Action::Up == action) {
+        handle_release(*hit);
+    }
+}
+
+void gearoenix::render::widget::Widget::handle_cancel() noexcept
 {
     if (is_pressed) {
         is_pressed = false;
         on_cancel();
+    }
+}
+
+void gearoenix::render::widget::Widget::handle_press(const math::Vec3<double>& hit_point) noexcept
+{
+    is_pressed = true;
+    on_press(hit_point);
+}
+
+void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>& hit_point) noexcept
+{
+    if (is_pressed) {
+        is_pressed = false;
+        on_release(hit_point);
     }
 }
 
@@ -220,6 +253,11 @@ gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on
         if (nullptr != layout)
             (void)layout->on_event(event_data);
         break;
+    }
+    case core::event::Id::Touch: {
+        if (!sensitivity)
+            return core::event::Listener::Response::Continue;
+        handle_touch(event_data);
     }
     default:
         if (!sensitivity)

@@ -39,7 +39,10 @@ protected:
     void handle_click_gesture(const core::event::Data& event_data) noexcept;
     void handle_button_mouse(const core::event::Data& event_data) noexcept;
     void handle_movement_mouse(const core::event::Data& event_data) noexcept;
-    void handle_mouse_outside() noexcept;
+    void handle_touch(const core::event::Data& event_data) noexcept;
+    void handle_cancel() noexcept;
+    void handle_press(const math::Vec3<double>& hit_point) noexcept;
+    void handle_release(const math::Vec3<double>& hit_point) noexcept;
 
 public:
     Widget(std::string&& name, Type t, engine::Engine& e) noexcept;

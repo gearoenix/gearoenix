@@ -95,7 +95,7 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
             base.touch_down(
                 static_cast<FingerId>(pointer_id),
                 static_cast<double>(AMotionEvent_getRawX(e, pointer_index)),
-                base.window_size.y - static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
+                static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
             break;
         case AMOTION_EVENT_ACTION_MOVE: {
             const auto pointer_counts = AMotionEvent_getPointerCount(e);
@@ -103,7 +103,7 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
                 base.touch_move(
                     static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)),
                     static_cast<double>(AMotionEvent_getRawX(e, pi)),
-                    base.window_size.y - static_cast<double>(AMotionEvent_getRawY(e, pi)));
+                    static_cast<double>(AMotionEvent_getRawY(e, pi)));
             }
             break;
         }
