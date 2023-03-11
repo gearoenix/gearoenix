@@ -1,6 +1,5 @@
 #include "gx-plt-stm-asset.hpp"
 #include "../gx-plt-application.hpp"
-#include "../gx-plt-log.hpp"
 
 #ifdef GX_PLATFORM_IOS
 #include "../../core/gx-cr-string.hpp"
@@ -58,7 +57,7 @@ std::size_t gearoenix::platform::stream::Asset::read(void* data, const std::size
 #ifdef GX_PLATFORM_ANDROID
     const auto result = static_cast<std::size_t>(AAsset_read(file, data, static_cast<std::size_t>(length)));
 #elif defined(GX_USE_STD_FILE)
-    file.read(static_cast<char*>(data), length);
+    file.read(static_cast<char*>(data), static_cast<std::streamsize>(length));
     auto result = static_cast<std::size_t>(file.gcount());
 #else
 #error "Unexpected file interface"
@@ -75,10 +74,15 @@ std::size_t gearoenix::platform::stream::Asset::write(const void*, std::size_t) 
     GX_UNEXPECTED;
 }
 
+void gearoenix::platform::stream::Asset::flush() noexcept
+{
+    GX_UNEXPECTED; // Asset is only a reader stream
+}
+
 void gearoenix::platform::stream::Asset::seek(std::size_t offset) noexcept
 {
 #if defined(GX_USE_STD_FILE)
-    file.seekg(offset, std::ios::beg);
+    file.seekg(static_cast<std::streamoff>(offset), std::ios::beg);
 #elif defined(GX_PLATFORM_ANDROID)
     AAsset_seek(file, static_cast<off_t>(offset), SEEK_SET);
 #else

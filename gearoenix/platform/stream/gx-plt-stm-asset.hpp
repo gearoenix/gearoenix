@@ -23,7 +23,7 @@ struct Application;
 }
 
 namespace gearoenix::platform::stream {
-struct Asset final : public Stream {
+struct Asset : public Stream {
 private:
 #ifdef GX_USE_STD_FILE
     std::ifstream file;
@@ -37,14 +37,15 @@ private:
     Asset();
 
 public:
-    ~Asset() noexcept final;
+    ~Asset() noexcept override;
     /// It will return null if file does not exist
     [[nodiscard]] static Asset* construct(const platform::Application& platform_application, const std::string& name) noexcept;
-    [[nodiscard]] std::size_t read(void* data, std::size_t length) noexcept final;
-    [[nodiscard]] std::size_t write(const void* data, std::size_t length) noexcept final;
-    [[nodiscard]] std::size_t tell() noexcept final;
-    [[nodiscard]] std::size_t size() noexcept final;
-    void seek(std::size_t offset) noexcept final;
+    [[nodiscard]] std::size_t read(void* data, std::size_t length) noexcept override;
+    [[nodiscard]] std::size_t write(const void* data, std::size_t length) noexcept override;
+    [[nodiscard]] std::size_t tell() noexcept override;
+    [[nodiscard]] std::size_t size() noexcept override;
+    void flush() noexcept override;
+    void seek(std::size_t offset) noexcept override;
 };
 }
 

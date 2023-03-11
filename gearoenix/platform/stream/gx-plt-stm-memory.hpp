@@ -17,6 +17,7 @@ public:
     void seek(std::size_t offset) noexcept final;
     [[nodiscard]] std::size_t tell() noexcept final;
     [[nodiscard]] std::size_t size() noexcept final;
+    void flush() noexcept final;
 };
 }
 #endif

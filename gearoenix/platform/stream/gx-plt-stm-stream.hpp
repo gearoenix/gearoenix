@@ -28,6 +28,7 @@ public:
     virtual void seek(std::size_t offset) noexcept = 0;
     [[nodiscard]] virtual std::size_t tell() noexcept = 0;
     [[nodiscard]] virtual std::size_t size() noexcept = 0;
+    virtual void flush() noexcept = 0;
 
     void read(std::string& s) noexcept;
 

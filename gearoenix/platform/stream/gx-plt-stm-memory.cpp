@@ -55,3 +55,5 @@ std::size_t gearoenix::platform::stream::Memory::size() noexcept
 {
     return mem_data.size();
 }
+
+void gearoenix::platform::stream::Memory::flush() noexcept { }

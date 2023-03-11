@@ -1,7 +1,5 @@
 #include "gx-plt-stm-local.hpp"
-#include "../../core/gx-cr-build-configuration.hpp"
 #include "../gx-plt-application.hpp"
-#include "../gx-plt-log.hpp"
 
 #ifdef GX_PLATFORM_IOS
 #include "../../core/gx-cr-string.hpp"
@@ -32,7 +30,7 @@ static std::string create_path(const gearoenix::platform::Application& app, cons
 }
 
 gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable) noexcept
-    : file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : std::ios::in))
+    : file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in)
 {
     if (!file.is_open() || !file.good())
         GX_LOG_F("Can not open file: " << name);
@@ -42,7 +40,7 @@ gearoenix::platform::stream::Local::~Local() noexcept = default;
 
 gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable) noexcept
 {
-    std::fstream file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : std::ios::in));
+    std::fstream file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in);
     if (!file.is_open() || !file.good())
         return nullptr;
     return new Local(std::move(file));
@@ -50,7 +48,7 @@ gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(con
 
 std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t length) noexcept
 {
-    file.read((char*)data, static_cast<std::size_t>(length));
+    file.read((char*)data, static_cast<std::streamsize>(length));
     const auto result = (std::size_t)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
@@ -63,7 +61,7 @@ std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t len
 std::size_t gearoenix::platform::stream::Local::write(const void* data, std::size_t length) noexcept
 {
     const std::size_t before = (std::size_t)file.tellp();
-    file.write((const char*)data, static_cast<std::size_t>(length));
+    file.write((const char*)data, static_cast<std::streamsize>(length));
     const std::size_t result = ((std::size_t)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
@@ -75,8 +73,8 @@ std::size_t gearoenix::platform::stream::Local::write(const void* data, std::siz
 
 void gearoenix::platform::stream::Local::seek(std::size_t offset) noexcept
 {
-    file.seekg(offset);
-    file.seekp(offset);
+    file.seekg(static_cast<std::streamoff>(offset));
+    file.seekp(static_cast<std::streamoff>(offset));
 }
 
 std::size_t gearoenix::platform::stream::Local::tell() noexcept
@@ -97,4 +95,9 @@ std::size_t gearoenix::platform::stream::Local::size() noexcept
     const auto s = file.tellg();
     file.seekg(o);
     return static_cast<std::size_t>(s);
+}
+
+void gearoenix::platform::stream::Local::flush() noexcept
+{
+    file.flush();
 }
