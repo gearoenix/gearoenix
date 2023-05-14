@@ -14,7 +14,7 @@ done
 
 format_func() {
 	echo "$1"
-	clang-format-15 -i -style=WebKit "$1" &
+	clang-format -i -style=WebKit "$1" &
 	pids[$pi]=$!
 	pi=$((pi + 1))
 	pi=$((pi % np))

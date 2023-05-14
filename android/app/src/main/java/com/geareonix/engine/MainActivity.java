@@ -1,6 +1,8 @@
 package com.geareonix.engine;
+import android.annotation.TargetApi;
 import android.app.NativeActivity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -9,6 +11,7 @@ import org.fmod.FMOD;
 
 public class MainActivity extends NativeActivity {
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     final static int VISIBILITY_OPTS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION

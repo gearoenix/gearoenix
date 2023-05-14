@@ -7,12 +7,8 @@
 #include <android_native_app_glue.h>
 #endif
 
-gearoenix::platform::stream::Local::Local(std::fstream file) noexcept
-    : file(std::move(file))
-{
-}
-
-static std::string create_path(const gearoenix::platform::Application& app, const std::string& name) noexcept
+namespace {
+std::string create_path(const gearoenix::platform::Application& app, const std::string& name) noexcept
 {
 #ifdef GX_PLATFORM_IOS
     (void)app;
@@ -29,11 +25,26 @@ static std::string create_path(const gearoenix::platform::Application& app, cons
 #endif
 }
 
-gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable) noexcept
-    : file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in)
+std::ios::openmode create_open_mode(const bool writable) noexcept
 {
-    if (!file.is_open() || !file.good())
+    return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
+}
+}
+
+gearoenix::platform::stream::Local::Local(std::fstream file) noexcept
+    : file(std::move(file))
+{
+}
+
+gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable) noexcept
+    : file(create_path(app, name), create_open_mode(writable))
+{
+    if ((!file.is_open() || !file.good()) && writable) {
+        file.open(create_path(app, name), create_open_mode(writable) | std::ios::trunc);
+    }
+    if (!file.is_open() || !file.good()) {
         GX_LOG_F("Can not open file: " << name);
+    }
 }
 
 gearoenix::platform::stream::Local::~Local() noexcept = default;
@@ -46,9 +57,9 @@ gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(con
     return new Local(std::move(file));
 }
 
-std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Local::read(void* const data, const std::size_t length) noexcept
 {
-    file.read((char*)data, static_cast<std::streamsize>(length));
+    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(length));
     const auto result = (std::size_t)file.gcount();
 #ifdef GX_DEBUG_MODE
     if (0 == result)
@@ -58,10 +69,10 @@ std::size_t gearoenix::platform::stream::Local::read(void* data, std::size_t len
     return result;
 }
 
-std::size_t gearoenix::platform::stream::Local::write(const void* data, std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Local::write(const void* const data, const std::size_t length) noexcept
 {
     const std::size_t before = (std::size_t)file.tellp();
-    file.write((const char*)data, static_cast<std::streamsize>(length));
+    file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(length));
     const std::size_t result = ((std::size_t)file.tellp()) - before;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
@@ -84,7 +95,7 @@ std::size_t gearoenix::platform::stream::Local::tell() noexcept
 
 bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name) noexcept
 {
-    std::ifstream f(create_path(app, name));
+    const std::ifstream f(create_path(app, name));
     return f.is_open() && f.good();
 }
 
