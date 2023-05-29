@@ -12,6 +12,8 @@ struct Application;
 namespace gearoenix::platform {
 struct File;
 struct GlContext;
+struct GooglePlayBilling;
+
 struct Application {
     GX_GET_REF_PRV(BaseApplication, base);
     GX_GET_UPTR_PRV(android_app, android_application);
@@ -19,6 +21,7 @@ struct Application {
     GX_GET_VAL_PRV(bool, resumed, false);
     GX_GET_VAL_PRV(bool, focused, false);
     GX_GET_VAL_PRV(bool, surface_ready, false);
+    GX_GET_UPTR_PRV(GooglePlayBilling, google_play_billing);
 #ifdef GX_RENDER_OPENGL_ENABLED
     GX_GET_UPTR_PRV(GlContext, gl_context);
 #endif

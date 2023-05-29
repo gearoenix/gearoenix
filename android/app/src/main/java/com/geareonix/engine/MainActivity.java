@@ -1,7 +1,9 @@
 package com.geareonix.engine;
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.NativeActivity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -23,12 +25,21 @@ public class MainActivity extends NativeActivity {
         FMOD.init(this);
         super.onCreate(savedInstanceState);
         setDecor();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String [] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123456);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setDecor();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -58,6 +69,7 @@ public class MainActivity extends NativeActivity {
     }
 
     static {
+        System.loadLibrary("main");
         System.loadLibrary("fmod");
     }
 }

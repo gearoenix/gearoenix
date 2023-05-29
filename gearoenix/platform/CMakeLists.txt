@@ -5,6 +5,10 @@ ADD_SUBDIRECTORY(macos)
 SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-application.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-google-play-billing.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-google-play-billing.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-jni.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-jni.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-key.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-key.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp

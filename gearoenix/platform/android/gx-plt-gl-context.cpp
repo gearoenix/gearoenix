@@ -1,7 +1,7 @@
 #include "gx-plt-gl-context.hpp"
 #if defined(GX_PLATFORM_INTERFACE_ANDROID) && defined(GX_RENDER_OPENGL_ENABLED)
 #include "../../opengl/gx-gl-loader.hpp"
-#include "../gx-plt-log.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 
 void gearoenix::platform::GlContext::init_gles() noexcept
 {
@@ -53,10 +53,16 @@ bool gearoenix::platform::GlContext::check_surface(const EGLint opengl_version, 
     return 0 != eglChooseConfig(display, attribs, &config, 1, &num_configs) && num_configs > 0 && config != nullptr;
 }
 
-void gearoenix::platform::GlContext::init_egl_surface() noexcept
+void gearoenix::platform::GlContext::init_egl_display() noexcept
 {
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    GX_ASSERT_D(EGL_NO_DISPLAY != display);
     eglInitialize(display, nullptr, nullptr);
+}
+
+void gearoenix::platform::GlContext::init_egl_surface() noexcept
+{
+    init_egl_display();
     constexpr EGLint configs[8][3] {
         { EGL_OPENGL_ES3_BIT, 32, 4 },
         { EGL_OPENGL_ES3_BIT, 24, 4 },
@@ -67,16 +73,18 @@ void gearoenix::platform::GlContext::init_egl_surface() noexcept
         { EGL_OPENGL_ES2_BIT, 32, 0 },
         { EGL_OPENGL_ES2_BIT, 24, 0 },
     };
-    for (auto& c : configs)
+    for (auto& c : configs) {
         if (check_surface(c[0], c[1], c[2])) {
             surface = eglCreateWindowSurface(display, config, window, nullptr);
             if (surface == nullptr)
                 continue;
             eglQuerySurface(display, surface, EGL_WIDTH, &screen_width);
             eglQuerySurface(display, surface, EGL_HEIGHT, &screen_height);
-            GX_LOG_D("Surface with OpenGL: " << (c[0] == EGL_OPENGL_ES3_BIT ? "ES3" : "ES2") << ", depth: " << c[1] << ", samples: " << c[2]);
+            GX_LOG_D("Surface with OpenGL: " << (c[0] == EGL_OPENGL_ES3_BIT ? "ES3" : "ES2")
+                                             << ", depth: " << c[1] << ", samples: " << c[2]);
             return;
         }
+    }
     GX_LOG_F("No suitable surface found.");
 }
 
@@ -150,6 +158,7 @@ void gearoenix::platform::GlContext::resume(ANativeWindow* const _window) noexce
     const int original_height = screen_height;
     this->window = _window;
     surface = eglCreateWindowSurface(display, config, _window, nullptr);
+    GX_ASSERT_D(EGL_NO_SURFACE != surface);
     eglQuerySurface(display, surface, EGL_WIDTH, &screen_width);
     eglQuerySurface(display, surface, EGL_HEIGHT, &screen_height);
     if (screen_width != original_width || screen_height != original_height)
@@ -167,4 +176,5 @@ void gearoenix::platform::GlContext::resume(ANativeWindow* const _window) noexce
         init_egl_context();
     }
 }
+
 #endif

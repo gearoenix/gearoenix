@@ -34,6 +34,7 @@ private:
     void init_gles() noexcept;
     void terminate() noexcept;
     bool check_surface(EGLint opengl_version, EGLint depth_size, EGLint samples_size) noexcept;
+    void init_egl_display() noexcept;
     void init_egl_surface() noexcept;
     void init_egl_context() noexcept;
 

@@ -5,6 +5,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-log.hpp"
 #include "gx-plt-and-key.hpp"
+#include "gx-plt-and-google-play-billing.hpp"
 
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-plt-gl-context.hpp"
@@ -54,6 +55,11 @@ void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd)
         GX_LOG_D("Android window terminated.");
         surface_ready = false;
         on_not_ready_to_render();
+#ifdef GX_RENDER_OPENGL_ENABLED
+        if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
+            gl_context->suspend();
+        }
+#endif
         break;
     case APP_CMD_WINDOW_RESIZED:
         GX_LOG_D("Android window resized.");
@@ -159,6 +165,12 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
         }
 #endif
     } else if (a->window != android_application->window) {
+#ifdef GX_RENDER_OPENGL_ENABLED
+        if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
+            gl_context->suspend();
+            gl_context->resume(a->window);
+        }
+#else
         GX_LOG_F("Window reinitialized with different window (not implemented).");
         // todo
         // core::event::platform::System eul(core::event::platform::System::Action::UNLOAD);
@@ -170,17 +182,10 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
         // core::event::platform::System erl(core::event::platform::System::Action::RELOAD);
         // core_app->on_event(erl);
         // render_engine->on_event(erl);
+#endif
+
     } else {
         GX_LOG_D("Window Reinitialized");
-#ifdef GX_RENDER_OPENGL_ENABLED
-        if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
-            gl_context->resume(android_application->window);
-            // TODO
-            //            event_engine->initialize_window_size(
-            //                static_cast<std::size_t>(gl_context->get_screen_width()),
-            //                static_cast<std::size_t>(gl_context->get_screen_height()));
-        }
-#endif
         // todo: send event about reinitialization
     }
     running = true;
@@ -193,11 +198,6 @@ void gearoenix::platform::Application::on_not_ready_to_render() noexcept
     if (resumed && surface_ready)
         return;
     running = false;
-#ifdef GX_RENDER_OPENGL_ENABLED
-    if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
-        gl_context->suspend();
-    }
-#endif
 }
 
 void gearoenix::platform::Application::make_thread_current_jni() noexcept
@@ -237,9 +237,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app) no
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(running ? 0 : -1, nullptr, &events,
-                (void**)&source)
-            >= 0) {
+        if (ALooper_pollAll(running ? 0 : -1, nullptr, &events,(void**)&source) >= 0) {
             if (source != nullptr)
                 source->process(android_application.get(), source);
         }
