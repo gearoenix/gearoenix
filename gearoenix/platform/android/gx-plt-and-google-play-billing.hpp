@@ -5,16 +5,17 @@
 #include <jni.h>
 
 namespace gearoenix::platform {
-    struct GooglePlayBilling final {
-        static jclass billing_java_class;
-        static jmethodID launch_billing_flow_java_method;
+struct GooglePlayBilling final {
+    static jclass billing_java_class;
 
-    private:
+    static jmethodID launch_billing_flow_java_method;
+    static jmethodID query_product_details_async_static_method;
+    static jmethodID query_product_purchases_async_static_method;
 
-    public:
-        static void initialise_static(JNIEnv *env) noexcept;
-        static void launch_flow(const char* product_id) noexcept;
-    };
+private:
+public:
+    static void initialise_static(JNIEnv* env) noexcept;
+};
 }
 
 #endif

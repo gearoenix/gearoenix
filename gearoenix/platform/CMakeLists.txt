@@ -14,6 +14,9 @@ SET(GX_ENGINE_PLATFORM_SRC
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-and-log.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.cpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/android/gx-plt-gl-context.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/billing/gx-plt-bll-billing.cpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/billing/gx-plt-bll-billing.hpp
+        ${GX_ENGINE_PLATFORM_SRC_DIR}/billing/gx-plt-bll-build-configuration.hpp
         ${GX_ENGINE_PLATFORM_MACOS_SRC}
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-disable-warnings.hpp
         ${GX_ENGINE_PLATFORM_SRC_DIR}/macro/gx-plt-mcr-enable-warnings.hpp

@@ -4,8 +4,8 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-log.hpp"
-#include "gx-plt-and-key.hpp"
 #include "gx-plt-and-google-play-billing.hpp"
+#include "gx-plt-and-key.hpp"
 
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-plt-gl-context.hpp"
@@ -237,7 +237,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app) no
     int events;
     android_poll_source* source;
     do {
-        if (ALooper_pollAll(running ? 0 : -1, nullptr, &events,(void**)&source) >= 0) {
+        if (ALooper_pollAll(running ? 0 : -1, nullptr, &events, (void**)&source) >= 0) {
             if (source != nullptr)
                 source->process(android_application.get(), source);
         }

@@ -1,7 +1,7 @@
 #include "gx-plt-gl-context.hpp"
 #if defined(GX_PLATFORM_INTERFACE_ANDROID) && defined(GX_RENDER_OPENGL_ENABLED)
-#include "../../opengl/gx-gl-loader.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../../opengl/gx-gl-loader.hpp"
 
 void gearoenix::platform::GlContext::init_gles() noexcept
 {
