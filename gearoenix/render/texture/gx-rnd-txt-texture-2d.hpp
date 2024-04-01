@@ -3,15 +3,15 @@
 #include "gx-rnd-txt-texture.hpp"
 
 namespace gearoenix::render::texture {
-struct Texture2D : public Texture {
+struct Texture2D : Texture {
 protected:
     Texture2D(
         std::string name,
         const TextureInfo& info,
-        engine::Engine& e) noexcept;
+        engine::Engine& e);
 
 public:
-    ~Texture2D() noexcept override;
+    ~Texture2D() override;
 };
 }
 #endif

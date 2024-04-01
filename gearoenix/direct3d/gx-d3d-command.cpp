@@ -3,7 +3,7 @@
 #include "gx-d3d-check.hpp"
 #include "gx-d3d-device.hpp"
 
-gearoenix::d3d::Command::Command(Device& device, const D3D12_COMMAND_LIST_TYPE t) noexcept
+gearoenix::d3d::Command::Command(Device& device, const D3D12_COMMAND_LIST_TYPE t)
 {
     auto* const d = device.get_device().Get();
     GX_D3D_CHECK(d->CreateCommandAllocator(t, IID_PPV_ARGS(&allocator)));
@@ -11,14 +11,14 @@ gearoenix::d3d::Command::Command(Device& device, const D3D12_COMMAND_LIST_TYPE t
     GX_D3D_CHECK(list->Close());
 }
 
-gearoenix::d3d::Command::~Command() noexcept = default;
+gearoenix::d3d::Command::~Command() = default;
 
-ID3D12GraphicsCommandList6* gearoenix::d3d::Command::get_list() noexcept
+ID3D12GraphicsCommandList6* gearoenix::d3d::Command::get_list()
 {
     return list.Get();
 }
 
-void gearoenix::d3d::Command::begin(ID3D12PipelineState* const pipeline_state) noexcept
+void gearoenix::d3d::Command::begin(ID3D12PipelineState* const pipeline_state)
 {
     if (is_recording)
         GX_LOG_F("Command list is in recording state or it isn't closed yet.");
@@ -27,7 +27,7 @@ void gearoenix::d3d::Command::begin(ID3D12PipelineState* const pipeline_state) n
     GX_D3D_CHECK(list->Reset(allocator.Get(), pipeline_state));
 }
 
-void gearoenix::d3d::Command::close() noexcept
+void gearoenix::d3d::Command::close()
 {
     if (!is_recording)
         GX_LOG_F("Command list is not in recording state or it didn't start recording with begin() function.");
@@ -35,7 +35,7 @@ void gearoenix::d3d::Command::close() noexcept
     is_recording = false;
 }
 
-void gearoenix::d3d::Command::force_close() noexcept
+void gearoenix::d3d::Command::force_close()
 {
     if (is_recording) {
         GX_D3D_CHECK(list->Close());

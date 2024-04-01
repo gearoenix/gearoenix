@@ -92,7 +92,7 @@ void main() {\n\
     frag_colour = vec4(ambient + ems_rgh.xyz, 1.0);\n\
 }\n";
 
-gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e) noexcept
+gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -111,9 +111,9 @@ gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(brdflut);
 }
 
-gearoenix::gl::shader::DeferredPbr::~DeferredPbr() noexcept = default;
+gearoenix::gl::shader::DeferredPbr::~DeferredPbr() = default;
 
-void gearoenix::gl::shader::DeferredPbr::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::DeferredPbr::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

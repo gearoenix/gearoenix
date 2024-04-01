@@ -6,9 +6,9 @@
 #include <dlfcn.h>
 #endif
 
-gearoenix::platform::Library::Library() noexcept = default;
+gearoenix::platform::Library::Library() = default;
 
-gearoenix::platform::Library* gearoenix::platform::Library::construct(const char* name) noexcept
+gearoenix::platform::Library* gearoenix::platform::Library::construct(const char* name)
 {
 #ifdef GX_PLATFORM_WINDOWS
     auto* const lib = static_cast<void*>(LoadLibraryA(name));
@@ -22,7 +22,7 @@ gearoenix::platform::Library* gearoenix::platform::Library::construct(const char
     return l;
 }
 
-gearoenix::platform::Library::~Library() noexcept
+gearoenix::platform::Library::~Library()
 {
 #ifdef GX_PLATFORM_WINDOWS
     FreeLibrary(reinterpret_cast<HMODULE>(lib));
@@ -31,7 +31,7 @@ gearoenix::platform::Library::~Library() noexcept
 #endif
 }
 
-void* gearoenix::platform::Library::raw_load(const char* function_name) noexcept
+void* gearoenix::platform::Library::raw_load(const char* function_name)
 {
 #ifdef GX_PLATFORM_WINDOWS
     return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(lib), function_name));

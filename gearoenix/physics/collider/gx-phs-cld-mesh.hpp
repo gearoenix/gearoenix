@@ -16,9 +16,9 @@ private:
     math::Aabb3<double> box;
 
 public:
-    [[nodiscard]] std::optional<double> hit(const math::Ray3<double>& ray, double d_min) const noexcept;
+    [[nodiscard]] std::optional<double> hit(const math::Ray3<double>& ray, double d_min) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Mesh& m) noexcept
+    friend std::ostream& operator<<(std::ostream& os, const Mesh& m)
     {
         os << "{ 'object_class_name' : 'gearoenix::physics::collider::Mesh', 'triangles' : [";
         for (const math::Triangle3<double>& t : m.ts) {

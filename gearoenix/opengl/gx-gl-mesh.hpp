@@ -15,22 +15,22 @@ struct Mesh final : public render::mesh::Mesh {
     sizei indices_count = 0;
     Engine& e;
 
-    Mesh(Engine& e, const math::Aabb3<double>& box) noexcept;
-    ~Mesh() noexcept final;
+    Mesh(Engine& e, const math::Aabb3<double>& box);
+    ~Mesh() final;
     Mesh(const Mesh&) = delete;
 };
 
 struct MeshManager final : render::mesh::Manager {
     Engine& gl_e;
 
-    explicit MeshManager(Engine& e) noexcept;
-    ~MeshManager() noexcept final;
-    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
+    explicit MeshManager(Engine& e);
+    ~MeshManager() final;
+    void build(
         std::string&& name,
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCaller& end_callback) noexcept final;
+        const math::Aabb3<double>& occlusion_box,
+        core::job::EndCallerShared<render::mesh::Mesh>&& end_callback) final;
 };
 }
 

@@ -8,7 +8,7 @@
 
 gearoenix::vulkan::shader::Module::Module(
     const engine::Engine& e,
-    const std::string& file_address) noexcept
+    const std::string& file_address)
     : logical_device(e.get_logical_device())
 {
     const auto file = std::unique_ptr<platform::stream::Stream>(platform::stream::Asset::construct(e.get_platform_application(), file_address));
@@ -22,7 +22,7 @@ gearoenix::vulkan::shader::Module::Module(
     GX_VK_CHK(vkCreateShaderModule(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::shader::Module::~Module() noexcept
+gearoenix::vulkan::shader::Module::~Module()
 {
     vkDestroyShaderModule(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }

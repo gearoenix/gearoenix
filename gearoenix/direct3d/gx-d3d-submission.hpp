@@ -34,14 +34,14 @@ struct SubmissionManager final {
             std::vector<Command> threads_g_buffer_filler_commands;
             std::vector<ID3D12CommandList*> threads_g_buffer_filler_command_lists_raw;
 
-            Frame(Device&) noexcept;
+            Frame(Device&);
         };
         D3D12_GPU_VIRTUAL_ADDRESS current_frame_uniform_address;
         std::vector<std::pair<double, ModelBvhData>> opaque_models_data;
         std::vector<std::pair<double, ModelBvhData>> tranclucent_models_data;
         std::array<Frame, GX_D3D_FRAMES_BACKBUFFER_NUMBER> frames;
 
-        CameraData(Device&) noexcept;
+        CameraData(Device&);
     };
 
     struct SceneData final {
@@ -63,13 +63,13 @@ private:
 
     boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
 
-    [[nodiscard]] bool fill_g_buffer(const std::size_t camera_pool_index) noexcept;
+    [[nodiscard]] bool fill_g_buffer(const std::size_t camera_pool_index);
 
 public:
-    SubmissionManager(Engine& e) noexcept;
-    ~SubmissionManager() noexcept;
+    SubmissionManager(Engine& e);
+    ~SubmissionManager();
 
-    [[nodiscard]] bool render_frame() noexcept;
+    [[nodiscard]] bool render_frame();
 };
 }
 

@@ -31,7 +31,7 @@ struct Aabb3 final {
     GX_GET_VAL_PRV(Element, volume, static_cast<Element>(0));
 
 public:
-    constexpr Aabb3() noexcept
+    constexpr Aabb3()
         : upper(Vec3(-std::numeric_limits<Element>::max(), -std::numeric_limits<Element>::max(), -std::numeric_limits<Element>::max()))
         , lower(Vec3(std::numeric_limits<Element>::max(), std::numeric_limits<Element>::max(), std::numeric_limits<Element>::max()))
         , diameter(static_cast<Element>(0))
@@ -40,7 +40,7 @@ public:
     {
     }
 
-    constexpr Aabb3(const Vec3<Element>& upper, const Vec3<Element>& lower) noexcept
+    constexpr Aabb3(const Vec3<Element>& upper, const Vec3<Element>& lower)
         : upper(upper)
         , lower(lower)
         , diameter(upper - lower)
@@ -49,7 +49,7 @@ public:
     {
     }
 
-    constexpr explicit Aabb3(const Vec3<Element>& point) noexcept
+    constexpr explicit Aabb3(const Vec3<Element>& point)
         : upper(point)
         , lower(point)
         , diameter(static_cast<Element>(0))
@@ -58,14 +58,14 @@ public:
     {
     }
 
-    constexpr void update() noexcept
+    constexpr void update()
     {
         diameter = upper - lower;
         center = (upper + lower) * static_cast<Element>(0.5);
         volume = diameter.x * diameter.y * diameter.z;
     }
 
-    constexpr void reset() noexcept
+    constexpr void reset()
     {
         upper = Vec3(-std::numeric_limits<Element>::max(), -std::numeric_limits<Element>::max(), -std::numeric_limits<Element>::max());
         lower = Vec3(std::numeric_limits<Element>::max(), std::numeric_limits<Element>::max(), std::numeric_limits<Element>::max());
@@ -74,7 +74,7 @@ public:
         volume = static_cast<Element>(0);
     }
 
-    constexpr void reset(const Vec3<Element>& point) noexcept
+    constexpr void reset(const Vec3<Element>& point)
     {
         upper = point;
         lower = point;
@@ -83,13 +83,13 @@ public:
         volume = static_cast<Element>(0);
     }
 
-    constexpr void put(const Vec3<Element>& point) noexcept
+    constexpr void put(const Vec3<Element>& point)
     {
         put_without_update(point);
         update();
     }
 
-    constexpr void put(const Sphere<Element>& sphere) noexcept
+    constexpr void put(const Sphere<Element>& sphere)
     {
         const auto u = sphere.get_center() + sphere.get_radius();
         const auto l = sphere.get_center() - sphere.get_radius();
@@ -100,7 +100,7 @@ public:
         update();
     }
 
-    constexpr void put(const Aabb3<Element>& o) noexcept
+    constexpr void put(const Aabb3<Element>& o)
     {
         put_without_update(o);
         update();
@@ -108,7 +108,7 @@ public:
 
     /// For better performance but keep in mind call update after your puts finished
     /// In case your not sure about it, use put, it is safer
-    constexpr void put_without_update(const Vec3<Element>& point) noexcept
+    constexpr void put_without_update(const Vec3<Element>& point)
     {
         upper = upper.maximum(point);
         lower = lower.minimum(point);
@@ -116,13 +116,13 @@ public:
 
     /// For better performance but keep in mind call update after your puts finished
     /// In case your not sure about it, use put, it is safer
-    constexpr void put_without_update(const Aabb3<Element>& o) noexcept
+    constexpr void put_without_update(const Aabb3<Element>& o)
     {
         upper = upper.maximum(o.upper);
         lower = lower.minimum(o.lower);
     }
 
-    [[nodiscard]] constexpr std::optional<Element> hit(const Ray3<Element>& ray, const Element d_min) const noexcept
+    [[nodiscard]] constexpr std::optional<Element> hit(const Ray3<Element>& ray, const Element d_min) const
     {
         const auto& ro = ray.get_origin();
         const auto& rrd = ray.get_reversed_normalized_direction();
@@ -135,7 +135,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& o) const noexcept
+    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& o) const
     {
         if (upper.x > o.upper.x
             && upper.y > o.upper.y
@@ -149,13 +149,13 @@ public:
         return IntersectionStatus::Out;
     }
 
-    [[nodiscard]] constexpr bool check_intersection(const Sphere<Element>& sphere) const noexcept
+    [[nodiscard]] constexpr bool check_intersection(const Sphere<Element>& sphere) const
     {
         return check_intersection(Aabb3<Element>(
             sphere.get_center() + sphere.get_radius(), sphere.get_center() - sphere.get_radius()));
     }
 
-    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o, Aabb3<Element>& intersection) const noexcept
+    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o, Aabb3<Element>& intersection) const
     {
         int equals = 0;
         const auto u = upper.minimum(o.upper);
@@ -176,14 +176,14 @@ public:
         return false;
     }
 
-    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o) const
     {
         const auto max_dis = diameter + o.diameter;
         const auto dis = (center - o.center).abs() * static_cast<Element>(2);
         return max_dis.greater(dis).and_elements();
     }
 
-    constexpr void set_center(const Vec3<Element>& c) noexcept
+    constexpr void set_center(const Vec3<Element>& c)
     {
         const auto t = c - center;
         center = c;
@@ -191,7 +191,7 @@ public:
         lower += t;
     }
 
-    constexpr void set_diameter(const Vec3<Element>& d) noexcept
+    constexpr void set_diameter(const Vec3<Element>& d)
     {
         diameter = d;
         const auto hd = d * 0.5;
@@ -200,7 +200,7 @@ public:
         volume = d.x * d.y * d.z;
     }
 
-    constexpr void get_all_corners(std::array<math::Vec3<Element>, 8>& corners) const noexcept
+    constexpr void get_all_corners(std::array<math::Vec3<Element>, 8>& corners) const
     {
         corners[0].x = upper.x;
         corners[0].y = upper.y;
@@ -235,13 +235,13 @@ public:
         corners[7].z = lower.z;
     }
 
-    void write(platform::stream::Stream& s) const noexcept
+    void write(platform::stream::Stream& s) const
     {
         upper.write(s);
         lower.write(s);
     }
 
-    void read(platform::stream::Stream& s) noexcept
+    void read(platform::stream::Stream& s)
     {
         upper.read(s);
         lower.read(s);

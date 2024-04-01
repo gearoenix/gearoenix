@@ -36,15 +36,15 @@ struct Node final {
     GX_GET_REF_PRV(OutputMap, consumers);
 
 public:
-    Node(engine::Engine&, NodeLabel node_label, VkPipelineStageFlags stage) noexcept;
-    ~Node() noexcept;
-    Node(Node&&) noexcept;
-    Node(const Node&) noexcept;
-    Node& operator=(Node&&) noexcept;
-    Node& operator=(const Node&) noexcept;
-    void clear_traversing_level(boost::container::flat_map<NodeLabel, Node>& nodes) noexcept;
-    [[nodiscard]] int update_traversing_level(int traversal_level, boost::container::flat_map<NodeLabel, Node>& nodes) noexcept;
-    static void connect(Node& provider, Node& consumer, engine::Engine& e) noexcept;
+    Node(engine::Engine&, NodeLabel node_label, VkPipelineStageFlags stage);
+    ~Node();
+    Node(Node&&);
+    Node(const Node&);
+    Node& operator=(Node&&);
+    Node& operator=(const Node&);
+    void clear_traversing_level(boost::container::flat_map<NodeLabel, Node>& nodes);
+    [[nodiscard]] int update_traversing_level(int traversal_level, boost::container::flat_map<NodeLabel, Node>& nodes);
+    static void connect(Node& provider, Node& consumer, engine::Engine& e);
 };
 }
 

@@ -10,7 +10,7 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-eng-frame.hpp"
 
-void gearoenix::vulkan::engine::Engine::initialize_frame() noexcept
+void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
     frames.reserve(static_cast<std::size_t>(frames_count));
@@ -19,12 +19,12 @@ void gearoenix::vulkan::engine::Engine::initialize_frame() noexcept
     }
 }
 
-void gearoenix::vulkan::engine::Engine::window_resized() noexcept
+void gearoenix::vulkan::engine::Engine::window_resized()
 {
     GX_UNIMPLEMENTED;
 }
 
-gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_application) noexcept
+gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_application)
     : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
     , instance(*Instance::construct(&platform_application))
     , surface(instance, platform_application)
@@ -48,7 +48,7 @@ gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_applic
     initialize_frame();
 }
 
-gearoenix::vulkan::engine::Engine::~Engine() noexcept
+gearoenix::vulkan::engine::Engine::~Engine()
 {
     world = nullptr;
     logical_device.wait_to_finish();
@@ -56,7 +56,7 @@ gearoenix::vulkan::engine::Engine::~Engine() noexcept
     frames.clear();
 }
 
-void gearoenix::vulkan::engine::Engine::start_frame() noexcept
+void gearoenix::vulkan::engine::Engine::start_frame()
 {
     render::engine::Engine::start_frame();
     if (!swapchain_image_is_valid && !platform_application.get_base().get_window_resizing()) {
@@ -80,7 +80,7 @@ void gearoenix::vulkan::engine::Engine::start_frame() noexcept
     }
 }
 
-void gearoenix::vulkan::engine::Engine::end_frame() noexcept
+void gearoenix::vulkan::engine::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
     imgui_manager->end_frame();
@@ -91,27 +91,27 @@ void gearoenix::vulkan::engine::Engine::end_frame() noexcept
     }
 }
 
-void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() noexcept
+void gearoenix::vulkan::engine::Engine::upload_imgui_fonts()
 {
     imgui_manager->upload_fonts();
 }
 
-gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() noexcept
+gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()
 {
     return *frames[swapchain_image_index];
 }
 
-const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const noexcept
+const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const
 {
     return *frames[swapchain_image_index];
 }
 
-const gearoenix::vulkan::Framebuffer& gearoenix::vulkan::engine::Engine::get_current_framebuffer() const noexcept
+const gearoenix::vulkan::Framebuffer& gearoenix::vulkan::engine::Engine::get_current_framebuffer() const
 {
     return *frames[swapchain_image_index]->framebuffer;
 }
 
-bool gearoenix::vulkan::engine::Engine::is_supported() noexcept
+bool gearoenix::vulkan::engine::Engine::is_supported()
 {
     if (!Loader::load())
         return false;

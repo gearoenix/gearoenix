@@ -269,13 +269,13 @@ GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DEF_FUNCTIONS)
 
 namespace gearoenix::vulkan {
 struct Loader {
-    Loader() noexcept = delete;
-    [[nodiscard]] static bool is_loaded() noexcept;
-    [[nodiscard]] static bool load() noexcept;
-    static void load(VkInstance instance) noexcept;
-    static void load(VkDevice device) noexcept;
-    static void unload() noexcept;
-    [[nodiscard]] static PFN_vkVoidFunction get(const char*) noexcept;
+    Loader() = delete;
+    [[nodiscard]] static bool is_loaded();
+    [[nodiscard]] static bool load();
+    static void load(VkInstance instance);
+    static void load(VkDevice device);
+    static void unload();
+    [[nodiscard]] static PFN_vkVoidFunction get(const char*);
 };
 }
 

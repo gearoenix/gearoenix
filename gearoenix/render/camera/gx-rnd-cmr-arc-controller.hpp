@@ -34,20 +34,20 @@ namespace gearoenix::render::camera {
 //     bool rotate_left = false;
 //     bool rotate_right = false;
 //
-//     void update() noexcept;
-//     void values_updated() noexcept;
+//     void update() ;
+//     void values_updated() ;
 //
 //  public:
-//     explicit ArcController(std::shared_ptr<Camera> cam) noexcept;
-//     ~ArcController() noexcept final;
-//     void set_vertical_angle(double) noexcept;
-//     void set_min_vertical_angle(double) noexcept;
-//     void set_max_vertical_angle(double) noexcept;
-//     void set_distance(double) noexcept;
-//     void set_min_distance(double) noexcept;
-//     void set_max_distance(double) noexcept;
-//     void set_target(const math::Vec3<double>&) noexcept;
-//     [[nodiscard]] bool on_event(const core::event::Data& event_data) noexcept final;
+//     explicit ArcController(std::shared_ptr<Camera> cam) ;
+//     ~ArcController()  final;
+//     void set_vertical_angle(double) ;
+//     void set_min_vertical_angle(double) ;
+//     void set_max_vertical_angle(double) ;
+//     void set_distance(double) ;
+//     void set_min_distance(double) ;
+//     void set_max_distance(double) ;
+//     void set_target(const math::Vec3<double>&) ;
+//     [[nodiscard]] bool on_event(const core::event::Data& event_data)  final;
 //};
 }
 #endif

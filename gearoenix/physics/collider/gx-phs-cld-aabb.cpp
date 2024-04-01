@@ -1,24 +1,44 @@
 #include "gx-phs-cld-aabb.hpp"
+#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name) noexcept
-    : core::ecs::Component(this, std::move(name))
+namespace {
+gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 16> allocator;
+}
+
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
+    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
     , original_box(upper, lower)
     , updated_box(original_box)
 {
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name) noexcept
-    : core::ecs::Component(this, std::move(name))
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name)
+    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
     , original_box(original_box)
     , updated_box(original_box)
 {
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(Aabb3&&) noexcept = default;
+std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collider::Aabb3::construct(
+    const math::Vec3<double>& upper,
+    const math::Vec3<double>& lower,
+    std::string&& name)
+{
+    auto self = allocator.make_shared(upper, lower, std::move(name));
+    return self;
+}
 
-gearoenix::physics::collider::Aabb3::~Aabb3() noexcept = default;
+std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collider::Aabb3::construct(
+    const math::Aabb3<double>& original_box,
+    std::string&& name)
+{
+    auto self = allocator.make_shared(original_box, std::move(name));
+    return self;
+}
 
-void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& transform) noexcept
+gearoenix::physics::collider::Aabb3::~Aabb3() = default;
+
+void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& transform)
 {
     std::array<math::Vec3<double>, 8> corners;
     original_box.get_all_corners(corners);
@@ -29,4 +49,10 @@ void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& tra
         updated_box.put_without_update(tmp.xyz());
     }
     updated_box.update();
+}
+
+const boost::container::flat_set<std::type_index>& gearoenix::physics::collider::Aabb3::get_all_the_hierarchy_types_except_component() const
+{
+    static const boost::container::flat_set<std::type_index> types { core::ecs::Component::create_this_type_index(this) };
+    return types;
 }

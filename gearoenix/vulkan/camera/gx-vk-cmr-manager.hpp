@@ -13,12 +13,12 @@ struct Manager final : public render::camera::Manager {
 private:
     engine::Engine& vk_e;
 
-    std::shared_ptr<render::camera::Builder> build(const std::string& name) noexcept final;
-    void update() noexcept final;
+    std::shared_ptr<render::camera::Builder> build(const std::string& name) final;
+    void update() final;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept final;
+    explicit Manager(engine::Engine& e);
+    ~Manager() final;
 };
 }
 

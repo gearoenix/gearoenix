@@ -23,7 +23,7 @@ struct Point2D final {
     GX_GET_VAL_PRV(double, delta_previous_time, 0.0);
 
 public:
-    Point2D(const math::Vec2<double>& raw, const math::Vec2<double>& p) noexcept
+    Point2D(const math::Vec2<double>& raw, const math::Vec2<double>& p)
         : start_time(std::chrono::high_resolution_clock::now())
         , previous_time(start_time)
         , current_time(start_time)
@@ -36,10 +36,10 @@ public:
     {
     }
 
-    Point2D(const Point2D& o) noexcept = default;
-    Point2D& operator=(const Point2D& o) noexcept = default;
+    Point2D(const Point2D& o) = default;
+    Point2D& operator=(const Point2D& o) = default;
 
-    void update(const math::Vec2<double>& raw, const math::Vec2<double>& p) noexcept
+    void update(const math::Vec2<double>& raw, const math::Vec2<double>& p)
     {
         previous_position = current_position;
         raw_previous_position = raw_current_position;
@@ -62,7 +62,7 @@ public:
         delta_start_time = dur.count();
     }
 
-    void reinitialize() noexcept
+    void reinitialize()
     {
         start_time = previous_time = current_time = std::chrono::high_resolution_clock::now();
         start_position = previous_position = current_position;

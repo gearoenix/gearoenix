@@ -10,7 +10,7 @@ template <typename Element>
 struct Quat final {
     Element x, y, z, w;
 
-    constexpr explicit Quat(const Element e = static_cast<Element>(0)) noexcept
+    constexpr explicit Quat(const Element e = static_cast<Element>(0))
         : x(e)
         , y(e)
         , z(e)
@@ -18,7 +18,7 @@ struct Quat final {
     {
     }
 
-    constexpr Quat(const Element x, const Element y, const Element z, const Element w) noexcept
+    constexpr Quat(const Element x, const Element y, const Element z, const Element w)
         : x(x)
         , y(y)
         , z(z)
@@ -27,7 +27,7 @@ struct Quat final {
     }
 
     template <typename T>
-    constexpr explicit Quat(const Quat<T>& o) noexcept
+    constexpr explicit Quat(const Quat<T>& o)
         : x(static_cast<Element>(o.x))
         , y(static_cast<Element>(o.y))
         , z(static_cast<Element>(o.z))
@@ -35,7 +35,7 @@ struct Quat final {
     {
     }
 
-    constexpr void normalise() noexcept
+    constexpr void normalise()
     {
         const auto inv_length = (w > static_cast<Element>(0) ? static_cast<Element>(1) : static_cast<Element>(-1)) / std::sqrt(x * x + y * y + z * z + w * w);
         x *= inv_length;
@@ -44,14 +44,14 @@ struct Quat final {
         w *= inv_length;
     }
 
-    [[nodiscard]] constexpr Quat normalised() const noexcept
+    [[nodiscard]] constexpr Quat normalised() const
     {
         Quat q = *this;
         q.normalise();
         return q;
     }
 
-    constexpr Mat4x4<Element> to_mat() const noexcept
+    constexpr Mat4x4<Element> to_mat() const
     {
         const Element xx = x * x;
         const Element xy = x * y;
@@ -75,39 +75,39 @@ struct Quat final {
         return m;
     }
 
-    [[nodiscard]] constexpr bool safe_equal(const Quat& o) const noexcept
+    [[nodiscard]] constexpr bool safe_equal(const Quat& o) const
     {
         const auto nt = normalised();
         const auto no = o.normalised();
         return Numeric::equal(nt.x, no.x) && Numeric::equal(nt.y, no.y) && Numeric::equal(nt.z, no.z) && Numeric::equal(nt.w, no.w);
     }
 
-    [[nodiscard]] constexpr Quat operator*(const Element v) const noexcept
+    [[nodiscard]] constexpr Quat operator*(const Element v) const
     {
         return Quat(x * v, y * v, z * v, w * v);
     }
 
-    [[nodiscard]] constexpr Quat operator+(const Quat& o) const noexcept
+    [[nodiscard]] constexpr Quat operator+(const Quat& o) const
     {
         return Quat(x + o.x, y + o.y, z + o.z, w + o.w);
     }
 
-    [[nodiscard]] constexpr Quat operator-(const Quat& o) const noexcept
+    [[nodiscard]] constexpr Quat operator-(const Quat& o) const
     {
         return Quat(x - o.x, y - o.y, z - o.z, w - o.w);
     }
 
-    [[nodiscard]] constexpr Quat operator-(const Element v) const noexcept
+    [[nodiscard]] constexpr Quat operator-(const Element v) const
     {
         return Quat(x - v, y - v, z - v, w - v);
     }
 
-    [[nodiscard]] constexpr Quat abs() const noexcept
+    [[nodiscard]] constexpr Quat abs() const
     {
         return Quat(std::abs(x), std::abs(y), std::abs(z), std::abs(w));
     }
 
-    [[nodiscard]] constexpr Element dot(const Quat& o) const noexcept
+    [[nodiscard]] constexpr Element dot(const Quat& o) const
     {
         return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w);
     }
@@ -118,7 +118,7 @@ struct Quat final {
         return os;
     }
 
-    [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance) const noexcept
+    [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance) const
     {
         const auto a = (*this - o).abs();
         return a.x < tolerance && a.y < tolerance && a.z < tolerance && a.w < tolerance;

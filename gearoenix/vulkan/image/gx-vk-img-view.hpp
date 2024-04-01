@@ -12,16 +12,16 @@ struct View final {
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr);
 
 private:
-    void terminate() noexcept;
+    void terminate();
 
 public:
-    explicit View(Image&& img) noexcept;
-    View(View&&) noexcept;
+    explicit View(Image&& img);
+    View(View&&);
     View(const View&) = delete;
-    ~View() noexcept;
-    View& operator=(View&&) noexcept;
+    ~View();
+    View& operator=(View&&);
     View& operator=(const View&) = delete;
-    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr) noexcept;
+    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr);
 };
 }
 #endif

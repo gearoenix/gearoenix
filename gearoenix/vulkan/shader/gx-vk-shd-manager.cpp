@@ -2,15 +2,15 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-shd-module.hpp"
 
-gearoenix::vulkan::shader::Manager::Manager(const engine::Engine& e) noexcept
+gearoenix::vulkan::shader::Manager::Manager(const engine::Engine& e)
     : e(e)
 {
 }
 
-gearoenix::vulkan::shader::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::shader::Manager::~Manager() = default;
 
 std::shared_ptr<gearoenix::vulkan::shader::Module> gearoenix::vulkan::shader::Manager::get(
-    const std::string& shader_name) noexcept
+    const std::string& shader_name)
 {
     auto& search = modules[shader_name];
     auto result = search.lock();

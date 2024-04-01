@@ -7,7 +7,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-void gearoenix::vulkan::image::View::terminate() noexcept
+void gearoenix::vulkan::image::View::terminate()
 {
     if (vulkan_data != nullptr) {
         vkDestroyImageView(image.get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
@@ -15,7 +15,7 @@ void gearoenix::vulkan::image::View::terminate() noexcept
     }
 }
 
-gearoenix::vulkan::image::View::View(Image&& img) noexcept
+gearoenix::vulkan::image::View::View(Image&& img)
     : image(std::move(img))
 {
     VkImageViewCreateInfo info;
@@ -39,19 +39,19 @@ gearoenix::vulkan::image::View::View(Image&& img) noexcept
         image.get_logical_device()->get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::image::View::View(View&& o) noexcept
+gearoenix::vulkan::image::View::View(View&& o)
     : image(std::move(o.image))
     , vulkan_data(o.vulkan_data)
 {
     o.vulkan_data = nullptr;
 }
 
-gearoenix::vulkan::image::View::~View() noexcept
+gearoenix::vulkan::image::View::~View()
 {
     terminate();
 }
 
-gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&& o) noexcept
+gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&& o)
 {
     terminate();
     image = std::move(o.image);
@@ -60,7 +60,7 @@ gearoenix::vulkan::image::View& gearoenix::vulkan::image::View::operator=(View&&
     return *this;
 }
 
-gearoenix::vulkan::image::View gearoenix::vulkan::image::View::create_depth_stencil(memory::Manager& mem_mgr) noexcept
+gearoenix::vulkan::image::View gearoenix::vulkan::image::View::create_depth_stencil(memory::Manager& mem_mgr)
 {
     const auto& physical_device = mem_mgr.get_e().get_logical_device().get_physical_device();
     const VkFormat depth_format = physical_device.get_supported_depth_format();

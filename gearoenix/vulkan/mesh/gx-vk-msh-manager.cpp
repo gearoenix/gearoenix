@@ -29,8 +29,8 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     std::string&& name,
     const std::size_t vertices_count,
     const std::size_t indices_count,
-    core::sync::EndCaller&& c,
-    std::shared_ptr<Mesh>&& result) noexcept
+    core::job::EndCaller&& c,
+    std::shared_ptr<Mesh>&& result)
 {
     auto& dev = vk_e.get_logical_device();
     auto& cmd_mgr = vk_e.get_command_manager();
@@ -111,7 +111,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     cmd->end();
     std::shared_ptr<sync::Fence> fence(new sync::Fence(dev));
     waiter_queue->submit(*cmd, *fence);
-    waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable noexcept {
+    waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
         waiter->push([cmd = std::move(cmd)] {});
     });
@@ -120,9 +120,9 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
 void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     std::string&& name,
     std::shared_ptr<sync::Fence>&& fence,
-    core::sync::EndCaller&& c,
+    core::job::EndCaller&& c,
     std::shared_ptr<Mesh>&& result,
-    std::shared_ptr<query::Pool>&& query_pool) noexcept
+    std::shared_ptr<query::Pool>&& query_pool)
 {
     VkAccelerationStructureKHR old_accel = result->vulkan_data;
     auto old_accel_buff = std::move(result->accel_buff);
@@ -170,7 +170,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
             cmd = std::move(cmd),
             fence = std::move(fence),
             c = std::move(c),
-            result = std::move(result)]() mutable noexcept {
+            result = std::move(result)]() mutable {
             fence->wait();
             vkDestroyAccelerationStructureKHR(vk_dev, old_accel, nullptr);
             create_accel_after_blas_copy(std::move(c), std::move(result));
@@ -180,8 +180,8 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 }
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_blas_copy(
-    [[maybe_unused]] core::sync::EndCaller&& c,
-    std::shared_ptr<Mesh>&& result) noexcept
+    [[maybe_unused]] core::job::EndCaller&& c,
+    std::shared_ptr<Mesh>&& result)
 {
     result->initialize_blas();
 }
@@ -191,11 +191,11 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager:
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
     math::Aabb3<double>&& occlusion_box,
-    const core::sync::EndCaller& end_callback) noexcept
+    const core::job::EndCaller& end_callback)
 {
     std::shared_ptr<std::shared_ptr<Mesh>> result(new std::shared_ptr<Mesh>());
-    core::sync::EndCaller end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable noexcept -> void {
-        waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable noexcept {
+    core::job::EndCaller end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable -> void {
+        waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable {
             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(*result));
         });
     });
@@ -203,7 +203,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager:
     return *result;
 }
 
-gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e)
     : render::mesh::Manager(e)
     , vk_e(e)
     , waiter(new core::sync::WorkWaiter())
@@ -284,9 +284,9 @@ gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e) noexcept
     camera_bindings.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
 }
 
-gearoenix::vulkan::mesh::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::mesh::Manager::~Manager() = default;
 
-void gearoenix::vulkan::mesh::Manager::update() noexcept
+void gearoenix::vulkan::mesh::Manager::update()
 {
 }
 

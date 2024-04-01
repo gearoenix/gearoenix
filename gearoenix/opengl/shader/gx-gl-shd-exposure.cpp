@@ -33,7 +33,7 @@ void main() {\n\
     frag_colour.xyz *= value;\n\
 }";
 
-gearoenix::gl::shader::Exposure::Exposure(Engine& e) noexcept
+gearoenix::gl::shader::Exposure::Exposure(Engine& e)
     : Shader(e)
 {
 
@@ -46,9 +46,9 @@ gearoenix::gl::shader::Exposure::Exposure(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::Exposure::~Exposure() noexcept = default;
+gearoenix::gl::shader::Exposure::~Exposure() = default;
 
-void gearoenix::gl::shader::Exposure::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::Exposure::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

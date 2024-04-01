@@ -5,14 +5,14 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::command::Pool::Pool(Pool&& o) noexcept
+gearoenix::vulkan::command::Pool::Pool(Pool&& o)
     : logical_device(o.logical_device)
     , vulkan_data(o.vulkan_data)
 {
     o.vulkan_data = nullptr;
 }
 
-gearoenix::vulkan::command::Pool::Pool(const device::Logical& ld) noexcept
+gearoenix::vulkan::command::Pool::Pool(const device::Logical& ld)
     : logical_device(ld)
 {
     VkCommandPoolCreateInfo info;
@@ -23,7 +23,7 @@ gearoenix::vulkan::command::Pool::Pool(const device::Logical& ld) noexcept
     GX_VK_CHK(vkCreateCommandPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::command::Pool::~Pool() noexcept
+gearoenix::vulkan::command::Pool::~Pool()
 {
     if (nullptr != vulkan_data) {
         vkDestroyCommandPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);

@@ -6,7 +6,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool signaled) noexcept
+gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool signaled)
     : logical_device(ld)
 {
     VkFenceCreateInfo fence_create_info;
@@ -18,24 +18,24 @@ gearoenix::vulkan::sync::Fence::Fence(const device::Logical& ld, const bool sign
     GX_VK_CHK(vkCreateFence(logical_device.get_vulkan_data(), &fence_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::sync::Fence::~Fence() noexcept
+gearoenix::vulkan::sync::Fence::~Fence()
 {
     vkDestroyFence(logical_device.get_vulkan_data(), vulkan_data, nullptr);
     vulkan_data = nullptr;
 }
 
-void gearoenix::vulkan::sync::Fence::wait() noexcept
+void gearoenix::vulkan::sync::Fence::wait()
 {
     GX_VK_CHK(vkWaitForFences(logical_device.get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX));
 }
 
-void gearoenix::vulkan::sync::Fence::reset() noexcept
+void gearoenix::vulkan::sync::Fence::reset()
 {
     GX_VK_CHK(vkResetFences(logical_device.get_vulkan_data(), 1, &vulkan_data));
 }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> gearoenix::vulkan::sync::Fence::create_frame_based(
-    const engine::Engine& e, const bool signaled) noexcept
+    const engine::Engine& e, const bool signaled)
 {
     std::vector<std::shared_ptr<Fence>> result(e.get_swapchain().get_image_views().size());
     for (auto& s : result)

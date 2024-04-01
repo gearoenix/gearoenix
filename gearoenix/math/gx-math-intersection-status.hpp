@@ -18,7 +18,7 @@ enum struct IntersectionStatus {
 };
 }
 
-inline std::ostream& operator<<(std::ostream& os, const gearoenix::math::IntersectionStatus i) noexcept
+inline std::ostream& operator<<(std::ostream& os, const gearoenix::math::IntersectionStatus i)
 {
     switch (i) {
     case gearoenix::math::IntersectionStatus::Above:

@@ -16,7 +16,7 @@ gearoenix::vulkan::memory::Memory::Memory(
     void* const data,
     const Place place,
     const std::uint32_t type_index,
-    VkDeviceMemory vulkan_data) noexcept
+    VkDeviceMemory vulkan_data)
     : e(e)
     , parent(std::move(parent))
     , allocator(std::move(allocator))
@@ -27,12 +27,12 @@ gearoenix::vulkan::memory::Memory::Memory(
 {
 }
 
-std::size_t gearoenix::vulkan::memory::Memory::align(const engine::Engine& e, const std::size_t sz) noexcept
+std::size_t gearoenix::vulkan::memory::Memory::align(const engine::Engine& e, const std::size_t sz)
 {
     return math::Numeric::align(sz, static_cast<std::size_t>(e.get_logical_device().get_physical_device().get_max_memory_alignment()));
 }
 
-gearoenix::vulkan::memory::Memory::~Memory() noexcept
+gearoenix::vulkan::memory::Memory::~Memory()
 {
     if (parent == nullptr) {
         vkFreeMemory(e.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
@@ -40,7 +40,7 @@ gearoenix::vulkan::memory::Memory::~Memory() noexcept
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::size_t size)
 {
     const auto aligned_size = align(e, size);
     auto alc = allocator->allocate(aligned_size);
@@ -57,7 +57,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
 std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(
     const engine::Engine& e,
     const Place place,
-    const std::uint32_t type_index) noexcept
+    const std::uint32_t type_index)
 {
     const auto is_gpu = place == Place::Gpu;
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();

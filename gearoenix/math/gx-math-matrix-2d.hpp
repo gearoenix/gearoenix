@@ -11,7 +11,7 @@ struct Mat2x2 {
     Element e2;
     Element e3;
 
-    constexpr explicit Mat2x2(const Element diameter = static_cast<Element>(0)) noexcept
+    constexpr explicit Mat2x2(const Element diameter = static_cast<Element>(0))
         : e0(diameter)
         , e1(static_cast<Element>(0))
         , e2(static_cast<Element>(0))
@@ -19,7 +19,7 @@ struct Mat2x2 {
     {
     }
 
-    constexpr Mat2x2(const Element e0, const Element e1, const Element e2, const Element e3) noexcept
+    constexpr Mat2x2(const Element e0, const Element e1, const Element e2, const Element e3)
         : e0(e0)
         , e1(e1)
         , e2(e2)
@@ -27,7 +27,7 @@ struct Mat2x2 {
     {
     }
 
-    constexpr bool invert(const Element zero_tolerance = static_cast<Element>(0.0001)) noexcept
+    constexpr bool invert(const Element zero_tolerance = static_cast<Element>(0.0001))
     {
         static_assert(std::numeric_limits<Element>::is_signed,
             "This functionality is only available for signed element types.");
@@ -45,7 +45,7 @@ struct Mat2x2 {
         return true;
     }
 
-    constexpr Vec2<Element> operator*(const Vec2<Element>& v) const noexcept
+    constexpr Vec2<Element> operator*(const Vec2<Element>& v) const
     {
         return Vec2(e0 * v.x + e1 * v.y, e2 * v.x + e3 * v.y);
     }

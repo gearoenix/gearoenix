@@ -31,23 +31,23 @@ struct Engine final : public render::engine::Engine {
     GX_GET_CREF_PRV(std::shared_ptr<SubmissionManager>, submission_manager)
 
 private:
-    explicit Engine(platform::Application& platform_application) noexcept;
-    void device_lost_handle(int failed_tries) noexcept;
-    void window_resized(int failed_tries) noexcept;
-    void window_resized() noexcept final;
+    explicit Engine(platform::Application& platform_application);
+    void device_lost_handle(int failed_tries);
+    void window_resized(int failed_tries);
+    void window_resized() final;
 
 public:
     Engine(Engine&&) = delete;
     Engine(const Engine&) = delete;
     Engine& operator=(Engine&&) = delete;
     Engine& operator=(const Engine&) = delete;
-    ~Engine() noexcept final;
-    [[nodiscard]] static bool is_supported() noexcept;
-    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application) noexcept;
+    ~Engine() final;
+    [[nodiscard]] static bool is_supported();
+    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
 
-    void start_frame() noexcept final;
-    void end_frame() noexcept final;
-    void upload_imgui_fonts() noexcept final;
+    void start_frame() final;
+    void end_frame() final;
+    void upload_imgui_fonts() final;
 };
 }
 

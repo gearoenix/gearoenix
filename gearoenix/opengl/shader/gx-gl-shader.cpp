@@ -3,13 +3,13 @@
 #include "../gx-gl-engine.hpp"
 #include <vector>
 
-void gearoenix::gl::shader::Shader::run() noexcept
+void gearoenix::gl::shader::Shader::run()
 {
     link();
     glUseProgram(shader_program);
 }
 
-void gearoenix::gl::shader::Shader::link() const noexcept
+void gearoenix::gl::shader::Shader::link() const
 {
     sint is_success = 0;
     glLinkProgram(shader_program);
@@ -29,7 +29,7 @@ void gearoenix::gl::shader::Shader::link() const noexcept
     glUseProgram(shader_program);
 }
 
-void gearoenix::gl::shader::Shader::validate() const noexcept
+void gearoenix::gl::shader::Shader::validate() const
 {
     glValidateProgram(shader_program);
     sint is_success = 0;
@@ -49,7 +49,7 @@ void gearoenix::gl::shader::Shader::validate() const noexcept
     glUseProgram(shader_program);
 }
 
-gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const std::string& shd, const enumerated shader_type) const noexcept
+gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const std::string& shd, const enumerated shader_type) const
 {
     uint shader_obj = glCreateShader(shader_type);
     if (shader_obj == 0) {
@@ -78,17 +78,17 @@ gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const s
     return shader_obj;
 }
 
-void gearoenix::gl::shader::Shader::set_vertex_shader(const std::string& shd) noexcept
+void gearoenix::gl::shader::Shader::set_vertex_shader(const std::string& shd)
 {
     vertex_object = add_shader_to_program(shd, GL_VERTEX_SHADER);
 }
 
-void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd) noexcept
+void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd)
 {
     fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER);
 }
 
-gearoenix::gl::shader::Shader::Shader(Engine& e) noexcept
+gearoenix::gl::shader::Shader::Shader(Engine& e)
     : shader_program(glCreateProgram())
     , e(e)
 {
@@ -97,7 +97,7 @@ gearoenix::gl::shader::Shader::Shader(Engine& e) noexcept
     }
 }
 
-gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
+gearoenix::gl::shader::Shader::Shader(Shader&& o)
     : shader_program(o.shader_program)
     , e(o.e)
     , vertex_object(o.vertex_object)
@@ -108,7 +108,7 @@ gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
     o.fragment_object = static_cast<uint>(-1);
 }
 
-gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&& o) noexcept
+gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&& o)
 {
     shader_program = o.shader_program;
     vertex_object = o.vertex_object;
@@ -119,7 +119,7 @@ gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&&
     return *this;
 }
 
-gearoenix::gl::shader::Shader::~Shader() noexcept
+gearoenix::gl::shader::Shader::~Shader()
 {
     if (static_cast<uint>(-1) != vertex_object)
         glDeleteShader(vertex_object);
@@ -129,12 +129,12 @@ gearoenix::gl::shader::Shader::~Shader() noexcept
         glDeleteProgram(shader_program);
 }
 
-gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const noexcept
+gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const
 {
     return glGetUniformLocation(shader_program, &(uname[0]));
 }
 
-void gearoenix::gl::shader::Shader::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::Shader::bind(uint& current_shader) const
 {
     glUseProgram(shader_program);
     current_shader = shader_program;

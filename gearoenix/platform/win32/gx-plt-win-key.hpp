@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 namespace gearoenix::platform {
-[[nodiscard]] key::Id convert_to_keyboard_key(WPARAM, LPARAM) noexcept;
+[[nodiscard]] key::Id convert_to_keyboard_key(WPARAM, LPARAM);
 }
 
 #endif

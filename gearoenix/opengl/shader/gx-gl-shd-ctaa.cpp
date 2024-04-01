@@ -16,7 +16,7 @@ void main() {\n\
     out_uv = position * 0.5 + 0.5;\n\
 }\n";
 
-gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::size_t colour_tuning_index) noexcept
+gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::size_t colour_tuning_index)
     : Shader(e)
 {
     const bool is_gamma_correction_index = colour_tuning_index == boost::mp11::mp_find<render::camera::ColourTuning, render::camera::GammaCorrection>::value;
@@ -113,9 +113,9 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
     GX_GL_THIS_GET_UNIFORM_TEXTURE(depth_texture);
 }
 
-gearoenix::gl::shader::ColourTuningAntiAliasing::~ColourTuningAntiAliasing() noexcept = default;
+gearoenix::gl::shader::ColourTuningAntiAliasing::~ColourTuningAntiAliasing() = default;
 
-void gearoenix::gl::shader::ColourTuningAntiAliasing::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::ColourTuningAntiAliasing::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -124,7 +124,7 @@ void gearoenix::gl::shader::ColourTuningAntiAliasing::bind(uint& current_shader)
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(depth_texture);
 }
 
-void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::ColourTuning& colour_tuning) noexcept
+void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::ColourTuning& colour_tuning)
 {
     switch (colour_tuning.index()) {
     case boost::mp11::mp_find<render::camera::ColourTuning, render::camera::GammaCorrection>::value:
@@ -136,7 +136,7 @@ void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::
     }
 }
 
-gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination(Engine& e) noexcept
+gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination(Engine& e)
     : e(e)
 {
 }

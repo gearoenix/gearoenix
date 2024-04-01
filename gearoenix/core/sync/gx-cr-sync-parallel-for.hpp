@@ -7,7 +7,7 @@
 namespace gearoenix::core::sync {
 struct ParallelFor final {
 
-    static void exec(const std::function<void(unsigned int, unsigned int)>& fun) noexcept;
+    static void exec(const std::function<void(unsigned int, unsigned int)>& fun);
 
 public:
     ParallelFor() = delete;
@@ -16,7 +16,7 @@ public:
     template <typename Iter, typename Fun>
     static void exec(Iter first, Iter end, Fun&& f)
     {
-        exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
+        exec([&](const unsigned int kernels_count, const unsigned int kernel_index) {
             Iter iter = first;
             for (unsigned int i = 0; i < kernel_index; ++i, ++iter)
                 if (iter == end)
@@ -33,7 +33,7 @@ public:
     template <typename Iter, typename Fun>
     static void execi(Iter first, Iter end, Fun&& f)
     {
-        exec([&](const unsigned int kernels_count, const unsigned int kernel_index) noexcept {
+        exec([&](const unsigned int kernels_count, const unsigned int kernel_index) {
             unsigned int index = kernel_index;
             Iter iter = first;
             for (unsigned int i = 0; i < kernel_index; ++i, ++iter)
@@ -64,7 +64,7 @@ public:
             first_index = end_index;
         }
         ranges.emplace_back(first + first_index, end);
-        exec([&](const unsigned int, const unsigned int kernel_index) noexcept {
+        exec([&](const unsigned int, const unsigned int kernel_index) {
             auto& range = ranges[kernel_index];
             for (Iter iter = range.first; iter != range.second; ++iter) {
                 f(*iter, kernel_index);

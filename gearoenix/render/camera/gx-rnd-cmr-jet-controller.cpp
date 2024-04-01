@@ -7,7 +7,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-gearoenix::core::event::Listener::Response gearoenix::render::camera::JetController::on_event(const core::event::Data& d) noexcept
+gearoenix::core::event::Listener::Response gearoenix::render::camera::JetController::on_event(const core::event::Data& d)
 {
     switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
@@ -82,7 +82,7 @@ gearoenix::core::event::Listener::Response gearoenix::render::camera::JetControl
     return Response::Continue;
 }
 
-gearoenix::render::camera::JetController::JetController(engine::Engine& e, const core::ecs::entity_id_t camera_entity_id) noexcept
+gearoenix::render::camera::JetController::JetController(engine::Engine& e, const core::ecs::entity_id_t camera_entity_id)
     : camera_entity_id(camera_entity_id)
     , e(e)
 {
@@ -94,7 +94,7 @@ gearoenix::render::camera::JetController::JetController(engine::Engine& e, const
     event_engine->add_listener(core::event::Id::MovementMouse, this);
 }
 
-gearoenix::render::camera::JetController::~JetController() noexcept
+gearoenix::render::camera::JetController::~JetController()
 {
     auto* const event_engine = e.get_platform_application().get_base().get_event_engine();
     event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
@@ -104,7 +104,7 @@ gearoenix::render::camera::JetController::~JetController() noexcept
     event_engine->remove_listener(core::event::Id::MovementMouse, 0.0f, this);
 }
 
-void gearoenix::render::camera::JetController::update() noexcept
+void gearoenix::render::camera::JetController::update()
 {
     auto* const trn = e.get_world()->get_component<physics::Transformation>(camera_entity_id);
     const auto delta_time = e.get_delta_time();

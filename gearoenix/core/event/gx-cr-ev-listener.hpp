@@ -10,10 +10,9 @@ struct Listener {
         Discontinue,
     };
 
-public:
-    virtual ~Listener() noexcept = default;
+    virtual ~Listener() = default;
     /// If it returns true no more process on event will happen
-    [[nodiscard]] virtual Response on_event(const Data& event_data) noexcept = 0;
+    [[nodiscard]] virtual Response on_event(const Data& event_data) = 0;
 };
 }
 #endif

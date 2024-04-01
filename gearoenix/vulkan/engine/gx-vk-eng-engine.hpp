@@ -58,22 +58,22 @@ struct Engine final : public render::engine::Engine {
     //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 
 private:
-    void initialize_frame() noexcept;
-    void window_resized() noexcept final;
+    void initialize_frame();
+    void window_resized() final;
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
-    explicit Engine(platform::Application& platform_application) noexcept;
-    ~Engine() noexcept final;
-    void start_frame() noexcept final;
-    void end_frame() noexcept final;
-    void upload_imgui_fonts() noexcept final;
+    explicit Engine(platform::Application& platform_application);
+    ~Engine() final;
+    void start_frame() final;
+    void end_frame() final;
+    void upload_imgui_fonts() final;
 
-    [[nodiscard]] Frame& get_current_frame() noexcept;
-    [[nodiscard]] const Frame& get_current_frame() const noexcept;
-    [[nodiscard]] const Framebuffer& get_current_framebuffer() const noexcept;
-    [[nodiscard]] static bool is_supported() noexcept;
+    [[nodiscard]] Frame& get_current_frame();
+    [[nodiscard]] const Frame& get_current_frame() const;
+    [[nodiscard]] const Framebuffer& get_current_framebuffer() const;
+    [[nodiscard]] static bool is_supported();
 };
 }
 #endif

@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
 
     constexpr float epsilon = 0.0001f;
 
-    auto compare = [&](const std::string& operation, const int location) noexcept {
+    auto compare = [&](const std::string& operation, const int location) {
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j) {
                 const auto a = glmm[i][j];

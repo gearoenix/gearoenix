@@ -9,7 +9,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-void gearoenix::vulkan::image::Image::terminate() noexcept
+void gearoenix::vulkan::image::Image::terminate()
 {
     if (nullptr != allocated_memory && vulkan_data != nullptr) {
         vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
@@ -17,7 +17,7 @@ void gearoenix::vulkan::image::Image::terminate() noexcept
     }
 }
 
-gearoenix::vulkan::image::Image::Image(Image&& o) noexcept
+gearoenix::vulkan::image::Image::Image(Image&& o)
     : logical_device(o.logical_device)
     , allocated_memory(std::move(o.allocated_memory))
     , image_width(o.image_width)
@@ -43,7 +43,7 @@ gearoenix::vulkan::image::Image::Image(
     const VkFormat format,
     const VkImageCreateFlags flags,
     const VkImageUsageFlags usage,
-    VkImage vulkan_data) noexcept
+    VkImage vulkan_data)
     : logical_device(logical_device)
     , image_width(image_width)
     , image_height(image_height)
@@ -66,7 +66,7 @@ gearoenix::vulkan::image::Image::Image(
     const VkFormat format,
     const VkImageCreateFlags flags,
     const VkImageUsageFlags usage,
-    memory::Manager& mem_mgr) noexcept
+    memory::Manager& mem_mgr)
     : logical_device(&mem_mgr.get_e().get_logical_device())
     , image_width(image_width)
     , image_height(image_height)
@@ -104,12 +104,12 @@ gearoenix::vulkan::image::Image::Image(
         allocated_memory->get_allocator()->get_offset()));
 }
 
-gearoenix::vulkan::image::Image::~Image() noexcept
+gearoenix::vulkan::image::Image::~Image()
 {
     terminate();
 }
 
-gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Image&& o) noexcept
+gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Image&& o)
 {
     terminate();
     logical_device = o.logical_device;
@@ -127,7 +127,7 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
     return *this;
 }
 //
-// void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept
+// void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
 //{
 //    VkPipelineStageFlags src_stage;
 //    VkPipelineStageFlags dst_stage;
@@ -166,12 +166,12 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
 //        1, &barrier);
 //}
 //
-// void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c) noexcept
+// void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c)
 //{
 //    transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 //}
 //
-// void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b) noexcept
+// void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b)
 //{
 //    VkBufferImageCopy region;
 //    GX_SET_ZERO(region)
@@ -209,7 +209,7 @@ gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Imag
 //        &region);
 //}
 //
-// void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c) noexcept
+// void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c)
 //{
 //    transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 //}

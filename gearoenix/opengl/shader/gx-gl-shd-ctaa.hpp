@@ -13,10 +13,10 @@ struct ColourTuningAntiAliasing final : public Shader {
     GX_GL_UNIFORM_TEXTURE(depth_texture);
 
 public:
-    ColourTuningAntiAliasing(Engine& e, std::size_t colour_tuning_index) noexcept;
-    ~ColourTuningAntiAliasing() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
-    void set(const render::camera::ColourTuning& colour_tuning) noexcept;
+    ColourTuningAntiAliasing(Engine& e, std::size_t colour_tuning_index);
+    ~ColourTuningAntiAliasing() final;
+    void bind(uint& current_shader) const final;
+    void set(const render::camera::ColourTuning& colour_tuning);
 };
 
 struct ColourTuningAntiAliasingCombination final : public ShaderCombination {
@@ -27,10 +27,10 @@ struct ColourTuningAntiAliasingCombination final : public ShaderCombination {
 private:
     std::array<std::optional<ColourTuningAntiAliasing>, std::variant_size_v<render::camera::ColourTuning>> combination;
 
-    explicit ColourTuningAntiAliasingCombination(Engine& e) noexcept;
+    explicit ColourTuningAntiAliasingCombination(Engine& e);
 
 public:
-    [[nodiscard]] ColourTuningAntiAliasing& get(const render::camera::ColourTuning& colour_tuning) noexcept
+    [[nodiscard]] ColourTuningAntiAliasing& get(const render::camera::ColourTuning& colour_tuning)
     {
         auto& result = combination[colour_tuning.index()];
         if (result.has_value())

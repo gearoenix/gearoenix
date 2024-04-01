@@ -2,7 +2,7 @@
 #include <limits>
 #include <optional>
 
-gearoenix::ai::Dijkstra::Dijkstra(const std::vector<std::vector<std::tuple<int, int>>>& g) noexcept
+gearoenix::ai::Dijkstra::Dijkstra(const std::vector<std::vector<std::tuple<int, int>>>& g)
 {
     graph.reserve(g.size());
     for (auto& c : g) {
@@ -14,7 +14,7 @@ gearoenix::ai::Dijkstra::Dijkstra(const std::vector<std::vector<std::tuple<int, 
     }
 }
 
-gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int start) const noexcept
+gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int start) const
 {
     struct SeenInfo {
         int weight = std::numeric_limits<int>::max();
@@ -46,4 +46,4 @@ gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int sta
     return gearoenix::ai::Graph<int, int>();
 }
 
-gearoenix::ai::Dijkstra::~Dijkstra() noexcept = default;
+gearoenix::ai::Dijkstra::~Dijkstra() = default;

@@ -36,9 +36,9 @@ public:
     Queue& operator=(Queue&&) = delete;
     Queue& operator=(const Queue&) = delete;
     /// It must be created in the same thread that it is going to be used.
-    explicit Queue(engine::Engine& e) noexcept;
-    ~Queue() noexcept;
-    void submit(command::Buffer&, sync::Fence& fence) noexcept;
+    explicit Queue(engine::Engine& e);
+    ~Queue();
+    void submit(command::Buffer&, sync::Fence& fence);
     void submit(
         std::size_t wait_semaphores_count,
         const VkSemaphore* wait_semaphores,
@@ -47,7 +47,7 @@ public:
         const VkCommandBuffer* commands,
         std::size_t signal_semaphores_count,
         const VkSemaphore* signal_semaphores,
-        VkFence fence = nullptr) noexcept;
+        VkFence fence = nullptr);
 };
 }
 

@@ -7,7 +7,7 @@
 #include "gx-vk-check.hpp"
 #include "gx-vk-swapchain.hpp"
 
-gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
+gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw)
     : swapchain(std::move(sw))
 {
     const auto& d = swapchain.get_logical_device();
@@ -80,7 +80,7 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw) noexcept
     GX_VK_CHK(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::RenderPass::~RenderPass() noexcept
+gearoenix::vulkan::RenderPass::~RenderPass()
 {
     if (nullptr != vulkan_data)
         vkDestroyRenderPass(swapchain.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);

@@ -1,9 +1,6 @@
 #ifndef GEAROENIX_CORE_APPLICATION_HPP
 #define GEAROENIX_CORE_APPLICATION_HPP
 #include "../platform/gx-plt-application.hpp"
-#include "gx-cr-build-configuration.hpp"
-#include "gx-cr-types.hpp"
-#include <memory>
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #define GEAROENIX_START(ApplicationMainClass) GX_MAIN_ENTRY(                 \
@@ -35,9 +32,9 @@ protected:
     render::engine::Engine& render_engine;
 
 public:
-    explicit Application(platform::Application& platform_application) noexcept;
-    virtual ~Application() noexcept;
-    virtual void update() noexcept;
+    explicit Application(platform::Application& platform_application);
+    virtual ~Application();
+    virtual void update();
 };
 }
 #endif

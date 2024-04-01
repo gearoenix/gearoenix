@@ -5,6 +5,7 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/skybox/gx-rnd-sky-builder.hpp"
 #include "../render/skybox/gx-rnd-sky-manager.hpp"
+#include "../render/skybox/gx-rnd-sky-skybox.hpp"
 #include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
@@ -13,40 +14,49 @@ struct Texture2D;
 struct TextureCube;
 struct Mesh;
 
-struct Skybox final : core::ecs::Component {
-    std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
-    std::shared_ptr<Mesh> mesh;
+struct Skybox final : render::skybox::Skybox {
+    typedef std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> GlTexture;
 
+    GX_GET_CREF_PRV(GlTexture, gl_texture);
+    GX_GET_CREF_PRV(std::shared_ptr<Mesh>, gl_mesh);
+
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+
+public:
     Skybox(
-        std::variant<std::shared_ptr<Texture2D>,
-            std::shared_ptr<TextureCube>>&& texture,
+        render::skybox::Texture&& texture,
         std::shared_ptr<Mesh>&& mesh,
-        std::string&& name) noexcept;
-    ~Skybox() noexcept final;
-    Skybox(Skybox&&) noexcept;
-    [[nodiscard]] uint get_vertex_object() const noexcept;
-    [[nodiscard]] uint get_index_buffer() const noexcept;
-    [[nodiscard]] uint get_texture_object() const noexcept;
+        std::string&& name);
+    [[nodiscard]] static std::shared_ptr<Skybox> construct(
+        render::skybox::Texture&& texture,
+        std::shared_ptr<render::mesh::Mesh>&& mesh,
+        std::string&& name);
+    ~Skybox() override;
+    [[nodiscard]] uint get_vertex_object() const;
+    [[nodiscard]] uint get_index_buffer() const;
+    [[nodiscard]] uint get_texture_object() const;
 };
 
-struct SkyboxBuilder final : public render::skybox::Builder {
+struct SkyboxBuilder final : render::skybox::Builder {
     SkyboxBuilder(
         Engine& e,
-        const std::string& name,
-        std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& bound_texture,
-        const core::sync::EndCaller& end_callback) noexcept;
-    ~SkyboxBuilder() noexcept final;
+        std::string&& name,
+        render::skybox::Texture&& bound_texture,
+        std::shared_ptr<render::mesh::Mesh>&& mesh,
+        core::job::EndCaller<>&& entity_end_callback);
+    ~SkyboxBuilder() override;
 };
 
-struct SkyboxManager final : public render::skybox::Manager {
+struct SkyboxManager final : render::skybox::Manager {
     Engine& eng;
 
-    explicit SkyboxManager(Engine& e) noexcept;
-    ~SkyboxManager() noexcept final;
+    explicit SkyboxManager(Engine& e);
+    ~SkyboxManager() override;
     [[nodiscard]] std::shared_ptr<render::skybox::Builder> build(
         std::string&& name,
-        Texture&& bound_texture,
-        const core::sync::EndCaller& c) noexcept final;
+        render::skybox::Texture&& bound_texture,
+        std::shared_ptr<render::mesh::Mesh>&& mesh,
+        core::job::EndCaller<>&& entity_end_callback) override;
 };
 }
 

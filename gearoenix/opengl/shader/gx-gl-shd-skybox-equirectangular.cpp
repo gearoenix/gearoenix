@@ -49,7 +49,7 @@ void main() {\n\
     frag_colour = texture(albedo, (vec2(atan(v.y, v.x), asin(v.z)) * inv_atan) + 0.5);\n\
 }\n";
 
-gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e) noexcept
+gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -61,9 +61,9 @@ gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e) n
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::shader::SkyboxEquirectangular::~SkyboxEquirectangular() noexcept = default;
+gearoenix::gl::shader::SkyboxEquirectangular::~SkyboxEquirectangular() = default;
 
-void gearoenix::gl::shader::SkyboxEquirectangular::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::SkyboxEquirectangular::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

@@ -12,28 +12,28 @@ struct Engine;
 struct Camera final : public core::ecs::Component {
     UniformBuffer uniform;
 
-    Camera(Engine& e, const std::string& name) noexcept;
-    ~Camera() noexcept final;
-    Camera(Camera&&) noexcept;
+    Camera(Engine& e, const std::string& name);
+    ~Camera() final;
+    Camera(Camera&&);
 };
 
 struct CameraBuilder final : public render::camera::Builder {
     friend struct CameraManager;
 
 private:
-    CameraBuilder(Engine& e, const std::string& name) noexcept;
+    CameraBuilder(Engine& e, const std::string& name);
 
 public:
-    ~CameraBuilder() noexcept final;
+    ~CameraBuilder() final;
 };
 
 struct CameraManager final : public render::camera::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name) noexcept final;
+    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name) final;
 
 public:
-    explicit CameraManager(Engine& e) noexcept;
-    ~CameraManager() noexcept final;
+    explicit CameraManager(Engine& e);
+    ~CameraManager() final;
 };
 }
 

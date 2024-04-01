@@ -3,7 +3,7 @@
 #include "../gx-plt-log.hpp"
 #include <X11/Xlib.h>
 
-gearoenix::platform::key::Id gearoenix::platform::convert_mouse_to_key(const unsigned int b) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_mouse_to_key(const unsigned int b)
 {
     switch (b) {
     case Button1:

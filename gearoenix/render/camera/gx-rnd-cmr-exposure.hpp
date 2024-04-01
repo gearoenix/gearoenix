@@ -12,20 +12,20 @@ private:
     float sensitivity = 1.0f;
     float value = 1.0f;
 
-    void update() noexcept;
+    void update();
 
 public:
-    Exposure() noexcept;
-    void set_aperture(float) noexcept;
-    [[nodiscard]] float get_aperture() const noexcept;
-    void set_shutter_speed(float) noexcept;
-    [[nodiscard]] float get_shutter_speed() const noexcept;
-    void set_sensitivity(float) noexcept;
-    [[nodiscard]] float get_sensitivity() const noexcept;
-    [[nodiscard]] float get_value() const noexcept;
-    void enable() noexcept;
-    void disable() noexcept;
-    void show_debug_gui() noexcept;
+    Exposure();
+    void set_aperture(float);
+    [[nodiscard]] float get_aperture() const;
+    void set_shutter_speed(float);
+    [[nodiscard]] float get_shutter_speed() const;
+    void set_sensitivity(float);
+    [[nodiscard]] float get_sensitivity() const;
+    [[nodiscard]] float get_value() const;
+    void enable();
+    void disable();
+    void show_debug_gui();
 };
 }
 

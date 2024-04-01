@@ -16,15 +16,15 @@ struct ArmatureAnimationInfo final {
     std::string name;
     std::vector<BoneChannelBuilder> channels;
 
-    void optimise() noexcept;
+    void optimise();
 };
 
 struct Animation {
     const std::string name;
 
-    explicit Animation(std::string name) noexcept;
-    virtual ~Animation() noexcept;
-    virtual void animate(Manager& manager, double time) noexcept = 0;
+    explicit Animation(std::string name);
+    virtual ~Animation();
+    virtual void animate(Manager& manager, double time) = 0;
 };
 
 struct ArmatureAnimation final : public Animation {
@@ -36,10 +36,10 @@ struct ArmatureAnimation final : public Animation {
         std::string name,
         std::size_t bones_channels_count,
         std::size_t bones_channels_first_index,
-        std::size_t bones_channels_end_index) noexcept;
-    ~ArmatureAnimation() noexcept final;
-    void animate(Manager& manager, double time) noexcept final;
-    void animate(Manager& manager, const BoneChannel& bone_channel, double time) noexcept;
+        std::size_t bones_channels_end_index);
+    ~ArmatureAnimation() final;
+    void animate(Manager& manager, double time) final;
+    void animate(Manager& manager, const BoneChannel& bone_channel, double time);
 };
 
 struct SpriteAnimation final : public Animation {
@@ -53,12 +53,12 @@ struct SpriteAnimation final : public Animation {
         std::string name,
         std::shared_ptr<render::material::Sprite> sprite,
         std::size_t width,
-        std::size_t height) noexcept;
-    ~SpriteAnimation() noexcept final;
-    void animate(Manager& manager, double time) noexcept final;
+        std::size_t height);
+    ~SpriteAnimation() final;
+    void animate(Manager& manager, double time) final;
 };
 
-struct AnimationPlayer final : core::ecs::Component {
+struct AnimationPlayer final : public core::ecs::Component {
     friend struct Manager;
 
     GX_GET_VAL_PRV(double, time, 0.0);
@@ -70,15 +70,15 @@ struct AnimationPlayer final : core::ecs::Component {
     GX_GET_REFC_PRV(std::shared_ptr<Animation>, animation);
 
 public:
-    AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0) noexcept;
-    AnimationPlayer(AnimationPlayer&&) noexcept;
-    ~AnimationPlayer() noexcept final;
-
-    void update_time(double delta_time) noexcept;
-    void set_loop_start_time(double t) noexcept;
-    void set_loop_end_time(double t) noexcept;
-    void set_loop_range_time(double start, double end) noexcept;
-    void animate(Manager& manager) noexcept;
+    AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
+    ~AnimationPlayer() final;
+    [[nodiscard]] static std::shared_ptr<AnimationPlayer> construct(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
+    void update_time(double delta_time);
+    void set_loop_start_time(double t);
+    void set_loop_end_time(double t);
+    void set_loop_range_time(double start, double end);
+    void animate(Manager& manager);
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final;
 };
 }
 #endif

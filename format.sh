@@ -26,7 +26,7 @@ ${clang_format} --version
 clang_version=$(${clang_format} --version 2>&1)
 
 # Extract the major version number using regular expression matching
-regex=' ([0-9]+)\.[0-9]+\.[0-9]+ '
+regex='([0-9]+)\.[0-9]+\.[0-9]+'
 if [[ ${clang_version} =~ ${regex} ]]; then
   major_version=${BASH_REMATCH[1]}
 else

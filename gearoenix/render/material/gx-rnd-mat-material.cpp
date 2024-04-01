@@ -1,15 +1,16 @@
 #include "gx-rnd-mat-material.hpp"
 #include <utility>
 
-gearoenix::render::material::Material::Material(std::string name, const Id id) noexcept
-    : id(id)
+gearoenix::render::material::Material::Material(engine::Engine& e, std::string name, const Id id)
+    : e(e)
+    , id(id)
     , name(std::move(name))
 {
 }
 
-gearoenix::render::material::Material::~Material() noexcept = default;
+gearoenix::render::material::Material::~Material() = default;
 
-void gearoenix::render::material::Material::set_albedo(const std::shared_ptr<texture::Texture2D>&) noexcept
+void gearoenix::render::material::Material::set_albedo(std::shared_ptr<texture::Texture2D>&&)
 {
     GX_UNIMPLEMENTED;
 }

@@ -26,12 +26,12 @@ private:
     bool rotate_right = false;
     bool rotate = false;
 
-    [[nodiscard]] Response on_event(const core::event::Data& event_data) noexcept final;
+    [[nodiscard]] Response on_event(const core::event::Data& event_data) final;
 
 public:
-    JetController(engine::Engine& e, core::ecs::entity_id_t camera_entity_id) noexcept;
-    ~JetController() noexcept final;
-    void update() noexcept;
+    JetController(engine::Engine& e, core::ecs::entity_id_t camera_entity_id);
+    ~JetController() final;
+    void update();
 };
 }
 #endif

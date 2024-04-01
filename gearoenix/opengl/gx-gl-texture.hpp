@@ -10,74 +10,71 @@
 namespace gearoenix::gl {
 struct Engine;
 struct Uploader;
-struct Target;
 
-[[nodiscard]] sint convert_internal_format(render::texture::TextureFormat f) noexcept;
-[[nodiscard]] enumerated convert_format(render::texture::TextureFormat f) noexcept;
-[[nodiscard]] enumerated convert_data_format(render::texture::TextureFormat f) noexcept;
-[[nodiscard]] float convert_min(render::texture::Filter f) noexcept;
-[[nodiscard]] float convert_mag(render::texture::Filter f) noexcept;
-[[nodiscard]] sint convert(render::texture::Wrap w) noexcept;
-[[nodiscard]] enumerated convert(render::texture::Face f) noexcept;
+[[nodiscard]] sint convert_internal_format(render::texture::TextureFormat f);
+[[nodiscard]] enumerated convert_format(render::texture::TextureFormat f);
+[[nodiscard]] enumerated convert_data_format(render::texture::TextureFormat f);
+[[nodiscard]] float convert_min(render::texture::Filter f);
+[[nodiscard]] float convert_mag(render::texture::Filter f);
+[[nodiscard]] sint convert(render::texture::Wrap w);
+[[nodiscard]] enumerated convert(render::texture::Face f);
 
-struct Texture2D final : public render::texture::Texture2D {
+struct Texture2D final : render::texture::Texture2D {
     friend struct TextureManager;
 
     Engine& e;
-    GX_GET_VAL_PRV(uint, object, 0);
+    GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
-private:
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept final;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const override;
 
 public:
     Texture2D(
         Engine& e,
         const render::texture::TextureInfo& info,
-        std::string name) noexcept;
-    ~Texture2D() noexcept final;
-    void bind(enumerated texture_unit) noexcept;
-    void generate_mipmaps() noexcept;
+        std::string name);
+    ~Texture2D() override;
+    void bind(enumerated texture_unit) const;
+    void generate_mipmaps();
 };
 
-struct TextureCube final : public render::texture::TextureCube {
+struct TextureCube final : render::texture::TextureCube {
     friend struct TextureManager;
 
     Engine& e;
-    GX_GET_VAL_PRV(uint, object, 0);
+    GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
-private:
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept final;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const override;
 
 public:
     TextureCube(
         Engine& e,
         const render::texture::TextureInfo& info,
-        std::string name) noexcept;
-    ~TextureCube() noexcept final;
-    void bind(enumerated texture_unit) noexcept;
+        std::string name);
+    ~TextureCube() override;
+    void bind(enumerated texture_unit) const;
 };
 
-struct TextureManager final : public render::texture::Manager {
+struct TextureManager final : render::texture::Manager {
     Engine& eng;
 
-    explicit TextureManager(Engine& e) noexcept;
-    ~TextureManager() noexcept final;
+    explicit TextureManager(Engine& e);
+    ~TextureManager() override;
 
 private:
-    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels_v(
-        std::string name,
-        std::vector<std::vector<std::uint8_t>> pixels,
+    void create_2d_from_pixels_v(
+        std::string&& name,
+        std::vector<std::vector<std::uint8_t>>&& pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::texture::TextureCube> create_cube_from_pixels_v(
-        std::string name,
-        std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+        core::job::EndCallerShared<render::texture::Texture2D>&& c) override;
+    void create_cube_from_pixels_v(
+        std::string&& name,
+        std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::texture::Target> create_target_v(
-        std::string name,
+        core::job::EndCallerShared<render::texture::TextureCube>&& c) override;
+    void create_target_v(
+        std::string&& name,
         std::vector<render::texture::Attachment>&& attachments,
-        const core::sync::EndCaller& c) noexcept final;
+        core::job::EndCallerShared<render::texture::Target>&& c) override;
 };
 }
 

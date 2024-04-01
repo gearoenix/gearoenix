@@ -47,26 +47,26 @@ public:
     };
 
 private:
-    [[nodiscard]] int is_good(VkPhysicalDevice gpu) noexcept;
-    void initialize_extensions() noexcept;
-    void initialize_features() noexcept;
-    void initialize_properties() noexcept;
+    [[nodiscard]] int is_good(VkPhysicalDevice gpu);
+    void initialize_extensions();
+    void initialize_features();
+    void initialize_properties();
 
 public:
     Physical(const Physical&) = delete;
     Physical(Physical&&) = delete;
-    explicit Physical(const Surface& surface) noexcept;
-    ~Physical() noexcept;
+    explicit Physical(const Surface& surface);
+    ~Physical();
     Physical& operator=(const Physical&) = delete;
     Physical& operator=(Physical&&) = delete;
-    [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const noexcept;
-    [[nodiscard]] std::size_t align_size(std::size_t size) const noexcept;
+    [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const;
+    [[nodiscard]] std::size_t align_size(std::size_t size) const;
 
     /// It's going to fetch a new information about the surface every time.
     ///
     /// \note If you don't care about new information you can cache it for your future uses.
-    [[nodiscard]] VkSurfaceCapabilitiesKHR get_surface_capabilities() const noexcept;
-    [[nodiscard]] static std::vector<VkPhysicalDevice> get_available_devices(VkInstance instance) noexcept;
+    [[nodiscard]] VkSurfaceCapabilitiesKHR get_surface_capabilities() const;
+    [[nodiscard]] static std::vector<VkPhysicalDevice> get_available_devices(VkInstance instance);
 };
 }
 #endif

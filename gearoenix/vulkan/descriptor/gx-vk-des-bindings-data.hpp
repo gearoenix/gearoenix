@@ -31,12 +31,12 @@ private:
     std::map<std::variant<std::size_t, std::thread::id>, std::weak_ptr<PoolManager>> pools;
 
     [[nodiscard]] static std::vector<VkDescriptorPoolSize> create_pool_sizes(
-        const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept;
-    BindingsData(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept;
-    [[nodiscard]] std::shared_ptr<Set> create_set(std::optional<std::size_t> kernel_index) noexcept;
+        const std::vector<VkDescriptorSetLayoutBinding>& data);
+    BindingsData(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data);
+    [[nodiscard]] std::shared_ptr<Set> create_set(std::optional<std::size_t> kernel_index);
 
 public:
-    ~BindingsData() noexcept;
+    ~BindingsData();
 };
 }
 

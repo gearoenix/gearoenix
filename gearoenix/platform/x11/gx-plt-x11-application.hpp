@@ -24,14 +24,14 @@ struct Application final {
 private:
     Atom close_message;
 
-    void fetch_events() noexcept;
+    void fetch_events();
 
 public:
-    explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
-    ~Application() noexcept;
-    void run(core::Application* core_application = nullptr) noexcept;
+    explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
+    ~Application();
+    void run(core::Application* core_application = nullptr);
 #ifdef GX_RENDER_VULKAN_ENABLED
-    [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const noexcept;
+    [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const;
 #endif
 };
 }

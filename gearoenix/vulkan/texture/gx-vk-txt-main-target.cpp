@@ -21,7 +21,7 @@ gearoenix::vulkan::texture::MainTarget::Frame::Frame(
     std::shared_ptr<Framebuffer> framebuffer,
     std::shared_ptr<sync::Fence> wait_fence,
     std::shared_ptr<sync::Semaphore> start_semaphore,
-    std::shared_ptr<sync::Semaphore> end_semaphore) noexcept
+    std::shared_ptr<sync::Semaphore> end_semaphore)
     : framebuffer(std::move(framebuffer))
     , wait_fence(std::move(wait_fence))
     , start_semaphore(std::move(start_semaphore))
@@ -29,7 +29,7 @@ gearoenix::vulkan::texture::MainTarget::Frame::Frame(
 {
 }
 
-gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o) noexcept
+gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o)
     : render::texture::Target(o)
     , swapchain(o.swapchain)
     , depth_stencil(o.depth_stencil)
@@ -38,7 +38,7 @@ gearoenix::vulkan::texture::MainTarget::MainTarget(const MainTarget& o) noexcept
 {
 }
 
-gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, engine::Engine* e) noexcept
+gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, engine::Engine* e)
     : render::texture::Target(core::asset::Manager::create_id(), e)
 {
     const auto* const plt_app = e->get_platform_application().get();
@@ -59,14 +59,14 @@ gearoenix::vulkan::texture::MainTarget::MainTarget(memory::Manager& mem_mgr, eng
     }
 }
 
-gearoenix::vulkan::texture::MainTarget::~MainTarget() noexcept = default;
+gearoenix::vulkan::texture::MainTarget::~MainTarget() = default;
 
-gearoenix::render::texture::Target* gearoenix::vulkan::texture::MainTarget::clone() const noexcept
+gearoenix::render::texture::Target* gearoenix::vulkan::texture::MainTarget::clone() const
 {
     return new MainTarget(*this);
 }
 
-void gearoenix::vulkan::texture::MainTarget::update() noexcept
+void gearoenix::vulkan::texture::MainTarget::update()
 {
     current_frame = &frames[e->get_frame_number()];
     GX_CHECK_NOT_EQUAL_D(swapchain->get_next_image_index(current_frame->start_semaphore), 0xFFFFFFFF)
@@ -74,7 +74,7 @@ void gearoenix::vulkan::texture::MainTarget::update() noexcept
     current_frame->wait_fence->reset();
 }
 
-void gearoenix::vulkan::texture::MainTarget::present() noexcept
+void gearoenix::vulkan::texture::MainTarget::present()
 {
     auto vk_swap = swapchain->get_vulkan_data();
     const auto frame_number = static_cast<std::uint32_t>(e->get_frame_number());

@@ -36,11 +36,11 @@ struct GameApp final : public gearoenix::core::Application {
 
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
-        gearoenix::core::sync::EndCaller end_callback([] {});
+        gearoenix::core::sync::EndCaller const end_callback([] {});
 
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
-        scene_builder->get_scene().enabled = true;
+        scene_builder->get_scene().set_enabled(true);
 
         auto mesh = render_engine.get_mesh_manager()->build(
             "triangle-mesh",

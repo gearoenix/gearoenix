@@ -4,45 +4,39 @@
 #include "gx-rnd-mat-sprite.hpp"
 #include "gx-rnd-mat-unlit.hpp"
 
-gearoenix::render::material::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::render::material::Manager::Manager(engine::Engine& e)
     : e(e)
 {
 }
 
-gearoenix::render::material::Manager::~Manager() noexcept = default;
+gearoenix::render::material::Manager::~Manager() = default;
 
 #define GX_RND_MAT_RETURN_IF_FOUND(x)                                    \
     if (auto search = materials.find(name); materials.end() != search) { \
         if (auto m = search->second.lock()) {                            \
             GX_ASSERT_D(Id::x == m->get_id());                           \
-            return std::dynamic_pointer_cast<x>(m);                      \
+            auto cm = std::dynamic_pointer_cast<x>(m);                   \
+            GX_ASSERT_D(nullptr != cm);                                  \
+            c.set_return(std::move(cm));                                 \
+            return;                                                      \
         }                                                                \
     }                                                                    \
     static_assert(true, "")
 
-std::shared_ptr<gearoenix::render::material::Pbr> gearoenix::render::material::Manager::get_pbr(
-    const std::string& name, const core::sync::EndCaller& c) noexcept
-{
-    GX_RND_MAT_RETURN_IF_FOUND(Pbr);
-    auto m = construct_pbr(name, c);
-    materials.emplace(name, m);
-    return m;
-}
+#define GX_RND_MAT_CONSTRUCT(x, sx)                                                                             \
+    GX_RND_MAT_RETURN_IF_FOUND(x);                                                                              \
+    construct_##sx(name, core::job::EndCallerShared<x>([this, c = std::move(c), name](std::shared_ptr<x>&& m) { \
+        materials.emplace(name, std::move(m));                                                                  \
+    }))
 
-std::shared_ptr<gearoenix::render::material::Unlit> gearoenix::render::material::Manager::get_unlit(
-    const std::string& name, const core::sync::EndCaller& c) noexcept
-{
-    GX_RND_MAT_RETURN_IF_FOUND(Unlit);
-    auto m = construct_unlit(name, c);
-    materials.emplace(name, m);
-    return m;
-}
+#define GX_RND_MAT_FUNC(x, sx)                                      \
+    void gearoenix::render::material::Manager::get_##sx(            \
+        const std::string& name, core::job::EndCallerShared<x>&& c) \
+    {                                                               \
+        GX_RND_MAT_CONSTRUCT(x, sx);                                \
+    }                                                               \
+    static_assert(true, "")
 
-std::shared_ptr<gearoenix::render::material::Sprite> gearoenix::render::material::Manager::get_sprite(
-    const std::string& name, const core::sync::EndCaller& c) noexcept
-{
-    GX_RND_MAT_RETURN_IF_FOUND(Sprite);
-    auto m = construct_sprite(name, c);
-    materials.emplace(name, m);
-    return m;
-}
+GX_RND_MAT_FUNC(Pbr, pbr);
+GX_RND_MAT_FUNC(Unlit, unlit);
+GX_RND_MAT_FUNC(Sprite, sprite);

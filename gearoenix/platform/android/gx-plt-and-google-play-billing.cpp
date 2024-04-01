@@ -22,7 +22,7 @@ jmethodID gearoenix::platform::GooglePlayBilling::query_product_purchases_async_
 GX_PLT_BILLING_FUNCTIONS_MAP(GX_DEC_FUNCTIONS);
 #undef GX_HELPER
 
-void gearoenix::platform::GooglePlayBilling::initialise_static(JNIEnv* const env) noexcept
+void gearoenix::platform::GooglePlayBilling::initialise_static(JNIEnv* const env)
 {
     // prevent optimisation the function alive
 #define GX_KEEP_FUNCTION_ALIVE(f) Java_com_geareonix_billing_GooglePlay_00024Native_product_1##f(nullptr, nullptr, -1)
@@ -30,7 +30,7 @@ void gearoenix::platform::GooglePlayBilling::initialise_static(JNIEnv* const env
 
     GX_KEEP_FUNCTIONS_ALIVE;
 
-    billing_java_class = env->FindClass("com/geareonix/billing/GooglePlay");
+    billing_java_class = reinterpret_cast<jclass>(env->NewGlobalRef(env->FindClass("com/geareonix/billing/GooglePlay")));
 
     if (nullptr == billing_java_class) {
         return;
@@ -54,7 +54,7 @@ void gearoenix::platform::GooglePlayBilling::initialise_static(JNIEnv* const env
     GX_ASSERT_D(nullptr != GooglePlayBilling::query_product_purchases_async_static_method);
 }
 
-void gearoenix::platform::Billing::launch_flow(const int product_index) noexcept
+void gearoenix::platform::Billing::launch_flow(const int product_index)
 {
     GX_KEEP_FUNCTIONS_ALIVE;
 
@@ -67,7 +67,7 @@ void gearoenix::platform::Billing::launch_flow(const int product_index) noexcept
         static_cast<jint>(product_index));
 }
 
-void gearoenix::platform::Billing::query_products_info() noexcept
+void gearoenix::platform::Billing::query_products_info()
 {
     GX_KEEP_FUNCTIONS_ALIVE;
 
@@ -79,7 +79,7 @@ void gearoenix::platform::Billing::query_products_info() noexcept
         GooglePlayBilling::query_product_details_async_static_method);
 }
 
-void gearoenix::platform::Billing::query_purchases_info() noexcept
+void gearoenix::platform::Billing::query_purchases_info()
 {
     GX_KEEP_FUNCTIONS_ALIVE;
 

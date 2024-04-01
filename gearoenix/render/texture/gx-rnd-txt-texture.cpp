@@ -1,16 +1,14 @@
 #include "gx-rnd-txt-texture.hpp"
-#include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-pixel-iterator.hpp"
-#include <cmath>
 
 gearoenix::render::texture::Texture::Texture(
     std::string name,
     const TextureInfo& info,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
     : e(e)
     , name(std::move(name))
     , info(info)
@@ -22,16 +20,18 @@ void gearoenix::render::texture::Texture::write_image(
     const std::uint8_t* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const TextureFormat format) const noexcept
+    const TextureFormat format)
 {
     if (format_has_float_component(format)) {
-        if (32 != format_component_bits_count(format))
+        if (32 != format_component_bits_count(format)) {
             GX_LOG_F("We can only export 32bit float format.");
-        render::texture::Image::encode_hdr(s, data, img_width, img_height, format_components_count(format));
+        }
+        Image::encode_hdr(s, data, img_width, img_height, format_components_count(format));
     } else {
-        if (8 != format_component_bits_count(format))
+        if (8 != format_component_bits_count(format)) {
             GX_UNIMPLEMENTED;
-        render::texture::Image::encode_png(s, data, img_width, img_height, format_components_count(format));
+        }
+        Image::encode_png(s, data, img_width, img_height, format_components_count(format));
     }
 }
 
@@ -40,7 +40,7 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     const std::uint8_t* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const TextureFormat format) const noexcept
+    const TextureFormat format)
 {
     const auto offset_of_size = s.tell();
     s.write_fail_debug(static_cast<std::uint32_t>(0));
@@ -53,15 +53,15 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     s.seek(curr_off);
 }
 
-gearoenix::render::texture::Texture::~Texture() noexcept = default;
+gearoenix::render::texture::Texture::~Texture() = default;
 
-void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller&) const noexcept
+void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>&) const
 {
     s->write_fail_debug(name);
     info.write(*s);
 }
 
-std::size_t gearoenix::render::texture::Texture::get_mipmaps_count() const noexcept
+std::size_t gearoenix::render::texture::Texture::get_mipmaps_count() const
 {
     return compute_mipmaps_count(info);
 }
@@ -70,12 +70,12 @@ std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
     const float* const data,
     const std::size_t in_components_count,
     const std::size_t pixels_count,
-    const std::size_t out_components_count) noexcept
+    const std::size_t out_components_count)
 {
     auto iter = Pixel<float>::ConstIterator(data, in_components_count, pixels_count);
-    auto end = iter + (pixels_count + 1);
+    const auto end = iter + (pixels_count + 1);
     std::vector<std::uint8_t> result(out_components_count * pixels_count);
-    for (; iter < end; ++iter) {
+    for (; iter != end; ++iter) {
         std::size_t i = 0;
         const std::size_t index = iter.get_pixel_index() * out_components_count;
         const float* const pixel_elements = iter.get_data();
@@ -94,7 +94,7 @@ std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
 std::vector<std::vector<std::uint8_t>> gearoenix::render::texture::Texture::convert_float_pixels(
     const std::vector<std::vector<std::uint8_t>>& data,
     const std::size_t in_components_count,
-    const std::size_t out_components_count) noexcept
+    const std::size_t out_components_count)
 {
     std::vector<std::vector<std::uint8_t>> result;
     result.reserve(data.size());
@@ -111,7 +111,7 @@ std::vector<std::vector<std::uint8_t>> gearoenix::render::texture::Texture::conv
 std::vector<std::vector<std::vector<std::uint8_t>>> gearoenix::render::texture::Texture::convert_float_pixels(
     const std::vector<std::vector<std::vector<std::uint8_t>>>& data,
     const std::size_t in_components_count,
-    const std::size_t out_components_count) noexcept
+    const std::size_t out_components_count)
 {
     std::vector<std::vector<std::vector<std::uint8_t>>> result;
     result.reserve(data.size());
@@ -121,12 +121,12 @@ std::vector<std::vector<std::vector<std::uint8_t>>> gearoenix::render::texture::
 }
 
 std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(
-    const std::size_t img_width, const std::size_t img_height) noexcept
+    const std::size_t img_width, const std::size_t img_height)
 {
     return math::Numeric::floor_log2(img_width > img_height ? img_width : img_height) + 1;
 }
 
-std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(const TextureInfo& info) noexcept
+std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(const TextureInfo& info)
 {
     return info.has_mipmap ? compute_mipmaps_count(info.width, info.height) : 1;
 }

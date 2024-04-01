@@ -5,7 +5,7 @@
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 
-void gearoenix::vulkan::mesh::Mesh::initialize_blas() noexcept
+void gearoenix::vulkan::mesh::Mesh::initialize_blas()
 {
     VkAccelerationStructureDeviceAddressInfoKHR info;
     GX_SET_ZERO(info);
@@ -21,21 +21,21 @@ gearoenix::vulkan::mesh::Mesh::Mesh(
     const render::Vertices& vertices,
     const std::vector<std::uint32_t>& indices,
     math::Aabb3<double>&& occlusion_box,
-    const core::sync::EndCaller& c) noexcept
+    const core::job::EndCaller& c)
     : render::mesh::Mesh(occlusion_box)
     , vertex(e.get_buffer_manager().create(name + "-vertices", render::get_data(vertices), core::bytes_count(vertices), c))
     , index(e.get_buffer_manager().create(name + "-indices", indices, c))
 {
 }
 
-gearoenix::vulkan::mesh::Mesh::~Mesh() noexcept
+gearoenix::vulkan::mesh::Mesh::~Mesh()
 {
     vkDestroyAccelerationStructureKHR(
         vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
     vulkan_data = nullptr;
 }
 
-std::pair<VkDeviceAddress, VkDeviceAddress> gearoenix::vulkan::mesh::Mesh::get_buffers_address() const noexcept
+std::pair<VkDeviceAddress, VkDeviceAddress> gearoenix::vulkan::mesh::Mesh::get_buffers_address() const
 {
     return {
         vertex->get_device_address(),

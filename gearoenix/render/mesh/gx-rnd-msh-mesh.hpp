@@ -7,10 +7,10 @@ struct Mesh {
     const math::Aabb3<double> box;
 
 protected:
-    Mesh(const math::Aabb3<double>& box) noexcept;
+    explicit Mesh(const math::Aabb3<double>& box);
 
 public:
-    virtual ~Mesh() noexcept;
+    virtual ~Mesh();
 
     Mesh(Mesh&&) = delete;
     Mesh(const Mesh&) = delete;

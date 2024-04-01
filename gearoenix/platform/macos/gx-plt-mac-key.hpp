@@ -6,7 +6,7 @@
 
 namespace gearoenix::platform {
 
-[[nodiscard]] key::Id convert_key(unsigned short key_code) noexcept;
+[[nodiscard]] key::Id convert_key(unsigned short key_code);
 
 }
 

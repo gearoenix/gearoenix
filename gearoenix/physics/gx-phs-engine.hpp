@@ -17,12 +17,12 @@ struct Engine final {
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager);
 
 public:
-    explicit Engine(render::engine::Engine& render_engine) noexcept;
-    ~Engine() noexcept;
+    explicit Engine(render::engine::Engine& render_engine);
+    ~Engine();
     Engine(Engine&&) = delete;
     Engine(const Engine&) = delete;
-    void start_frame() noexcept;
-    void end_frame() noexcept;
+    void start_frame();
+    void end_frame();
 };
 }
 #endif

@@ -31,14 +31,14 @@ struct Swapchain final {
 public:
     Swapchain(const Swapchain&) = delete;
     Swapchain(Swapchain&&) = delete;
-    explicit Swapchain(const engine::Engine& e) noexcept;
-    ~Swapchain() noexcept;
+    explicit Swapchain(const engine::Engine& e);
+    ~Swapchain();
     Swapchain& operator=(const Swapchain&) = delete;
     Swapchain& operator=(Swapchain&&) = delete;
     /// If the frame is valid it return true otherwise false
-    [[nodiscard]] std::optional<std::uint32_t> get_next_image_index(const sync::Semaphore& semaphore) noexcept;
-    void initialize() noexcept;
-    [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const noexcept;
+    [[nodiscard]] std::optional<std::uint32_t> get_next_image_index(const sync::Semaphore& semaphore);
+    void initialize();
+    [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const;
 };
 }
 #endif

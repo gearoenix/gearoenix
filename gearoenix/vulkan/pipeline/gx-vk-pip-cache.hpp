@@ -16,8 +16,8 @@ struct Cache final {
 
 public:
     Cache(const Cache&) = delete;
-    explicit Cache(const device::Logical& logical_device) noexcept;
-    ~Cache() noexcept;
+    explicit Cache(const device::Logical& logical_device);
+    ~Cache();
 };
 }
 #endif

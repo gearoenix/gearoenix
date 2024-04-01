@@ -12,34 +12,34 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun)
 {
-    on_press = [this, fun = fun](const math::Vec3<double>& p) noexcept -> void {
-        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(pressed_texture);
+    on_press = [this, fun = fun](const math::Vec3<double>& p) -> void {
+        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         fun(p);
     };
 }
 
-void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<double>&)>& fun)
 {
-    on_release = [this, fun = fun](const math::Vec3<double>& p) noexcept -> void {
-        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(rest_texture);
+    on_release = [this, fun = fun](const math::Vec3<double>& p) -> void {
+        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun(p);
     };
 }
 
-void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<void()>& fun) noexcept
+void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<void()>& fun)
 {
-    on_cancel = [this, fun = fun]() noexcept -> void {
-        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(rest_texture);
+    on_cancel = [this, fun = fun]() -> void {
+        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun();
     };
 }
 
-gearoenix::render::widget::Button::Button(std::string&& name, engine::Engine& e) noexcept
+gearoenix::render::widget::Button::Button(std::string&& name, engine::Engine& e)
     : Widget(std::move(name), Type::Button, e)
 {
     set_on_press_impl(on_press);
@@ -47,80 +47,148 @@ gearoenix::render::widget::Button::Button(std::string&& name, engine::Engine& e)
     set_on_cancel_impl(on_cancel);
 }
 
-gearoenix::render::widget::Button::~Button() noexcept = default;
+gearoenix::render::widget::Button::~Button() = default;
 
-std::pair<std::shared_ptr<gearoenix::render::model::Builder>, std::shared_ptr<gearoenix::render::widget::Button>>
-gearoenix::render::widget::Button::construct(
+void gearoenix::render::widget::Button::construct(
     std::string&& name,
-    engine::Engine& e,
-    const std::string& pressed_texture_asset,
-    const std::string& rest_texture_asset,
+    std::string&& pressed_texture_asset,
+    std::string&& rest_texture_asset,
     const core::ecs::entity_id_t camera_id,
-    Widget& parent,
-    scene::Builder& scene_builder,
-    const core::sync::EndCaller& end_callback) noexcept
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
 {
-    auto mat = e.get_material_manager()->get_unlit(name + "-material", end_callback);
-    mat->set_transparency(render::material::Transparency::Transparent);
-    auto rest_txt = e.get_texture_manager()->create_2d_from_file(
-        rest_texture_asset,
-        platform::stream::Path::create_asset(rest_texture_asset),
-        render::texture::TextureInfo(),
-        end_callback);
-    auto pressed_txt = e.get_texture_manager()->create_2d_from_file(
-        pressed_texture_asset,
-        platform::stream::Path::create_asset(pressed_texture_asset),
-        render::texture::TextureInfo(),
-        end_callback);
-    mat->set_albedo(rest_txt);
-    auto model_builder = e.get_model_manager()->build(
-        name + "-model",
-        e.get_mesh_manager()->build_plate(end_callback),
-        std::move(mat),
-        core::sync::EndCaller(end_callback),
-        true);
-    const auto id = model_builder->get_id();
-    auto but = std::make_shared<render::widget::Button>(std::move(name), e);
-    but->set_rest_texture(std::move(rest_txt));
-    but->set_pressed_texture(std::move(pressed_txt));
-    but->set_model_entity_id(id);
-    but->set_camera_entity_id(camera_id);
-    parent.add_child(but);
-    scene_builder.add(std::shared_ptr(model_builder));
-    return { std::move(model_builder), std::move(but) };
+    engine::Engine& e = parent->e;
+    const auto material_name = name + "-material";
+    core::job::EndCallerShared<material::Unlit> mat_end([n = std::move(name), pt = std::move(pressed_texture_asset), r = std::move(rest_texture_asset), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
+        construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(s), std::move(e));
+    });
+    e.get_material_manager()->get_unlit(material_name, std::move(mat_end));
 }
 
-void gearoenix::render::widget::Button::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Button::construct(
+    std::string&& name,
+    std::shared_ptr<material::Material>&& mat,
+    std::string&& pressed_texture_asset,
+    std::string&& rest_texture_asset,
+    const core::ecs::entity_id_t camera_id,
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+{
+    engine::Engine& e = parent->e;
+    const auto path = platform::stream::Path::create_asset(pressed_texture_asset);
+    core::job::EndCallerShared<texture::Texture2D> te([n = std::move(name), m = std::move(mat), r = std::move(rest_texture_asset), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& pt) mutable {
+        construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(s), std::move(e));
+    });
+    e.get_texture_manager()->create_2d_from_file(
+        std::move(pressed_texture_asset),
+        path,
+        texture::TextureInfo(),
+        std::move(te));
+}
+
+void gearoenix::render::widget::Button::construct(
+    std::string&& name,
+    std::shared_ptr<material::Material>&& mat,
+    std::shared_ptr<texture::Texture2D>&& pressed_texture,
+    std::string&& rest_texture_asset,
+    const core::ecs::entity_id_t camera_id,
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+{
+    engine::Engine& e = parent->e;
+    const auto path = platform::stream::Path::create_asset(rest_texture_asset);
+    core::job::EndCallerShared<texture::Texture2D> te([n = std::move(name), m = std::move(mat), pt = std::move(pressed_texture), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& r) mutable {
+        construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(s), std::move(e));
+    });
+    e.get_texture_manager()->create_2d_from_file(
+        std::move(rest_texture_asset),
+        path,
+        texture::TextureInfo(),
+        std::move(te));
+}
+
+void gearoenix::render::widget::Button::construct(
+    std::string&& name,
+    std::shared_ptr<material::Material>&& mat,
+    std::shared_ptr<texture::Texture2D>&& pressed_texture,
+    std::shared_ptr<texture::Texture2D>&& rest_texture,
+    const core::ecs::entity_id_t camera_id,
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+{
+    engine::Engine& e = parent->e;
+    e.get_mesh_manager()->build_plate(
+        core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), m = std::move(mat), pt = std::move(pressed_texture), r = std::move(rest_texture), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& bm) mutable {
+            construct(std::move(n), std::move(m), std::move(pt), std::move(r), std::move(bm), c, std::move(p), std::move(s), std::move(e));
+        }));
+}
+
+void gearoenix::render::widget::Button::construct(
+    std::string&& name,
+    std::shared_ptr<material::Material>&& mat,
+    std::shared_ptr<texture::Texture2D>&& pressed_texture,
+    std::shared_ptr<texture::Texture2D>&& rest_texture,
+    std::shared_ptr<mesh::Mesh>&& button_mesh,
+    const core::ecs::entity_id_t camera_id,
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+{
+    mat->set_transparency(material::Transparency::Transparent);
+    mat->set_albedo(std::shared_ptr(rest_texture));
+    auto model_builder = parent->e.get_model_manager()->build(
+        name + "-model",
+        std::move(button_mesh),
+        std::move(mat),
+        core::job::EndCaller([] {}),
+        true);
+    const auto id = model_builder->get_id();
+    auto but = std::make_shared<Button>(std::move(name), parent->e);
+    but->set_rest_texture(std::move(rest_texture));
+    but->set_pressed_texture(std::move(pressed_texture));
+    but->set_model_entity_id(id);
+    but->set_camera_entity_id(camera_id);
+    parent->add_child(but);
+    but->parent = std::move(parent);
+    scene_builder->add(std::shared_ptr(model_builder));
+    end_callback.set_return({ std::move(model_builder), std::move(but) });
+}
+
+void gearoenix::render::widget::Button::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     set_on_press_impl(fun);
 }
 
-void gearoenix::render::widget::Button::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Button::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     set_on_release_impl(fun);
 }
 
-void gearoenix::render::widget::Button::set_on_cancel(const std::function<void()>& fun) noexcept
+void gearoenix::render::widget::Button::set_on_cancel(const std::function<void()>& fun)
 {
     set_on_cancel_impl(fun);
 }
 
-void gearoenix::render::widget::Button::set_rest_texture(std::shared_ptr<texture::Texture2D>&& t) noexcept
+void gearoenix::render::widget::Button::set_rest_texture(std::shared_ptr<texture::Texture2D>&& t)
 {
     rest_texture = std::move(t);
     if (!is_pressed) {
-        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
-            mdl->get_bound_material()->set_albedo(rest_texture);
+        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         }
     }
 }
 
-void gearoenix::render::widget::Button::set_pressed_texture(std::shared_ptr<texture::Texture2D>&& t) noexcept
+void gearoenix::render::widget::Button::set_pressed_texture(std::shared_ptr<texture::Texture2D>&& t)
 {
     pressed_texture = std::move(t);
     if (is_pressed) {
-        if (auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
-            mdl->get_bound_material()->set_albedo(pressed_texture);
+        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+            mdl->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         }
     }
 }

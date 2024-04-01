@@ -21,9 +21,9 @@ private:
 
 public:
     /// \return The Id of the function (not the influencer id), in future a function can delete itself by it.
-    [[nodiscard]] Id add(std::vector<Id> influenced_ids, double priority, std::function<void()> function) noexcept;
-    void remove(Id function_id) noexcept;
-    void update() noexcept;
+    [[nodiscard]] Id add(std::vector<Id> influenced_ids, double priority, std::function<void()> function);
+    void remove(Id function_id);
+    void update();
 };
 }
 #endif

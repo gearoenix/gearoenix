@@ -10,14 +10,14 @@ gearoenix::metal::Texture2D::Texture2D(
     id<MTLTexture> resource,
     id<MTLSamplerState> sampler,
     const render::texture::TextureInfo& info,
-    std::string name) noexcept
+    std::string name)
     : render::texture::Texture2D(std::move(name), info, e)
     , resource(resource)
     , sampler(sampler)
 {
 }
 
-gearoenix::metal::Texture2D::~Texture2D() noexcept
+gearoenix::metal::Texture2D::~Texture2D()
 {
     [resource release];
 }
@@ -25,7 +25,7 @@ gearoenix::metal::Texture2D::~Texture2D() noexcept
 void convert(
     MTLSamplerDescriptor* desc,
     const gearoenix::render::texture::Filter mag_filter,
-    const gearoenix::render::texture::Filter min_filter) noexcept
+    const gearoenix::render::texture::Filter min_filter)
 {
     if (mag_filter == gearoenix::render::texture::Filter::LinearMipmapLinear && min_filter == gearoenix::render::texture::Filter::LinearMipmapLinear) {
         desc.minFilter = MTLSamplerMinMagFilterLinear;
@@ -48,7 +48,7 @@ void convert(
     }
 }
 
-static MTLSamplerAddressMode convert(const gearoenix::render::texture::Wrap w) noexcept
+static MTLSamplerAddressMode convert(const gearoenix::render::texture::Wrap w)
 {
     switch (w) {
     case gearoenix::render::texture::Wrap::Repeat:
@@ -61,7 +61,7 @@ static MTLSamplerAddressMode convert(const gearoenix::render::texture::Wrap w) n
 }
 
 static id<MTLSamplerState> create_sampler(
-    const gearoenix::render::texture::SamplerInfo& sample_info, id<MTLDevice> device, MTLSamplerDescriptor* desc) noexcept
+    const gearoenix::render::texture::SamplerInfo& sample_info, id<MTLDevice> device, MTLSamplerDescriptor* desc)
 {
     convert(desc, sample_info.mag_filter, sample_info.min_filter);
     desc.rAddressMode = convert(sample_info.wrap_r);
@@ -74,7 +74,7 @@ static id<MTLSamplerState> create_sampler(
 }
 
 static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MTLSamplerState>> create_samplers(
-    const std::vector<gearoenix::render::texture::SamplerInfo>& sample_infos, id<MTLDevice> device) noexcept
+    const std::vector<gearoenix::render::texture::SamplerInfo>& sample_infos, id<MTLDevice> device)
 {
     boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MTLSamplerState>> samplers;
     MTLSamplerDescriptor* desc = [MTLSamplerDescriptor new];
@@ -84,7 +84,7 @@ static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MT
     return samplers;
 }
 
-gearoenix::metal::TextureManager::TextureManager(Engine& e) noexcept
+gearoenix::metal::TextureManager::TextureManager(Engine& e)
     : e(e)
     , samplers(create_samplers(
           { render::texture::SamplerInfo {
@@ -115,7 +115,7 @@ gearoenix::metal::TextureManager::TextureManager(Engine& e) noexcept
 {
 }
 
-gearoenix::metal::TextureManager::~TextureManager() noexcept
+gearoenix::metal::TextureManager::~TextureManager()
 {
     for (auto& s : samplers)
         [s.second release];
@@ -125,7 +125,7 @@ gearoenix::metal::TextureManager::~TextureManager() noexcept
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCaller& c) noexcept
+    const core::job::EndCaller& c)
 {
     const auto sampler_search = samplers.find(info.sampler_info);
     if (samplers.end() == sampler_search)
@@ -141,7 +141,7 @@ gearoenix::metal::TextureManager::~TextureManager() noexcept
     texture_descriptor.mipmapLevelCount = pixels.size() == 1 && info.has_mipmap ? render::texture::Texture::compute_mipmaps_count(info.width, info.height) : pixels.size();
     id<MTLTexture> texture = [e.get_heap_manager()->gpu newTextureWithDescriptor:texture_descriptor];
     auto result = std::make_shared<Texture2D>(e, texture, sampler, info, std::move(name));
-    core::sync::EndCaller end([c, result] {});
+    core::job::EndCaller end([c, result] {});
     e.get_uploader()->upload(texture, texture_descriptor, std::move(pixels), std::move(end));
     return result;
 }

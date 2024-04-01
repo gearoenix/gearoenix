@@ -8,7 +8,7 @@
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
 
-int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
+int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu)
 {
     std::uint32_t queue_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, nullptr);
@@ -72,7 +72,7 @@ int gearoenix::vulkan::device::Physical::is_good(VkPhysicalDevice gpu) noexcept
     return -1;
 }
 
-void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
+void gearoenix::vulkan::device::Physical::initialize_extensions()
 {
     std::uint32_t ext_count = 0;
     GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr));
@@ -96,7 +96,7 @@ void gearoenix::vulkan::device::Physical::initialize_extensions() noexcept
     }
 }
 
-void gearoenix::vulkan::device::Physical::initialize_features() noexcept
+void gearoenix::vulkan::device::Physical::initialize_features()
 {
     vkGetPhysicalDeviceFeatures(vulkan_data, &features);
     VkPhysicalDeviceFeatures2 info;
@@ -120,7 +120,7 @@ void gearoenix::vulkan::device::Physical::initialize_features() noexcept
     }
 }
 
-void gearoenix::vulkan::device::Physical::initialize_properties() noexcept
+void gearoenix::vulkan::device::Physical::initialize_properties()
 {
     vkGetPhysicalDeviceProperties(vulkan_data, &properties);
     GX_LOG_D("Physical device name is: " << properties.deviceName);
@@ -145,7 +145,7 @@ void gearoenix::vulkan::device::Physical::initialize_properties() noexcept
     }
 }
 
-gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
+gearoenix::vulkan::device::Physical::Physical(const Surface& surf)
     : surface(surf)
     , properties {}
     , features {}
@@ -212,10 +212,10 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf) noexcept
             limits.bufferImageGranularity)));
 }
 
-gearoenix::vulkan::device::Physical::~Physical() noexcept = default;
+gearoenix::vulkan::device::Physical::~Physical() = default;
 
 std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
-    std::uint32_t type_bits, const std::uint32_t mem_properties) const noexcept
+    std::uint32_t type_bits, const std::uint32_t mem_properties) const
 {
     for (uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
         if ((type_bits & 1u) == 1u) {
@@ -228,19 +228,19 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
     GX_LOG_F("Could not find the requested memory type.");
 }
 
-std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const noexcept
+std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const
 {
     return math::Numeric::align(size, static_cast<std::size_t>(max_memory_alignment));
 }
 
-VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const noexcept
+VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
 {
     VkSurfaceCapabilitiesKHR info;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, surface.get_vulkan_data(), &info);
     return info;
 }
 
-std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available_devices(VkInstance instance) noexcept
+std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available_devices(VkInstance instance)
 {
     std::uint32_t gpu_count = 0;
     GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr));

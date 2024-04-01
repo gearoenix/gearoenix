@@ -3,7 +3,7 @@
 #include <algorithm>
 
 gearoenix::core::allocator::Range::Range(
-    const std::size_t size, const std::size_t offset, std::shared_ptr<Range> parent) noexcept
+    const std::size_t size, const std::size_t offset, std::shared_ptr<Range> parent)
     : size(size)
     , offset(offset)
     , parent(std::move(parent))
@@ -11,7 +11,7 @@ gearoenix::core::allocator::Range::Range(
 {
 }
 
-void gearoenix::core::allocator::Range::deallocate(const Range* const child) noexcept
+void gearoenix::core::allocator::Range::deallocate(const Range* const child)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     auto* const child_previous = child->previous;
@@ -40,7 +40,7 @@ void gearoenix::core::allocator::Range::deallocate(const Range* const child) noe
     ranges.emplace(new_key, new_range);
 }
 
-std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::size_t size)
 {
     GX_CHECK_NOT_EQUAL_D(size, 0);
     std::shared_ptr<Range> result(new Range(size, 0));
@@ -48,13 +48,13 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
     return result;
 }
 
-gearoenix::core::allocator::Range::~Range() noexcept
+gearoenix::core::allocator::Range::~Range()
 {
     if (nullptr != parent)
         parent->deallocate(this);
 }
 
-std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::size_t sz) noexcept
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::size_t sz)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     auto search = std::upper_bound(

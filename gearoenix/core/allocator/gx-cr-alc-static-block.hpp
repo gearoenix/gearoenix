@@ -15,7 +15,7 @@ struct StaticBlock final {
     struct std_deleter {
         StaticBlock<Size>& ref;
 
-        void operator()(T const* p) noexcept
+        void operator()(T const* p)
         {
             ref.free(p);
         }
@@ -30,12 +30,12 @@ private:
 
 public:
 #ifdef GX_DEBUG_MODE
-    StaticBlock() noexcept
+    StaticBlock()
     {
         std::memset(memory.data(), 0, memory.size());
     }
 
-    ~StaticBlock() noexcept
+    ~StaticBlock()
     {
         for (auto c : memory) {
             GX_ASSERT(c == 0);
@@ -44,7 +44,7 @@ public:
 #endif
 
     template <typename T, typename... Args>
-    [[nodiscard]] T* alloc(Args&&... args) noexcept
+    [[nodiscard]] T* alloc(Args&&... args)
     {
         std::lock_guard<std::mutex> _lg(this_lock);
         auto search = size_map.lower_bound({ sizeof(T), 0 });
@@ -69,13 +69,13 @@ public:
     }
 
     template <typename T, typename... Args>
-    [[nodiscard]] auto make_shared(Args&&... args) noexcept
+    [[nodiscard]] auto make_shared(Args&&... args)
     {
         return std::shared_ptr<T>(alloc<T>(std::forward<Args>(args)...), std_deleter<T> { *this });
     }
 
     template <typename T>
-    void free(T* const t) noexcept
+    void free(T* const t)
     {
         t->~T();
         auto start = reinterpret_cast<std::size_t>(t) - reinterpret_cast<std::size_t>(memory.data());

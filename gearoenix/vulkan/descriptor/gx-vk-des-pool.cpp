@@ -9,7 +9,7 @@
 gearoenix::vulkan::descriptor::Pool::Pool(
     const device::Logical& logical_device,
     const VkDescriptorPoolSize* pool_sizes,
-    const std::uint32_t count) noexcept
+    const std::uint32_t count)
     : logical_device(logical_device)
 {
     VkDescriptorPoolCreateInfo info;
@@ -23,7 +23,7 @@ gearoenix::vulkan::descriptor::Pool::Pool(
 }
 
 gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create_imgui(
-    const device::Logical& logical_device) noexcept
+    const device::Logical& logical_device)
 {
     const VkDescriptorPoolSize pool_sizes[] = {
         { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -41,7 +41,7 @@ gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create
     return new Pool(logical_device, pool_sizes, GX_COUNT_OF(pool_sizes));
 }
 
-gearoenix::vulkan::descriptor::Pool::~Pool() noexcept
+gearoenix::vulkan::descriptor::Pool::~Pool()
 {
     vkDestroyDescriptorPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }

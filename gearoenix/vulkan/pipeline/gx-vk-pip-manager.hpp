@@ -35,16 +35,16 @@ private:
     std::vector<VkPipelineShaderStageCreateInfo> stages_create_info;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> shader_group_create_info;
 
-    void initialize_ray_tracing() noexcept;
+    void initialize_ray_tracing();
 
 public:
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    explicit Manager(const engine::Engine& e) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Pipeline> create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>& des_set_layout) noexcept;
+    explicit Manager(const engine::Engine& e);
+    ~Manager();
+    [[nodiscard]] std::shared_ptr<Pipeline> create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>& des_set_layout);
 };
 }
 #endif

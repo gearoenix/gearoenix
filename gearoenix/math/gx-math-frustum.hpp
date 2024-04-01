@@ -20,7 +20,7 @@ struct Frustum final {
     ///   | 6------7 |
     ///   |/        \|
     ///   2----------3
-    constexpr explicit Frustum(const std::array<Vec3<Element>, 8>& points) noexcept
+    constexpr explicit Frustum(const std::array<Vec3<Element>, 8>& points)
         : planes {
             Plane(points[0], points[2], points[1]),
             Plane(points[0], points[1], points[4]),
@@ -32,20 +32,20 @@ struct Frustum final {
     {
     }
 
-    constexpr explicit Frustum(const std::array<Plane<Element>, 6>& planes) noexcept
+    constexpr explicit Frustum(const std::array<Plane<Element>, 6>& planes)
         : planes(planes)
     {
     }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
-    [[nodiscard]] bool check_intersection(const Aabb3<Element>& aabb) const noexcept
+    [[nodiscard]] bool check_intersection(const Aabb3<Element>& aabb) const
     {
         return IntersectionStatus::Out != check_intersection_status(aabb);
     }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
     /// It is not a completely correct, sometime it includes non-colliding objects
-    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& aabb) const noexcept
+    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& aabb) const
     {
         auto status = IntersectionStatus::In;
         std::array<Vec3<Element>, 8> points;

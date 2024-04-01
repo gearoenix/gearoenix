@@ -5,16 +5,16 @@
 #include "gx-vk-des-set.hpp"
 #include <cstring>
 
-gearoenix::vulkan::descriptor::Manager::Manager(const device::Logical& logical_device) noexcept
+gearoenix::vulkan::descriptor::Manager::Manager(const device::Logical& logical_device)
     : imgui(Pool::create_imgui(logical_device))
     , logical_device(logical_device)
 {
 }
 
-gearoenix::vulkan::descriptor::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::descriptor::Manager::~Manager() = default;
 
 std::unique_ptr<gearoenix::vulkan::descriptor::BindingsData>& gearoenix::vulkan::descriptor::Manager::get_bindings_data(
-    const std::vector<VkDescriptorSetLayoutBinding>& bindings) noexcept
+    const std::vector<VkDescriptorSetLayoutBinding>& bindings)
 {
     const auto bsz = bindings.size() * sizeof(bindings[0]);
     std::vector<std::uint8_t> key(bsz);
@@ -24,7 +24,7 @@ std::unique_ptr<gearoenix::vulkan::descriptor::BindingsData>& gearoenix::vulkan:
 
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::Manager::create_set(
     const std::vector<VkDescriptorSetLayoutBinding>& bindings,
-    const std::optional<std::size_t> kernel_index) noexcept
+    const std::optional<std::size_t> kernel_index)
 {
     auto& bd = get_bindings_data(bindings);
     if (nullptr == bd) {

@@ -3,7 +3,7 @@
 #import "gx-mtl-engine.hpp"
 #import <Metal/MTLCommandBuffer.h>
 
-void gearoenix::metal::Uploader::upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::sync::EndCaller&& c) noexcept
+void gearoenix::metal::Uploader::upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::job::EndCaller&& c)
 {
     auto source = [e.get_device() newBufferWithBytes:data length:static_cast<NSUInteger>(size) options:MTLResourceStorageModeShared];
     source.label = [NSString stringWithFormat:@"Gearoenix-UploadBuffer-%@", destination.label];
@@ -24,15 +24,15 @@ void gearoenix::metal::Uploader::upload(id<MTLBuffer> destination, const void* d
     });
 }
 
-gearoenix::metal::Uploader::Uploader(Engine& e) noexcept
+gearoenix::metal::Uploader::Uploader(Engine& e)
     : e(e)
     , queue([e.get_device() newCommandQueue])
 {
 }
 
-gearoenix::metal::Uploader::~Uploader() noexcept = default;
+gearoenix::metal::Uploader::~Uploader() = default;
 
-void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDescriptor* const texture_descriptor, std::vector<std::vector<std::uint8_t>>&& pixels, core::sync::EndCaller&& c) noexcept
+void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDescriptor* const texture_descriptor, std::vector<std::vector<std::uint8_t>>&& pixels, core::job::EndCaller&& c)
 {
     NSUInteger width = texture_descriptor.width;
     NSUInteger height = texture_descriptor.height;

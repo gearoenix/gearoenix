@@ -6,7 +6,6 @@
 #include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
-#include "gx-plt-main-entry.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include "gx-plt-touch.hpp"
 #include <boost/container/flat_map.hpp>
@@ -63,35 +62,34 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(TouchStateMap, touch_states);
     GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);
     GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now());
-    GX_GET_UCPTR_PRV(core::sync::WorkWaiter, asset_worker);
 
 public:
-    BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept;
-    ~BaseApplication() noexcept;
-    void initialize_window_position(int x, int y) noexcept;
-    void initialize_window_size(int w, int h) noexcept;
-    void update_window_size(int w, int h) noexcept;
-    void update_window() noexcept;
-    void initialize_mouse_position(double x, double y) noexcept;
-    void update_mouse_position(double x, double y) noexcept;
-    void mouse_key(key::Id, key::Action) noexcept;
-    void mouse_wheel(double v) noexcept;
-    void keyboard_key(key::Id, key::Action) noexcept;
-    void character_input(char16_t ch) noexcept;
-    void touch_down(FingerId finger_id, double x, double y) noexcept;
-    void touch_move(FingerId finger_id, double x, double y) noexcept;
-    void touch_up(FingerId finger_id) noexcept;
-    void touch_cancel(FingerId finger_id) noexcept;
-    void initialize_engine(Application&) noexcept;
-    void initialize_core_application(Application&, core::Application*) noexcept;
-    void going_to_be_closed() noexcept;
-    void terminate() noexcept;
-    void update() noexcept;
+    BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration);
+    ~BaseApplication();
+    void initialize_window_position(int x, int y);
+    void initialize_window_size(int w, int h);
+    void update_window_size(int w, int h);
+    void update_window();
+    void initialize_mouse_position(double x, double y);
+    void update_mouse_position(double x, double y);
+    void mouse_key(key::Id, key::Action);
+    void mouse_wheel(double v);
+    void keyboard_key(key::Id, key::Action);
+    void character_input(char16_t ch);
+    void touch_down(FingerId finger_id, double x, double y);
+    void touch_move(FingerId finger_id, double x, double y);
+    void touch_up(FingerId finger_id);
+    void touch_cancel(FingerId finger_id);
+    void initialize_engine(Application&);
+    void initialize_core_application(Application&, core::Application*);
+    void going_to_be_closed();
+    void terminate();
+    void update();
 
 private:
-    [[nodiscard]] double normalise_x(double x) const noexcept;
-    [[nodiscard]] double normalise_y(double y) const noexcept;
-    [[nodiscard]] math::Vec2<double> normalise_position(double x, double y) const noexcept;
+    [[nodiscard]] double normalise_x(double x) const;
+    [[nodiscard]] double normalise_y(double y) const;
+    [[nodiscard]] math::Vec2<double> normalise_position(double x, double y) const;
 };
 }
 

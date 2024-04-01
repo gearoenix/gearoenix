@@ -49,19 +49,19 @@ public:
         Engine& e,
         std::size_t directional_lights_count,
         std::size_t shadow_casters_directional_lights_count,
-        std::size_t bones_count) noexcept;
-    ForwardPbr(ForwardPbr&&) noexcept;
-    ~ForwardPbr() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
-    void set_shadow_caster_directional_light_normalised_vp_data(const void* data) noexcept;
-    void set_shadow_caster_directional_light_direction_data(const void* data) noexcept;
-    void set_shadow_caster_directional_light_colour_data(const void* data) noexcept;
-    [[nodiscard]] const sint* get_shadow_caster_directional_light_shadow_map_indices() const noexcept;
+        std::size_t bones_count);
+    ForwardPbr(ForwardPbr&&);
+    ~ForwardPbr() final;
+    void bind(uint& current_shader) const final;
+    void set_shadow_caster_directional_light_normalised_vp_data(const void* data);
+    void set_shadow_caster_directional_light_direction_data(const void* data);
+    void set_shadow_caster_directional_light_colour_data(const void* data);
+    [[nodiscard]] const sint* get_shadow_caster_directional_light_shadow_map_indices() const;
 
-    void set_bones_m_inv_m_data(const void* data) noexcept;
+    void set_bones_m_inv_m_data(const void* data);
 
-    void set_directional_light_direction_data(const void* data) noexcept;
-    void set_directional_light_colour_data(const void* data) noexcept;
+    void set_directional_light_direction_data(const void* data);
+    void set_directional_light_colour_data(const void* data);
 };
 
 struct ForwardPbrCombination final : public ShaderCombination {
@@ -75,13 +75,13 @@ private:
 
     bones combinations;
 
-    explicit ForwardPbrCombination(Engine& e) noexcept
+    explicit ForwardPbrCombination(Engine& e)
         : e(e)
     {
     }
 
 public:
-    [[nodiscard]] ForwardPbr& get(const std::size_t bones_count, const std::size_t shadow_casters_directional_lights_count, const std::size_t directional_lights_count) noexcept
+    [[nodiscard]] ForwardPbr& get(const std::size_t bones_count, const std::size_t shadow_casters_directional_lights_count, const std::size_t directional_lights_count)
     {
         auto& s = combinations[bones_count][shadow_casters_directional_lights_count][directional_lights_count];
         if (s.has_value())

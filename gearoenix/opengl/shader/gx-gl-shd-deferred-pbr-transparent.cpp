@@ -66,7 +66,7 @@ void main() {\n\
         (alb_mtl + pos_dpt + ems_rgh) * 0.00001;\n\
 }\n";
 
-gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent(Engine& e) noexcept
+gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -81,9 +81,9 @@ gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent(Engine& e)
     GX_GL_THIS_GET_UNIFORM_TEXTURE(ssao_resolved);
 }
 
-gearoenix::gl::shader::DeferredPbrTransparent::~DeferredPbrTransparent() noexcept = default;
+gearoenix::gl::shader::DeferredPbrTransparent::~DeferredPbrTransparent() = default;
 
-void gearoenix::gl::shader::DeferredPbrTransparent::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::DeferredPbrTransparent::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

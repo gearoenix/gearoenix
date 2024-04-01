@@ -31,13 +31,13 @@ public:
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    explicit Manager(const device::Logical& logical_device) noexcept;
-    ~Manager() noexcept;
+    explicit Manager(const device::Logical& logical_device);
+    ~Manager();
     [[nodiscard]] std::unique_ptr<BindingsData>& get_bindings_data(
-        const std::vector<VkDescriptorSetLayoutBinding>& bindings) noexcept;
+        const std::vector<VkDescriptorSetLayoutBinding>& bindings);
     [[nodiscard]] std::shared_ptr<Set> create_set(
         const std::vector<VkDescriptorSetLayoutBinding>& bindings,
-        std::optional<std::size_t> kernel_index = std::nullopt) noexcept;
+        std::optional<std::size_t> kernel_index = std::nullopt);
 };
 }
 

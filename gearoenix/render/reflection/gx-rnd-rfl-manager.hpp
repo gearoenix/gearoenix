@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_MANAGER_MANAGER_HPP
 #define GEAROENIX_RENDER_MANAGER_MANAGER_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include <string>
 
@@ -22,27 +22,28 @@ protected:
     engine::Engine& e;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
+    explicit Manager(engine::Engine& e);
+    virtual ~Manager();
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    virtual ~Manager() noexcept;
 
-    [[nodiscard]] std::shared_ptr<Builder> build_baked(
+    void build_baked(
         const std::string& name,
         const platform::stream::Path& path,
-        const core::sync::EndCaller& c) noexcept;
+        core::job::EndCallerShared<Builder>&& c,
+        core::job::EndCaller<>&& entity_end_callback) const;
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_baked(
         const std::string& name,
-        const std::shared_ptr<texture::TextureCube>& irradiance,
-        const std::shared_ptr<texture::TextureCube>& radiance,
+        std::shared_ptr<texture::TextureCube>&& irradiance,
+        std::shared_ptr<texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
-        const core::sync::EndCaller& end_callback) noexcept
+        core::job::EndCaller<>&& end_callback)
         = 0;
 
-    [[nodiscard]] virtual std::shared_ptr<Builder> build_runtime(
+    virtual void build_runtime(
         const std::string& name,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
@@ -50,10 +51,11 @@ public:
         std::size_t environment_resolution,
         std::size_t irradiance_resolution,
         std::size_t radiance_resolution,
-        const core::sync::EndCaller& end_callback) noexcept
+        core::job::EndCaller<>&& entity_end_callback,
+        core::job::EndCallerShared<Builder>&& probe_end_callback)
         = 0;
 
-    virtual void update() noexcept;
+    virtual void update();
 };
 }
 #endif

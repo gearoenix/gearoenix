@@ -17,7 +17,7 @@ struct GearoenixCoreSyncParallelForData final {
     bool terminated = false;
     std::thread thread;
 
-    GearoenixCoreSyncParallelForData(const unsigned int count, const unsigned int index) noexcept
+    GearoenixCoreSyncParallelForData(const unsigned int count, const unsigned int index)
     {
         // It was causing problem in linux in debug mode
         thread = std::thread([count, index, this] {
@@ -39,7 +39,7 @@ struct GearoenixCoreSyncParallelForData final {
         });
     }
 
-    ~GearoenixCoreSyncParallelForData() noexcept
+    ~GearoenixCoreSyncParallelForData()
     {
         do {
             is_running = false;
@@ -51,7 +51,7 @@ struct GearoenixCoreSyncParallelForData final {
 
     void send_work(
         const std::function<void(unsigned int, unsigned int)>* const function,
-        gearoenix::core::sync::Semaphore* const sig) noexcept
+        gearoenix::core::sync::Semaphore* const sig)
     {
         {
             std::lock_guard<std::mutex> _lg(jobs_lock);
@@ -64,7 +64,7 @@ struct GearoenixCoreSyncParallelForData final {
 static std::mutex gearoenix_core_sync_parallel_for_data_lock;
 static std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
 
-static std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise() noexcept
+static std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise()
 {
     const auto id = std::this_thread::get_id();
     {
@@ -84,7 +84,7 @@ static std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix
     return result.first->second;
 }
 
-void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned int, unsigned int)>& fun) noexcept
+void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned int, unsigned int)>& fun)
 {
     auto& datas = gearoenix_core_sync_parallel_for_data_initialise();
     Semaphore signal;

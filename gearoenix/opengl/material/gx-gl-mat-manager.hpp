@@ -14,12 +14,12 @@ struct Manager final : public render::material::Manager {
     Engine& gl_e;
 
 private:
-    [[nodiscard]] std::shared_ptr<render::material::Pbr> construct_pbr(const std::string& name, const core::sync::EndCaller& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::material::Unlit> construct_unlit(const std::string& name, const core::sync::EndCaller& c) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::material::Sprite> construct_sprite(const std::string& name, const core::sync::EndCaller& c) noexcept final;
+    void construct_pbr(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c) final;
+    void construct_unlit(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c) final;
+    void construct_sprite(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c) final;
 
 public:
-    explicit Manager(Engine& e) noexcept;
+    explicit Manager(Engine& e);
 };
 }
 

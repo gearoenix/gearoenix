@@ -7,7 +7,7 @@
 #include "gx-d3d-check.hpp"
 #include <dxgidebug.h>
 
-gearoenix::d3d::Adapter::Adapter() noexcept
+gearoenix::d3d::Adapter::Adapter()
 {
 #ifdef GX_DEBUG_MODE
     Microsoft::WRL::ComPtr<ID3D12Debug> debug_controller;

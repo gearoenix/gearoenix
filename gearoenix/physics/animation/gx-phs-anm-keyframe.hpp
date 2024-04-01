@@ -29,7 +29,7 @@ using Keyframe = std::variant<
     KeyframeGltf2Bezier<Value>>;
 
 template <typename Value>
-[[nodiscard]] constexpr const Value& get_key(const Keyframe<Value>& keyframe) noexcept
+[[nodiscard]] constexpr const Value& get_key(const Keyframe<Value>& keyframe)
 {
     if (std::holds_alternative<KeyframeLinear<Value>>(keyframe))
         return std::get<KeyframeLinear<Value>>(keyframe).key;

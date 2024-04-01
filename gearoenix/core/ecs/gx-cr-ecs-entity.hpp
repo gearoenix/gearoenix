@@ -1,22 +1,21 @@
 #ifndef GEAROENIX_CORE_ECS_ENTITY_HPP
 #define GEAROENIX_CORE_ECS_ENTITY_HPP
 #include "../../platform/gx-plt-log.hpp"
-#include "../gx-cr-build-configuration.hpp"
+#include "../job/gx-cr-job-end-caller.hpp"
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
-#include "../sync/gx-cr-sync-end-caller.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
 #include <atomic>
 #include <boost/container/flat_map.hpp>
-#include <optional>
 #include <string>
-#include <vector>
 
 namespace gearoenix::core::ecs {
 struct World;
 struct Archetype;
 struct EntityBuilder;
+struct Component;
+
 struct Entity final {
     friend struct World;
     friend struct EntityBuilder;
@@ -25,71 +24,62 @@ private:
     static std::atomic<entity_id_t> last_id;
 
     Archetype* archetype = nullptr;
-    unsigned char* components = nullptr;
+    std::shared_ptr<Component>* components = nullptr;
     std::string name;
 
-    Entity(Archetype* archetype, unsigned char* components, std::string&& name) noexcept;
+    Entity(Archetype* archetype, std::shared_ptr<Component>* components, std::string&& name) noexcept;
 
 public:
     Entity(Entity&&) noexcept;
     Entity(const Entity&) = delete;
-    Entity& operator=(Entity&&) noexcept = default;
+    Entity& operator=(Entity&&) = default;
     Entity& operator=(const Entity&) = delete;
-    void show_debug_gui() noexcept;
+    void show_debug_gui();
 };
 
 struct EntityBuilder final {
     friend struct World;
-    typedef boost::container::flat_map<std::type_index, std::unique_ptr<Component>> components_t;
+    friend struct EntitySharedBuilder;
+
+    /// Only final types are used in the key
+    typedef boost::container::flat_map<std::type_index, std::shared_ptr<Component>> components_t;
+    typedef boost::container::flat_map<std::type_index, std::type_index> bases_to_leaves_t;
 
     GX_GET_CVAL_PRV(entity_id_t, id);
     GX_GETSET_CREF_PRV(std::string, name);
 
-private:
     components_t components;
-    sync::EndCaller end_caller;
+    bases_to_leaves_t bases_to_leaves;
+    job::EndCaller<> end_caller;
 
-    EntityBuilder(entity_id_t, std::string&& name, sync::EndCaller&& end_caller) noexcept;
+    EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<void>&& end_caller) noexcept;
 
 public:
-    EntityBuilder(std::string&& name, sync::EndCaller&& end_caller) noexcept;
+    EntityBuilder(std::string&& name, job::EndCaller<void>&& end_caller) noexcept;
     EntityBuilder(EntityBuilder&&) noexcept;
     EntityBuilder(const EntityBuilder&) = delete;
     EntityBuilder& operator=(EntityBuilder&&) = delete;
     EntityBuilder& operator=(const EntityBuilder&) = delete;
 
-    template <typename ComponentType>
-    void add_component(ComponentType&& component) noexcept
-    {
-        Component::types_check<ComponentType>();
-        auto c = std::make_pair(
-            Component::create_type_index<ComponentType>(),
-            std::make_unique<ComponentType>(std::forward<ComponentType>(component)));
-        const auto search = components.find(c.first);
-        if (search != components.end())
-            GX_LOG_F("Component '" << typeid(ComponentType).name() << "' already exists in entity '" << id);
-        components.emplace(std::move(c));
-    }
+    void add_component(std::shared_ptr<Component>&& component);
 
     template <typename... ComponentType>
-    void add_components(ComponentType&&... cs) noexcept
+    void add_components(std::shared_ptr<ComponentType>&&... cs)
     {
         ((add_component(std::move(cs))), ...);
     }
 
-    [[nodiscard]] const Component* get_component(std::type_index component_type) const noexcept;
-    [[nodiscard]] Component* get_component(std::type_index component_type) noexcept;
+    [[nodiscard]] const std::shared_ptr<Component>& get_component(std::type_index component_type) const;
+    [[nodiscard]] const std::shared_ptr<Component>& get_component_final_type(std::type_index component_type) const;
 
     template <typename ComponentType>
-    const ComponentType* get_component() const noexcept
+    ComponentType* get_component() const
     {
-        return reinterpret_cast<const ComponentType*>(get_component(std::type_index(typeid(ComponentType))));
-    }
-
-    template <typename ComponentType>
-    ComponentType* get_component() noexcept
-    {
-        return reinterpret_cast<ComponentType*>(get_component(std::type_index(typeid(ComponentType))));
+        if constexpr (std::is_final_v<ComponentType>) {
+            return static_cast<ComponentType*>(get_component_final_type(std::type_index(typeid(ComponentType))).get());
+        } else {
+            return dynamic_cast<ComponentType*>(get_component(std::type_index(typeid(ComponentType))).get());
+        }
     }
 };
 
@@ -97,14 +87,13 @@ struct EntitySharedBuilder final {
     friend struct World;
     GX_GET_REF_PRV(EntityBuilder, builder);
 
-private:
     World* const world;
 
-    EntitySharedBuilder(World* world, std::string&& name, sync::EndCaller&& end_caller) noexcept;
+    EntitySharedBuilder(World* world, std::string&& name, job::EndCaller<>&& end_caller);
 
 public:
-    ~EntitySharedBuilder() noexcept;
-    [[nodiscard]] entity_id_t get_id() const noexcept { return builder.get_id(); }
+    ~EntitySharedBuilder();
+    [[nodiscard]] entity_id_t get_id() const { return builder.get_id(); }
 };
 }
 

@@ -3,7 +3,7 @@
 gearoenix::core::Id gearoenix::core::sync::InfluenceManager::add(
     std::vector<Id> influenced_ids,
     const double priority,
-    std::function<void()> function) noexcept
+    std::function<void()> function)
 {
     std::lock_guard<std::mutex> _lg(actions_lock)
         const auto id
@@ -12,13 +12,13 @@ gearoenix::core::Id gearoenix::core::sync::InfluenceManager::add(
     return id;
 }
 
-void gearoenix::core::sync::InfluenceManager::remove(const Id function_id) noexcept
+void gearoenix::core::sync::InfluenceManager::remove(const Id function_id)
 {
     GX_GUARD_LOCK(actions)
     actions.emplace_back(function_id);
 }
 
-void gearoenix::core::sync::InfluenceManager::update() noexcept
+void gearoenix::core::sync::InfluenceManager::update()
 {
     {
         GX_GUARD_LOCK(actions)

@@ -4,7 +4,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 
-void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(gearoenix::physics::Transformation& trn) const noexcept
+void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::Transformation& trn) const
 {
     const auto wds = distance.to_world(e);
     const auto& wsz = e.get_platform_application().get_base().get_window_size();
@@ -27,7 +27,7 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(gearoenix:
     trn.set_local_location(l);
 }
 
-gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWindowBasedPlacer::on_event(const core::event::Data& event_data) noexcept
+gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWindowBasedPlacer::on_event(const core::event::Data& event_data)
 {
     if (event_data.get_source() == core::event::Id::PlatformWindowSizeChange) {
         if (auto* const trn = e.get_world()->get_component<physics::Transformation>(model_entity_id); nullptr != trn) {
@@ -36,5 +36,5 @@ gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWind
             GX_UNEXPECTED;
         }
     }
-    return core::event::Listener::Response::Continue;
+    return Response::Continue;
 }

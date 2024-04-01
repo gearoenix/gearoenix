@@ -3,11 +3,11 @@
 #include "../gx-plt-log.hpp"
 #include <cstring>
 
-gearoenix::platform::stream::Memory::Memory() noexcept = default;
+gearoenix::platform::stream::Memory::Memory() = default;
 
-gearoenix::platform::stream::Memory::~Memory() noexcept = default;
+gearoenix::platform::stream::Memory::~Memory() = default;
 
-std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t length)
 {
     const std::size_t sz = length + index;
     const std::size_t result = sz > mem_data.size() ? mem_data.size() - index : length;
@@ -20,7 +20,7 @@ std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t lengt
     return result;
 }
 
-std::size_t gearoenix::platform::stream::Memory::write(const void* d, std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Memory::write(const void* d, std::size_t length)
 {
     const std::size_t sz = length + index;
     if (sz <= mem_data.size()) {
@@ -37,7 +37,7 @@ std::size_t gearoenix::platform::stream::Memory::write(const void* d, std::size_
     return length;
 }
 
-void gearoenix::platform::stream::Memory::seek(std::size_t offset) noexcept
+void gearoenix::platform::stream::Memory::seek(std::size_t offset)
 {
 #ifdef GX_DEBUG_MODE
     if (offset > mem_data.size())
@@ -46,14 +46,14 @@ void gearoenix::platform::stream::Memory::seek(std::size_t offset) noexcept
     index = offset;
 }
 
-std::size_t gearoenix::platform::stream::Memory::tell() noexcept
+std::size_t gearoenix::platform::stream::Memory::tell()
 {
     return index;
 }
 
-std::size_t gearoenix::platform::stream::Memory::size() noexcept
+std::size_t gearoenix::platform::stream::Memory::size()
 {
     return mem_data.size();
 }
 
-void gearoenix::platform::stream::Memory::flush() noexcept { }
+void gearoenix::platform::stream::Memory::flush() { }

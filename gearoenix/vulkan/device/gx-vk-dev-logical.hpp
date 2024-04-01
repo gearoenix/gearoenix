@@ -24,9 +24,9 @@ public:
     Logical(Logical&&) = delete;
     Logical& operator=(const Logical&) = delete;
     Logical& operator=(Logical&&) = delete;
-    explicit Logical(const Physical& p) noexcept;
-    ~Logical() noexcept;
-    void wait_to_finish() noexcept;
+    explicit Logical(const Physical& p);
+    ~Logical();
+    void wait_to_finish();
 };
 }
 #endif

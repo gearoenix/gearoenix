@@ -19,20 +19,20 @@ private:
         std::size_t underprocess_index = 0;
         Semaphore signal;
         std::thread thread;
-        void kernel() noexcept;
-        explicit Thread(std::size_t i) noexcept;
-        ~Thread() noexcept;
+        void kernel();
+        explicit Thread(std::size_t i);
+        ~Thread();
     };
     std::vector<std::unique_ptr<Thread>> threads;
 
 public:
-    ChanneledWorkers() noexcept;
-    ~ChanneledWorkers() noexcept;
+    ChanneledWorkers();
+    ~ChanneledWorkers();
 
-    ChanneledWorkers(const ChanneledWorkers&) noexcept = delete;
-    void operator=(const ChanneledWorkers&) noexcept = delete;
+    ChanneledWorkers(const ChanneledWorkers&) = delete;
+    void operator=(const ChanneledWorkers&) = delete;
 
-    void perform(const std::function<void(std::size_t)>& job) noexcept;
+    void perform(const std::function<void(std::size_t)>& job);
 };
 }
 #endif

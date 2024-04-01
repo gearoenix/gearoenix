@@ -1,17 +1,12 @@
 #ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
 #include "../gx-rnd-runtime-configuration.hpp"
-#include "../texture/gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
 #include <chrono>
 #include <memory>
 #include <set>
-#include <vector>
-
-namespace gearoenix::core {
-struct FunctionLoader;
-}
+#include <thread>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -67,6 +62,7 @@ struct Manager;
 
 namespace gearoenix::render::engine {
 struct Engine {
+    GX_GET_CVAL_PRT(std::thread::id, jobs_thread_id);
     GX_GET_CVAL_PRT(Type, engine_type);
     GX_GET_RRF_PRT(platform::Application, platform_application);
     GX_GET_UPTR_PRT(physics::Engine, physics_engine);
@@ -90,20 +86,19 @@ struct Engine {
     GX_GET_UPTR_PRT(core::ecs::World, world);
     GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
 
-protected:
-    Engine(Type engine_type, platform::Application& platform_application) noexcept;
+    Engine(Type engine_type, platform::Application& platform_application);
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
-    [[nodiscard]] static std::set<Type> get_available_engines() noexcept;
-    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application) noexcept;
-    virtual ~Engine() noexcept;
-    virtual void start_frame() noexcept;
-    virtual void end_frame() noexcept;
-    virtual void window_resized() noexcept;
-    virtual void upload_imgui_fonts() noexcept = 0;
-    virtual void show_debug_gui() noexcept;
+    [[nodiscard]] static std::set<Type> get_available_engines();
+    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
+    virtual ~Engine();
+    virtual void start_frame();
+    virtual void end_frame();
+    virtual void window_resized();
+    virtual void upload_imgui_fonts() = 0;
+    virtual void show_debug_gui();
 };
 }
 #endif

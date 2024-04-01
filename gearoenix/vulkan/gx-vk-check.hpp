@@ -8,7 +8,7 @@
 #include <string>
 
 namespace gearoenix::vulkan {
-const char* result_to_string(VkResult res) noexcept;
+const char* result_to_string(VkResult res);
 }
 
 #define GX_VK_CHK(func)                                                  \

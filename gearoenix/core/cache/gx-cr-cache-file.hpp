@@ -16,16 +16,16 @@ public:
     GX_GET_CREF_PRV(IdOffsetMap, offsets)
 
 public:
-    explicit File(std::unique_ptr<platform::stream::Stream> file) noexcept;
+    explicit File(std::unique_ptr<platform::stream::Stream> file);
     template <typename C>
-    std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept;
+    std::shared_ptr<C> get(Id id, std::function<std::shared_ptr<C>(std::string)> new_fun);
     template <typename C>
-    std::shared_ptr<C> get(Id id) const noexcept;
+    std::shared_ptr<C> get(Id id) const;
 };
 }
 
 template <typename T>
-gearoenix::core::cache::File<T>::File(std::unique_ptr<platform::stream::Stream> f) noexcept
+gearoenix::core::cache::File<T>::File(std::unique_ptr<platform::stream::Stream> f)
     : file(std::move(f))
 {
     if (file != nullptr) {
@@ -43,7 +43,7 @@ gearoenix::core::cache::File<T>::File(std::unique_ptr<platform::stream::Stream> 
 
 template <typename T>
 template <typename C>
-std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>(std::string)> new_fun) noexcept
+std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::function<std::shared_ptr<C>(std::string)> new_fun)
 {
     std::function<std::shared_ptr<C>()> fn_new = [new_fun, this, id] {
 #ifdef GX_DEBUG_MODE
@@ -62,7 +62,7 @@ std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id, std::functi
 
 template <typename T>
 template <typename C>
-inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const noexcept
+inline std::shared_ptr<C> gearoenix::core::cache::File<T>::get(const Id id) const
 {
     return cacher.template get<C>(id);
 }

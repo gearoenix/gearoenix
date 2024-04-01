@@ -5,7 +5,7 @@
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/model/gx-rnd-mdl-transformation.hpp"
 
-void gearoenix::physics::constraint::WindowScaler::update() noexcept
+void gearoenix::physics::constraint::WindowScaler::update()
 {
     auto new_size = event_engine->get_window_ratio() * 2.0 * size_percentage;
     if (max_size_scale.has_value()) {
@@ -23,19 +23,19 @@ void gearoenix::physics::constraint::WindowScaler::update() noexcept
     update_chained_constraints();
 }
 
-gearoenix::physics::constraint::WindowScaler::WindowScaler(const core::Id id, std::string name, render::engine::Engine* const e) noexcept
+gearoenix::physics::constraint::WindowScaler::WindowScaler(const core::Id id, std::string name, render::engine::Engine* const e)
     : Constraint(id, Type::WindowScaler, std::move(name))
     , event_engine(e->get_platform_application()->get_event_engine())
 {
 }
 
-gearoenix::physics::constraint::WindowScaler::~WindowScaler() noexcept
+gearoenix::physics::constraint::WindowScaler::~WindowScaler()
 {
     if (registered)
         event_engine->remove_listener(core::event::Id::SystemWindowSizeChange, 0.0, this);
 }
 
-bool gearoenix::physics::constraint::WindowScaler::on_event(const core::event::Data& e) noexcept
+bool gearoenix::physics::constraint::WindowScaler::on_event(const core::event::Data& e)
 {
     switch (e.get_source()) {
     case core::event::Id::SystemWindowSizeChange: {
@@ -48,31 +48,31 @@ bool gearoenix::physics::constraint::WindowScaler::on_event(const core::event::D
     return false;
 }
 
-void gearoenix::physics::constraint::WindowScaler::register_listener() noexcept
+void gearoenix::physics::constraint::WindowScaler::register_listener()
 {
     event_engine->add_listener(core::event::Id::SystemWindowSizeChange, 0.0, this);
     registered = true;
 }
 
-void gearoenix::physics::constraint::WindowScaler::set_size_percentage(const double v) noexcept
+void gearoenix::physics::constraint::WindowScaler::set_size_percentage(const double v)
 {
     size_percentage = v;
     WindowScaler::update();
 }
 
-void gearoenix::physics::constraint::WindowScaler::set_max_size_scale(std::optional<double> v) noexcept
+void gearoenix::physics::constraint::WindowScaler::set_max_size_scale(std::optional<double> v)
 {
     max_size_scale = v;
     WindowScaler::update();
 }
 
-void gearoenix::physics::constraint::WindowScaler::set_min_size_scale(std::optional<double> v) noexcept
+void gearoenix::physics::constraint::WindowScaler::set_min_size_scale(std::optional<double> v)
 {
     min_size_scale = v;
     WindowScaler::update();
 }
 
-void gearoenix::physics::constraint::WindowScaler::set_current_size(const double v) noexcept
+void gearoenix::physics::constraint::WindowScaler::set_current_size(const double v)
 {
     current_size = v;
     WindowScaler::update();

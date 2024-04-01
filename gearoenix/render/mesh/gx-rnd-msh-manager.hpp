@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_MESH_MANAGER_HPP
 #define GEAROENIX_RENDER_MESH_MANAGER_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../texture/gx-rnd-txt-face.hpp"
@@ -20,38 +20,38 @@ protected:
     std::mutex meshes_lock;
     std::map<std::string, std::weak_ptr<Mesh>> meshes;
 
-    explicit Manager(engine::Engine& e) noexcept;
+    explicit Manager(engine::Engine& e);
 
 public:
-    virtual ~Manager() noexcept;
+    virtual ~Manager();
 
-    [[nodiscard]] std::shared_ptr<Mesh> build_icosphere(std::size_t subdivisions, core::sync::EndCaller&& end_callback) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_plate(const core::sync::EndCaller& end_callback) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_cube(core::sync::EndCaller&& end_callback) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_inward_cube(core::sync::EndCaller&& end_callback) noexcept;
-    [[nodiscard]] std::shared_ptr<Mesh> build_face_square(texture::Face f, core::sync::EndCaller&& end_callback) noexcept;
+    void build_icosphere(std::size_t subdivisions, core::job::EndCallerShared<Mesh>&& end_callback);
+    void build_plate(core::job::EndCallerShared<Mesh>&& end_callback);
+    void build_cube(core::job::EndCallerShared<Mesh>&& end_callback);
+    void build_inward_cube(core::job::EndCallerShared<Mesh>&& end_callback);
+    // void build_face_square(texture::Face f, core::job::EndCallerShared<Mesh>&& end_callback);
 
-    [[nodiscard]] virtual std::shared_ptr<Mesh> build(
+    virtual void build(
         std::string&& name,
         Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCaller& end_callback) noexcept
+        const math::Aabb3<double>& occlusion_box,
+        core::job::EndCallerShared<Mesh>&& end_callback)
         = 0;
 
-    [[nodiscard]] std::shared_ptr<Mesh> build(
+    void build(
         std::string&& name,
         std::vector<PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const core::sync::EndCaller& end_callback) noexcept;
+        core::job::EndCallerShared<Mesh>&& end_callback);
 
-    [[nodiscard]] std::shared_ptr<Mesh> build(
+    void build(
         std::string&& name,
         std::vector<PbrVertexAnimated>&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const core::sync::EndCaller& end_callback) noexcept;
+        core::job::EndCallerShared<Mesh>&& end_callback);
 
-    [[nodiscard]] bool remove_if_exist(const std::string& name) noexcept;
+    [[nodiscard]] bool remove_if_exist(const std::string& name);
 };
 }
 

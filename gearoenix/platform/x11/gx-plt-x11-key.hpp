@@ -5,7 +5,7 @@
 #include "../gx-plt-key.hpp"
 
 namespace gearoenix::platform {
-[[nodiscard]] key::Id convert_mouse_to_key(unsigned int) noexcept;
+[[nodiscard]] key::Id convert_mouse_to_key(unsigned int);
 }
 
 #endif

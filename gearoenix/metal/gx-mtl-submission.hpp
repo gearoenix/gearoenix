@@ -49,12 +49,12 @@ private:
 
     dispatch_semaphore_t present_semaphore;
 
-    [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index) noexcept;
+    [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index);
 
 public:
-    SubmissionManager(Engine& e) noexcept;
-    ~SubmissionManager() noexcept;
-    void update() noexcept;
+    SubmissionManager(Engine& e);
+    ~SubmissionManager();
+    void update();
 };
 }
 

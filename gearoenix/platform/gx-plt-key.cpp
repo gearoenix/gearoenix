@@ -1,7 +1,7 @@
 #include "gx-plt-key.hpp"
 #include <imgui/imgui.h>
 
-void gearoenix::platform::key::initialize_imgui_keymap() noexcept
+void gearoenix::platform::key::initialize_imgui_keymap()
 {
     auto& io = ImGui::GetIO();
     io.KeyMap[ImGuiKey_Tab] = static_cast<int>(Id::Tab);
@@ -28,7 +28,7 @@ void gearoenix::platform::key::initialize_imgui_keymap() noexcept
     io.KeyMap[ImGuiKey_Z] = static_cast<int>(Id::Z);
 }
 
-int gearoenix::platform::key::convert_mouse_to_imgui(const Id m) noexcept
+int gearoenix::platform::key::convert_mouse_to_imgui(const Id m)
 {
     switch (m) {
     case Id::Left:

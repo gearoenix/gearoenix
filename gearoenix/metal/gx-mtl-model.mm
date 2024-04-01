@@ -13,7 +13,7 @@ gearoenix::metal::Model::Model(
     Engine& e,
     std::shared_ptr<Mesh>&& bound_mesh,
     const NSUInteger buffer_size,
-    const std::string& name) noexcept
+    const std::string& name)
     : core::ecs::Component(this)
     , uniform(e.get_buffer_manager()->create_uniform(sizeof(ModelUniform)))
     , gbuffers_filler_args(e, e.get_pipeline_manager()->get_gbuffers_filler_vertex_shader(), GEAROENIX_METAL_GBUFFERS_FILLER_ARGUMENT_BUFFER_BIND_INDEX, name)
@@ -21,21 +21,21 @@ gearoenix::metal::Model::Model(
 {
 }
 
-gearoenix::metal::Model::~Model() noexcept = default;
+gearoenix::metal::Model::~Model() = default;
 
-gearoenix::metal::Model::Model(Model&& o) noexcept = default;
+gearoenix::metal::Model::Model(Model&& o) = default;
 
 gearoenix::metal::ModelBuilder::ModelBuilder(
     Engine& e,
     const std::string& name,
     std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
-    bool is_transformable) noexcept
+    bool is_transformable)
     : render::model::Builder(e, name, std::move(bound_mesh), is_transformable)
     , e(e)
 {
 }
 
-void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& mat) noexcept
+void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& mat)
 {
     render::model::Builder::set_material(mat);
     auto& b = entity_builder->get_builder();
@@ -70,23 +70,23 @@ void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& m
     b.add_component(std::move(m));
 }
 
-gearoenix::metal::ModelBuilder::~ModelBuilder() noexcept = default;
+gearoenix::metal::ModelBuilder::~ModelBuilder() = default;
 
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::metal::ModelManager::build(
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    core::sync::EndCaller&&,
-    const bool is_transformable) noexcept
+    core::job::EndCaller&&,
+    const bool is_transformable)
 {
     return std::shared_ptr<render::model::Builder>(new ModelBuilder(
         dynamic_cast<Engine&>(e), name, std::move(mesh), is_transformable));
 }
 
-gearoenix::metal::ModelManager::ModelManager(Engine& e) noexcept
+gearoenix::metal::ModelManager::ModelManager(Engine& e)
     : render::model::Manager(e)
 {
 }
 
-gearoenix::metal::ModelManager::~ModelManager() noexcept = default;
+gearoenix::metal::ModelManager::~ModelManager() = default;
 
 #endif

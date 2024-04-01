@@ -21,9 +21,9 @@ struct ForwardPbrTransparent final : public Shader {
     GX_GL_UNIFORM_TEXTURE(radiance);
 
 public:
-    explicit ForwardPbrTransparent(Engine& e) noexcept;
-    ~ForwardPbrTransparent() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit ForwardPbrTransparent(Engine& e);
+    ~ForwardPbrTransparent() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

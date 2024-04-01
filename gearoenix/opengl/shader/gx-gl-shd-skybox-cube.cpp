@@ -48,7 +48,7 @@ void main() {\n\
     frag_colour = texture(albedo, normalize(out_uv));\n\
 }\n";
 
-gearoenix::gl::shader::SkyboxCube::SkyboxCube(Engine& e) noexcept
+gearoenix::gl::shader::SkyboxCube::SkyboxCube(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -60,9 +60,9 @@ gearoenix::gl::shader::SkyboxCube::SkyboxCube(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::shader::SkyboxCube::~SkyboxCube() noexcept = default;
+gearoenix::gl::shader::SkyboxCube::~SkyboxCube() = default;
 
-void gearoenix::gl::shader::SkyboxCube::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::SkyboxCube::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

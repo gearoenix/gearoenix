@@ -1,5 +1,6 @@
 #include "gx-gl-mat-pbr.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../gx-gl-engine.hpp"
 #include "../gx-gl-texture.hpp"
 #include "../shader/gx-gl-shd-forward-pbr.hpp"
@@ -9,29 +10,31 @@
 #include "../submission/gx-gl-sbm-camera.hpp"
 #include "../submission/gx-gl-sbm-scene.hpp"
 
-gearoenix::gl::material::Pbr::Pbr(Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept
-    : render::material::Pbr(e, name, c)
-    , gl::material::Material(false)
-    , gl_albedo(std::dynamic_pointer_cast<Texture2D>(albedo))
-    , gl_normal(std::dynamic_pointer_cast<Texture2D>(normal))
-    , gl_emission(std::dynamic_pointer_cast<Texture2D>(emission))
-    , gl_metallic_roughness(std::dynamic_pointer_cast<Texture2D>(metallic_roughness))
-    , gl_occlusion(std::dynamic_pointer_cast<Texture2D>(occlusion))
-    , gl_brdflut(std::dynamic_pointer_cast<Texture2D>(brdflut))
+gearoenix::gl::material::Pbr::Pbr(Engine& e, const std::string& name)
+    : render::material::Pbr(e, name)
+    , material::Material(false)
     , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())
     , forward_pbr_combination(e.get_shader_manager()->get<shader::ForwardPbrCombination>())
     , gbuffers_filler_combination(e.get_specification().is_deferred_supported ? new shader::GBuffersFiller(e) : nullptr)
 {
 }
 
-gearoenix::gl::material::Pbr::~Pbr() noexcept = default;
+void gearoenix::gl::material::Pbr::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c)
+{
+    static core::allocator::SharedArray<Pbr, MAX_COUNT> allocator;
+    const auto result = allocator.make_shared(e, name);
+    c.set_return(result);
+    result->initialise(std::move(c));
+}
 
-void gearoenix::gl::material::Pbr::shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) noexcept
+gearoenix::gl::material::Pbr::~Pbr() = default;
+
+void gearoenix::gl::material::Pbr::shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader)
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(model.bones_count);
     shadow_caster_shader.bind(current_shader);
-    shadow_caster_shader.set_mvp_data(reinterpret_cast<const float*>(&camera.mvps[model.fist_mvp_index]));
-    const math::Vec2<float> alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
+    shadow_caster_shader.set_mvp_data(&camera.mvps[model.fist_mvp_index]);
+    const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
     shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
 
     glActiveTexture(GL_TEXTURE0 + shadow_caster_shader.get_albedo_index());
@@ -41,33 +44,39 @@ void gearoenix::gl::material::Pbr::shadow(const submission::Model& model, const 
     glDrawElements(GL_TRIANGLES, model.indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Pbr::set_albedo(const std::shared_ptr<render::texture::Texture2D>& o) noexcept
+void gearoenix::gl::material::Pbr::set_albedo(std::shared_ptr<render::texture::Texture2D>&& o)
 {
-    render::material::Pbr::set_albedo(o);
     gl_albedo = std::dynamic_pointer_cast<Texture2D>(o);
+    render::material::Pbr::set_albedo(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::set_normal(std::shared_ptr<render::texture::Texture2D>&& o) noexcept
+void gearoenix::gl::material::Pbr::set_normal(std::shared_ptr<render::texture::Texture2D>&& o)
 {
     gl_normal = std::dynamic_pointer_cast<Texture2D>(o);
     render::material::Pbr::set_normal(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::set_emission(std::shared_ptr<render::texture::Texture2D>&& o) noexcept
+void gearoenix::gl::material::Pbr::set_emission(std::shared_ptr<render::texture::Texture2D>&& o)
 {
     gl_emission = std::dynamic_pointer_cast<Texture2D>(o);
     render::material::Pbr::set_emission(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&& o) noexcept
+void gearoenix::gl::material::Pbr::set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&& o)
 {
     gl_metallic_roughness = std::dynamic_pointer_cast<Texture2D>(o);
     render::material::Pbr::set_metallic_roughness(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::set_occlusion(std::shared_ptr<render::texture::Texture2D>&& o) noexcept
+void gearoenix::gl::material::Pbr::set_occlusion(std::shared_ptr<render::texture::Texture2D>&& o)
 {
     gl_occlusion = std::dynamic_pointer_cast<Texture2D>(o);
+    render::material::Pbr::set_occlusion(std::move(o));
+}
+
+void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::Texture2D>&& o)
+{
+    gl_brdflut = std::dynamic_pointer_cast<Texture2D>(o);
     render::material::Pbr::set_occlusion(std::move(o));
 }
 
@@ -75,7 +84,7 @@ void gearoenix::gl::material::Pbr::forward_render(
     const submission::Model& model,
     const submission::Camera& camera,
     const submission::Scene& scene,
-    uint& current_shader) noexcept
+    uint& current_shader)
 {
 
     auto& shader = forward_pbr_combination->get(model.bones_count, model.shadow_caster_directional_lights_count, model.directional_lights_count);
@@ -84,7 +93,7 @@ void gearoenix::gl::material::Pbr::forward_render(
     shader.set_camera_position_reserved_data(reinterpret_cast<const float*>(&camera.pos));
 
     if (model.bones_count > 0) {
-        shader.set_bones_m_inv_m_data(reinterpret_cast<const float*>(&scene.bones_data[model.first_bone_index]));
+        shader.set_bones_m_inv_m_data(&scene.bones_data[model.first_bone_index]);
     } else {
         shader.set_m_data(reinterpret_cast<const float*>(&model.m));
         shader.set_inv_m_data(reinterpret_cast<const float*>(&model.inv_m));
@@ -136,9 +145,9 @@ void gearoenix::gl::material::Pbr::deferred_gbuffer_render(
     const submission::Model& model,
     const submission::Camera& camera,
     const submission::Scene&,
-    uint& current_shader) noexcept
+    uint& current_shader)
 {
-    auto& shader = *gbuffers_filler_combination;
+    const auto& shader = *gbuffers_filler_combination;
     shader.bind(current_shader);
     shader.set_vp_data(reinterpret_cast<const float*>(&camera.vp));
     shader.set_camera_position_data(reinterpret_cast<const float*>(&camera.pos));

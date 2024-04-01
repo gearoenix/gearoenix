@@ -22,9 +22,9 @@ struct GBuffersFiller final : public Shader {
     GX_GL_UNIFORM_TEXTURE(radiance);
 
 public:
-    explicit GBuffersFiller(Engine& e) noexcept;
-    ~GBuffersFiller() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit GBuffersFiller(Engine& e);
+    ~GBuffersFiller() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

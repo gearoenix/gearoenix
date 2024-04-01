@@ -20,8 +20,8 @@ struct Surface {
 public:
     Surface(const Surface&) = delete;
     Surface(Surface&&) = delete;
-    Surface(const Instance& instance, const platform::Application& platform_application) noexcept;
-    ~Surface() noexcept;
+    Surface(const Instance& instance, const platform::Application& platform_application);
+    ~Surface();
     Surface& operator=(const Surface&) = delete;
     Surface& operator=(Surface&&) = delete;
 };

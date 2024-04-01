@@ -6,7 +6,7 @@ gearoenix::gl::shader::Unlit::Unlit(
     const bool has_uv_transform,
     const bool has_alpha_cutoff,
     const bool has_albedo_factor,
-    const bool has_albedo) noexcept
+    const bool has_albedo)
     : Shader(e)
 {
     std::stringstream vs;
@@ -77,9 +77,9 @@ gearoenix::gl::shader::Unlit::Unlit(
     }
 }
 
-gearoenix::gl::shader::Unlit::~Unlit() noexcept = default;
+gearoenix::gl::shader::Unlit::~Unlit() = default;
 
-void gearoenix::gl::shader::Unlit::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::Unlit::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

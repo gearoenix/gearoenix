@@ -43,9 +43,12 @@
 #include "../shader/gx-gl-shd-skybox-equirectangular.hpp"
 #include "../shader/gx-gl-shd-ssao-resolve.hpp"
 #include "../shader/gx-gl-shd-unlit.hpp"
-#include <algorithm>
-#include <boost/mp11/algorithm.hpp>
+
 #include <imgui/backends/imgui_impl_opengl3.h>
+
+#include <boost/mp11/algorithm.hpp>
+
+#include <algorithm>
 
 #if defined(GX_PLATFORM_INTERFACE_ANDROID)
 #define GX_ALGORITHM_EXECUTION
@@ -59,18 +62,18 @@
 #include "../../platform/android/gx-plt-gl-context.hpp"
 #endif
 
-void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes() noexcept
+void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes()
 {
     auto& plt = e.get_platform_application().get_base();
     auto& cfg = plt.get_configuration().get_render_configuration();
     back_buffer_size_changed();
-    resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) noexcept -> bool {
+    resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) -> bool {
         back_buffer_size_changed();
         return true;
     });
 }
 
-void gearoenix::gl::submission::Manager::back_buffer_size_changed() noexcept
+void gearoenix::gl::submission::Manager::back_buffer_size_changed()
 {
     back_buffer_size = math::Vec2<uint>(e.get_texture_manager()->get_default_camera_render_target_dimensions());
     back_buffer_aspect_ratio = static_cast<float>(back_buffer_size.x) / static_cast<float>(back_buffer_size.y);
@@ -81,7 +84,7 @@ void gearoenix::gl::submission::Manager::back_buffer_size_changed() noexcept
     initialise_ssao();
 }
 
-void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
+void gearoenix::gl::submission::Manager::initialise_gbuffers()
 {
     if (!e.get_specification().is_deferred_supported)
         return;
@@ -103,37 +106,37 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
         .has_mipmap = false,
     };
     gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, core::job::EndCaller([] {})));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, core::job::EndCaller([] {})));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, core::job::EndCaller([] {})));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
     gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, core::job::EndCaller([] {})));
 
     auto irradiance_txt_info = position_depth_txt_info;
     irradiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
     gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info, core::job::EndCaller([] {})));
 
     auto radiance_txt_info = position_depth_txt_info;
     radiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
     gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info, core::job::EndCaller([] {})));
 
     auto depth_txt_info = position_depth_txt_info;
     depth_txt_info.format = render::texture::TextureFormat::D32;
     gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info, core::job::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
@@ -143,12 +146,12 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers() noexcept
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
-    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), core::sync::EndCaller([] {})));
+    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), core::job::EndCaller([] {})));
 
     GX_LOG_D("GBuffers have been created.");
 }
 
-void gearoenix::gl::submission::Manager::initialise_ssao() noexcept
+void gearoenix::gl::submission::Manager::initialise_ssao()
 {
     if (!e.get_specification().is_deferred_supported)
         return;
@@ -170,16 +173,16 @@ void gearoenix::gl::submission::Manager::initialise_ssao() noexcept
         .has_mipmap = false,
     };
     ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, core::sync::EndCaller([] {})));
+        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, core::job::EndCaller([] {})));
 
     std::vector<render::texture::Attachment> attachments(1);
     attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
-    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), core::sync::EndCaller([] {})));
+    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), core::job::EndCaller([] {})));
 
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
 
-void gearoenix::gl::submission::Manager::initialise_screen_vertices() noexcept
+void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 {
     constexpr std::array<float, 6> screen_vertices = {
         -1.0f, 3.0f, // 1
@@ -196,11 +199,11 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices() noexcept
     glBindVertexArray(0);
 }
 
-void gearoenix::gl::submission::Manager::fill_scenes() noexcept
+void gearoenix::gl::submission::Manager::fill_scenes()
 {
     e.get_world()->synchronised_system<render::scene::Scene>(
-        [&](const core::ecs::entity_id_t scene_id, render::scene::Scene* const scene) noexcept {
-            if (!scene->enabled)
+        [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const scene) {
+            if (!scene->get_enabled())
                 return;
             const auto scene_pool_index = scene_pool.emplace([] { return Scene(); });
             auto& scene_pool_ref = scene_pool[scene_pool_index];
@@ -216,9 +219,9 @@ void gearoenix::gl::submission::Manager::fill_scenes() noexcept
             scene_pool_ref.bones_data.clear();
             scene_pool_ref.debug_mesh_data.clear();
             scene_pool_ref.name = &scene->get_name();
-            e.get_world()->synchronised_system<core::ecs::And<render::camera::Camera, physics::Transformation>>(
-                [&](const core::ecs::entity_id_t camera_id, render::camera::Camera* const camera, physics::Transformation* const transform) noexcept {
-                    if (!camera->enabled)
+            e.get_world()->synchronised_system<core::ecs::All<render::camera::Camera, physics::TransformationComponent>>(
+                [&](const core::ecs::entity_id_t camera_id, render::camera::Camera* const camera, physics::TransformationComponent* const transform) {
+                    if (!camera->get_enabled())
                         return;
                     if (camera->get_scene_id() != scene_id)
                         return;
@@ -243,29 +246,29 @@ void gearoenix::gl::submission::Manager::fill_scenes() noexcept
                             .indices_count = mesh->indices_count });
                     }
                 });
-            e.get_world()->synchronised_system<core::ecs::And<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDirectionalLight>>(
-                [&](const core::ecs::entity_id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDirectionalLight* const gll) noexcept {
-                    if (!l->enabled)
+            e.get_world()->synchronised_system<core::ecs::All<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDirectionalLight>>(
+                [&](const core::ecs::entity_id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDirectionalLight* const gll) {
+                    if (!l->get_enabled())
                         return;
-                    if (!rl->enabled)
+                    if (!rl->get_enabled())
                         return;
-                    if (!gll->enabled)
+                    if (!gll->get_enabled())
                         return;
                     if (scene_id != l->scene_id)
                         return;
-                    DirectionalShadowCaster scdld {
+                    DirectionalShadowCaster shadow_caster_directional_light_data {
                         .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl->get_camera_id())->get_frustum(),
                         .shadow_data = DirectionalShadow {
                             .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl->get_camera_id())->get_view_projection(),
-                            .direction = math::Vec3<float>(e.get_world()->get_component<physics::Transformation>(rl->get_camera_id())->get_z_axis()),
+                            .direction = math::Vec3<float>(e.get_world()->get_component<physics::TransformationComponent>(rl->get_camera_id())->get_z_axis()),
                             .colour = l->colour,
                             .shadow_map_texture = gll->get_shadow_map_texture_v(),
                         }
                     };
-                    scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, scdld);
+                    scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, shadow_caster_directional_light_data);
                 });
-            e.get_world()->synchronised_system<core::ecs::And<render::skybox::Skybox, gl::Skybox>>([&](const core::ecs::entity_id_t skybox_id, render::skybox::Skybox* const render_skybox, gl::Skybox* const gl_skybox) noexcept {
-                if (!render_skybox->enabled)
+            e.get_world()->synchronised_system<core::ecs::All<render::skybox::Skybox, gl::Skybox>>([&](const core::ecs::entity_id_t skybox_id, render::skybox::Skybox* const render_skybox, gl::Skybox* const gl_skybox) {
+                if (!render_skybox->get_enabled())
                     return;
                 if (render_skybox->get_scene_id() != scene_id)
                     return;
@@ -281,9 +284,9 @@ void gearoenix::gl::submission::Manager::fill_scenes() noexcept
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                e.get_world()->synchronised_system<core::ecs::And<render::reflection::Baked, gl::Reflection>>(
-                    [&](const core::ecs::entity_id_t reflection_id, render::reflection::Baked* const render_baked, gl::Reflection* const gl_baked) noexcept {
-                        if (!render_baked->enabled)
+                e.get_world()->synchronised_system<core::ecs::All<render::reflection::Baked, gl::BakedReflection>>(
+                    [&](const core::ecs::entity_id_t reflection_id, render::reflection::Baked* const render_baked, gl::BakedReflection* const gl_baked) {
+                        if (!render_baked->get_enabled())
                             return;
                         if (render_baked->get_scene_id() != scene_id)
                             return;
@@ -305,18 +308,18 @@ void gearoenix::gl::submission::Manager::fill_scenes() noexcept
         });
 }
 
-void gearoenix::gl::submission::Manager::update_scenes() noexcept
+void gearoenix::gl::submission::Manager::update_scenes()
 {
     e.get_world()->parallel_system<render::scene::Scene>(
-        [&](const core::ecs::entity_id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) noexcept {
-            if (!render_scene->enabled)
+        [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) {
+            if (!render_scene->get_enabled())
                 return;
             auto& scene_data = scene_pool[scenes[std::make_pair(render_scene->get_layer(), scene_id)]];
             update_scene(scene_id, scene_data, *render_scene);
         });
 }
 
-void gearoenix::gl::submission::Manager::update_scene(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene) noexcept
+void gearoenix::gl::submission::Manager::update_scene(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene)
 {
     scene_data.ssao_settings = render_scene.get_ssao_settings();
     auto& bvh = scenes_bvhs[scene_id];
@@ -327,19 +330,19 @@ void gearoenix::gl::submission::Manager::update_scene(const core::ecs::entity_id
     update_scene_cameras(scene_id, scene_data, bvh);
 }
 
-void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh) noexcept
+void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
     if (!render_scene.get_recreate_bvh())
         return;
     bvh.reset();
-    e.get_world()->synchronised_system<core::ecs::And<physics::collider::Aabb3, render::model::Model, gl::Model, physics::Transformation>>(
-        [&](
+    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>>(
+        [&, this](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             render::model::Model* const render_model,
             gl::Model* const model,
-            physics::Transformation* const model_transform) noexcept {
-            if (!render_model->enabled || render_model->get_is_transformable() || render_model->scene_id != scene_id) {
+            physics::TransformationComponent* const model_transform) {
+            if (!render_model->get_enabled() || render_model->get_is_transformable() || render_model->scene_id != scene_id) {
                 return;
             }
             auto& mesh = *model->get_mesh();
@@ -364,18 +367,18 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
     bvh.create_nodes();
 }
 
-void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data) noexcept
+void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
     auto& anm_mgr = *e.get_physics_engine()->get_animation_manager();
-    e.get_world()->synchronised_system<core::ecs::Or<core::ecs::And<physics::collider::Aabb3, render::model::Model, gl::Model, physics::Transformation>, physics::animation::Armature>>(
-        [&](
+    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
+        [&, this](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             render::model::Model* const render_model,
             gl::Model* const gl_model,
-            physics::Transformation* const model_transform,
-            physics::animation::Armature* const armature) noexcept {
-            if (!render_model->enabled || !render_model->get_is_transformable() || render_model->scene_id != scene_id)
+            physics::TransformationComponent* const model_transform,
+            physics::animation::Armature* const armature) {
+            if (!render_model->get_enabled() || !render_model->get_is_transformable() || render_model->scene_id != scene_id)
                 return;
             const auto& mesh = *gl_model->get_mesh();
             std::size_t first_bone_index = 0;
@@ -383,7 +386,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             if (nullptr != armature) {
                 first_bone_index = scene_data.bones_data.size();
                 anm_mgr.loop_over_bones(
-                    [&](const physics::animation::Bone& bone) noexcept {
+                    [&](const physics::animation::Bone& bone) {
                         ++bones_count;
                         scene_data.bones_data.push_back(Bone {
                             .m = bone.m,
@@ -419,11 +422,11 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
         });
 }
 
-void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh) noexcept
+void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
     if (render_scene.get_recreate_bvh() || render_scene.get_reflection_probs_changed()) {
         for (const auto& reflection : scene_data.reflections) {
-            bvh.call_on_intersecting(reflection.second.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+            bvh.call_on_intersecting(reflection.second.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
                 if (reflection.second.size > m.reflection_probe_size)
                     return;
@@ -435,7 +438,7 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
         }
     }
 
-    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& m, const unsigned int) noexcept {
+    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& m, const unsigned int) {
         for (const auto& reflection : scene_data.reflections) {
             if (!reflection.second.box.check_intersection(m.box))
                 return;
@@ -450,16 +453,16 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
     });
 }
 
-void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh) noexcept
+void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    bvh.call_on_all([&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+    bvh.call_on_all([&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
         bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
         bvh_node_data.user_data.model.directional_lights_count = 0;
     });
     for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
         bvh.call_on_intersecting(
             shadow.second.frustum,
-            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
                 if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
                     return;
@@ -469,7 +472,7 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
                 m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
                 ++m.shadow_caster_directional_lights_count;
             },
-            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) noexcept {
+            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
                 if (m.directional_lights_direction.size() == m.directional_lights_count)
                     return;
@@ -479,7 +482,7 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
             });
     }
 
-    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& md, const unsigned int) noexcept {
+    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& md, const unsigned int) {
         auto& m = md.base.model;
         m.shadow_caster_directional_lights_count = 0;
         m.directional_lights_count = 0;
@@ -503,29 +506,28 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
     });
 }
 
-void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh) noexcept
+void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    e.get_world()->parallel_system<core::ecs::And<render::camera::Camera, gl::Camera, physics::collider::Frustum, physics::Transformation>>(
-        [&](
+    e.get_world()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::TransformationComponent>>(
+        [&, this](
             const core::ecs::entity_id_t camera_id,
-            render::camera::Camera* const render_camera,
-            gl::Camera* const gl_camera,
+            gl::Camera* const camera,
             physics::collider::Frustum* const frustum,
-            physics::Transformation* const transform,
-            const unsigned int /*kernel_index*/) noexcept -> void {
-            if (!render_camera->enabled || scene_id != render_camera->get_scene_id())
+            physics::TransformationComponent* const transform,
+            const unsigned int /*kernel_index*/) -> void {
+            if (!camera->get_enabled() || scene_id != camera->get_scene_id())
                 return;
             const auto camera_location = transform->get_global_location();
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
-            switch (render_camera->get_usage()) {
+            switch (camera->get_usage()) {
             case render::camera::Camera::Usage::Main:
-                camera_pool_index = scene_data.cameras[std::make_pair(render_camera->get_layer(), camera_id)];
+                camera_pool_index = scene_data.cameras[std::make_pair(camera->get_layer(), camera_id)];
                 break;
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
-                auto& reflection = scene_data.reflections[render_camera->get_reference_id()];
+                auto& reflection = scene_data.reflections[camera->get_reference_id()];
                 self_irradiance = reflection.irradiance;
                 self_radiance = reflection.radiance;
                 break;
@@ -535,11 +537,11 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 break;
             }
             auto& camera_data = camera_pool[camera_pool_index];
-            camera_data.clear(*gl_camera, *render_camera, math::Vec3<float>(camera_location));
+            camera_data.clear(*camera, *camera, math::Vec3<float>(camera_location));
 
             // Recoding static models
-            bvh.call_on_intersecting(*frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                if ((bvh_node_data.user_data.cameras_flags & render_camera->get_flag()) == 0)
+            bvh.call_on_intersecting(*frustum, [&, this](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+                if ((bvh_node_data.user_data.cameras_flags & camera->get_flag()) == 0)
                     return;
                 const auto dir = camera_location - bvh_node_data.box.get_center();
                 const auto dis = dir.square_length();
@@ -558,8 +560,8 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             });
 
             // Recording dynamic models
-            core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& m, const unsigned int kernel_index) noexcept {
-                if ((m.base.cameras_flags & render_camera->get_flag()) == 0)
+            core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&, this](DynamicModel& m, const unsigned int kernel_index) {
+                if ((m.base.cameras_flags & camera->get_flag()) == 0)
                     return;
                 if (!frustum->check_intersection(m.box))
                     return;
@@ -600,9 +602,9 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             core::sync::ParallelFor::execi(
                 camera_data.models_data.begin(),
                 camera_data.models_data.end(),
-                [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) noexcept {
+                [&, this](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
                     auto& m = d_m.second;
-                    if (!m.material->needs_mvp && render_camera->get_usage() != render::camera::Camera::Usage::Shadow)
+                    if (!m.material->needs_mvp && camera->get_usage() != render::camera::Camera::Usage::Shadow)
                         return;
                     if (m.bones_count > 0) {
                         const auto last_bone_index = m.first_bone_index + m.bones_count;
@@ -628,7 +630,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             core::sync::ParallelFor::exec(
                 scene_data.debug_mesh_data.begin(),
                 scene_data.debug_mesh_data.end(),
-                [&](DebugModel m, const unsigned int kernel_index) noexcept {
+                [&, this](DebugModel m, const unsigned int kernel_index) {
                     m.m = camera_data.vp * m.m;
                     camera_data.debug_meshes_threads[kernel_index].push_back(std::move(m));
                 });
@@ -637,7 +639,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
         });
 }
 
-void gearoenix::gl::submission::Manager::render_shadows() noexcept
+void gearoenix::gl::submission::Manager::render_shadows()
 {
     push_debug_group("render-shadows");
     GX_GL_CHECK_D;
@@ -650,7 +652,7 @@ void gearoenix::gl::submission::Manager::render_shadows() noexcept
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera)
 {
     push_debug_group("render-shadows for camera " + *camera.name);
     set_framebuffer(camera.framebuffer);
@@ -663,7 +665,7 @@ void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera) no
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene) noexcept
+void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene)
 {
     push_debug_group("render-shadows for scene " + *scene.name);
     for (auto& camera_pool_index : scene.shadow_cameras) {
@@ -673,11 +675,11 @@ void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene) noex
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_reflection_probes() noexcept
+void gearoenix::gl::submission::Manager::render_reflection_probes()
 {
     push_debug_group("render-reflection-probes");
-    e.get_world()->synchronised_system<core::ecs::And<gl::Reflection, ReflectionRuntime, render::reflection::Runtime>>(
-        [&](const core::ecs::entity_id_t, gl::Reflection* const r, ReflectionRuntime* const rr, render::reflection::Runtime* const rrr) noexcept {
+    e.get_world()->synchronised_system<core::ecs::All<gl::BakedReflection, RuntimeReflection, render::reflection::Runtime>>(
+        [&](const core::ecs::entity_id_t, gl::BakedReflection* const r, RuntimeReflection* const rr, render::reflection::Runtime* const rrr) {
             constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
                 std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
                 std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
@@ -740,7 +742,7 @@ void gearoenix::gl::submission::Manager::render_reflection_probes() noexcept
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_reflection_probes(const Scene& scene) noexcept
+void gearoenix::gl::submission::Manager::render_reflection_probes(const Scene& scene)
 {
     push_debug_group("render-reflection-probes for scene " + *scene.name);
     for (auto& camera_pool_index : scene.reflection_cameras) {
@@ -750,7 +752,7 @@ void gearoenix::gl::submission::Manager::render_reflection_probes(const Scene& s
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, const Camera& camera)
 {
     push_debug_group("render-skyboxes for scene " + *scene.name + " and for camera " + *camera.name);
     glDepthMask(GL_FALSE);
@@ -787,7 +789,7 @@ void gearoenix::gl::submission::Manager::render_skyboxes(const Scene& scene, con
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scene, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scene, const Camera& camera)
 {
     push_debug_group("render-forward-camera for scene " + *scene.name + " and for camera " + *camera.name);
     GX_GL_CHECK_D;
@@ -807,7 +809,7 @@ void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scen
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
+void gearoenix::gl::submission::Manager::render_with_deferred()
 {
     auto& os_app = e.get_platform_application();
     const auto& base_os_app = os_app.get_base();
@@ -918,7 +920,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred() noexcept
     }
 }
 
-void gearoenix::gl::submission::Manager::render_with_forward() noexcept
+void gearoenix::gl::submission::Manager::render_with_forward()
 {
     push_debug_group("render-forward");
     for (auto& scene_layer_entity_id_pool_index : scenes) {
@@ -969,7 +971,7 @@ void gearoenix::gl::submission::Manager::render_with_forward() noexcept
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Camera& camera)
 {
     if (!camera.bloom_data.has_value())
         return;
@@ -1067,7 +1069,7 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Came
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_colour_correction_anti_aliasing(const Scene& s, const Camera& camera) noexcept
+void gearoenix::gl::submission::Manager::render_colour_correction_anti_aliasing(const Scene& s, const Camera& camera)
 {
     GX_GL_CHECK_D;
     push_debug_group("render-colour-correction-anti-aliasing in scene " + *s.name + " for camera " + *camera.name);
@@ -1089,7 +1091,7 @@ void gearoenix::gl::submission::Manager::render_colour_correction_anti_aliasing(
     GX_GL_CHECK_D;
 }
 
-void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene) noexcept
+void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
 {
     push_debug_group("render-debug-meshes in scene " + *scene.name);
     glDisable(GL_DEPTH_TEST);
@@ -1109,7 +1111,7 @@ void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_imgui() noexcept
+void gearoenix::gl::submission::Manager::render_imgui()
 {
     push_debug_group("render-imgui");
     ImGui::Render();
@@ -1121,7 +1123,7 @@ void gearoenix::gl::submission::Manager::render_imgui() noexcept
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::set_viewport_clip(const math::Vec4<sizei>& viewport_clip) noexcept
+void gearoenix::gl::submission::Manager::set_viewport_clip(const math::Vec4<sizei>& viewport_clip)
 {
     if (current_viewport_clip == viewport_clip)
         return;
@@ -1134,7 +1136,7 @@ void gearoenix::gl::submission::Manager::set_viewport_clip(const math::Vec4<size
         current_viewport_clip.z, current_viewport_clip.w);
 }
 
-void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_object) noexcept
+void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_object)
 {
     if (current_bound_framebuffer == framebuffer_object)
         return;
@@ -1144,7 +1146,7 @@ void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_
     glBindFramebuffer(GL_FRAMEBUFFER, current_bound_framebuffer);
 }
 
-gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
+gearoenix::gl::submission::Manager::Manager(Engine& e)
     : e(e)
     , final_shader(new shader::Final(e))
     , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
@@ -1162,8 +1164,8 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     , bloom_vertical_shader(new shader::BloomVertical(e))
     , bloom_upsampler_shader(new shader::BloomUpsampler(e))
     , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
-    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::sync::EndCaller([] {}))))
-    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::sync::EndCaller([] {}))))
+    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::job::EndCaller([] {}))))
+    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::job::EndCaller([] {}))))
 {
     GX_GL_CHECK_D;
     GX_LOG_D("Creating submission manager.");
@@ -1182,12 +1184,12 @@ gearoenix::gl::submission::Manager::Manager(Engine& e) noexcept
     e.todos.unload();
 }
 
-gearoenix::gl::submission::Manager::~Manager() noexcept
+gearoenix::gl::submission::Manager::~Manager()
 {
     e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_listener(resolution_cfg_listener_id);
 }
 
-void gearoenix::gl::submission::Manager::update() noexcept
+void gearoenix::gl::submission::Manager::update()
 {
     camera_pool.clear();
     scene_pool.clear();
@@ -1215,7 +1217,7 @@ void gearoenix::gl::submission::Manager::update() noexcept
 #endif
 }
 
-void gearoenix::gl::submission::Manager::window_resized() noexcept
+void gearoenix::gl::submission::Manager::window_resized()
 {
     if (e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value)
         return;

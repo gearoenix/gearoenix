@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <execution>
 
-gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device) noexcept
+gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device)
 {
     const std::size_t threads_count = std::thread::hardware_concurrency();
     threads_g_buffer_filler_commands.reserve(threads_count);
@@ -37,7 +37,7 @@ gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device) noex
     }
 }
 
-gearoenix::d3d::SubmissionManager::CameraData::CameraData(Device& device) noexcept
+gearoenix::d3d::SubmissionManager::CameraData::CameraData(Device& device)
     : frames {
         Frame(device),
         Frame(device),
@@ -46,7 +46,7 @@ gearoenix::d3d::SubmissionManager::CameraData::CameraData(Device& device) noexce
 {
 }
 
-bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::size_t camera_pool_index) noexcept
+bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::size_t camera_pool_index)
 {
     auto& camera = camera_pool[camera_pool_index];
     auto& frame = camera.frames[e.get_frame_number()];
@@ -91,7 +91,7 @@ bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::size_t camera_p
     return false;
 }
 
-gearoenix::d3d::SubmissionManager::SubmissionManager(Engine& e) noexcept
+gearoenix::d3d::SubmissionManager::SubmissionManager(Engine& e)
     : e(e)
     , device(e.get_device())
     , descriptor_manager(e.get_descriptor_manager())
@@ -101,9 +101,9 @@ gearoenix::d3d::SubmissionManager::SubmissionManager(Engine& e) noexcept
 {
 }
 
-gearoenix::d3d::SubmissionManager::~SubmissionManager() noexcept = default;
+gearoenix::d3d::SubmissionManager::~SubmissionManager() = default;
 
-bool gearoenix::d3d::SubmissionManager::render_frame() noexcept
+bool gearoenix::d3d::SubmissionManager::render_frame()
 {
     auto* const world = e.get_world();
 

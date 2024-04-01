@@ -5,7 +5,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-// void gearoenix::render::camera::ArcController::update() noexcept
+// void gearoenix::render::camera::ArcController::update()
 //{
 //     bool values_changed = false;
 //     if (rotate_x != 0.0) {
@@ -41,7 +41,7 @@
 //     }
 // }
 //
-// void gearoenix::render::camera::ArcController::values_updated() noexcept
+// void gearoenix::render::camera::ArcController::values_updated()
 //{
 // #ifdef GX_DEBUG_MODE
 //     const auto up_len = up.square_length() - 1;
@@ -68,7 +68,7 @@
 //     trn->look_at(target + direction, target, up);
 // }
 //
-// gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> c) noexcept
+// gearoenix::render::camera::ArcController::ArcController(std::shared_ptr<Camera> c)
 //     : up(0.0, 0.0, 1.0)
 //     , direction(1.0, 0.0, 0.0)
 //     , controlled_camera(std::move(c))
@@ -83,7 +83,7 @@
 //     values_updated();
 // }
 //
-// gearoenix::render::camera::ArcController::~ArcController() noexcept
+// gearoenix::render::camera::ArcController::~ArcController()
 //{
 //     render_engine->get_update_manager()->remove(function_id);
 //     auto* const event_engine = render_engine->get_platform_application()->get_event_engine();
@@ -92,49 +92,49 @@
 //     event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
 // }
 //
-// void gearoenix::render::camera::ArcController::set_vertical_angle(const double a) noexcept
+// void gearoenix::render::camera::ArcController::set_vertical_angle(const double a)
 //{
 //     vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_min_vertical_angle(const double a) noexcept
+// void gearoenix::render::camera::ArcController::set_min_vertical_angle(const double a)
 //{
 //     min_vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_max_vertical_angle(const double a) noexcept
+// void gearoenix::render::camera::ArcController::set_max_vertical_angle(const double a)
 //{
 //     max_vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_distance(const double d) noexcept
+// void gearoenix::render::camera::ArcController::set_distance(const double d)
 //{
 //     distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_min_distance(const double d) noexcept
+// void gearoenix::render::camera::ArcController::set_min_distance(const double d)
 //{
 //     min_distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_max_distance(const double d) noexcept
+// void gearoenix::render::camera::ArcController::set_max_distance(const double d)
 //{
 //     max_distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_target(const math::Vec3<double>& t) noexcept
+// void gearoenix::render::camera::ArcController::set_target(const math::Vec3<double>& t)
 //{
 //     target = t;
 //     values_updated();
 // }
 //
-// bool gearoenix::render::camera::ArcController::on_event(const core::event::Data& d) noexcept
+// bool gearoenix::render::camera::ArcController::on_event(const core::event::Data& d)
 //{
 //     switch (d.get_source()) {
 //     case core::event::Id::GestureDrag2D: {

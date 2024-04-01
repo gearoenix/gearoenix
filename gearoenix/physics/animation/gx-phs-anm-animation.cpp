@@ -1,27 +1,28 @@
 #include "gx-phs-anm-animation.hpp"
+#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
 #include <utility>
 
-void gearoenix::physics::animation::ArmatureAnimationInfo::optimise() noexcept
+void gearoenix::physics::animation::ArmatureAnimationInfo::optimise()
 {
     for (auto& c : channels)
         c.optimise();
 }
 
-gearoenix::physics::animation::Animation::Animation(std::string name) noexcept
+gearoenix::physics::animation::Animation::Animation(std::string name)
     : name(std::move(name))
 {
 }
 
-gearoenix::physics::animation::Animation::~Animation() noexcept = default;
+gearoenix::physics::animation::Animation::~Animation() = default;
 
 gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(
     std::string name,
     const std::size_t bones_channels_count,
     const std::size_t bones_channels_first_index,
-    const std::size_t bones_channels_end_index) noexcept
+    const std::size_t bones_channels_end_index)
     : Animation(std::move(name))
     , bones_channels_count(bones_channels_count)
     , bones_channels_first_index(bones_channels_first_index)
@@ -29,16 +30,16 @@ gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(
 {
 }
 
-gearoenix::physics::animation::ArmatureAnimation::~ArmatureAnimation() noexcept = default;
+gearoenix::physics::animation::ArmatureAnimation::~ArmatureAnimation() = default;
 
-void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const double time) noexcept
+void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const double time)
 {
     for (std::size_t bone_channel_index = bones_channels_first_index; bone_channel_index < bones_channels_end_index; ++bone_channel_index) {
         animate(manager, manager.get_bones_channels()[bone_channel_index], time);
     }
 }
 
-void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const BoneChannel& bone_channel, const double time) noexcept
+void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const BoneChannel& bone_channel, const double time)
 {
     Bone& bone = manager.get_bones()[bone_channel.target_bone_index];
 
@@ -114,7 +115,7 @@ gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
     std::string name,
     std::shared_ptr<render::material::Sprite> sprite,
     const std::size_t width,
-    const std::size_t height) noexcept
+    const std::size_t height)
     : Animation(std::move(name))
     , sprite(std::move(sprite))
     , count(static_cast<double>(width * height))
@@ -125,7 +126,7 @@ gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
 }
 
 void gearoenix::physics::animation::SpriteAnimation::animate(
-    Manager&, const double time) noexcept
+    Manager&, const double time)
 {
     GX_ASSERT_D(time <= 1.0);
     const auto pos = static_cast<std::size_t>(count * time);
@@ -133,23 +134,35 @@ void gearoenix::physics::animation::SpriteAnimation::animate(
     sprite->get_uv_transform() = math::Vec4<float>(uv_scale, uv_scale * v);
 }
 
-gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() noexcept = default;
+gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
+
+namespace {
+gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::AnimationPlayer, 16> animation_player_allocator;
+}
 
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::shared_ptr<Animation> animation,
     std::string&& name,
-    const double starting_time) noexcept
-    : core::ecs::Component(this, std::move(name))
+    const double starting_time)
+    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
     , time(starting_time)
     , animation(std::move(animation))
 {
 }
 
-gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(AnimationPlayer&&) noexcept = default;
+gearoenix::physics::animation::AnimationPlayer::~AnimationPlayer() = default;
 
-gearoenix::physics::animation::AnimationPlayer::~AnimationPlayer() noexcept = default;
+std::shared_ptr<gearoenix::physics::animation::AnimationPlayer> gearoenix::physics::animation::AnimationPlayer::construct(
+    std::shared_ptr<Animation> animation,
+    std::string&& name,
+    const double starting_time)
+{
+    auto self = animation_player_allocator.make_shared(std::move(animation), std::move(name), starting_time);
+    self->set_component_self(self);
+    return self;
+}
 
-void gearoenix::physics::animation::AnimationPlayer::update_time(const double delta_time) noexcept
+void gearoenix::physics::animation::AnimationPlayer::update_time(const double delta_time)
 {
     time += delta_time * speed;
     if (is_loop) {
@@ -159,26 +172,32 @@ void gearoenix::physics::animation::AnimationPlayer::update_time(const double de
     }
 }
 
-void gearoenix::physics::animation::AnimationPlayer::set_loop_start_time(const double t) noexcept
+void gearoenix::physics::animation::AnimationPlayer::set_loop_start_time(const double t)
 {
     loop_start_time = t;
     loop_length_time = loop_end_time - loop_start_time;
 }
 
-void gearoenix::physics::animation::AnimationPlayer::set_loop_end_time(const double t) noexcept
+void gearoenix::physics::animation::AnimationPlayer::set_loop_end_time(const double t)
 {
     loop_end_time = t;
     loop_length_time = loop_end_time - loop_start_time;
 }
 
-void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const double start, const double end) noexcept
+void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const double start, const double end)
 {
     loop_start_time = start;
     loop_end_time = end;
     loop_length_time = loop_end_time - loop_start_time;
 }
 
-void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager) noexcept
+void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager)
 {
     animation->animate(manager, time);
+}
+
+const boost::container::flat_set<std::type_index>& gearoenix::physics::animation::AnimationPlayer::get_all_the_hierarchy_types_except_component() const
+{
+    static const boost::container::flat_set<std::type_index> types { core::ecs::Component::create_this_type_index(this) };
+    return types;
 }

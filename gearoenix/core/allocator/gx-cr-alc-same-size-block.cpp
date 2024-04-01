@@ -5,14 +5,14 @@
 
 gearoenix::core::allocator::SameSizeBlock::SameSizeBlock(
     const std::size_t object_size,
-    const std::size_t objects_count_in_each_block) noexcept
+    const std::size_t objects_count_in_each_block)
     : object_size(object_size)
     , objects_count_in_each_block(objects_count_in_each_block)
     , block_bytes_count(object_size * objects_count_in_each_block)
 {
 }
 
-gearoenix::core::allocator::SameSizeBlock::~SameSizeBlock() noexcept
+gearoenix::core::allocator::SameSizeBlock::~SameSizeBlock()
 {
 #ifdef GX_DEBUG_MODE
     for (const auto& block : blocks)
@@ -21,7 +21,7 @@ gearoenix::core::allocator::SameSizeBlock::~SameSizeBlock() noexcept
 #endif
 }
 
-unsigned char* gearoenix::core::allocator::SameSizeBlock::alloc() noexcept
+unsigned char* gearoenix::core::allocator::SameSizeBlock::alloc()
 {
     const std::lock_guard<std::mutex> _lg(this_lock);
     if (free_pointers.empty()) {
@@ -38,7 +38,7 @@ unsigned char* gearoenix::core::allocator::SameSizeBlock::alloc() noexcept
     return result;
 }
 
-void gearoenix::core::allocator::SameSizeBlock::free(unsigned char* const p) noexcept
+void gearoenix::core::allocator::SameSizeBlock::free(unsigned char* const p)
 {
     const std::lock_guard<std::mutex> _lg(this_lock);
 #ifdef GX_DEBUG_MODE

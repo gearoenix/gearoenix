@@ -10,14 +10,14 @@
 gearoenix::vulkan::pipeline::Pipeline::Pipeline(
     std::shared_ptr<Layout> layout,
     std::shared_ptr<Cache> cache,
-    VkPipeline vulkan_data) noexcept
+    VkPipeline vulkan_data)
     : layout(std::move(layout))
     , cache(std::move(cache))
     , vulkan_data(vulkan_data)
 {
 }
 
-gearoenix::vulkan::pipeline::Pipeline::~Pipeline() noexcept
+gearoenix::vulkan::pipeline::Pipeline::~Pipeline()
 {
     vkDestroyPipeline(
         layout->get_des_set_layout()->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
@@ -27,7 +27,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     std::shared_ptr<Layout> layout,
     std::shared_ptr<Cache> cache,
     const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
-    const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info) noexcept
+    const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info)
 {
     VkRayTracingPipelineCreateInfoKHR info;
     GX_SET_ZERO(info);

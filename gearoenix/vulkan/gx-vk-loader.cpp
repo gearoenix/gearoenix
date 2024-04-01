@@ -13,12 +13,12 @@ GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DECL_FUNCTIONS)
 
 static std::unique_ptr<gearoenix::platform::Library> vulkan_lib = nullptr;
 
-bool gearoenix::vulkan::Loader::is_loaded() noexcept
+bool gearoenix::vulkan::Loader::is_loaded()
 {
     return vkCreateInstance != nullptr;
 }
 
-bool gearoenix::vulkan::Loader::load() noexcept
+bool gearoenix::vulkan::Loader::load()
 {
     if (is_loaded())
         return true;
@@ -44,7 +44,7 @@ bool gearoenix::vulkan::Loader::load() noexcept
     return is_loaded();
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance) noexcept
+void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance)
 {
 #define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
     if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
@@ -57,7 +57,7 @@ void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance) noexc
 #undef GX_VULKAN_LOADER_LOAD_FUNCTION
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] VkDevice device) noexcept
+void gearoenix::vulkan::Loader::load([[maybe_unused]] VkDevice device)
 {
 #define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
     if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
@@ -70,12 +70,12 @@ void gearoenix::vulkan::Loader::load([[maybe_unused]] VkDevice device) noexcept
 #undef GX_VULKAN_LOADER_LOAD_FUNCTION
 }
 
-void gearoenix::vulkan::Loader::unload() noexcept
+void gearoenix::vulkan::Loader::unload()
 {
     vulkan_lib = nullptr;
 }
 
-PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name) noexcept
+PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name)
 {
     return vulkan_lib->load<PFN_vkVoidFunction>(name);
 }

@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 
-gearoenix::vulkan::queue::Queue::Queue(engine::Engine& e) noexcept
+gearoenix::vulkan::queue::Queue::Queue(engine::Engine& e)
     : e(e)
 {
     static std::mutex queue_index_lock;
@@ -34,9 +34,9 @@ gearoenix::vulkan::queue::Queue::Queue(engine::Engine& e) noexcept
         &vulkan_data);
 }
 
-gearoenix::vulkan::queue::Queue::~Queue() noexcept = default;
+gearoenix::vulkan::queue::Queue::~Queue() = default;
 
-void gearoenix::vulkan::queue::Queue::submit(command::Buffer& cmd, sync::Fence& fence) noexcept
+void gearoenix::vulkan::queue::Queue::submit(command::Buffer& cmd, sync::Fence& fence)
 {
     VkSubmitInfo info;
     GX_SET_ZERO(info);
@@ -54,7 +54,7 @@ void gearoenix::vulkan::queue::Queue::submit(
     const VkCommandBuffer* const commands,
     const std::size_t signal_semaphores_count,
     const VkSemaphore* const signal_semaphores,
-    VkFence fence) noexcept
+    VkFence fence)
 {
     VkSubmitInfo info;
     GX_SET_ZERO(info);

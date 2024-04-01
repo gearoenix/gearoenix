@@ -22,21 +22,21 @@ struct Texture2D final : public render::texture::Texture2D {
         id<MTLTexture> resource,
         id<MTLSamplerState> sampler,
         const render::texture::TextureInfo& info,
-        std::string name) noexcept;
-    ~Texture2D() noexcept final;
+        std::string name);
+    ~Texture2D() final;
 };
 
 struct TextureManager final : public render::texture::Manager {
     Engine& e;
     const boost::container::flat_map<render::texture::SamplerInfo, id<MTLSamplerState>> samplers;
 
-    TextureManager(Engine& e) noexcept;
-    ~TextureManager() noexcept final;
+    TextureManager(Engine& e);
+    ~TextureManager() final;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept final;
+        const core::job::EndCaller& c) final;
 };
 }
 

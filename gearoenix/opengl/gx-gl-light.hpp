@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/light/gx-rnd-lt-builder.hpp"
+#include "../render/light/gx-rnd-lt-directional.hpp"
 #include "../render/light/gx-rnd-lt-manager.hpp"
 #include "gx-gl-types.hpp"
 
@@ -12,60 +13,66 @@ struct Engine;
 struct Texture2D;
 struct Target;
 
-struct ShadowCasterDirectionalLight final : public core::ecs::Component {
-    friend struct LightBuilder;
-    friend struct LightManager;
-
+struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirectional {
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target);
     GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1));
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
 
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+
 public:
-    explicit ShadowCasterDirectionalLight(std::string&& name) noexcept;
-    ~ShadowCasterDirectionalLight() noexcept final;
-    ShadowCasterDirectionalLight(ShadowCasterDirectionalLight&&) noexcept;
+    explicit ShadowCasterDirectionalLight(std::string&& name);
+    [[nodiscard]] static std::shared_ptr<ShadowCasterDirectionalLight> construct(std::string&& name);
+    ~ShadowCasterDirectionalLight() override;
+    void set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback) override;
+    void set_shadow_map_target(std::shared_ptr<render::texture::Target>&& t) override;
 };
 
-struct LightBuilder final : public render::light::Builder {
-    friend struct LightManager;
+struct LightBuilder final : render::light::Builder {
     Engine& eng;
 
 private:
     LightBuilder(
         Engine& e,
         const std::string& name,
-        const render::light::Builder::DirectionalInfo& info,
-        const core::sync::EndCaller& end_callback) noexcept;
+        const ShadowCasterDirectionalInfo& info,
+        core::job::EndCaller<>&& end_callback);
 
+public:
     LightBuilder(
         Engine& e,
         const std::string& name,
-        const render::light::Builder::ShadowCasterDirectionalInfo& info,
-        const core::sync::EndCaller& end_callback) noexcept;
-
-public:
-    ~LightBuilder() noexcept final;
+        const DirectionalInfo& info,
+        core::job::EndCaller<>&& end_callback);
+    static void construct(
+        Engine& e,
+        const std::string& name,
+        const ShadowCasterDirectionalInfo& info,
+        core::job::EndCallerShared<Builder>&& end_callback,
+        core::job::EndCaller<>&& entity_end_callback);
+    ~LightBuilder() override;
 };
 
-struct LightManager final : public render::light::Manager {
+struct LightManager final : render::light::Manager {
     Engine& eng;
 
 private:
     [[nodiscard]] std::shared_ptr<render::light::Builder> build_directional(
         const std::string& name,
-        const core::sync::EndCaller& end_callback) noexcept final;
-    [[nodiscard]] std::shared_ptr<render::light::Builder> build_shadow_caster_directional(
+        core::job::EndCaller<>&& end_callback) override;
+    void build_shadow_caster_directional(
         const std::string& name,
         std::size_t shadow_map_resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,
-        const core::sync::EndCaller& end_callback) noexcept final;
+        core::job::EndCallerShared<render::light::Builder>&& end_callback,
+        core::job::EndCaller<>&& entity_end_callback) override;
 
 public:
-    explicit LightManager(Engine& e) noexcept;
-    ~LightManager() noexcept final;
+    explicit LightManager(Engine& e);
+    ~LightManager() override;
 };
 }
 

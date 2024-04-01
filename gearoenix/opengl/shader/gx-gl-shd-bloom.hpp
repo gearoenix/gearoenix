@@ -12,9 +12,9 @@ struct BloomPrefilter final : public Shader {
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomPrefilter(Engine& e) noexcept;
-    ~BloomPrefilter() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit BloomPrefilter(Engine& e);
+    ~BloomPrefilter() final;
+    void bind(uint& current_shader) const final;
 };
 
 struct BloomHorizontal final : public Shader {
@@ -22,9 +22,9 @@ struct BloomHorizontal final : public Shader {
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomHorizontal(Engine& e) noexcept;
-    ~BloomHorizontal() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit BloomHorizontal(Engine& e);
+    ~BloomHorizontal() final;
+    void bind(uint& current_shader) const final;
 };
 
 struct BloomVertical final : public Shader {
@@ -32,9 +32,9 @@ struct BloomVertical final : public Shader {
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomVertical(Engine& e) noexcept;
-    ~BloomVertical() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit BloomVertical(Engine& e);
+    ~BloomVertical() final;
+    void bind(uint& current_shader) const final;
 };
 
 struct BloomUpsampler final : public Shader {
@@ -43,9 +43,9 @@ struct BloomUpsampler final : public Shader {
     GX_GL_UNIFORM_TEXTURE(low_texture);
 
 public:
-    explicit BloomUpsampler(Engine& e) noexcept;
-    ~BloomUpsampler() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit BloomUpsampler(Engine& e);
+    ~BloomUpsampler() final;
+    void bind(uint& current_shader) const final;
 };
 }
 #endif

@@ -10,16 +10,16 @@
 gearoenix::platform::stream::Asset::Asset() = default;
 
 #ifdef GX_PLATFORM_ANDROID
-gearoenix::platform::stream::Asset::~Asset() noexcept
+gearoenix::platform::stream::Asset::~Asset()
 {
     AAsset_close(file);
 }
 #else
-gearoenix::platform::stream::Asset::~Asset() noexcept = default;
+gearoenix::platform::stream::Asset::~Asset() = default;
 #endif
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(
-    const platform::Application& platform_application, const std::string& name) noexcept
+    const platform::Application& platform_application, const std::string& name)
 {
     const std::string file_name = "assets/" + name;
     auto* const asset = new Asset();
@@ -52,7 +52,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
     return asset;
 }
 
-std::size_t gearoenix::platform::stream::Asset::read(void* data, const std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Asset::read(void* data, const std::size_t length)
 {
 #ifdef GX_PLATFORM_ANDROID
     const auto result = static_cast<std::size_t>(AAsset_read(file, data, static_cast<std::size_t>(length)));
@@ -69,17 +69,17 @@ std::size_t gearoenix::platform::stream::Asset::read(void* data, const std::size
     return result;
 }
 
-std::size_t gearoenix::platform::stream::Asset::write(const void*, std::size_t) noexcept
+std::size_t gearoenix::platform::stream::Asset::write(const void*, std::size_t)
 {
     GX_UNEXPECTED;
 }
 
-void gearoenix::platform::stream::Asset::flush() noexcept
+void gearoenix::platform::stream::Asset::flush()
 {
     GX_UNEXPECTED; // Asset is only a reader stream
 }
 
-void gearoenix::platform::stream::Asset::seek(std::size_t offset) noexcept
+void gearoenix::platform::stream::Asset::seek(std::size_t offset)
 {
 #if defined(GX_USE_STD_FILE)
     file.seekg(static_cast<std::streamoff>(offset), std::ios::beg);
@@ -90,7 +90,7 @@ void gearoenix::platform::stream::Asset::seek(std::size_t offset) noexcept
 #endif
 }
 
-std::size_t gearoenix::platform::stream::Asset::tell() noexcept
+std::size_t gearoenix::platform::stream::Asset::tell()
 {
 #if defined(GX_USE_STD_FILE)
     return (std::size_t)file.tellg();
@@ -101,7 +101,7 @@ std::size_t gearoenix::platform::stream::Asset::tell() noexcept
 #endif
 }
 
-std::size_t gearoenix::platform::stream::Asset::size() noexcept
+std::size_t gearoenix::platform::stream::Asset::size()
 {
 #ifdef GX_USE_STD_FILE
     const auto c = file.tellg();

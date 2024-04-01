@@ -8,7 +8,7 @@
 #include "../../vulkan/gx-vk-loader.hpp"
 #endif
 
-void gearoenix::platform::Application::fetch_events() noexcept
+void gearoenix::platform::Application::fetch_events()
 {
     while (XPending(display) > 0) {
         XEvent event;
@@ -55,7 +55,7 @@ void gearoenix::platform::Application::fetch_events() noexcept
     }
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config)
     : base(GX_MAIN_ENTRY_ARGS, config)
     , display(XOpenDisplay(nullptr))
     , screen(XDefaultScreenOfDisplay(display))
@@ -101,14 +101,14 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     base.initialize_engine(*this);
 }
 
-gearoenix::platform::Application::~Application() noexcept
+gearoenix::platform::Application::~Application()
 {
     base.render_engine = nullptr;
     XDestroyWindow(display, window);
     XCloseDisplay(display);
 }
 
-void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
+void gearoenix::platform::Application::run(core::Application* const core_app)
 {
     base.initialize_core_application(*this, core_app);
     for (fetch_events(); base.running; fetch_events()) {
@@ -117,7 +117,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app) no
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
-std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const noexcept
+std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const
 {
     return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME };
 }

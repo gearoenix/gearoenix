@@ -24,29 +24,29 @@ public:
     GX_GET_CREF_PRV(KeyNameMap, key_to_name)
 public:
     template <typename C>
-    std::shared_ptr<C> get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
+    std::shared_ptr<C> get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun);
     template <typename C>
-    std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept;
+    std::shared_ptr<C> get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun);
     template <typename C>
-    std::shared_ptr<C> get(const std::string& name) const noexcept;
+    std::shared_ptr<C> get(const std::string& name) const;
     template <typename C>
-    std::shared_ptr<C> get(const Key& id) const noexcept;
-    void register_name(const std::string& name, const Key& k) noexcept;
-    Key get_key(const std::string& name) const noexcept;
-    std::optional<Key> try_get_key(const std::string& name) const noexcept;
+    std::shared_ptr<C> get(const Key& id) const;
+    void register_name(const std::string& name, const Key& k);
+    Key get_key(const std::string& name) const;
+    std::optional<Key> try_get_key(const std::string& name) const;
 };
 }
 
 template <typename T, struct Key, struct Compare>
 template <typename C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name, const std::function<std::shared_ptr<C>()>& new_fun)
 {
     return get(get_key(name), new_fun);
 }
 
 template <typename T, struct Key, struct Compare>
 template <typename C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun) noexcept
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id, const std::function<std::shared_ptr<C>()>& new_fun)
 {
     auto search = cacheds.find(id);
     if (search == cacheds.end()) {
@@ -68,14 +68,14 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 
 template <typename T, struct Key, struct Compare>
 template <typename C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name) const noexcept
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const std::string& name) const
 {
     return get(get_key(name));
 }
 
 template <typename T, struct Key, struct Compare>
 template <typename C>
-std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const noexcept
+std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Key& id) const
 {
     const auto search = cacheds.find(id);
     if (search == cacheds.end()) {
@@ -89,7 +89,7 @@ std::shared_ptr<C> gearoenix::core::cache::Cacher<T, Key, Compare>::get(const Ke
 }
 
 template <typename T, struct Key, struct Compare>
-void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::string& name, const Key& k) noexcept
+void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::string& name, const Key& k)
 {
 #ifdef GX_DEBUG_MODE
     const auto search = name_to_key.find(name);
@@ -106,7 +106,7 @@ void gearoenix::core::cache::Cacher<T, Key, Compare>::register_name(const std::s
 }
 
 template <typename T, struct Key, struct Compare>
-Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& name) const noexcept
+Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& name) const
 {
     const auto search = name_to_key.find(name);
     if (search == name_to_key.end())
@@ -116,7 +116,7 @@ Key gearoenix::core::cache::Cacher<T, Key, Compare>::get_key(const std::string& 
 
 template <typename T, struct Key, struct Compare>
 std::optional<Key>
-gearoenix::core::cache::Cacher<T, Key, Compare>::try_get_key(const std::string& name) const noexcept
+gearoenix::core::cache::Cacher<T, Key, Compare>::try_get_key(const std::string& name) const
 {
     const auto search = name_to_key.find(name);
     if (search == name_to_key.end())

@@ -19,13 +19,13 @@ private:
     Pool* const pool;
     const std::shared_ptr<PoolManager> pool_manager;
 
-    Set(Pool*, std::shared_ptr<PoolManager> pool_manager, VkDescriptorSet vulkan_data) noexcept;
+    Set(Pool*, std::shared_ptr<PoolManager> pool_manager, VkDescriptorSet vulkan_data);
     [[nodiscard]] static std::shared_ptr<Set> construct(
-        Pool* pool, std::shared_ptr<PoolManager> pool_manager, VkDescriptorSetLayout layout) noexcept;
+        Pool* pool, std::shared_ptr<PoolManager> pool_manager, VkDescriptorSetLayout layout);
 
 public:
-    ~Set() noexcept;
-    void write(const VkWriteDescriptorSet* data, std::uint32_t count) noexcept;
+    ~Set();
+    void write(const VkWriteDescriptorSet* data, std::uint32_t count);
 };
 }
 #endif

@@ -40,7 +40,7 @@ void main() {\n\
     frag_colour = textureLod(albedo, out_uv, 0.0);\n\
 }\n";
 
-gearoenix::gl::shader::Final::Final(Engine& e) noexcept
+gearoenix::gl::shader::Final::Final(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -50,9 +50,9 @@ gearoenix::gl::shader::Final::Final(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::shader::Final::~Final() noexcept = default;
+gearoenix::gl::shader::Final::~Final() = default;
 
-void gearoenix::gl::shader::Final::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::Final::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

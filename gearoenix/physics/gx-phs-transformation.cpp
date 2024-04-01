@@ -1,66 +1,70 @@
 #include "gx-phs-transformation.hpp"
+#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include <imgui/imgui.h>
 
-gearoenix::physics::Transformation::Transformation(std::string&& name) noexcept
-    : core::ecs::Component(this, std::move(name))
-    , x_axis(1.0, 0.0, 0.0)
+namespace {
+gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 256> allocator;
+}
+
+gearoenix::physics::Transformation::Transformation()
+    : x_axis(1.0, 0.0, 0.0)
     , y_axis(0.0, 1.0, 0.0)
     , z_axis(0.0, 0.0, 1.0)
     , scale(1.0)
 {
 }
 
-gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_global_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_global_location() const
 {
     return global_matrix.get_location();
 }
 
-void gearoenix::physics::Transformation::get_global_location(math::Vec3<double>& l) const noexcept
+void gearoenix::physics::Transformation::get_global_location(math::Vec3<double>& l) const
 {
     global_matrix.get_location(l);
 }
 
-gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_local_location() const noexcept
+gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_local_location() const
 {
     return local_matrix.get_location();
 }
 
-void gearoenix::physics::Transformation::get_local_location(math::Vec3<double>& l) const noexcept
+void gearoenix::physics::Transformation::get_local_location(math::Vec3<double>& l) const
 {
     local_matrix.get_location(l);
 }
 
-void gearoenix::physics::Transformation::set_local_location(const math::Vec3<double>& l) noexcept
+void gearoenix::physics::Transformation::set_local_location(const math::Vec3<double>& l)
 {
     changed = true;
     local_matrix.set_location(l);
 }
 
-void gearoenix::physics::Transformation::local_translate(const math::Vec3<double>& t) noexcept
+void gearoenix::physics::Transformation::local_translate(const math::Vec3<double>& t)
 {
     changed = true;
     local_matrix.translate(t);
 }
 
-void gearoenix::physics::Transformation::local_x_translate(const double v) noexcept
+void gearoenix::physics::Transformation::local_x_translate(const double v)
 {
     changed = true;
     local_translate(x_axis * v);
 }
 
-void gearoenix::physics::Transformation::local_y_translate(const double v) noexcept
+void gearoenix::physics::Transformation::local_y_translate(const double v)
 {
     changed = true;
     local_translate(y_axis * v);
 }
 
-void gearoenix::physics::Transformation::local_z_translate(const double v) noexcept
+void gearoenix::physics::Transformation::local_z_translate(const double v)
 {
     changed = true;
     local_translate(z_axis * v);
 }
 
-void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis, const math::Vec3<double>& l) noexcept
+void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis, const math::Vec3<double>& l)
 {
     changed = true;
     const auto loc = get_local_location();
@@ -73,7 +77,7 @@ void gearoenix::physics::Transformation::local_outer_rotate(const double d, cons
     local_translate((r * math::Vec4(l - loc, 0.0)).xyz() + loc);
 }
 
-void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis) noexcept
+void gearoenix::physics::Transformation::local_outer_rotate(const double d, const math::Vec3<double>& axis)
 {
     changed = true;
     const auto r = decltype(local_matrix)::rotation(axis, d);
@@ -83,7 +87,7 @@ void gearoenix::physics::Transformation::local_outer_rotate(const double d, cons
     local_matrix = r * local_matrix;
 }
 
-void gearoenix::physics::Transformation::local_rotate(const double d, const math::Vec3<double>& axis) noexcept
+void gearoenix::physics::Transformation::local_rotate(const double d, const math::Vec3<double>& axis)
 {
     changed = true;
     const auto loc = local_matrix.get_location();
@@ -96,7 +100,7 @@ void gearoenix::physics::Transformation::local_rotate(const double d, const math
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::local_rotate(const math::Quat<double>& q) noexcept
+void gearoenix::physics::Transformation::local_rotate(const math::Quat<double>& q)
 {
     changed = true;
     const auto loc = local_matrix.get_location();
@@ -109,7 +113,7 @@ void gearoenix::physics::Transformation::local_rotate(const math::Quat<double>& 
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::local_x_rotate(const double d) noexcept
+void gearoenix::physics::Transformation::local_x_rotate(const double d)
 {
     changed = true;
     const auto loc = local_matrix.get_location();
@@ -121,7 +125,7 @@ void gearoenix::physics::Transformation::local_x_rotate(const double d) noexcept
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::local_y_rotate(const double d) noexcept
+void gearoenix::physics::Transformation::local_y_rotate(const double d)
 {
     changed = true;
     const auto loc = local_matrix.get_location();
@@ -133,7 +137,7 @@ void gearoenix::physics::Transformation::local_y_rotate(const double d) noexcept
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::local_z_rotate(const double d) noexcept
+void gearoenix::physics::Transformation::local_z_rotate(const double d)
 {
     changed = true;
     const auto loc = local_matrix.get_location();
@@ -145,49 +149,49 @@ void gearoenix::physics::Transformation::local_z_rotate(const double d) noexcept
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::set_local_scale(const gearoenix::math::Vec3<double>& s) noexcept
+void gearoenix::physics::Transformation::set_local_scale(const gearoenix::math::Vec3<double>& s)
 {
     changed = true;
     local_matrix.local_scale(s / scale);
     scale = s;
 }
 
-void gearoenix::physics::Transformation::local_scale(const double s) noexcept
+void gearoenix::physics::Transformation::local_scale(const double s)
 {
     changed = true;
     local_matrix.local_scale(s);
     scale *= s;
 }
 
-void gearoenix::physics::Transformation::local_scale(const math::Vec3<double>& s) noexcept
+void gearoenix::physics::Transformation::local_scale(const math::Vec3<double>& s)
 {
     changed = true;
     local_matrix.local_scale(s);
     scale *= s;
 }
 
-void gearoenix::physics::Transformation::local_x_scale(const double s) noexcept
+void gearoenix::physics::Transformation::local_x_scale(const double s)
 {
     changed = true;
     local_matrix.local_x_scale(s);
     scale.x *= s;
 }
 
-void gearoenix::physics::Transformation::local_y_scale(const double s) noexcept
+void gearoenix::physics::Transformation::local_y_scale(const double s)
 {
     changed = true;
     local_matrix.local_y_scale(s);
     scale.y *= s;
 }
 
-void gearoenix::physics::Transformation::local_z_scale(const double s) noexcept
+void gearoenix::physics::Transformation::local_z_scale(const double s)
 {
     changed = true;
     local_matrix.local_z_scale(s);
     scale.z *= s;
 }
 
-void gearoenix::physics::Transformation::set_local_orientation(const math::Quat<double>& q) noexcept
+void gearoenix::physics::Transformation::set_local_orientation(const math::Quat<double>& q)
 {
     changed = true;
     const auto r = q.to_mat();
@@ -200,7 +204,7 @@ void gearoenix::physics::Transformation::set_local_orientation(const math::Quat<
     local_translate(l);
 }
 
-gearoenix::math::Quat<double> gearoenix::physics::Transformation::get_local_orientation() const noexcept
+gearoenix::math::Quat<double> gearoenix::physics::Transformation::get_local_orientation() const
 {
     const double trace = x_axis.x + y_axis.y + z_axis.z;
     if (trace > 0.0) {
@@ -239,7 +243,7 @@ gearoenix::math::Quat<double> gearoenix::physics::Transformation::get_local_orie
     };
 }
 
-void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up)
 {
     changed = true;
     z_axis = (location - target).normalised();
@@ -249,7 +253,7 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     scale = math::Vec3<double>(1.0);
 }
 
-void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) noexcept
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up)
 {
     changed = true;
     math::Vec3<double> l;
@@ -261,7 +265,7 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     scale = math::Vec3<double>(1.0);
 }
 
-void gearoenix::physics::Transformation::local_update() noexcept
+void gearoenix::physics::Transformation::local_update()
 {
     if (changed) {
         global_matrix = local_matrix;
@@ -269,7 +273,7 @@ void gearoenix::physics::Transformation::local_update() noexcept
     }
 }
 
-void gearoenix::physics::Transformation::update(const Transformation& parent) noexcept
+void gearoenix::physics::Transformation::update(const Transformation& parent)
 {
     if (parent.changed)
         changed = true;
@@ -279,14 +283,14 @@ void gearoenix::physics::Transformation::update(const Transformation& parent) no
     }
 }
 
-void gearoenix::physics::Transformation::local_update_without_inverse() noexcept
+void gearoenix::physics::Transformation::local_update_without_inverse()
 {
     if (changed) {
         global_matrix = local_matrix;
     }
 }
 
-void gearoenix::physics::Transformation::update_without_inverse(const Transformation& parent) noexcept
+void gearoenix::physics::Transformation::update_without_inverse(const Transformation& parent)
 {
     if (parent.changed)
         changed = true;
@@ -295,12 +299,12 @@ void gearoenix::physics::Transformation::update_without_inverse(const Transforma
     }
 }
 
-void gearoenix::physics::Transformation::clear_change() noexcept
+void gearoenix::physics::Transformation::clear_change()
 {
     changed = false;
 }
 
-void gearoenix::physics::Transformation::reset() noexcept
+void gearoenix::physics::Transformation::reset()
 {
     global_matrix = local_matrix = inverted_global_matrix = math::Mat4x4<double>();
     x_axis = math::X3D<double>;
@@ -313,7 +317,7 @@ void gearoenix::physics::Transformation::reset() noexcept
 void gearoenix::physics::Transformation::reset(
     const math::Vec3<double>& s,
     const math::Quat<double>& r,
-    const math::Vec3<double>& l) noexcept
+    const math::Vec3<double>& l)
 {
     local_matrix = r.to_mat();
     x_axis = { local_matrix.data[0][0], local_matrix.data[0][1], local_matrix.data[0][2] };
@@ -325,7 +329,7 @@ void gearoenix::physics::Transformation::reset(
     changed = true;
 }
 
-void gearoenix::physics::Transformation::show_debug_gui() noexcept
+void gearoenix::physics::Transformation::show_debug_gui()
 {
     if (ImGui::TreeNode("Transformation")) {
         auto l = get_local_location();
@@ -363,7 +367,7 @@ void gearoenix::physics::Transformation::reset(
     const math::Vec3<double>& x,
     const math::Vec3<double>& y,
     const math::Vec3<double>& z,
-    const math::Vec3<double>& l) noexcept
+    const math::Vec3<double>& l)
 {
     x_axis = x;
     y_axis = y;
@@ -388,4 +392,23 @@ void gearoenix::physics::Transformation::reset(
     local_matrix.local_scale(s);
     local_matrix.set_location(l);
     changed = true;
+}
+
+const boost::container::flat_set<std::type_index>& gearoenix::physics::TransformationComponent::get_all_the_hierarchy_types_except_component() const
+{
+    static const boost::container::flat_set types {
+        create_this_type_index(this),
+        std::type_index(typeid(Transformation))
+    };
+    return types;
+}
+
+gearoenix::physics::TransformationComponent::TransformationComponent(std::string&& name)
+    : Component(create_this_type_index(this), std::move(name))
+{
+}
+
+std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(std::string&& name)
+{
+    return allocator.make_shared(std::move(name));
 }

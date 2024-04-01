@@ -14,7 +14,7 @@ static constexpr const char* const vertex_shader_src = "#version 300 es\n"
                                                        "    out_uv = position* 0.5 + 0.5;\n"
                                                        "}";
 
-gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e) noexcept
+gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e)
     : Shader(e)
 {
     // Vertex Shader -----------------------------------------------------------------------------------
@@ -73,9 +73,9 @@ gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::BloomPrefilter::~BloomPrefilter() noexcept = default;
+gearoenix::gl::shader::BloomPrefilter::~BloomPrefilter() = default;
 
-void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -83,7 +83,7 @@ void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const noe
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e) noexcept
+gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -126,9 +126,9 @@ gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::BloomHorizontal::~BloomHorizontal() noexcept = default;
+gearoenix::gl::shader::BloomHorizontal::~BloomHorizontal() = default;
 
-void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -136,7 +136,7 @@ void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const no
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e) noexcept
+gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -175,9 +175,9 @@ gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::BloomVertical::~BloomVertical() noexcept = default;
+gearoenix::gl::shader::BloomVertical::~BloomVertical() = default;
 
-void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -185,7 +185,7 @@ void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const noex
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
+gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -225,9 +225,9 @@ gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(low_texture);
 }
 
-gearoenix::gl::shader::BloomUpsampler::~BloomUpsampler() noexcept = default;
+gearoenix::gl::shader::BloomUpsampler::~BloomUpsampler() = default;
 
-void gearoenix::gl::shader::BloomUpsampler::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::BloomUpsampler::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

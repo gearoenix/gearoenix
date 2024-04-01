@@ -1,7 +1,7 @@
 #include "gx-rnd-txt-face.hpp"
 #include "../../platform/gx-plt-log.hpp"
 
-std::string std::to_string(const gearoenix::render::texture::Face f) noexcept
+std::string std::to_string(const gearoenix::render::texture::Face f)
 {
     switch (f) {
     case gearoenix::render::texture::Face::PositiveX:

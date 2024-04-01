@@ -1,138 +1,86 @@
 #include "gx-gl-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
-#include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::BloomData::BloomData(
-    std::shared_ptr<Target>&& prefilter_target,
-    Targets&& horizontal_targets,
-    Targets&& vertical_targets,
-    UpTargets&& upsampler_targets) noexcept
-    : prefilter_target(std::move(prefilter_target))
-    , horizontal_targets(std::move(horizontal_targets))
-    , vertical_targets(std::move(vertical_targets))
-    , upsampler_targets(std::move(upsampler_targets))
+namespace {
+gearoenix::core::allocator::SharedArray<gearoenix::gl::Camera, gearoenix::render::camera::Camera::MAX_COUNT> allocator;
+}
+
+const boost::container::flat_set<std::type_index>& gearoenix::gl::Camera::get_all_the_hierarchy_types_except_component() const
+{
+    static const boost::container::flat_set types { create_type_index<Camera>(), create_this_type_index(this) };
+    return types;
+}
+
+void gearoenix::gl::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
+{
+    gl_customised_target = std::dynamic_pointer_cast<Target>(t);
+    render::camera::Camera::set_customised_target(std::move(t));
+}
+
+gearoenix::gl::Camera::Camera(
+    Engine& e,
+    const std::string& name,
+    const std::size_t resolution_cfg_listener,
+    std::shared_ptr<Target>&& customised_target,
+    const render::camera::ProjectionData projection_data,
+    const float near,
+    const float far,
+    const bool has_bloom)
+    : render::camera::Camera(
+          e, std::type_index(typeid(Camera)), name, resolution_cfg_listener,
+          std::move(customised_target), projection_data, near, far, has_bloom)
 {
 }
 
-gearoenix::gl::BloomData::~BloomData() noexcept = default;
-
-std::optional<gearoenix::gl::BloomData> gearoenix::gl::BloomData::construct(
-    const std::optional<render::camera::BloomData>& bloom_data) noexcept
+std::shared_ptr<gearoenix::gl::Camera> gearoenix::gl::Camera::construct(
+    Engine& e,
+    const std::string& name,
+    const std::size_t resolution_cfg_listener,
+    std::shared_ptr<Target>&& customised_target,
+    render::camera::ProjectionData projection_data,
+    const float near,
+    const float far,
+    const bool has_bloom)
 {
-    if (!bloom_data.has_value())
-        return std::nullopt;
-    return BloomData(
-        std::dynamic_pointer_cast<Target>(bloom_data->get_prefilter_target()),
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[5]),
-        },
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[5]),
-        },
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[5]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[6]),
-        });
+    auto self = allocator.make_shared(e, name, resolution_cfg_listener, std::move(customised_target), projection_data, near, far, has_bloom);
+    self->set_component_self(self);
+    return self;
 }
 
-gearoenix::gl::Camera::Camera(std::string&& name, const render::camera::Camera& c) noexcept
-    : core::ecs::Component(this, std::move(name))
-    , target(std::dynamic_pointer_cast<Target>(c.get_target()))
-    , second_target(std::dynamic_pointer_cast<Target>(c.get_second_target()))
-    , bloom_data(BloomData::construct(c.get_bloom_data()))
-{
-}
+gearoenix::gl::Camera::~Camera() = default;
 
-void gearoenix::gl::Camera::disable_bloom() noexcept
-{
-    bloom_data = std::nullopt;
-}
-
-void gearoenix::gl::Camera::update(const render::camera::Camera& c) noexcept
-{
-    target = std::dynamic_pointer_cast<Target>(c.get_target());
-    second_target = std::dynamic_pointer_cast<Target>(c.get_second_target());
-    bloom_data = BloomData::construct(c.get_bloom_data());
-}
-
-gearoenix::gl::Camera::~Camera() noexcept = default;
-
-gearoenix::gl::Camera::Camera(Camera&&) noexcept = default;
-
-gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept
-    : render::camera::Builder(e, name, std::move(end_caller))
+gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& end_caller)
+    : Builder(e, name, std::move(end_caller))
     , eng(e)
 {
     auto& builder = entity_builder->get_builder();
-    Camera camera(name + "-gl-camera", *entity_builder->get_builder().get_component<render::camera::Camera>());
+    auto camera = Camera::construct(e, name + "-gl-camera", 0);
     builder.add_component(std::move(camera));
 }
 
-void gearoenix::gl::CameraBuilder::set_customised_target(std::shared_ptr<render::texture::Target>&& target) noexcept
+gearoenix::gl::CameraBuilder::~CameraBuilder() = default;
+
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::gl::CameraManager::build_v(
+    const std::string& name, core::job::EndCaller<>&& end_caller)
 {
-    entity_builder->get_builder().get_component<Camera>()->target = std::dynamic_pointer_cast<Target>(target);
-    render::camera::Builder::set_customised_target(std::move(target));
+    return std::make_shared<CameraBuilder>(dynamic_cast<Engine&>(e), name, std::move(end_caller));
 }
 
-void gearoenix::gl::CameraBuilder::disable_bloom() noexcept
+gearoenix::gl::CameraManager::CameraManager(Engine& e)
+    : Manager(e)
 {
-    Builder::disable_bloom();
-    entity_builder->get_builder().get_component<Camera>()->disable_bloom();
 }
 
-gearoenix::gl::CameraBuilder::~CameraBuilder() noexcept = default;
-
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::gl::CameraManager::build_v(const std::string& name, core::sync::EndCaller&& end_caller) noexcept
-{
-    return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name, std::move(end_caller)));
-}
-
-gearoenix::gl::CameraManager::CameraManager(Engine& e) noexcept
-    : render::camera::Manager(e)
-{
-    core::ecs::Component::register_type<Camera>();
-    resolution_cfg_listener_with_entity_id_v = [this](core::ecs::entity_id_t id, const render::Resolution&) noexcept -> void {
-        auto [c, rnd_c] = this->e.get_world()->get_components<Camera, render::camera::Camera>(id);
-        GX_ASSERT_D(c);
-        GX_ASSERT_D(rnd_c);
-        c->update(*rnd_c);
-    };
-    resolution_cfg_listener_with_entity_builder_v = [](render::camera::Builder& b, const render::Resolution&) noexcept -> void {
-        auto* const c = b.get_entity_builder()->get_builder().get_component<Camera>();
-        GX_ASSERT_D(c);
-        c->update(b.get_camera());
-    };
-}
-
-void gearoenix::gl::CameraManager::window_resized() noexcept
+void gearoenix::gl::CameraManager::window_resized()
 {
     Manager::window_resized();
-    e.get_world()->parallel_system<core::ecs::And<Camera, render::camera::Camera>>(
-        [](const core::ecs::entity_id_t, Camera* const c, render::camera::Camera* const rnd_c, const unsigned int) noexcept -> void {
-            c->update(*rnd_c);
-        });
 }
 
-gearoenix::gl::CameraManager::~CameraManager() noexcept = default;
+gearoenix::gl::CameraManager::~CameraManager() = default;
 
 #endif

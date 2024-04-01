@@ -7,7 +7,7 @@
 #include "gx-vk-render-pass.hpp"
 #include "image/gx-vk-img-view.hpp"
 
-gearoenix::vulkan::Framebuffer::Framebuffer(Framebuffer&& o) noexcept
+gearoenix::vulkan::Framebuffer::Framebuffer(Framebuffer&& o)
     : view(o.view)
     , depth(o.depth)
     , render_pass(o.render_pass)
@@ -20,7 +20,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(Framebuffer&& o) noexcept
 gearoenix::vulkan::Framebuffer::Framebuffer(
     const image::View* const v,
     const image::View* const d,
-    const RenderPass* const rp) noexcept
+    const RenderPass* const rp)
     : view(v)
     , depth(d)
     , render_pass(rp)
@@ -47,7 +47,7 @@ gearoenix::vulkan::Framebuffer::Framebuffer(
     GX_VK_CHK(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::Framebuffer::~Framebuffer() noexcept
+gearoenix::vulkan::Framebuffer::~Framebuffer()
 {
     if (nullptr != vulkan_data) {
         vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);

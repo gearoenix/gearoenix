@@ -27,20 +27,20 @@ struct Application {
 #endif
 
 private:
-    void handle(android_app* app, int32_t cmd) noexcept;
-    int32_t handle(android_app* app, AInputEvent* e) noexcept;
-    static void handle_cmd(android_app* app, int32_t cmd) noexcept;
-    static int32_t handle_input(android_app* app, AInputEvent* e) noexcept;
-    void on_check_ready_to_render(android_app*) noexcept;
-    void on_not_ready_to_render() noexcept;
-    void make_thread_current_jni() noexcept;
+    void handle(android_app* app, int32_t cmd);
+    int32_t handle(android_app* app, AInputEvent* e);
+    static void handle_cmd(android_app* app, int32_t cmd);
+    static int32_t handle_input(android_app* app, AInputEvent* e);
+    void on_check_ready_to_render(android_app*);
+    void on_not_ready_to_render();
+    void make_thread_current_jni();
 
 public:
-    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
-    ~Application() noexcept;
-    void run(core::Application* = nullptr) noexcept;
-    [[nodiscard]] const char* get_clipboard() const noexcept;
-    void set_soft_keyboard_visibility(bool show) noexcept;
+    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
+    ~Application();
+    void run(core::Application* = nullptr);
+    [[nodiscard]] const char* get_clipboard() const;
+    void set_soft_keyboard_visibility(bool show);
 };
 }
 

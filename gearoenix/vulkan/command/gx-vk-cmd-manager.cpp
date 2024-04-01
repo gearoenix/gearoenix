@@ -2,14 +2,14 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
 
-gearoenix::vulkan::command::Manager::Manager(const engine::Engine& e) noexcept
+gearoenix::vulkan::command::Manager::Manager(const engine::Engine& e)
     : e(e)
 {
 }
 
-gearoenix::vulkan::command::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::command::Manager::~Manager() = default;
 
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type t, const std::optional<std::size_t> thread_index) noexcept
+gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type t, const std::optional<std::size_t> thread_index)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     Pool* pool;
@@ -32,7 +32,7 @@ gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(c
     return { pool, t };
 }
 
-std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::command::Manager::create_frame_based() noexcept
+std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::command::Manager::create_frame_based()
 {
     std::vector<std::shared_ptr<Buffer>> result(e.get_swapchain().get_image_views().size());
     for (auto& c : result)

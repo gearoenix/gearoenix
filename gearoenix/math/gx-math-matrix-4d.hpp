@@ -8,7 +8,7 @@ template <typename Element>
 struct Mat4x4 final {
     Element data[4][4];
 
-    constexpr Mat4x4() noexcept
+    constexpr Mat4x4()
         : data {
             { static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
             { static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0) },
@@ -18,7 +18,7 @@ struct Mat4x4 final {
     {
     }
 
-    constexpr explicit Mat4x4(const Element diameter) noexcept
+    constexpr explicit Mat4x4(const Element diameter)
         : data {
             { diameter, static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
             { static_cast<Element>(0), diameter, static_cast<Element>(0), static_cast<Element>(0) },
@@ -32,7 +32,7 @@ struct Mat4x4 final {
         const Element e0, const Element e1, const Element e2, const Element e3,
         const Element e4, const Element e5, const Element e6, const Element e7,
         const Element e8, const Element e9, const Element e10, const Element e11,
-        const Element e12, const Element e13, const Element e14, const Element e15) noexcept
+        const Element e12, const Element e13, const Element e14, const Element e15)
         : data {
             { e0, e1, e2, e3 },
             { e4, e5, e6, e7 },
@@ -42,12 +42,12 @@ struct Mat4x4 final {
     {
     }
 
-    explicit Mat4x4(platform::stream::Stream* const f) noexcept
+    explicit Mat4x4(platform::stream::Stream* const f)
     {
         read(f);
     }
 
-    constexpr Mat4x4(const Mat4x4<Element>& m) noexcept
+    constexpr Mat4x4(const Mat4x4<Element>& m)
         : data {
             { m.data[0][0], m.data[0][1], m.data[0][2], m.data[0][3] },
             { m.data[1][0], m.data[1][1], m.data[1][2], m.data[1][3] },
@@ -58,7 +58,7 @@ struct Mat4x4 final {
     }
 
     template <typename T>
-    constexpr explicit Mat4x4(const Mat4x4<T>& m) noexcept
+    constexpr explicit Mat4x4(const Mat4x4<T>& m)
         : data {
             { static_cast<Element>(m.data[0][0]), static_cast<Element>(m.data[0][1]), static_cast<Element>(m.data[0][2]), static_cast<Element>(m.data[0][3]) },
             { static_cast<Element>(m.data[1][0]), static_cast<Element>(m.data[1][1]), static_cast<Element>(m.data[1][2]), static_cast<Element>(m.data[1][3]) },
@@ -68,7 +68,7 @@ struct Mat4x4 final {
     {
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const noexcept
+    [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const
     {
         return Vec4<Element>(
             data[0][0] * v.x + data[1][0] * v.y + data[2][0] * v.z + data[3][0] * v.w,
@@ -77,7 +77,7 @@ struct Mat4x4 final {
             data[0][3] * v.x + data[1][3] * v.y + data[2][3] * v.z + data[3][3] * v.w);
     }
 
-    [[nodiscard]] constexpr Mat4x4<Element> operator*(const Mat4x4<Element>& m) const noexcept
+    [[nodiscard]] constexpr Mat4x4<Element> operator*(const Mat4x4<Element>& m) const
     {
         Mat4x4<Element> r;
         for (int i = 0; i < 4; ++i) {
@@ -88,7 +88,7 @@ struct Mat4x4 final {
         return r;
     }
 
-    constexpr Mat4x4<Element>& operator=(const Mat4x4<Element>& m) noexcept
+    constexpr Mat4x4<Element>& operator=(const Mat4x4<Element>& m)
     {
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
@@ -98,32 +98,32 @@ struct Mat4x4 final {
         return *this;
     }
 
-    constexpr void operator*=(const Mat4x4<Element>& m) noexcept
+    constexpr void operator*=(const Mat4x4<Element>& m)
     {
         const auto o = *this * m;
         *this = o;
     }
 
     template <typename T>
-    constexpr Element operator[](const T i) const noexcept
+    constexpr Element operator[](const T i) const
     {
         return data[i >> 2][i & 3];
     }
 
     template <typename T>
-    constexpr Element& operator[](const T i) noexcept
+    constexpr Element& operator[](const T i)
     {
         return data[i >> 2][i & 3];
     }
 
     /// It does not change location
-    constexpr void local_scale(const Element s) noexcept
+    constexpr void local_scale(const Element s)
     {
         local_scale(s, s, s);
     }
 
     /// It does not change location
-    constexpr void local_x_scale(const Element s) noexcept
+    constexpr void local_x_scale(const Element s)
     {
         data[0][0] *= s;
         data[0][1] *= s;
@@ -132,7 +132,7 @@ struct Mat4x4 final {
     }
 
     /// It does not change location
-    constexpr void local_y_scale(const Element s) noexcept
+    constexpr void local_y_scale(const Element s)
     {
         data[1][0] *= s;
         data[1][1] *= s;
@@ -141,7 +141,7 @@ struct Mat4x4 final {
     }
 
     /// It does not change location
-    constexpr void local_z_scale(const Element s) noexcept
+    constexpr void local_z_scale(const Element s)
     {
         data[2][0] *= s;
         data[2][1] *= s;
@@ -150,7 +150,7 @@ struct Mat4x4 final {
     }
 
     /// It does not change location
-    constexpr void local_w_scale(const Element s) noexcept
+    constexpr void local_w_scale(const Element s)
     {
         data[3][0] *= s;
         data[3][1] *= s;
@@ -159,7 +159,7 @@ struct Mat4x4 final {
     }
 
     /// It does not change location
-    constexpr void local_scale(const Element a, const Element b, const Element c) noexcept
+    constexpr void local_scale(const Element a, const Element b, const Element c)
     {
         local_x_scale(a);
         local_y_scale(b);
@@ -167,32 +167,32 @@ struct Mat4x4 final {
     }
 
     /// It changes location
-    constexpr void local_scale(const Element a, const Element b, const Element c, const Element d) noexcept
+    constexpr void local_scale(const Element a, const Element b, const Element c, const Element d)
     {
         local_scale(a, b, c);
         local_w_scale(d);
     }
 
     /// It does not change location
-    constexpr void local_scale(const Vec3<Element>& s) noexcept
+    constexpr void local_scale(const Vec3<Element>& s)
     {
         local_scale(s.x, s.y, s.z);
     }
 
     /// It changes location
-    constexpr void local_scale(const Vec4<Element>& s) noexcept
+    constexpr void local_scale(const Vec4<Element>& s)
     {
         local_scale(s.x, s.y, s.z, s.w);
     }
 
     /// It changes location
-    constexpr void global_scale(const Element s) noexcept
+    constexpr void global_scale(const Element s)
     {
         global_scale(s, s, s);
     }
 
     /// It changes location
-    constexpr void global_scale(const Element a, const Element b, const Element c) noexcept
+    constexpr void global_scale(const Element a, const Element b, const Element c)
     {
         data[0][0] *= a;
         data[1][0] *= a;
@@ -211,7 +211,7 @@ struct Mat4x4 final {
     }
 
     /// It changes location
-    constexpr void global_scale(const Element a, const Element b, const Element c, const Element d) noexcept
+    constexpr void global_scale(const Element a, const Element b, const Element c, const Element d)
     {
         global_scale(a, b, c);
 
@@ -222,51 +222,51 @@ struct Mat4x4 final {
     }
 
     /// It changes location
-    constexpr void global_scale(const Vec3<Element>& s) noexcept
+    constexpr void global_scale(const Vec3<Element>& s)
     {
         global_scale(s.x, s.y, s.z);
     }
 
     /// It changes location
-    constexpr void global_scale(const Vec4<Element>& s) noexcept
+    constexpr void global_scale(const Vec4<Element>& s)
     {
         global_scale(s.x, s.y, s.z, s.w);
     }
 
-    constexpr void translate(const Vec3<Element>& v) noexcept
+    constexpr void translate(const Vec3<Element>& v)
     {
         data[3][0] += v.x;
         data[3][1] += v.y;
         data[3][2] += v.z;
     }
 
-    constexpr void set_location(const Vec3<Element>& location = Vec3<Element>(0)) noexcept
+    constexpr void set_location(const Vec3<Element>& location = Vec3<Element>(0))
     {
         data[3][0] = location.x;
         data[3][1] = location.y;
         data[3][2] = location.z;
     }
 
-    constexpr void get_location(Vec3<Element>& location) const noexcept
+    constexpr void get_location(Vec3<Element>& location) const
     {
         location.x = data[3][0];
         location.y = data[3][1];
         location.z = data[3][2];
     }
 
-    [[nodiscard]] constexpr Vec3<Element> get_location() const noexcept
+    [[nodiscard]] constexpr Vec3<Element> get_location() const
     {
         Vec3<Element> v;
         get_location(v);
         return v;
     }
 
-    constexpr void inverse() noexcept
+    constexpr void inverse()
     {
         *this = inverted();
     }
 
-    constexpr void transpose() noexcept
+    constexpr void transpose()
     {
         for (auto i = 0; i < 4; ++i) {
             for (auto j = i + 1; j < 4; ++j) {
@@ -275,14 +275,14 @@ struct Mat4x4 final {
         }
     }
 
-    void read(platform::stream::Stream* const f) noexcept
+    void read(platform::stream::Stream* const f)
     {
         for (auto& r : data)
             for (auto& c : r)
                 c = static_cast<Element>(f->read<float>());
     }
 
-    [[nodiscard]] constexpr Element determinant() const noexcept
+    [[nodiscard]] constexpr Element determinant() const
     {
         return (+data[0][0] * (+data[1][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) + data[3][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]))
             - data[1][0] * (+data[0][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]))
@@ -290,7 +290,7 @@ struct Mat4x4 final {
             - data[3][0] * (+data[0][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]) - data[1][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]) + data[2][1] * (data[0][2] * data[1][3] - data[0][3] * data[1][2])));
     }
 
-    [[nodiscard]] constexpr Mat4x4<Element> inverted() const noexcept
+    [[nodiscard]] constexpr Mat4x4<Element> inverted() const
     {
         const auto id = static_cast<Element>(1) / determinant();
         Mat4x4<Element> result;
@@ -313,7 +313,7 @@ struct Mat4x4 final {
         return result;
     }
 
-    [[nodiscard]] constexpr Mat4x4<Element> transposed() const noexcept
+    [[nodiscard]] constexpr Mat4x4<Element> transposed() const
     {
         Mat4x4<Element> r;
         for (auto i = 0; i < 4; ++i) {
@@ -324,14 +324,14 @@ struct Mat4x4 final {
         return r;
     }
 
-    [[nodiscard]] constexpr Vec3<Element> project(const Vec3<Element>& v) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> project(const Vec3<Element>& v) const
     {
         Vec4<Element> v4(v, static_cast<Element>(1));
         v4 = *this * v4;
         return v4.xyz() / v4.w;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& target, const Vec3<Element>& up) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& target, const Vec3<Element>& up)
     {
         const auto z = (target - position).normalised();
         const auto x = up.cross(z).normalised();
@@ -339,7 +339,7 @@ struct Mat4x4 final {
         return look_at(position, x, y, z);
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> look_at(const Vec3<Element>& position, const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
     {
         Mat4x4<Element> m;
         m.data[0][0] = -x.x;
@@ -361,7 +361,7 @@ struct Mat4x4 final {
         return m;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> rotation(const Vec3<Element>& w, const Element degree) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> rotation(const Vec3<Element>& w, const Element degree)
     {
         const auto sinus = static_cast<Element>(sin(static_cast<double>(degree)));
         const auto cosinus = static_cast<Element>(cos(static_cast<double>(degree)));
@@ -398,7 +398,7 @@ struct Mat4x4 final {
         return m;
     }
 
-    [[nodiscard]] constexpr static Mat4x4<Element> translator(const Vec3<Element>& v) noexcept
+    [[nodiscard]] constexpr static Mat4x4<Element> translator(const Vec3<Element>& v)
     {
         Mat4x4<Element> r;
         r.data[0][0] = static_cast<Element>(1);
@@ -424,7 +424,7 @@ struct Mat4x4 final {
         const Element proj_width,
         const Element proj_height,
         const Element proj_near,
-        const Element proj_far) noexcept
+        const Element proj_far)
     {
         Mat4x4 r;
         r.data[0][0] = static_cast<Element>(2) / proj_width;
@@ -450,7 +450,7 @@ struct Mat4x4 final {
         const Element proj_width,
         const Element proj_height,
         const Element proj_near,
-        const Element proj_far) noexcept
+        const Element proj_far)
     {
         Mat4x4 r;
         r.data[0][0] = (static_cast<Element>(2) * proj_near) / proj_width;

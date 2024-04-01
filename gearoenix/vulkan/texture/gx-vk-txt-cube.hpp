@@ -2,7 +2,7 @@
 #define GEAROENIX_VULKAN_TEXTURE_CUBE_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
 
@@ -25,11 +25,11 @@ public:
         std::vector<std::vector<std::vector<std::uint8_t>>> data,
         const render::texture::TextureInfo& info,
         std::size_t aspect,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    ~TextureCube() noexcept final;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& call);
+    ~TextureCube() final;
     void write_gx3d(
         const std::shared_ptr<platform::stream::Stream>& s,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept final;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c) final;
 };
 }
 #endif

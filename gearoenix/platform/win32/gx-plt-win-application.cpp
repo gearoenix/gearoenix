@@ -11,7 +11,7 @@ LRESULT CALLBACK gearoenix::platform::Application::static_handler(
     HWND hwnd,
     const UINT message,
     const WPARAM w_param,
-    const LPARAM l_param) noexcept
+    const LPARAM l_param)
 {
     auto platform_application = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     if (WM_CREATE == message) {
@@ -30,7 +30,7 @@ LRESULT gearoenix::platform::Application::handler(
     HWND hwnd,
     const UINT message,
     const WPARAM w_param,
-    const LPARAM l_param) noexcept
+    const LPARAM l_param)
 {
     switch (message) {
     case WM_CLOSE:
@@ -94,7 +94,7 @@ LRESULT gearoenix::platform::Application::handler(
     return DefWindowProc(hwnd, message, w_param, l_param);
 }
 
-void gearoenix::platform::Application::update_mouse_position() noexcept
+void gearoenix::platform::Application::update_mouse_position()
 {
     POINT p;
     if (GetCursorPos(&p) && ScreenToClient(window, &p)) {
@@ -102,7 +102,7 @@ void gearoenix::platform::Application::update_mouse_position() noexcept
     }
 }
 
-void gearoenix::platform::Application::update_window_size() noexcept
+void gearoenix::platform::Application::update_window_size()
 {
     if (!base.window_is_up)
         return;
@@ -117,7 +117,7 @@ void gearoenix::platform::Application::update_window_size() noexcept
     base.update_window_size(w, h);
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config)
     : base(GX_MAIN_ENTRY_ARGS, config)
 {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
@@ -185,9 +185,9 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     base.initialize_engine(*this);
 }
 
-gearoenix::platform::Application::~Application() noexcept = default;
+gearoenix::platform::Application::~Application() = default;
 
-void gearoenix::platform::Application::run(core::Application* core_app) noexcept
+void gearoenix::platform::Application::run(core::Application* core_app)
 {
     base.initialize_core_application(*this, core_app);
     GX_LOG_D("Run function of WinApi interface called.");

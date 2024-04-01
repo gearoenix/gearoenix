@@ -39,20 +39,20 @@ struct Swapchain final {
     GX_GET_ARRC_PRV(float, clear_colour, 4)
     GX_GET_VAL_PRV(UINT, back_buffer_index, 0)
 
-    explicit Swapchain(Engine& e) noexcept;
-    ~Swapchain() noexcept;
+    explicit Swapchain(Engine& e);
+    ~Swapchain();
     /// Returns true if device is lost.
-    [[nodiscard]] bool set_window_size(const platform::Application&) noexcept;
-    void wait_for_gpu() noexcept;
-    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12Resource>& get_current_render_target() const noexcept;
-    void transit_to_target(ID3D12GraphicsCommandList6* cmd) noexcept;
-    void prepare(ID3D12GraphicsCommandList6* cmd) noexcept;
-    void clear(ID3D12GraphicsCommandList6* cmd) noexcept;
-    void transit_to_present(ID3D12GraphicsCommandList6* cmd) noexcept;
-    [[nodiscard]] bool present() noexcept;
+    [[nodiscard]] bool set_window_size(const platform::Application&);
+    void wait_for_gpu();
+    [[nodiscard]] const Microsoft::WRL::ComPtr<ID3D12Resource>& get_current_render_target() const;
+    void transit_to_target(ID3D12GraphicsCommandList6* cmd);
+    void prepare(ID3D12GraphicsCommandList6* cmd);
+    void clear(ID3D12GraphicsCommandList6* cmd);
+    void transit_to_present(ID3D12GraphicsCommandList6* cmd);
+    [[nodiscard]] bool present();
 
 private:
-    void move_to_next_frame() noexcept;
+    void move_to_next_frame();
 
     std::queue<UINT64> fence_values;
     UINT64 current_fence_value = 0;

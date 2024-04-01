@@ -16,7 +16,7 @@
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
 
-gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexcept
+gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t)
     : pool(pool)
     , type(t)
 {
@@ -29,7 +29,7 @@ gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t) noexc
     GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data));
 }
 
-gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
+gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o)
     : pool(o.pool)
     , type(o.type)
     , vulkan_data(o.vulkan_data)
@@ -37,7 +37,7 @@ gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o) noexcept
     o.vulkan_data = nullptr;
 }
 
-gearoenix::vulkan::command::Buffer::~Buffer() noexcept
+gearoenix::vulkan::command::Buffer::~Buffer()
 {
     if (nullptr != vulkan_data) {
         vkFreeCommandBuffers(
@@ -47,7 +47,7 @@ gearoenix::vulkan::command::Buffer::~Buffer() noexcept
     }
 }
 
-void gearoenix::vulkan::command::Buffer::begin() noexcept
+void gearoenix::vulkan::command::Buffer::begin()
 {
     has_record = true;
     VkCommandBufferBeginInfo info;
@@ -56,7 +56,7 @@ void gearoenix::vulkan::command::Buffer::begin() noexcept
     GX_VK_CHK(vkBeginCommandBuffer(vulkan_data, &info));
 }
 
-void gearoenix::vulkan::command::Buffer::end() noexcept
+void gearoenix::vulkan::command::Buffer::end()
 {
     GX_VK_CHK(vkEndCommandBuffer(vulkan_data));
 }
@@ -64,14 +64,14 @@ void gearoenix::vulkan::command::Buffer::end() noexcept
 void gearoenix::vulkan::command::Buffer::copy(
     buffer::Buffer& src,
     buffer::Buffer& des,
-    const std::vector<VkBufferCopy>& info) noexcept
+    const std::vector<VkBufferCopy>& info)
 {
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), static_cast<std::uint32_t>(info.size()), info.data());
 }
 
 void gearoenix::vulkan::command::Buffer::copy(
     buffer::Buffer& src,
-    buffer::Buffer& dst) noexcept
+    buffer::Buffer& dst)
 {
     VkBufferCopy info;
     const auto& src_alc = *src.get_allocator();
@@ -85,7 +85,7 @@ void gearoenix::vulkan::command::Buffer::copy(
 void gearoenix::vulkan::command::Buffer::barrier(
     buffer::Buffer& buff,
     std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
-    std::pair<VkAccessFlags, VkPipelineStageFlags> des_state) noexcept
+    std::pair<VkAccessFlags, VkPipelineStageFlags> des_state)
 {
     const auto& alc = *buff.get_allocator();
     VkBufferMemoryBarrier info;
@@ -99,7 +99,7 @@ void gearoenix::vulkan::command::Buffer::barrier(
     vkCmdPipelineBarrier(vulkan_data, src_state.second, des_state.second, 0, 0, nullptr, 1, &info, 0, nullptr);
 }
 
-void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept
+void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer)
 {
     const auto& img = framebuffer.get_depth()->get_image();
     VkRenderPassBeginInfo info;
@@ -115,29 +115,29 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
 }
 
 // void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
-//     const VkRenderPassBeginInfo& render_pass_begin_info) noexcept
+//     const VkRenderPassBeginInfo& render_pass_begin_info)
 //{
 //     Loader::vkCmdBeginRenderPass(vulkan_data, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 // }
 //
 // void gearoenix::vulkan::command::Buffer::set_viewport(
-//     const VkViewport& viewport) noexcept
+//     const VkViewport& viewport)
 //{
 //     Loader::vkCmdSetViewport(vulkan_data, 0, 1, &viewport);
 // }
 //
-// void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor) noexcept
+// void gearoenix::vulkan::command::Buffer::set_scissor(const VkRect2D& scissor)
 //{
 //     Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
 // }
 //
 
-void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
+void gearoenix::vulkan::command::Buffer::end_render_pass()
 {
     vkCmdEndRenderPass(vulkan_data);
 }
 
-// void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip)
 //{
 //     Loader::vkCmdBindPipeline(vulkan_data, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);
 // }
@@ -146,35 +146,35 @@ void gearoenix::vulkan::command::Buffer::end_render_pass() noexcept
 //     VkPipelineBindPoint pipeline_bind_point,
 //     VkPipelineLayout pipeline_layout,
 //     uint32_t first_set,
-//     const VkDescriptorSet& des_set) noexcept
+//     const VkDescriptorSet& des_set)
 //{
 //     Loader::vkCmdBindDescriptorSets(
 //         vulkan_data, pipeline_bind_point, pipeline_layout, first_set, 1, &des_set, 0, nullptr);
 // }
 //
-// void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_vertex_buffers(VkBuffer buf, VkDeviceSize offset)
 //{
 //     Loader::vkCmdBindVertexBuffers(vulkan_data, 0, 1, &buf, &offset);
 // }
 //
-// void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset) noexcept
+// void gearoenix::vulkan::command::Buffer::bind_index_buffer(VkBuffer buf, VkDeviceSize offset)
 //{
 //     Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
 // }
 
-void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count) noexcept
+void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count)
 {
     vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }
 
 void gearoenix::vulkan::command::Buffer::build_acceleration_structure(
     const VkAccelerationStructureBuildGeometryInfoKHR& info,
-    const VkAccelerationStructureBuildRangeInfoKHR* const* const ranges) noexcept
+    const VkAccelerationStructureBuildRangeInfoKHR* const* const ranges)
 {
     vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, ranges);
 }
 
-const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const noexcept
+const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const
 {
     return &vulkan_data;
 }

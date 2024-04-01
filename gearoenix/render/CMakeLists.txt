@@ -63,6 +63,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-probe.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-probe.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.cpp
@@ -79,6 +81,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-types.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-attachment.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/texture/gx-rnd-txt-binding-point.cpp

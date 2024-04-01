@@ -23,7 +23,7 @@ struct WindowSizeChangeData final {
         const int previous_width,
         const int previous_height,
         const int current_width,
-        const int current_height) noexcept
+        const int current_height)
         : previous_width(previous_width)
         , previous_height(previous_height)
         , previous_reversed_half_width(2.0 / static_cast<double>(previous_width))

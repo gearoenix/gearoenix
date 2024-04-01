@@ -24,7 +24,7 @@
 #include <fstream>
 #include <string>
 
-gearoenix::d3d::Engine::Engine(platform::Application& platform_application) noexcept
+gearoenix::d3d::Engine::Engine(platform::Application& platform_application)
     : render::engine::Engine(render::engine::Type::Direct3D, platform_application)
     , platform_application(platform_application)
 {
@@ -32,7 +32,7 @@ gearoenix::d3d::Engine::Engine(platform::Application& platform_application) noex
     device_lost_handle(0);
 }
 
-void gearoenix::d3d::Engine::device_lost_handle(const int failed_tries) noexcept
+void gearoenix::d3d::Engine::device_lost_handle(const int failed_tries)
 {
     GX_ASSERT(failed_tries < 3);
 
@@ -72,48 +72,48 @@ void gearoenix::d3d::Engine::device_lost_handle(const int failed_tries) noexcept
     window_resized(failed_tries);
 }
 
-void gearoenix::d3d::Engine::window_resized(int failed_tries) noexcept
+void gearoenix::d3d::Engine::window_resized(int failed_tries)
 {
     if (swapchain->set_window_size(platform_application))
         device_lost_handle(++failed_tries);
 }
 
-void gearoenix::d3d::Engine::window_resized() noexcept
+void gearoenix::d3d::Engine::window_resized()
 {
     window_resized(0);
 }
 
-gearoenix::d3d::Engine::~Engine() noexcept
+gearoenix::d3d::Engine::~Engine()
 {
     swapchain->wait_for_gpu();
     world = nullptr;
 }
 
-bool gearoenix::d3d::Engine::is_supported() noexcept
+bool gearoenix::d3d::Engine::is_supported()
 {
     GX_TODO;
     return true;
 }
 
 std::unique_ptr<gearoenix::d3d::Engine> gearoenix::d3d::Engine::construct(
-    platform::Application& platform_application) noexcept
+    platform::Application& platform_application)
 {
     return std::unique_ptr<Engine>(new Engine(platform_application));
 }
 
-void gearoenix::d3d::Engine::start_frame() noexcept
+void gearoenix::d3d::Engine::start_frame()
 {
     render::engine::Engine::start_frame();
 }
 
-void gearoenix::d3d::Engine::end_frame() noexcept
+void gearoenix::d3d::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
     if (submission_manager->render_frame())
         device_lost_handle(0);
 }
 
-void gearoenix::d3d::Engine::upload_imgui_fonts() noexcept
+void gearoenix::d3d::Engine::upload_imgui_fonts()
 {
     GX_TODO;
 }

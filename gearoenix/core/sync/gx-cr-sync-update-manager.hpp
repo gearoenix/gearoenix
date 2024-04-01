@@ -9,14 +9,14 @@ private:
     InfluenceManager influence_manager;
     sync::KernelWorkers* const workers;
 
-    void update() noexcept;
-    void update_kernel(unsigned int kernel_index) noexcept;
+    void update();
+    void update_kernel(unsigned int kernel_index);
 
 public:
-    explicit UpdateManager(sync::KernelWorkers* workers) noexcept;
-    ~UpdateManager() noexcept;
-    [[nodiscard]] Id add(std::vector<Id> influenced_ids, double priority, std::function<void()> fun) noexcept;
-    void remove(Id id) noexcept;
+    explicit UpdateManager(sync::KernelWorkers* workers);
+    ~UpdateManager();
+    [[nodiscard]] Id add(std::vector<Id> influenced_ids, double priority, std::function<void()> fun);
+    void remove(Id id);
 };
 }
 #endif

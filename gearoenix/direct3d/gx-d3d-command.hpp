@@ -13,16 +13,16 @@ private:
     bool is_recording = false;
 
 public:
-    Command(Device& device, D3D12_COMMAND_LIST_TYPE type) noexcept;
-    ~Command() noexcept;
-    Command(Command&&) noexcept = default;
+    Command(Device& device, D3D12_COMMAND_LIST_TYPE type);
+    ~Command();
+    Command(Command&&) = default;
     Command(const Command&) = delete;
     Command& operator=(const Command&) = delete;
 
-    [[nodiscard]] ID3D12GraphicsCommandList6* get_list() noexcept;
-    void begin(ID3D12PipelineState* const pipeline_state) noexcept;
-    void close() noexcept;
-    void force_close() noexcept;
+    [[nodiscard]] ID3D12GraphicsCommandList6* get_list();
+    void begin(ID3D12PipelineState* const pipeline_state);
+    void close();
+    void force_close();
 };
 }
 

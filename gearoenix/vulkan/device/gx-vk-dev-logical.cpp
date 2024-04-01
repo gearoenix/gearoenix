@@ -6,7 +6,7 @@
 #include "gx-vk-dev-physical.hpp"
 #include <array>
 
-gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
+gearoenix::vulkan::device::Logical::Logical(const Physical& p)
     : physical_device(p)
 {
     VkPhysicalDeviceFeatures device_features;
@@ -114,7 +114,7 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p) noexcept
     Loader::load(vulkan_data);
 }
 
-gearoenix::vulkan::device::Logical::~Logical() noexcept
+gearoenix::vulkan::device::Logical::~Logical()
 {
     if (vulkan_data != nullptr) {
         vkDestroyDevice(vulkan_data, nullptr);
@@ -122,7 +122,7 @@ gearoenix::vulkan::device::Logical::~Logical() noexcept
     }
 }
 
-void gearoenix::vulkan::device::Logical::wait_to_finish() noexcept
+void gearoenix::vulkan::device::Logical::wait_to_finish()
 {
     vkDeviceWaitIdle(vulkan_data);
 }

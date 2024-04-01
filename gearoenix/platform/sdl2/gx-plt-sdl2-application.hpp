@@ -19,28 +19,28 @@ struct Application final {
     GX_GET_VAL_PRV(SDL_GLContext, gl_context, nullptr);
 #endif
 private:
-    static void initialize_sdl() noexcept;
-    void initialize_screen() noexcept;
-    void initialize_window() noexcept;
-    void initialize_mouse() noexcept;
-    [[nodiscard]] bool create_window(std::uint32_t flags) noexcept;
+    static void initialize_sdl();
+    void initialize_screen();
+    void initialize_window();
+    void initialize_mouse();
+    [[nodiscard]] bool create_window(std::uint32_t flags);
 #ifdef GX_RENDER_OPENGL_ENABLED
-    [[nodiscard]] bool create_gl_window(int mj, int mn, std::uint32_t flags) noexcept;
-    [[nodiscard]] bool create_gl_sample_window(int samples, std::uint32_t flags) noexcept;
-    [[nodiscard]] bool create_gl_depth_window(int depth, std::uint32_t flags) noexcept;
+    [[nodiscard]] bool create_gl_window(int mj, int mn, std::uint32_t flags);
+    [[nodiscard]] bool create_gl_sample_window(int samples, std::uint32_t flags);
+    [[nodiscard]] bool create_gl_depth_window(int depth, std::uint32_t flags);
 #endif
-    void fetch_events() noexcept;
+    void fetch_events();
 
 public:
-    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
-    ~Application() noexcept;
-    void run(core::Application* = nullptr) noexcept;
-    void loop() noexcept;
-    void set_caption(const std::string&) noexcept;
-    void set_window_fullscreen(bool b) noexcept;
+    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
+    ~Application();
+    void run(core::Application* = nullptr);
+    void loop();
+    void set_caption(const std::string&);
+    void set_window_fullscreen(bool b);
 #ifdef GX_RENDER_VULKAN_ENABLED
-    [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const noexcept;
-    void create_vulkan_surface(void* vulkan_instance, void* vulkan_data_ptr) const noexcept;
+    [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const;
+    void create_vulkan_surface(void* vulkan_instance, void* vulkan_data_ptr) const;
 #endif
 };
 }

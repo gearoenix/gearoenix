@@ -9,9 +9,9 @@ struct Exposure final : public Shader {
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit Exposure(Engine& e) noexcept;
-    ~Exposure() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit Exposure(Engine& e);
+    ~Exposure() final;
+    void bind(uint& current_shader) const final;
 };
 }
 #endif

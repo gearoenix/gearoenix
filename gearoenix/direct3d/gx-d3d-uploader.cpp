@@ -8,7 +8,7 @@
 #include "gx-d3d-queue.hpp"
 #include "gx-d3d-texture.hpp"
 
-void gearoenix::d3d::Uploader::wait(const UINT64 fv) noexcept
+void gearoenix::d3d::Uploader::wait(const UINT64 fv)
 {
     auto fence_event = CreateEventW(nullptr, false, false, nullptr);
     GX_ASSERT_D(NULL != fence_event);
@@ -19,7 +19,7 @@ void gearoenix::d3d::Uploader::wait(const UINT64 fv) noexcept
     GX_ASSERT_D(0 != ch);
 }
 
-gearoenix::d3d::Uploader::Uploader(std::shared_ptr<Device> _device) noexcept
+gearoenix::d3d::Uploader::Uploader(std::shared_ptr<Device> _device)
     : device(std::move(_device))
     , copy_queue(new Queue(device, Queue::Type::Copy))
     , direct_queue(new Queue(device, Queue::Type::Direct))
@@ -27,12 +27,12 @@ gearoenix::d3d::Uploader::Uploader(std::shared_ptr<Device> _device) noexcept
     GX_D3D_CHECK(device->get_device()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 }
 
-gearoenix::d3d::Uploader::~Uploader() noexcept = default;
+gearoenix::d3d::Uploader::~Uploader() = default;
 
 void gearoenix::d3d::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<GpuBuffer>&& buffer,
-    core::sync::EndCaller&& end) noexcept
+    core::job::EndCaller&& end)
 {
     uploader.push([this, data = std::move(data), buffer = std::move(buffer), end = std::move(end)]() {
         const auto& dev = device->get_device();
@@ -72,7 +72,7 @@ void gearoenix::d3d::Uploader::upload(
     std::vector<std::uint8_t>&& data,
     std::shared_ptr<Texture2D>&& texture,
     const UINT subresource_index,
-    core::sync::EndCaller&& end) noexcept
+    core::job::EndCaller&& end)
 {
     uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end), subresource_index]() {
         const auto desc = texture->get_resource()->GetDesc();

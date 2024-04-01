@@ -4,9 +4,9 @@
 gearoenix::render::texture::TextureCube::TextureCube(
     std::string name,
     const TextureInfo& info,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
     : Texture(std::move(name), info, e)
 {
 }
 
-gearoenix::render::texture::TextureCube::~TextureCube() noexcept = default;
+gearoenix::render::texture::TextureCube::~TextureCube() = default;

@@ -18,7 +18,7 @@ struct BoneInfo final {
     std::vector<BoneInfo> children;
     std::string name;
 
-    explicit BoneInfo(std::string&& name) noexcept;
+    explicit BoneInfo(std::string&& name);
 };
 
 struct Bone final {
@@ -39,7 +39,7 @@ struct Bone final {
         std::size_t parent_index,
         std::size_t children_count,
         std::size_t first_child_index,
-        std::size_t last_child_index) noexcept;
+        std::size_t last_child_index);
 };
 }
 #endif

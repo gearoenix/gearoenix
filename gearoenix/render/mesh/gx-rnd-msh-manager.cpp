@@ -1,23 +1,26 @@
 #include "gx-rnd-msh-manager.hpp"
 #include <boost/container/flat_map.hpp>
 
-gearoenix::render::mesh::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::render::mesh::Manager::Manager(engine::Engine& e)
     : e(e)
 {
 }
 
-gearoenix::render::mesh::Manager::~Manager() noexcept = default;
+gearoenix::render::mesh::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_icosphere(std::size_t subdivisions, core::sync::EndCaller&& end_callback) noexcept
+void gearoenix::render::mesh::Manager::build_icosphere(const std::size_t subdivisions, core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-icosphere-" + std::to_string(subdivisions);
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
-    std::vector<PbrVertex> vertices {
+    std::vector vertices {
         PbrVertex(
             math::Vec3(0.0f, 0.0f, -1.0f),
             math::Vec3(8.129646857923944e-07f, 0.0f, -1.0f),
@@ -109,11 +112,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::vector<std::uint32_t> new_indices;
         new_indices.reserve(indices.size() << 2);
         for (std::size_t index_index = 0; index_index < last_index_index;) {
-            const auto insert = [&](const std::uint32_t i1, const std::uint32_t i2) noexcept {
-                if (auto search = cached_vertices.find(std::make_pair(i1, i2)); cached_vertices.end() != search)
+            const auto insert = [&](const std::uint32_t i1, const std::uint32_t i2) {
+                if (const auto search = cached_vertices.find(std::make_pair(i1, i2)); cached_vertices.end() != search) {
                     return search->second;
-                if (auto search = cached_vertices.find(std::make_pair(i2, i1)); cached_vertices.end() != search)
+                }
+                if (const auto search = cached_vertices.find(std::make_pair(i2, i1)); cached_vertices.end() != search) {
                     return search->second;
+                }
                 const auto& p1 = vertices[i1];
                 const auto& p2 = vertices[i2];
                 PbrVertex v;
@@ -171,18 +176,21 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
         std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_plate(const core::sync::EndCaller& c) noexcept
+void gearoenix::render::mesh::Manager::build_plate(core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-plate-mesh";
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
     return build(
         std::move(name),
-        std::vector<PbrVertex> {
+        std::vector {
             PbrVertex(
                 math::Vec3(-1.f, -1.0f, 0.0f),
                 math::Vec3(0.0f, 0.0f, 1.0f),
@@ -205,21 +213,24 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
                 math::Vec2(1.0f, 1.0f)),
         },
         std::vector<std::uint32_t> { 0, 1, 2, 1, 3, 2 },
-        c);
+        std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_cube(core::sync::EndCaller&& c) noexcept
+void gearoenix::render::mesh::Manager::build_cube(core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-cube-mesh";
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
     return build(
         std::move(name),
-        std::vector<PbrVertex> {
+        std::vector {
             PbrVertex(
                 math::Vec3(-1.f, -1.0f, 1.0f),
                 math::Vec3(0.0f, 0.0f, 1.0f),
@@ -360,21 +371,24 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
             20, 22, 21, // 11
             21, 22, 23, // 12
         },
-        std::move(c));
+        std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build_inward_cube(core::sync::EndCaller&& c) noexcept
+void gearoenix::render::mesh::Manager::build_inward_cube(core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-cube-mesh";
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
     return build(
         std::move(name),
-        std::vector<PbrVertex> {
+        std::vector {
             PbrVertex(
                 math::Vec3(-1.f, -1.0f, 1.0f),
                 math::Vec3(0.0f, 0.0f, -1.0f),
@@ -515,20 +529,23 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
             20, 21, 22, // 11
             21, 23, 22, // 12
         },
-        std::move(c));
+        std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build(
+void gearoenix::render::mesh::Manager::build(
     std::string&& name,
     std::vector<PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const core::sync::EndCaller& end_callback) noexcept
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
     math::Aabb3<double> occlusion_box;
     for (const PbrVertex& vertex : vertices) {
@@ -538,17 +555,20 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager::build(
+void gearoenix::render::mesh::Manager::build(
     std::string&& name,
     std::vector<PbrVertexAnimated>&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const core::sync::EndCaller& end_callback) noexcept
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     {
-        std::lock_guard<std::mutex> _lg(meshes_lock);
-        if (auto search = meshes.find(name); meshes.end() != search)
-            if (auto m = search->second.lock(); nullptr != m)
-                return m;
+        const std::lock_guard _lg(meshes_lock);
+        if (const auto search = meshes.find(name); meshes.end() != search) {
+            if (auto m = search->second.lock(); nullptr != m) {
+                end_callback.set_return(std::move(m));
+                return;
+            }
+        }
     }
     math::Aabb3<double> occlusion_box;
     for (const auto& vertex : vertices) {
@@ -558,12 +578,13 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::render::mesh::Manager:
     return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
 }
 
-bool gearoenix::render::mesh::Manager::remove_if_exist(const std::string& name) noexcept
+bool gearoenix::render::mesh::Manager::remove_if_exist(const std::string& name)
 {
-    std::lock_guard<std::mutex> _lg(meshes_lock);
-    auto search = meshes.find(name);
-    if (meshes.end() == search)
+    const std::lock_guard _lg(meshes_lock);
+    const auto search = meshes.find(name);
+    if (meshes.end() == search) {
         return false;
+    }
     meshes.erase(search);
     return true;
 }

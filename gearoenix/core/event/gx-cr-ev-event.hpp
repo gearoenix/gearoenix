@@ -33,7 +33,7 @@ struct Data final {
     GX_GET_REFC_PRV(DataVar, data);
 
 public:
-    Data(const Id source, DataVar data) noexcept
+    Data(const Id source, DataVar data)
         : source(source)
         , data(std::move(data))
     {

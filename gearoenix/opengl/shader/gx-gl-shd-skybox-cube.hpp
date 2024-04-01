@@ -10,9 +10,9 @@ struct SkyboxCube final : public Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    explicit SkyboxCube(Engine& e) noexcept;
-    ~SkyboxCube() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit SkyboxCube(Engine& e);
+    ~SkyboxCube() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

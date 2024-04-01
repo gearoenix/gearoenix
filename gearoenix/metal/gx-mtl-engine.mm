@@ -11,7 +11,7 @@
 #import "gx-mtl-texture.hpp"
 #import "gx-mtl-uploader.hpp"
 
-gearoenix::metal::Engine::Engine(platform::Application& platform_application) noexcept
+gearoenix::metal::Engine::Engine(platform::Application& platform_application)
     : render::engine::Engine(render::engine::Type::Metal, platform_application)
     , device(platform_application.get_app_delegate().view_controller.metal_kit_view.device)
     , pipeline_manager(new PipelineManager(*this))
@@ -27,33 +27,33 @@ gearoenix::metal::Engine::Engine(platform::Application& platform_application) no
     texture_manager = std::make_unique<TextureManager>(*this);
 }
 
-gearoenix::metal::Engine::~Engine() noexcept = default;
+gearoenix::metal::Engine::~Engine() = default;
 
-void gearoenix::metal::Engine::start_frame() noexcept
+void gearoenix::metal::Engine::start_frame()
 {
     render::engine::Engine::start_frame();
 }
 
-void gearoenix::metal::Engine::end_frame() noexcept
+void gearoenix::metal::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
     submission_manager->update();
 }
 
-void gearoenix::metal::Engine::window_resized() noexcept
+void gearoenix::metal::Engine::window_resized()
 {
 }
 
-void gearoenix::metal::Engine::upload_imgui_fonts() noexcept
+void gearoenix::metal::Engine::upload_imgui_fonts()
 {
 }
 
-bool gearoenix::metal::Engine::is_supported() noexcept
+bool gearoenix::metal::Engine::is_supported()
 {
     return true;
 }
 
-std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application) noexcept
+std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application)
 {
     return std::make_unique<gearoenix::metal::Engine>(platform_application);
 }

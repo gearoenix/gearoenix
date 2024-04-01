@@ -22,12 +22,12 @@
     GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED); \
     GX_GET_VAL_PRV(sint, name##_index, GX_GL_TEXTURE_INDEX_FAILED)
 
-#define GX_GL_UNIFORM(name, function)                              \
-public:                                                            \
-    void set_##name##_data(const float* const data) const noexcept \
-    {                                                              \
-        glUniform##function;                                       \
-    }                                                              \
+#define GX_GL_UNIFORM(name, function)                     \
+public:                                                   \
+    void set_##name##_data(const float* const data) const \
+    {                                                     \
+        glUniform##function;                              \
+    }                                                     \
     GX_GET_VAL_PRV(sint, name, GX_GL_UNIFORM_FAILED)
 
 #define GX_GL_UNIFORM_VECTOR(name, element_count, count) \
@@ -91,26 +91,26 @@ protected:
     uint vertex_object = 0;
     uint fragment_object = 0;
 
-    void run() noexcept;
-    void link() const noexcept;
-    void validate() const noexcept;
-    [[nodiscard]] uint add_shader_to_program(const std::string& shd, enumerated shader_type) const noexcept;
-    void set_vertex_shader(const std::string& shd) noexcept;
-    void set_fragment_shader(const std::string& shd) noexcept;
+    void run();
+    void link() const;
+    void validate() const;
+    [[nodiscard]] uint add_shader_to_program(const std::string& shd, enumerated shader_type) const;
+    void set_vertex_shader(const std::string& shd);
+    void set_fragment_shader(const std::string& shd);
 
 public:
-    explicit Shader(Engine& e) noexcept;
+    explicit Shader(Engine& e);
     Shader(const Shader&) = delete;
-    Shader(Shader&&) noexcept;
-    Shader& operator=(Shader&&) noexcept;
-    virtual ~Shader() noexcept;
+    Shader(Shader&&);
+    Shader& operator=(Shader&&);
+    virtual ~Shader();
     /// returns GX_SHADER_UNIFORM_FAILED when uniform not found.
-    [[nodiscard]] sint get_uniform_location(const std::string& name) const noexcept;
-    virtual void bind(uint& current_shader) const noexcept;
+    [[nodiscard]] sint get_uniform_location(const std::string& name) const;
+    virtual void bind(uint& current_shader) const;
 };
 
 struct ShaderCombination {
-    virtual ~ShaderCombination() noexcept = default;
+    virtual ~ShaderCombination() = default;
 };
 }
 

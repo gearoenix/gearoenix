@@ -5,7 +5,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::pipeline::Layout::Layout(std::shared_ptr<descriptor::SetLayout> _des_set_lay) noexcept
+gearoenix::vulkan::pipeline::Layout::Layout(std::shared_ptr<descriptor::SetLayout> _des_set_lay)
     : des_set_layout(std::move(_des_set_lay))
 {
     VkPipelineLayoutCreateInfo info;
@@ -16,7 +16,7 @@ gearoenix::vulkan::pipeline::Layout::Layout(std::shared_ptr<descriptor::SetLayou
     GX_VK_CHK(vkCreatePipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::pipeline::Layout::~Layout() noexcept
+gearoenix::vulkan::pipeline::Layout::~Layout()
 {
     vkDestroyPipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
 }

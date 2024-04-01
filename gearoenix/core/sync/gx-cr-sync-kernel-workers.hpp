@@ -36,21 +36,21 @@ private:
     // For each thread there is a separate mutex to do not lock all threads by one mutex
     std::vector<std::shared_ptr<std::mutex>> workers_syncers;
 
-    void thread_loop(unsigned int) noexcept;
+    void thread_loop(unsigned int);
 
 public:
-    KernelWorkers() noexcept;
-    ~KernelWorkers() noexcept;
+    KernelWorkers();
+    ~KernelWorkers();
     void add_step(
         std::function<void(const unsigned int)> worker,
-        std::function<void()> receiver = [] {}) noexcept;
+        std::function<void()> receiver = [] {});
     void add_step(
         std::function<void()> sender,
         std::function<void(const unsigned int)> worker,
         std::function<void()> meanwhile,
-        std::function<void()> receiver) noexcept;
-    void do_steps() noexcept;
-    [[nodiscard]] unsigned int get_threads_count() const noexcept;
+        std::function<void()> receiver);
+    void do_steps();
+    [[nodiscard]] unsigned int get_threads_count() const;
 };
 }
 #endif

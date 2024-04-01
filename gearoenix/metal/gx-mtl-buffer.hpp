@@ -28,18 +28,18 @@ struct UniformBuffer final {
     UniformBuffer(
         std::shared_ptr<const core::Allocator>&& gpu_range,
         std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT>&& cpu_ranges,
-        std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT>&& data) noexcept;
-    ~UniformBuffer() noexcept;
-    UniformBuffer(UniformBuffer&&) noexcept;
+        std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT>&& data);
+    ~UniformBuffer();
+    UniformBuffer(UniformBuffer&&);
 };
 
 struct ArgsBuffer final {
     id<MTLArgumentEncoder> encoder;
     id<MTLBuffer> buffer;
 
-    ArgsBuffer(Engine& e, id<MTLFunction> func, NSUInteger index, const std::string& name) noexcept;
-    ~ArgsBuffer() noexcept;
-    ArgsBuffer(ArgsBuffer&&) noexcept;
+    ArgsBuffer(Engine& e, id<MTLFunction> func, NSUInteger index, const std::string& name);
+    ~ArgsBuffer();
+    ArgsBuffer(ArgsBuffer&&);
 };
 
 struct BufferManager final {
@@ -49,11 +49,11 @@ struct BufferManager final {
     const std::shared_ptr<core::Allocator> uniforms_cpu_range;
     const std::array<std::shared_ptr<core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT> uniforms_cpu_ranges;
 
-    BufferManager(Engine& e) noexcept;
-    ~BufferManager() noexcept;
+    BufferManager(Engine& e);
+    ~BufferManager();
     BufferManager(const BufferManager&) = delete;
-    [[nodiscard]] UniformBuffer create_uniform(NSUInteger size) noexcept;
-    void update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number) noexcept;
+    [[nodiscard]] UniformBuffer create_uniform(NSUInteger size);
+    void update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number);
 };
 }
 

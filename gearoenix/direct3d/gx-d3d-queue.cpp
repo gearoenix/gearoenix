@@ -4,7 +4,7 @@
 #include "gx-d3d-check.hpp"
 #include "gx-d3d-device.hpp"
 
-gearoenix::d3d::Queue::Queue(std::shared_ptr<Device> _device, const Type ty) noexcept
+gearoenix::d3d::Queue::Queue(std::shared_ptr<Device> _device, const Type ty)
     : device(std::move(_device))
 {
     D3D12_COMMAND_QUEUE_DESC queue_desc;
@@ -24,15 +24,15 @@ gearoenix::d3d::Queue::Queue(std::shared_ptr<Device> _device, const Type ty) noe
     GX_D3D_CHECK(device->get_device()->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&command_queue)));
 }
 
-gearoenix::d3d::Queue::~Queue() noexcept = default;
+gearoenix::d3d::Queue::~Queue() = default;
 
-void gearoenix::d3d::Queue::exe(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6>& cmd) noexcept
+void gearoenix::d3d::Queue::exe(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList6>& cmd)
 {
     ID3D12CommandList* cmds[] = { cmd.Get() };
     command_queue->ExecuteCommandLists(1, cmds);
 }
 
-void gearoenix::d3d::Queue::exe(ID3D12CommandList** cmds, UINT count) noexcept
+void gearoenix::d3d::Queue::exe(ID3D12CommandList** cmds, UINT count)
 {
     command_queue->ExecuteCommandLists(count, cmds);
 }

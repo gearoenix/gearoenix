@@ -16,12 +16,12 @@ private:
     [[nodiscard]] std::shared_ptr<render::model::Builder> build(
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
-        const core::sync::EndCaller& c,
-        bool is_transformable) noexcept final;
+        const core::job::EndCaller& c,
+        bool is_transformable) final;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept final;
+    explicit Manager(engine::Engine& e);
+    ~Manager() final;
 };
 }
 #endif

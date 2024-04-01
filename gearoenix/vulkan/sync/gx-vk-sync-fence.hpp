@@ -25,12 +25,12 @@ public:
     Fence(Fence&&) = delete;
     Fence& operator=(const Fence&) = delete;
     Fence& operator=(Fence&&) = delete;
-    explicit Fence(const device::Logical& logical_device, bool signaled = false) noexcept;
-    ~Fence() noexcept;
-    void wait() noexcept;
-    void reset() noexcept;
+    explicit Fence(const device::Logical& logical_device, bool signaled = false);
+    ~Fence();
+    void wait();
+    void reset();
     [[nodiscard]] static std::vector<std::shared_ptr<Fence>> create_frame_based(
-        const engine::Engine& e, bool signaled = false) noexcept;
+        const engine::Engine& e, bool signaled = false);
 };
 }
 #endif

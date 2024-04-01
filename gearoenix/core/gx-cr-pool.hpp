@@ -20,13 +20,13 @@ public:
         using reference = typename std::vector<T>::iterator::reference;
         using iterator_category = typename std::vector<T>::iterator::iterator_category;
 
-        constexpr iterator(const std::size_t index, Pool* const pool) noexcept
+        constexpr iterator(const std::size_t index, Pool* const pool)
             : index(index)
             , pool(pool)
         {
         }
 
-        constexpr iterator& operator++() noexcept
+        constexpr iterator& operator++()
         {
             if (index < pool->size)
                 ++index;
@@ -35,22 +35,22 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*() noexcept
+        [[nodiscard]] constexpr reference operator*()
         {
             return pool->objects[index];
         }
 
-        [[nodiscard]] constexpr pointer operator->() noexcept
+        [[nodiscard]] constexpr pointer operator->()
         {
             return &pool->objects[index];
         }
 
-        [[nodiscard]] constexpr bool operator==(const iterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator==(const iterator& rhs) const
         {
             return index == rhs.index;
         }
 
-        [[nodiscard]] constexpr bool operator!=(const iterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator!=(const iterator& rhs) const
         {
             return index != rhs.index;
         }
@@ -67,13 +67,13 @@ public:
         using reference = typename std::vector<T>::const_iterator::reference;
         using iterator_category = typename std::vector<T>::const_iterator::iterator_category;
 
-        constexpr const_iterator(const std::size_t index, const Pool* const pool) noexcept
+        constexpr const_iterator(const std::size_t index, const Pool* const pool)
             : index(index)
             , pool(pool)
         {
         }
 
-        constexpr const_iterator& operator++() noexcept
+        constexpr const_iterator& operator++()
         {
             if (index < pool->size)
                 ++index;
@@ -82,22 +82,22 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*() noexcept
+        [[nodiscard]] constexpr reference operator*()
         {
             return pool->objects[index];
         }
 
-        [[nodiscard]] constexpr pointer operator->() noexcept
+        [[nodiscard]] constexpr pointer operator->()
         {
             return &pool->objects[index];
         }
 
-        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const
         {
             return index == rhs.index;
         }
 
-        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const
         {
             return index != rhs.index;
         }
@@ -108,51 +108,51 @@ public:
     };
 
     template <typename F>
-    [[nodiscard]] constexpr std::size_t emplace(const F&& func) noexcept
+    [[nodiscard]] constexpr std::size_t emplace(const F&& func)
     {
         for (std::size_t i = objects.size(); i <= size; ++i)
             objects.emplace_back(func());
         return size++;
     }
 
-    constexpr void clear() noexcept
+    constexpr void clear()
     {
         size = 0;
     }
 
-    [[nodiscard]] constexpr std::size_t get_size() noexcept
+    [[nodiscard]] constexpr std::size_t get_size()
     {
         return size;
     }
 
-    [[nodiscard]] constexpr iterator begin() noexcept
+    [[nodiscard]] constexpr iterator begin()
     {
         return iterator(0, this);
     }
 
-    [[nodiscard]] constexpr iterator end() noexcept
+    [[nodiscard]] constexpr iterator end()
     {
         return iterator(size, this);
     }
 
-    [[nodiscard]] constexpr const_iterator begin() const noexcept
+    [[nodiscard]] constexpr const_iterator begin() const
     {
         return const_iterator(0, this);
     }
 
-    [[nodiscard]] constexpr const_iterator end() const noexcept
+    [[nodiscard]] constexpr const_iterator end() const
     {
         return const_iterator(size, this);
     }
 
     template <typename I>
-    [[nodiscard]] constexpr const T& operator[](const I index) const noexcept
+    [[nodiscard]] constexpr const T& operator[](const I index) const
     {
         return objects[static_cast<std::size_t>(index)];
     }
 
     template <typename I>
-    [[nodiscard]] constexpr T& operator[](const I index) noexcept
+    [[nodiscard]] constexpr T& operator[](const I index)
     {
         return objects[static_cast<std::size_t>(index)];
     }

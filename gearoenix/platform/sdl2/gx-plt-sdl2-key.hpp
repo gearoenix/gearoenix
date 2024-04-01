@@ -6,8 +6,8 @@
 #include <SDL2/SDL_keycode.h>
 
 namespace gearoenix::platform {
-[[nodiscard]] key::Id convert_sdl_key(SDL_Keycode key) noexcept;
-[[nodiscard]] key::Id convert_sdl_mouse_key(Uint8 key) noexcept;
+[[nodiscard]] key::Id convert_sdl_key(SDL_Keycode key);
+[[nodiscard]] key::Id convert_sdl_mouse_key(Uint8 key);
 }
 
 #endif

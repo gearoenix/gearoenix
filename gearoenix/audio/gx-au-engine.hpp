@@ -22,10 +22,10 @@ struct Engine final {
     GX_GET_PTR_PRV(FMOD::System, system);
 
 public:
-    explicit Engine(platform::Application&) noexcept;
-    ~Engine() noexcept;
+    explicit Engine(platform::Application&);
+    ~Engine();
 
-    void update() noexcept;
+    void update();
 };
 }
 #endif

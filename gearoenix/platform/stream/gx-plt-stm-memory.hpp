@@ -10,14 +10,14 @@ private:
     std::size_t index = 0;
 
 public:
-    Memory() noexcept;
-    ~Memory() noexcept final;
-    [[nodiscard]] std::size_t read(void* d, std::size_t length) noexcept final;
-    [[nodiscard]] std::size_t write(const void* d, std::size_t length) noexcept final;
-    void seek(std::size_t offset) noexcept final;
-    [[nodiscard]] std::size_t tell() noexcept final;
-    [[nodiscard]] std::size_t size() noexcept final;
-    void flush() noexcept final;
+    Memory();
+    ~Memory() final;
+    [[nodiscard]] std::size_t read(void* d, std::size_t length) final;
+    [[nodiscard]] std::size_t write(const void* d, std::size_t length) final;
+    void seek(std::size_t offset) final;
+    [[nodiscard]] std::size_t tell() final;
+    [[nodiscard]] std::size_t size() final;
+    void flush() final;
 };
 }
 #endif

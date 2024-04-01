@@ -9,7 +9,7 @@ namespace gearoenix::math {
 struct Numeric {
 public:
     template <typename T>
-    constexpr static void check_signable() noexcept
+    constexpr static void check_signable()
     {
         static_assert(
             std::numeric_limits<T>::is_signed,
@@ -17,7 +17,7 @@ public:
     }
 
     template <typename T1, typename T2>
-    constexpr static void check_same_signibility() noexcept
+    constexpr static void check_same_signibility()
     {
         static_assert(
             !std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed,
@@ -26,7 +26,7 @@ public:
 
     // It will raise given number to the nearest bigger or equal value that is in power of 2
     template <typename T>
-    [[nodiscard]] constexpr static T raise_p2(const T v) noexcept
+    [[nodiscard]] constexpr static T raise_p2(const T v)
     {
         unsigned long long i = 1;
         while (v > static_cast<T>(i)) {
@@ -36,7 +36,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T raise_p2(const T v, const T maximum, const T minimum) noexcept
+    [[nodiscard]] constexpr static T raise_p2(const T v, const T maximum, const T minimum)
     {
         if (v > maximum)
             return maximum;
@@ -46,7 +46,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T is_p2(T v) noexcept
+    [[nodiscard]] constexpr static T is_p2(T v)
     {
         int r = 0;
         while (v > 0) {
@@ -57,7 +57,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T safe_maximum(const T a, const T b) noexcept
+    [[nodiscard]] constexpr static T safe_maximum(const T a, const T b)
     {
         if constexpr (std::is_floating_point_v<T>) {
             if (std::isnan(a))
@@ -69,7 +69,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T safe_minimum(const T a, const T b) noexcept
+    [[nodiscard]] constexpr static T safe_minimum(const T a, const T b)
     {
         if constexpr (std::is_floating_point_v<T>) {
             if (std::isnan(a))
@@ -81,14 +81,14 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T clamp(const T v, const T mx, const T mn) noexcept
+    [[nodiscard]] constexpr static T clamp(const T v, const T mx, const T mn)
     {
         return maximum(minimum(v, mx), mn);
     }
 
     /// On failure it returns static_cast<T>(-1).
     template <typename T>
-    [[nodiscard]] constexpr static T floor_log2(const T a) noexcept
+    [[nodiscard]] constexpr static T floor_log2(const T a)
     {
         static_assert(std::numeric_limits<T>::is_integer, "Only integer number can be used by this function.");
         for (T i = a, j = 0; i > 0; i >>= 1, ++j) {
@@ -99,7 +99,7 @@ public:
         return static_cast<T>(-1);
     }
 
-    [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits) noexcept
+    [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits)
     {
         bits = (bits << 16u) | (bits >> 16u);
         bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -110,21 +110,21 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T geometry_schlick_ggx(const T n_dot_v, const T roughness) noexcept
+    [[nodiscard]] static constexpr T geometry_schlick_ggx(const T n_dot_v, const T roughness)
     {
         const auto k = (roughness * roughness) * static_cast<T>(0.5);
         return n_dot_v / (n_dot_v * (1.0f - k) + k);
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T align(const T value, const T alignment) noexcept
+    [[nodiscard]] static constexpr T align(const T value, const T alignment)
     {
         const T r = value % alignment;
         return r != 0 ? value + (alignment - r) : value;
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = static_cast<T>(0.0001)) noexcept
+    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = static_cast<T>(0.0001))
     {
         return a == b || std::abs(a) + std::abs(b) < tolerance || std::abs(a - b) / (std::abs(a) + std::abs(b)) < tolerance;
     }

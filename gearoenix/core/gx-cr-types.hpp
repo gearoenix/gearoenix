@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_TYPES_HPP
 #define GEAROENIX_CORE_TYPES_HPP
-#include <cstddef>
 #include <cstdint>
 
 #define GX_POS_EPSILON 0.0001f

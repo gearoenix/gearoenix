@@ -2,15 +2,15 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-smp-sampler.hpp"
 
-gearoenix::vulkan::sampler::Manager::Manager(std::shared_ptr<device::Logical> logical_device) noexcept
+gearoenix::vulkan::sampler::Manager::Manager(std::shared_ptr<device::Logical> logical_device)
     : logical_device(std::move(logical_device))
 {
 }
 
-gearoenix::vulkan::sampler::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::sampler::Manager::~Manager() = default;
 
 const std::shared_ptr<gearoenix::vulkan::sampler::Sampler>& gearoenix::vulkan::sampler::Manager::get(
-    const gearoenix::render::texture::SamplerInfo& info) noexcept
+    const gearoenix::render::texture::SamplerInfo& info)
 {
     GX_GUARD_LOCK(samplers)
     auto& smp = samplers[info];

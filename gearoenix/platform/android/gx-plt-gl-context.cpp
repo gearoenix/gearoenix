@@ -3,7 +3,7 @@
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../opengl/gx-gl-loader.hpp"
 
-void gearoenix::platform::GlContext::init_gles() noexcept
+void gearoenix::platform::GlContext::init_gles()
 {
     if (gles_initialized)
         return;
@@ -15,7 +15,7 @@ void gearoenix::platform::GlContext::init_gles() noexcept
     GX_LOG_F("No suitable OpenGL library found");
 }
 
-void gearoenix::platform::GlContext::terminate() noexcept
+void gearoenix::platform::GlContext::terminate()
 {
     if (display != EGL_NO_DISPLAY) {
         eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -34,7 +34,7 @@ void gearoenix::platform::GlContext::terminate() noexcept
     context_valid = false;
 }
 
-bool gearoenix::platform::GlContext::check_surface(const EGLint opengl_version, const EGLint _depth_size, const EGLint _samples_size) noexcept
+bool gearoenix::platform::GlContext::check_surface(const EGLint opengl_version, const EGLint _depth_size, const EGLint _samples_size)
 {
     const EGLint attribs[] = {
         EGL_RENDERABLE_TYPE, opengl_version,
@@ -53,14 +53,14 @@ bool gearoenix::platform::GlContext::check_surface(const EGLint opengl_version, 
     return 0 != eglChooseConfig(display, attribs, &config, 1, &num_configs) && num_configs > 0 && config != nullptr;
 }
 
-void gearoenix::platform::GlContext::init_egl_display() noexcept
+void gearoenix::platform::GlContext::init_egl_display()
 {
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     GX_ASSERT_D(EGL_NO_DISPLAY != display);
     eglInitialize(display, nullptr, nullptr);
 }
 
-void gearoenix::platform::GlContext::init_egl_surface() noexcept
+void gearoenix::platform::GlContext::init_egl_surface()
 {
     init_egl_display();
     constexpr EGLint configs[8][3] {
@@ -88,7 +88,7 @@ void gearoenix::platform::GlContext::init_egl_surface() noexcept
     GX_LOG_F("No suitable surface found.");
 }
 
-void gearoenix::platform::GlContext::init_egl_context() noexcept
+void gearoenix::platform::GlContext::init_egl_context()
 {
     context_valid = true;
     {
@@ -101,12 +101,12 @@ void gearoenix::platform::GlContext::init_egl_context() noexcept
     GX_LOG_F("Can not create the required context");
 }
 
-gearoenix::platform::GlContext::~GlContext() noexcept
+gearoenix::platform::GlContext::~GlContext()
 {
     terminate();
 }
 
-void gearoenix::platform::GlContext::init(ANativeWindow* const _window) noexcept
+void gearoenix::platform::GlContext::init(ANativeWindow* const _window)
 {
     if (egl_context_initialized)
         return;
@@ -117,7 +117,7 @@ void gearoenix::platform::GlContext::init(ANativeWindow* const _window) noexcept
     egl_context_initialized = true;
 }
 
-gearoenix::platform::GlContext::State gearoenix::platform::GlContext::swap() noexcept
+gearoenix::platform::GlContext::State gearoenix::platform::GlContext::swap()
 {
     const EGLBoolean b = eglSwapBuffers(display, surface);
     if (b == 0) {
@@ -134,13 +134,13 @@ gearoenix::platform::GlContext::State gearoenix::platform::GlContext::swap() noe
     return State::RUNNING;
 }
 
-void gearoenix::platform::GlContext::invalidate() noexcept
+void gearoenix::platform::GlContext::invalidate()
 {
     terminate();
     egl_context_initialized = false;
 }
 
-void gearoenix::platform::GlContext::suspend() noexcept
+void gearoenix::platform::GlContext::suspend()
 {
     if (surface != EGL_NO_SURFACE) {
         eglDestroySurface(display, surface);
@@ -148,7 +148,7 @@ void gearoenix::platform::GlContext::suspend() noexcept
     }
 }
 
-void gearoenix::platform::GlContext::resume(ANativeWindow* const _window) noexcept
+void gearoenix::platform::GlContext::resume(ANativeWindow* const _window)
 {
     if (!egl_context_initialized) {
         init(_window);

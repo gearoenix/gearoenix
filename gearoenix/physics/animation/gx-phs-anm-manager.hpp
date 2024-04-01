@@ -36,28 +36,28 @@ private:
     core::allocator::StaticBlock<1048 * 1024> animation_allocator;
     std::map<std::string, std::shared_ptr<Animation>> animations_map;
 
-    void insert_bones(BoneInfo& bones_info, std::size_t current_index) noexcept;
-    void update_bone(std::size_t index, const Transformation& parent) noexcept;
+    void insert_bones(BoneInfo& bones_info, std::size_t current_index);
+    void update_bone(std::size_t index, const Transformation& parent);
 
 public:
-    explicit Manager(render::engine::Engine& e) noexcept;
+    explicit Manager(render::engine::Engine& e);
     Manager(const Manager&) = delete;
     Manager(Manager&&) = delete;
-    ~Manager() noexcept;
+    ~Manager();
     void operator=(const Manager& o) = delete;
     void operator=(Manager&& o) = delete;
-    void create_armature(core::ecs::EntityBuilder& builder, BoneInfo& bones_info) noexcept;
-    void create_animation_player(core::ecs::EntityBuilder& builder, ArmatureAnimationInfo& info) noexcept;
+    void create_armature(core::ecs::EntityBuilder& builder, BoneInfo& bones_info);
+    void create_animation_player(core::ecs::EntityBuilder& builder, ArmatureAnimationInfo& info);
     void create_sprite_player(
         core::ecs::EntityBuilder& builder,
         std::string name,
         std::shared_ptr<render::material::Sprite> sprite,
         std::size_t width,
-        std::size_t height) noexcept;
-    void update() noexcept;
+        std::size_t height);
+    void update();
 
     template <typename Function>
-    void loop_over_bones(Function&& function, const std::size_t bone_index) noexcept
+    void loop_over_bones(Function&& function, const std::size_t bone_index)
     {
         const Bone& bone = bones[bone_index];
         for (std::size_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
@@ -67,7 +67,7 @@ public:
     }
 
     template <typename Function>
-    void loop_over_bones(Function&& function, Armature& armature) noexcept
+    void loop_over_bones(Function&& function, Armature& armature)
     {
         function(bones[armature.root_bone_index]);
         loop_over_bones(function, armature.root_bone_index);

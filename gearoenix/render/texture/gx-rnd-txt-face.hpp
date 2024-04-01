@@ -24,7 +24,7 @@ constexpr Face FACES[6] = {
 }
 
 namespace std {
-[[nodiscard]] std::string to_string(const gearoenix::render::texture::Face f) noexcept;
+[[nodiscard]] std::string to_string(gearoenix::render::texture::Face f);
 }
 
 #endif

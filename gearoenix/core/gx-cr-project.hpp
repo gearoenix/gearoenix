@@ -12,10 +12,10 @@ struct Project final {
     GX_GET_CREF_PRV(std::vector<ecs::entity_id_t>, scenes);
 
 public:
-    explicit Project(std::string name) noexcept;
+    explicit Project(std::string name);
 
     Project(const Project&) = delete;
-    Project(Project&&) noexcept;
+    Project(Project&&);
     Project& operator=(const Project&) = delete;
     Project& operator=(Project&&) = delete;
 };

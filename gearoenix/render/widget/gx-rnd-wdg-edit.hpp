@@ -74,33 +74,33 @@ struct Edit final : public Widget, public core::event::Listener {
 private:
     GX_CREATE_GUARD(text)
 
-    void init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept;
-    void on_scale() noexcept;
-    void compute_starting() noexcept;
-    void compute_cuts() noexcept;
-    void refill_text() noexcept;
-    void refill_text_widths() noexcept;
-    void place_cursor() noexcept;
-    void render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void remove(bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+    void init(const core::job::EndCaller<core::job::EndCallerIgnore>& end_call);
+    void on_scale();
+    void compute_starting();
+    void compute_cuts();
+    void refill_text();
+    void refill_text_widths();
+    void place_cursor();
+    void render_text(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
+    void remove(bool from_left, const core::job::EndCaller<core::job::EndCallerIgnore>& c);
 
     Edit(
         core::Id id,
         std::string name,
         platform::stream::Stream* f,
         engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
     Edit(
         core::Id id,
         std::string name,
         engine::Engine* e,
         const EditTheme& theme,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
     Edit(
         core::Id id,
         std::string name,
         engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
 
 public:
     [[nodiscard]] static std::shared_ptr<Edit> construct(
@@ -108,33 +108,33 @@ public:
         std::string name,
         platform::stream::Stream* f,
         engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
     [[nodiscard]] static std::shared_ptr<Edit> construct(
         core::Id id,
         std::string name,
         engine::Engine* e,
         const EditTheme& theme,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
     [[nodiscard]] static std::shared_ptr<Edit> construct(
         core::Id id,
         std::string name,
         engine::Engine* e,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept;
-    ~Edit() noexcept final;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c);
+    ~Edit() final;
     void set_text(
         const std::wstring& t,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
     void set_hint_text(
         const std::wstring& t,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void active(bool b = true) noexcept;
-    [[nodiscard]] bool on_event(const core::event::Data& d) noexcept final;
-    void set_left_to_right(bool b) noexcept;
-    void insert(wchar_t character, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER) noexcept;
-    void selected(const math::Vec3<double>& point) noexcept final;
-    void clear() noexcept;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
+    void active(bool b = true);
+    [[nodiscard]] bool on_event(const core::event::Data& d) final;
+    void set_left_to_right(bool b);
+    void insert(wchar_t character, const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
+    void backspace(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
+    void del(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
+    void selected(const math::Vec3<double>& point) final;
+    void clear();
 };
 }
 #endif

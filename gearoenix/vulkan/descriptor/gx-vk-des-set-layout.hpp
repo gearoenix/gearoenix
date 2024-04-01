@@ -20,9 +20,9 @@ public:
     SetLayout(const SetLayout&) = delete;
     SetLayout& operator=(SetLayout&&) = delete;
     SetLayout& operator=(const SetLayout&) = delete;
-    SetLayout(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept;
-    ~SetLayout() noexcept;
-    [[nodiscard]] VkDescriptorSetLayout* get_vulkan_data_ptr() noexcept;
+    SetLayout(const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data);
+    ~SetLayout();
+    [[nodiscard]] VkDescriptorSetLayout* get_vulkan_data_ptr();
 };
 }
 #endif

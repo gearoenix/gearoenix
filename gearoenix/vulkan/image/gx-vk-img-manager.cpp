@@ -5,14 +5,14 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-img-image.hpp"
 
-gearoenix::vulkan::image::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::vulkan::image::Manager::Manager(engine::Engine& e)
     : e(e)
 {
 }
 
-gearoenix::vulkan::image::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::image::Manager::~Manager() = default;
 
-// void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd) noexcept
+// void gearoenix::vulkan::image::Manager::update(command::Buffer& cmd)
 //{
 //     auto& images = frame_upload_images[e->get_frame_number()];
 //     images.clear();

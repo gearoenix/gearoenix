@@ -17,12 +17,13 @@ struct Sprite final : public render::material::Sprite, public Material {
     GX_GET_REFC_PRV(std::shared_ptr<shader::UnlitCombination>, unlit_combination);
 
 public:
-    Sprite(Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept;
-    ~Sprite() noexcept final;
-    void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) noexcept final;
-    void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) noexcept final;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) noexcept final;
-    void set_albedo(const std::shared_ptr<render::texture::Texture2D>&) noexcept final;
+    Sprite(Engine& e, const std::string& name);
+    static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c);
+    ~Sprite() final;
+    void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) final;
+    void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void deferred_gbuffer_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) final;
 };
 }
 

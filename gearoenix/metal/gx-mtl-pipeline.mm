@@ -6,7 +6,7 @@
 #import "gx-mtl-engine.hpp"
 #import <dispatch/data.h>
 
-gearoenix::metal::PipelineManager::PipelineManager(Engine& e) noexcept
+gearoenix::metal::PipelineManager::PipelineManager(Engine& e)
 {
     std::unique_ptr<platform::stream::Asset> all_shaders_lib_asset(platform::stream::Asset::construct(e.get_platform_application(), "shaders/all-metal-shaders.metallib"));
     if (nullptr == all_shaders_lib_asset)

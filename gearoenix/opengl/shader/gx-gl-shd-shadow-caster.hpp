@@ -14,10 +14,10 @@ struct ShadowCaster final : public Shader {
 public:
     const sizei mvp_count;
 
-    explicit ShadowCaster(Engine& e, std::size_t bones_count = 0) noexcept;
-    ~ShadowCaster() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
-    void set_mvp_data(const void* data) const noexcept;
+    explicit ShadowCaster(Engine& e, std::size_t bones_count = 0);
+    ~ShadowCaster() final;
+    void bind(uint& current_shader) const final;
+    void set_mvp_data(const void* data) const;
 };
 
 struct ShadowCasterCombination final : public ShaderCombination {
@@ -28,11 +28,11 @@ struct ShadowCasterCombination final : public ShaderCombination {
 private:
     std::array<std::optional<ShadowCaster>, GX_RENDER_MAX_BONES_COUNT + 1> shaders;
 
-    explicit ShadowCasterCombination(Engine& e) noexcept;
+    explicit ShadowCasterCombination(Engine& e);
 
 public:
-    ~ShadowCasterCombination() noexcept final = default;
-    [[nodiscard]] const ShadowCaster& get(std::size_t bones_count = 0) noexcept
+    ~ShadowCasterCombination() final = default;
+    [[nodiscard]] const ShadowCaster& get(std::size_t bones_count = 0)
     {
         auto& s = shaders[bones_count];
         if (s.has_value())

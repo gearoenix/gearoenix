@@ -29,32 +29,32 @@ struct Buffer final {
     GX_GETSET_VAL_PRV(bool, has_record, false);
 
 public:
-    Buffer(Pool* pool, Type t) noexcept;
-    Buffer(const Buffer&) noexcept = delete;
-    Buffer& operator=(const Buffer&) noexcept = delete;
-    Buffer(Buffer&&) noexcept;
-    ~Buffer() noexcept;
-    void begin() noexcept;
-    void end() noexcept;
-    void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&) noexcept;
-    void copy(buffer::Buffer& src, buffer::Buffer& des) noexcept;
+    Buffer(Pool* pool, Type t);
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+    Buffer(Buffer&&);
+    ~Buffer();
+    void begin();
+    void end();
+    void copy(buffer::Buffer& src, buffer::Buffer& des, const std::vector<VkBufferCopy>&);
+    void copy(buffer::Buffer& src, buffer::Buffer& des);
     void barrier(
         buffer::Buffer& buff,
         std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
-        std::pair<VkAccessFlags, VkPipelineStageFlags> des_state) noexcept;
-    void begin(const RenderPass& render_pass, const Framebuffer& framebuffer) noexcept;
-    void end_render_pass() noexcept;
-    void set(const Viewport& viewport) noexcept;
-    void set(const Scissor& scissor) noexcept;
-    void bind(Pipeline pip) noexcept;
-    void bind(const DescriptorSet& set) noexcept;
-    void bind_vertices(buffer::Buffer& buf) noexcept;
-    void bind_indices(buffer::Buffer& buf) noexcept;
-    void draw_indices(std::size_t count) noexcept;
+        std::pair<VkAccessFlags, VkPipelineStageFlags> des_state);
+    void begin(const RenderPass& render_pass, const Framebuffer& framebuffer);
+    void end_render_pass();
+    void set(const Viewport& viewport);
+    void set(const Scissor& scissor);
+    void bind(Pipeline pip);
+    void bind(const DescriptorSet& set);
+    void bind_vertices(buffer::Buffer& buf);
+    void bind_indices(buffer::Buffer& buf);
+    void draw_indices(std::size_t count);
     void build_acceleration_structure(
         const VkAccelerationStructureBuildGeometryInfoKHR&,
-        const VkAccelerationStructureBuildRangeInfoKHR* const* const) noexcept;
-    [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const noexcept;
+        const VkAccelerationStructureBuildRangeInfoKHR* const* const);
+    [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const;
 };
 }
 #endif

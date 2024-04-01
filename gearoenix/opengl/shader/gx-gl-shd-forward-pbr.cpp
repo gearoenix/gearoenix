@@ -8,7 +8,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     Engine& e,
     const std::size_t directional_lights_count,
     const std::size_t shadow_casters_directional_lights_count,
-    const std::size_t bones_count) noexcept
+    const std::size_t bones_count)
     : Shader(e)
     , directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
@@ -261,11 +261,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     }
 }
 
-gearoenix::gl::shader::ForwardPbr::ForwardPbr(ForwardPbr&&) noexcept = default;
+gearoenix::gl::shader::ForwardPbr::ForwardPbr(ForwardPbr&&) = default;
 
-gearoenix::gl::shader::ForwardPbr::~ForwardPbr() noexcept = default;
+gearoenix::gl::shader::ForwardPbr::~ForwardPbr() = default;
 
-void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -281,7 +281,7 @@ void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const noexcep
     GX_GL_SHADER_SET_TEXTURE_INDEX_DYNAMIC_ARRAY_UNIFORM(shadow_caster_directional_light_shadow_map);
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data)
 {
     glUniformMatrix4fv(
         shadow_caster_directional_light_normalised_vp,
@@ -290,7 +290,7 @@ void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_norm
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data)
 {
     glUniform3fv(
         directional_light_direction,
@@ -298,7 +298,7 @@ void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(con
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data)
 {
     glUniform3fv(
         directional_light_colour,
@@ -306,7 +306,7 @@ void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const 
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data)
 {
     glUniform3fv(
         shadow_caster_directional_light_direction,
@@ -314,7 +314,7 @@ void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_dire
         reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data)
 {
     glUniform3fv(
         shadow_caster_directional_light_colour,
@@ -322,14 +322,14 @@ void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colo
         reinterpret_cast<const float*>(data));
 }
 
-const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const noexcept
+const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const
 {
     if (shadow_caster_directional_light_shadow_map_indices.empty())
         return nullptr;
     return shadow_caster_directional_light_shadow_map_indices.data();
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data) noexcept
+void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data)
 {
     glUniformMatrix4fv(
         bones_m_inv_m,

@@ -20,9 +20,9 @@ struct Manager final {
     std::map<render::texture::SamplerInfo, std::shared_ptr<Sampler>> samplers;
 
 public:
-    explicit Manager(std::shared_ptr<device::Logical> logical_device) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] const std::shared_ptr<Sampler>& get(const render::texture::SamplerInfo& info) noexcept;
+    explicit Manager(std::shared_ptr<device::Logical> logical_device);
+    ~Manager();
+    [[nodiscard]] const std::shared_ptr<Sampler>& get(const render::texture::SamplerInfo& info);
 };
 }
 #endif

@@ -19,12 +19,12 @@ private:
         engine::Engine& e,
         const std::string& name,
         std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
-        bool is_transformable) noexcept;
+        bool is_transformable);
 
-    void set_material(const render::material::Pbr& material_type) noexcept final;
+    void set_material(const render::material::Pbr& material_type) final;
 
 public:
-    ~Builder() noexcept final;
+    ~Builder() final;
 };
 }
 

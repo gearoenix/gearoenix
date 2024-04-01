@@ -1,10 +1,8 @@
 #ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
 #define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include <map>
-#include <memory>
+#include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "gx-rnd-sky-types.hpp"
 #include <string>
-#include <variant>
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -14,38 +12,44 @@ namespace gearoenix::platform::stream {
 struct Path;
 }
 
-namespace gearoenix::render::texture {
-struct Texture2D;
-struct TextureCube;
+namespace gearoenix::render::mesh {
+struct Mesh;
 }
 
 namespace gearoenix::render::skybox {
 struct Builder;
 struct Manager {
-    typedef std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>> Texture;
 
 protected:
     engine::Engine& e;
 
-    explicit Manager(engine::Engine& e) noexcept;
+    explicit Manager(engine::Engine& e);
 
 public:
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    virtual ~Manager() noexcept;
+    virtual ~Manager();
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
         Texture&& bound_texture,
-        const core::sync::EndCaller& c) noexcept
+        std::shared_ptr<mesh::Mesh>&& bound_mesh,
+        core::job::EndCaller<>&& entity_end_callback)
         = 0;
 
-    [[nodiscard]] virtual std::shared_ptr<Builder> build(
+    void build(
         std::string&& name,
         platform::stream::Path&& texture_path,
-        const core::sync::EndCaller& c) noexcept;
+        core::job::EndCaller<>&& entity_end_callback,
+        core::job::EndCallerShared<Builder>&& builder_callback);
+
+    void build(
+        std::string&& name,
+        Texture&& bound_texture,
+        core::job::EndCaller<>&& entity_end_callback,
+        core::job::EndCallerShared<Builder>&& builder_callback);
 };
 }
 #endif

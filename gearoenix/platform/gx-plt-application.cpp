@@ -2,7 +2,7 @@
 #include "../audio/gx-au-engine.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
-#include "../core/sync/gx-cr-sync-parallel-for.hpp"
+#include "../core/job/gx-cr-job-manager.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include <imgui/imgui.h>
@@ -10,12 +10,12 @@
 constexpr double click_time_threshold = 0.3;
 constexpr double click_distance_threshold = 0.1;
 
-gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration) noexcept
+gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration)
     : configuration(configuration)
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
-    , asset_worker(new core::sync::WorkWaiter())
 {
+    core::job::initialise();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -31,15 +31,15 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
     }
 }
 
-gearoenix::platform::BaseApplication::~BaseApplication() noexcept = default;
+gearoenix::platform::BaseApplication::~BaseApplication() = default;
 
-void gearoenix::platform::BaseApplication::initialize_window_position(const int x, const int y) noexcept
+void gearoenix::platform::BaseApplication::initialize_window_position(const int x, const int y)
 {
     window_size.x = x;
     window_size.y = y;
 }
 
-void gearoenix::platform::BaseApplication::initialize_window_size(const int w, const int h) noexcept
+void gearoenix::platform::BaseApplication::initialize_window_size(const int w, const int h)
 {
     update_window_size(w, h);
     previous_window_size.x = w;
@@ -47,7 +47,7 @@ void gearoenix::platform::BaseApplication::initialize_window_size(const int w, c
     window_resizing = false;
 }
 
-void gearoenix::platform::BaseApplication::update_window_size(const int w, const int h) noexcept
+void gearoenix::platform::BaseApplication::update_window_size(const int w, const int h)
 {
     window_resizing = true;
     window_size.x = w;
@@ -58,7 +58,7 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
     last_time_window_resized = std::chrono::high_resolution_clock::now();
 }
 
-void gearoenix::platform::BaseApplication::update_window() noexcept
+void gearoenix::platform::BaseApplication::update_window()
 {
     if (window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > configuration.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
@@ -73,14 +73,14 @@ void gearoenix::platform::BaseApplication::update_window() noexcept
     }
 }
 
-void gearoenix::platform::BaseApplication::initialize_mouse_position(const double x, const double y) noexcept
+void gearoenix::platform::BaseApplication::initialize_mouse_position(const double x, const double y)
 {
     mouse_previous_position = mouse_position = { x, y };
     mouse_previous_normalised_position = mouse_normalised_position = normalise_position(x, y);
     ImGui::GetIO().MousePos = { static_cast<float>(x), static_cast<float>(y) };
 }
 
-void gearoenix::platform::BaseApplication::update_mouse_position(const double x, const double y) noexcept
+void gearoenix::platform::BaseApplication::update_mouse_position(const double x, const double y)
 {
     mouse_previous_position = mouse_position;
     mouse_previous_normalised_position = mouse_normalised_position;
@@ -100,7 +100,7 @@ void gearoenix::platform::BaseApplication::update_mouse_position(const double x,
                 mouse_previous_normalised_position)));
 }
 
-void gearoenix::platform::BaseApplication::mouse_key(const key::Id k, const key::Action a) noexcept
+void gearoenix::platform::BaseApplication::mouse_key(const key::Id k, const key::Action a)
 {
     ImGui::GetIO().MouseDown[key::convert_mouse_to_imgui(k)] = a == key::Action::Press;
     event_engine->broadcast(
@@ -110,12 +110,12 @@ void gearoenix::platform::BaseApplication::mouse_key(const key::Id k, const key:
                 a, k, mouse_normalised_position, mouse_position)));
 }
 
-void gearoenix::platform::BaseApplication::mouse_wheel(const double v) noexcept
+void gearoenix::platform::BaseApplication::mouse_wheel(const double v)
 {
     ImGui::GetIO().MouseWheel += static_cast<float>(v);
 }
 
-void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const key::Action a) noexcept
+void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const key::Action a)
 {
     const auto pressed = a == key::Action::Press;
     auto& io = ImGui::GetIO();
@@ -146,12 +146,12 @@ void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const k
             core::event::button::Keyboard(a, k)));
 }
 
-void gearoenix::platform::BaseApplication::character_input(const char16_t ch) noexcept
+void gearoenix::platform::BaseApplication::character_input(const char16_t ch)
 {
     ImGui::GetIO().AddInputCharacterUTF16(ch);
 }
 
-void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const double x, const double y) noexcept
+void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const double x, const double y)
 {
     const core::event::Point2D p({ x, y }, normalise_position(x, y));
     touch_states.emplace(finger_id, p);
@@ -164,7 +164,7 @@ void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, 
                 core::event::touch::Action::Down)));
 }
 
-void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, const double x, const double y) noexcept
+void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, const double x, const double y)
 {
     const auto search = touch_states.find(finger_id);
     if (touch_states.end() == search)
@@ -195,7 +195,7 @@ void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, 
                 core::event::touch::Action::Move)));
 }
 
-void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id) noexcept
+void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id)
 {
     const auto search = touch_states.find(finger_id);
     if (touch_states.end() == search)
@@ -224,7 +224,7 @@ void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id) no
     touch_states.erase(search);
 }
 
-void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id) noexcept
+void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id)
 {
     const auto search = touch_states.find(finger_id);
     if (touch_states.end() == search)
@@ -239,7 +239,7 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
     touch_states.erase(finger_id);
 }
 
-void gearoenix::platform::BaseApplication::initialize_engine(Application& app) noexcept
+void gearoenix::platform::BaseApplication::initialize_engine(Application& app)
 {
     render_engine = render::engine::Engine::construct(app);
     audio_engine = std::make_unique<audio::Engine>(app);
@@ -247,7 +247,7 @@ void gearoenix::platform::BaseApplication::initialize_engine(Application& app) n
 
 void gearoenix::platform::BaseApplication::initialize_core_application(
     Application& app,
-    core::Application* const core_app) noexcept
+    core::Application* const core_app)
 {
     if (nullptr == core_app) {
         core_application = std::make_unique<core::Application>(app);
@@ -256,20 +256,20 @@ void gearoenix::platform::BaseApplication::initialize_core_application(
     }
 }
 
-void gearoenix::platform::BaseApplication::going_to_be_closed() noexcept
+void gearoenix::platform::BaseApplication::going_to_be_closed()
 {
     running = false;
     GX_TODO;
 }
 
-void gearoenix::platform::BaseApplication::terminate() noexcept
+void gearoenix::platform::BaseApplication::terminate()
 {
     core_application = nullptr;
     render_engine = nullptr;
     ImGui::DestroyContext();
 }
 
-void gearoenix::platform::BaseApplication::update() noexcept
+void gearoenix::platform::BaseApplication::update()
 {
     update_window();
     render_engine->start_frame();
@@ -278,17 +278,17 @@ void gearoenix::platform::BaseApplication::update() noexcept
     render_engine->end_frame();
 }
 
-double gearoenix::platform::BaseApplication::normalise_x(const double x) const noexcept
+double gearoenix::platform::BaseApplication::normalise_x(const double x) const
 {
     return (x - static_cast<double>(window_size.x) * 0.5) / static_cast<double>(window_size.y);
 }
 
-double gearoenix::platform::BaseApplication::normalise_y(const double y) const noexcept
+double gearoenix::platform::BaseApplication::normalise_y(const double y) const
 {
     return 0.5 - (y / static_cast<double>(window_size.y));
 }
 
-gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const noexcept
+gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const
 {
     return { normalise_x(x), normalise_y(y) };
 }

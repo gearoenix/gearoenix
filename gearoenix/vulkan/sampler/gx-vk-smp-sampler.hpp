@@ -17,10 +17,10 @@ struct Sampler final {
 public:
     explicit Sampler(
         std::shared_ptr<device::Logical> logical_device,
-        const render::texture::SamplerInfo& sampler_info) noexcept;
-    ~Sampler() noexcept;
-    [[nodiscard]] static VkFilter convert(render::texture::Filter filter) noexcept;
-    [[nodiscard]] static VkSamplerAddressMode convert(render::texture::Wrap wrap) noexcept;
+        const render::texture::SamplerInfo& sampler_info);
+    ~Sampler();
+    [[nodiscard]] static VkFilter convert(render::texture::Filter filter);
+    [[nodiscard]] static VkSamplerAddressMode convert(render::texture::Wrap wrap);
 };
 }
 #endif

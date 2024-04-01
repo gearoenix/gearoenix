@@ -14,24 +14,24 @@ private:
     Semaphore s;
 
 public:
-    Channel() noexcept = default;
+    Channel() = default;
 
-    Channel(const Channel&) noexcept = delete;
-    void operator=(const Channel&) noexcept = delete;
+    Channel(const Channel&) = delete;
+    void operator=(const Channel&) = delete;
 
-    [[nodiscard]] std::size_t get_pending() const noexcept
+    [[nodiscard]] std::size_t get_pending() const
     {
         return data.size();
     }
 
-    void send(const T& t) noexcept
+    void send(const T& t)
     {
         std::lock_guard<std::mutex> _l(m);
         data.push(t);
         s.release();
     }
 
-    T receive() noexcept
+    T receive()
     {
         s.lock();
         std::lock_guard<std::mutex> _l(m);

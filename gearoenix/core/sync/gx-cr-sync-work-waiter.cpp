@@ -2,7 +2,7 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <utility>
 
-void gearoenix::core::sync::WorkWaiter::wait_loop() noexcept
+void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
     state = State::Working;
     while (State::Working == state) {
@@ -15,12 +15,12 @@ void gearoenix::core::sync::WorkWaiter::wait_loop() noexcept
     GX_LOG_D("Worker thread: " << std::this_thread::get_id() << " is finished.");
 }
 
-gearoenix::core::sync::WorkWaiter::WorkWaiter() noexcept
+gearoenix::core::sync::WorkWaiter::WorkWaiter()
     : thread([this] { wait_loop(); })
 {
 }
 
-gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
+gearoenix::core::sync::WorkWaiter::~WorkWaiter()
 {
     GX_CHECK_NOT_EQUAL_D(state, State::Terminated);
     do {
@@ -30,7 +30,7 @@ gearoenix::core::sync::WorkWaiter::~WorkWaiter() noexcept
     thread.join();
 }
 
-void gearoenix::core::sync::WorkWaiter::push(std::function<void()>&& f) noexcept
+void gearoenix::core::sync::WorkWaiter::push(std::function<void()>&& f)
 {
     function_loader.load(std::move(f));
     semaphore.release();

@@ -90,7 +90,7 @@ void main() {\n\
 \n\
 }\n";
 
-gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e) noexcept
+gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -113,9 +113,9 @@ gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e) n
     // GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
 }
 
-gearoenix::gl::shader::ForwardPbrTransparent::~ForwardPbrTransparent() noexcept = default;
+gearoenix::gl::shader::ForwardPbrTransparent::~ForwardPbrTransparent() = default;
 
-void gearoenix::gl::shader::ForwardPbrTransparent::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::ForwardPbrTransparent::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

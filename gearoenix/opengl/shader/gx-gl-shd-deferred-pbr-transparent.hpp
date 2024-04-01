@@ -13,9 +13,9 @@ struct DeferredPbrTransparent final : public Shader {
     GX_GL_UNIFORM_TEXTURE(ssao_resolved);
 
 public:
-    explicit DeferredPbrTransparent(Engine& e) noexcept;
-    ~DeferredPbrTransparent() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit DeferredPbrTransparent(Engine& e);
+    ~DeferredPbrTransparent() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

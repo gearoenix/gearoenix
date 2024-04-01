@@ -35,7 +35,7 @@ private:
         std::shared_ptr<core::allocator::Range> allocator,
         std::shared_ptr<const Buffer> parent,
         std::shared_ptr<memory::Memory> allocated_memory,
-        VkBuffer vulkan_data) noexcept;
+        VkBuffer vulkan_data);
 
 public:
     Buffer(Buffer&&) = delete;
@@ -43,13 +43,13 @@ public:
     Buffer& operator=(Buffer&&) = delete;
     Buffer& operator=(const Buffer&) = delete;
     [[nodiscard]] static std::shared_ptr<Buffer> construct(
-        const std::string&, std::size_t size, memory::Place place, memory::Manager& memory_manager) noexcept;
-    ~Buffer() noexcept;
-    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::size_t size) noexcept;
-    // void push_memory_barrier(command::Buffer& command) const noexcept;
-    //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) noexcept;
-    void write(const void* data, std::size_t size) noexcept;
-    [[nodiscard]] VkDeviceAddress get_device_address() const noexcept;
+        const std::string&, std::size_t size, memory::Place place, memory::Manager& memory_manager);
+    ~Buffer();
+    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::size_t size);
+    // void push_memory_barrier(command::Buffer& command) const ;
+    //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) ;
+    void write(const void* data, std::size_t size);
+    [[nodiscard]] VkDeviceAddress get_device_address() const;
 };
 }
 #endif

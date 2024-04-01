@@ -20,10 +20,10 @@ private:
     boost::container::flat_map<std::type_index, std::weak_ptr<ShaderCombination>> shaders;
 
 public:
-    explicit Manager(Engine& e) noexcept;
+    explicit Manager(Engine& e);
 
     template <typename SC>
-    [[nodiscard]] std::shared_ptr<SC> get() noexcept
+    [[nodiscard]] std::shared_ptr<SC> get()
     {
         const auto type_index = std::type_index(typeid(SC));
         if (auto search = shaders.find(type_index); shaders.end() != search) {

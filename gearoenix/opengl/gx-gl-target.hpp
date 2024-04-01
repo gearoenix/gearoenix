@@ -2,12 +2,11 @@
 #define GEAROENIX_GL_TARGET_HPP
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../core/job/gx-cr-job-end-caller.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../core/sync/gx-cr-sync-end-caller.hpp"
 #include "../render/texture/gx-rnd-txt-target.hpp"
 #include "gx-gl-types.hpp"
 #include <memory>
-#include <optional>
 #include <variant>
 #include <vector>
 
@@ -16,8 +15,11 @@ struct Texture2D;
 struct TextureCube;
 struct Engine;
 
-struct Target final : public render::texture::Target {
+struct Target final : render::texture::Target {
     struct GlAttachment final {
+        static constexpr std::size_t VARIANT_2D_INDEX = 0;
+        static constexpr std::size_t VARIANT_CUBE_INDEX = 1;
+
         std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
         uint texture_object = static_cast<uint>(-1);
         sint mipmap_level = -1;
@@ -29,10 +31,16 @@ struct Target final : public render::texture::Target {
     GX_GET_VAL_PRV(uint, framebuffer, static_cast<uint>(-1));
     GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments);
 
+    Target(Engine& e, std::vector<render::texture::Attachment>&& attachments);
+
 public:
-    Target(Engine& e, std::vector<render::texture::Attachment>&& attachments, const core::sync::EndCaller& end_callback) noexcept;
-    ~Target() noexcept final;
-    void bind() noexcept;
+    static void construct(
+        Engine& e,
+        std::string&& name,
+        std::vector<render::texture::Attachment>&& attachments,
+        core::job::EndCallerShared<render::texture::Target>&& end_callback);
+    ~Target() override;
+    void bind() const;
 };
 }
 

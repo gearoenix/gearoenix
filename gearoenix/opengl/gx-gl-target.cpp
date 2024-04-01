@@ -1,4 +1,6 @@
 #include "gx-gl-target.hpp"
+
+#include "gx-gl-label.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
@@ -6,33 +8,43 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment>&& _attachments, const core::sync::EndCaller& end_callback) noexcept
-    : render::texture::Target(std::move(_attachments))
+gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment>&& attachments)
+    : render::texture::Target(std::move(attachments))
     , e(e)
 {
-    GX_ASSERT_D(!attachments.empty());
-    gl_attachments.reserve(attachments.size());
+}
+
+void gearoenix::gl::Target::construct(
+    Engine& e,
+    std::string&& name,
+    std::vector<render::texture::Attachment>&& attachments,
+    core::job::EndCallerShared<render::texture::Target>&& end_callback)
+{
+    std::shared_ptr<Target> self(new Target(e, std::move(attachments)));
+    GX_ASSERT_D(!self->attachments.empty());
+    self->gl_attachments.reserve(self->attachments.size());
     std::vector<enumerated> binding_points;
-    binding_points.reserve(attachments.size());
+    binding_points.reserve(self->attachments.size());
     enumerated current_binding_point = GL_COLOR_ATTACHMENT0;
-    for (const auto& a : attachments) {
-        gl_attachments.emplace_back();
-        auto& gla = gl_attachments.back();
+    for (const auto& a : self->attachments) {
+        self->gl_attachments.emplace_back();
+        auto& gla = self->gl_attachments.back();
         gla.mipmap_level = static_cast<decltype(gla.mipmap_level)>(a.mipmap_level);
-        auto format = render::texture::TextureFormat::Unknown;
-        if (a.var.index() == 0) {
-            const auto& a2d = std::get<0>(a.var);
+        render::texture::TextureFormat format;
+        if (a.var.index() == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+            const auto& a2d = std::get<render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX>(a.var);
             format = a2d.txt->get_info().format;
             gla.texture = std::dynamic_pointer_cast<Texture2D>(a2d.txt);
             gla.target = GL_TEXTURE_2D;
-        } else if (a.var.index() == 1) {
-            const auto& acb = std::get<1>(a.var);
+        } else if (a.var.index() == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+            const auto& acb = std::get<render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(a.var);
             format = acb.txt->get_info().format;
             gla.texture = std::dynamic_pointer_cast<TextureCube>(acb.txt);
             gla.target = convert(acb.face);
-        } else
+        } else {
             GX_UNEXPECTED;
-        if (render::texture::format_is_depth(format)) {
+        }
+        if (format_is_depth(format)) {
             gla.binding_index = GL_DEPTH_ATTACHMENT;
         } else {
             gla.binding_index = current_binding_point;
@@ -40,20 +52,29 @@ gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment
             ++current_binding_point;
         }
     }
-    e.todos.load([this, binding_points = std::move(binding_points), end_callback] {
-        glGenFramebuffers(1, &framebuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    end_callback.set_return(self);
+    core::job::send_job(e.get_jobs_thread_id(), [self = std::move(self), name = std::move(name), binding_points = std::move(binding_points), end_callback = std::move(end_callback)] {
+        glGenFramebuffers(1, &self->framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, self->framebuffer);
         GX_GL_CHECK_D;
-        for (auto& a : gl_attachments) {
-            a.texture_object = a.texture.index() == 0 ? std::get<0>(a.texture)->get_object() : std::get<1>(a.texture)->get_object();
+        for (auto& a : self->gl_attachments) {
+            switch (a.texture.index()) {
+            case GlAttachment::VARIANT_2D_INDEX:
+                a.texture_object = std::get<GlAttachment::VARIANT_2D_INDEX>(a.texture)->get_object();
+                break;
+            case GlAttachment::VARIANT_CUBE_INDEX:
+                a.texture_object = std::get<GlAttachment::VARIANT_CUBE_INDEX>(a.texture)->get_object();
+                break;
+            default:
+                GX_UNEXPECTED;
+            }
             glFramebufferTexture2D(GL_FRAMEBUFFER, a.binding_index, a.target, a.texture_object, a.mipmap_level);
             GX_GL_CHECK_D;
         }
         glDrawBuffers(static_cast<sizei>(binding_points.size()), binding_points.data());
         glReadBuffer(GL_NONE);
         GX_GL_CHECK_D;
-        const auto framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        switch (framebuffer_status) {
+        switch (const auto framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
         case GL_FRAMEBUFFER_UNDEFINED:
             GX_LOG_F("Target is the default framebuffer, but the default framebuffer does not exist.");
         case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
@@ -75,20 +96,22 @@ gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment
         default:
             GX_LOG_F("Unknown framebuffer error: " << framebuffer_status);
         }
+        set_framebuffer_label(self->framebuffer, name);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     });
 }
 
-gearoenix::gl::Target::~Target() noexcept
+gearoenix::gl::Target::~Target()
 {
     attachments.clear();
-    e.todos.load([framebuffer = framebuffer] {
+    core::job::send_job(e.get_jobs_thread_id(), [framebuffer = framebuffer] {
         glDeleteFramebuffers(1, &framebuffer);
     });
 }
 
-void gearoenix::gl::Target::bind() noexcept
+void gearoenix::gl::Target::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
+
 #endif

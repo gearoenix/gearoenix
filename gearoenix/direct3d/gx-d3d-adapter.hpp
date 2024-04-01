@@ -10,7 +10,7 @@ struct Adapter final {
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<IDXGIFactory7>, factory)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<IDXGIAdapter4>, adapter)
 
-    Adapter() noexcept;
+    Adapter();
 };
 }
 

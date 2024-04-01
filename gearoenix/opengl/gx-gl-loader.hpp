@@ -185,9 +185,9 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
 GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_DECL);
 GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_DECL);
 
-[[nodiscard]] bool load_library() noexcept;
-void unload_library() noexcept;
-[[nodiscard]] bool extension_exists(const std::string& ext_name) noexcept;
+[[nodiscard]] bool load_library();
+void unload_library();
+[[nodiscard]] bool extension_exists(const std::string& ext_name);
 
 #ifdef GX_DEBUG_MODE
 void GX_GL_APIENTRY_TYPE debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);

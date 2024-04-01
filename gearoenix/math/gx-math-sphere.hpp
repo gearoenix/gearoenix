@@ -18,32 +18,32 @@ struct Sphere final {
 public:
     Sphere() = delete;
 
-    constexpr Sphere(const Vec3<Element>& center, const Element radius) noexcept
+    constexpr Sphere(const Vec3<Element>& center, const Element radius)
         : center(center)
         , radius(radius)
         , radius2(radius * radius)
     {
     }
 
-    constexpr void set_radius(const Element r) noexcept
+    constexpr void set_radius(const Element r)
     {
         radius2 = r * r;
         radius = r;
     }
 
-    constexpr void set_center(const Vec3<Element>& c) noexcept
+    constexpr void set_center(const Vec3<Element>& c)
     {
         center = c;
     }
 
-    constexpr void insert(const Element r) noexcept
+    constexpr void insert(const Element r)
     {
         if (radius < r) {
             set_radius(r);
         }
     }
 
-    [[nodiscard]] constexpr std::optional<Element> hit(const math::Ray3<Element>& r) const noexcept
+    [[nodiscard]] constexpr std::optional<Element> hit(const math::Ray3<Element>& r) const
     {
         const auto dir = center - r.get_origin();
         const auto dir2 = dir.square_length();
@@ -59,7 +59,7 @@ public:
         return dis - std::sqrt(radius2 - a2);
     }
 
-    [[nodiscard]] constexpr std::optional<Element> hit(const math::Ray3<Element>& r, const Element d_min) const noexcept
+    [[nodiscard]] constexpr std::optional<Element> hit(const math::Ray3<Element>& r, const Element d_min) const
     {
         if (const auto h = hit(r))
             if ((*h) < d_min)
@@ -67,7 +67,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] constexpr IntersectionStatus check_intersection(const Sphere<Element>& o) const noexcept
+    [[nodiscard]] constexpr IntersectionStatus check_intersection(const Sphere<Element>& o) const
     {
         const auto l = (center - o.center).length();
         const auto r = radius + o.radius;

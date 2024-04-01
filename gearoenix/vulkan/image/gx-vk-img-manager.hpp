@@ -3,7 +3,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include <tuple>
 #include <vector>
 
@@ -26,8 +26,8 @@ private:
     engine::Engine& e;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept;
+    explicit Manager(engine::Engine& e);
+    ~Manager();
 };
 }
 

@@ -22,9 +22,9 @@ public:
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    explicit Manager(const engine::Engine& e) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Module> get(const std::string& shader_name) noexcept;
+    explicit Manager(const engine::Engine& e);
+    ~Manager();
+    [[nodiscard]] std::shared_ptr<Module> get(const std::string& shader_name);
 };
 }
 

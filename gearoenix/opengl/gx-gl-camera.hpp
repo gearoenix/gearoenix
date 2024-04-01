@@ -4,9 +4,8 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/camera/gx-rnd-cmr-builder.hpp"
+#include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../render/camera/gx-rnd-cmr-manager.hpp"
-#include <array>
-#include <optional>
 
 namespace gearoenix::render::camera {
 struct BloomData;
@@ -17,65 +16,50 @@ struct Engine;
 struct Target;
 struct Texture2D;
 
-struct BloomData final {
-    typedef std::array<std::shared_ptr<Target>, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT> Targets;
-    typedef std::array<std::shared_ptr<Target>, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT + 1> UpTargets;
+struct Camera final : render::camera::Camera {
+    GX_GET_CREF_PRV(std::shared_ptr<Target>, gl_customised_target);
 
-    GX_GET_CREF_PRV(std::shared_ptr<Target>, prefilter_target);
-    GX_GET_CREF_PRV(Targets, horizontal_targets);
-    GX_GET_CREF_PRV(Targets, vertical_targets);
-    GX_GET_CREF_PRV(UpTargets, upsampler_targets);
-
-    BloomData(
-        std::shared_ptr<Target>&& prefilter_target,
-        Targets&& horizontal_targets,
-        Targets&& vertical_targets,
-        UpTargets&& upsampler_targets) noexcept;
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
 
 public:
-    ~BloomData() noexcept;
-    [[nodiscard]] static std::optional<BloomData> construct(const std::optional<render::camera::BloomData>& bloom_data) noexcept;
+    Camera(
+        Engine& e,
+        const std::string& name,
+        std::size_t resolution_cfg_listener,
+        std::shared_ptr<Target>&& customised_target,
+        render::camera::ProjectionData projection_data,
+        float near,
+        float far,
+        bool has_bloom);
+    static std::shared_ptr<Camera> construct(
+        Engine& e,
+        const std::string& name,
+        std::size_t resolution_cfg_listener,
+        std::shared_ptr<Target>&& customised_target = nullptr,
+        render::camera::ProjectionData projection_data = render::camera::PerspectiveProjectionData {},
+        float near = 1.0f,
+        float far = 100.0f,
+        bool has_bloom = true);
+    ~Camera() override;
 };
 
-struct Camera final : public core::ecs::Component {
-    friend struct CameraBuilder;
-    friend struct CameraManager;
-
-    GX_GET_CREF_PRV(std::shared_ptr<Target>, target);
-    GX_GET_CREF_PRV(std::shared_ptr<Target>, second_target);
-    GX_GET_CREF_PRV(std::optional<gl::BloomData>, bloom_data);
-
-private:
-    void disable_bloom() noexcept;
-    void update(const render::camera::Camera& camera) noexcept;
-
-public:
-    Camera(std::string&& name, const render::camera::Camera& camera) noexcept;
-    ~Camera() noexcept final;
-    Camera(Camera&&) noexcept;
-};
-
-struct CameraBuilder final : public render::camera::Builder {
-    friend struct CameraManager;
+struct CameraBuilder final : render::camera::Builder {
     Engine& eng;
 
-private:
-    CameraBuilder(Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept;
-    void set_customised_target(std::shared_ptr<render::texture::Target>&& target) noexcept final;
-    void disable_bloom() noexcept final;
-
-public:
-    ~CameraBuilder() noexcept final;
+    CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& end_caller);
+    ~CameraBuilder() override;
 };
 
-struct CameraManager final : public render::camera::Manager {
+struct CameraManager final : render::camera::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::camera::Builder> build_v(const std::string& name, core::sync::EndCaller&& end_caller) noexcept final;
-    void window_resized() noexcept final;
+    [[nodiscard]] std::shared_ptr<render::camera::Builder> build_v(
+        const std::string& name, core::job::EndCaller<>&& end_caller) override;
+    void window_resized() override;
 
 public:
-    explicit CameraManager(Engine& e) noexcept;
-    ~CameraManager() noexcept final;
+    explicit CameraManager(Engine& e);
+    ~CameraManager() override;
 };
 }
 

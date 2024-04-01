@@ -9,7 +9,7 @@
 
 void gearoenix::physics::animation::Manager::insert_bones(
     BoneInfo& bones_info,
-    const std::size_t current_index) noexcept
+    const std::size_t current_index)
 {
     bones[current_index].first_child_index = bones.size();
     for (auto& child_bone : bones_info.children) {
@@ -31,7 +31,7 @@ void gearoenix::physics::animation::Manager::insert_bones(
     }
 }
 
-void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform) noexcept
+void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform)
 {
     auto& bone = bones[index];
     bone.transform.update_without_inverse(parent_transform);
@@ -45,25 +45,23 @@ void gearoenix::physics::animation::Manager::update_bone(const std::size_t index
     bone.transform.clear_change();
 }
 
-gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e) noexcept
+gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<AnimationPlayer>();
-    core::ecs::Component::register_type<Armature>();
 }
 
-gearoenix::physics::animation::Manager::~Manager() noexcept = default;
+gearoenix::physics::animation::Manager::~Manager() = default;
 
 void gearoenix::physics::animation::Manager::create_armature(
     core::ecs::EntityBuilder& builder,
-    BoneInfo& bones_info) noexcept
+    BoneInfo& bones_info)
 {
     const std::lock_guard<std::mutex> _lg(this_lock);
 
     const auto root_index = bones.size();
 
-    Armature arm(builder.get_name() + "-armature");
-    arm.root_bone_index = root_index;
+    auto arm = Armature::construct(builder.get_name() + "-armature");
+    arm->root_bone_index = root_index;
     builder.add_component(std::move(arm));
 
     bones_indices[bones_info.name] = root_index;
@@ -82,7 +80,7 @@ void gearoenix::physics::animation::Manager::create_armature(
 
 void gearoenix::physics::animation::Manager::create_animation_player(
     core::ecs::EntityBuilder& builder,
-    ArmatureAnimationInfo& info) noexcept
+    ArmatureAnimationInfo& info)
 {
     const std::lock_guard<std::mutex> _lg(this_lock);
     const std::size_t bones_channels_count = info.channels.size();
@@ -126,7 +124,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     if (!info.name.empty()) {
         animations_map.emplace(info.name, anim);
     }
-    builder.add_component(AnimationPlayer(std::move(anim), builder.get_name() + "-animation-player"));
+    builder.add_component(AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player"));
 }
 
 void gearoenix::physics::animation::Manager::create_sprite_player(
@@ -134,26 +132,27 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
     std::string name,
     std::shared_ptr<render::material::Sprite> sprite,
     const std::size_t width,
-    const std::size_t height) noexcept
+    const std::size_t height)
 {
     auto anim = animation_allocator.make_shared<SpriteAnimation>(name, std::move(sprite), width, height);
     if (!name.empty()) {
         animations_map.emplace(std::move(name), anim);
     }
-    AnimationPlayer player(std::move(anim), builder.get_name() + "-animation-player");
-    player.set_loop_range_time(0.0, 0.999);
+    auto player = AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player");
+    player->set_loop_range_time(0.0, 0.999);
     builder.add_component(std::move(player));
 }
 
-void gearoenix::physics::animation::Manager::update() noexcept
+void gearoenix::physics::animation::Manager::update()
 {
-    e.get_world()->parallel_system<core::ecs::And<core::ecs::Or<AnimationPlayer, Armature>, Transformation>>([this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) noexcept {
-        if (nullptr != player) {
-            player->update_time(e.get_delta_time());
-            player->animate(*this);
-        }
-        if (nullptr != armature) {
-            update_bone(armature->root_bone_index, *model_transform);
-        }
-    });
+    e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, TransformationComponent>>(
+        [this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) {
+            if (nullptr != player) {
+                player->update_time(e.get_delta_time());
+                player->animate(*this);
+            }
+            if (nullptr != armature) {
+                update_bone(armature->root_bone_index, *model_transform);
+            }
+        });
 }

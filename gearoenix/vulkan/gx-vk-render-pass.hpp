@@ -14,8 +14,8 @@ struct RenderPass final {
 
 public:
     RenderPass(const RenderPass&) = delete;
-    explicit RenderPass(const Swapchain& swapchain) noexcept;
-    ~RenderPass() noexcept;
+    explicit RenderPass(const Swapchain& swapchain);
+    ~RenderPass();
 };
 }
 #endif

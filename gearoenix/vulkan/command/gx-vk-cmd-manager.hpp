@@ -27,12 +27,12 @@ private:
 public:
     Manager(const Manager&) = delete;
     Manager(Manager&&) = delete;
-    explicit Manager(const engine::Engine& e) noexcept;
-    ~Manager() noexcept;
+    explicit Manager(const engine::Engine& e);
+    ~Manager();
     Manager& operator=(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
-    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::size_t> thread_index = std::nullopt) noexcept;
-    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based() noexcept;
+    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::size_t> thread_index = std::nullopt);
+    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based();
 };
 }
 #endif

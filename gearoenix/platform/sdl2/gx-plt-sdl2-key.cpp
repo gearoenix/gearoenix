@@ -109,7 +109,7 @@ static const boost::container::flat_map<SDL_Keycode, gearoenix::platform::key::I
     { SDLK_KP_PERIOD, gearoenix::platform::key::Id::NumpadDot },
 };
 
-gearoenix::platform::key::Id gearoenix::platform::convert_sdl_key(const SDL_Keycode key) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_sdl_key(const SDL_Keycode key)
 {
     if (const auto search = gearoenix_sdl_keyboard_map.find(key); gearoenix_sdl_keyboard_map.end() != search)
         return search->second;
@@ -117,7 +117,7 @@ gearoenix::platform::key::Id gearoenix::platform::convert_sdl_key(const SDL_Keyc
     return key::Id::Unknown;
 }
 
-gearoenix::platform::key::Id gearoenix::platform::convert_sdl_mouse_key(const Uint8 key) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_sdl_mouse_key(const Uint8 key)
 {
     switch (key) {
     case SDL_BUTTON_LEFT:

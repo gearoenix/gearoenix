@@ -27,8 +27,8 @@ struct Frame final {
         const Swapchain&,
         const image::View&,
         const RenderPass&,
-        unsigned int) noexcept;
-    ~Frame() noexcept;
+        unsigned int);
+    ~Frame();
 };
 }
 

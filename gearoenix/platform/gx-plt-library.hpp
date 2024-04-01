@@ -10,20 +10,20 @@ namespace gearoenix::platform {
 struct Library final {
 private:
     void* lib = nullptr;
-    Library() noexcept;
+    Library();
 
 public:
-    static Library* construct(const char* name) noexcept;
-    ~Library() noexcept;
-    void* raw_load(const char* function_name) noexcept;
+    static Library* construct(const char* name);
+    ~Library();
+    void* raw_load(const char* function_name);
 
     template <typename FunctionPtr>
-    FunctionPtr load(const char* function_name) noexcept;
+    FunctionPtr load(const char* function_name);
 };
 }
 
 template <typename FunctionPtr>
-FunctionPtr gearoenix::platform::Library::load(const char* function_name) noexcept
+FunctionPtr gearoenix::platform::Library::load(const char* function_name)
 {
     return reinterpret_cast<FunctionPtr>(raw_load(function_name));
 }

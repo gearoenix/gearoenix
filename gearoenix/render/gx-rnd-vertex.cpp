@@ -1,11 +1,11 @@
 #include "gx-rnd-vertex.hpp"
 
-gearoenix::render::PbrVertex::PbrVertex(platform::stream::Stream& f) noexcept
+gearoenix::render::PbrVertex::PbrVertex(platform::stream::Stream& f)
 {
     read(f);
 }
 
-void gearoenix::render::PbrVertex::read(platform::stream::Stream& f) noexcept
+void gearoenix::render::PbrVertex::read(platform::stream::Stream& f)
 {
     position.read(f);
     normal.read(f);
@@ -13,7 +13,7 @@ void gearoenix::render::PbrVertex::read(platform::stream::Stream& f) noexcept
     uv.read(f);
 }
 
-std::ostream& gearoenix::render::operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v) noexcept
+std::ostream& gearoenix::render::operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v)
 {
     os << R"({ "type": "PbrVertex", "position": )" << v.position
        << ", \"normal\": " << v.normal
@@ -22,7 +22,7 @@ std::ostream& gearoenix::render::operator<<(std::ostream& os, const gearoenix::r
     return os;
 }
 
-const void* gearoenix::render::get_data(const render::Vertices& vertices) noexcept
+const void* gearoenix::render::get_data(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -34,7 +34,7 @@ const void* gearoenix::render::get_data(const render::Vertices& vertices) noexce
     }
 }
 
-std::size_t gearoenix::render::get_element_size(const render::Vertices& vertices) noexcept
+std::size_t gearoenix::render::get_element_size(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -46,7 +46,7 @@ std::size_t gearoenix::render::get_element_size(const render::Vertices& vertices
     }
 }
 
-bool gearoenix::render::has_bone_weights(const render::Vertices& vertices) noexcept
+bool gearoenix::render::has_bone_weights(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -58,7 +58,7 @@ bool gearoenix::render::has_bone_weights(const render::Vertices& vertices) noexc
     }
 }
 
-bool gearoenix::render::has_bone_indices(const render::Vertices& vertices) noexcept
+bool gearoenix::render::has_bone_indices(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -70,7 +70,7 @@ bool gearoenix::render::has_bone_indices(const render::Vertices& vertices) noexc
     }
 }
 
-std::size_t gearoenix::core::count(const render::Vertices& vertices) noexcept
+std::size_t gearoenix::core::count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -82,7 +82,7 @@ std::size_t gearoenix::core::count(const render::Vertices& vertices) noexcept
     }
 }
 
-std::size_t gearoenix::core::bytes_count(const render::Vertices& vertices) noexcept
+std::size_t gearoenix::core::bytes_count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:

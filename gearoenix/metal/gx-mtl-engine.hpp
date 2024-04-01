@@ -20,14 +20,14 @@ struct Engine final : public render::engine::Engine {
     GX_GET_UPTR_PRV(BufferManager, buffer_manager)
     GX_GET_UPTR_PRV(SubmissionManager, submission_manager)
 
-    Engine(platform::Application& platform_application) noexcept;
-    ~Engine() noexcept final;
-    void start_frame() noexcept final;
-    void end_frame() noexcept final;
-    void window_resized() noexcept final;
-    void upload_imgui_fonts() noexcept final;
-    [[nodiscard]] static bool is_supported() noexcept;
-    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application) noexcept;
+    Engine(platform::Application& platform_application);
+    ~Engine() final;
+    void start_frame() final;
+    void end_frame() final;
+    void window_resized() final;
+    void upload_imgui_fonts() final;
+    [[nodiscard]] static bool is_supported();
+    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
 };
 }
 

@@ -1,82 +1,118 @@
 #include "gx-gl-skybox.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../render/skybox/gx-rnd-sky-skybox.hpp"
+#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"
+#include <boost/mp11/algorithm.hpp>
+
+namespace {
+gearoenix::core::allocator::SharedArray<gearoenix::gl::Skybox, gearoenix::gl::Skybox::MAX_COUNT> allocator;
+
+template <typename T>
+constexpr size_t index_of_texture = boost::mp11::mp_find<gearoenix::render::skybox::Texture, std::shared_ptr<T>>::value;
+
+constexpr auto index_of_texture_2d = index_of_texture<gearoenix::render::texture::Texture2D>;
+constexpr auto index_of_texture_cube = index_of_texture<gearoenix::render::texture::TextureCube>;
+
+gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Texture& texture)
+{
+    switch (texture.index()) {
+    case index_of_texture_2d:
+        return std::dynamic_pointer_cast<gearoenix::gl::Texture2D>(std::get<index_of_texture_2d>(texture));
+    case index_of_texture_cube:
+        return std::dynamic_pointer_cast<gearoenix::gl::TextureCube>(std::get<index_of_texture_cube>(texture));
+    default:
+        GX_UNEXPECTED;
+    }
+}
+}
+
+const boost::container::flat_set<std::type_index>& gearoenix::gl::Skybox::get_all_the_hierarchy_types_except_component() const
+{
+    static const boost::container::flat_set types { create_type_index<render::skybox::Skybox>(), create_this_type_index(this) };
+    return types;
+}
 
 gearoenix::gl::Skybox::Skybox(
-    std::variant<std::shared_ptr<Texture2D>,
-        std::shared_ptr<TextureCube>>&& texture,
+    render::skybox::Texture&& texture,
     std::shared_ptr<Mesh>&& mesh,
-    std::string&& name) noexcept
-    : core::ecs::Component(this, std::move(name))
-    , texture(std::move(texture))
-    , mesh(std::move(mesh))
+    std::string&& name)
+    : render::skybox::Skybox(
+          create_this_type_index(this),
+          std::shared_ptr<render::mesh::Mesh>(mesh),
+          std::move(texture),
+          std::move(name))
+    , gl_texture(::convert(bound_texture))
+    , gl_mesh(std::move(mesh))
 {
 }
 
-gearoenix::gl::Skybox::~Skybox() noexcept = default;
+gearoenix::gl::Skybox::~Skybox() = default;
 
-gearoenix::gl::Skybox::Skybox(Skybox&&) noexcept = default;
-
-gearoenix::gl::uint gearoenix::gl::Skybox::get_vertex_object() const noexcept
+gearoenix::gl::uint gearoenix::gl::Skybox::get_vertex_object() const
 {
-    return mesh->vertex_object;
+    return gl_mesh->vertex_object;
 }
 
-gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const noexcept
+gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const
 {
-    return mesh->index_buffer;
+    return gl_mesh->index_buffer;
 }
 
-gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const noexcept
+gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const
 {
-    return texture.index() == 0 ? std::get<0>(texture)->get_object() : std::get<1>(texture)->get_object();
+    switch (gl_texture.index()) {
+    case index_of_texture_2d:
+        return std::get<index_of_texture_2d>(gl_texture)->get_object();
+    case index_of_texture_cube:
+        return std::get<index_of_texture_cube>(gl_texture)->get_object();
+    default:
+        GX_UNEXPECTED;
+    }
+}
+
+std::shared_ptr<gearoenix::gl::Skybox> gearoenix::gl::Skybox::construct(
+    render::skybox::Texture&& texture,
+    std::shared_ptr<render::mesh::Mesh>&& mesh,
+    std::string&& name)
+{
+    auto self = allocator.make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name));
+    self->set_component_self(self);
+    return self;
 }
 
 gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
     Engine& e,
-    const std::string& name,
-    std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>>&& bound_texture,
-    const core::sync::EndCaller& end_callback) noexcept
-    : render::skybox::Builder(
-        e,
-        name,
-        bound_texture.index() == 0 ? std::variant<std::shared_ptr<render::texture::Texture2D>, std::shared_ptr<render::texture::TextureCube>>(std::get<0>(bound_texture)) : std::variant<std::shared_ptr<render::texture::Texture2D>, std::shared_ptr<render::texture::TextureCube>>(std::get<1>(bound_texture)),
-        end_callback)
+    std::string&& name,
+    render::skybox::Texture&& bound_texture,
+    std::shared_ptr<render::mesh::Mesh>&& mesh,
+    core::job::EndCaller<>&& entity_end_callback)
+    : Builder(e, std::move(name), std::move(entity_end_callback))
 {
-    auto& builder = entity_builder->get_builder();
-    builder.set_name(name);
-    builder.add_component(Skybox(
+    entity_builder->get_builder().add_component(Skybox::construct(
         std::move(bound_texture),
-        std::dynamic_pointer_cast<Mesh>(builder.get_component<render::skybox::Skybox>()->get_bound_mesh()),
-        name + "-gl-skybox"));
+        std::move(mesh),
+        entity_builder->get_builder().get_name() + "-gl-skybox"));
 }
 
-gearoenix::gl::SkyboxBuilder::~SkyboxBuilder() noexcept = default;
+gearoenix::gl::SkyboxBuilder::~SkyboxBuilder() = default;
 
-gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e) noexcept
-    : render::skybox::Manager(e)
+gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e)
+    : Manager(e)
     , eng(e)
 {
-    core::ecs::Component::register_type<Skybox>();
 }
 
-gearoenix::gl::SkyboxManager::~SkyboxManager() noexcept = default;
+gearoenix::gl::SkyboxManager::~SkyboxManager() = default;
 
 std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::gl::SkyboxManager::build(
-    std::string&& name, Texture&& bound_texture, const core::sync::EndCaller& c) noexcept
+    std::string&& name,
+    render::skybox::Texture&& bound_texture,
+    std::shared_ptr<render::mesh::Mesh>&& mesh,
+    core::job::EndCaller<>&& entity_end_callback)
 {
-    std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
-    if (bound_texture.index() == 0)
-        texture = std::dynamic_pointer_cast<Texture2D>(std::get<0>(bound_texture));
-    else if (bound_texture.index() == 1)
-        texture = std::dynamic_pointer_cast<TextureCube>(std::get<1>(bound_texture));
-    else
-        GX_UNEXPECTED;
-    return std::make_shared<SkyboxBuilder>(eng, std::move(name), std::move(texture), c);
+    return std::make_shared<SkyboxBuilder>(eng, std::move(name), std::move(bound_texture), std::move(mesh), std::move(entity_end_callback));
 }
 
 #endif

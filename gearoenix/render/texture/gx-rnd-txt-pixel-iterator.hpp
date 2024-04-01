@@ -1,7 +1,5 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_PIXEL_ITERATOR_HPP
 #define GEAROENIX_RENDER_TEXTURE_PIXEL_ITERATOR_HPP
-#include <cstdint>
-#include <vector>
 
 namespace gearoenix::render::texture {
 template <typename Element>
@@ -13,9 +11,9 @@ struct Pixel {
         using reference = const Element&;
         using iterator_category = std::random_access_iterator_tag;
 
-        constexpr ConstIterator() noexcept { }
+        constexpr ConstIterator() = default;
 
-        constexpr ConstIterator(const Element* data, std::size_t components_count, std::size_t pixel_counts) noexcept
+        constexpr ConstIterator(const Element* data, const std::size_t components_count, const std::size_t pixel_counts)
             : data(data)
             , pixels_count(pixel_counts)
             , elements_count(components_count * pixel_counts)
@@ -25,7 +23,7 @@ struct Pixel {
         {
         }
 
-        constexpr ConstIterator(const Element* data, std::size_t components_count, std::size_t pixel_counts, std::size_t elements_count) noexcept
+        constexpr ConstIterator(const Element* data, const std::size_t components_count, const std::size_t pixel_counts, const std::size_t elements_count)
             : data(data)
             , pixels_count(pixel_counts)
             , elements_count(elements_count)
@@ -35,9 +33,9 @@ struct Pixel {
         {
         }
 
-        constexpr ConstIterator(const ConstIterator& o) noexcept = default;
+        constexpr ConstIterator(const ConstIterator& o) = default;
 
-        constexpr ConstIterator& operator++() noexcept
+        constexpr ConstIterator& operator++()
         {
             current_ptr += pixel_size;
             ++pixel_index;
@@ -49,7 +47,7 @@ struct Pixel {
         }
 
         template <typename I>
-        constexpr void operator+=(const I i) noexcept
+        constexpr void operator+=(const I i)
         {
             current_ptr += pixel_size * static_cast<std::size_t>(i);
             pixel_index += static_cast<std::size_t>(i);
@@ -60,70 +58,70 @@ struct Pixel {
         }
 
         template <typename I>
-        constexpr ConstIterator operator+(const I i) const noexcept
+        constexpr ConstIterator operator+(const I i) const
         {
             ConstIterator o(*this);
             o += i;
             return o;
         }
 
-        [[nodiscard]] constexpr difference_type operator-(const ConstIterator& o) const noexcept
+        [[nodiscard]] constexpr difference_type operator-(const ConstIterator& o) const
         {
             return pixel_index - o.pixel_index;
         }
 
         template <typename I>
-        constexpr const Element& operator[](const I i) const noexcept
+        constexpr const Element& operator[](const I i) const
         {
             return reinterpret_cast<const Element*>(current_ptr)[i];
         }
 
-        [[nodiscard]] constexpr reference operator*() noexcept
+        [[nodiscard]] constexpr reference operator*()
         {
             return *reinterpret_cast<const Element*>(current_ptr);
         }
 
-        [[nodiscard]] constexpr pointer operator->() noexcept
+        [[nodiscard]] constexpr pointer operator->()
         {
             return reinterpret_cast<const Element*>(current_ptr);
         }
 
-        [[nodiscard]] constexpr bool operator==(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator==(const ConstIterator& rhs) const
         {
             return current_ptr == rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr bool operator!=(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator!=(const ConstIterator& rhs) const
         {
             return current_ptr != rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr bool operator<(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator<(const ConstIterator& rhs) const
         {
             return current_ptr < rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr bool operator<=(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator<=(const ConstIterator& rhs) const
         {
             return current_ptr <= rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr bool operator>(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator>(const ConstIterator& rhs) const
         {
             return current_ptr > rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr bool operator>=(const ConstIterator& rhs) const noexcept
+        [[nodiscard]] constexpr bool operator>=(const ConstIterator& rhs) const
         {
             return current_ptr > rhs.current_ptr;
         }
 
-        [[nodiscard]] constexpr std::size_t get_pixel_index() const noexcept
+        [[nodiscard]] constexpr std::size_t get_pixel_index() const
         {
             return pixel_index;
         }
 
-        [[nodiscard]] constexpr const Element* get_data() const noexcept
+        [[nodiscard]] constexpr const Element* get_data() const
         {
             return data;
         }

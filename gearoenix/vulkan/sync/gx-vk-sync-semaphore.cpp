@@ -6,14 +6,14 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::sync::Semaphore::Semaphore(Semaphore&& o) noexcept
+gearoenix::vulkan::sync::Semaphore::Semaphore(Semaphore&& o)
     : logical_device(o.logical_device)
     , vulkan_data(o.vulkan_data)
 {
     o.vulkan_data = nullptr;
 }
 
-gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcept
+gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld)
     : logical_device(ld)
 {
     VkSemaphoreCreateInfo info;
@@ -22,7 +22,7 @@ gearoenix::vulkan::sync::Semaphore::Semaphore(const device::Logical& ld) noexcep
     GX_VK_CHK(vkCreateSemaphore(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept
+gearoenix::vulkan::sync::Semaphore::~Semaphore()
 {
     if (nullptr != vulkan_data) {
         vkDestroySemaphore(logical_device.get_vulkan_data(), vulkan_data, nullptr);
@@ -30,13 +30,13 @@ gearoenix::vulkan::sync::Semaphore::~Semaphore() noexcept
     }
 }
 
-const VkSemaphore* gearoenix::vulkan::sync::Semaphore::get_vulkan_data_ptr() const noexcept
+const VkSemaphore* gearoenix::vulkan::sync::Semaphore::get_vulkan_data_ptr() const
 {
     return &vulkan_data;
 }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> gearoenix::vulkan::sync::Semaphore::create_frame_based(
-    const engine::Engine& e) noexcept
+    const engine::Engine& e)
 {
     std::vector<std::shared_ptr<Semaphore>> result(e.get_swapchain().get_image_views().size());
     for (auto& s : result)

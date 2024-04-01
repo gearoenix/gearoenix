@@ -7,7 +7,7 @@ void gearoenix::vulkan::mark(
     const std::string& n,
     const std::uint64_t o,
     const VkDebugReportObjectTypeEXT t,
-    const device::Logical& d) noexcept
+    const device::Logical& d)
 {
     if (nullptr == vkDebugMarkerSetObjectNameEXT)
         return;

@@ -61,7 +61,7 @@ void main() {\n\
     frag_out = vec4(irradiance, 1.0);\n\
 }\n";
 
-gearoenix::gl::shader::Irradiance::Irradiance(Engine& e) noexcept
+gearoenix::gl::shader::Irradiance::Irradiance(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -72,9 +72,9 @@ gearoenix::gl::shader::Irradiance::Irradiance(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(environment);
 }
 
-gearoenix::gl::shader::Irradiance::~Irradiance() noexcept = default;
+gearoenix::gl::shader::Irradiance::~Irradiance() = default;
 
-void gearoenix::gl::shader::Irradiance::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::Irradiance::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

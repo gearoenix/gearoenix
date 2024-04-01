@@ -7,7 +7,7 @@
 #include "gx-d3d-adapter.hpp"
 #include "gx-d3d-check.hpp"
 
-gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter) noexcept
+gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter)
     : adapter(std::move(_adapter))
 {
     if (FAILED(D3D12CreateDevice(

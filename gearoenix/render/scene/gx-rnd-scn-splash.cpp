@@ -34,7 +34,7 @@ constexpr double wing_angle_start = -0.4;
 constexpr double wing_angle_end = 0.2;
 constexpr double wing_rotate_dis = wing_angle_end - wing_angle_start;
 
-double gearoenix::render::scene::Splash::calculate_scale() const noexcept
+double gearoenix::render::scene::Splash::calculate_scale() const
 {
     auto& win_sz = e.get_platform_application().get_base().get_window_size();
     const auto win_ar = static_cast<double>(win_sz.x) / static_cast<double>(win_sz.y);
@@ -47,12 +47,16 @@ double gearoenix::render::scene::Splash::calculate_scale() const noexcept
 
 gearoenix::render::scene::Splash::Splash(
     engine::Engine& e,
-    const core::sync::EndCaller& start_callback,
-    const core::sync::EndCaller& end_callback) noexcept
+    const core::job::EndCaller<>& end_callback)
     : e(e)
     , end_callback(end_callback)
+    , current_scale(calculate_scale() * whole_scale_start)
+    , wings_current_angle(wing_angle_start)
 {
+}
 
+void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& start_callback)
+{
     std::vector<gearoenix::render::PbrVertex> plane_vertices(4);
     plane_vertices[0].position = { 1.0f, 1.0f, 0.0f };
     plane_vertices[0].uv = { 1.0f, 0.0f };
@@ -80,154 +84,260 @@ gearoenix::render::scene::Splash::Splash(
     auto left_wing_indices = plane_indices;
     auto right_wing_indices = plane_indices;
 
-    auto scene_callback = gearoenix::core::sync::EndCaller([this, end = start_callback]() noexcept -> void {
-        this->e.get_world()->get_component<Scene>(scene_id)->enabled = true;
+    auto entity_callback = core::job::EndCaller([this, end = start_callback]() -> void {
+        this->e.get_world()->get_component<Scene>(scene_id)->set_enabled(true);
     });
 
-    const auto scene_builder = e.get_scene_manager()->build(
-        "gearoenix-splash-scene", 0.0, core::sync::EndCaller(scene_callback));
+    auto scene_builder = e.get_scene_manager()->build(
+        "gearoenix-splash-scene", 0.0, core::job::EndCaller(entity_callback));
     scene_id = scene_builder->get_entity_builder()->get_builder().get_id();
 
-    auto plane_mesh = e.get_mesh_manager()->build(
+    {
+        auto camera_builder = e.get_camera_manager()->build(
+            "gearoenix-splash-camera", core::job::EndCaller(entity_callback));
+        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
+        auto& camera = camera_builder->get_camera();
+        camera.set_projection_data(camera::OrthographicProjectionData { .scale = 1.0 });
+        camera.disable_bloom();
+        camera.get_colour_tuning() = camera::RawColour {};
+        scene_builder->add(std::move(camera_builder));
+    }
+
+    struct Values {
+        engine::Engine& e;
+        std::shared_ptr<scene::Builder> scene_builder;
+        core::job::EndCaller<> entity_callback;
+        std::shared_ptr<Splash> splash;
+
+        std::shared_ptr<mesh::Mesh> plane_mesh;
+        std::shared_ptr<mesh::Mesh> plate_mesh;
+        std::shared_ptr<mesh::Mesh> left_wing_mesh;
+        std::shared_ptr<mesh::Mesh> right_wing_mesh;
+        std::shared_ptr<material::Unlit> bg_mat;
+        std::shared_ptr<material::Unlit> gear_mat;
+        std::shared_ptr<material::Unlit> glare_mat;
+        std::shared_ptr<material::Unlit> wing_mat;
+        std::shared_ptr<material::Unlit> text_mat;
+        std::shared_ptr<texture::Texture2D> gear_txt;
+        std::shared_ptr<texture::Texture2D> glare_txt;
+        std::shared_ptr<texture::Texture2D> wing_txt;
+        std::shared_ptr<texture::Texture2D> text_txt;
+        double text_width = 0.0, text_height = 0.0;
+
+        Values(
+            engine::Engine& e,
+            std::shared_ptr<Splash>&& splash,
+            std::shared_ptr<scene::Builder>&& scene_builder,
+            core::job::EndCaller<>&& entity_callback)
+            : e(e)
+            , scene_builder(std::move(scene_builder))
+            , entity_callback(std::move(entity_callback))
+            , splash(std::move(splash))
+        {
+        }
+
+        ~Values()
+        {
+            {
+                auto bg_model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-bg",
+                    std::shared_ptr(plane_mesh),
+                    std::move(bg_mat),
+                    core::job::EndCaller(entity_callback),
+                    true);
+                bg_model_builder->get_transformation().local_scale(100.0);
+                scene_builder->add(std::move(bg_model_builder));
+            }
+
+            {
+                gear_mat->set_transparency(material::Transparency::Transparent);
+                gear_mat->set_albedo(std::move(gear_txt));
+                auto gear_model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-gear",
+                    std::shared_ptr(plane_mesh),
+                    std::move(gear_mat),
+                    core::job::EndCaller(entity_callback),
+                    true);
+                gear_model_builder->get_transformation().local_scale(splash->current_scale * gear_base_scale);
+                gear_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.3f });
+                splash->gear_id = gear_model_builder->get_entity_builder()->get_builder().get_id();
+                scene_builder->add(std::move(gear_model_builder));
+            }
+
+            {
+                glare_mat->set_transparency(material::Transparency::Transparent);
+                glare_mat->set_albedo(std::move(glare_txt));
+                auto glare_model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-glare",
+                    std::shared_ptr(plane_mesh),
+                    std::move(glare_mat),
+                    core::job::EndCaller(entity_callback),
+                    true);
+                glare_model_builder->get_transformation().local_scale(splash->current_scale * glare_base_scale);
+                glare_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.2f });
+                splash->glare_id = glare_model_builder->get_entity_builder()->get_builder().get_id();
+                scene_builder->add(std::move(glare_model_builder));
+            }
+
+            wing_mat->set_transparency(material::Transparency::Transparent);
+            wing_mat->set_albedo(std::move(wing_txt));
+
+            {
+                auto wing_model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-left-wing",
+                    std::move(left_wing_mesh),
+                    std::shared_ptr(wing_mat),
+                    core::job::EndCaller(entity_callback),
+                    true);
+                wing_model_builder->get_transformation().local_scale(splash->current_scale * wings_base_scale);
+                wing_model_builder->get_transformation().local_translate({ 0.0, 0.0, 0.1 });
+                wing_model_builder->get_transformation().local_z_rotate(-wing_angle_start);
+                splash->left_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
+                scene_builder->add(std::move(wing_model_builder));
+            }
+
+            {
+                auto wing_model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-right-wing",
+                    std::move(right_wing_mesh),
+                    std::move(wing_mat),
+                    core::job::EndCaller(entity_callback),
+                    true);
+                wing_model_builder->get_transformation().local_scale(splash->current_scale * wings_base_scale);
+                wing_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.1f });
+                wing_model_builder->get_transformation().local_z_rotate(wing_angle_start);
+                splash->right_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
+                scene_builder->add(std::move(wing_model_builder));
+            }
+
+            {
+                text_mat->set_transparency(material::Transparency::Transparent);
+                text_mat->get_albedo_factor() = { 0.4f, 0.0f, 0.0f, 0.0f };
+                math::Vec3<double> scale(splash->current_scale * gearoenix_text_base_scale);
+                scale.x *= text_width / text_height;
+                text_mat->set_albedo(std::move(text_txt));
+                auto model_builder = e.get_model_manager()->build(
+                    "gearoenix-splash-text",
+                    std::move(plate_mesh),
+                    std::move(text_mat),
+                    std::move(entity_callback),
+                    true);
+                auto& trn = model_builder->get_transformation();
+                trn.local_scale(scale);
+                trn.local_translate({ 0.0f, -0.25f, 0.5f });
+                splash->gearoenix_text = model_builder->get_id();
+                scene_builder->add(std::move(model_builder));
+            }
+        }
+    };
+
+    auto values = std::make_shared<Values>(e, weak_self.lock(), std::move(scene_builder), std::move(entity_callback));
+
+    const auto font = e.get_font_manager()->get("Roboto-Bold");
+
+    e.get_mesh_manager()->build(
         "gearoenix-splash-plane",
         std::move(plane_vertices),
         std::move(plane_indices),
-        scene_callback);
-    auto left_wing_mesh = e.get_mesh_manager()->build(
+        core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) {
+            values->plane_mesh = std::move(m);
+        }));
+
+    e.get_mesh_manager()->build(
         "gearoenix-splash-left-wing",
         std::move(left_wing_vertices),
         std::move(left_wing_indices),
-        scene_callback);
-    auto right_wing_mesh = e.get_mesh_manager()->build(
+        core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) {
+            values->left_wing_mesh = std::move(m);
+        }));
+
+    e.get_mesh_manager()->build(
         "gearoenix-splash-right-wing",
         std::move(right_wing_vertices),
         std::move(right_wing_indices),
-        scene_callback);
-    {
-        auto bg_mat = e.get_material_manager()->get_unlit("gearoenix-splash-bg", scene_callback);
-        auto bg_model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-bg",
-            std::shared_ptr(plane_mesh),
-            std::move(bg_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        bg_model_builder->get_transformation().local_scale(100.0);
-        scene_builder->add(std::move(bg_model_builder));
-    }
-    current_scale = calculate_scale() * whole_scale_start;
-    {
-        auto gear_mat = e.get_material_manager()->get_unlit("gearoenix-splash-gear", scene_callback);
-        gear_mat->set_transparency(material::Transparency::Transparent);
-        gear_mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
-            "gearoenix-splash-gear",
-            gearoenix::platform::stream::Path::create_asset("gearoenix-splash/gear.png"),
-            gearoenix::render::texture::TextureInfo(),
-            scene_callback));
-        auto gear_model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-gear",
-            std::shared_ptr(plane_mesh),
-            std::move(gear_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        gear_model_builder->get_transformation().local_scale(current_scale * gear_base_scale);
-        gear_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.3f });
-        gear_id = gear_model_builder->get_entity_builder()->get_builder().get_id();
-        scene_builder->add(std::move(gear_model_builder));
-    }
+        core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) {
+            values->right_wing_mesh = std::move(m);
+        }));
 
-    {
-        auto glare_mat = e.get_material_manager()->get_unlit("gearoenix-splash-glare", scene_callback);
-        glare_mat->set_transparency(material::Transparency::Transparent);
-        glare_mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
-            "gearoenix-splash-glare",
-            gearoenix::platform::stream::Path::create_asset("gearoenix-splash/glare.png"),
-            gearoenix::render::texture::TextureInfo(),
-            scene_callback));
-        auto glare_model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-glare",
-            std::shared_ptr(plane_mesh),
-            std::move(glare_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        glare_model_builder->get_transformation().local_scale(current_scale * glare_base_scale);
-        glare_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.2f });
-        glare_id = glare_model_builder->get_entity_builder()->get_builder().get_id();
-        scene_builder->add(std::move(glare_model_builder));
-    }
+    e.get_mesh_manager()->build_plate(
+        core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) {
+            values->plate_mesh = std::move(m);
+        }));
 
-    auto wing_mat = e.get_material_manager()->get_unlit("gearoenix-splash-wing", scene_callback);
-    wing_mat->set_transparency(material::Transparency::Transparent);
-    wing_mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
+    e.get_material_manager()->get_unlit(
+        "gearoenix-splash-bg",
+        core::job::EndCallerShared<material::Unlit>([values](std::shared_ptr<material::Unlit>&& m) {
+            values->bg_mat = std::move(m);
+        }));
+
+    e.get_material_manager()->get_unlit(
+        "gearoenix-splash-gear",
+        core::job::EndCallerShared<material::Unlit>([values](std::shared_ptr<material::Unlit>&& m) {
+            values->gear_mat = std::move(m);
+        }));
+
+    e.get_material_manager()->get_unlit(
+        "gearoenix-splash-glare",
+        core::job::EndCallerShared<material::Unlit>([values](std::shared_ptr<material::Unlit>&& m) {
+            values->glare_mat = std::move(m);
+        }));
+
+    e.get_material_manager()->get_unlit(
+        "gearoenix-splash-wing",
+        core::job::EndCallerShared<material::Unlit>([values](std::shared_ptr<material::Unlit>&& m) {
+            values->wing_mat = std::move(m);
+        }));
+
+    e.get_material_manager()->get_unlit(
+        "gearoenix-splash-text",
+        core::job::EndCallerShared<material::Unlit>([values](std::shared_ptr<material::Unlit>&& m) {
+            values->text_mat = std::move(m);
+        }));
+
+    e.get_texture_manager()->create_2d_from_file(
+        "gearoenix-splash-gear",
+        platform::stream::Path::create_asset("gearoenix-splash/gear.png"),
+        texture::TextureInfo {},
+        core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
+            values->gear_txt = std::move(t);
+        }));
+
+    e.get_texture_manager()->create_2d_from_file(
+        "gearoenix-splash-glare",
+        platform::stream::Path::create_asset("gearoenix-splash/glare.png"),
+        texture::TextureInfo(),
+        core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
+            values->glare_txt = std::move(t);
+        }));
+
+    e.get_texture_manager()->create_2d_from_file(
         "gearoenix-splash-wing",
         gearoenix::platform::stream::Path::create_asset("gearoenix-splash/wing.png"),
         gearoenix::render::texture::TextureInfo(),
-        scene_callback));
+        core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
+            values->wing_txt = std::move(t);
+        }));
 
-    wings_current_angle = wing_angle_start;
-    {
-        auto wing_model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-left-wing",
-            std::move(left_wing_mesh),
-            std::shared_ptr(wing_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        wing_model_builder->get_transformation().local_scale(current_scale * wings_base_scale);
-        wing_model_builder->get_transformation().local_translate({ 0.0, 0.0, 0.1 });
-        wing_model_builder->get_transformation().local_z_rotate(-wing_angle_start);
-        left_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
-        scene_builder->add(std::move(wing_model_builder));
-    }
-
-    {
-        auto wing_model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-right-wing",
-            std::move(right_wing_mesh),
-            std::move(wing_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        wing_model_builder->get_transformation().local_scale(current_scale * wings_base_scale);
-        wing_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.1f });
-        wing_model_builder->get_transformation().local_z_rotate(wing_angle_start);
-        right_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
-        scene_builder->add(std::move(wing_model_builder));
-    }
-
-    {
-        auto text_mat = e.get_material_manager()->get_unlit("gearoenix-splash-text", scene_callback);
-        text_mat->set_transparency(material::Transparency::Transparent);
-        text_mat->get_albedo_factor() = { 0.4f, 0.0f, 0.0f, 0.0f };
-        const auto font = e.get_font_manager()->get("Roboto-Bold");
-        const auto text_height = e.get_platform_application().get_base().get_screen_size().y * 0.0001;
-        double text_width = 0.0;
-        const auto text_texture = font->bake(
-            L"Gearoenix", math::Vec4(1.0), text_height, text_width, scene_callback);
-        math::Vec3<double> scale(current_scale * gearoenix_text_base_scale);
-        scale.x *= text_width / text_height;
-        text_mat->set_albedo(text_texture);
-        auto model_builder = e.get_model_manager()->build(
-            "gearoenix-splash-text",
-            e.get_mesh_manager()->build_plate(scene_callback),
-            std::move(text_mat),
-            core::sync::EndCaller(scene_callback),
-            true);
-        auto& trn = model_builder->get_transformation();
-        trn.local_scale(scale);
-        trn.local_translate({ 0.0f, -0.25f, 0.5f });
-        gearoenix_text = model_builder->get_id();
-        scene_builder->add(std::move(model_builder));
-    }
-
-    auto camera_builder = e.get_camera_manager()->build(
-        "gearoenix-splash-camera", core::sync::EndCaller(scene_callback));
-    camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-    auto& camera = camera_builder->get_camera();
-    camera.set_projection_type(camera::Projection::Orthographic);
-    camera_builder->disable_bloom();
-    camera.get_colour_tuning() = camera::RawColour {};
-    scene_builder->add(std::move(camera_builder));
+    values->text_height = e.get_platform_application().get_base().get_screen_size().y * 0.0001;
+    font->bake(
+        L"Gearoenix", math::Vec4(1.0), values->text_height, values->text_width,
+        core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
+            values->text_txt = std::move(t);
+        }));
 }
 
-void gearoenix::render::scene::Splash::update() noexcept
+std::shared_ptr<gearoenix::render::scene::Splash> gearoenix::render::scene::Splash::construct(
+    engine::Engine& e,
+    const core::job::EndCaller<>& start_callback,
+    const core::job::EndCaller<>& end_callback)
+{
+    std::shared_ptr<Splash> result(new Splash(e, end_callback));
+    result->weak_self = result;
+    result->initialise(start_callback);
+    return result;
+}
+
+void gearoenix::render::scene::Splash::update()
 {
     auto* const gear_tran = e.get_world()->get_component<physics::Transformation>(gear_id);
     if (gear_tran == nullptr)
@@ -292,7 +402,7 @@ void gearoenix::render::scene::Splash::update() noexcept
     wings_current_angle = new_wing_angle;
 }
 
-void gearoenix::render::scene::Splash::hide() noexcept
+void gearoenix::render::scene::Splash::hide()
 {
-    e.get_world()->get_component<scene::Scene>(scene_id)->enabled = false;
+    e.get_world()->get_component<scene::Scene>(scene_id)->set_enabled(false);
 }

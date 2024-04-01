@@ -1,7 +1,7 @@
 #include "gx-vk-check.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 
-const char* gearoenix::vulkan::result_to_string(const VkResult res) noexcept
+const char* gearoenix::vulkan::result_to_string(const VkResult res)
 {
     switch (res) {
     case VK_SUCCESS:

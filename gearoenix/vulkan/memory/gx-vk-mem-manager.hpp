@@ -27,9 +27,9 @@ public:
     Manager(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
-    explicit Manager(const engine::Engine& e) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place) noexcept;
+    explicit Manager(const engine::Engine& e);
+    ~Manager();
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place);
 };
 }
 #endif

@@ -9,7 +9,7 @@
 gearoenix::d3d::CpuBuffer::CpuBuffer(
     ID3D12Device* const device,
     const UINT buffer_size,
-    [[maybe_unused]] LPCWSTR resource_name) noexcept
+    [[maybe_unused]] LPCWSTR resource_name)
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);
@@ -21,13 +21,13 @@ gearoenix::d3d::CpuBuffer::CpuBuffer(
     GX_D3D_CHECK(resource->Map(0, &r, &pointer));
 }
 
-gearoenix::d3d::CpuBuffer::~CpuBuffer() noexcept
+gearoenix::d3d::CpuBuffer::~CpuBuffer()
 {
     if (nullptr != resource)
         resource->Unmap(0, nullptr);
 }
 
-gearoenix::d3d::CpuBuffer::CpuBuffer(CpuBuffer&& o) noexcept
+gearoenix::d3d::CpuBuffer::CpuBuffer(CpuBuffer&& o)
     : resource(std::move(o.resource))
     , pointer(o.pointer)
 {
@@ -35,7 +35,7 @@ gearoenix::d3d::CpuBuffer::CpuBuffer(CpuBuffer&& o) noexcept
     o.pointer = nullptr;
 }
 
-void gearoenix::d3d::CpuBuffer::copy(const void* data, std::size_t size) noexcept
+void gearoenix::d3d::CpuBuffer::copy(const void* data, std::size_t size)
 {
     std::memcpy(pointer, data, size);
 }
@@ -43,7 +43,7 @@ void gearoenix::d3d::CpuBuffer::copy(const void* data, std::size_t size) noexcep
 gearoenix::d3d::GpuBuffer::GpuBuffer(
     ID3D12Device* const device,
     const UINT buffer_size,
-    [[maybe_unused]] LPCWSTR resource_name) noexcept
+    [[maybe_unused]] LPCWSTR resource_name)
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);
@@ -51,7 +51,7 @@ gearoenix::d3d::GpuBuffer::GpuBuffer(
     resource->SetName(resource_name);
 }
 
-gearoenix::d3d::UniformBuffer::UniformBuffer(const Engine& e, const UINT buffer_size, LPCWSTR resource_name) noexcept
+gearoenix::d3d::UniformBuffer::UniformBuffer(const Engine& e, const UINT buffer_size, LPCWSTR resource_name)
     : buffer(e.get_device()->get_device().Get(), math::Numeric::align(buffer_size, 256U), resource_name)
     , descriptor(e.get_descriptor_manager()->allocate_others())
 {
@@ -62,7 +62,7 @@ gearoenix::d3d::UniformBuffer::UniformBuffer(const Engine& e, const UINT buffer_
     e.get_device()->get_device()->CreateConstantBufferView(&desc, descriptor.cpu_handle);
 }
 
-gearoenix::d3d::UniformBuffer::UniformBuffer(UniformBuffer&& o) noexcept
+gearoenix::d3d::UniformBuffer::UniformBuffer(UniformBuffer&& o)
     : buffer(std::move(o.buffer))
     , descriptor(std::move(o.descriptor))
 {

@@ -19,9 +19,9 @@ struct Model final : public core::ecs::Component {
         Engine& e,
         std::shared_ptr<Mesh>&& bound_mesh,
         UINT buffer_size,
-        const std::string& name) noexcept;
-    ~Model() noexcept final;
-    Model(Model&&) noexcept;
+        const std::string& name);
+    ~Model() final;
+    Model(Model&&);
 };
 
 struct ModelBuilder final : public render::model::Builder {
@@ -34,12 +34,12 @@ private:
         Engine& e,
         const std::string& name,
         std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
-        bool is_transformable) noexcept;
+        bool is_transformable);
 
-    void set_material(const render::material::Pbr& material_type) noexcept final;
+    void set_material(const render::material::Pbr& material_type) final;
 
 public:
-    ~ModelBuilder() noexcept final;
+    ~ModelBuilder() final;
 };
 
 struct ModelManager final : public render::model::Manager {
@@ -47,12 +47,12 @@ private:
     [[nodiscard]] std::shared_ptr<render::model::Builder> build(
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
-        core::sync::EndCaller&& c,
-        bool is_transformable) noexcept final;
+        core::job::EndCaller&& c,
+        bool is_transformable) final;
 
 public:
-    explicit ModelManager(Engine& e) noexcept;
-    ~ModelManager() noexcept final;
+    explicit ModelManager(Engine& e);
+    ~ModelManager() final;
 };
 }
 

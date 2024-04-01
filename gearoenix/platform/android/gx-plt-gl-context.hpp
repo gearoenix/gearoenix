@@ -31,24 +31,24 @@ private:
     bool egl_context_initialized = false;
     bool context_valid = false;
 
-    void init_gles() noexcept;
-    void terminate() noexcept;
-    bool check_surface(EGLint opengl_version, EGLint depth_size, EGLint samples_size) noexcept;
-    void init_egl_display() noexcept;
-    void init_egl_surface() noexcept;
-    void init_egl_context() noexcept;
+    void init_gles();
+    void terminate();
+    bool check_surface(EGLint opengl_version, EGLint depth_size, EGLint samples_size);
+    void init_egl_display();
+    void init_egl_surface();
+    void init_egl_context();
 
 public:
-    GlContext() noexcept = default;
-    ~GlContext() noexcept;
+    GlContext() = default;
+    ~GlContext();
     GlContext(GlContext const&) = delete;
     void operator=(GlContext const&) = delete;
 
-    void init(ANativeWindow* window) noexcept;
-    [[nodiscard]] State swap() noexcept;
-    void invalidate() noexcept;
-    void suspend() noexcept;
-    void resume(ANativeWindow* window) noexcept;
+    void init(ANativeWindow* window);
+    [[nodiscard]] State swap();
+    void invalidate();
+    void suspend();
+    void resume(ANativeWindow* window);
 };
 }
 #endif

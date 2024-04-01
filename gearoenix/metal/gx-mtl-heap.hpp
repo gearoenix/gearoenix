@@ -9,8 +9,8 @@ struct Engine;
 struct HeapManager final {
     const id<MTLHeap> gpu;
 
-    HeapManager(Engine& e) noexcept;
-    ~HeapManager() noexcept;
+    HeapManager(Engine& e);
+    ~HeapManager();
 };
 }
 

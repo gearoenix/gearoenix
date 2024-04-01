@@ -2,25 +2,25 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-ev-listener.hpp"
 
-gearoenix::core::event::Engine::Engine() noexcept = default;
+gearoenix::core::event::Engine::Engine() = default;
 
-gearoenix::core::event::Engine::~Engine() noexcept
+gearoenix::core::event::Engine::~Engine()
 {
     if (!events_id_priority_listeners.empty())
         GX_UNEXPECTED;
 }
 
-void gearoenix::core::event::Engine::add_listener(const Id event_id, Listener* const listener, const double priority) noexcept
+void gearoenix::core::event::Engine::add_listener(const Id event_id, Listener* const listener, const double priority)
 {
     events_id_priority_listeners.emplace(event_id, priority, listener);
 }
 
-void gearoenix::core::event::Engine::remove_listener(const Id event_id, const double priority, Listener* const listener) noexcept
+void gearoenix::core::event::Engine::remove_listener(const Id event_id, const double priority, Listener* const listener)
 {
     events_id_priority_listeners.erase(std::make_tuple(event_id, priority, listener));
 }
 
-void gearoenix::core::event::Engine::remove_listener(const Id event_id, Listener* const listener) noexcept
+void gearoenix::core::event::Engine::remove_listener(const Id event_id, Listener* const listener)
 {
     auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_id, -std::numeric_limits<double>::max(), listener));
     while (events_id_priority_listeners.end() != search && std::get<0>(*search) == event_id) {
@@ -32,7 +32,7 @@ void gearoenix::core::event::Engine::remove_listener(const Id event_id, Listener
     }
 }
 
-void gearoenix::core::event::Engine::remove_listener(Listener* const listener) noexcept
+void gearoenix::core::event::Engine::remove_listener(Listener* const listener)
 {
     auto search = events_id_priority_listeners.begin();
     while (search != events_id_priority_listeners.end()) {
@@ -44,7 +44,7 @@ void gearoenix::core::event::Engine::remove_listener(Listener* const listener) n
     }
 }
 
-void gearoenix::core::event::Engine::broadcast(const Data& event_data) noexcept
+void gearoenix::core::event::Engine::broadcast(const Data& event_data)
 {
     bool keep_continuing = true;
     for (

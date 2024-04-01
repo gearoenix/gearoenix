@@ -17,7 +17,7 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
     const std::size_t aspect,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
     : render::texture::TextureCube(id, std::move(name), info.format, info.sampler_info, eng)
     , view(new image::View(std::make_shared<image::Image>(
           static_cast<std::uint32_t>(aspect), static_cast<std::uint32_t>(aspect), 1u,
@@ -41,11 +41,11 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(
     eng->get_image_manager()->upload(view->get_image(), std::move(buff), call);
 }
 
-gearoenix::vulkan::texture::TextureCube::~TextureCube() noexcept = default;
+gearoenix::vulkan::texture::TextureCube::~TextureCube() = default;
 
 void gearoenix::vulkan::texture::TextureCube::write_gx3d(
     const std::shared_ptr<platform::stream::Stream>&,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>&)
 {
     GX_UNIMPLEMENTED
 }

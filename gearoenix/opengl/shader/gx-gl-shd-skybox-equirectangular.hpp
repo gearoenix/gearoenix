@@ -10,9 +10,9 @@ struct SkyboxEquirectangular final : public Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    explicit SkyboxEquirectangular(Engine& e) noexcept;
-    ~SkyboxEquirectangular() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit SkyboxEquirectangular(Engine& e);
+    ~SkyboxEquirectangular() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

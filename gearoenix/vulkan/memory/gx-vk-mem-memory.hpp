@@ -34,17 +34,17 @@ private:
         void* data,
         Place place,
         std::uint32_t type_index,
-        VkDeviceMemory vulkan_data) noexcept;
+        VkDeviceMemory vulkan_data);
 
 public:
     Memory(Memory&&) = delete;
     Memory(const Memory&) = delete;
     Memory& operator=(Memory&&) = delete;
     Memory& operator=(const Memory&) = delete;
-    [[nodiscard]] static std::size_t align(const engine::Engine&, std::size_t) noexcept;
-    [[nodiscard]] static std::shared_ptr<Memory> construct(const engine::Engine&, Place, std::uint32_t type_index) noexcept;
-    ~Memory() noexcept;
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size) noexcept;
+    [[nodiscard]] static std::size_t align(const engine::Engine&, std::size_t);
+    [[nodiscard]] static std::shared_ptr<Memory> construct(const engine::Engine&, Place, std::uint32_t type_index);
+    ~Memory();
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size);
 };
 }
 #endif

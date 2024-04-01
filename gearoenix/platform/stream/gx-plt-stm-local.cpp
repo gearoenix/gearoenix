@@ -8,7 +8,7 @@
 #endif
 
 namespace {
-std::string create_path(const gearoenix::platform::Application& app, const std::string& name) noexcept
+std::string create_path(const gearoenix::platform::Application& app, const std::string& name)
 {
 #ifdef GX_PLATFORM_IOS
     (void)app;
@@ -25,18 +25,18 @@ std::string create_path(const gearoenix::platform::Application& app, const std::
 #endif
 }
 
-std::ios::openmode create_open_mode(const bool writable) noexcept
+std::ios::openmode create_open_mode(const bool writable)
 {
     return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
 }
 }
 
-gearoenix::platform::stream::Local::Local(std::fstream file) noexcept
+gearoenix::platform::stream::Local::Local(std::fstream file)
     : file(std::move(file))
 {
 }
 
-gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable) noexcept
+gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable)
     : file(create_path(app, name), create_open_mode(writable))
 {
     if ((!file.is_open() || !file.good()) && writable) {
@@ -47,9 +47,9 @@ gearoenix::platform::stream::Local::Local(const Application& app, const std::str
     }
 }
 
-gearoenix::platform::stream::Local::~Local() noexcept = default;
+gearoenix::platform::stream::Local::~Local() = default;
 
-gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable) noexcept
+gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable)
 {
     std::fstream file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in);
     if (!file.is_open() || !file.good())
@@ -57,7 +57,7 @@ gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(con
     return new Local(std::move(file));
 }
 
-std::size_t gearoenix::platform::stream::Local::read(void* const data, const std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Local::read(void* const data, const std::size_t length)
 {
     file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(length));
     const auto result = (std::size_t)file.gcount();
@@ -69,7 +69,7 @@ std::size_t gearoenix::platform::stream::Local::read(void* const data, const std
     return result;
 }
 
-std::size_t gearoenix::platform::stream::Local::write(const void* const data, const std::size_t length) noexcept
+std::size_t gearoenix::platform::stream::Local::write(const void* const data, const std::size_t length)
 {
     const std::size_t before = (std::size_t)file.tellp();
     file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(length));
@@ -82,24 +82,24 @@ std::size_t gearoenix::platform::stream::Local::write(const void* const data, co
     return result;
 }
 
-void gearoenix::platform::stream::Local::seek(std::size_t offset) noexcept
+void gearoenix::platform::stream::Local::seek(std::size_t offset)
 {
     file.seekg(static_cast<std::streamoff>(offset));
     file.seekp(static_cast<std::streamoff>(offset));
 }
 
-std::size_t gearoenix::platform::stream::Local::tell() noexcept
+std::size_t gearoenix::platform::stream::Local::tell()
 {
     return static_cast<std::size_t>(file.tellg());
 }
 
-bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name) noexcept
+bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name)
 {
     const std::ifstream f(create_path(app, name));
     return f.is_open() && f.good();
 }
 
-std::size_t gearoenix::platform::stream::Local::size() noexcept
+std::size_t gearoenix::platform::stream::Local::size()
 {
     const auto o = file.tellg();
     file.seekg(0, std::ios::end);
@@ -108,7 +108,7 @@ std::size_t gearoenix::platform::stream::Local::size() noexcept
     return static_cast<std::size_t>(s);
 }
 
-void gearoenix::platform::stream::Local::flush() noexcept
+void gearoenix::platform::stream::Local::flush()
 {
     file.flush();
 }

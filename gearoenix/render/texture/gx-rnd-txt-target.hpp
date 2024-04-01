@@ -3,7 +3,6 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../math/gx-math-vector-2d.hpp"
 #include "gx-rnd-txt-attachment.hpp"
-#include "gx-rnd-txt-type.hpp"
 #include <vector>
 
 namespace gearoenix::render::engine {
@@ -14,13 +13,12 @@ namespace gearoenix::render::texture {
 struct Target {
     GX_GET_CREF_PRT(std::vector<Attachment>, attachments);
 
-protected:
-    explicit Target(std::vector<Attachment>&& attachments) noexcept;
+    explicit Target(std::vector<Attachment>&& attachments);
 
 public:
-    virtual ~Target() noexcept;
-    [[nodiscard]] math::Vec2<std::size_t> get_dimension() const noexcept;
-    [[nodiscard]] float get_aspect_ratio() const noexcept;
+    virtual ~Target();
+    [[nodiscard]] math::Vec2<std::size_t> get_dimension() const;
+    [[nodiscard]] float get_aspect_ratio() const;
 };
 }
 #endif

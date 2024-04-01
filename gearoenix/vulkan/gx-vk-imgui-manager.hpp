@@ -27,13 +27,13 @@ public:
     ImGuiManager& operator=(ImGuiManager&&) = delete;
     ImGuiManager& operator=(const ImGuiManager&&) = delete;
 
-    explicit ImGuiManager(engine::Engine& e) noexcept;
-    ~ImGuiManager() noexcept;
+    explicit ImGuiManager(engine::Engine& e);
+    ~ImGuiManager();
 
-    void upload_fonts() noexcept;
-    void start_frame() noexcept;
-    void end_frame() noexcept;
-    void update() noexcept;
+    void upload_fonts();
+    void start_frame();
+    void end_frame();
+    void update();
 };
 }
 

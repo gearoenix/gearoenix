@@ -16,10 +16,10 @@ private:
     std::stack<unsigned char*> free_pointers;
 
 public:
-    SameSizeBlock(std::size_t object_size, std::size_t objects_count_in_each_block) noexcept;
-    ~SameSizeBlock() noexcept;
-    [[nodiscard]] unsigned char* alloc() noexcept;
-    void free(unsigned char*) noexcept;
+    SameSizeBlock(std::size_t object_size, std::size_t objects_count_in_each_block);
+    ~SameSizeBlock();
+    [[nodiscard]] unsigned char* alloc();
+    void free(unsigned char*);
 };
 }
 

@@ -1,7 +1,7 @@
 #include "gx-mtl-vertex.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 
-gearoenix::metal::VertexDescriptions::VertexDescriptions() noexcept
+gearoenix::metal::VertexDescriptions::VertexDescriptions()
     : pbr([[MTLVertexDescriptor alloc] init])
 {
     pbr.attributes[PbrAttrIndexPosition].format = MTLVertexFormatFloat3;

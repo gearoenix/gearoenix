@@ -3,7 +3,7 @@
 #import "gx-mtl-engine.hpp"
 
 namespace {
-static MTLHeapDescriptor* create_heap_descriptor(const NSUInteger size, const MTLStorageMode storage_mode) noexcept
+static MTLHeapDescriptor* create_heap_descriptor(const NSUInteger size, const MTLStorageMode storage_mode)
 {
     MTLHeapDescriptor* const desc = [MTLHeapDescriptor new];
     desc.storageMode = storage_mode;
@@ -12,12 +12,12 @@ static MTLHeapDescriptor* create_heap_descriptor(const NSUInteger size, const MT
 }
 }
 
-gearoenix::metal::HeapManager::HeapManager(Engine& e) noexcept
+gearoenix::metal::HeapManager::HeapManager(Engine& e)
     : gpu([e.get_device() newHeapWithDescriptor:create_heap_descriptor(512 * 1024 * 1024, MTLStorageModePrivate)])
 {
 }
 
-gearoenix::metal::HeapManager::~HeapManager() noexcept
+gearoenix::metal::HeapManager::~HeapManager()
 {
     [gpu release];
 }

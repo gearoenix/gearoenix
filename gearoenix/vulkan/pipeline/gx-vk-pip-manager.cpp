@@ -12,7 +12,7 @@
 
 static const char* const default_stage_entry = "main";
 
-void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing() noexcept
+void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing()
 {
     ray_gen_sm = shader_manager->get("camera.rgen");
     close_hit_sm = shader_manager->get("pbr.rchit");
@@ -101,7 +101,7 @@ void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing() noexcept
     }
 }
 
-gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e) noexcept
+gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e)
     : cache(new Cache(e.get_logical_device()))
     , shader_manager(new shader::Manager(e))
 {
@@ -111,10 +111,10 @@ gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e) noexcept
         GX_UNIMPLEMENTED;
 }
 
-gearoenix::vulkan::pipeline::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::pipeline::Manager::~Manager() = default;
 
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(
-    const std::shared_ptr<descriptor::SetLayout>& des_set_layout) noexcept
+    const std::shared_ptr<descriptor::SetLayout>& des_set_layout)
 {
     return Pipeline::construct_ray_tracing(
         std::make_shared<Layout>(des_set_layout), cache, stages_create_info, shader_group_create_info);

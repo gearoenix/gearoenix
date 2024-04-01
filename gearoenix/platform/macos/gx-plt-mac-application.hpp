@@ -17,14 +17,14 @@ struct Application final {
     GX_GET_PTRC_PRV(GearoenixPlatformAppDelegate, app_delegate)
 
 private:
-    void update_window_size() noexcept;
-    void update_mouse_position() noexcept;
+    void update_window_size();
+    void update_mouse_position();
 
 public:
-    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration()) noexcept;
-    ~Application() noexcept;
-    void run(core::Application* = nullptr) noexcept;
-    void update() noexcept;
+    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
+    ~Application();
+    void run(core::Application* = nullptr);
+    void update();
 };
 }
 #endif

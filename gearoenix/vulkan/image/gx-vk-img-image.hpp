@@ -38,11 +38,11 @@ struct Image final {
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
 
 private:
-    void terminate() noexcept;
+    void terminate();
 
 public:
     Image(const Image&) = delete;
-    Image(Image&&) noexcept;
+    Image(Image&&);
     Image(
         const device::Logical* logical_device,
         std::uint32_t image_width,
@@ -53,7 +53,7 @@ public:
         VkFormat format,
         VkImageCreateFlags flags,
         VkImageUsageFlags usage,
-        VkImage vulkan_data) noexcept;
+        VkImage vulkan_data);
     Image(
         std::uint32_t image_width,
         std::uint32_t image_height,
@@ -63,14 +63,14 @@ public:
         VkFormat format,
         VkImageCreateFlags flags,
         VkImageUsageFlags usage,
-        memory::Manager& memory_manager) noexcept;
-    ~Image() noexcept;
+        memory::Manager& memory_manager);
+    ~Image();
     Image& operator=(const Image&) = delete;
-    Image& operator=(Image&&) noexcept;
-    //    void transit(command::Buffer& cmd, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) noexcept;
-    //    void transit_for_writing(command::Buffer& cmd) noexcept;
-    //    void copy_from_buffer(command::Buffer& cmd, const buffer::Buffer& buf) noexcept;
-    //    void transit_for_reading(command::Buffer& cmd) noexcept;
+    Image& operator=(Image&&);
+    //    void transit(command::Buffer& cmd, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) ;
+    //    void transit_for_writing(command::Buffer& cmd) ;
+    //    void copy_from_buffer(command::Buffer& cmd, const buffer::Buffer& buf) ;
+    //    void transit_for_reading(command::Buffer& cmd) ;
 };
 }
 #endif

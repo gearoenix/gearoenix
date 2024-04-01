@@ -3,7 +3,7 @@
 #include "../../core/macro/gx-cr-mcr-characterifier.hpp"
 #include "../gx-plt-log.hpp"
 
-gearoenix::platform::key::Id gearoenix::platform::convert_to_keyboard_key(const WPARAM wp, const LPARAM lp) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_to_keyboard_key(const WPARAM wp, const LPARAM lp)
 {
     const UINT scancode = (lp & 0x00ff0000) >> 16;
     const bool extended = (lp & 0x01000000) != 0;

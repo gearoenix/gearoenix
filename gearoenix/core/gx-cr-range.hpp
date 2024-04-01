@@ -27,34 +27,34 @@ public:
         typedef value_type* pointer;
         typedef std::forward_iterator_tag iterator_category;
 
-        constexpr Iterator() noexcept = default;
-        constexpr Iterator(T* ptr, std::size_t jump, T* end_ptr) noexcept;
-        ~Iterator() noexcept = default;
-        constexpr Iterator(const Iterator&) noexcept;
-        constexpr Iterator& operator=(const Iterator&) noexcept;
-        constexpr Iterator& operator++() noexcept;
-        //        constexpr reference operator*() const noexcept;
-        constexpr reference operator*() noexcept;
+        constexpr Iterator() = default;
+        constexpr Iterator(T* ptr, std::size_t jump, T* end_ptr);
+        ~Iterator() = default;
+        constexpr Iterator(const Iterator&);
+        constexpr Iterator& operator=(const Iterator&);
+        constexpr Iterator& operator++();
+        //        constexpr reference operator*() const ;
+        constexpr reference operator*();
         template <typename I>
-        constexpr Iterator& operator+=(I increment) noexcept;
+        constexpr Iterator& operator+=(I increment);
         template <typename I>
-        constexpr Iterator operator+(I increment) const noexcept;
-        [[nodiscard]] constexpr bool operator==(const Iterator& o) const noexcept;
-        [[nodiscard]] constexpr bool operator!=(const Iterator& o) const noexcept;
-        constexpr void swap(Iterator& o) noexcept;
+        constexpr Iterator operator+(I increment) const;
+        [[nodiscard]] constexpr bool operator==(const Iterator& o) const;
+        [[nodiscard]] constexpr bool operator!=(const Iterator& o) const;
+        constexpr void swap(Iterator& o);
         template <typename O>
-        [[nodiscard]] constexpr O* cast() noexcept;
+        [[nodiscard]] constexpr O* cast();
     };
 
-    constexpr PtrRange(T* ptr, std::size_t count, std::size_t jump) noexcept;
+    constexpr PtrRange(T* ptr, std::size_t count, std::size_t jump);
 
-    [[nodiscard]] constexpr Iterator begin() noexcept;
-    [[nodiscard]] constexpr Iterator end() noexcept;
+    [[nodiscard]] constexpr Iterator begin();
+    [[nodiscard]] constexpr Iterator end();
 };
 }
 
 template <typename T>
-constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(T* const ptr, const std::size_t jump, T* const end_ptr) noexcept
+constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(T* const ptr, const std::size_t jump, T* const end_ptr)
     : ptr(ptr)
     , jump(jump)
     , end_ptr(end_ptr)
@@ -62,7 +62,7 @@ constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(T* const ptr, const s
 }
 
 template <typename T>
-constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(const Iterator& o) noexcept
+constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(const Iterator& o)
     : ptr(o.ptr)
     , jump(o.jump)
     , end_ptr(o.end_ptr)
@@ -70,7 +70,7 @@ constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(const Iterator& o) no
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator=(const Iterator& o) noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator=(const Iterator& o)
 {
     if (this == &o)
         return *this;
@@ -81,7 +81,7 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator++() noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator++()
 {
     ptr += jump;
     if (end_ptr < ptr)
@@ -90,14 +90,14 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*() noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*()
 {
     return ptr;
 }
 
 template <typename T>
 template <typename I>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator+=(const I increment) noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrRange<T>::Iterator::operator+=(const I increment)
 {
     ptr += increment * jump;
     if (end_ptr < ptr)
@@ -107,7 +107,7 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
 
 template <typename T>
 template <typename I>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::Iterator::operator+(const I increment) const noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::Iterator::operator+(const I increment) const
 {
     auto new_ptr = ptr + (increment * jump);
     if (end_ptr < new_ptr)
@@ -116,19 +116,19 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRa
 }
 
 template <typename T>
-constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator==(const Iterator& o) const noexcept
+constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator==(const Iterator& o) const
 {
     return ptr == o.ptr && jump == o.jump && end_ptr == o.end_ptr;
 }
 
 template <typename T>
-constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator!=(const Iterator& o) const noexcept
+constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator!=(const Iterator& o) const
 {
     return ptr != o.ptr || jump != o.jump || end_ptr != o.end_ptr;
 }
 
 template <typename T>
-constexpr void gearoenix::core::PtrRange<T>::Iterator::swap(Iterator& o) noexcept
+constexpr void gearoenix::core::PtrRange<T>::Iterator::swap(Iterator& o)
 {
     std::swap(ptr, o.ptr);
     std::swap(jump, o.jump);
@@ -137,13 +137,13 @@ constexpr void gearoenix::core::PtrRange<T>::Iterator::swap(Iterator& o) noexcep
 
 template <typename T>
 template <typename O>
-constexpr O* gearoenix::core::PtrRange<T>::Iterator::cast() noexcept
+constexpr O* gearoenix::core::PtrRange<T>::Iterator::cast()
 {
     return reinterpret_cast<O*>(ptr);
 }
 
 template <typename T>
-constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::size_t count, const std::size_t jump) noexcept
+constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::size_t count, const std::size_t jump)
     : ptr(ptr)
     , count(count)
     , jump(jump)
@@ -152,13 +152,13 @@ constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::size_t
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::begin() noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::begin()
 {
     return Iterator(ptr, jump, end_ptr);
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::end() noexcept
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::end()
 {
     return Iterator(end_ptr, jump, end_ptr);
 }

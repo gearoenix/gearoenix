@@ -5,7 +5,7 @@
 #include "gx-vk-des-set-layout.hpp"
 
 std::vector<VkDescriptorPoolSize> gearoenix::vulkan::descriptor::BindingsData::create_pool_sizes(
-    const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept
+    const std::vector<VkDescriptorSetLayoutBinding>& data)
 {
     std::map<VkDescriptorType, std::uint32_t> szs;
     for (const auto& b : data) {
@@ -24,7 +24,7 @@ std::vector<VkDescriptorPoolSize> gearoenix::vulkan::descriptor::BindingsData::c
 
 gearoenix::vulkan::descriptor::BindingsData::BindingsData(
     const device::Logical& logical_device,
-    const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept
+    const std::vector<VkDescriptorSetLayoutBinding>& data)
     : logical_device(logical_device)
     , layout(new SetLayout(logical_device, data))
     , pool_sizes(create_pool_sizes(data))
@@ -32,7 +32,7 @@ gearoenix::vulkan::descriptor::BindingsData::BindingsData(
 }
 
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::BindingsData::create_set(
-    const std::optional<std::size_t> kernel_index) noexcept
+    const std::optional<std::size_t> kernel_index)
 {
     std::variant<std::size_t, std::thread::id> ti;
     if (kernel_index.has_value())
@@ -47,6 +47,6 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
     return pool->create_set(pool_sizes, *layout);
 }
 
-gearoenix::vulkan::descriptor::BindingsData::~BindingsData() noexcept = default;
+gearoenix::vulkan::descriptor::BindingsData::~BindingsData() = default;
 
 #endif

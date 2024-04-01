@@ -11,8 +11,8 @@ enum struct Type : core::Id {
     Metal = 4,
 };
 
-[[nodiscard]] const char* to_string(Type) noexcept;
+[[nodiscard]] const char* to_string(Type);
 
-std::ostream& operator<<(std::ostream& os, Type t) noexcept;
+std::ostream& operator<<(std::ostream& os, Type t);
 }
 #endif

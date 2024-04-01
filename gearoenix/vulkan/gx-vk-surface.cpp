@@ -9,7 +9,7 @@
 #include <android_native_app_glue.h>
 #endif
 
-gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Application& plt_app) noexcept
+gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Application& plt_app)
     : instance(ins)
     , platform_application(plt_app)
 {
@@ -40,7 +40,7 @@ gearoenix::vulkan::Surface::Surface(const Instance& ins, const platform::Applica
 #endif
 }
 
-gearoenix::vulkan::Surface::~Surface() noexcept
+gearoenix::vulkan::Surface::~Surface()
 {
     if (nullptr != vulkan_data) {
         vkDestroySurfaceKHR(instance.get_vulkan_data(), vulkan_data, nullptr);

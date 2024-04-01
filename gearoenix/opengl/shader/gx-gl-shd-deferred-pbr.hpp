@@ -17,9 +17,9 @@ struct DeferredPbr final : public Shader {
     GX_GL_UNIFORM_TEXTURE(brdflut);
 
 public:
-    explicit DeferredPbr(Engine& e) noexcept;
-    ~DeferredPbr() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit DeferredPbr(Engine& e);
+    ~DeferredPbr() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

@@ -23,6 +23,9 @@
 
 #elif defined(WIN32) || defined(WIN64) || defined(_WIN32) || defined(_WIN64)
 
+#ifdef NOMINMAX
+#undef NOMINMAX
+#endif
 #define NOMINMAX true
 #define GX_PLATFORM_WINDOWS true
 #define GX_PLATFORM_INTERFACE_SDL2 true

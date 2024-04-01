@@ -99,7 +99,7 @@ void main() {\n\
     frag_out_radiance = textureLod(radiance, normalize(reflect(out_eye, frag_out_normal_ao.xyz)), mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n\
 }\n";
 
-gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e) noexcept
+gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -123,9 +123,9 @@ gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
 }
 
-gearoenix::gl::shader::GBuffersFiller::~GBuffersFiller() noexcept = default;
+gearoenix::gl::shader::GBuffersFiller::~GBuffersFiller() = default;
 
-void gearoenix::gl::shader::GBuffersFiller::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::GBuffersFiller::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

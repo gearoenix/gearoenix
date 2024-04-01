@@ -2,9 +2,9 @@
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include <boost/functional/hash.hpp>
 
-bool gearoenix::render::texture::TextureInfo::operator==(const TextureInfo& o) const noexcept = default;
+bool gearoenix::render::texture::TextureInfo::operator==(const TextureInfo& o) const = default;
 
-void gearoenix::render::texture::TextureInfo::read(platform::stream::Stream& s) noexcept
+void gearoenix::render::texture::TextureInfo::read(platform::stream::Stream& s)
 {
     s.read(format);
     sampler_info.read(s);
@@ -15,7 +15,7 @@ void gearoenix::render::texture::TextureInfo::read(platform::stream::Stream& s) 
     s.read(has_mipmap);
 }
 
-void gearoenix::render::texture::TextureInfo::write(platform::stream::Stream& s) const noexcept
+void gearoenix::render::texture::TextureInfo::write(platform::stream::Stream& s) const
 {
     s.write_fail_debug(format);
     sampler_info.write(s);
@@ -26,7 +26,7 @@ void gearoenix::render::texture::TextureInfo::write(platform::stream::Stream& s)
     s.write_fail_debug(has_mipmap);
 }
 
-std::size_t gearoenix::render::texture::TextureInfoHasher::operator()(const TextureInfo& i) const noexcept
+std::size_t gearoenix::render::texture::TextureInfoHasher::operator()(const TextureInfo& i) const
 {
     std::size_t seed = boost::hash_value(typeid(SamplerInfo));
     boost::hash_combine(seed, boost::hash_value(i.format));

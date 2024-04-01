@@ -83,31 +83,31 @@ private:
         std::string&& name,
         std::size_t vertices_count,
         std::size_t indices_count,
-        core::sync::EndCaller&& c,
-        std::shared_ptr<Mesh>&& result) noexcept;
+        core::job::EndCaller&& c,
+        std::shared_ptr<Mesh>&& result);
 
     void create_accel_after_query_ready(
         std::string&& name,
         std::shared_ptr<sync::Fence>&& fence,
-        core::sync::EndCaller&& c,
+        core::job::EndCaller&& c,
         std::shared_ptr<Mesh>&& result,
-        std::shared_ptr<query::Pool>&& query_pool) noexcept;
+        std::shared_ptr<query::Pool>&& query_pool);
 
     void create_accel_after_blas_copy(
-        core::sync::EndCaller&& c,
-        std::shared_ptr<Mesh>&& result) noexcept;
+        core::job::EndCaller&& c,
+        std::shared_ptr<Mesh>&& result);
 
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
         std::string&& name,
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCaller& end_callback) noexcept final;
+        const core::job::EndCaller& end_callback) final;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept final;
-    void update() noexcept;
+    explicit Manager(engine::Engine& e);
+    ~Manager() final;
+    void update();
 };
 }
 

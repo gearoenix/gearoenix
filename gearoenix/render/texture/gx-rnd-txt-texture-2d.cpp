@@ -4,9 +4,9 @@
 gearoenix::render::texture::Texture2D::Texture2D(
     std::string name,
     const TextureInfo& info,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
     : Texture(std::move(name), info, e)
 {
 }
 
-gearoenix::render::texture::Texture2D::~Texture2D() noexcept = default;
+gearoenix::render::texture::Texture2D::~Texture2D() = default;

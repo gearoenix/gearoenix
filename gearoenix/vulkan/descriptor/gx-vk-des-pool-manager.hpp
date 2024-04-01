@@ -27,15 +27,15 @@ private:
     std::set<Pool*> free_pools;
     std::weak_ptr<PoolManager> self;
 
-    explicit PoolManager(const device::Logical& logical_device) noexcept;
-    [[nodiscard]] static std::shared_ptr<PoolManager> construct(const device::Logical& logical_device) noexcept;
+    explicit PoolManager(const device::Logical& logical_device);
+    [[nodiscard]] static std::shared_ptr<PoolManager> construct(const device::Logical& logical_device);
     [[nodiscard]] std::shared_ptr<Set> create_set(
         const std::vector<VkDescriptorPoolSize>& pool_sizes,
-        const SetLayout& layout) noexcept;
-    void pool_freed(Pool*) noexcept;
+        const SetLayout& layout);
+    void pool_freed(Pool*);
 
 public:
-    ~PoolManager() noexcept;
+    ~PoolManager();
 };
 }
 

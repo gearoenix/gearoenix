@@ -4,7 +4,7 @@
 #include "gx-gl-constants.hpp"
 #include "gx-gl-loader.hpp"
 
-bool gearoenix::gl::check_for_error() noexcept
+bool gearoenix::gl::check_for_error()
 {
     switch (glGetError()) {
     case GL_NO_ERROR:

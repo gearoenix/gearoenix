@@ -6,7 +6,7 @@
 #include <cstdint>
 
 namespace gearoenix::platform {
-key::Id convert_android_key(std::int32_t key_code) noexcept;
+key::Id convert_android_key(std::int32_t key_code);
 }
 
 #endif

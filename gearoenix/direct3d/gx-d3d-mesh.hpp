@@ -22,19 +22,19 @@ struct Mesh final : public render::mesh::Mesh {
         math::Aabb3<double>&& box,
         UINT vertex_size,
         UINT vertices_size,
-        UINT indices_count) noexcept;
-    ~Mesh() noexcept final;
+        UINT indices_count);
+    ~Mesh() final;
 };
 
 struct MeshManager final : render::mesh::Manager {
-    explicit MeshManager(Engine& e) noexcept;
-    ~MeshManager() noexcept final;
+    explicit MeshManager(Engine& e);
+    ~MeshManager() final;
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
         std::string&& name,
         std::vector<render::PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        core::sync::EndCaller&& end_callback) noexcept final;
+        core::job::EndCaller&& end_callback) final;
 };
 }
 

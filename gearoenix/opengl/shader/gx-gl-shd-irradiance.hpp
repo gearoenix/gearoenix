@@ -9,9 +9,9 @@ struct Irradiance final : public Shader {
     GX_GL_UNIFORM_TEXTURE(environment);
 
 public:
-    explicit Irradiance(Engine& e) noexcept;
-    ~Irradiance() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit Irradiance(Engine& e);
+    ~Irradiance() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

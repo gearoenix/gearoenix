@@ -4,7 +4,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::pipeline::Cache::Cache(const device::Logical& logical_device) noexcept
+gearoenix::vulkan::pipeline::Cache::Cache(const device::Logical& logical_device)
     : logical_device(logical_device)
 {
     VkPipelineCacheCreateInfo info;
@@ -13,7 +13,7 @@ gearoenix::vulkan::pipeline::Cache::Cache(const device::Logical& logical_device)
     GX_VK_CHK(vkCreatePipelineCache(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::pipeline::Cache::~Cache() noexcept
+gearoenix::vulkan::pipeline::Cache::~Cache()
 {
     if (nullptr != vulkan_data) {
         vkDestroyPipelineCache(logical_device.get_vulkan_data(), vulkan_data, nullptr);

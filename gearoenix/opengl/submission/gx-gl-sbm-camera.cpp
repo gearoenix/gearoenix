@@ -9,7 +9,7 @@
 
 std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::BloomData::construct(
     const std::optional<gl::BloomData>& gl_bd,
-    const std::optional<render::camera::BloomData>& rnd_bd) noexcept
+    const std::optional<render::camera::BloomData>& rnd_bd)
 {
     if (!rnd_bd.has_value())
         return std::nullopt;
@@ -25,7 +25,7 @@ std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::B
     return r;
 }
 
-gearoenix::gl::submission::Camera::Camera() noexcept
+gearoenix::gl::submission::Camera::Camera()
     : threads_opaque_models_data(std::thread::hardware_concurrency())
     , threads_translucent_models_data(std::thread::hardware_concurrency())
     , threads_mvps(std::thread::hardware_concurrency())
@@ -36,7 +36,7 @@ gearoenix::gl::submission::Camera::Camera() noexcept
 void gearoenix::gl::submission::Camera::clear(
     const gl::Camera& gl_cam,
     const render::camera::Camera& rnd_cam,
-    const math::Vec3<float>& location) noexcept
+    const math::Vec3<float>& location)
 {
     models_data.clear();
     mvps.clear();
@@ -53,17 +53,17 @@ void gearoenix::gl::submission::Camera::clear(
         v.clear();
 
     const auto target_dimension = rnd_cam.get_target()->get_dimension();
-    framebuffer = gl_cam.get_target()->get_framebuffer();
-    colour_attachment = gl_cam.get_target()->get_gl_attachments()[0].texture_object;
-    if (gl_cam.get_target()->get_gl_attachments().size() == 2) {
+    framebuffer = gl_cam.get_gl_target()->get_framebuffer();
+    colour_attachment = gl_cam.get_gl_target()->get_gl_attachments()[0].texture_object;
+    if (gl_cam.get_gl_target()->get_gl_attachments().size() == 2) {
         // it means we have the main camera not shadow or reflection probe
-        depth_attachment = gl_cam.get_target()->get_gl_attachments()[1].texture_object;
+        depth_attachment = gl_cam.get_gl_target()->get_gl_attachments()[1].texture_object;
     } else {
         depth_attachment = static_cast<uint>(-1);
     }
     if (nullptr != gl_cam.get_second_target()) {
-        second_framebuffer = gl_cam.get_second_target()->get_framebuffer();
-        second_colour_attachment = gl_cam.get_second_target()->get_gl_attachments()[0].texture_object;
+        second_framebuffer = gl_cam.get_gl_second_target()->get_framebuffer();
+        second_colour_attachment = gl_cam.get_gl_second_target()->get_gl_attachments()[0].texture_object;
     } else {
         second_framebuffer = static_cast<uint>(-1);
         second_colour_attachment = static_cast<uint>(-1);
@@ -75,7 +75,7 @@ void gearoenix::gl::submission::Camera::clear(
     skybox_scale = rnd_cam.get_far() / 1.732051f;
     exposure_value = rnd_cam.get_exposure().get_enabled() ? rnd_cam.get_exposure().get_value() : 1.0f;
     colour_tuning = rnd_cam.get_colour_tuning();
-    bloom_data = BloomData::construct(gl_cam.get_bloom_data(), rnd_cam.get_bloom_data());
+    bloom_data = BloomData::construct(gl_cam.get_gl_bloom_data(), rnd_cam.get_bloom_data());
     out_reference = rnd_cam.get_reference_id();
 }
 

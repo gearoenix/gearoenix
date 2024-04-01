@@ -13,35 +13,35 @@
 
 #include <cstring>
 
-void gearoenix::render::texture::Image::encode_write_func(void* const context, void* const data, const int size) noexcept
+void gearoenix::render::texture::Image::encode_write_func(void* const context, void* const data, const int size)
 {
-    auto* const file = reinterpret_cast<platform::stream::Stream*>(context);
+    auto* const file = static_cast<platform::stream::Stream*>(context);
     (void)file->write(data, size);
 }
 
 void gearoenix::render::texture::Image::decode(
     platform::stream::Stream* const file,
-    std::vector<unsigned char>& data,
+    std::vector<unsigned char>& encoded_data,
     std::size_t& img_width,
-    std::size_t& img_height) noexcept
+    std::size_t& img_height)
 {
     std::vector<unsigned char> img;
     file->read(img);
     std::size_t img_channels = 0;
-    decode(img.data(), img.size(), 4, data, img_width, img_height, img_channels);
+    decode(img.data(), img.size(), 4, encoded_data, img_width, img_height, img_channels);
 }
 
 void gearoenix::render::texture::Image::decode(
-    const unsigned char* const data,
-    const std::size_t size,
+    const unsigned char* const formatted_data,
+    const std::size_t formatted_size,
     const std::optional<std::size_t> requested_channels,
     std::vector<unsigned char>& decoded_data,
     std::size_t& img_width,
     std::size_t& img_height,
-    std::size_t& img_channels) noexcept
+    std::size_t& img_channels)
 {
-    int iw, ih, chs;
-    unsigned char* dd = stbi_load_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
+    int iw = 0, ih = 0, chs = 0;
+    unsigned char* const dd = stbi_load_from_memory(formatted_data, static_cast<int>(formatted_size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
         GX_LOG_F("Image decoder error.");
@@ -57,16 +57,16 @@ void gearoenix::render::texture::Image::decode(
 }
 
 void gearoenix::render::texture::Image::decode(
-    const unsigned char* const data,
-    const std::size_t size,
+    const unsigned char* const formatted_data,
+    const std::size_t formatted_size,
     const std::optional<std::size_t> requested_channels,
     std::vector<float>& decoded_data,
     std::size_t& img_width,
     std::size_t& img_height,
-    std::size_t& img_channels) noexcept
+    std::size_t& img_channels)
 {
-    int iw, ih, chs;
-    float* const dd = stbi_loadf_from_memory(data, static_cast<int>(size), &iw, &ih, &chs,
+    int iw = 0, ih = 0, chs = 0;
+    float* const dd = stbi_loadf_from_memory(formatted_data, static_cast<int>(formatted_size), &iw, &ih, &chs,
         static_cast<int>(requested_channels.has_value() ? requested_channels.value() : 0));
     if (dd == nullptr) {
         GX_LOG_F("Image decoder error.");
@@ -84,7 +84,7 @@ void gearoenix::render::texture::Image::encode_png(
     const std::uint8_t* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) noexcept
+    const std::size_t components_count)
 {
     stbi_write_png_compression_level = 100;
     stbi_write_png_to_func(
@@ -102,7 +102,7 @@ void gearoenix::render::texture::Image::encode_hdr(
     const void* const data,
     const std::size_t img_width,
     const std::size_t img_height,
-    const std::size_t components_count) noexcept
+    const std::size_t components_count)
 {
     stbi_write_hdr_to_func(
         encode_write_func,
@@ -110,5 +110,5 @@ void gearoenix::render::texture::Image::encode_hdr(
         static_cast<int>(img_width),
         static_cast<int>(img_height),
         static_cast<int>(components_count),
-        reinterpret_cast<const float*>(data));
+        static_cast<const float*>(data));
 }

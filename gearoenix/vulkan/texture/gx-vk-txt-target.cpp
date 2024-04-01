@@ -6,7 +6,7 @@
 #include "gx-vk-txt-cube.hpp"
 
 // MSVC does not support trivial copy constructor
-gearoenix::vulkan::texture::Target::Target(const Target& o) noexcept
+gearoenix::vulkan::texture::Target::Target(const Target& o)
     : render::texture::Target(o)
     , render_pass(o.render_pass)
     , start_semaphore(o.start_semaphore)
@@ -19,7 +19,7 @@ gearoenix::vulkan::texture::Target::Target(
     const core::Id id,
     const std::vector<render::texture::AttachmentInfo>& infos,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
     : render::texture::Target(id, e)
 {
     GX_CHECK_NOT_EQUAL_D(infos.size(), 0)
@@ -94,9 +94,9 @@ gearoenix::vulkan::texture::Target::Target(
     }
 }
 
-gearoenix::vulkan::texture::Target::~Target() noexcept = default;
+gearoenix::vulkan::texture::Target::~Target() = default;
 
-gearoenix::vulkan::texture::Target* gearoenix::vulkan::texture::Target::clone() const noexcept
+gearoenix::vulkan::texture::Target* gearoenix::vulkan::texture::Target::clone() const
 {
     return new Target(*this);
 }

@@ -5,13 +5,13 @@
 #include "gx-vk-des-set-layout.hpp"
 #include "gx-vk-des-set.hpp"
 
-gearoenix::vulkan::descriptor::PoolManager::PoolManager(const device::Logical& logical_device) noexcept
+gearoenix::vulkan::descriptor::PoolManager::PoolManager(const device::Logical& logical_device)
     : logical_device(logical_device)
 {
 }
 
 std::shared_ptr<gearoenix::vulkan::descriptor::PoolManager> gearoenix::vulkan::descriptor::PoolManager::construct(
-    const device::Logical& logical_device) noexcept
+    const device::Logical& logical_device)
 {
     std::shared_ptr<PoolManager> result(new PoolManager(logical_device));
     result->self = result;
@@ -20,7 +20,7 @@ std::shared_ptr<gearoenix::vulkan::descriptor::PoolManager> gearoenix::vulkan::d
 
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::PoolManager::create_set(
     const std::vector<VkDescriptorPoolSize>& pool_sizes,
-    const SetLayout& layout) noexcept
+    const SetLayout& layout)
 {
     auto s = self.lock();
     for (auto iter = free_pools.begin(); iter != free_pools.end();) {
@@ -38,12 +38,12 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
     GX_UNEXPECTED;
 }
 
-void gearoenix::vulkan::descriptor::PoolManager::pool_freed(Pool* const p) noexcept
+void gearoenix::vulkan::descriptor::PoolManager::pool_freed(Pool* const p)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     free_pools.emplace(p);
 }
 
-gearoenix::vulkan::descriptor::PoolManager::~PoolManager() noexcept = default;
+gearoenix::vulkan::descriptor::PoolManager::~PoolManager() = default;
 
 #endif

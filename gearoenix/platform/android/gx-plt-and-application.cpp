@@ -11,7 +11,7 @@
 #include "gx-plt-gl-context.hpp"
 #endif
 
-void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd) noexcept
+void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd)
 {
     switch (cmd) {
     case APP_CMD_START:
@@ -74,12 +74,12 @@ void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd)
     }
 }
 
-int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent* const e) noexcept
+int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent* const e)
 {
     const auto event_type = AInputEvent_getType(e);
     switch (event_type) {
     case AINPUT_EVENT_TYPE_KEY:
-        base.keyboard_key(convert_android_key(AKeyEvent_getKeyCode(e)), [&]() noexcept {
+        base.keyboard_key(convert_android_key(AKeyEvent_getKeyCode(e)), [&]() {
             switch (AKeyEvent_getAction(e)) {
                 case AKEY_EVENT_ACTION_UP:
                     return gearoenix::platform::key::Action::Release;
@@ -133,19 +133,19 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
     return 0;
 }
 
-void gearoenix::platform::Application::handle_cmd(android_app* const a, int32_t cmd) noexcept
+void gearoenix::platform::Application::handle_cmd(android_app* const a, int32_t cmd)
 {
     auto platform_application = static_cast<Application*>(a->userData);
     platform_application->handle(a, cmd);
 }
 
-int32_t gearoenix::platform::Application::handle_input(android_app* const a, AInputEvent* const e) noexcept
+int32_t gearoenix::platform::Application::handle_input(android_app* const a, AInputEvent* const e)
 {
     auto platform_application = static_cast<Application*>(a->userData);
     return platform_application->handle(a, e);
 }
 
-void gearoenix::platform::Application::on_check_ready_to_render(android_app* const a) noexcept
+void gearoenix::platform::Application::on_check_ready_to_render(android_app* const a)
 {
     if (running)
         return;
@@ -191,7 +191,7 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
     running = true;
 }
 
-void gearoenix::platform::Application::on_not_ready_to_render() noexcept
+void gearoenix::platform::Application::on_not_ready_to_render()
 {
     if (!running)
         return;
@@ -200,7 +200,7 @@ void gearoenix::platform::Application::on_not_ready_to_render() noexcept
     running = false;
 }
 
-void gearoenix::platform::Application::make_thread_current_jni() noexcept
+void gearoenix::platform::Application::make_thread_current_jni()
 {
     JavaVM* const java_vm = android_application->activity->vm;
     JNIEnv* java_env = nullptr;
@@ -208,7 +208,7 @@ void gearoenix::platform::Application::make_thread_current_jni() noexcept
     GX_ASSERT(JNI_ERR != java_vm->AttachCurrentThread(&java_env, nullptr));
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config)
     : base(GX_MAIN_ENTRY_ARGS, config)
     , android_application(state)
     , gl_context(new GlContext())
@@ -229,9 +229,9 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     } while (state->destroyRequested == 0);
 }
 
-gearoenix::platform::Application::~Application() noexcept = default;
+gearoenix::platform::Application::~Application() = default;
 
-void gearoenix::platform::Application::run(core::Application* const core_app) noexcept
+void gearoenix::platform::Application::run(core::Application* const core_app)
 {
     base.initialize_core_application(*this, core_app);
     int events;
@@ -248,12 +248,12 @@ void gearoenix::platform::Application::run(core::Application* const core_app) no
     running = false;
 }
 
-const char* gearoenix::platform::Application::get_clipboard() const noexcept
+const char* gearoenix::platform::Application::get_clipboard() const
 {
     return nullptr;
 }
 
-void gearoenix::platform::Application::set_soft_keyboard_visibility(const bool show) noexcept
+void gearoenix::platform::Application::set_soft_keyboard_visibility(const bool show)
 {
     // Attaches the current thread to the JVM.
     auto* const activity = android_application->activity;

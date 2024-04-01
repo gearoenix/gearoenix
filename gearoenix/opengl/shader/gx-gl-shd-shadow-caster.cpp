@@ -3,7 +3,7 @@
 #include "../gx-gl-engine.hpp"
 #include <sstream>
 
-gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::size_t bones_count) noexcept
+gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::size_t bones_count)
     : Shader(e)
     , mvp_count(static_cast<sizei>(bones_count + 1))
 {
@@ -67,9 +67,9 @@ gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::size_t b
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
 }
 
-gearoenix::gl::shader::ShadowCaster::~ShadowCaster() noexcept = default;
+gearoenix::gl::shader::ShadowCaster::~ShadowCaster() = default;
 
-void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;
@@ -77,12 +77,12 @@ void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const noexc
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }
 
-void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const void* const data) const noexcept
+void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const void* const data) const
 {
     glUniformMatrix4fv(mvp, mvp_count, GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination(Engine& e) noexcept
+gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination(Engine& e)
     : e(e)
 {
 }

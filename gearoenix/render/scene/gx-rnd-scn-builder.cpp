@@ -15,17 +15,17 @@
 #include "gx-rnd-scn-scene.hpp"
 
 gearoenix::render::scene::Builder::Builder(
-    engine::Engine& e, const std::string& name, const double layer, core::sync::EndCaller&& end_callback) noexcept
+    engine::Engine& e, const std::string& name, const double layer, core::job::EndCaller<>&& end_callback)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(Scene(e, layer, name + "-scene"));
+    b.add_component(Scene::construct(e, layer, name + "-scene"));
     b.set_name(name);
 }
 
-gearoenix::render::scene::Builder::~Builder() noexcept = default;
+gearoenix::render::scene::Builder::~Builder() = default;
 
-void gearoenix::render::scene::Builder::add(std::shared_ptr<model::Builder>&& model_builder) noexcept
+void gearoenix::render::scene::Builder::add(std::shared_ptr<model::Builder>&& model_builder)
 {
     auto& b = entity_builder->get_builder();
     auto& mb = model_builder->get_entity_builder()->get_builder();
@@ -39,7 +39,7 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<model::Builder>&& mo
     model_builders.emplace(std::string(name), std::move(model_builder));
 }
 
-void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& camera_builder) noexcept
+void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& camera_builder)
 {
     auto& b = entity_builder->get_builder();
     auto& cb = camera_builder->get_entity_builder()->get_builder();
@@ -53,10 +53,10 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<camera::Builder>&& c
     camera_builders.emplace(std::string(name), std::move(camera_builder));
 }
 
-void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>&& reflection_builder) noexcept
+void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>&& reflection_builder)
 {
-    auto& b = entity_builder->get_builder();
-    auto& rb = reflection_builder->get_entity_builder()->get_builder();
+    const auto& b = entity_builder->get_builder();
+    const auto& rb = reflection_builder->get_entity_builder()->get_builder();
     if (auto* const rr = rb.get_component<reflection::Runtime>(); nullptr != rr) {
         b.get_component<Scene>()->add_runtime_reflection(rb.get_id(), *rr);
         rr->set_scene_id(b.get_id());
@@ -74,7 +74,7 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<reflection::Builder>
     reflection_builders.emplace(std::string(name), std::move(reflection_builder));
 }
 
-void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& skybox_builder) noexcept
+void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& skybox_builder)
 {
     auto& b = entity_builder->get_builder();
     auto& sb = skybox_builder->get_entity_builder()->get_builder();
@@ -88,7 +88,7 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<skybox::Builder>&& s
     skybox_builders.emplace(std::string(name), std::move(skybox_builder));
 }
 
-void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& light_builder) noexcept
+void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& light_builder)
 {
     auto& b = entity_builder->get_builder();
     auto& lb = light_builder->get_entity_builder()->get_builder();
@@ -96,26 +96,28 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& li
     GX_ASSERT_D(nullptr != l);
     b.get_component<Scene>()->add_light(lb.get_id(), *l);
     l->scene_id = b.get_id();
-    for (const auto& camera_builder : light_builder->get_cameras())
-        if (nullptr != camera_builder)
-            add(std::shared_ptr<camera::Builder>(camera_builder));
+    for (const auto& camera_builder : light_builder->get_camera_builders()) {
+        if (nullptr != camera_builder) {
+            add(std::shared_ptr(camera_builder));
+        }
+    }
     const auto& name = light_builder->get_entity_builder()->get_builder().get_name();
     GX_ASSERT(!name.empty());
     GX_ASSERT(!light_builders.contains(name));
     light_builders.emplace(std::string(name), std::move(light_builder));
 }
 
-gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() noexcept
+gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene()
 {
     return *entity_builder->get_builder().get_component<Scene>();
 }
 
-const gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() const noexcept
+const gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene() const
 {
     return *entity_builder->get_builder().get_component<Scene>();
 }
 
-gearoenix::core::ecs::entity_id_t gearoenix::render::scene::Builder::get_id() const noexcept
+gearoenix::core::ecs::entity_id_t gearoenix::render::scene::Builder::get_id() const
 {
     return entity_builder->get_id();
 }

@@ -25,16 +25,16 @@ private:
     Pool(
         const device::Logical& logical_device,
         const VkDescriptorPoolSize* pool_sizes,
-        std::uint32_t count) noexcept;
+        std::uint32_t count);
 
-    [[nodiscard]] static Pool* create_imgui(const device::Logical& logical_device) noexcept;
+    [[nodiscard]] static Pool* create_imgui(const device::Logical& logical_device);
 
 public:
     Pool(Pool&&) = delete;
     Pool(const Pool&) = delete;
     Pool& operator=(Pool&&) = delete;
     Pool& operator=(const Pool&) = delete;
-    ~Pool() noexcept;
+    ~Pool();
 };
 }
 #endif

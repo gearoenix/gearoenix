@@ -6,18 +6,18 @@
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::vulkan::model::Manager::build(
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    const core::sync::EndCaller& c,
-    const bool is_transformable) noexcept
+    const core::job::EndCaller& c,
+    const bool is_transformable)
 {
     return std::shared_ptr<Builder>(new Builder(vk_e, name, std::move(mesh), is_transformable));
 }
 
-gearoenix::vulkan::model::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::vulkan::model::Manager::Manager(engine::Engine& e)
     : render::model::Manager(e)
     , vk_e(e)
 {
 }
 
-gearoenix::vulkan::model::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::model::Manager::~Manager() = default;
 
 #endif

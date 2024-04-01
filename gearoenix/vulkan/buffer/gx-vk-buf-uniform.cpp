@@ -8,16 +8,16 @@
 gearoenix::vulkan::buffer::Uniform::Uniform(
     const engine::Engine& e,
     std::vector<std::shared_ptr<Buffer>> cpu,
-    std::shared_ptr<Buffer> gpu) noexcept
+    std::shared_ptr<Buffer> gpu)
     : e(e)
     , cpu(std::move(cpu))
     , gpu(std::move(gpu))
 {
 }
 
-gearoenix::vulkan::buffer::Uniform::~Uniform() noexcept = default;
+gearoenix::vulkan::buffer::Uniform::~Uniform() = default;
 
-void gearoenix::vulkan::buffer::Uniform::update(const void* const src) noexcept
+void gearoenix::vulkan::buffer::Uniform::update(const void* const src)
 {
     const auto& b = *cpu[e.get_frame_number()];
     std::memcpy(b.get_allocated_memory()->get_data(), src, b.get_allocator()->get_size());

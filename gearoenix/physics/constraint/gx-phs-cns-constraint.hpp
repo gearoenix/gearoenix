@@ -34,11 +34,11 @@ public:
     GX_GET_CREF_PRT(ConstraintMap, after_constraints)
 
 protected:
-    Constraint(core::Id id, Type t, std::string name, bool active = true) noexcept;
+    Constraint(core::Id id, Type t, std::string name, bool active = true);
 
     /// This function will be called after the parent constraint applied on its models
-    virtual void update() noexcept { }
-    void update_chained_constraints() noexcept
+    virtual void update() { }
+    void update_chained_constraints()
     {
         for (const auto& c : after_constraints) {
             c.second->update();
@@ -47,9 +47,9 @@ protected:
 
 public:
     ~Constraint() override;
-    virtual void apply(double delta_time_from_start, double delta_time_from_previous) noexcept = 0;
+    virtual void apply(double delta_time_from_start, double delta_time_from_previous) = 0;
 
-    void add(const std::shared_ptr<Constraint>& c) noexcept
+    void add(const std::shared_ptr<Constraint>& c)
     {
 #ifdef GX_DEBUG_MODE
         if (after_constraints.find(c->get_id()) != after_constraints.end())
@@ -58,7 +58,7 @@ public:
         after_constraints.emplace(c->get_id(), c);
     }
 
-    void add_affected(const std::shared_ptr<render::model::Model>& m) noexcept;
+    void add_affected(const std::shared_ptr<render::model::Model>& m);
 };
 }
 #endif

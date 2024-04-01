@@ -11,7 +11,7 @@
 #include "gx-d3d-queue.hpp"
 #include <d3dx12.h>
 
-gearoenix::d3d::Swapchain::Swapchain(Engine& e) noexcept
+gearoenix::d3d::Swapchain::Swapchain(Engine& e)
     : queue(e.get_queue())
     , device(e.get_device())
     , descriptor_manager(e.get_descriptor_manager())
@@ -30,9 +30,9 @@ gearoenix::d3d::Swapchain::Swapchain(Engine& e) noexcept
     GX_SET_ZERO(scissor);
 }
 
-gearoenix::d3d::Swapchain::~Swapchain() noexcept = default;
+gearoenix::d3d::Swapchain::~Swapchain() = default;
 
-bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& platform_application) noexcept
+bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& platform_application)
 {
     auto* const dev = device->get_device().Get();
     const auto& base_plt_app = platform_application.get_base();
@@ -156,7 +156,7 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
     return false;
 }
 
-void gearoenix::d3d::Swapchain::wait_for_gpu() noexcept
+void gearoenix::d3d::Swapchain::wait_for_gpu()
 {
     GX_ASSERT(nullptr != fence && fence_event.IsValid());
     GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value));
@@ -168,12 +168,12 @@ void gearoenix::d3d::Swapchain::wait_for_gpu() noexcept
         fence_values.push(current_fence_value);
 }
 
-const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::d3d::Swapchain::get_current_render_target() const noexcept
+const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::d3d::Swapchain::get_current_render_target() const
 {
     return frames[back_buffer_index].render_target;
 }
 
-void gearoenix::d3d::Swapchain::transit_to_target(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::d3d::Swapchain::transit_to_target(ID3D12GraphicsCommandList6* const cmd)
 {
     D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         frames[back_buffer_index].render_target.Get(),
@@ -182,7 +182,7 @@ void gearoenix::d3d::Swapchain::transit_to_target(ID3D12GraphicsCommandList6* co
     cmd->ResourceBarrier(1, &barrier);
 }
 
-void gearoenix::d3d::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::d3d::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd)
 {
     auto& frame = frames[back_buffer_index];
     cmd->RSSetViewports(1, &viewport);
@@ -190,13 +190,13 @@ void gearoenix::d3d::Swapchain::prepare(ID3D12GraphicsCommandList6* const cmd) n
     cmd->OMSetRenderTargets(1, &frame.render_target_decriptor->cpu_handle, false, &depth_stencil_descriptor->cpu_handle);
 }
 
-void gearoenix::d3d::Swapchain::clear(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::d3d::Swapchain::clear(ID3D12GraphicsCommandList6* const cmd)
 {
     cmd->ClearRenderTargetView(frames[back_buffer_index].render_target_decriptor->cpu_handle, clear_colour, 0, nullptr);
     cmd->ClearDepthStencilView(depth_stencil_descriptor->cpu_handle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void gearoenix::d3d::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* const cmd) noexcept
+void gearoenix::d3d::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* const cmd)
 {
     const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         frames[back_buffer_index].render_target.Get(),
@@ -205,7 +205,7 @@ void gearoenix::d3d::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* c
     cmd->ResourceBarrier(1, &barrier);
 }
 
-bool gearoenix::d3d::Swapchain::present() noexcept
+bool gearoenix::d3d::Swapchain::present()
 {
     const auto hr = swapchain->Present(1, 0);
     // If the device was reset we must completely reinitialize the renderer.
@@ -219,7 +219,7 @@ bool gearoenix::d3d::Swapchain::present() noexcept
     return false;
 }
 
-void gearoenix::d3d::Swapchain::move_to_next_frame() noexcept
+void gearoenix::d3d::Swapchain::move_to_next_frame()
 {
     GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), ++current_fence_value));
     // Update the back buffer index.

@@ -1,19 +1,21 @@
 #ifndef GEAROENIX_RENDER_LIGHT_LIGHT_HPP
 #define GEAROENIX_RENDER_LIGHT_LIGHT_HPP
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 
 namespace gearoenix::render::light {
-struct Light final : public core::ecs::Component {
+struct Light : core::ecs::Component {
     math::Vec3<float> colour = { 1.0f, 1.0f, 1.0f };
     core::ecs::entity_id_t scene_id = 0;
     bool is_shadow_caster = false;
 
-    explicit Light(std::string&& name) noexcept;
-    Light(Light&&) noexcept;
-    ~Light() noexcept final;
-    void show_debug_gui() noexcept final;
+protected:
+    explicit Light(std::type_index final_type_index, std::string&& name);
+
+public:
+    ~Light() override;
+    void show_debug_gui() override;
 };
 }
 #endif

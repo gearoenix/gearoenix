@@ -13,7 +13,7 @@ gearoenix::vulkan::buffer::Buffer::Buffer(
     std::shared_ptr<core::allocator::Range> allocator,
     std::shared_ptr<const Buffer> parent,
     std::shared_ptr<memory::Memory> allocated_memory,
-    VkBuffer vulkan_data) noexcept
+    VkBuffer vulkan_data)
     : allocator(std::move(allocator))
     , parent(std::move(parent))
     , allocated_memory(std::move(allocated_memory))
@@ -25,7 +25,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     const std::string& name,
     const std::size_t size,
     const memory::Place place,
-    memory::Manager& memory_manager) noexcept
+    memory::Manager& memory_manager)
 {
     const auto& logical_device = memory_manager.get_e().get_logical_device();
     const auto& physical_device = logical_device.get_physical_device();
@@ -67,7 +67,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     return result;
 }
 
-gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
+gearoenix::vulkan::buffer::Buffer::~Buffer()
 {
     if (nullptr == parent && nullptr != vulkan_data) {
         vkDestroyBuffer(
@@ -76,7 +76,7 @@ gearoenix::vulkan::buffer::Buffer::~Buffer() noexcept
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size)
 {
     const auto aligned_size = allocated_memory->get_e().get_logical_device().get_physical_device().align_size(size);
     auto alc = allocator->allocate(aligned_size);
@@ -90,13 +90,13 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     return result;
 }
 
-void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size) noexcept
+void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size)
 {
     GX_CHECK_NOT_EQUAL_D(nullptr, allocated_memory->get_data());
     std::memcpy(allocated_memory->get_data(), data, size);
 }
 
-VkDeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const noexcept
+VkDeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const
 {
     VkBufferDeviceAddressInfo info;
     GX_SET_ZERO(info);

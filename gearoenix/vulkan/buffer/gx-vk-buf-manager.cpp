@@ -12,7 +12,7 @@
 #include "gx-vk-buf-buffer.hpp"
 #include "gx-vk-buf-uniform.hpp"
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer() const noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer() const
 {
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     const auto& phs_dev = e.get_physical_device();
@@ -21,7 +21,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return Buffer::construct("upload-buffer", up_sz, memory::Place::Cpu, memory_manager);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_gpu_root_buffer() const noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_gpu_root_buffer() const
 {
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     const auto& phs_dev = e.get_physical_device();
@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return Buffer::construct("gpu-buffer", gpu_sz, memory::Place::Gpu, memory_manager);
 }
 
-std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_source() const noexcept
+std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_source() const
 {
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     const auto& phs_dev = e.get_physical_device();
@@ -42,7 +42,7 @@ std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulka
     return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_destination() const noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_destination() const
 {
     const auto& cfg = e.get_platform_application().get_base().get_configuration().get_render_configuration();
     const auto& phs_dev = e.get_physical_device();
@@ -52,7 +52,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
 
 gearoenix::vulkan::buffer::Manager::Manager(
     memory::Manager& memory_manager,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
     : memory_manager(memory_manager)
     , e(e)
     , upload_root_buffer(create_upload_root_buffer())
@@ -66,19 +66,19 @@ gearoenix::vulkan::buffer::Manager::Manager(
     });
 }
 
-gearoenix::vulkan::buffer::Manager::~Manager() noexcept = default;
+gearoenix::vulkan::buffer::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::size_t size)
 {
     return gpu_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::size_t size)
 {
     return upload_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size) noexcept
+std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size)
 {
     std::vector<std::shared_ptr<Buffer>> cpus(each_frame_upload_source.size());
     for (std::size_t fi = 0; fi < each_frame_upload_source.size(); ++fi)
@@ -91,7 +91,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     const std::string& name,
     const void* const data,
     const std::size_t size,
-    const core::sync::EndCaller& end) noexcept
+    const core::job::EndCaller& end)
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu)
@@ -100,7 +100,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     if (nullptr == gpu)
         return nullptr;
     cpu->write(data, size);
-    uploader->push([this, name, cpu = std::move(cpu), gpu, end = end]() mutable noexcept {
+    uploader->push([this, name, cpu = std::move(cpu), gpu, end = end]() mutable {
         auto cmd = std::make_shared<command::Buffer>(e.get_command_manager().create(command::Type::Primary));
         GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data(), e.get_logical_device());
         cmd->begin();
@@ -113,7 +113,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
                 gpu = std::move(gpu),
                 end = std::move(end),
                 cmd = std::move(cmd),
-                fence = std::move(fence)]() noexcept {
+                fence = std::move(fence)]() {
                 fence->wait();
             });
     });

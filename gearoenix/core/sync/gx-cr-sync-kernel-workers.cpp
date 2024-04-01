@@ -2,7 +2,7 @@
 #include "gx-cr-sync-semaphore.hpp"
 #include <utility>
 
-void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel_index) noexcept
+void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel_index)
 {
     state = State::Running;
 #define GX_HELPER                  \
@@ -26,7 +26,7 @@ void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel
 #undef GX_HELPER
 }
 
-gearoenix::core::sync::KernelWorkers::KernelWorkers() noexcept
+gearoenix::core::sync::KernelWorkers::KernelWorkers()
 {
     const unsigned int kernels_count = std::thread::hardware_concurrency();
     signals.reserve(kernels_count);
@@ -39,7 +39,7 @@ gearoenix::core::sync::KernelWorkers::KernelWorkers() noexcept
     }
 }
 
-gearoenix::core::sync::KernelWorkers::~KernelWorkers() noexcept
+gearoenix::core::sync::KernelWorkers::~KernelWorkers()
 {
     state = State::Terminating;
     while (state != State::Terminated)
@@ -49,12 +49,12 @@ gearoenix::core::sync::KernelWorkers::~KernelWorkers() noexcept
         t.join();
 }
 
-void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver) noexcept
+void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver)
 {
     add_step([] {}, std::move(worker), [] {}, std::move(receiver));
 }
 
-void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver) noexcept
+void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver)
 {
     const size_t kernels_count = threads.size();
     std::vector<std::shared_ptr<Semaphore>> waits;
@@ -78,7 +78,7 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender
         m->unlock();
 }
 
-void gearoenix::core::sync::KernelWorkers::do_steps() noexcept
+void gearoenix::core::sync::KernelWorkers::do_steps()
 {
     for (const std::shared_ptr<Semaphore>& signal : signals)
         signal->release();
@@ -93,7 +93,7 @@ void gearoenix::core::sync::KernelWorkers::do_steps() noexcept
     }
 }
 
-unsigned int gearoenix::core::sync::KernelWorkers::get_threads_count() const noexcept
+unsigned int gearoenix::core::sync::KernelWorkers::get_threads_count() const
 {
     return static_cast<unsigned int>(threads.size());
 }

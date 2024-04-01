@@ -7,7 +7,7 @@
 
 gearoenix::vulkan::sampler::Sampler::Sampler(
     std::shared_ptr<device::Logical> ld,
-    const render::texture::SamplerInfo& sampler_info) noexcept
+    const render::texture::SamplerInfo& sampler_info)
     : logical_device(std::move(ld))
 {
     VkSamplerCreateInfo info;
@@ -32,12 +32,12 @@ gearoenix::vulkan::sampler::Sampler::Sampler(
     GX_VK_CHK_L(vkCreateSampler(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data))
 }
 
-gearoenix::vulkan::sampler::Sampler::~Sampler() noexcept
+gearoenix::vulkan::sampler::Sampler::~Sampler()
 {
     Loader::vkDestroySampler(logical_device->get_vulkan_data(), vulkan_data, nullptr);
 }
 
-VkFilter gearoenix::vulkan::sampler::Sampler::convert(const render::texture::Filter filter) noexcept
+VkFilter gearoenix::vulkan::sampler::Sampler::convert(const render::texture::Filter filter)
 {
     switch (filter) {
     case render::texture::Filter::Linear:
@@ -53,7 +53,7 @@ VkFilter gearoenix::vulkan::sampler::Sampler::convert(const render::texture::Fil
     }
 }
 
-VkSamplerAddressMode gearoenix::vulkan::sampler::Sampler::convert(const render::texture::Wrap wrap) noexcept
+VkSamplerAddressMode gearoenix::vulkan::sampler::Sampler::convert(const render::texture::Wrap wrap)
 {
     switch (wrap) {
     case render::texture::Wrap::Repeat:

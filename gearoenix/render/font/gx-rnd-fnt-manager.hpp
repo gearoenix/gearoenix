@@ -17,9 +17,9 @@ private:
     boost::container::flat_map<std::string, std::shared_ptr<Font>> fonts;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Font> get(const std::string& name) noexcept;
+    explicit Manager(engine::Engine& e);
+    ~Manager();
+    [[nodiscard]] std::shared_ptr<Font> get(const std::string& name);
 };
 }
 #endif

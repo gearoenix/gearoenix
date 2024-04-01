@@ -10,8 +10,8 @@ struct JniUtility final {
     static JavaVM* jvm;
     static JNIEnv* env;
 
-    static void make_current() noexcept;
-    [[nodiscard]] static std::string consume_string(jstring j_str) noexcept;
+    static void make_current();
+    [[nodiscard]] static std::string consume_string(jstring j_str);
 };
 }
 

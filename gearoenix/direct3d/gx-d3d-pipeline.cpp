@@ -9,7 +9,7 @@
 #include "gx-d3d-engine.hpp"
 #include <fstream>
 
-gearoenix::d3d::PipelineManager::PipelineManager(Engine& e) noexcept
+gearoenix::d3d::PipelineManager::PipelineManager(Engine& e)
     : e(e)
     , device(e.get_device())
 {
@@ -17,9 +17,9 @@ gearoenix::d3d::PipelineManager::PipelineManager(Engine& e) noexcept
     initialize_mipmap_generator();
 }
 
-gearoenix::d3d::PipelineManager::~PipelineManager() noexcept = default;
+gearoenix::d3d::PipelineManager::~PipelineManager() = default;
 
-void gearoenix::d3d::PipelineManager::initialize_g_buffer_filler() noexcept
+void gearoenix::d3d::PipelineManager::initialize_g_buffer_filler()
 {
     const std::unique_ptr<platform::stream::Asset> g_buffer_vs_f(platform::stream::Asset::construct(e.get_platform_application(), "shaders/gx-d3d-shd-gbuffers-filler.vs.cso"));
     GX_ASSERT(nullptr != g_buffer_vs_f);
@@ -93,7 +93,7 @@ void gearoenix::d3d::PipelineManager::initialize_g_buffer_filler() noexcept
     GX_D3D_CHECK(d->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&g_buffer_filler_pipeline_state)));
 }
 
-void gearoenix::d3d::PipelineManager::initialize_mipmap_generator() noexcept
+void gearoenix::d3d::PipelineManager::initialize_mipmap_generator()
 {
     const std::unique_ptr<platform::stream::Asset> f(platform::stream::Asset::construct(e.get_platform_application(), "shaders/gx-d3d-shd-mipmap-generator.cs.cso"));
     GX_ASSERT(nullptr != f);

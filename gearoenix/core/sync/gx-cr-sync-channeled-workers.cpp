@@ -1,7 +1,7 @@
 #include "gx-cr-sync-channeled-workers.hpp"
 #include "../../platform/gx-plt-log.hpp"
 
-void gearoenix::core::sync::ChanneledWorkers::Thread::kernel() noexcept
+void gearoenix::core::sync::ChanneledWorkers::Thread::kernel()
 {
     running = true;
     while (running) {
@@ -21,13 +21,13 @@ void gearoenix::core::sync::ChanneledWorkers::Thread::kernel() noexcept
     running = true;
 }
 
-gearoenix::core::sync::ChanneledWorkers::Thread::Thread(const std::size_t i) noexcept
+gearoenix::core::sync::ChanneledWorkers::Thread::Thread(const std::size_t i)
     : thread_index(i)
     , thread([this] { kernel(); })
 {
 }
 
-gearoenix::core::sync::ChanneledWorkers::Thread::~Thread() noexcept
+gearoenix::core::sync::ChanneledWorkers::Thread::~Thread()
 {
     running = false;
     if (!running)
@@ -35,7 +35,7 @@ gearoenix::core::sync::ChanneledWorkers::Thread::~Thread() noexcept
     thread.join();
 }
 
-gearoenix::core::sync::ChanneledWorkers::ChanneledWorkers() noexcept
+gearoenix::core::sync::ChanneledWorkers::ChanneledWorkers()
 {
     std::size_t count = std::thread::hardware_concurrency();
     threads.reserve(count);
@@ -43,9 +43,9 @@ gearoenix::core::sync::ChanneledWorkers::ChanneledWorkers() noexcept
         threads.emplace_back(new Thread(i));
 }
 
-gearoenix::core::sync::ChanneledWorkers::~ChanneledWorkers() noexcept = default;
+gearoenix::core::sync::ChanneledWorkers::~ChanneledWorkers() = default;
 
-void gearoenix::core::sync::ChanneledWorkers::perform(const std::function<void(std::size_t)>& job) noexcept
+void gearoenix::core::sync::ChanneledWorkers::perform(const std::function<void(std::size_t)>& job)
 {
     std::size_t min = std::numeric_limits<std::size_t>::max();
     std::size_t i = 0;

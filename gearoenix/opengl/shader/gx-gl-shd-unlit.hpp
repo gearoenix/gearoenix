@@ -14,9 +14,9 @@ struct Unlit final : public Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    Unlit(Engine& e, bool has_uv_transform, bool has_alpha_cutoff, bool has_albedo_factor, bool has_albedo) noexcept;
-    ~Unlit() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    Unlit(Engine& e, bool has_uv_transform, bool has_alpha_cutoff, bool has_albedo_factor, bool has_albedo);
+    ~Unlit() final;
+    void bind(uint& current_shader) const final;
 };
 
 struct UnlitCombination final : public ShaderCombination {
@@ -31,13 +31,13 @@ private:
 
     has_uv_transform combinations;
 
-    explicit UnlitCombination(Engine& e) noexcept
+    explicit UnlitCombination(Engine& e)
         : e(e)
     {
     }
 
 public: /// TODO: support bone-count too
-    [[nodiscard]] Unlit& get(const bool uv_transform, const bool alpha_cutoff, const bool albedo_factor, const bool albedo) noexcept
+    [[nodiscard]] Unlit& get(const bool uv_transform, const bool alpha_cutoff, const bool albedo_factor, const bool albedo)
     {
         auto& s = combinations
             [static_cast<std::size_t>(uv_transform)]

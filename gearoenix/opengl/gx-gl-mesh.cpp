@@ -6,15 +6,15 @@
 #include "gx-gl-label.hpp"
 #include "gx-gl-loader.hpp"
 
-gearoenix::gl::Mesh::Mesh(Engine& e, const math::Aabb3<double>& box) noexcept
+gearoenix::gl::Mesh::Mesh(Engine& e, const math::Aabb3<double>& box)
     : render::mesh::Mesh(box)
     , e(e)
 {
 }
 
-gearoenix::gl::Mesh::~Mesh() noexcept
+gearoenix::gl::Mesh::~Mesh()
 {
-    e.todos.load([vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
+    core::job::send_job(e.get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
         GX_GL_CHECK_D;
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -26,26 +26,27 @@ gearoenix::gl::Mesh::~Mesh() noexcept
     });
 }
 
-gearoenix::gl::MeshManager::MeshManager(Engine& e) noexcept
+gearoenix::gl::MeshManager::MeshManager(Engine& e)
     : render::mesh::Manager(e)
     , gl_e(e)
 {
 }
 
-gearoenix::gl::MeshManager::~MeshManager() noexcept = default;
+gearoenix::gl::MeshManager::~MeshManager() = default;
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build(
+void gearoenix::gl::MeshManager::build(
     std::string&& name,
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
-    math::Aabb3<double>&& occlusion_box,
-    const core::sync::EndCaller& end_callback) noexcept
+    const math::Aabb3<double>& occlusion_box,
+    core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
 {
     auto m = std::make_shared<Mesh>(gl_e, occlusion_box);
     m->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
-    gl_e.todos.load([c = end_callback, m, vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
+    end_callback.set_return(m);
+    core::job::send_job(e.get_jobs_thread_id(), [c = std::move(end_callback), m = std::move(m), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(m->vertex_object));
         glBindVertexArray(m->vertex_object);
@@ -88,7 +89,6 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::gl::MeshManager::build
         set_vertex_array_label(m->vertex_object, name + "-vertex-array");
         GX_GL_CHECK_D;
     });
-    return m;
 }
 
 #endif

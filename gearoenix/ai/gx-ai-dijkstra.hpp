@@ -13,10 +13,10 @@ struct Dijkstra {
 
 public:
     /// vertices -> connections -> (index, weight)
-    explicit Dijkstra(const std::vector<std::vector<std::tuple<int, int>>>& graph) noexcept;
-    ~Dijkstra() noexcept;
+    explicit Dijkstra(const std::vector<std::vector<std::tuple<int, int>>>& graph);
+    ~Dijkstra();
 
-    Graph<int, int> best_graph(int start) const noexcept;
+    Graph<int, int> best_graph(int start) const;
 };
 }
 

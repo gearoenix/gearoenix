@@ -14,7 +14,7 @@
 #define GX_DEBUG_SWAPCHAIN
 #endif
 
-gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e) noexcept
+gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e)
     : e(e)
     , logical_device(e.get_logical_device())
     , format {}
@@ -22,12 +22,12 @@ gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e) noexcept
     initialize();
 }
 
-gearoenix::vulkan::Swapchain::~Swapchain() noexcept
+gearoenix::vulkan::Swapchain::~Swapchain()
 {
     vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore) noexcept
+std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore)
 {
     std::uint32_t image_index = 0;
     const VkResult result = vkAcquireNextImageKHR(
@@ -45,7 +45,7 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
     }
 }
 
-void gearoenix::vulkan::Swapchain::initialize() noexcept
+void gearoenix::vulkan::Swapchain::initialize()
 {
     image_views.clear();
     const auto& physical_device = logical_device.get_physical_device();
@@ -123,7 +123,7 @@ void gearoenix::vulkan::Swapchain::initialize() noexcept
     }
 }
 
-const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const noexcept
+const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const
 {
     return &vulkan_data;
 }

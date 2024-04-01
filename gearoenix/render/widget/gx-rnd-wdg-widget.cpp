@@ -10,7 +10,7 @@
 #include "gx-rnd-wdg-layout.hpp"
 #include <array>
 
-constexpr std::array<gearoenix::core::event::Id, 6> default_event_ids {
+constexpr std::array default_event_ids {
     gearoenix::core::event::Id::GestureClick,
     gearoenix::core::event::Id::GestureDrag2D,
     gearoenix::core::event::Id::ButtonMouse,
@@ -19,7 +19,7 @@ constexpr std::array<gearoenix::core::event::Id, 6> default_event_ids {
     gearoenix::core::event::Id::Touch,
 };
 
-std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const noexcept
+std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const
 {
     const auto* const world = e.get_world();
     if (0 == model_entity_id)
@@ -29,7 +29,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
         return std::nullopt;
     if (0 == camera_entity_id)
         return std::nullopt;
-    const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
+    const auto [camera_transform, camera] = world->get_components<physics::TransformationComponent, camera::Camera>(camera_entity_id);
     if (nullptr == camera_transform || nullptr == camera)
         return std::nullopt;
     const auto ray = camera->generate_ray(*camera_transform, normalised_point);
@@ -39,7 +39,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
     return std::nullopt;
 }
 
-void gearoenix::render::widget::Widget::handle_click_gesture(const core::event::Data& event_data) noexcept
+void gearoenix::render::widget::Widget::handle_click_gesture(const core::event::Data& event_data)
 {
     const auto& click = std::get<core::event::gesture::Click>(event_data.get_data());
     const auto hit = get_hit_point(click.get_point().get_current_position());
@@ -48,7 +48,7 @@ void gearoenix::render::widget::Widget::handle_click_gesture(const core::event::
     on_click(hit.value());
 }
 
-void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::Data& event_data) noexcept
+void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::Data& event_data)
 {
     const auto& mouse = std::get<core::event::button::Mouse>(event_data.get_data());
     const auto hit = get_hit_point(mouse.get_position_normalised());
@@ -65,17 +65,16 @@ void gearoenix::render::widget::Widget::handle_button_mouse(const core::event::D
     }
 }
 
-void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event::Data& event_data) noexcept
+void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event::Data& event_data)
 {
     const auto& move = std::get<core::event::movement::Mouse>(event_data.get_data());
     const auto hit = get_hit_point(move.get_current_normalised_position());
     if (!hit.has_value()) {
         handle_cancel();
-        return;
     }
 }
 
-void gearoenix::render::widget::Widget::handle_touch(const core::event::Data& event_data) noexcept
+void gearoenix::render::widget::Widget::handle_touch(const core::event::Data& event_data)
 {
     if (e.get_platform_application().get_base().get_touch_states().size() > 1) {
         handle_cancel();
@@ -95,7 +94,7 @@ void gearoenix::render::widget::Widget::handle_touch(const core::event::Data& ev
     }
 }
 
-void gearoenix::render::widget::Widget::handle_cancel() noexcept
+void gearoenix::render::widget::Widget::handle_cancel()
 {
     if (is_pressed) {
         is_pressed = false;
@@ -103,13 +102,13 @@ void gearoenix::render::widget::Widget::handle_cancel() noexcept
     }
 }
 
-void gearoenix::render::widget::Widget::handle_press(const math::Vec3<double>& hit_point) noexcept
+void gearoenix::render::widget::Widget::handle_press(const math::Vec3<double>& hit_point)
 {
     is_pressed = true;
     on_press(hit_point);
 }
 
-void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>& hit_point) noexcept
+void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>& hit_point)
 {
     if (is_pressed) {
         is_pressed = false;
@@ -120,18 +119,18 @@ void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>&
 gearoenix::render::widget::Widget::Widget(
     std::string&& n,
     const Type widget_type,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
     : e(e)
     , name(std::move(n))
     , widget_type(widget_type)
-    , on_press([](const math::Vec3<double>&) noexcept -> void {})
-    , on_release([](const math::Vec3<double>&) noexcept -> void {})
-    , on_click([](const math::Vec3<double>&) noexcept -> void {})
-    , on_cancel([]() noexcept -> void {})
+    , on_press([](const math::Vec3<double>&) -> void {})
+    , on_release([](const math::Vec3<double>&) -> void {})
+    , on_click([](const math::Vec3<double>&) -> void {})
+    , on_cancel([]() -> void {})
 {
 }
 
-gearoenix::render::widget::Widget::~Widget() noexcept
+gearoenix::render::widget::Widget::~Widget()
 {
     auto& ee = *e.get_platform_application().get_base().get_event_engine();
     for (const auto event_id : default_event_ids) {
@@ -139,27 +138,27 @@ gearoenix::render::widget::Widget::~Widget() noexcept
     }
 }
 
-void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     on_press = fun;
 }
 
-void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     on_release = fun;
 }
 
-void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun) noexcept
+void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun)
 {
     on_cancel = fun;
 }
 
-void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun) noexcept
+void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     on_click = fun;
 }
 
-void gearoenix::render::widget::Widget::set_sensitivity(const bool b) noexcept
+void gearoenix::render::widget::Widget::set_sensitivity(const bool b)
 {
     sensitivity = b;
     for (const auto& child : children) {
@@ -167,17 +166,17 @@ void gearoenix::render::widget::Widget::set_sensitivity(const bool b) noexcept
     }
 }
 
-void gearoenix::render::widget::Widget::set_model_entity_id(const core::ecs::entity_id_t id) noexcept
+void gearoenix::render::widget::Widget::set_model_entity_id(const core::ecs::entity_id_t id)
 {
     model_entity_id = id;
 }
 
-void gearoenix::render::widget::Widget::set_camera_entity_id(const core::ecs::entity_id_t id) noexcept
+void gearoenix::render::widget::Widget::set_camera_entity_id(const core::ecs::entity_id_t id)
 {
     camera_entity_id = id;
 }
 
-void gearoenix::render::widget::Widget::register_for_events() noexcept
+void gearoenix::render::widget::Widget::register_for_events()
 {
     auto& ee = *e.get_platform_application().get_base().get_event_engine();
     for (const auto event_id : default_event_ids) {
@@ -185,67 +184,67 @@ void gearoenix::render::widget::Widget::register_for_events() noexcept
     }
 }
 
-void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l) noexcept
+void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l)
 {
     layout = std::move(l);
 }
 
-void gearoenix::render::widget::Widget::show() noexcept
+void gearoenix::render::widget::Widget::show()
 {
     auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
     GX_ASSERT_D(nullptr != mdl);
-    mdl->enabled = true;
+    mdl->set_enabled(true);
     for (auto& child : children) {
         child.second->show();
     }
     set_sensitivity(true);
 }
 
-void gearoenix::render::widget::Widget::hide() noexcept
+void gearoenix::render::widget::Widget::hide()
 {
     auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
     GX_ASSERT_D(nullptr != mdl);
-    mdl->enabled = false;
+    mdl->set_enabled(false);
     for (auto& child : children) {
         child.second->hide();
     }
     set_sensitivity(false);
 }
 
-void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority) noexcept
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority)
 {
     children.emplace(std::make_pair(priority, child->name), std::move(child));
 }
 
-void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child) noexcept
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)
 {
     add_child(std::move(child), 0.0);
 }
 
 gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(
-    const core::event::Data& event_data) noexcept
+    const core::event::Data& event_data)
 {
     switch (event_data.get_source()) {
     case core::event::Id::GestureClick: {
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         handle_click_gesture(event_data);
         break;
     }
     case core::event::Id::GestureDrag2D: {
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         break;
     }
     case core::event::Id::MovementMouse: {
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         handle_movement_mouse(event_data);
         break;
     }
     case core::event::Id::ButtonMouse: {
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         handle_button_mouse(event_data);
         break;
     }
@@ -256,19 +255,20 @@ gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on
     }
     case core::event::Id::Touch: {
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         handle_touch(event_data);
     }
     default:
         if (!sensitivity)
-            return core::event::Listener::Response::Continue;
+            return Response::Continue;
         break;
     }
     for (const auto& child : children) {
         const auto res = child.second->on_event(event_data);
-        if (res == core::event::Listener::Response::Continue)
+        if (res == Response::Continue) {
             continue;
+        }
         return res;
     }
-    return core::event::Listener::Response::Continue;
+    return Response::Continue;
 }

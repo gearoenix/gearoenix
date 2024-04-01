@@ -21,9 +21,9 @@ struct Framebuffer final {
 
 public:
     Framebuffer(const Framebuffer&) = delete;
-    Framebuffer(Framebuffer&&) noexcept;
-    Framebuffer(const image::View* view, const image::View* depth, const RenderPass* render_pass) noexcept;
-    ~Framebuffer() noexcept;
+    Framebuffer(Framebuffer&&);
+    Framebuffer(const image::View* view, const image::View* depth, const RenderPass* render_pass);
+    ~Framebuffer();
     Framebuffer& operator=(const Framebuffer&) = delete;
     Framebuffer& operator=(Framebuffer&&) = delete;
 };

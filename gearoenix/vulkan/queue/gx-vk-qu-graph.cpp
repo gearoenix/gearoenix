@@ -9,7 +9,7 @@
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include <algorithm>
 
-void gearoenix::vulkan::queue::Graph::SubmitData::FrameData::clear() noexcept
+void gearoenix::vulkan::queue::Graph::SubmitData::FrameData::clear()
 {
     providers_waits.clear();
     pipeline_stages.clear();
@@ -17,14 +17,14 @@ void gearoenix::vulkan::queue::Graph::SubmitData::FrameData::clear() noexcept
     consumers_signals.clear();
 }
 
-void gearoenix::vulkan::queue::Graph::SubmitData::clear() noexcept
+void gearoenix::vulkan::queue::Graph::SubmitData::clear()
 {
     for (auto& frame : frame_data)
         frame.clear();
 }
 
 void gearoenix::vulkan::queue::Graph::SubmitData::add_provider(
-    const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores) noexcept
+    const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores)
 {
     if (frame_data.empty())
         frame_data.resize(semaphores.size());
@@ -42,7 +42,7 @@ void gearoenix::vulkan::queue::Graph::SubmitData::add_provider(
 }
 
 void gearoenix::vulkan::queue::Graph::SubmitData::add_consumer(
-    const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores) noexcept
+    const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores)
 {
     if (frame_data.empty())
         frame_data.resize(semaphores.size());
@@ -56,7 +56,7 @@ void gearoenix::vulkan::queue::Graph::SubmitData::add_consumer(
     }
 }
 
-void gearoenix::vulkan::queue::Graph::update_traversing_level() noexcept
+void gearoenix::vulkan::queue::Graph::update_traversing_level()
 {
     auto& start_node = nodes.find(NodeLabel::Start)->second;
     start_node.clear_traversing_level(nodes);
@@ -64,14 +64,14 @@ void gearoenix::vulkan::queue::Graph::update_traversing_level() noexcept
     submit_data.resize(static_cast<std::size_t>(max_tl));
 }
 
-void gearoenix::vulkan::queue::Graph::clear_submit_data() noexcept
+void gearoenix::vulkan::queue::Graph::clear_submit_data()
 {
     for (auto& d : submit_data) {
         d.clear();
     }
 }
 
-void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node) noexcept
+void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node)
 {
     if (node.get_traversed())
         return;
@@ -91,7 +91,7 @@ void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node) noexcept
     }
 }
 
-void gearoenix::vulkan::queue::Graph::update() noexcept
+void gearoenix::vulkan::queue::Graph::update()
 {
     update_traversing_level();
     clear_submit_data();
@@ -108,7 +108,7 @@ void gearoenix::vulkan::queue::Graph::update() noexcept
     }
 }
 
-void gearoenix::vulkan::queue::Graph::submit() noexcept
+void gearoenix::vulkan::queue::Graph::submit()
 {
     const auto frame_index = q.get_e().get_frame_number();
     const auto submit_data_end = submit_data.size() - 1;
@@ -133,7 +133,7 @@ void gearoenix::vulkan::queue::Graph::submit() noexcept
     }
 }
 
-gearoenix::vulkan::queue::Graph::Graph(engine::Engine& e) noexcept
+gearoenix::vulkan::queue::Graph::Graph(engine::Engine& e)
     : start_semaphore(sync::Semaphore::create_frame_based(e))
     , end_semaphore(sync::Semaphore::create_frame_based(e))
     , fence(sync::Fence::create_frame_based(e, true))
@@ -144,13 +144,13 @@ gearoenix::vulkan::queue::Graph::Graph(engine::Engine& e) noexcept
     Node::connect(nodes.find(NodeLabel::Start)->second, nodes.find(NodeLabel::End)->second, e);
 }
 
-gearoenix::vulkan::queue::Graph::~Graph() noexcept = default;
+gearoenix::vulkan::queue::Graph::~Graph() = default;
 
 std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::queue::Graph::place_node_between(
     const NodeLabel provider_node_label,
     const NodeLabel new_node_label,
     const NodeLabel consumer_node_label,
-    const VkPipelineStageFlags wait_stage) noexcept
+    const VkPipelineStageFlags wait_stage)
 {
     GX_CHECK_EQUAL_D(nodes.end(), nodes.find(new_node_label));
     auto& new_node = nodes.emplace(new_node_label, Node(q.get_e(), new_node_label, wait_stage)).first->second;
@@ -183,14 +183,14 @@ std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulk
     return new_node.get_frame_commands();
 }
 
-void gearoenix::vulkan::queue::Graph::start_frame() noexcept
+void gearoenix::vulkan::queue::Graph::start_frame()
 {
     auto& f = *fence[q.get_e().get_frame_number()];
     f.wait();
     f.reset();
 }
 
-bool gearoenix::vulkan::queue::Graph::present(Swapchain& swapchain, const std::uint32_t image_index) noexcept
+bool gearoenix::vulkan::queue::Graph::present(Swapchain& swapchain, const std::uint32_t image_index)
 {
     submit();
 
@@ -211,7 +211,7 @@ bool gearoenix::vulkan::queue::Graph::present(Swapchain& swapchain, const std::u
     return true;
 }
 
-const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::queue::Graph::get_present_semaphore() noexcept
+const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::queue::Graph::get_present_semaphore()
 {
     return *start_semaphore[q.get_e().get_frame_number()];
 }

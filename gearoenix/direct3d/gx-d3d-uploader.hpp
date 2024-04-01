@@ -2,7 +2,7 @@
 
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_DIRECT3D_ENABLED
-#include "../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../core/sync/gx-cr-job-end-caller.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "gx-d3d-loader.hpp"
 
@@ -25,13 +25,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence;
     UINT64 fence_value = 1;
 
-    void wait(UINT64 fv) noexcept;
+    void wait(UINT64 fv);
 
 public:
-    explicit Uploader(std::shared_ptr<Device> device) noexcept;
-    ~Uploader() noexcept;
-    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<GpuBuffer>&& buffer, core::sync::EndCaller&& end) noexcept;
-    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<Texture2D>&& texture, UINT subresource, core::sync::EndCaller&& end) noexcept;
+    explicit Uploader(std::shared_ptr<Device> device);
+    ~Uploader();
+    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<GpuBuffer>&& buffer, core::job::EndCaller&& end);
+    void upload(std::vector<std::uint8_t>&& data, std::shared_ptr<Texture2D>&& texture, UINT subresource, core::job::EndCaller&& end);
 };
 }
 

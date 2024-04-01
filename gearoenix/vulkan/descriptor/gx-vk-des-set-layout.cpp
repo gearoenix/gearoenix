@@ -5,7 +5,7 @@
 #include "../gx-vk-check.hpp"
 
 gearoenix::vulkan::descriptor::SetLayout::SetLayout(
-    const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data) noexcept
+    const device::Logical& logical_device, const std::vector<VkDescriptorSetLayoutBinding>& data)
     : logical_device(logical_device)
 {
     VkDescriptorSetLayoutCreateInfo info;
@@ -16,12 +16,12 @@ gearoenix::vulkan::descriptor::SetLayout::SetLayout(
     GX_VK_CHK(vkCreateDescriptorSetLayout(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::descriptor::SetLayout::~SetLayout() noexcept
+gearoenix::vulkan::descriptor::SetLayout::~SetLayout()
 {
     vkDestroyDescriptorSetLayout(logical_device.get_vulkan_data(), vulkan_data, nullptr);
 }
 
-VkDescriptorSetLayout* gearoenix::vulkan::descriptor::SetLayout::get_vulkan_data_ptr() noexcept
+VkDescriptorSetLayout* gearoenix::vulkan::descriptor::SetLayout::get_vulkan_data_ptr()
 {
     return &vulkan_data;
 }

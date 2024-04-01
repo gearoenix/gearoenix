@@ -4,19 +4,13 @@
 
 gearoenix::render::reflection::Baked::Baked(
     engine::Engine& e,
-    std::shared_ptr<texture::TextureCube> irradiance,
-    std::shared_ptr<texture::TextureCube> radiance,
-    math::Aabb3<double> include_box,
-    std::string&& name) noexcept
-    : core::ecs::Component(this, std::move(name))
-    , radiance_mips_count(static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance->get_info().width))))
-    , include_box(include_box)
-    , irradiance(std::move(irradiance))
-    , radiance(std::move(radiance))
-    , e(e)
+    const std::type_index final_component_type_index,
+    std::shared_ptr<texture::TextureCube>&& irradiance,
+    std::shared_ptr<texture::TextureCube>&& radiance,
+    const math::Aabb3<double>& include_box,
+    std::string&& name)
+    : Probe(e, final_component_type_index, std::move(irradiance), std::move(radiance), include_box, std::move(name))
 {
 }
 
-gearoenix::render::reflection::Baked::~Baked() noexcept = default;
-
-gearoenix::render::reflection::Baked::Baked(Baked&&) noexcept = default;
+gearoenix::render::reflection::Baked::~Baked() = default;

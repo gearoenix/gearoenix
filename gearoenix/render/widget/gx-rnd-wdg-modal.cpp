@@ -16,7 +16,7 @@ gearoenix::render::widget::Modal::Modal(
     engine::Engine& e,
     std::shared_ptr<Button>&& close,
     std::shared_ptr<Button>&& cancel,
-    std::shared_ptr<Button>&& ok) noexcept
+    std::shared_ptr<Button>&& ok)
     : Widget(std::move(name), Type::Modal, e)
     , close(std::move(close))
     , cancel(std::move(cancel))
@@ -24,50 +24,108 @@ gearoenix::render::widget::Modal::Modal(
 {
 }
 
-std::tuple<
-    std::shared_ptr<gearoenix::render::model::Builder>,
-    std::shared_ptr<gearoenix::render::model::Builder>,
-    std::shared_ptr<gearoenix::render::model::Builder>,
-    std::shared_ptr<gearoenix::render::model::Builder>,
-    std::shared_ptr<gearoenix::render::widget::Modal>>
-gearoenix::render::widget::Modal::construct(
-    std::string&& n,
-    engine::Engine& e,
-    const std::string& background_texture_asset,
-    const std::optional<std::pair<std::string, std::string>>& close_fs,
-    const std::optional<std::pair<std::string, std::string>>& cancel_fs,
-    const std::optional<std::pair<std::string, std::string>>& ok_fs,
+void gearoenix::render::widget::Modal::construct(
+    std::string&& name,
+    std::string&& background_texture_asset,
+    const std::optional<std::pair<std::string, std::string>>& close_button_texture_asset,
+    const std::optional<std::pair<std::string, std::string>>& cancel_button_texture_asset,
+    const std::optional<std::pair<std::string, std::string>>& ok_button_texture_asset,
     const core::ecs::entity_id_t camera_id,
-    Widget* const parent,
-    scene::Builder& scene_builder,
-    const core::sync::EndCaller& end_callback) noexcept
+    std::shared_ptr<Widget>&& parent,
+    std::shared_ptr<scene::Builder>&& scene_builder,
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
-    auto result = std::make_shared<Modal>(std::move(n), e, nullptr, nullptr, nullptr);
-    auto mat = e.get_material_manager()->get_unlit(result->name + "-material", end_callback);
-    mat->set_transparency(render::material::Transparency::Transparent);
-    mat->set_albedo(e.get_texture_manager()->create_2d_from_file(
-        background_texture_asset,
-        platform::stream::Path::create_asset(background_texture_asset),
-        render::texture::TextureInfo(),
-        end_callback));
-    auto bg_md = e.get_model_manager()->build(
-        result->name + "-background-model",
-        e.get_mesh_manager()->build_plate(end_callback),
-        std::move(mat),
-        core::sync::EndCaller(end_callback),
-        true);
-    result->set_model_entity_id(bg_md->get_id());
-    result->set_camera_entity_id(camera_id);
-    if (nullptr != parent)
-        parent->add_child(result);
-    scene_builder.add(std::shared_ptr(bg_md));
-    auto [close_md, close_button] = close_fs.has_value() ? Button::construct(result->name + "-close-button", e, close_fs->first, close_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
-    auto [cancel_md, cancel_button] = cancel_fs.has_value() ? Button::construct(result->name + "-cancel-button", e, cancel_fs->first, cancel_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
-    auto [ok_md, ok_button] = ok_fs.has_value() ? Button::construct(result->name + "-ok-button", e, ok_fs->first, ok_fs->second, camera_id, *result, scene_builder, end_callback) : std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>(nullptr, nullptr);
-    result->close = std::move(close_button);
-    result->cancel = std::move(cancel_button);
-    result->ok = std::move(ok_button);
-    return { std::move(bg_md), std::move(close_md), std::move(cancel_md), std::move(ok_md), std::move(result) };
+    struct Values {
+        core::job::EndCaller<ConstructorReturn> end_callback;
+        ConstructorReturn return_value;
+        std::shared_ptr<material::Unlit> mat;
+        std::shared_ptr<texture::Texture2D> background_texture;
+        std::shared_ptr<mesh::Mesh> msh;
+
+        explicit Values(core::job::EndCaller<ConstructorReturn>&& end_callback)
+            : end_callback(std::move(end_callback))
+        {
+        }
+    };
+
+    auto& e = scene_builder->e;
+
+    auto values = std::make_shared<Values>(std::move(end_callback));
+    values->return_value.modal = std::make_shared<Modal>(std::move(name), e, nullptr, nullptr, nullptr);
+
+    auto values_ready = core::job::EndCaller([values, parent = std::move(parent), scene_builder = scene_builder, camera_id]() mutable {
+        values->mat->set_transparency(material::Transparency::Transparent);
+        values->mat->set_albedo(std::move(values->background_texture));
+        values->return_value.background_model_builder = values->return_value.modal->e.get_model_manager()->build(
+            values->return_value.modal->name + "-background-model",
+            std::move(values->msh),
+            std::move(values->mat),
+            core::job::EndCaller([] {}),
+            true);
+        values->return_value.modal->set_model_entity_id(values->return_value.background_model_builder->get_id());
+        values->return_value.modal->set_camera_entity_id(camera_id);
+        if (nullptr != parent) {
+            parent->add_child(values->return_value.modal);
+        }
+        values->return_value.modal->parent = std::move(parent);
+        scene_builder->add(std::shared_ptr(values->return_value.background_model_builder));
+        values->end_callback.set_return(std::move(values->return_value));
+    });
+
+    e.get_material_manager()->get_unlit(
+        values->return_value.modal->name + "-material",
+        core::job::EndCallerShared<material::Unlit>([values, values_ready](std::shared_ptr<material::Unlit>&& mat) {
+            values->mat = std::move(mat);
+            (void)values_ready;
+        }));
+
+    const auto path = platform::stream::Path::create_asset(background_texture_asset);
+    e.get_texture_manager()->create_2d_from_file(
+        std::move(background_texture_asset), path, texture::TextureInfo(),
+        core::job::EndCallerShared<texture::Texture2D>([values, values_ready](std::shared_ptr<texture::Texture2D>&& tex) {
+            values->background_texture = std::move(tex);
+            (void)values_ready;
+        }));
+
+    e.get_mesh_manager()->build_plate(core::job::EndCallerShared<mesh::Mesh>([values, values_ready](std::shared_ptr<mesh::Mesh>&& msh) {
+        values->msh = std::move(msh);
+        (void)values_ready;
+    }));
+
+    auto& result = values->return_value.modal;
+
+    if (close_button_texture_asset.has_value()) {
+        Button::construct(
+            result->name + "-close-button", std::string(close_button_texture_asset->first), std::string(close_button_texture_asset->second), camera_id,
+            std::shared_ptr(result), std::shared_ptr(scene_builder),
+            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
+                values->return_value.modal->close = std::move(bb.second);
+                values->return_value.close_button_model_builder = std::move(bb.first);
+                (void)values_ready;
+            }));
+    }
+
+    if (cancel_button_texture_asset.has_value()) {
+        Button::construct(
+            result->name + "-cancel-button", std::string(cancel_button_texture_asset->first), std::string(cancel_button_texture_asset->second), camera_id,
+            std::shared_ptr(result), std::shared_ptr(scene_builder),
+            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
+                values->return_value.modal->cancel = std::move(bb.second);
+                values->return_value.cancel_button_model_builder = std::move(bb.first);
+                (void)values_ready;
+            }));
+    }
+
+    if (ok_button_texture_asset.has_value()) {
+        Button::construct(
+            result->name + "-ok-button", std::string(ok_button_texture_asset->first), std::string(ok_button_texture_asset->second), camera_id,
+            std::shared_ptr(result), std::move(scene_builder),
+            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
+                values->return_value.modal->ok = std::move(bb.second);
+                values->return_value.ok_button_model_builder = std::move(bb.first);
+                (void)values_ready;
+            }));
+    }
 }
 
-gearoenix::render::widget::Modal::~Modal() noexcept = default;
+gearoenix::render::widget::Modal::~Modal() = default;

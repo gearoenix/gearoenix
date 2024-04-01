@@ -20,7 +20,7 @@ struct Data final {
     GX_GET_CVAL_PRV(Action, action);
 
 public:
-    Data(Point2D point, const platform::FingerId finger_id, const Action& action) noexcept
+    Data(Point2D point, const platform::FingerId finger_id, const Action& action)
         : point(point)
         , finger_id(finger_id)
         , action(action)

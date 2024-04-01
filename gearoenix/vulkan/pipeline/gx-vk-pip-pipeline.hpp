@@ -16,19 +16,19 @@ struct Pipeline final {
     GX_GET_VAL_PRV(VkPipeline, vulkan_data, nullptr);
 
 private:
-    Pipeline(std::shared_ptr<Layout>, std::shared_ptr<Cache>, VkPipeline) noexcept;
+    Pipeline(std::shared_ptr<Layout>, std::shared_ptr<Cache>, VkPipeline);
 
 public:
     Pipeline(Pipeline&&) = delete;
     Pipeline(const Pipeline&) = delete;
     Pipeline& operator=(Pipeline&&) = delete;
     Pipeline& operator=(const Pipeline&) = delete;
-    ~Pipeline() noexcept;
+    ~Pipeline();
     [[nodiscard]] static std::shared_ptr<Pipeline> construct_ray_tracing(
         std::shared_ptr<Layout> layout,
         std::shared_ptr<Cache> cache,
         const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
-        const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info) noexcept;
+        const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info);
 };
 }
 #endif

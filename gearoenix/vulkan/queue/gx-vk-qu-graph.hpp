@@ -24,13 +24,13 @@ struct Graph final {
             std::shared_ptr<command::Buffer> cmd;
             std::vector<VkSemaphore> consumers_signals;
 
-            void clear() noexcept;
+            void clear();
         };
         std::vector<FrameData> frame_data;
 
-        void clear() noexcept;
-        void add_provider(const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores) noexcept;
-        void add_consumer(const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores) noexcept;
+        void clear();
+        void add_provider(const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores);
+        void add_consumer(const std::vector<std::shared_ptr<sync::Semaphore>>& semaphores);
     };
 
     const std::vector<std::shared_ptr<sync::Semaphore>> start_semaphore;
@@ -42,28 +42,28 @@ struct Graph final {
     GX_GET_CREF_PRV(std::vector<SubmitData>, submit_data);
 
 private:
-    void update_traversing_level() noexcept;
-    void clear_submit_data() noexcept;
-    void update_submit_data(Node& node) noexcept;
-    void update() noexcept;
-    void submit() noexcept;
+    void update_traversing_level();
+    void clear_submit_data();
+    void update_submit_data(Node& node);
+    void update();
+    void submit();
 
 public:
-    explicit Graph(engine::Engine&) noexcept;
-    ~Graph() noexcept;
+    explicit Graph(engine::Engine&);
+    ~Graph();
     [[nodiscard]] std::vector<std::shared_ptr<command::Buffer>> place_node_between(
         NodeLabel provider_node_label,
         NodeLabel new_node_label,
         NodeLabel consumer_node_label,
-        VkPipelineStageFlags wait_stage) noexcept;
+        VkPipelineStageFlags wait_stage);
     [[nodiscard]] std::vector<std::shared_ptr<command::Buffer>> create_node_path(
         NodeLabel provider_node_label,
         NodeLabel new_node_label,
         NodeLabel consumer_node_label,
-        VkPipelineStageFlags wait_stage) noexcept;
-    void start_frame() noexcept;
-    [[nodiscard]] bool present(Swapchain& swapchain, std::uint32_t image_index) noexcept;
-    [[nodiscard]] const sync::Semaphore& get_present_semaphore() noexcept;
+        VkPipelineStageFlags wait_stage);
+    void start_frame();
+    [[nodiscard]] bool present(Swapchain& swapchain, std::uint32_t image_index);
+    [[nodiscard]] const sync::Semaphore& get_present_semaphore();
 };
 }
 

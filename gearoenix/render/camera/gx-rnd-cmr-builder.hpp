@@ -1,9 +1,8 @@
 #ifndef GEAROENIX_RENDER_CAMERA_BUILDER_HPP
 #define GEAROENIX_RENDER_CAMERA_BUILDER_HPP
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
-#include "gx-rnd-cmr-projection.hpp"
 #include <memory>
 #include <string>
 
@@ -12,7 +11,7 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct Transformation;
+struct TransformationComponent;
 }
 
 namespace gearoenix::render::engine {
@@ -31,24 +30,20 @@ struct Builder {
 
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
-protected:
-    Builder(engine::Engine& e, const std::string& name, core::sync::EndCaller&& end_caller) noexcept;
+    Builder(engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback);
 
 public:
     Builder(Builder&&) = delete;
     Builder(const Builder&) = delete;
     Builder& operator=(Builder&&) = delete;
     Builder& operator=(const Builder&) = delete;
-    virtual ~Builder() noexcept;
+    virtual ~Builder();
 
-    [[nodiscard]] physics::Transformation& get_transformation() noexcept;
-    [[nodiscard]] const physics::Transformation& get_transformation() const noexcept;
-    [[nodiscard]] Camera& get_camera() noexcept;
-    [[nodiscard]] const Camera& get_camera() const noexcept;
-    // It is needed because the target must not be changed directly
-    virtual void set_customised_target(std::shared_ptr<texture::Target>&& target) noexcept;
-    virtual void disable_bloom() noexcept;
-    [[nodiscard]] core::ecs::entity_id_t get_id() const noexcept;
+    [[nodiscard]] physics::TransformationComponent& get_transformation();
+    [[nodiscard]] const physics::TransformationComponent& get_transformation() const;
+    [[nodiscard]] Camera& get_camera();
+    [[nodiscard]] const Camera& get_camera() const;
+    [[nodiscard]] core::ecs::entity_id_t get_id() const;
 };
 }
 #endif

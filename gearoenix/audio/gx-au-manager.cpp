@@ -7,29 +7,29 @@
 #include <fmod/fmod.hpp>
 #include <fmod/fmod_errors.h>
 
-gearoenix::audio::Manager::Manager(Engine& engine) noexcept
+gearoenix::audio::Manager::Manager(Engine& engine)
     : engine(engine)
 {
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name) noexcept
+std::size_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name)
 {
     return create_audio(platform::stream::Path::create_asset(asset_path), name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name) noexcept
+std::size_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name)
 {
     auto stream = platform::stream::Stream::open(asset_path, engine.get_platform_application());
     return create_audio(*stream, name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& asset_stream, const std::string& name) noexcept
+std::size_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& asset_stream, const std::string& name)
 {
     const auto data = asset_stream.get_file_content();
     return create_audio_ogg(data, name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name) noexcept
+std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name)
 {
     FMOD_CREATESOUNDEXINFO info;
     GX_SET_ZERO(info);
@@ -48,7 +48,7 @@ std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::u
     return audio_index;
 }
 
-std::size_t gearoenix::audio::Manager::create_player(const std::string& name, const std::size_t audio_index, const bool is_loop) noexcept
+std::size_t gearoenix::audio::Manager::create_player(const std::string& name, const std::size_t audio_index, const bool is_loop)
 {
     FMOD::Channel* channel = nullptr;
     GX_AUDIO_FMOD_RESULT_CHECK(engine.get_system()->playSound(audios[audio_index].sound, nullptr, true, &channel));

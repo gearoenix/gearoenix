@@ -4,23 +4,22 @@
 #include "gx-rnd-scn-builder.hpp"
 #include "gx-rnd-scn-scene.hpp"
 
-gearoenix::render::scene::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::render::scene::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Scene>();
 }
 
-gearoenix::render::scene::Manager::~Manager() noexcept = default;
+gearoenix::render::scene::Manager::~Manager() = default;
 
 std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Manager::build(
-    const std::string& name, const double layer, core::sync::EndCaller&& end_callback) noexcept
+    const std::string& name, const double layer, core::job::EndCaller<>&& end_callback) const
 {
-    return std::shared_ptr<Builder>(new Builder(e, name, layer, std::move(end_callback)));
+    return std::make_shared<Builder>(e, name, layer, std::move(end_callback));
 }
 
-void gearoenix::render::scene::Manager::update() noexcept
+void gearoenix::render::scene::Manager::update() const
 {
-    e.get_world()->parallel_system<Scene>([](const core::ecs::entity_id_t scene_id, Scene* const s, const auto /*kernel_index*/) noexcept {
+    e.get_world()->parallel_system<Scene>([](const core::ecs::entity_id_t scene_id, Scene* const s, const auto /*kernel_index*/) {
         s->update(scene_id);
     });
 }

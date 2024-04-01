@@ -1,7 +1,7 @@
 #include "gx-plt-stm-path.hpp"
 #include "../gx-plt-log.hpp"
 
-const std::string& gearoenix::platform::stream::Path::get_raw_data() const noexcept
+const std::string& gearoenix::platform::stream::Path::get_raw_data() const
 {
     switch (data.index()) {
     case 0:

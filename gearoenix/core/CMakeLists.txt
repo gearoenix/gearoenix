@@ -5,6 +5,8 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-same-size-block.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-shared-array.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-shared-array.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/cache/gx-cr-cache-cacher.cpp
@@ -38,6 +40,9 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-link.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-node.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/graph/gx-cr-gr-node.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/job/gx-cr-job-end-caller.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/job/gx-cr-job-manager.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/job/gx-cr-job-manager.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-assert.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-characterifier.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/macro/gx-cr-mcr-concatenate.hpp
@@ -52,7 +57,6 @@ SET(GX_ENGINE_CORE_SRC
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channel.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channeled-workers.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-channeled-workers.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-end-caller.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-influence-manager.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-influence-manager.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-kernel-workers.cpp

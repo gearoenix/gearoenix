@@ -19,7 +19,7 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
-gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexcept
+gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
     , shader_manager(new shader::Manager(*this))
 {
@@ -59,10 +59,10 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application) noexc
     skybox_manager = std::make_unique<SkyboxManager>(*this);
     reflection_manager = std::make_unique<ReflectionManager>(*this);
     light_manager = std::make_unique<LightManager>(*this);
-    todos.unload();
+    core::job::execute_current_thread_jobs();
 }
 
-gearoenix::gl::Engine::~Engine() noexcept
+gearoenix::gl::Engine::~Engine()
 {
     world = nullptr;
     skybox_manager = nullptr;
@@ -73,51 +73,52 @@ gearoenix::gl::Engine::~Engine() noexcept
     camera_manager = nullptr;
     physics_engine = nullptr;
     material_manager = nullptr;
-    todos.unload();
+    core::job::execute_current_thread_jobs();
     ImGui_ImplOpenGL3_DestroyFontsTexture();
     ImGui_ImplOpenGL3_Shutdown();
 }
 
-void gearoenix::gl::Engine::start_frame() noexcept
+void gearoenix::gl::Engine::start_frame()
 {
-    todos.unload();
+    core::job::execute_current_thread_jobs();
     render::engine::Engine::start_frame();
-    todos.unload();
+    core::job::execute_current_thread_jobs();
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 }
 
-void gearoenix::gl::Engine::end_frame() noexcept
+void gearoenix::gl::Engine::end_frame()
 {
-    todos.unload();
+    core::job::execute_current_thread_jobs();
     render::engine::Engine::end_frame();
-    todos.unload();
+    core::job::execute_current_thread_jobs();
     submission_manager->update();
-    todos.unload();
+    core::job::execute_current_thread_jobs();
 }
 
-void gearoenix::gl::Engine::window_resized() noexcept
+void gearoenix::gl::Engine::window_resized()
 {
     render::engine::Engine::window_resized();
     submission_manager->window_resized();
 }
 
-void gearoenix::gl::Engine::upload_imgui_fonts() noexcept
+void gearoenix::gl::Engine::upload_imgui_fonts()
 {
     ImGui_ImplOpenGL3_CreateFontsTexture();
 }
 
-bool gearoenix::gl::Engine::is_supported() noexcept
+bool gearoenix::gl::Engine::is_supported()
 {
     return load_library();
 }
 
-std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct(platform::Application& platform_application) noexcept
+std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct(platform::Application& platform_application)
 {
-    if (!is_supported())
+    if (!is_supported()) {
         return {};
-    return std::make_unique<gearoenix::gl::Engine>(platform_application);
+    }
+    return std::make_unique<Engine>(platform_application);
 }
 
 #endif

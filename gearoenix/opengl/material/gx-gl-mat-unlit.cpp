@@ -1,5 +1,6 @@
 #include "gx-gl-mat-unlit.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../gx-gl-engine.hpp"
 #include "../gx-gl-texture.hpp"
 #include "../shader/gx-gl-shd-manager.hpp"
@@ -7,24 +8,28 @@
 #include "../shader/gx-gl-shd-unlit.hpp"
 #include "../submission/gx-gl-sbm-camera.hpp"
 
-gearoenix::gl::material::Unlit::Unlit(
-    Engine& e,
-    const std::string& name,
-    const core::sync::EndCaller& c) noexcept
-    : render::material::Unlit(e, name, c)
+gearoenix::gl::material::Unlit::Unlit(Engine& e, const std::string& name)
+    : render::material::Unlit(e, name)
     , gl::material::Material(true)
-    , gl_albedo(std::dynamic_pointer_cast<Texture2D>(albedo))
     , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())
     , unlit_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
 {
 }
 
-gearoenix::gl::material::Unlit::~Unlit() noexcept = default;
+void gearoenix::gl::material::Unlit::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c)
+{
+    static core::allocator::SharedArray<gl::material::Unlit, render::material::Unlit::MAX_COUNT> allocator;
+    auto result = allocator.make_shared(e, name);
+    c.set_return(result);
+    result->initialise(std::move(c));
+}
+
+gearoenix::gl::material::Unlit::~Unlit() = default;
 
 void gearoenix::gl::material::Unlit::shadow(
     const submission::Model& model,
     const submission::Camera& camera,
-    uint& current_shader) noexcept
+    uint& current_shader)
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(model.bones_count);
     shadow_caster_shader.bind(current_shader);
@@ -43,7 +48,7 @@ void gearoenix::gl::material::Unlit::forward_render(
     const submission::Model& model,
     const submission::Camera& camera,
     const submission::Scene&,
-    uint& current_shader) noexcept
+    uint& current_shader)
 {
     auto& shader = unlit_combination->get(false, true, true, true);
     shader.bind(current_shader);
@@ -60,14 +65,14 @@ void gearoenix::gl::material::Unlit::deferred_gbuffer_render(
     const submission::Model&,
     const submission::Camera&,
     const submission::Scene&,
-    uint&) noexcept
+    uint&)
 {
 }
 
-void gearoenix::gl::material::Unlit::set_albedo(const std::shared_ptr<render::texture::Texture2D>& t) noexcept
+void gearoenix::gl::material::Unlit::set_albedo(std::shared_ptr<render::texture::Texture2D>&& t)
 {
     gl_albedo = std::dynamic_pointer_cast<Texture2D>(t);
-    render::material::Unlit::set_albedo(t);
+    render::material::Unlit::set_albedo(std::move(t));
 }
 
 #endif

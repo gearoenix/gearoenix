@@ -4,24 +4,24 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 
-gearoenix::vulkan::queue::Node::Node(engine::Engine& e, const NodeLabel node_label, VkPipelineStageFlags stage) noexcept
+gearoenix::vulkan::queue::Node::Node(engine::Engine& e, const NodeLabel node_label, VkPipelineStageFlags stage)
     : node_label(node_label)
     , stage(stage)
     , frame_commands(e.get_command_manager().create_frame_based())
 {
 }
 
-gearoenix::vulkan::queue::Node::~Node() noexcept = default;
+gearoenix::vulkan::queue::Node::~Node() = default;
 
-gearoenix::vulkan::queue::Node::Node(Node&& o) noexcept = default;
+gearoenix::vulkan::queue::Node::Node(Node&& o) = default;
 
-gearoenix::vulkan::queue::Node::Node(const Node&) noexcept = default;
+gearoenix::vulkan::queue::Node::Node(const Node&) = default;
 
-gearoenix::vulkan::queue::Node& gearoenix::vulkan::queue::Node::operator=(Node&& o) noexcept = default;
+gearoenix::vulkan::queue::Node& gearoenix::vulkan::queue::Node::operator=(Node&& o) = default;
 
-gearoenix::vulkan::queue::Node& gearoenix::vulkan::queue::Node::operator=(const Node& o) noexcept = default;
+gearoenix::vulkan::queue::Node& gearoenix::vulkan::queue::Node::operator=(const Node& o) = default;
 
-void gearoenix::vulkan::queue::Node::clear_traversing_level(boost::container::flat_map<NodeLabel, Node>& nodes) noexcept
+void gearoenix::vulkan::queue::Node::clear_traversing_level(boost::container::flat_map<NodeLabel, Node>& nodes)
 {
     traversal_level = -1;
     traversed = false;
@@ -32,7 +32,7 @@ void gearoenix::vulkan::queue::Node::clear_traversing_level(boost::container::fl
     }
 }
 
-int gearoenix::vulkan::queue::Node::update_traversing_level(const int tl, boost::container::flat_map<NodeLabel, Node>& nodes) noexcept
+int gearoenix::vulkan::queue::Node::update_traversing_level(const int tl, boost::container::flat_map<NodeLabel, Node>& nodes)
 {
     int max_tl = tl;
     if (tl > traversal_level) {
@@ -51,7 +51,7 @@ int gearoenix::vulkan::queue::Node::update_traversing_level(const int tl, boost:
 void gearoenix::vulkan::queue::Node::connect(
     Node& provider,
     Node& consumer,
-    engine::Engine& e) noexcept
+    engine::Engine& e)
 {
     GX_CHECK_EQUAL_D(consumer.providers.end(), consumer.providers.find(provider.node_label));
     GX_CHECK_EQUAL_D(provider.consumers.end(), provider.consumers.find(consumer.node_label));

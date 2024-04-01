@@ -1,8 +1,7 @@
 #include "gx-phs-anm-bone.hpp"
 
-gearoenix::physics::animation::BoneInfo::BoneInfo(std::string&& name) noexcept
-    : transform(name + "-transformation")
-    , name(std::move(name))
+gearoenix::physics::animation::BoneInfo::BoneInfo(std::string&& name)
+    : name(std::move(name))
 {
 }
 
@@ -13,7 +12,7 @@ gearoenix::physics::animation::Bone::Bone(
     const std::size_t parent_index,
     const std::size_t children_count,
     const std::size_t first_child_index,
-    const std::size_t last_child_index) noexcept
+    const std::size_t last_child_index)
     : transform(std::move(transform))
     , inverse_bind(inverse_bind)
     , name(std::move(name))

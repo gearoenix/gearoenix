@@ -17,7 +17,7 @@ gearoenix::d3d::Model::Model(
     Engine& e,
     std::shared_ptr<Mesh>&& bound_mesh,
     const UINT buffer_size,
-    const std::string& name) noexcept
+    const std::string& name)
     : core::ecs::Component(this)
     , uniforms {
         UniformBuffer(e, buffer_size, core::String::to_wchar_ptr(name + "-D3D-Uniform-0")),
@@ -28,21 +28,21 @@ gearoenix::d3d::Model::Model(
 {
 }
 
-gearoenix::d3d::Model::~Model() noexcept = default;
+gearoenix::d3d::Model::~Model() = default;
 
-gearoenix::d3d::Model::Model(Model&&) noexcept = default;
+gearoenix::d3d::Model::Model(Model&&) = default;
 
 gearoenix::d3d::ModelBuilder::ModelBuilder(
     Engine& e,
     const std::string& name,
     std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
-    bool is_transformable) noexcept
+    bool is_transformable)
     : render::model::Builder(e, name, std::move(bound_mesh), is_transformable)
     , e(e)
 {
 }
 
-void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat) noexcept
+void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat)
 {
     render::model::Builder::set_material(mat);
     auto& b = entity_builder->get_builder();
@@ -70,23 +70,23 @@ void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat
     b.add_component(std::move(m));
 }
 
-gearoenix::d3d::ModelBuilder::~ModelBuilder() noexcept = default;
+gearoenix::d3d::ModelBuilder::~ModelBuilder() = default;
 
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::d3d::ModelManager::build(
     std::string&& name,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    core::sync::EndCaller&&,
-    const bool is_transformable) noexcept
+    core::job::EndCaller&&,
+    const bool is_transformable)
 {
     return std::shared_ptr<render::model::Builder>(new ModelBuilder(
         dynamic_cast<Engine&>(e), name, std::move(mesh), is_transformable));
 }
 
-gearoenix::d3d::ModelManager::ModelManager(Engine& e) noexcept
+gearoenix::d3d::ModelManager::ModelManager(Engine& e)
     : render::model::Manager(e)
 {
 }
 
-gearoenix::d3d::ModelManager::~ModelManager() noexcept = default;
+gearoenix::d3d::ModelManager::~ModelManager() = default;
 
 #endif

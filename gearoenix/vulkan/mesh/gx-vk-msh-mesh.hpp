@@ -2,7 +2,7 @@
 #define GEAROENIX_VULKAN_MESH_ACCEL_HPP
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../render/gx-rnd-vertex.hpp"
 #include "../../render/mesh/gx-rnd-msh-mesh.hpp"
 #include "../gx-vk-loader.hpp"
@@ -27,7 +27,7 @@ struct Mesh final : public render::mesh::Mesh {
     GX_GET_VAL_PRV(VkDeviceAddress, acceleration_address, 0);
 
 private:
-    void initialize_blas() noexcept;
+    void initialize_blas();
 
 public:
     Mesh(
@@ -36,9 +36,9 @@ public:
         const render::Vertices& vertices,
         const std::vector<std::uint32_t>& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::sync::EndCaller& end) noexcept;
-    ~Mesh() noexcept final;
-    [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const noexcept;
+        const core::job::EndCaller& end);
+    ~Mesh() final;
+    [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const;
 };
 }
 

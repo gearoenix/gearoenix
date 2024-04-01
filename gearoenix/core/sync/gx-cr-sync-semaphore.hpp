@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
 #define GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
-#include "../gx-cr-build-configuration.hpp"
 #include <condition_variable>
 #include <mutex>
 
@@ -12,15 +11,15 @@ private:
     int count = 0;
 
 public:
-    explicit Semaphore(int count = 0) noexcept;
+    explicit Semaphore(int count = 0);
     Semaphore(Semaphore const&) = delete;
     void operator=(Semaphore const&) = delete;
-    ~Semaphore() noexcept = default;
-    void lock() noexcept;
-    void release() noexcept;
+    ~Semaphore() = default;
+    void lock();
+    void release();
 
     template <typename Duration>
-    void lock_for(const Duration& timeout_time) noexcept
+    void lock_for(const Duration& timeout_time)
     {
         std::unique_lock<std::mutex> lock(m);
         if (c.wait_for(lock, timeout_time, [this] { return count > 0; })) {

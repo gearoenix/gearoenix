@@ -28,8 +28,8 @@ public:
     Module(const Module&) = delete;
     Module& operator=(Module&&) = delete;
     Module& operator=(const Module&) = delete;
-    Module(const engine::Engine& e, const std::string& file_address) noexcept;
-    ~Module() noexcept;
+    Module(const engine::Engine& e, const std::string& file_address);
+    ~Module();
 };
 }
 #endif

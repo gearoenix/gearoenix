@@ -12,9 +12,9 @@ struct Radiance final : public Shader {
     GX_GL_UNIFORM_TEXTURE(environment);
 
 public:
-    explicit Radiance(Engine& e) noexcept;
-    ~Radiance() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit Radiance(Engine& e);
+    ~Radiance() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

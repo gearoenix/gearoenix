@@ -1,88 +1,101 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include <cstring>
 
-std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBuilder::components_t& cs) noexcept
+std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBuilder::components_t& cs)
 {
     std::size_t s = 0;
     for (const auto& c : cs)
-        s += Component::get_type_info(c.first).get_size();
+        s += sizeof(c.second);
     return s;
 }
 
 gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Archetype::get_components_indices(
-    const EntityBuilder::components_t& cs) noexcept
+    const EntityBuilder::components_t& cs)
 {
-    const auto css = cs.size();
     components_indices_t cis;
-    cis.reserve(css);
     std::size_t index = 0;
     for (const auto& c : cs) {
-        cis[c.first] = index;
-        index += Component::get_type_info(c.first).get_size();
+        const auto& ts = c.second->get_all_the_hierarchy_types_except_component();
+        for (const auto& t : ts) {
+            if (const auto search = cis.find(t); cis.end() != search) {
+                GX_LOG_F("There is a duplicate type in the entity components map.\n"
+                         "No two component types can have overlapping component types in their hierarchy map.\n"
+                         "Clashing component: "
+                    << c.second->get_name());
+            }
+            cis.emplace(t, index);
+        }
+        ++index;
     }
     return cis;
 }
 
-gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs) noexcept
+gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs)
     : components_indices(get_components_indices(cs))
     , entity_size(header_size + get_components_size(cs))
     , alc(entity_size, 2048)
 {
 }
 
-unsigned char* gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id) noexcept
+std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id)
 {
     unsigned char* const entity = alc.alloc();
     entities.emplace(entity);
+    std::memset(entity, 0, entity_size); // we need it because of the std::shared_ptr moves
     *reinterpret_cast<entity_id_t*>(entity) = id;
-    return entity + sizeof(entity_id_t);
+    return reinterpret_cast<std::shared_ptr<gearoenix::core::ecs::Component>*>(&entity[header_size]);
 }
 
-unsigned char* gearoenix::core::ecs::Archetype::allocate_entity(
+std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(
     const entity_id_t ei,
-    const EntityBuilder::components_t& cs) noexcept
+    const EntityBuilder::components_t& cs)
 {
     auto* const ptr = allocate_entity(ei);
     for (const auto& c : cs) {
         auto search = components_indices.find(c.first);
         GX_ASSERT_D(components_indices.end() != search);
-        Component::get_type_info(c.first).get_move_constructor()(&ptr[search->second], c.second.get());
+        ptr[search->second] = c.second;
     }
     return ptr;
 }
 
-void gearoenix::core::ecs::Archetype::remove_entity(unsigned char* const cs) noexcept
+void gearoenix::core::ecs::Archetype::delete_entity(std::shared_ptr<Component>* const cs)
 {
-    for (const auto& ci : components_indices)
-        reinterpret_cast<Component*>(cs + ci.second)->~Component();
-    unsigned char* const ptr = cs - sizeof(entity_id_t);
+    for (const auto& ci : components_indices) {
+        cs[ci.second] = nullptr;
+    }
+    auto* const ptr = reinterpret_cast<unsigned char*>(cs) - sizeof(entity_id_t);
     entities.erase(ptr);
     alc.free(ptr);
 }
 
-gearoenix::core::ecs::Archetype::~Archetype() noexcept
+void gearoenix::core::ecs::Archetype::move_out_entity(
+    std::shared_ptr<Component>* const cs,
+    EntityBuilder::components_t& components)
+{
+    for (auto& ci : components_indices) {
+        auto& c = cs[ci.second];
+        if (nullptr == c)
+            continue;
+        const auto t = c->get_final_type_index();
+        if (const auto search = components.find(t); components.end() != search) {
+            GX_LOG_F("Component already exists in the component map, name: " << c->get_name());
+        }
+        components.emplace(t, std::move(c));
+        c = nullptr;
+    }
+    delete_entity(cs);
+}
+
+gearoenix::core::ecs::Archetype::~Archetype()
 {
     for (auto* const entity : entities) {
-        auto* const ptr = entity + sizeof(entity_id_t);
+        auto* const ptr = reinterpret_cast<std::shared_ptr<Component>*>(&entity[header_size]);
         for (const auto& ci : components_indices) {
-            reinterpret_cast<Component*>(&ptr[ci.second])->~Component();
+            ptr[ci.second] = nullptr;
         }
 #ifdef GX_DEBUG_MODE
         alc.free(entity);
 #endif
     }
-}
-
-void gearoenix::core::ecs::Archetype::move_out_entity(
-    unsigned char* const cs,
-    EntityBuilder::components_t& components) noexcept
-{
-    for (const auto& ci : components_indices) {
-        const auto& ti = Component::get_type_info(ci.first);
-        std::unique_ptr<Component> dst(reinterpret_cast<Component*>(std::malloc(ti.get_size())));
-        auto* const src = reinterpret_cast<Component*>(&cs[ci.second]);
-        ti.get_move_constructor()(dst.get(), src);
-        components.emplace(ci.first, std::move(dst));
-    }
-    remove_entity(cs);
 }

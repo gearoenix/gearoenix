@@ -18,19 +18,19 @@
 #import "gx-mtl-pipeline.hpp"
 #import <thread>
 
-gearoenix::metal::SubmissionManager::SubmissionManager(Engine& e) noexcept
+gearoenix::metal::SubmissionManager::SubmissionManager(Engine& e)
     : e(e)
     , queue([e.get_device() newCommandQueue])
     , present_semaphore(dispatch_semaphore_create(GEAROENIX_METAL_FRAMES_COUNT))
 {
 }
 
-gearoenix::metal::SubmissionManager::~SubmissionManager() noexcept
+gearoenix::metal::SubmissionManager::~SubmissionManager()
 {
     [queue release];
 }
 
-void gearoenix::metal::SubmissionManager::update() noexcept
+void gearoenix::metal::SubmissionManager::update()
 {
     dispatch_semaphore_wait(present_semaphore, DISPATCH_TIME_FOREVER);
 

@@ -20,10 +20,10 @@ struct Billing final {
     static std::function<void(int)> on_unpurchased;
 
 public:
-    static void launch_flow(int product_index) noexcept;
+    static void launch_flow(int product_index);
     // TODO: provide an API to provide the product info from the native code
-    static void query_products_info() noexcept;
-    static void query_purchases_info() noexcept;
+    static void query_products_info();
+    static void query_purchases_info();
 };
 }
 

@@ -15,12 +15,12 @@ struct PipelineManager final {
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12RootSignature>, mipmap_generator_root_signature)
     GX_GET_CREF_PRV(Microsoft::WRL::ComPtr<ID3D12PipelineState>, mipmap_generator_pipeline_state)
 
-    PipelineManager(Engine& e) noexcept;
-    ~PipelineManager() noexcept;
+    PipelineManager(Engine& e);
+    ~PipelineManager();
 
 private:
-    void initialize_g_buffer_filler() noexcept;
-    void initialize_mipmap_generator() noexcept;
+    void initialize_g_buffer_filler();
+    void initialize_mipmap_generator();
 };
 }
 

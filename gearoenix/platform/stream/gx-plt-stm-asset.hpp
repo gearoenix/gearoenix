@@ -37,15 +37,15 @@ private:
     Asset();
 
 public:
-    ~Asset() noexcept override;
+    ~Asset() override;
     /// It will return null if file does not exist
-    [[nodiscard]] static Asset* construct(const platform::Application& platform_application, const std::string& name) noexcept;
-    [[nodiscard]] std::size_t read(void* data, std::size_t length) noexcept override;
-    [[nodiscard]] std::size_t write(const void* data, std::size_t length) noexcept override;
-    [[nodiscard]] std::size_t tell() noexcept override;
-    [[nodiscard]] std::size_t size() noexcept override;
-    void flush() noexcept override;
-    void seek(std::size_t offset) noexcept override;
+    [[nodiscard]] static Asset* construct(const platform::Application& platform_application, const std::string& name);
+    [[nodiscard]] std::size_t read(void* data, std::size_t length) override;
+    [[nodiscard]] std::size_t write(const void* data, std::size_t length) override;
+    [[nodiscard]] std::size_t tell() override;
+    [[nodiscard]] std::size_t size() override;
+    void flush() override;
+    void seek(std::size_t offset) override;
 };
 }
 

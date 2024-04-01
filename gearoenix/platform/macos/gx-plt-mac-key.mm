@@ -2,7 +2,7 @@
 #ifdef GX_PLATFORM_MACOS
 #import <array>
 
-gearoenix::platform::key::Id gearoenix::platform::convert_key(const unsigned short key_code) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_key(const unsigned short key_code)
 {
     static const std::array<key::Id, 0x80> ks = []() constexpr {
         std::array<key::Id, 0x80> ks = { key::Id::Unknown };

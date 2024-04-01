@@ -2,7 +2,7 @@
 #define GEAROENIX_VULKAN_TEXTURE_2D_HPP
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-2d.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
 #include "../gx-vk-loader.hpp"
@@ -27,12 +27,12 @@ public:
         const render::texture::TextureInfo& info,
         std::size_t img_width,
         std::size_t img_height,
-        const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept;
-    ~Texture2D() noexcept final;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& call);
+    ~Texture2D() final;
     void write_gx3d(
         const std::shared_ptr<platform::stream::Stream>& s,
-        const gearoenix::core::sync::EndCaller<gearoenix::core::sync::EndCallerIgnore>&) noexcept final;
-    [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format) noexcept;
+        const gearoenix::core::job::EndCaller<gearoenix::core::job::EndCallerIgnore>&) final;
+    [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format);
 };
 }
 #endif

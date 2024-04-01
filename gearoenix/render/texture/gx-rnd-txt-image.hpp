@@ -11,7 +11,7 @@ struct Stream;
 namespace gearoenix::render::texture {
 struct Image {
 
-    static void encode_write_func(void* context, void* data, int size) noexcept;
+    static void encode_write_func(void* context, void* data, int size);
 
 public:
     Image() = delete;
@@ -19,9 +19,9 @@ public:
 
     static void decode(
         platform::stream::Stream* file,
-        std::vector<unsigned char>& decoded_data,
+        std::vector<unsigned char>& encoded_data,
         std::size_t& img_width,
-        std::size_t& img_height) noexcept;
+        std::size_t& img_height);
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
@@ -29,7 +29,7 @@ public:
         std::vector<unsigned char>& decoded_data,
         std::size_t& img_width,
         std::size_t& img_height,
-        std::size_t& img_channels) noexcept;
+        std::size_t& img_channels);
     static void decode(
         const unsigned char* formatted_data,
         std::size_t formatted_size,
@@ -37,19 +37,19 @@ public:
         std::vector<float>& decoded_data,
         std::size_t& img_width,
         std::size_t& img_height,
-        std::size_t& img_channels) noexcept;
+        std::size_t& img_channels);
     static void encode_png(
         platform::stream::Stream& file,
         const std::uint8_t* data,
         std::size_t img_width,
         std::size_t img_height,
-        std::size_t components_count) noexcept;
+        std::size_t components_count);
     static void encode_hdr(
         platform::stream::Stream& file,
         const void* data,
         std::size_t img_width,
         std::size_t img_height,
-        std::size_t components_count) noexcept;
+        std::size_t components_count);
 };
 }
 #endif

@@ -42,60 +42,60 @@ struct CountNot<> final {
 };
 
 template <typename... Args>
-struct And final {
+struct All final {
     static constexpr std::size_t count = sizeof...(Args);
     template <std::size_t N>
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
 };
 
 template <typename T>
-struct IsAnd final {
+struct IsAll final {
     typedef T type;
     static constexpr bool value = false;
 };
 
 template <typename... Args>
-struct IsAnd<And<Args...>> final {
+struct IsAll<All<Args...>> final {
     template <std::size_t N>
-    using type = typename And<Args...>::template type<N>;
+    using type = typename All<Args...>::template type<N>;
     static constexpr bool value = true;
     using tuple = std::tuple<Args...>;
     static constexpr std::size_t count = sizeof...(Args);
 };
 
 template <typename T>
-inline constexpr bool is_and_v = IsAnd<T>::value;
+inline constexpr bool is_all_v = IsAll<T>::value;
 
 template <typename T, std::size_t N>
-using and_t = typename IsAnd<T>::template type<N>;
+using all_t = typename IsAll<T>::template type<N>;
 
 template <typename... Args>
-struct Or final {
+struct Any final {
     static constexpr std::size_t count = sizeof...(Args);
     template <std::size_t N>
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
 };
 
 template <typename T>
-struct IsOr final {
+struct IsAny final {
     typedef T type;
     static constexpr bool value = false;
 };
 
 template <typename... Args>
-struct IsOr<Or<Args...>> final {
+struct IsAny<Any<Args...>> final {
     template <std::size_t N>
-    using type = typename Or<Args...>::template type<N>;
+    using type = typename Any<Args...>::template type<N>;
     static constexpr bool value = true;
     using tuple = std::tuple<Args...>;
     static constexpr std::size_t count = sizeof...(Args);
 };
 
 template <typename T>
-inline constexpr bool is_or_v = IsOr<T>::value;
+inline constexpr bool is_any_v = IsAny<T>::value;
 
 template <typename T, std::size_t N>
-using or_t = typename IsOr<T>::template type<N>;
+using any_t = typename IsAny<T>::template type<N>;
 
 template <typename>
 inline constexpr bool is_tuple_v = false;
@@ -141,18 +141,18 @@ struct ConditionTypesPack final {
     };
 
     template <typename... Ts>
-    struct Types<And<Ts...>> final {
+    struct Types<All<Ts...>> final {
         using tuple = typename TuplesPack<typename std::tuple<Ts...>>::types;
     };
 
     template <typename... Ts>
-    struct Types<Or<Ts...>> final {
+    struct Types<Any<Ts...>> final {
         using tuple = typename TuplesPack<typename std::tuple<Ts...>>::types;
     };
 
     using types = typename Types<T>::tuple;
 };
-static_assert(std::is_same_v<std::tuple<int, char, float>, ConditionTypesPack<And<int, char, float>>::types>, "Internal error!");
+static_assert(std::is_same_v<std::tuple<int, char, float>, ConditionTypesPack<All<int, char, float>>::types>, "Internal error!");
 }
 
 #endif

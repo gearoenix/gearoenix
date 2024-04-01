@@ -1,11 +1,13 @@
 #ifndef GEAROENIX_RENDER_WIDGET_TEXT_HPP
 #define GEAROENIX_RENDER_WIDGET_TEXT_HPP
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "gx-rnd-wdg-alignment.hpp"
 #include "gx-rnd-wdg-widget.hpp"
 
 namespace gearoenix::core::sync {
+template <typename T>
 struct EndCaller;
 }
 
@@ -17,6 +19,10 @@ namespace gearoenix::render::material {
 struct Unlit;
 }
 
+namespace gearoenix::render::mesh {
+struct Mesh;
+}
+
 namespace gearoenix::render::model {
 struct Builder;
 }
@@ -26,7 +32,7 @@ struct Builder;
 }
 
 namespace gearoenix::render::widget {
-struct Text final : public Widget {
+struct Text final : Widget {
     GX_GETSET_CREF_PRT(std::wstring, text);
     GX_GETSET_CREF_PRT(std::shared_ptr<font::Font>, text_font);
     GX_GETSET_CREF_PRT(math::Vec4<double>, text_colour);
@@ -36,19 +42,33 @@ struct Text final : public Widget {
     GX_GET_CREF_PRT(std::weak_ptr<Text>, text_self);
 
 private:
-    Text(std::string&& name, engine::Engine& e, const core::sync::EndCaller& c) noexcept;
+    Text(std::string&& name, engine::Engine& e);
 
 public:
-    [[nodiscard]] static std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>> construct(
+    static void construct(
         std::string&& name,
-        engine::Engine& e,
         core::ecs::entity_id_t camera_id,
-        Widget* parent,
-        scene::Builder& scene_builder,
-        const core::sync::EndCaller& c) noexcept;
-    ~Text() noexcept final;
-    [[nodiscard]] math::Vec2<double> get_text_size() const noexcept;
-    void update_text(const core::sync::EndCaller& c) noexcept;
+        std::shared_ptr<Widget>&& parent,
+        std::shared_ptr<scene::Builder>&& scene_builder,
+        core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback);
+    static void construct(
+        std::string&& name,
+        core::ecs::entity_id_t camera_id,
+        std::shared_ptr<mesh::Mesh>&& msh,
+        std::shared_ptr<Widget>&& parent,
+        std::shared_ptr<scene::Builder>&& scene_builder,
+        core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback);
+    static void construct(
+        std::string&& name,
+        core::ecs::entity_id_t camera_id,
+        std::shared_ptr<mesh::Mesh>&& msh,
+        std::shared_ptr<material::Unlit>&& mat,
+        std::shared_ptr<Widget>&& parent,
+        std::shared_ptr<scene::Builder>&& scene_builder,
+        core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback);
+    ~Text() override;
+    [[nodiscard]] math::Vec2<double> get_text_size() const;
+    void update_text(const core::job::EndCaller<>& c) const;
 };
 }
 #endif

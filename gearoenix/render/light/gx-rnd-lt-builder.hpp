@@ -1,8 +1,13 @@
 #ifndef GEAROENIX_RENDER_LIGHT_BUILDER_HPP
 #define GEAROENIX_RENDER_LIGHT_BUILDER_HPP
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/ecs/gx-cr-ecs-types.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <array>
+
+namespace gearoenix::core::ecs {
+struct EntitySharedBuilder;
+}
 
 namespace gearoenix::physics {
 struct Transformation;
@@ -23,8 +28,6 @@ struct ShadowCasterDirectional;
 struct Point;
 struct Spot;
 struct Builder {
-    friend struct Manager;
-
     struct DirectionalInfo final {
     };
 
@@ -47,32 +50,33 @@ struct Builder {
     struct ShadowCasterSpotInfo final {
     };
 
-    typedef std::array<std::shared_ptr<camera::Builder>, 6> Cameras;
-
     engine::Engine& e;
+    std::array<std::shared_ptr<camera::Builder>, 6> camera_builders;
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
-    GX_GETSET_CREF_PRT(Cameras, cameras);
 
-protected:
     Builder(
         engine::Engine& e,
         const std::string& name,
         const DirectionalInfo& info,
-        const core::sync::EndCaller& end_callback) noexcept;
+        core::job::EndCaller<>&& end_callback);
 
     Builder(
         engine::Engine& e,
         const std::string& name,
         const ShadowCasterDirectionalInfo& info,
-        const core::sync::EndCaller& end_callback) noexcept;
+        core::job::EndCaller<>&& end_callback);
 
 public:
     Builder(const Builder&) = delete;
     Builder(Builder&&) = delete;
-    virtual ~Builder() noexcept;
-    [[nodiscard]] const ShadowCasterDirectional* get_shadow_caster_directional() const noexcept;
-    [[nodiscard]] physics::Transformation& get_transformation(std::size_t camera_index = 0) noexcept;
-    [[nodiscard]] Light& get_light() noexcept;
+    virtual ~Builder();
+    [[nodiscard]] const ShadowCasterDirectional* get_shadow_caster_directional() const;
+    [[nodiscard]] ShadowCasterDirectional* get_shadow_caster_directional();
+    [[nodiscard]] const physics::Transformation* get_transformation() const;
+    [[nodiscard]] physics::Transformation* get_transformation();
+    [[nodiscard]] const Light& get_light() const;
+    [[nodiscard]] Light& get_light();
+    [[nodiscard]] core::ecs::entity_id_t get_id() const;
 };
 }
 #endif

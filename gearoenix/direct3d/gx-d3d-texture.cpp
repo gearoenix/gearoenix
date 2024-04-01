@@ -21,7 +21,7 @@ gearoenix::d3d::Texture2D::Texture2D(
     Engine& e,
     const UINT sampler_index,
     Microsoft::WRL::ComPtr<ID3D12Resource>&& r,
-    Descriptor&& d) noexcept
+    Descriptor&& d)
     : render::texture::Texture2D(std::move(name), info, e)
     , sampler_index(sampler_index)
     , resource(std::move(r))
@@ -29,7 +29,7 @@ gearoenix::d3d::Texture2D::Texture2D(
 {
 }
 
-gearoenix::d3d::Texture2D::~Texture2D() noexcept = default;
+gearoenix::d3d::Texture2D::~Texture2D() = default;
 
 const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::d3d::TextureManager::samplers_indices {
     { render::texture::SamplerInfo {
@@ -61,7 +61,7 @@ const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::d3d::Te
         2u }
 };
 
-void gearoenix::d3d::TextureManager::wait(const UINT64 fv) noexcept
+void gearoenix::d3d::TextureManager::wait(const UINT64 fv)
 {
     auto fence_event = CreateEventW(nullptr, false, false, nullptr);
     GX_ASSERT_D(NULL != fence_event);
@@ -73,7 +73,7 @@ void gearoenix::d3d::TextureManager::wait(const UINT64 fv) noexcept
 }
 
 gearoenix::d3d::TextureManager::TextureManager(
-    Engine& e) noexcept
+    Engine& e)
     : e(e)
     , descriptor_manager(e.get_descriptor_manager())
     , uploader(e.get_uploader())
@@ -83,13 +83,13 @@ gearoenix::d3d::TextureManager::TextureManager(
     GX_D3D_CHECK(device->get_device()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 }
 
-gearoenix::d3d::TextureManager::~TextureManager() noexcept = default;
+gearoenix::d3d::TextureManager::~TextureManager() = default;
 
 std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureManager::create_2d_from_pixels(
     std::string name,
     std::vector<std::vector<std::uint8_t>> pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCaller& c) noexcept
+    const core::job::EndCaller& c)
 {
     GX_GUARD_LOCK(textures_2d);
     if (auto textures_2d_search = textures_2d.find(name); textures_2d.end() != textures_2d_search)
@@ -138,7 +138,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     GX_D3D_CHECK(resource->SetName(w_name.c_str()));
     auto t = std::make_shared<Texture2D>(name, info, e, sampler_search->second, std::move(resource), std::move(descriptor));
 
-    core::sync::EndCaller on_mipmap_complete([this, t, desc, c]() {
+    core::job::EndCaller on_mipmap_complete([this, t, desc, c]() {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc;
         GX_SET_ZERO(srv_desc);
         srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -148,7 +148,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
         device->get_device()->CreateShaderResourceView(t->resource.Get(), &srv_desc, t->descriptor.cpu_handle);
     });
 
-    const core::sync::EndCaller on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() mutable noexcept {
+    const core::job::EndCaller on_upload_complete([this, t, desc, on_mipmap_complete = std::move(on_mipmap_complete), needs_mipmap_generator]() mutable {
         if (!needs_mipmap_generator)
             return;
         worker.push([this, t = std::move(t), desc, on_mipmap_complete = std::move(on_mipmap_complete)] {
@@ -244,13 +244,13 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
             std::move(pixels[mipmap_index]),
             std::shared_ptr<Texture2D>(t),
             static_cast<UINT>(mipmap_index),
-            core::sync::EndCaller(on_upload_complete));
+            core::job::EndCaller(on_upload_complete));
     }
     textures_2d.emplace(std::move(name), t);
     return t;
 }
 
-void gearoenix::d3d::TextureManager::convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out) noexcept
+void gearoenix::d3d::TextureManager::convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out)
 {
     const static std::map<std::pair<render::texture::Filter, render::texture::Filter>, D3D12_FILTER> map_filter {
         { { render::texture::Filter::Nearest, render::texture::Filter::Nearest }, D3D12_FILTER_MIN_MAG_MIP_POINT },

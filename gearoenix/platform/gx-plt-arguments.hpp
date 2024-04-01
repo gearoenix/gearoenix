@@ -19,13 +19,13 @@ public:
     GX_GET_VAL_PRV(bool, has_tokens, false);
 
 private:
-    [[nodiscard]] static std::string extract_process_directory(const std::string& s) noexcept;
+    [[nodiscard]] static std::string extract_process_directory(const std::string& s);
 
 public:
-    Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept;
-    [[nodiscard]] static bool is_key(const std::string& s) noexcept;
-    [[nodiscard]] bool get_value(const std::string& key, std::string& value, bool necessary = false) const noexcept;
-    [[nodiscard]] bool get_value(const std::string& key, int& value, bool necessary = false) const noexcept;
+    Arguments(GX_MAIN_ENTRY_ARGS_DEF);
+    [[nodiscard]] static bool is_key(const std::string& s);
+    [[nodiscard]] bool get_value(const std::string& key, std::string& value, bool necessary = false) const;
+    [[nodiscard]] bool get_value(const std::string& key, int& value, bool necessary = false) const;
 };
 }
 

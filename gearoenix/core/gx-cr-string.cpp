@@ -5,12 +5,12 @@
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
-bool gearoenix::core::String::is_character(const platform::key::Id ki) noexcept
+bool gearoenix::core::String::is_character(const platform::key::Id ki)
 {
     return to_character(ki).has_value();
 }
 
-std::optional<wchar_t> gearoenix::core::String::to_character(const platform::key::Id ki, const bool sp, const Language l) noexcept
+std::optional<wchar_t> gearoenix::core::String::to_character(const platform::key::Id ki, const bool sp, const Language l)
 {
     if (l == Language::English) {
         switch (ki) {
@@ -156,17 +156,17 @@ std::optional<wchar_t> gearoenix::core::String::to_character(const platform::key
     return std::nullopt;
 }
 
-std::string gearoenix::core::String::to_string(const std::wstring& s) noexcept
+std::string gearoenix::core::String::to_string(const std::wstring& s)
 {
     return converter.to_bytes(s);
 }
 
-std::wstring gearoenix::core::String::to_wstring(const std::string& s) noexcept
+std::wstring gearoenix::core::String::to_wstring(const std::string& s)
 {
     return converter.from_bytes(s);
 }
 
-const wchar_t* gearoenix::core::String::to_wchar_ptr(const std::string& s) noexcept
+const wchar_t* gearoenix::core::String::to_wchar_ptr(const std::string& s)
 {
     static thread_local std::wstring w;
     w = to_wstring(s);
@@ -174,27 +174,27 @@ const wchar_t* gearoenix::core::String::to_wchar_ptr(const std::string& s) noexc
 }
 
 #ifdef GX_IN_IOS
-NSString* gearoenix::core::String::to_objc_string(const std::string& s) noexcept
+NSString* gearoenix::core::String::to_objc_string(const std::string& s)
 {
     return to_objc_string(s.c_str());
 }
 
-NSString* gearoenix::core::String::to_objc_string(const char* const s) noexcept
+NSString* gearoenix::core::String::to_objc_string(const char* const s)
 {
     return [NSString stringWithCString:s encoding:[NSString defaultCStringEncoding]];
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const std::string& s) noexcept
+std::string gearoenix::core::String::join_path(const NSString* dir, const std::string& s)
 {
     return join_path(dir, s.c_str());
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const char* s) noexcept
+std::string gearoenix::core::String::join_path(const NSString* dir, const char* s)
 {
     return join_path(dir, to_objc_string(s));
 }
 
-std::string gearoenix::core::String::join_path(const NSString* dir, const NSString* s) noexcept
+std::string gearoenix::core::String::join_path(const NSString* dir, const NSString* s)
 {
     NSArray* parts = [NSArray arrayWithObjects:dir, s, (NSString*)nil];
     return std::string([[NSString pathWithComponents:parts] fileSystemRepresentation]);

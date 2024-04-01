@@ -3,7 +3,7 @@
 
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "../../core/gx-cr-types.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-phs-cns-constraint.hpp"
 #include <map>
@@ -20,22 +20,22 @@ struct WindowScaler final : public Constraint, public core::event::Listener {
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
 
 private:
-    void update() noexcept final;
+    void update() final;
 
 public:
-    WindowScaler(core::Id id, std::string name, render::engine::Engine* e) noexcept;
-    ~WindowScaler() noexcept final;
+    WindowScaler(core::Id id, std::string name, render::engine::Engine* e);
+    ~WindowScaler() final;
 
-    void apply(double, double) noexcept final { }
+    void apply(double, double) final { }
 
-    [[nodiscard]] bool on_event(const core::event::Data& e) noexcept final;
+    [[nodiscard]] bool on_event(const core::event::Data& e) final;
 
-    void register_listener() noexcept;
+    void register_listener();
 
-    void set_size_percentage(double v) noexcept;
-    void set_max_size_scale(std::optional<double> v) noexcept;
-    void set_min_size_scale(std::optional<double> v) noexcept;
-    void set_current_size(double s) noexcept;
+    void set_size_percentage(double v);
+    void set_max_size_scale(std::optional<double> v);
+    void set_min_size_scale(std::optional<double> v);
+    void set_current_size(double s);
 };
 }
 #endif

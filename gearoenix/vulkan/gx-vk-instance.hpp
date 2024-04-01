@@ -24,13 +24,13 @@ struct Instance final {
     GX_GET_VAL_PRV(VkDebugReportCallbackEXT, report_callback, nullptr);
 #endif
 private:
-    Instance() noexcept = default;
+    Instance() = default;
 
 public:
     Instance(const Instance&) = delete;
-    Instance(Instance&&) noexcept;
-    [[nodiscard]] static std::optional<Instance> construct(const platform::Application* app) noexcept;
-    ~Instance() noexcept;
+    Instance(Instance&&);
+    [[nodiscard]] static std::optional<Instance> construct(const platform::Application* app);
+    ~Instance();
     Instance& operator=(const Instance&) = delete;
     Instance& operator=(Instance&&) = delete;
 };

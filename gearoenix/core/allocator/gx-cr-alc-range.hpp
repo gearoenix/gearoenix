@@ -29,17 +29,17 @@ private:
     Range* previous = nullptr;
     Range* next = nullptr;
 
-    Range(std::size_t, std::size_t, std::shared_ptr<Range> parent = nullptr) noexcept;
-    void deallocate(const Range* child) noexcept;
+    Range(std::size_t, std::size_t, std::shared_ptr<Range> parent = nullptr);
+    void deallocate(const Range* child);
 
 public:
-    [[nodiscard]] static std::shared_ptr<Range> construct(std::size_t size) noexcept;
+    [[nodiscard]] static std::shared_ptr<Range> construct(std::size_t size);
     Range(Range&&) = delete;
     Range(const Range&) = delete;
     Range& operator=(Range&&) = delete;
     Range& operator=(const Range&) = delete;
-    ~Range() noexcept;
-    [[nodiscard]] std::shared_ptr<Range> allocate(std::size_t size) noexcept;
+    ~Range();
+    [[nodiscard]] std::shared_ptr<Range> allocate(std::size_t size);
 };
 }
 #endif

@@ -1,5 +1,6 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../core/job/gx-cr-job-manager.hpp"
 #include "../platform/stream/gx-plt-stm-local.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
@@ -13,7 +14,8 @@
 // #define GX_DEBUG_TEXTURE_WRITE
 #endif
 
-static void flip_texture(std::vector<std::uint8_t>& pixels, std::size_t height) noexcept
+namespace {
+void flip_texture(std::vector<std::uint8_t>& pixels, const std::size_t height)
 {
     GX_ASSERT_D(!pixels.empty());
     GX_ASSERT_D(height > 0);
@@ -28,7 +30,7 @@ static void flip_texture(std::vector<std::uint8_t>& pixels, std::size_t height) 
     }
 }
 
-static void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t height) noexcept
+void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t height)
 {
     for (auto& mip_pixels : pixels) {
         flip_texture(mip_pixels, height);
@@ -36,13 +38,14 @@ static void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::si
     }
 }
 
-static void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::size_t height) noexcept
+void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::size_t height)
 {
     for (auto& p : pixels)
         flip_texture(p, height);
 }
+}
 
-gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f) noexcept
+gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f)
 {
     switch (f) {
     case render::texture::TextureFormat::Float16:
@@ -70,7 +73,7 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
     }
 }
 
-gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::TextureFormat f) noexcept
+gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::TextureFormat f)
 {
     switch (f) {
     case render::texture::TextureFormat::Float16:
@@ -93,7 +96,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::T
     }
 }
 
-gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::texture::TextureFormat f) noexcept
+gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::texture::TextureFormat f)
 {
     switch (f) {
     case render::texture::TextureFormat::D32:
@@ -114,7 +117,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::textu
     }
 }
 
-float gearoenix::gl::convert_min(const render::texture::Filter f) noexcept
+float gearoenix::gl::convert_min(const render::texture::Filter f)
 {
     switch (f) {
     case render::texture::Filter::Nearest:
@@ -134,7 +137,7 @@ float gearoenix::gl::convert_min(const render::texture::Filter f) noexcept
     }
 }
 
-float gearoenix::gl::convert_mag(const render::texture::Filter f) noexcept
+float gearoenix::gl::convert_mag(const render::texture::Filter f)
 {
     switch (f) {
     case render::texture::Filter::Nearest:
@@ -146,7 +149,7 @@ float gearoenix::gl::convert_mag(const render::texture::Filter f) noexcept
     }
 }
 
-gearoenix::gl::sint gearoenix::gl::convert(const render::texture::Wrap w) noexcept
+gearoenix::gl::sint gearoenix::gl::convert(const render::texture::Wrap w)
 {
     switch (w) {
     case render::texture::Wrap::ClampToEdge:
@@ -160,7 +163,7 @@ gearoenix::gl::sint gearoenix::gl::convert(const render::texture::Wrap w) noexce
     }
 }
 
-gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f) noexcept
+gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f)
 {
     switch (f) {
     case render::texture::Face::PositiveX:
@@ -180,25 +183,25 @@ gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f) noexce
     }
 }
 
-void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept
+void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const
 {
     render::texture::Texture2D::write(s, c);
-    e.todos.load([this, s, c] {
+    core::job::send_job(e.get_jobs_thread_id(), [this, s, c] {
         GX_GL_CHECK_D;
-        gl::uint framebuffer = 0;
+        uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_2D, object);
         auto pixel_element_size = format_pixel_size(info.format);
         std::vector<std::uint8_t> data;
-        auto level_width = static_cast<gl::sizei>(info.width);
-        auto level_height = static_cast<gl::sizei>(info.height);
+        auto level_width = static_cast<sizei>(info.width);
+        auto level_height = static_cast<sizei>(info.height);
         const auto mips_count = get_mipmaps_count();
-        for (gl::sint mip_index = 0; mip_index < static_cast<gl::sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
+        for (sint mip_index = 0; mip_index < static_cast<sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
             data.resize(pixel_element_size * static_cast<std::size_t>(level_width * level_height));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
             glReadPixels(0, 0, level_width, level_height, convert_format(info.format), convert_data_format(info.format), data.data());
-            flip_texture(data, static_cast<std::size_t>(level_height));
+            flip_texture(data, level_height);
 #ifdef GX_DEBUG_TEXTURE_WRITE
             const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
             platform::stream::Local l(e.get_platform_application(),
@@ -210,54 +213,55 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
+        (void)c;
     });
 }
 
 gearoenix::gl::Texture2D::Texture2D(
     Engine& e,
     const render::texture::TextureInfo& info,
-    std::string name) noexcept
+    std::string name)
     : render::texture::Texture2D(std::move(name), info, e)
     , e(e)
 {
 }
 
-gearoenix::gl::Texture2D::~Texture2D() noexcept
+gearoenix::gl::Texture2D::~Texture2D()
 {
-    e.todos.load([o = object]() {
+    core::job::send_job(e.get_jobs_thread_id(), [o = object] {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures(1, &o);
     });
 }
 
-void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) noexcept
+void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) const
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, object);
 }
 
-void gearoenix::gl::Texture2D::generate_mipmaps() noexcept
+void gearoenix::gl::Texture2D::generate_mipmaps()
 {
     glBindTexture(GL_TEXTURE_2D, object);
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::sync::EndCaller& c) const noexcept
+void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const
 {
     render::texture::TextureCube::write(s, c);
-    e.todos.load([this, s, c] {
+    core::job::send_job(e.get_jobs_thread_id(), [this, s, c] {
         GX_GL_CHECK_D;
-        gl::uint framebuffer = 0;
+        uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
         auto pixel_element_size = format_pixel_size(info.format);
         std::vector<std::uint8_t> data;
         for (auto face : render::texture::FACES) {
-            auto level_aspect = static_cast<gl::sizei>(info.width);
+            auto level_aspect = static_cast<sizei>(info.width);
             const auto mips_count = get_mipmaps_count();
-            for (gl::sint mipmap_index = 0; mipmap_index < static_cast<gl::sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
+            for (sint mipmap_index = 0; mipmap_index < static_cast<sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
                 data.resize(static_cast<std::size_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.format), convert_data_format(info.format), data.data());
@@ -274,45 +278,46 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
+        (void)c;
     });
 }
 
 gearoenix::gl::TextureCube::TextureCube(
     Engine& e,
     const render::texture::TextureInfo& info,
-    std::string name) noexcept
+    std::string name)
     : render::texture::TextureCube(std::move(name), info, e)
     , e(e)
 {
 }
 
-gearoenix::gl::TextureCube::~TextureCube() noexcept
+gearoenix::gl::TextureCube::~TextureCube()
 {
-    e.todos.load([o = object]() {
+    core::job::send_job(e.get_jobs_thread_id(), [o = object]() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glDeleteTextures(1, &o);
     });
 }
 
-void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) noexcept
+void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) const
 {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_CUBE_MAP, object);
 }
 
-gearoenix::gl::TextureManager::TextureManager(Engine& e) noexcept
-    : render::texture::Manager(e)
+gearoenix::gl::TextureManager::TextureManager(Engine& e)
+    : Manager(e)
     , eng(e)
 {
 }
 
-gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
+gearoenix::gl::TextureManager::~TextureManager() = default;
 
-[[nodiscard]] std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::gl::TextureManager::create_2d_from_pixels_v(
-    std::string name,
-    std::vector<std::vector<std::uint8_t>> pixels,
+void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
+    std::string&& name,
+    std::vector<std::vector<std::uint8_t>>&& pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCaller& c) noexcept
+    core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
     flip_texture(pixels, info.height);
     std::shared_ptr<Texture2D> result(new Texture2D(eng, info, std::move(name)));
@@ -320,9 +325,10 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
     const auto internal_format = convert_internal_format(info.format);
     const auto format = convert_format(info.format);
     const auto data_format = convert_data_format(info.format);
-    const auto gl_img_width = static_cast<gl::sizei>(info.width);
-    const auto gl_img_height = static_cast<gl::sizei>(info.height);
-    eng.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+    const auto gl_img_width = static_cast<sizei>(info.width);
+    const auto gl_img_height = static_cast<sizei>(info.height);
+    c.set_return(result);
+    core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
@@ -346,12 +352,14 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         } else {
             for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
                 const auto li = static_cast<gl::sint>(level_index);
-                auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
-                if (lw < 1)
+                auto lw = gl_img_width >> level_index;
+                if (lw < 1) {
                     lw = 1;
-                auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
-                if (lh < 1)
+                }
+                auto lh = gl_img_height >> level_index;
+                if (lh < 1) {
                     lh = 1;
+                }
                 glTexImage2D(GL_TEXTURE_2D, li, internal_format, lw, lh, 0, format, data_format, pixels[level_index].data());
             }
         }
@@ -362,14 +370,13 @@ gearoenix::gl::TextureManager::~TextureManager() noexcept = default;
         set_texture_label(result->object, result->name);
         GX_GL_CHECK_D;
     });
-    return result;
 }
 
-std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureManager::create_cube_from_pixels_v(
-    std::string name,
-    std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
+    std::string&& name,
+    std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
     const render::texture::TextureInfo& info,
-    const core::sync::EndCaller& c) noexcept
+    core::job::EndCallerShared<render::texture::TextureCube>&& c)
 {
     std::shared_ptr<TextureCube> result(new TextureCube(eng, info, std::move(name)));
     const bool needs_mipmap_generation = info.has_mipmap && (pixels.empty() || pixels[0].size() < 2);
@@ -379,7 +386,8 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
     const auto gl_img_width = static_cast<gl::sizei>(info.width);
     const auto gl_img_height = static_cast<gl::sizei>(info.height);
     flip_texture(pixels, info.height);
-    eng.todos.load([result, needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = c] {
+    c.set_return(result);
+    core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_CUBE_MAP, result->object);
@@ -406,10 +414,10 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
                 const auto& face_pixels = pixels[face_index];
                 for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
                     const auto li = static_cast<gl::sint>(level_index);
-                    auto lw = static_cast<gl::sizei>(gl_img_width >> level_index);
+                    auto lw = gl_img_width >> level_index;
                     if (lw < 1)
                         lw = 1;
-                    auto lh = static_cast<gl::sizei>(gl_img_height >> level_index);
+                    auto lh = gl_img_height >> level_index;
                     if (lh < 1)
                         lh = 1;
                     glTexImage2D(gl_face, li, internal_format, lw, lh, 0, format, data_format, face_pixels[level_index].data());
@@ -423,17 +431,14 @@ std::shared_ptr<gearoenix::render::texture::TextureCube> gearoenix::gl::TextureM
         set_texture_label(result->object, result->name);
         GX_GL_CHECK_D;
     });
-    return result;
 }
 
-std::shared_ptr<gearoenix::render::texture::Target> gearoenix::gl::TextureManager::create_target_v(
-    std::string name,
+void gearoenix::gl::TextureManager::create_target_v(
+    std::string&& name,
     std::vector<render::texture::Attachment>&& attachments,
-    const core::sync::EndCaller& c) noexcept
+    core::job::EndCallerShared<render::texture::Target>&& c)
 {
-    auto result = std::make_shared<Target>(eng, std::move(attachments), c);
-    eng.todos.load([result] {}); // Keep the texture alive till then
-    return result;
+    Target::construct(eng, std::move(name), std::move(attachments), std::move(c));
 }
 
 #endif

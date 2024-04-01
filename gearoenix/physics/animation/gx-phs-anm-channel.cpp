@@ -7,14 +7,14 @@ template <typename T>
 static bool keyframe_is_interpolated(
     const std::pair<double, T>& ks,
     const std::pair<double, T>& km,
-    const std::pair<double, T>& ke) noexcept
+    const std::pair<double, T>& ke)
 {
     const auto i = interpolate(ks, ke, km.first);
     return i.equal(get_key(km.second), 0.001);
 }
 
 template <typename T>
-static bool optimise_keyframe(std::vector<std::pair<double, T>>& samples) noexcept
+static bool optimise_keyframe(std::vector<std::pair<double, T>>& samples)
 {
     auto iter1 = samples.begin();
     if (samples.end() == iter1)
@@ -45,7 +45,7 @@ static bool optimise_keyframe(std::vector<std::pair<double, T>>& samples) noexce
 }
 }
 
-void gearoenix::physics::animation::BoneChannelBuilder::optimise() noexcept
+void gearoenix::physics::animation::BoneChannelBuilder::optimise()
 {
     optimise_keyframe(scale_samples);
     optimise_keyframe(rotation_samples);

@@ -2,7 +2,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 
-double gearoenix::render::widget::Size::to_world(const engine::Engine& e) const noexcept
+double gearoenix::render::widget::Size::to_world(const engine::Engine& e) const
 {
     switch (type_index) {
     case Type::WidthBased: {

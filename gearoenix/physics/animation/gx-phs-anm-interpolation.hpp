@@ -14,7 +14,7 @@ template <typename Value, typename T>
 [[nodiscard]] constexpr Value interpolate(
     const std::pair<double, Keyframe<Value>>& start_keyframe,
     const std::pair<double, Keyframe<Value>>& end_keyframe,
-    const T time) noexcept
+    const T time)
 {
     const auto td = end_keyframe.first - start_keyframe.first;
     const auto t = (time - start_keyframe.first) / td;

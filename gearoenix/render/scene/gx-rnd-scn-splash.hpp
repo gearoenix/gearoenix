@@ -1,8 +1,7 @@
 #ifndef GEAROENIX_RENDER_SCENE_SPLASH_HPP
 #define GEAROENIX_RENDER_SCENE_SPLASH_HPP
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <optional>
 
 namespace gearoenix::render::engine {
@@ -27,14 +26,18 @@ private:
     bool is_animating_text = false;
     double after_animation = 0.0;
     core::ecs::entity_id_t gearoenix_text = 0;
-    std::optional<core::sync::EndCaller> end_callback;
+    std::weak_ptr<Splash> weak_self;
+    std::optional<core::job::EndCaller<>> end_callback;
 
-    [[nodiscard]] double calculate_scale() const noexcept;
+    [[nodiscard]] double calculate_scale() const;
+
+    Splash(engine::Engine& e, const core::job::EndCaller<>& end_callback);
+    void initialise(const core::job::EndCaller<>& start_callback);
 
 public:
-    Splash(engine::Engine& e, const core::sync::EndCaller& start_callback, const core::sync::EndCaller& end_callback) noexcept;
-    void update() noexcept;
-    void hide() noexcept;
+    [[nodiscard]] static std::shared_ptr<Splash> construct(engine::Engine& e, const core::job::EndCaller<>& start_callback, const core::job::EndCaller<>& end_callback);
+    void update();
+    void hide();
 };
 }
 

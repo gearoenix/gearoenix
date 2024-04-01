@@ -14,7 +14,7 @@ struct VertexDescriptions final {
 
     MTLVertexDescriptor* const pbr;
 
-    VertexDescriptions() noexcept;
+    VertexDescriptions();
 };
 }
 

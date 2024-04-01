@@ -9,7 +9,7 @@
 gearoenix::vulkan::descriptor::Set::Set(
     Pool* pool,
     std::shared_ptr<PoolManager> pool_manager,
-    VkDescriptorSet vulkan_data) noexcept
+    VkDescriptorSet vulkan_data)
     : vulkan_data(vulkan_data)
     , pool(pool)
     , pool_manager(std::move(pool_manager))
@@ -19,7 +19,7 @@ gearoenix::vulkan::descriptor::Set::Set(
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::Set::construct(
     Pool* pool,
     std::shared_ptr<PoolManager> pool_manager,
-    VkDescriptorSetLayout layout) noexcept
+    VkDescriptorSetLayout layout)
 {
     VkDescriptorSet vulkan_data = nullptr;
     VkDescriptorSetAllocateInfo info;
@@ -36,7 +36,7 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
     GX_LOG_F("Error in descriptor set allocation: " << result_to_string(state));
 }
 
-gearoenix::vulkan::descriptor::Set::~Set() noexcept
+gearoenix::vulkan::descriptor::Set::~Set()
 {
     GX_VK_CHK(vkFreeDescriptorSets(
         pool->get_logical_device().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data));
@@ -45,7 +45,7 @@ gearoenix::vulkan::descriptor::Set::~Set() noexcept
 
 void gearoenix::vulkan::descriptor::Set::write(
     const VkWriteDescriptorSet* const data,
-    const std::uint32_t count) noexcept
+    const std::uint32_t count)
 {
     vkUpdateDescriptorSets(pool->get_logical_device().get_vulkan_data(), count, data, 0, nullptr);
 }

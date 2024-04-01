@@ -1,48 +1,64 @@
 #include "gx-rnd-rfl-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../math/gx-math-aabb.hpp"
-#include "../../platform/stream/gx-plt-stm-path.hpp"
-#include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
-#include "gx-rnd-rfl-baked.hpp"
 #include "gx-rnd-rfl-builder.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
 
-gearoenix::render::reflection::Manager::Manager(engine::Engine& e) noexcept
+gearoenix::render::reflection::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Baked>();
-    core::ecs::Component::register_type<Runtime>();
 }
 
-gearoenix::render::reflection::Manager::~Manager() noexcept = default;
+gearoenix::render::reflection::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::render::reflection::Manager::build_baked(
+void gearoenix::render::reflection::Manager::build_baked(
     const std::string& name,
     const platform::stream::Path& path,
-    const core::sync::EndCaller& c) noexcept
+    core::job::EndCallerShared<Builder>&& c,
+    core::job::EndCaller<>&& entity_end_callback) const
 {
+
     const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
     GX_ASSERT(nullptr != stream);
-    math::Aabb3<double> include_box;
-    include_box.read(*stream);
-    const auto irradiance = std::dynamic_pointer_cast<texture::TextureCube>(e.get_texture_manager()->read_gx3d(stream, c));
-    GX_ASSERT(irradiance != nullptr);
-    const auto radiance = std::dynamic_pointer_cast<texture::TextureCube>(e.get_texture_manager()->read_gx3d(stream, c));
-    GX_ASSERT(radiance != nullptr);
-    return build_baked(name, irradiance, radiance, include_box, c);
+
+    struct Values {
+        core::job::EndCallerShared<Builder> c;
+        core::job::EndCaller<>&& entity_end_callback;
+        math::Aabb3<double> include_box;
+        std::shared_ptr<texture::TextureCube> irradiance;
+        std::shared_ptr<texture::TextureCube> radiance;
+
+        ~Values()
+        {
+            GX_ASSERT(irradiance != nullptr);
+            GX_ASSERT(radiance != nullptr);
+
+            c.set_return(build_baked(name, std::move(irradiance), std::move(radiance), include_box, std::move(entity_end_callback)));
+        }
+    };
+
+    auto values = std::make_shared<Values>(std::move(c), std::move(entity_end_callback));
+    values->include_box.read(*stream);
+
+    e.get_texture_manager()->read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) {
+        values->irradiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t));
+    }));
+
+    e.get_texture_manager()->read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) {
+        values->radiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t));
+    }));
 }
 
-void gearoenix::render::reflection::Manager::update() noexcept
+void gearoenix::render::reflection::Manager::update()
 {
     e.get_world()->parallel_system<Runtime>(
         [this](
             const core::ecs::entity_id_t /*entity_id*/,
             Runtime* const runtime_probe,
             const unsigned int /*kernel_index*/) {
-            if (runtime_probe->enabled) {
+            if (runtime_probe->get_enabled()) {
                 runtime_probe->update_state();
             }
         });

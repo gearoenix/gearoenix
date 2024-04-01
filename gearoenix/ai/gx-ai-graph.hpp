@@ -14,13 +14,13 @@ struct Node {
     std::shared_ptr<VertexData> data;
     std::map<std::shared_ptr<Node<VertexData, EdgeData>>, std::shared_ptr<EdgeData>> connections;
 
-    friend std::ostream& operator<<(std::ostream& os, const Node& n) noexcept
+    friend std::ostream& operator<<(std::ostream& os, const Node& n)
     {
         os << R"({"data":")" << (*(n.data)) << R"(","connections-count":")" << n.connections.size() << "\"}";
         return os;
     }
 
-    void clear() noexcept
+    void clear()
     {
         data = nullptr;
         auto cons = std::move(connections);
@@ -35,13 +35,13 @@ template <typename VertexData, typename EdgeData>
 struct Graph {
     std::shared_ptr<Node<VertexData, EdgeData>> head;
 
-    ~Graph() noexcept
+    ~Graph()
     {
         if (head != nullptr)
             head->clear();
     }
 
-    [[nodiscard]] bool operator==(const Graph& o) const noexcept
+    [[nodiscard]] bool operator==(const Graph& o) const
     {
         const auto mine = get_all_nodes();
         const auto its = o.get_all_nodes();
@@ -56,7 +56,7 @@ struct Graph {
 
     static void get_all_descendants(
         std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s,
-        const std::shared_ptr<Node<VertexData, EdgeData>>& n) noexcept
+        const std::shared_ptr<Node<VertexData, EdgeData>>& n)
     {
         if (s.find(n) != s.end())
             return;
@@ -66,7 +66,7 @@ struct Graph {
         }
     }
 
-    [[nodiscard]] std::set<std::shared_ptr<Node<VertexData, EdgeData>>> get_all_nodes() const noexcept
+    [[nodiscard]] std::set<std::shared_ptr<Node<VertexData, EdgeData>>> get_all_nodes() const
     {
         std::set<std::shared_ptr<Node<VertexData, EdgeData>>> s;
         get_all_descendants(s, head);
@@ -76,7 +76,7 @@ struct Graph {
     static void print(
         std::ostream& os,
         std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s,
-        const std::shared_ptr<Node<VertexData, EdgeData>>& n) noexcept
+        const std::shared_ptr<Node<VertexData, EdgeData>>& n)
     {
         s.insert(n);
         os << "{\"node\":" << (*n) << ",\"connections\":[";
@@ -94,7 +94,7 @@ struct Graph {
         os << "]}";
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Graph& g) noexcept
+    friend std::ostream& operator<<(std::ostream& os, const Graph& g)
     {
         std::set<std::shared_ptr<Node<VertexData, EdgeData>>> s;
         print(os, s, g.head);

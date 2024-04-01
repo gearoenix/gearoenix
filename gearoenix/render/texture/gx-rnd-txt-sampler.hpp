@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_SAMPLE_HPP
 #include "gx-rnd-txt-filter.hpp"
 #include "gx-rnd-txt-wrap.hpp"
+#include <cstdlib>
 
 namespace gearoenix::platform::stream {
 struct Stream;
@@ -16,16 +17,16 @@ struct SamplerInfo final {
     Wrap wrap_r = Wrap::Repeat;
     std::uint8_t anisotropic_level = 0;
 
-    void write(platform::stream::Stream& s) const noexcept;
-    void read(platform::stream::Stream& s) noexcept;
-    [[nodiscard]] bool needs_mipmap() const noexcept;
-    [[nodiscard]] bool operator<(const SamplerInfo& o) const noexcept;
-    [[nodiscard]] bool operator>(const SamplerInfo& o) const noexcept;
-    [[nodiscard]] bool operator==(const SamplerInfo& o) const noexcept;
+    void write(platform::stream::Stream& s) const;
+    void read(platform::stream::Stream& s);
+    [[nodiscard]] bool needs_mipmap() const;
+    [[nodiscard]] bool operator<(const SamplerInfo& o) const;
+    [[nodiscard]] bool operator>(const SamplerInfo& o) const;
+    [[nodiscard]] bool operator==(const SamplerInfo& o) const;
 };
 
 struct SamplerInfoHasher final {
-    [[nodiscard]] std::size_t operator()(const SamplerInfo& sampler) const noexcept;
+    [[nodiscard]] std::size_t operator()(const SamplerInfo& sampler) const;
 };
 }
 #endif

@@ -2,14 +2,14 @@
 
 #include <utility>
 
-gearoenix::core::Project::Project(std::string name) noexcept
+gearoenix::core::Project::Project(std::string name)
     : name(std::move(name))
     , file_address()
     , is_asset(false)
 {
 }
 
-gearoenix::core::Project::Project(Project&& o) noexcept
+gearoenix::core::Project::Project(Project&& o)
     : name(std::move(o.name))
     , file_address(std::move(o.file_address))
     , is_asset(o.is_asset)

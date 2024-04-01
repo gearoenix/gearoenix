@@ -3,7 +3,7 @@
 #include "../../render/model/gx-rnd-mdl-dynamic.hpp"
 #include "../gx-phs-constants.hpp"
 
-void gearoenix::physics::body::Car::update_steering_angle() noexcept
+void gearoenix::physics::body::Car::update_steering_angle()
 {
     if (steering_angle > steering_angle_max) {
         steering_angle = steering_angle_max;
@@ -14,7 +14,7 @@ void gearoenix::physics::body::Car::update_steering_angle() noexcept
         steering_angle = steering_angle_min;
 }
 
-void gearoenix::physics::body::Car::update_axles() noexcept
+void gearoenix::physics::body::Car::update_axles()
 {
     // front_slip_angle = (lateral_velocity + (wheels_angular_velocity * front_axle_center_of_gravity_distance)).atan() - (velocity.sign() * steering_angle);
     // rear_slip_angle = (lateral_velocity - (wheels_angular_velocity * rear_axle_center_of_gravity_distance)).atan();
@@ -27,7 +27,7 @@ void gearoenix::physics::body::Car::update_axles() noexcept
     // rear_capped_lateral_force = rear_lateral_force - rear_friction_force;
 }
 
-void gearoenix::physics::body::Car::update_engine() noexcept
+void gearoenix::physics::body::Car::update_engine()
 {
     velocity_attitude = velocity.length();
     // wheels_angular_velocity = velocity_attitude / (2.0 * GX_PI * tire_radius);
@@ -46,7 +46,7 @@ void gearoenix::physics::body::Car::update_engine() noexcept
     engine_torque = torque_rpm_diagram_points[torque_index].second(engine_angular_velocity_rpm);
 }
 
-void gearoenix::physics::body::Car::update() noexcept
+void gearoenix::physics::body::Car::update()
 {
     update_steering_angle();
     update_axles();
@@ -59,7 +59,7 @@ gearoenix::physics::body::Car::Car(
     std::shared_ptr<render::model::Dynamic> car_left_front_wheel,
     std::shared_ptr<render::model::Dynamic> car_right_front_wheel,
     std::shared_ptr<render::model::Dynamic> car_left_rear_wheel,
-    std::shared_ptr<render::model::Dynamic> car_right_rear_wheel) noexcept
+    std::shared_ptr<render::model::Dynamic> car_right_rear_wheel)
     : Body(core::asset::Manager::create_id(), std::move(name), Type::Car, std::move(car_body))
     , front_axle {
         .left_wheel { .model = std::move(car_left_front_wheel) },
@@ -79,4 +79,4 @@ gearoenix::physics::body::Car::Car(
     };
 }
 
-gearoenix::physics::body::Car::~Car() noexcept = default;
+gearoenix::physics::body::Car::~Car() = default;

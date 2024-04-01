@@ -27,9 +27,9 @@
         background_material(new material::Unlit(e, c)),                  \
         cursor_material(new material::Unlit(e, c))
 
-void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::sync::EndCallerIgnore>& end_call) noexcept
+void gearoenix::render::widget::Edit::init(const core::job::EndCaller<core::job::EndCallerIgnore>& end_call)
 {
-    const core::sync::EndCaller<core::sync::EndCallerIgnore> c([end_call, this] {
+    const core::job::EndCaller<core::job::EndCallerIgnore> c([end_call, this] {
         event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     });
 
@@ -40,16 +40,16 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const fnt_mgr = ast_mgr->get_font_manager();
 
-    core::sync::EndCaller<mesh::Mesh> msh_end([c](const std::shared_ptr<mesh::Mesh>&) {});
+    core::job::EndCaller<mesh::Mesh> msh_end([c](const std::shared_ptr<mesh::Mesh>&) {});
     const auto plate_mesh = msh_mgr->create_plate(msh_end);
 
-    core::sync::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
+    core::job::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
     text_font = fnt_mgr->get_default_2d(fend);
 
     text_material->set_translucency(material::TranslucencyMode::Transparent);
     hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
 
-    core::sync::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
+    core::job::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
 
     text_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-txt", mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));
@@ -90,7 +90,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     cursor_animation = std::make_shared<physics::animation::Animation>(
         "gx-edit-" + name + "-crs-anm",
         [cursor_material { cursor_material }, t1, t2, t3, t4, t5](
-            const double from_start, const double) noexcept {
+            const double from_start, const double) {
             const auto s = from_start - std::floor(from_start / t5) * t5;
             if (t1 > s) {
                 cursor_material->set_alpha(1.0f);
@@ -110,7 +110,7 @@ void gearoenix::render::widget::Edit::init(const core::sync::EndCaller<core::syn
     on_scale();
 }
 
-void gearoenix::render::widget::Edit::on_scale() noexcept
+void gearoenix::render::widget::Edit::on_scale()
 {
     aspects[0] = (collider->get_current_local_scale()[0] - (collider->get_current_local_scale()[1] * (1.0f - theme.text_size))) * 2.0f;
     aspects[1] = collider->get_current_local_scale()[1] * theme.text_size * 2.0f;
@@ -127,7 +127,7 @@ void gearoenix::render::widget::Edit::on_scale() noexcept
     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 }
 
-void gearoenix::render::widget::Edit::compute_starting() noexcept
+void gearoenix::render::widget::Edit::compute_starting()
 {
     text_font->compute_text_widths(text, aspects[1], text_widths);
     cursor_pos_in_text = text_widths[left_text.size()];
@@ -144,14 +144,14 @@ void gearoenix::render::widget::Edit::compute_starting() noexcept
     }
 }
 
-void gearoenix::render::widget::Edit::compute_cuts() noexcept
+void gearoenix::render::widget::Edit::compute_cuts()
 {
     starting_text_cut = GX_MAX(starting_text_cut, 0.0f);
     ending_text_cut = starting_text_cut + aspects[0];
     ending_text_cut = GX_MIN(ending_text_cut, text_widths[text.size()]);
 }
 
-void gearoenix::render::widget::Edit::refill_text() noexcept
+void gearoenix::render::widget::Edit::refill_text()
 {
     text.clear();
     for (const wchar_t ch : left_text) {
@@ -162,12 +162,12 @@ void gearoenix::render::widget::Edit::refill_text() noexcept
     }
 }
 
-void gearoenix::render::widget::Edit::refill_text_widths() noexcept
+void gearoenix::render::widget::Edit::refill_text_widths()
 {
     text_font->compute_text_widths(text, aspects[1], text_widths);
 }
 
-void gearoenix::render::widget::Edit::place_cursor() noexcept
+void gearoenix::render::widget::Edit::place_cursor()
 {
     const auto text_center = text_model->get_transformation()->get_location();
     const auto text_aspect = text_model->get_collider()->get_current_local_scale().xy();
@@ -177,10 +177,10 @@ void gearoenix::render::widget::Edit::place_cursor() noexcept
     tran->set_location(loc);
 }
 
-void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Edit::render_text(const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     const auto img_width = std::abs(ending_text_cut - starting_text_cut) * 1.0001f;
-    core::sync::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+    core::job::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         text_material->set_color(txt);
         if (hint_text_model->get_enabled())
             hint_text_model->set_enabled(false);
@@ -194,7 +194,7 @@ void gearoenix::render::widget::Edit::render_text(const core::sync::EndCaller<co
         img_width / (text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
 
-void gearoenix::render::widget::Edit::remove(const bool from_left, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Edit::remove(const bool from_left, const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     const auto before = text_widths.back();
     refill_text();
@@ -229,12 +229,12 @@ gearoenix::render::widget::Edit::Edit(
     std::string name,
     platform::stream::Stream* const,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
     : GX_EDIT_INIT {
         GX_UNIMPLEMENTED
     }
 
-    gearoenix::render::widget::Edit::Edit(const core::Id my_id, std::string name, engine::Engine* const e, const EditTheme& theme, const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    gearoenix::render::widget::Edit::Edit(const core::Id my_id, std::string name, engine::Engine* const e, const EditTheme& theme, const core::job::EndCaller<core::job::EndCallerIgnore>& c)
     : GX_EDIT_INIT
     , theme(theme)
 {
@@ -245,7 +245,7 @@ gearoenix::render::widget::Edit::Edit(
     const core::Id my_id,
     std::string name,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
     : GX_EDIT_INIT
 {
     init(c);
@@ -263,7 +263,7 @@ std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit
     std::string name,
     platform::stream::Stream* const f,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_EDIT_CONS(id, std::move(name), f, e, c);
 }
@@ -273,7 +273,7 @@ std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit
     std::string name,
     engine::Engine* const e,
     const EditTheme& theme,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_EDIT_CONS(id, std::move(name), e, theme, c);
 }
@@ -282,19 +282,19 @@ std::shared_ptr<gearoenix::render::widget::Edit> gearoenix::render::widget::Edit
     const core::Id id,
     std::string name,
     engine::Engine* const e,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_EDIT_CONS(id, std::move(name), e, c);
 }
 
-gearoenix::render::widget::Edit::~Edit() noexcept
+gearoenix::render::widget::Edit::~Edit()
 {
     cursor_animation->set_activity(false);
 }
 
 void gearoenix::render::widget::Edit::set_text(
     const std::wstring& t,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_GUARD_LOCK(text)
     if (t.empty())
@@ -316,7 +316,7 @@ void gearoenix::render::widget::Edit::set_text(
 
 void gearoenix::render::widget::Edit::set_hint_text(
     const std::wstring& t,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_GUARD_LOCK(text)
     if (t.empty())
@@ -328,7 +328,7 @@ void gearoenix::render::widget::Edit::set_hint_text(
     const auto raw_img_width = (scale[0] - scale[1] * (1.0f - theme.hint_text_size)) * 2.0f;
     const auto is_bigger = raw_img_width < hint_text_widths.back();
     const auto img_width = is_bigger ? raw_img_width : hint_text_widths.back();
-    core::sync::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
+    core::job::EndCaller<texture::Texture2D> txt_end([c, this](const std::shared_ptr<texture::Texture2D>& txt) {
         hint_text_material->set_color(txt);
         text_model->set_enabled(false);
         hint_text_model->set_enabled(true);
@@ -340,13 +340,13 @@ void gearoenix::render::widget::Edit::set_hint_text(
         img_width / (hint_text_model->get_collider()->get_current_local_scale()[0] * 2.0f));
 }
 
-void gearoenix::render::widget::Edit::active(bool b) noexcept
+void gearoenix::render::widget::Edit::active(bool b)
 {
     cursor_model->set_enabled(b);
     actived = b;
 }
 
-bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexcept
+bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d)
 {
     switch (d.get_source()) {
     case core::event::Id::ButtonKeyboard: {
@@ -418,7 +418,7 @@ bool gearoenix::render::widget::Edit::on_event(const core::event::Data& d) noexc
     return false;
 }
 
-void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
+void gearoenix::render::widget::Edit::set_left_to_right(const bool b)
 {
     GX_GUARD_LOCK(text)
     if (left_to_right == b)
@@ -449,7 +449,7 @@ void gearoenix::render::widget::Edit::set_left_to_right(const bool b) noexcept
 
 void gearoenix::render::widget::Edit::insert(
     const wchar_t character,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_GUARD_LOCK(text)
     bool increase_to_right = true;
@@ -512,7 +512,7 @@ void gearoenix::render::widget::Edit::insert(
     place_cursor();
 }
 
-void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) noexcept
+void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point)
 {
     e->get_platform_application()->set_soft_keyboard_visibility(true);
     if (text.empty())
@@ -551,7 +551,7 @@ void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point) 
     place_cursor();
 }
 
-void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Edit::backspace(const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_GUARD_LOCK(text)
     if (text.empty())
@@ -581,7 +581,7 @@ void gearoenix::render::widget::Edit::backspace(const core::sync::EndCaller<core
     remove(removed_from_left, c);
 }
 
-void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync::EndCallerIgnore>& c) noexcept
+void gearoenix::render::widget::Edit::del(const core::job::EndCaller<core::job::EndCallerIgnore>& c)
 {
     GX_GUARD_LOCK(text)
     if (text.empty())
@@ -624,7 +624,7 @@ void gearoenix::render::widget::Edit::del(const core::sync::EndCaller<core::sync
     remove(!left_to_right, c);
 }
 
-void gearoenix::render::widget::Edit::clear() noexcept
+void gearoenix::render::widget::Edit::clear()
 {
     GX_GUARD_LOCK(text)
     cursor_pos_in_text = 0.0f;

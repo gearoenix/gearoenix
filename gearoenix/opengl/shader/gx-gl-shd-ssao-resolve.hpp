@@ -11,9 +11,9 @@ struct SsaoResolve final : public Shader {
     GX_GL_UNIFORM_TEXTURE(normal_ao);
 
 public:
-    explicit SsaoResolve(Engine& e) noexcept;
-    ~SsaoResolve() noexcept final;
-    void bind(uint& current_shader) const noexcept final;
+    explicit SsaoResolve(Engine& e);
+    ~SsaoResolve() final;
+    void bind(uint& current_shader) const final;
 };
 }
 

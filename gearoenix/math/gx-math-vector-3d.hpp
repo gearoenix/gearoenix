@@ -8,38 +8,38 @@ template <typename Element>
 struct Vec3 final {
     Element x, y, z;
 
-    constexpr Vec3() noexcept
+    constexpr Vec3()
         : x(static_cast<Element>(0))
         , y(static_cast<Element>(0))
         , z(static_cast<Element>(0))
     {
     }
 
-    constexpr explicit Vec3(const Element e) noexcept
+    constexpr explicit Vec3(const Element e)
         : x(e)
         , y(e)
         , z(e)
     {
     }
 
-    constexpr explicit Vec3(const Vec2<Element>& o, const Element e = static_cast<Element>(0)) noexcept
+    constexpr explicit Vec3(const Vec2<Element>& o, const Element e = static_cast<Element>(0))
         : x(o.x)
         , y(o.y)
         , z(e)
     {
     }
 
-    constexpr Vec3(const Element x, const Element y, const Element z) noexcept
+    constexpr Vec3(const Element x, const Element y, const Element z)
         : x(x)
         , y(y)
         , z(z)
     {
     }
 
-    constexpr Vec3(const Vec3& o) noexcept = default;
+    constexpr Vec3(const Vec3& o) = default;
 
     template <typename T>
-    constexpr explicit Vec3(const Vec3<T>& o) noexcept
+    constexpr explicit Vec3(const Vec3<T>& o)
         : x(static_cast<Element>(o.x))
         , y(static_cast<Element>(o.y))
         , z(static_cast<Element>(o.z))
@@ -47,49 +47,49 @@ struct Vec3 final {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
-    constexpr Vec3<Element> operator-() const noexcept
+    constexpr Vec3<Element> operator-() const
     {
         return Vec3<Element>(-x, -y, -z);
     }
 
-    constexpr Vec3<Element> operator+(const Vec3<Element>& o) const noexcept
+    constexpr Vec3<Element> operator+(const Vec3<Element>& o) const
     {
         return Vec3<Element>(x + o.x, y + o.y, z + o.z);
     }
 
-    constexpr Vec3<Element> operator-(const Vec3<Element>& o) const noexcept
+    constexpr Vec3<Element> operator-(const Vec3<Element>& o) const
     {
         Numeric::check_signable<Element>();
         return Vec3<Element>(x - o.x, y - o.y, z - o.z);
     }
 
-    constexpr Vec3<Element> operator*(const Vec3<Element>& o) const noexcept
+    constexpr Vec3<Element> operator*(const Vec3<Element>& o) const
     {
         return Vec3<Element>(x * o.x, y * o.y, z * o.z);
     }
 
-    constexpr Vec3<Element> operator/(const Vec3<Element>& o) const noexcept
+    constexpr Vec3<Element> operator/(const Vec3<Element>& o) const
     {
         return Vec3<Element>(x / o.x, y / o.y, z / o.z);
     }
 
-    constexpr Vec3<Element> operator+(const Element o) const noexcept
+    constexpr Vec3<Element> operator+(const Element o) const
     {
         return Vec3<Element>(x + o, y + o, z + o);
     }
 
-    constexpr Vec3<Element> operator-(const Element o) const noexcept
+    constexpr Vec3<Element> operator-(const Element o) const
     {
         Numeric::check_signable<Element>();
         return Vec3<Element>(x - o, y - o, z - o);
     }
 
-    constexpr Vec3<Element> operator*(const Element o) const noexcept
+    constexpr Vec3<Element> operator*(const Element o) const
     {
         return Vec3<Element>(x * o, y * o, z * o);
     }
 
-    constexpr Vec3<Element> operator/(const Element o) const noexcept
+    constexpr Vec3<Element> operator/(const Element o) const
     {
         if constexpr (std::is_floating_point_v<Element>) {
             const auto m = static_cast<Element>(1) / o;
@@ -99,16 +99,16 @@ struct Vec3 final {
         }
     }
 
-    constexpr Vec3& operator=(const Vec3& o) noexcept = default;
+    constexpr Vec3& operator=(const Vec3& o) = default;
 
-    constexpr void operator+=(const Vec3<Element>& o) noexcept
+    constexpr void operator+=(const Vec3<Element>& o)
     {
         x += o.x;
         y += o.y;
         z += o.z;
     }
 
-    constexpr void operator-=(const Vec3<Element>& o) noexcept
+    constexpr void operator-=(const Vec3<Element>& o)
     {
         Numeric::check_signable<Element>();
         x -= o.x;
@@ -116,28 +116,28 @@ struct Vec3 final {
         z -= o.z;
     }
 
-    constexpr void operator*=(const Vec3<Element>& o) noexcept
+    constexpr void operator*=(const Vec3<Element>& o)
     {
         x *= o.x;
         y *= o.y;
         z *= o.z;
     }
 
-    constexpr void operator/=(const Vec3<Element>& o) noexcept
+    constexpr void operator/=(const Vec3<Element>& o)
     {
         x /= o.x;
         y /= o.y;
         z /= o.z;
     }
 
-    constexpr void operator+=(const Element o) noexcept
+    constexpr void operator+=(const Element o)
     {
         x += o;
         y += o;
         z += o;
     }
 
-    constexpr void operator-=(const Element o) noexcept
+    constexpr void operator-=(const Element o)
     {
         Numeric::check_signable<Element>();
         x -= o;
@@ -145,14 +145,14 @@ struct Vec3 final {
         z -= o;
     }
 
-    constexpr void operator*=(const Element o) noexcept
+    constexpr void operator*=(const Element o)
     {
         x *= o;
         y *= o;
         z *= o;
     }
 
-    constexpr void operator/=(const Element o) noexcept
+    constexpr void operator/=(const Element o)
     {
         if constexpr (std::is_floating_point_v<Element>) {
             const auto m = static_cast<Element>(1) / o;
@@ -165,7 +165,7 @@ struct Vec3 final {
     }
 
     template <typename T>
-    [[nodiscard]] Element operator[](const T i) const noexcept
+    [[nodiscard]] Element operator[](const T i) const
     {
         static_assert(std::numeric_limits<T>::is_integer, "Index type must be an integer kind.");
         switch (i) {
@@ -181,7 +181,7 @@ struct Vec3 final {
     }
 
     template <typename T>
-    [[nodiscard]] Element& operator[](const T i) noexcept
+    [[nodiscard]] Element& operator[](const T i)
     {
         static_assert(std::numeric_limits<T>::is_integer, "Index type must be an integer kind.");
         switch (i) {
@@ -196,83 +196,83 @@ struct Vec3 final {
         }
     }
 
-    [[nodiscard]] constexpr bool operator<(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool operator<(const Vec3<Element>& o) const
     {
         return z < o.z || (z == o.z && (y < o.y || (y == o.y && z < o.z)));
     }
 
-    [[nodiscard]] constexpr bool operator<=(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool operator<=(const Vec3<Element>& o) const
     {
         return z < o.z || (z == o.z && (y < o.y || (y == o.y && z <= o.z)));
     }
 
-    [[nodiscard]] constexpr bool operator==(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool operator==(const Vec3<Element>& o) const
     {
         return z == o.z && y == o.y && z == o.z;
     }
 
-    [[nodiscard]] constexpr bool operator>(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool operator>(const Vec3<Element>& o) const
     {
         return z > o.z || (z == o.z && (y > o.y || (y == o.y && z > o.z)));
     }
 
-    [[nodiscard]] constexpr bool operator>=(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr bool operator>=(const Vec3<Element>& o) const
     {
         return z > o.z || (z == o.z && (y > o.y || (y == o.y && z >= o.z)));
     }
 
-    [[nodiscard]] constexpr Vec2<Element> xy() const noexcept
+    [[nodiscard]] constexpr Vec2<Element> xy() const
     {
         return Vec2<Element>(x, y);
     }
 
-    [[nodiscard]] constexpr const Element* data() const noexcept
+    [[nodiscard]] constexpr const Element* data() const
     {
         return &x;
     }
 
-    [[nodiscard]] constexpr Element* data() noexcept
+    [[nodiscard]] constexpr Element* data()
     {
         return reinterpret_cast<Element*>(this);
     }
 
-    [[nodiscard]] constexpr Element dot(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Element dot(const Vec3<Element>& o) const
     {
         return x * o.x + y * o.y + z * o.z;
     }
 
-    [[nodiscard]] constexpr Element square_length() const noexcept
+    [[nodiscard]] constexpr Element square_length() const
     {
         return dot(*this);
     }
 
-    [[nodiscard]] constexpr Element length() const noexcept
+    [[nodiscard]] constexpr Element length() const
     {
         return static_cast<Element>(std::sqrt(square_length()));
     }
 
-    [[nodiscard]] constexpr Element abs_length() const noexcept
+    [[nodiscard]] constexpr Element abs_length() const
     {
         return std::abs(x) + std::abs(y) + std::abs(z);
     }
 
-    [[nodiscard]] constexpr Element square_distance(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Element square_distance(const Vec3<Element>& o) const
     {
         return (*this - o).square_length();
     }
 
-    [[nodiscard]] constexpr Element distance(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Element distance(const Vec3<Element>& o) const
     {
         return (*this - o).length();
     }
 
-    [[nodiscard]] constexpr Element abs_distance(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Element abs_distance(const Vec3<Element>& o) const
     {
         return (*this - o).abs_length();
     }
 
     /// \note Only on unit(normalised) vectors will give expected result.
-    [[nodiscard]] constexpr Vec3 normalized_perpendicular() const noexcept
+    [[nodiscard]] constexpr Vec3 normalized_perpendicular() const
     {
         math::Vec3 result(static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0));
         auto d = dot(result);
@@ -288,33 +288,33 @@ struct Vec3 final {
     }
 
     /// \note Only on (this) unit(normalised) vectors will give expected result.
-    [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const noexcept
+    [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const
     {
         return o - (*this * dot(o));
     }
 
-    [[nodiscard]] constexpr Vec3<Element> abs() const noexcept
+    [[nodiscard]] constexpr Vec3<Element> abs() const
     {
         return Vec3<Element>(std::abs(x), std::abs(y), std::abs(z));
     }
 
-    [[nodiscard]] constexpr Vec3<Element> cross(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> cross(const Vec3<Element>& o) const
     {
         return Vec3<Element>(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x);
     }
 
-    [[nodiscard]] constexpr bool equal(const Vec3<Element>& o, const Element tolerance) const noexcept
+    [[nodiscard]] constexpr bool equal(const Vec3<Element>& o, const Element tolerance) const
     {
         const auto a = (*this - o).abs();
         return a.x < tolerance && a.y < tolerance && a.z < tolerance;
     }
 
-    [[nodiscard]] constexpr Vec3<Element> safe_minimum(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> safe_minimum(const Vec3<Element>& o) const
     {
         return Vec3<Element>(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y), Numeric::safe_minimum(z, o.z));
     }
 
-    [[nodiscard]] constexpr Vec3<Element> minimum(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> minimum(const Vec3<Element>& o) const
     {
         return Vec3<Element>(
             x < o.x ? x : o.x,
@@ -322,12 +322,12 @@ struct Vec3 final {
             z < o.z ? z : o.z);
     }
 
-    [[nodiscard]] constexpr Vec3<Element> safe_maximum(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> safe_maximum(const Vec3<Element>& o) const
     {
         return Vec3<Element>(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y), Numeric::safe_maximum(z, o.z));
     }
 
-    [[nodiscard]] constexpr Vec3<Element> maximum(const Vec3<Element>& o) const noexcept
+    [[nodiscard]] constexpr Vec3<Element> maximum(const Vec3<Element>& o) const
     {
         return Vec3<Element>(
             x > o.x ? x : o.x,
@@ -335,39 +335,39 @@ struct Vec3 final {
             z > o.z ? z : o.z);
     }
 
-    [[nodiscard]] constexpr Element safe_minimum() const noexcept
+    [[nodiscard]] constexpr Element safe_minimum() const
     {
         return Numeric::safe_minimum(Numeric::safe_minimum(x, y), z);
     }
 
-    [[nodiscard]] constexpr Element minimum() const noexcept
+    [[nodiscard]] constexpr Element minimum() const
     {
         const auto m = x < y ? x : y;
         return m < z ? m : z;
     }
 
-    [[nodiscard]] constexpr Element safe_maximum() const noexcept
+    [[nodiscard]] constexpr Element safe_maximum() const
     {
         return Numeric::safe_maximum(Numeric::safe_maximum(x, y), z);
     }
 
-    [[nodiscard]] constexpr Element maximum() const noexcept
+    [[nodiscard]] constexpr Element maximum() const
     {
         const auto m = x > y ? x : y;
         return m > z ? m : z;
     }
 
-    [[nodiscard]] constexpr Vec3<Element> normalised() const noexcept
+    [[nodiscard]] constexpr Vec3<Element> normalised() const
     {
         return *this / length();
     }
 
-    constexpr void normalise() noexcept
+    constexpr void normalise()
     {
         *this /= length();
     }
 
-    constexpr void clamp(const Element lower, const Element upper) noexcept
+    constexpr void clamp(const Element lower, const Element upper)
     {
         if (x < lower)
             x = lower;
@@ -383,7 +383,7 @@ struct Vec3 final {
             z = upper;
     }
 
-    [[nodiscard]] constexpr Vec3 atan() const noexcept
+    [[nodiscard]] constexpr Vec3 atan() const
     {
         return Vec3(
             static_cast<Element>(std::atan(static_cast<double>(x))),
@@ -391,7 +391,7 @@ struct Vec3 final {
             static_cast<Element>(std::atan(static_cast<double>(z))));
     }
 
-    [[nodiscard]] constexpr Vec3 sign() const noexcept
+    [[nodiscard]] constexpr Vec3 sign() const
     {
         return Vec3(
             std::signbit(x) ? static_cast<Element>(-1) : static_cast<Element>(1),
@@ -400,44 +400,44 @@ struct Vec3 final {
     }
 
     /// the called vector must be normalised
-    [[nodiscard]] constexpr Vec3 reflect(const Vec3& o) const noexcept
+    [[nodiscard]] constexpr Vec3 reflect(const Vec3& o) const
     {
         return o + (*this * (dot(o) * static_cast<Element>(-2)));
     }
 
-    [[nodiscard]] constexpr Vec3<bool> less(const Element v) const noexcept
+    [[nodiscard]] constexpr Vec3<bool> less(const Element v) const
     {
         return Vec3<bool>(x < v, y < v, z < v);
     }
 
-    [[nodiscard]] constexpr Vec3<bool> less(const Vec3& o) const noexcept
+    [[nodiscard]] constexpr Vec3<bool> less(const Vec3& o) const
     {
         return Vec3<bool>(x < o.x, y < o.y, z < o.z);
     }
 
-    [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const noexcept
+    [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const
     {
         return Vec3<bool>(x > v, y > v, z > v);
     }
 
-    [[nodiscard]] constexpr Vec3<bool> greater(const Vec3& o) const noexcept
+    [[nodiscard]] constexpr Vec3<bool> greater(const Vec3& o) const
     {
         return Vec3<bool>(x > o.x, y > o.y, z > o.z);
     }
 
-    [[nodiscard]] constexpr bool and_elements() const noexcept
+    [[nodiscard]] constexpr bool and_elements() const
     {
         return x && y && z;
     }
 
-    [[nodiscard]] constexpr bool or_elements() const noexcept
+    [[nodiscard]] constexpr bool or_elements() const
     {
         return x || y || z;
     }
 
     [[nodiscard]] static constexpr Vec3<Element> importance_sample_ggx(
         const Vec2<Element>& xi, const Vec3<Element>& n, const Element roughness,
-        const Element tolerance = static_cast<Element>(0.001)) noexcept
+        const Element tolerance = static_cast<Element>(0.001))
     {
         const auto one = static_cast<Element>(1);
         const auto two = static_cast<Element>(2);
@@ -459,21 +459,21 @@ struct Vec3 final {
         return sample_vec.normalised();
     }
 
-    void read(platform::stream::Stream& s) noexcept
+    void read(platform::stream::Stream& s)
     {
         x = static_cast<Element>(s.read<float>());
         y = static_cast<Element>(s.read<float>());
         z = static_cast<Element>(s.read<float>());
     }
 
-    void write(platform::stream::Stream& s) const noexcept
+    void write(platform::stream::Stream& s) const
     {
         s.write_fail_debug(static_cast<float>(x));
         s.write_fail_debug(static_cast<float>(y));
         s.write_fail_debug(static_cast<float>(z));
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Vec3<Element>& v) noexcept
+    friend std::ostream& operator<<(std::ostream& os, const Vec3<Element>& v)
     {
         os << R"("Vec3": { "x": ")" << v.x << R"(", "y": ")" << v.y << R"(", "z": ")" << v.z << R"(" })";
         return os;

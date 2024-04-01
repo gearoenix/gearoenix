@@ -3,18 +3,25 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::Sprite::Sprite(engine::Engine& e, const std::string& name, const core::sync::EndCaller& c) noexcept
-    : Material(name, Id::Sprite)
+gearoenix::render::material::Sprite::Sprite(engine::Engine& e, const std::string& name)
+    : Material(e, name, Id::Sprite)
     , albedo_factor(1.0f, 1.0f, 1.0f, 1.0f)
     , uv_transform(1.0f, 1.0f, 0.0f, 0.0f)
 {
-    const auto& tm = e.get_texture_manager();
-    albedo = tm->create_2d_from_colour(math::Vec4(1.0f, 1.0f, 1.0f, 1.0f), c);
 }
 
-gearoenix::render::material::Sprite::~Sprite() noexcept = default;
-
-void gearoenix::render::material::Sprite::set_albedo(const std::shared_ptr<texture::Texture2D>& t) noexcept
+void gearoenix::render::material::Sprite::initialise(core::job::EndCallerShared<Sprite>&& c)
 {
-    albedo = t;
+    e.get_texture_manager()->create_2d_from_colour(
+        math::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        core::job::EndCallerShared<texture::Texture2D>([this, c = std::move(c)](std::shared_ptr<texture::Texture2D>&& t) {
+            set_albedo(std::move(t));
+        }));
+}
+
+gearoenix::render::material::Sprite::~Sprite() = default;
+
+void gearoenix::render::material::Sprite::set_albedo(std::shared_ptr<texture::Texture2D>&& t)
+{
+    albedo = std::move(t);
 }

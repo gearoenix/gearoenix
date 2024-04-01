@@ -3,7 +3,6 @@
 #include "../../core/gx-cr-string.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
-#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
@@ -32,7 +31,7 @@
 static int file_index = 0;
 #endif
 
-void gearoenix::render::font::Font::init() noexcept
+void gearoenix::render::font::Font::init()
 {
     const auto init_result = stbtt_InitFont(stb_font.get(), ttf_data.data(), 0);
     GX_ASSERT_D(0 != init_result);
@@ -43,7 +42,7 @@ void gearoenix::render::font::Font::init() noexcept
 
 gearoenix::render::font::Font::Font(
     engine::Engine& e,
-    const std::string& name) noexcept
+    const std::string& name)
     : e(e)
     , stb_font(new stbtt_fontinfo())
     , ttf_data(platform::stream::Asset::construct(e.get_platform_application(), "fonts/" + name + ".ttf")->get_file_content())
@@ -51,12 +50,12 @@ gearoenix::render::font::Font::Font(
     init();
 }
 
-gearoenix::render::font::Font::~Font() noexcept = default;
+gearoenix::render::font::Font::~Font() = default;
 
 void gearoenix::render::font::Font::compute_text_widths(
     const std::wstring& text,
     const double text_height,
-    std::vector<double>& widths) const noexcept
+    std::vector<double>& widths) const
 {
 #ifdef GX_DEBUG_MODE
     if (text.empty()) {
@@ -101,14 +100,14 @@ void gearoenix::render::font::Font::compute_text_widths(
     }
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font::bake(
+void gearoenix::render::font::Font::bake(
     const std::wstring& text,
     const std::vector<double>& txt_widths,
     const math::Vec4<double>& color_vector,
     const double img_width,
     const double img_height,
     const double img_start_skip,
-    const core::sync::EndCaller& end) const noexcept
+    core::job::EndCallerShared<texture::Texture2D>&& end) const
 {
     const auto converter = [](const double v) {
         if (v >= 1.0f)
@@ -201,24 +200,25 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::
         .type = texture::Type::Texture2D,
         .has_mipmap = false,
     };
-    return e.get_texture_manager()->create_2d_from_pixels(
+    e.get_texture_manager()->create_2d_from_pixels(
         "gearoenix-baked-tex2d-" + core::String::to_string(text),
-        { std::move(img_pixels) }, txt_info, end);
+        { std::move(img_pixels) }, txt_info, std::move(end));
 }
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::render::font::Font::bake(
+void gearoenix::render::font::Font::bake(
     const std::wstring& text,
     const math::Vec4<double>& color,
     const double img_height,
     double& img_width,
-    const core::sync::EndCaller& end) const noexcept
+    core::job::EndCallerShared<texture::Texture2D>&& end) const
 {
     if (text.empty()) {
         img_width = img_height;
-        return e.get_texture_manager()->create_2d_from_colour(math::Vec4(0.0f), end);
+        e.get_texture_manager()->create_2d_from_colour(math::Vec4(0.0f), std::move(end));
+        return;
     }
     std::vector<double> widths(text.size() + 1);
     compute_text_widths(text, img_height, widths);
     img_width = widths.back();
-    return bake(text, widths, color, img_width, img_height, 0.0f, end);
+    bake(text, widths, color, img_width, img_height, 0.0f, std::move(end));
 }

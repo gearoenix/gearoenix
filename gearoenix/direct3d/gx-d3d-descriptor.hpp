@@ -28,8 +28,8 @@ struct DescriptorAllocator final {
         Device& d,
         UINT descriptors_count,
         D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-        const wchar_t* name) noexcept;
-    ~DescriptorAllocator() noexcept;
+        const wchar_t* name);
+    ~DescriptorAllocator();
 };
 
 struct CpuDescriptorAllocator final {
@@ -42,8 +42,8 @@ struct CpuDescriptorAllocator final {
         Device& d,
         UINT descriptors_count,
         D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-        const wchar_t* name) noexcept;
-    ~CpuDescriptorAllocator() noexcept;
+        const wchar_t* name);
+    ~CpuDescriptorAllocator();
 };
 
 struct Descriptor final {
@@ -60,11 +60,11 @@ private:
         UINT resource_index,
         D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
         D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
-        std::shared_ptr<core::Allocator>&& allocator) noexcept;
+        std::shared_ptr<core::Allocator>&& allocator);
 
 public:
-    ~Descriptor() noexcept;
-    Descriptor(Descriptor&&) noexcept;
+    ~Descriptor();
+    Descriptor(Descriptor&&);
 };
 
 struct CpuDescriptor final {
@@ -79,11 +79,11 @@ private:
     CpuDescriptor(
         UINT resource_index,
         D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-        std::shared_ptr<core::Allocator>&& allocator) noexcept;
+        std::shared_ptr<core::Allocator>&& allocator);
 
 public:
-    ~CpuDescriptor() noexcept;
-    CpuDescriptor(CpuDescriptor&&) noexcept;
+    ~CpuDescriptor();
+    CpuDescriptor(CpuDescriptor&&);
 };
 
 struct DescriptorManager final {
@@ -96,12 +96,12 @@ struct DescriptorManager final {
     GX_GET_REFC_PRV(D3D12_GPU_DESCRIPTOR_HANDLE, texture_2d_region_gpu_handle)
     GX_GET_REFC_PRV(D3D12_GPU_DESCRIPTOR_HANDLE, samplers_region_gpu_handle)
 
-    explicit DescriptorManager(std::shared_ptr<Device> device) noexcept;
-    ~DescriptorManager() noexcept;
-    [[nodiscard]] Descriptor allocate_texture_2d() noexcept;
-    [[nodiscard]] Descriptor allocate_others() noexcept;
-    [[nodiscard]] CpuDescriptor allocate_rtv() noexcept;
-    [[nodiscard]] CpuDescriptor allocate_dsv() noexcept;
+    explicit DescriptorManager(std::shared_ptr<Device> device);
+    ~DescriptorManager();
+    [[nodiscard]] Descriptor allocate_texture_2d();
+    [[nodiscard]] Descriptor allocate_others();
+    [[nodiscard]] CpuDescriptor allocate_rtv();
+    [[nodiscard]] CpuDescriptor allocate_dsv();
 };
 }
 

@@ -16,7 +16,7 @@ struct RuntimeConfiguration {
     GX_GET_REF_PRV(render::RuntimeConfiguration, render_configuration);
 
 public:
-    RuntimeConfiguration() noexcept
+    RuntimeConfiguration()
         : application_name(GX_APPLICATION_NAME)
     {
     }

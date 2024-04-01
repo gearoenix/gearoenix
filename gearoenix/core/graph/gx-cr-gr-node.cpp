@@ -1,7 +1,7 @@
 #include "gx-cr-gr-node.hpp"
 #include "../asset/gx-cr-asset-manager.hpp"
 
-gearoenix::core::graph::Node::Node(std::string n, const std::vector<std::string>& input_links, const std::vector<std::string>& output_links) noexcept
+gearoenix::core::graph::Node::Node(std::string n, const std::vector<std::string>& input_links, const std::vector<std::string>& output_links)
     : asset::Asset(asset::Manager::create_id(), asset::Type::Node, std::move(n))
 {
     input_links_providers_links.resize(input_links.size());
@@ -14,24 +14,24 @@ gearoenix::core::graph::Node::Node(std::string n, const std::vector<std::string>
     }
 }
 
-gearoenix::core::graph::Node::~Node() noexcept = default;
+gearoenix::core::graph::Node::~Node() = default;
 
-void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_index, Node* const o, const unsigned int provider_output_link_index) noexcept
+void gearoenix::core::graph::Node::set_provider(const unsigned int input_link_index, Node* const o, const unsigned int provider_output_link_index)
 {
     input_links_providers_links[input_link_index] = std::make_pair(o, provider_output_link_index);
 }
 
-void gearoenix::core::graph::Node::clear_provider(unsigned int input_link_index) noexcept
+void gearoenix::core::graph::Node::clear_provider(unsigned int input_link_index)
 {
     input_links_providers_links[input_link_index] = std::make_pair(nullptr, 0);
 }
 
-void gearoenix::core::graph::Node::set_providers_count(const std::size_t count) noexcept
+void gearoenix::core::graph::Node::set_providers_count(const std::size_t count)
 {
     input_links_providers_links.resize(count);
 }
 
-void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link_index) noexcept
+void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link_index)
 {
     auto& p = input_links_providers_links[input_link_index];
     Node* const ptr = p.first;
@@ -42,12 +42,12 @@ void gearoenix::core::graph::Node::remove_provider(const unsigned int input_link
     ptr->remove_consumer(l, id, input_link_index);
 }
 
-void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, Node* const o, const unsigned int consumer_input_link_index) noexcept
+void gearoenix::core::graph::Node::set_consumer(const unsigned int output_link_index, Node* const o, const unsigned int consumer_input_link_index)
 {
     output_links_consumers_links[output_link_index][std::make_pair(o->get_id(), consumer_input_link_index)] = o;
 }
 
-void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_link_index, const Id node_id, const unsigned int consumer_input_link_index) noexcept
+void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_link_index, const Id node_id, const unsigned int consumer_input_link_index)
 {
     auto& m = output_links_consumers_links[output_link_index];
     auto search = m.find(std::make_pair(node_id, consumer_input_link_index));
@@ -59,7 +59,7 @@ void gearoenix::core::graph::Node::remove_consumer(const unsigned int output_lin
     ptr->remove_provider(l);
 }
 
-unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::string& n, bool& exist) const noexcept
+unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::string& n, bool& exist) const
 {
     auto a = input_links_string_index.find(n);
     if (a == input_links_string_index.end()) {
@@ -70,7 +70,7 @@ unsigned int gearoenix::core::graph::Node::get_input_link_index(const std::strin
     return a->second;
 }
 
-unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::string& n, bool& exist) const noexcept
+unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::string& n, bool& exist) const
 {
     auto a = output_links_string_index.find(n);
     if (a == output_links_string_index.end()) {
@@ -81,7 +81,7 @@ unsigned int gearoenix::core::graph::Node::get_output_link_index(const std::stri
     return a->second;
 }
 
-std::vector<std::string> gearoenix::core::graph::Node::get_input_links_names() const noexcept
+std::vector<std::string> gearoenix::core::graph::Node::get_input_links_names() const
 {
     std::vector<std::string> result;
     for (const auto& p : input_links_string_index) {
@@ -90,7 +90,7 @@ std::vector<std::string> gearoenix::core::graph::Node::get_input_links_names() c
     return result;
 }
 
-std::vector<std::string> gearoenix::core::graph::Node::get_output_links_names() const noexcept
+std::vector<std::string> gearoenix::core::graph::Node::get_output_links_names() const
 {
     std::vector<std::string> result;
     for (const auto& p : output_links_string_index) {
@@ -99,7 +99,7 @@ std::vector<std::string> gearoenix::core::graph::Node::get_output_links_names() 
     return result;
 }
 
-void gearoenix::core::graph::Node::connect(Node* const p, const unsigned int po, Node* const c, const unsigned int ci) noexcept
+void gearoenix::core::graph::Node::connect(Node* const p, const unsigned int po, Node* const c, const unsigned int ci)
 {
     p->set_consumer(po, c, ci);
     c->set_provider(ci, p, po);

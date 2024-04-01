@@ -1,6 +1,6 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
@@ -21,11 +21,13 @@ struct Texture;
 struct Texture2D;
 struct TextureCube;
 struct Target;
+
+struct DefaultCameraTargets final {
+    std::shared_ptr<Target> first_colour;
+    std::shared_ptr<Target> second_colour;
+};
+
 struct Manager {
-    struct DefaultCameraTargets final {
-        std::shared_ptr<Target> colour;
-        std::shared_ptr<Target> second_colour;
-    };
 
 protected:
     engine::Engine& e;
@@ -40,88 +42,75 @@ protected:
     std::mutex targets_lock;
     std::map<std::string, std::weak_ptr<Target>> targets;
 
-    [[nodiscard]] virtual std::shared_ptr<Texture2D> create_2d_from_pixels_v(
-        std::string name,
-        std::vector<std::vector<std::uint8_t>> pixels,
+    virtual void create_2d_from_pixels_v(
+        std::string&& name,
+        std::vector<std::vector<std::uint8_t>>&& pixels,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept
+        core::job::EndCallerShared<Texture2D>&& c)
         = 0;
-    [[nodiscard]] virtual std::shared_ptr<TextureCube> create_cube_from_pixels_v(
-        std::string name,
-        std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+    virtual void create_cube_from_pixels_v(
+        std::string&& name,
+        std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept
+        core::job::EndCallerShared<TextureCube>&& c)
         = 0;
-    [[nodiscard]] virtual std::shared_ptr<Target> create_target_v(
-        std::string name,
+    virtual void create_target_v(
+        std::string&& name,
         std::vector<Attachment>&& attachments,
-        const core::sync::EndCaller& c) noexcept
+        core::job::EndCallerShared<Target>&& c)
         = 0;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    virtual ~Manager() noexcept;
-    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(
-        const platform::stream::Path& path,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture> read_gx3d(
-        const std::shared_ptr<platform::stream::Stream>& stream,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_colour(
-        const math::Vec4<float>& colour,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> get_brdflut(
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> get_checker(
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_pixels(
-        std::string name,
-        std::vector<std::vector<std::uint8_t>> pixels,
+    explicit Manager(engine::Engine& e);
+    virtual ~Manager();
+    void read_gx3d(const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c);
+    void read_gx3d(platform::stream::Stream& stream, core::job::EndCallerShared<Texture>&& c);
+    void create_2d_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c);
+    void get_brdflut(core::job::EndCallerShared<Texture2D>&& c);
+    void get_checker(core::job::EndCallerShared<Texture2D>&& c);
+    void create_2d_from_pixels(
+        std::string&& name,
+        std::vector<std::vector<std::uint8_t>>&& pixels,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_formatted(
-        std::string name,
+        core::job::EndCallerShared<Texture2D>&& c);
+    void create_2d_from_formatted(
+        std::string&& name,
         const void* data,
         std::size_t size,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2df_from_formatted(
-        std::string name,
+        core::job::EndCallerShared<Texture2D>&& c);
+    void create_2df_from_formatted(
+        std::string&& name,
         const void* data,
         std::size_t size,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Texture2D> create_2d_from_file(
-        std::string name,
+        core::job::EndCallerShared<Texture2D>&& c);
+    void create_2d_from_file(
+        std::string&& name,
         const platform::stream::Path& path,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_colour(
-        const math::Vec4<float>& colour,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<TextureCube> create_cube_from_pixels(
-        std::string name,
-        std::vector<std::vector<std::vector<std::uint8_t>>> pixels,
+        core::job::EndCallerShared<Texture2D>&& c);
+    void create_cube_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<TextureCube>&& c);
+    void create_cube_from_pixels(
+        std::string&& name,
+        std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
         const TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept;
-    [[nodiscard]] std::shared_ptr<Target> create_target(
-        std::string name,
+        core::job::EndCallerShared<TextureCube>&& c);
+    void create_target(
+        std::string&& name,
         std::vector<Attachment>&& attachments,
-        const core::sync::EndCaller& c) noexcept;
+        core::job::EndCallerShared<Target>&& c);
     [[nodiscard]] static constexpr float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,
         const math::Vec3<float>& l,
-        float roughness) noexcept;
-    [[nodiscard]] static math::Vec2<float> integrate_brdf(
-        float n_dot_v,
-        float roughness) noexcept;
-    [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(
-        std::size_t resolution = 256) noexcept;
-    [[nodiscard]] math::Vec2<std::size_t> get_default_camera_render_target_dimensions() const noexcept;
-    [[nodiscard]] DefaultCameraTargets create_default_camera_render_target(
+        float roughness);
+    [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness);
+    [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(std::size_t resolution = 256);
+    [[nodiscard]] math::Vec2<std::size_t> get_default_camera_render_target_dimensions() const;
+    void create_default_camera_render_target(
         const std::string& camera_name,
-        const core::sync::EndCaller& c) noexcept;
+        core::job::EndCaller<DefaultCameraTargets>&& callback);
 };
 }
 
@@ -129,7 +118,7 @@ constexpr float gearoenix::render::texture::Manager::geometry_smith(
     const math::Vec3<float>& n,
     const math::Vec3<float>& v,
     const math::Vec3<float>& l,
-    const float roughness) noexcept
+    const float roughness)
 {
     auto temp = n.dot(v);
     const auto n_dot_v = temp < 0.0f ? 0.0f : temp;

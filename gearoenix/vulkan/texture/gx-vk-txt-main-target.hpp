@@ -42,7 +42,7 @@ public:
             std::shared_ptr<Framebuffer> framebuffer,
             std::shared_ptr<sync::Fence> wait_fence,
             std::shared_ptr<sync::Semaphore> start_semaphore,
-            std::shared_ptr<sync::Semaphore> end_semaphore) noexcept;
+            std::shared_ptr<sync::Semaphore> end_semaphore);
     };
     GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
     GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
@@ -50,14 +50,14 @@ public:
     GX_GET_CREF_PRV(std::vector<Frame>, frames)
     GX_GET_PTR_PRV(Frame, current_frame)
 
-    MainTarget(const MainTarget& o) noexcept;
+    MainTarget(const MainTarget& o);
 
 public:
-    MainTarget(memory::Manager& memory_manager, engine::Engine* e) noexcept;
-    ~MainTarget() noexcept final;
-    [[nodiscard]] render::texture::Target* clone() const noexcept final;
-    void update() noexcept;
-    void present() noexcept;
+    MainTarget(memory::Manager& memory_manager, engine::Engine* e);
+    ~MainTarget() final;
+    [[nodiscard]] render::texture::Target* clone() const final;
+    void update();
+    void present();
 };
 }
 #endif

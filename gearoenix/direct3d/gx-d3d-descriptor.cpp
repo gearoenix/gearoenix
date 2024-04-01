@@ -12,7 +12,7 @@ gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(
     Device& d,
     const UINT descriptors_count,
     const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-    const wchar_t* const name) noexcept
+    const wchar_t* const name)
     : allocator(core::Allocator::construct(descriptors_count))
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc;
@@ -32,13 +32,13 @@ gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(
     gpu_starting_handle = heap->GetGPUDescriptorHandleForHeapStart();
 }
 
-gearoenix::d3d::DescriptorAllocator::~DescriptorAllocator() noexcept = default;
+gearoenix::d3d::DescriptorAllocator::~DescriptorAllocator() = default;
 
 gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(
     Device& d,
     const UINT descriptors_count,
     const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-    const wchar_t* const name) noexcept
+    const wchar_t* const name)
     : allocator(core::Allocator::construct(descriptors_count))
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc;
@@ -56,13 +56,13 @@ gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(
     cpu_starting_handle = heap->GetCPUDescriptorHandleForHeapStart();
 }
 
-gearoenix::d3d::CpuDescriptorAllocator::~CpuDescriptorAllocator() noexcept = default;
+gearoenix::d3d::CpuDescriptorAllocator::~CpuDescriptorAllocator() = default;
 
 gearoenix::d3d::Descriptor::Descriptor(
     const UINT resource_index,
     D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
     D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
-    std::shared_ptr<core::Allocator>&& allocator) noexcept
+    std::shared_ptr<core::Allocator>&& allocator)
     : resource_index(resource_index)
     , cpu_handle(std::move(cpu_handle))
     , gpu_handle(std::move(gpu_handle))
@@ -70,25 +70,25 @@ gearoenix::d3d::Descriptor::Descriptor(
 {
 }
 
-gearoenix::d3d::Descriptor::~Descriptor() noexcept = default;
+gearoenix::d3d::Descriptor::~Descriptor() = default;
 
-gearoenix::d3d::Descriptor::Descriptor(Descriptor&&) noexcept = default;
+gearoenix::d3d::Descriptor::Descriptor(Descriptor&&) = default;
 
 gearoenix::d3d::CpuDescriptor::CpuDescriptor(
     const UINT resource_index,
     D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-    std::shared_ptr<core::Allocator>&& allocator) noexcept
+    std::shared_ptr<core::Allocator>&& allocator)
     : resource_index(resource_index)
     , cpu_handle(std::move(cpu_handle))
     , allocator(std::move(allocator))
 {
 }
 
-gearoenix::d3d::CpuDescriptor::~CpuDescriptor() noexcept = default;
+gearoenix::d3d::CpuDescriptor::~CpuDescriptor() = default;
 
-gearoenix::d3d::CpuDescriptor::CpuDescriptor(CpuDescriptor&&) noexcept = default;
+gearoenix::d3d::CpuDescriptor::CpuDescriptor(CpuDescriptor&&) = default;
 
-gearoenix::d3d::DescriptorManager::DescriptorManager(std::shared_ptr<Device> d) noexcept
+gearoenix::d3d::DescriptorManager::DescriptorManager(std::shared_ptr<Device> d)
     : device(std::move(d))
     , allocator(*device, GPU_DESCRIPTORS_COUNT, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, L"main-descriptor-heap")
     , sampler_allocator(*device, SAMPLER_DESCRIPTORS_COUNT, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, L"main-sampler-descriptor-heap")
@@ -106,9 +106,9 @@ gearoenix::d3d::DescriptorManager::DescriptorManager(std::shared_ptr<Device> d) 
     }
 }
 
-gearoenix::d3d::DescriptorManager::~DescriptorManager() noexcept = default;
+gearoenix::d3d::DescriptorManager::~DescriptorManager() = default;
 
-gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_texture_2d() noexcept
+gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_texture_2d()
 {
     auto alc = texture_2d_region_allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * allocator.size_increment;
@@ -123,7 +123,7 @@ gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_texture_2
         std::move(alc));
 }
 
-gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_others() noexcept
+gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_others()
 {
     auto alc = allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * allocator.size_increment;
@@ -138,7 +138,7 @@ gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_others() 
         std::move(alc));
 }
 
-gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_rtv() noexcept
+gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_rtv()
 {
     auto alc = rtv_allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * rtv_allocator.size_increment;
@@ -150,7 +150,7 @@ gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_rtv() 
         std::move(alc));
 }
 
-gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_dsv() noexcept
+gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_dsv()
 {
     auto alc = dsv_allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * dsv_allocator.size_increment;

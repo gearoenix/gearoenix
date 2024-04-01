@@ -1,7 +1,6 @@
 #ifndef GEAROENIX_RENDER_GLTF_LOADER_HPP
 #define GEAROENIX_RENDER_GLTF_LOADER_HPP
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../core/job/gx-cr-job-end-caller.hpp"
 #include <memory>
 #include <vector>
 
@@ -17,11 +16,12 @@ namespace gearoenix::render::scene {
 struct Builder;
 }
 
-namespace gearoenix::render {
-[[nodiscard]] std::vector<std::shared_ptr<scene::Builder>> load_gltf(
+namespace gearoenix::render::gltf {
+void load(
     engine::Engine& e,
     const platform::stream::Path& file,
-    const core::sync::EndCaller& end_callback) noexcept;
+    const core::job::EndCaller<std::vector<std::shared_ptr<scene::Builder>>>& scenes_end_callback,
+    const core::job::EndCaller<>& entity_end_callback);
 }
 
 #endif

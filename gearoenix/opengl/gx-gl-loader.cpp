@@ -22,7 +22,7 @@ GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_DEF);
 
 static bool is_loaded = false;
 
-bool gearoenix::gl::load_library() noexcept
+bool gearoenix::gl::load_library()
 {
     if (is_loaded)
         return true;
@@ -72,7 +72,7 @@ bool gearoenix::gl::load_library() noexcept
     return true;
 }
 
-void gearoenix::gl::unload_library() noexcept
+void gearoenix::gl::unload_library()
 {
     is_loaded = false;
 
@@ -85,13 +85,13 @@ void gearoenix::gl::unload_library() noexcept
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_UNLOAD);
 }
 
-bool gearoenix::gl::extension_exists(const std::string& ext_name) noexcept
+bool gearoenix::gl::extension_exists(const std::string& ext_name)
 {
     return gearoenix_gl_extensions.contains(ext_name);
 }
 
 #ifdef GX_DEBUG_MODE
-static const char* severity_to_string(const gearoenix::gl::enumerated severity) noexcept
+static const char* severity_to_string(const gearoenix::gl::enumerated severity)
 {
     switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:

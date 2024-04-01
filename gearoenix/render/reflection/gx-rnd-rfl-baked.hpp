@@ -1,9 +1,6 @@
 #ifndef GEAROENIX_RENDER_REFLECTION_BAKED_HPP
 #define GEAROENIX_RENDER_REFLECTION_BAKED_HPP
-#include "../../core/ecs/gx-cr-ecs-component.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../math/gx-math-aabb.hpp"
-#include <vector>
+#include "gx-rnd-rfl-probe.hpp"
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -14,23 +11,20 @@ struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
-struct Baked final : public core::ecs::Component {
-    GX_GET_VAL_PRV(std::size_t, radiance_mips_count, 0);
-    GX_GET_CREF_PRV(math::Aabb3<double>, include_box);
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, irradiance);
-    GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, radiance);
-    GX_GETSET_VAL_PRV(core::ecs::entity_id_t, scene_id, 0);
-    GX_GET_RRF_PRV(engine::Engine, e);
+struct Baked : Probe {
+    static constexpr std::size_t MAX_COUNT = 8;
 
-public:
+protected:
     Baked(
         engine::Engine& e,
-        std::shared_ptr<texture::TextureCube> irradiance,
-        std::shared_ptr<texture::TextureCube> radiance,
-        math::Aabb3<double> include_box,
-        std::string&& name) noexcept;
-    ~Baked() noexcept final;
-    Baked(Baked&&) noexcept;
+        std::type_index final_component_type_index,
+        std::shared_ptr<texture::TextureCube>&& irradiance,
+        std::shared_ptr<texture::TextureCube>&& radiance,
+        const math::Aabb3<double>& include_box,
+        std::string&& name);
+
+public:
+    ~Baked() override;
 };
 }
 #endif

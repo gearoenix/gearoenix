@@ -1,7 +1,7 @@
 #include "gx-plt-arguments.hpp"
 #include "../core/gx-cr-string.hpp"
 
-std::string gearoenix::platform::Arguments::extract_process_directory(const std::string& s) noexcept
+std::string gearoenix::platform::Arguments::extract_process_directory(const std::string& s)
 {
 #ifdef GX_PLATFORM_DESKTOP
 #ifdef GX_PLATFORM_WINDOWS
@@ -19,7 +19,7 @@ std::string gearoenix::platform::Arguments::extract_process_directory(const std:
 #endif
 }
 
-gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
+gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF)
 {
 #ifdef GX_PLATFORM_INTERFACE_WIN32
     int argc = 0;
@@ -73,12 +73,12 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF) noexcept
     GX_LOG_D("Parsing of arguments has been finished.");
 }
 
-bool gearoenix::platform::Arguments::is_key(const std::string& s) noexcept
+bool gearoenix::platform::Arguments::is_key(const std::string& s)
 {
     return s[0] == '-' && s[1] == '-';
 }
 
-bool gearoenix::platform::Arguments::get_value(const std::string& key, std::string& value, bool necessary) const noexcept
+bool gearoenix::platform::Arguments::get_value(const std::string& key, std::string& value, bool necessary) const
 {
     auto range = map.equal_range(key);
     int count = 0;
@@ -97,7 +97,7 @@ bool gearoenix::platform::Arguments::get_value(const std::string& key, std::stri
     return false;
 }
 
-bool gearoenix::platform::Arguments::get_value(const std::string& key, int& value, bool necessary) const noexcept
+bool gearoenix::platform::Arguments::get_value(const std::string& key, int& value, bool necessary) const
 {
     std::string v;
     if (!get_value(key, v, necessary))

@@ -16,8 +16,8 @@ struct Layout final {
     GX_GET_CREF_PRV(std::shared_ptr<descriptor::SetLayout>, des_set_layout);
 
 public:
-    explicit Layout(std::shared_ptr<descriptor::SetLayout> des_set_layout) noexcept;
-    ~Layout() noexcept;
+    explicit Layout(std::shared_ptr<descriptor::SetLayout> des_set_layout);
+    ~Layout();
 };
 }
 #endif

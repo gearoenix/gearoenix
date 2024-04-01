@@ -18,7 +18,7 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(
     const render::texture::TextureInfo& info,
     const std::size_t img_width,
     const std::size_t img_height,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>& call) noexcept
+    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
     : render::texture::Texture2D(id, std::move(name), info.format, info.sampler_info, e)
     , view(new image::View(std::make_shared<image::Image>(
           static_cast<std::uint32_t>(img_width), static_cast<std::uint32_t>(img_height), 1u,
@@ -37,15 +37,15 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(
     e->get_image_manager()->upload(view->get_image(), std::move(buff), call);
 }
 
-gearoenix::vulkan::texture::Texture2D::~Texture2D() noexcept = default;
+gearoenix::vulkan::texture::Texture2D::~Texture2D() = default;
 
 void gearoenix::vulkan::texture::Texture2D::write_gx3d(
     const std::shared_ptr<platform::stream::Stream>&,
-    const core::sync::EndCaller<core::sync::EndCallerIgnore>&) noexcept {
+    const core::job::EndCaller<core::job::EndCallerIgnore>&) {
     GX_UNEXPECTED
 }
 
-VkFormat gearoenix::vulkan::texture::Texture2D::convert(const render::texture::TextureFormat format) noexcept
+VkFormat gearoenix::vulkan::texture::Texture2D::convert(const render::texture::TextureFormat format)
 {
     switch (format) {
     case render::texture::TextureFormat::RgbaUint8:

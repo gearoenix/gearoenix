@@ -16,13 +16,13 @@ private:
     engine::Engine& e;
 
 public:
-    explicit Manager(engine::Engine& e) noexcept;
-    ~Manager() noexcept;
+    explicit Manager(engine::Engine& e);
+    ~Manager();
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     /// By layer you decide in what order scenes to be render on top of each other
-    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer, core::sync::EndCaller&& end_callback) noexcept;
-    void update() noexcept;
+    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer, core::job::EndCaller<>&& end_callback) const;
+    void update() const;
 };
 }
 #endif

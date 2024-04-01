@@ -13,7 +13,7 @@ private:
     Vec3<Element> edge[2];
 
 public:
-    constexpr Triangle3() noexcept = default;
+    constexpr Triangle3() = default;
 
     constexpr Triangle3(const Vec3<Element>& p1, const Vec3<Element>& p2, const Vec3<Element>& p3)
         : head(p1)
@@ -52,7 +52,7 @@ public:
         return false;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Triangle3& t) noexcept
+    friend std::ostream& operator<<(std::ostream& os, const Triangle3& t)
     {
         os << R"("Triangle3": { "head": ")" << t.head << R"(", "edge0": ")" << t.edge[0] << R"(", "edge1": ")" << t.edge[1] << "\" }\n";
         return os;

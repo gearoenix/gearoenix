@@ -52,7 +52,7 @@ private:
     std::vector<Data> data;
 
     template <typename N>
-    N& allocate() noexcept
+    N& allocate()
     {
         const auto i = nodes.size();
         nodes.resize(i + sizeof(N));
@@ -64,7 +64,7 @@ private:
         const std::size_t data_starting_index,
         const std::size_t data_ending_index,
         const math::Aabb3<double>& center_volume,
-        const math::Aabb3<double>& volume) noexcept
+        const math::Aabb3<double>& volume)
     {
         const auto data_size = data_ending_index - data_starting_index;
         GX_ASSERT_D(data_size > 0);
@@ -228,7 +228,7 @@ private:
     [[nodiscard]] std::optional<std::pair<double, const Data*>> hit(
         const std::size_t ptr,
         const math::Ray3<double>& ray,
-        const double minimum_distance) const noexcept
+        const double minimum_distance) const
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         auto hit_result = node.volume.hit(ray, minimum_distance);
@@ -260,7 +260,7 @@ private:
     }
 
     template <typename Function>
-    void call_on_all(const std::size_t ptr, Function&& function) noexcept
+    void call_on_all(const std::size_t ptr, Function&& function)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         if (node.leaf) {
@@ -277,7 +277,7 @@ private:
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection) noexcept
+    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
@@ -305,7 +305,7 @@ private:
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
-    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection) noexcept
+    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
@@ -336,7 +336,7 @@ private:
     }
 
 public:
-    void reset() noexcept
+    void reset()
     {
         nodes.clear();
         data.clear();
@@ -344,14 +344,14 @@ public:
         accu_volume.reset();
     }
 
-    void add(Data&& d) noexcept
+    void add(Data&& d)
     {
         accu_center_volume.put_without_update(d.box.get_center());
         accu_volume.put_without_update(d.box);
         data.push_back(std::move(d));
     }
 
-    void create_nodes() noexcept
+    void create_nodes()
     {
         if (data.empty())
             return;
@@ -360,7 +360,7 @@ public:
         create_node(0, data.size(), accu_center_volume, accu_volume);
     }
 
-    [[nodiscard]] std::optional<std::pair<double, Data*>> hit(const math::Ray3<double>& ray, const double minimum_distance) const noexcept
+    [[nodiscard]] std::optional<std::pair<double, Data*>> hit(const math::Ray3<double>& ray, const double minimum_distance) const
     {
         if (nodes.empty())
             return std::nullopt;
@@ -368,7 +368,7 @@ public:
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const Collider& cld, Function&& on_intersection) noexcept
+    void call_on_intersecting(const Collider& cld, Function&& on_intersection)
     {
         if (nodes.empty())
             return;
@@ -376,7 +376,7 @@ public:
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
-    void call_on_intersecting(const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection) noexcept
+    void call_on_intersecting(const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
     {
         if (nodes.empty())
             return;
@@ -384,7 +384,7 @@ public:
     }
 
     template <typename Function>
-    void call_on_all(Function&& function) noexcept
+    void call_on_all(Function&& function)
     {
         if (nodes.empty())
             return;

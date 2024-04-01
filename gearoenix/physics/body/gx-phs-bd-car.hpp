@@ -94,10 +94,10 @@ public:
     GX_GET_REF_PRV(Axle, front_axle)
     GX_GET_REF_PRV(Axle, rear_axle)
 private:
-    void update_steering_angle() noexcept;
-    void update_axles() noexcept;
-    void update_engine() noexcept;
-    void update() noexcept;
+    void update_steering_angle();
+    void update_axles();
+    void update_engine();
+    void update();
 
 public:
     Car(
@@ -106,8 +106,8 @@ public:
         std::shared_ptr<render::model::Dynamic> car_left_front_wheel,
         std::shared_ptr<render::model::Dynamic> car_right_front_wheel,
         std::shared_ptr<render::model::Dynamic> car_left_rear_wheel,
-        std::shared_ptr<render::model::Dynamic> car_right_rear_wheel) noexcept;
-    ~Car() noexcept override;
+        std::shared_ptr<render::model::Dynamic> car_right_rear_wheel);
+    ~Car() override;
 };
 }
 #endif

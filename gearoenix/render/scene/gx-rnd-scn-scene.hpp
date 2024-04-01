@@ -2,7 +2,7 @@
 #define GEAROENIX_RENDER_SCENE_SCENE_HPP
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../core/sync/gx-cr-sync-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -33,7 +33,7 @@ struct Skybox;
 }
 
 namespace gearoenix::render::scene {
-struct Scene final : public core::ecs::Component {
+struct Scene final : core::ecs::Component {
     typedef boost::container::flat_map<std::string, math::Vec3<double>> EmptyMap;
 
     GX_GET_RRF_PRV(engine::Engine, e);
@@ -51,21 +51,21 @@ struct Scene final : public core::ecs::Component {
     GX_GET_VAL_PRV(bool, recreate_bvh, true);
     GX_GET_VAL_PRV(bool, reflection_probs_changed, true); // TODO: later must find a mechanism to update it
 
-private:
     boost::container::flat_map<core::ecs::entity_id_t, std::uint64_t> cameras_flags;
 
 public:
-    Scene(engine::Engine& e, double layer, std::string&& name) noexcept;
-    ~Scene() noexcept final;
-    Scene(Scene&&) noexcept;
-    void add_model(core::ecs::entity_id_t entity, model::Model& m) noexcept;
-    void add_camera(core::ecs::entity_id_t entity, camera::Camera& c) noexcept;
-    void add_baked_reflection(core::ecs::entity_id_t entity, reflection::Baked& b) noexcept;
-    void add_runtime_reflection(core::ecs::entity_id_t entity, reflection::Runtime& r) noexcept;
-    void add_skybox(core::ecs::entity_id_t entity, skybox::Skybox& s) noexcept;
-    void add_light(core::ecs::entity_id_t entity, light::Light& l) noexcept;
-    void add_empty(const std::string& name, const math::Vec3<double>& location) noexcept;
-    void update(core::ecs::entity_id_t scene_entity_id) noexcept;
+    Scene(engine::Engine& e, double layer, std::string&& name);
+    [[nodiscard]] static std::shared_ptr<Scene> construct(engine::Engine& e, double layer, std::string&& name);
+    ~Scene() override;
+    void add_model(core::ecs::entity_id_t entity, model::Model& m);
+    void add_camera(core::ecs::entity_id_t entity, camera::Camera& c);
+    void add_baked_reflection(core::ecs::entity_id_t entity, reflection::Baked& b);
+    void add_runtime_reflection(core::ecs::entity_id_t entity, reflection::Runtime& r);
+    void add_skybox(core::ecs::entity_id_t entity, skybox::Skybox& s);
+    void add_light(core::ecs::entity_id_t entity, light::Light& l);
+    void add_empty(const std::string& name, const math::Vec3<double>& location);
+    void update(core::ecs::entity_id_t scene_entity_id);
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final;
 };
 }
 #endif

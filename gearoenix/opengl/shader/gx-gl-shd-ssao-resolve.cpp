@@ -148,7 +148,7 @@ void main() {\n\
     ssao_value = smoothstep(0.0, 1.0, ssao_value * ssao_samples_weight);\n\
 }\n";
 
-gearoenix::gl::shader::SsaoResolve::SsaoResolve(Engine& e) noexcept
+gearoenix::gl::shader::SsaoResolve::SsaoResolve(Engine& e)
     : Shader(e)
 {
     set_vertex_shader(vertex_shader_src);
@@ -161,9 +161,9 @@ gearoenix::gl::shader::SsaoResolve::SsaoResolve(Engine& e) noexcept
     GX_GL_THIS_GET_UNIFORM_TEXTURE(normal_ao);
 }
 
-gearoenix::gl::shader::SsaoResolve::~SsaoResolve() noexcept = default;
+gearoenix::gl::shader::SsaoResolve::~SsaoResolve() = default;
 
-void gearoenix::gl::shader::SsaoResolve::bind(uint& current_shader) const noexcept
+void gearoenix::gl::shader::SsaoResolve::bind(uint& current_shader) const
 {
     if (shader_program == current_shader)
         return;

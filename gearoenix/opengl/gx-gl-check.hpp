@@ -12,7 +12,7 @@
 #endif
 
 namespace gearoenix::gl {
-[[nodiscard]] bool check_for_error() noexcept;
+[[nodiscard]] bool check_for_error();
 }
 
 #endif

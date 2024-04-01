@@ -14,7 +14,7 @@ struct GooglePlayBilling final {
 
 private:
 public:
-    static void initialise_static(JNIEnv* env) noexcept;
+    static void initialise_static(JNIEnv* env);
 };
 }
 

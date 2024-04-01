@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_FORMAT_HPP
 #define GEAROENIX_RENDER_TEXTURE_FORMAT_HPP
 #include "../../core/gx-cr-types.hpp"
+#include <cstdlib>
+
 namespace gearoenix::render::texture {
 enum struct TextureFormat : core::TypeId {
     RgbaFloat16 = 1,
@@ -27,7 +29,7 @@ enum struct TextureFormat : core::TypeId {
     Unknown = 255,
 };
 
-[[nodiscard]] constexpr std::size_t format_component_bits_count(const TextureFormat f) noexcept
+[[nodiscard]] constexpr std::size_t format_component_bits_count(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -55,7 +57,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr bool format_has_float_component(const TextureFormat f) noexcept
+[[nodiscard]] constexpr bool format_has_float_component(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -79,7 +81,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr std::size_t format_components_count(const TextureFormat f) noexcept
+[[nodiscard]] constexpr std::size_t format_components_count(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -107,7 +109,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr bool format_is_depth(const TextureFormat f) noexcept
+[[nodiscard]] constexpr bool format_is_depth(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::D16:
@@ -119,7 +121,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr std::size_t format_pixel_size(const TextureFormat f) noexcept
+[[nodiscard]] constexpr std::size_t format_pixel_size(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::Float16:

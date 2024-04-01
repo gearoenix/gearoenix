@@ -28,14 +28,14 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* const jvm, void* const)
 
 #define GX_KEEP_FUNCTIONS_ALIVE (void)JNI_OnLoad(nullptr, nullptr)
 
-void gearoenix::platform::JniUtility::make_current() noexcept
+void gearoenix::platform::JniUtility::make_current()
 {
     GX_KEEP_FUNCTIONS_ALIVE;
 
     GX_ASSERT(JNI_ERR != jvm->AttachCurrentThread(&env, nullptr));
 }
 
-std::string gearoenix::platform::JniUtility::consume_string(jstring j_str) noexcept
+std::string gearoenix::platform::JniUtility::consume_string(jstring j_str)
 {
     GX_KEEP_FUNCTIONS_ALIVE;
 

@@ -28,8 +28,8 @@ struct Texture2D final : public render::texture::Texture2D {
         Engine& e,
         UINT sampler_index,
         Microsoft::WRL::ComPtr<ID3D12Resource>&& resource,
-        Descriptor&& descriptor) noexcept;
-    ~Texture2D() noexcept final;
+        Descriptor&& descriptor);
+    ~Texture2D() final;
 };
 
 struct TextureManager final : public render::texture::Manager {
@@ -46,18 +46,18 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence;
     UINT64 fence_value = 1;
 
-    void wait(UINT64) noexcept;
+    void wait(UINT64);
 
 public:
-    TextureManager(Engine& e) noexcept;
-    ~TextureManager() noexcept final;
+    TextureManager(Engine& e);
+    ~TextureManager() final;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::sync::EndCaller& c) noexcept final;
+        const core::job::EndCaller& c) final;
 
-    static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out) noexcept;
+    static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out);
 };
 }
 

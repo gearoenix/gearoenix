@@ -150,7 +150,7 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
 }
 #endif
 
-static std::uint32_t find_api_version() noexcept
+static std::uint32_t find_api_version()
 {
     const std::uint32_t min_version = VK_MAKE_VERSION(1u, 0u, 0u);
     std::uint32_t result;
@@ -163,7 +163,7 @@ static std::uint32_t find_api_version() noexcept
 }
 }
 
-gearoenix::vulkan::Instance::Instance(Instance&& o) noexcept
+gearoenix::vulkan::Instance::Instance(Instance&& o)
     : vulkan_data(o.vulkan_data)
     , report_callback(o.report_callback)
 {
@@ -172,7 +172,7 @@ gearoenix::vulkan::Instance::Instance(Instance&& o) noexcept
 }
 
 std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct(
-    const platform::Application* app) noexcept
+    const platform::Application* app)
 {
     Instance instance;
     VkApplicationInfo app_info;
@@ -252,7 +252,7 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
     return instance;
 }
 
-gearoenix::vulkan::Instance::~Instance() noexcept
+gearoenix::vulkan::Instance::~Instance()
 {
     if (nullptr != vulkan_data) {
 #ifdef GX_VULKAN_INSTANCE_DEBUG

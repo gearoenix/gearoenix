@@ -115,7 +115,7 @@ static const boost::container::flat_map<std::int32_t, gearoenix::platform::key::
     { AKEYCODE_NUMPAD_DOT, gearoenix::platform::key::Id::NumpadDot },
 };
 
-gearoenix::platform::key::Id gearoenix::platform::convert_android_key(const std::int32_t key_code) noexcept
+gearoenix::platform::key::Id gearoenix::platform::convert_android_key(const std::int32_t key_code)
 {
     if (const auto search = gearoenix_key_map.find(key_code); gearoenix_key_map.end() != search)
         return search->second;

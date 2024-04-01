@@ -11,11 +11,11 @@ private:
     std::vector<std::function<void()>> load_functions;
 
 public:
-    FunctionLoader() noexcept;
-    ~FunctionLoader() noexcept;
-    void load(std::function<void()>&& fun) noexcept;
-    void unload() noexcept;
-    [[nodiscard]] std::size_t get_loaded_count() const noexcept;
+    FunctionLoader();
+    ~FunctionLoader();
+    void load(std::function<void()>&& fun);
+    void unload();
+    [[nodiscard]] std::size_t get_loaded_count() const;
 };
 }
 #endif

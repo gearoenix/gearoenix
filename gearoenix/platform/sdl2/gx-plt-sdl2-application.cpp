@@ -12,7 +12,7 @@
 
 static bool sdl_initialized = false;
 
-void gearoenix::platform::Application::initialize_sdl() noexcept
+void gearoenix::platform::Application::initialize_sdl()
 {
     if (sdl_initialized)
         return;
@@ -22,7 +22,7 @@ void gearoenix::platform::Application::initialize_sdl() noexcept
     }
 }
 
-void gearoenix::platform::Application::initialize_screen() noexcept
+void gearoenix::platform::Application::initialize_screen()
 {
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
@@ -35,7 +35,7 @@ void gearoenix::platform::Application::initialize_screen() noexcept
     }
 }
 
-void gearoenix::platform::Application::initialize_window() noexcept
+void gearoenix::platform::Application::initialize_window()
 {
     std::uint32_t core_flags = SDL_WINDOW_SHOWN;
     core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
@@ -96,14 +96,14 @@ void gearoenix::platform::Application::initialize_window() noexcept
     GX_LOG_F("Can not create window with minimum requirements");
 }
 
-void gearoenix::platform::Application::initialize_mouse() noexcept
+void gearoenix::platform::Application::initialize_mouse()
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
     base.initialize_mouse_position(x, y);
 }
 
-bool gearoenix::platform::Application::create_window(const std::uint32_t flags) noexcept
+bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
     window = SDL_CreateWindow(
         base.configuration.get_application_name().c_str(),
@@ -114,7 +114,7 @@ bool gearoenix::platform::Application::create_window(const std::uint32_t flags) 
 }
 
 #ifdef GX_RENDER_OPENGL_ENABLED
-bool gearoenix::platform::Application::create_gl_window(const int mj, const int mn, const std::uint32_t flags) noexcept
+bool gearoenix::platform::Application::create_gl_window(const int mj, const int mn, const std::uint32_t flags)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, mj);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, mn);
@@ -128,7 +128,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
     return false;
 }
 
-bool gearoenix::platform::Application::create_gl_sample_window(const int samples, const std::uint32_t flags) noexcept
+bool gearoenix::platform::Application::create_gl_sample_window(const int samples, const std::uint32_t flags)
 {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, samples > 0 ? 1 : 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
@@ -139,7 +139,7 @@ bool gearoenix::platform::Application::create_gl_sample_window(const int samples
     return false;
 }
 
-bool gearoenix::platform::Application::create_gl_depth_window(const int depth, const std::uint32_t flags) noexcept
+bool gearoenix::platform::Application::create_gl_depth_window(const int depth, const std::uint32_t flags)
 {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depth);
     if (create_window(flags)) {
@@ -157,7 +157,7 @@ bool gearoenix::platform::Application::create_gl_depth_window(const int depth, c
 }
 #endif
 
-void gearoenix::platform::Application::fetch_events() noexcept
+void gearoenix::platform::Application::fetch_events()
 {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
@@ -214,7 +214,7 @@ void gearoenix::platform::Application::fetch_events() noexcept
     }
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config) noexcept
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config)
     : base(GX_MAIN_ENTRY_ARGS, config)
 {
     initialize_sdl();
@@ -224,7 +224,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     base.initialize_engine(*this);
 }
 
-gearoenix::platform::Application::~Application() noexcept
+gearoenix::platform::Application::~Application()
 {
     base.terminate();
 #ifdef GX_RENDER_OPENGL_ENABLED
@@ -237,13 +237,13 @@ gearoenix::platform::Application::~Application() noexcept
 }
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
-static void gearoenix_platform_application_loop(void* const arg) noexcept
+static void gearoenix_platform_application_loop(void* const arg)
 {
     reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
 }
 #endif
 
-void gearoenix::platform::Application::run(core::Application* core_app) noexcept
+void gearoenix::platform::Application::run(core::Application* core_app)
 {
     base.initialize_core_application(*this, core_app);
 
@@ -256,25 +256,25 @@ void gearoenix::platform::Application::run(core::Application* core_app) noexcept
 #endif
 }
 
-void gearoenix::platform::Application::loop() noexcept
+void gearoenix::platform::Application::loop()
 {
     fetch_events();
     base.update();
 }
 
-void gearoenix::platform::Application::set_caption(const std::string& s) noexcept
+void gearoenix::platform::Application::set_caption(const std::string& s)
 {
     SDL_SetWindowTitle(window, s.c_str());
 }
 
-void gearoenix::platform::Application::set_window_fullscreen(const bool b) noexcept
+void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
     SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
     base.configuration.set_fullscreen(b);
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
-std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const noexcept
+std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const
 {
     std::uint32_t extensions_count = 0;
     SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, nullptr);
@@ -284,7 +284,7 @@ std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions
 }
 
 void gearoenix::platform::Application::create_vulkan_surface(
-    void* vulkan_instance, void* const vulkan_data_ptr) const noexcept
+    void* vulkan_instance, void* const vulkan_data_ptr) const
 {
     if (SDL_Vulkan_CreateSurface(
             window,

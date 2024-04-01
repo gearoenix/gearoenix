@@ -3,19 +3,19 @@
 gearoenix::physics::body::Rigid::Rigid(
     const core::Id id,
     std::string name,
-    std::shared_ptr<render::model::Dynamic> model) noexcept
+    std::shared_ptr<render::model::Dynamic> model)
     : Body(id, std::move(name), Type::Rigid, std::move(model))
 {
 }
 
-gearoenix::physics::body::Rigid::~Rigid() noexcept = default;
+gearoenix::physics::body::Rigid::~Rigid() = default;
 
-void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<double>& f) noexcept
+void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<double>& f)
 {
     force += f;
 }
 
-void gearoenix::physics::body::Rigid::apply_time(const double delta_time) noexcept
+void gearoenix::physics::body::Rigid::apply_time(const double delta_time)
 {
     const auto hdt = delta_time * 0.5;
     const auto acc = (force + (speed * air_friction)) * inverted_mass;

@@ -22,14 +22,14 @@ struct Semaphore final {
     GX_GETSET_VAL_PRV(VkPipelineStageFlags, pipeline_stage, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
 
 public:
-    Semaphore(Semaphore&&) noexcept;
+    Semaphore(Semaphore&&);
     Semaphore(const Semaphore&) = delete;
     Semaphore& operator=(Semaphore&&) = delete;
     Semaphore& operator=(const Semaphore&) = delete;
-    explicit Semaphore(const device::Logical& logical_device) noexcept;
-    ~Semaphore() noexcept;
-    [[nodiscard]] const VkSemaphore* get_vulkan_data_ptr() const noexcept;
-    [[nodiscard]] static std::vector<std::shared_ptr<Semaphore>> create_frame_based(const engine::Engine& e) noexcept;
+    explicit Semaphore(const device::Logical& logical_device);
+    ~Semaphore();
+    [[nodiscard]] const VkSemaphore* get_vulkan_data_ptr() const;
+    [[nodiscard]] static std::vector<std::shared_ptr<Semaphore>> create_frame_based(const engine::Engine& e);
 };
 }
 #endif

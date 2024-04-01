@@ -9,7 +9,7 @@ struct Keyboard final {
     GX_GET_CVAL_PRV(platform::key::Id, key);
 
 public:
-    Keyboard(const platform::key::Action action, const platform::key::Id key) noexcept
+    Keyboard(const platform::key::Action action, const platform::key::Id key)
         : action(action)
         , key(key)
     {
@@ -27,7 +27,7 @@ public:
         const platform::key::Action action,
         const platform::key::Id key,
         const math::Vec2<double>& position_normalised,
-        const math::Vec2<double>& position) noexcept
+        const math::Vec2<double>& position)
         : action(action)
         , key(key)
         , position_normalised(position_normalised)
@@ -40,7 +40,7 @@ struct MouseScroll final {
     GX_GET_REFC_PRV(math::Vec2<double>, direction);
 
 public:
-    explicit MouseScroll(const math::Vec2<double>& direction) noexcept
+    explicit MouseScroll(const math::Vec2<double>& direction)
         : direction(direction)
     {
     }
