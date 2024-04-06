@@ -10,7 +10,6 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/light/gx-rnd-lt-directional.hpp"
-#include "../../render/light/gx-rnd-lt-light.hpp"
 #include "../../render/material/gx-rnd-mat-material.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
@@ -89,54 +88,73 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
     if (!e.get_specification().is_deferred_supported)
         return;
     auto* const txt_mgr = e.get_texture_manager();
-    const render::texture::TextureInfo position_depth_txt_info {
-        .format = render::texture::TextureFormat::RgbaFloat32,
-        .sampler_info = render::texture::SamplerInfo {
-            .min_filter = render::texture::Filter::Nearest,
-            .mag_filter = render::texture::Filter::Nearest,
-            .wrap_s = render::texture::Wrap::ClampToEdge,
-            .wrap_t = render::texture::Wrap::ClampToEdge,
-            .wrap_r = render::texture::Wrap::ClampToEdge,
-            .anisotropic_level = 0,
-        },
-        .width = back_buffer_size.x,
-        .height = back_buffer_size.y,
-        .depth = 0,
-        .type = render::texture::Type::Texture2D,
-        .has_mipmap = false,
-    };
-    gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info, core::job::EndCaller([] {})));
+    const auto position_depth_txt_info = render::texture::TextureInfo()
+        .set_format(render::texture::TextureFormat::RgbaFloat32)
+        .set_sampler_info(render::texture::SamplerInfo()
+            .set_min_filter(render::texture::Filter::Nearest)
+            .set_mag_filter(render::texture::Filter::Nearest)
+            .set_wrap_s(render::texture::Wrap::ClampToEdge)
+            .set_wrap_t(render::texture::Wrap::ClampToEdge)
+            .set_wrap_r(render::texture::Wrap::ClampToEdge)
+            .set_anisotropic_level(0))
+        .set_width(back_buffer_size.x)
+        .set_height(back_buffer_size.y)
+        .set_depth(0)
+        .set_type(render::texture::Type::Texture2D)
+        .set_has_mipmap(false);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
-    albedo_metallic_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info, core::job::EndCaller([] {})));
+    albedo_metallic_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto normal_ao_txt_info = position_depth_txt_info;
-    normal_ao_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info, core::job::EndCaller([] {})));
+    normal_ao_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
-    emission_roughness_txt_info.format = render::texture::TextureFormat::RgbaFloat16;
-    gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info, core::job::EndCaller([] {})));
+    emission_roughness_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto irradiance_txt_info = position_depth_txt_info;
-    irradiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
-    gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info, core::job::EndCaller([] {})));
+    irradiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto radiance_txt_info = position_depth_txt_info;
-    radiance_txt_info.format = render::texture::TextureFormat::RgbFloat16;
-    gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info, core::job::EndCaller([] {})));
+    radiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     auto depth_txt_info = position_depth_txt_info;
-    depth_txt_info.format = render::texture::TextureFormat::D32;
-    gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info, core::job::EndCaller([] {})));
+    depth_txt_info.set_format(render::texture::TextureFormat::D32);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
@@ -146,7 +164,11 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
-    gbuffers_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-gbuffers", std::move(attachments), core::job::EndCaller([] {})));
+    e.get_texture_manager()->create_target(
+        "gearoenix-gbuffers", std::move(attachments),
+        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) {
+            gbuffers_target = std::dynamic_pointer_cast<Target>(std::move(t));
+        }));
 
     GX_LOG_D("GBuffers have been created.");
 }
@@ -156,28 +178,33 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
     if (!e.get_specification().is_deferred_supported)
         return;
     auto* const txt_mgr = e.get_texture_manager();
-    const render::texture::TextureInfo txt_info {
-        .format = render::texture::TextureFormat::Float32,
-        .sampler_info = render::texture::SamplerInfo {
-            .min_filter = render::texture::Filter::Nearest,
-            .mag_filter = render::texture::Filter::Nearest,
-            .wrap_s = render::texture::Wrap::ClampToEdge,
-            .wrap_t = render::texture::Wrap::ClampToEdge,
-            .wrap_r = render::texture::Wrap::ClampToEdge,
-            .anisotropic_level = 0,
-        },
-        .width = back_buffer_size.x,
-        .height = back_buffer_size.y,
-        .depth = 0,
-        .type = render::texture::Type::Texture2D,
-        .has_mipmap = false,
-    };
-    ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(txt_mgr->create_2d_from_pixels(
-        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info, core::job::EndCaller([] {})));
+    const auto txt_info = render::texture::TextureInfo()
+        .set_format(render::texture::TextureFormat::Float32)
+        .set_sampler_info(render::texture::SamplerInfo()
+            .set_min_filter(render::texture::Filter::Nearest)
+            .set_mag_filter(render::texture::Filter::Nearest)
+            .set_wrap_s(render::texture::Wrap::ClampToEdge)
+            .set_wrap_t(render::texture::Wrap::ClampToEdge)
+            .set_wrap_r(render::texture::Wrap::ClampToEdge)
+            .set_anisotropic_level(0))
+        .set_width(back_buffer_size.x)
+        .set_height(back_buffer_size.y)
+        .set_depth(0)
+        .set_type(render::texture::Type::Texture2D)
+        .set_has_mipmap(false);
+    txt_mgr->create_2d_from_pixels(
+        "gearoenix-opengl-texture-ssao-resolve", {}, txt_info,
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     std::vector<render::texture::Attachment> attachments(1);
     attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
-    ssao_resolve_target = std::dynamic_pointer_cast<Target>(e.get_texture_manager()->create_target("gearoenix-ssao", std::move(attachments), core::job::EndCaller([] {})));
+    e.get_texture_manager()->create_target(
+        "gearoenix-ssao", std::move(attachments),
+        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) {
+            ssao_resolve_target = std::dynamic_pointer_cast<Target>(std::move(t));
+        }));
 
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
@@ -257,10 +284,10 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                     if (scene_id != l->scene_id)
                         return;
                     DirectionalShadowCaster shadow_caster_directional_light_data {
-                        .frustum = e.get_world()->get_component<physics::collider::Frustum>(rl->get_camera_id())->get_frustum(),
+                        .frustum =rl->get_shadow_frustum()->get_frustum(),
                         .shadow_data = DirectionalShadow {
-                            .normalised_vp = e.get_world()->get_component<render::camera::Camera>(rl->get_camera_id())->get_view_projection(),
-                            .direction = math::Vec3<float>(e.get_world()->get_component<physics::TransformationComponent>(rl->get_camera_id())->get_z_axis()),
+                            .normalised_vp = rl->get_shadow_camera()->get_view_projection(),
+                            .direction = math::Vec3<float>(rl->get_shadow_transform()->get_z_axis()),
                             .colour = l->colour,
                             .shadow_map_texture = gll->get_shadow_map_texture_v(),
                         }
@@ -291,8 +318,8 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                         if (render_baked->get_scene_id() != scene_id)
                             return;
                         const Reflection r {
-                            .irradiance = gl_baked->get_irradiance_v(),
-                            .radiance = gl_baked->get_radiance_v(),
+                            .irradiance = gl_baked->get_gl_irradiance_v(),
+                            .radiance = gl_baked->get_gl_radiance_v(),
                             .box = render_baked->get_include_box(),
                             .size = render_baked->get_include_box().get_diameter().square_length(),
                             .radiance_mips_count = static_cast<float>(render_baked->get_radiance_mips_count() - 1),
@@ -336,7 +363,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
         return;
     bvh.reset();
     e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>>(
-        [&, this](
+        [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             render::model::Model* const render_model,
@@ -345,13 +372,13 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
             if (!render_model->get_enabled() || render_model->get_is_transformable() || render_model->scene_id != scene_id) {
                 return;
             }
-            auto& mesh = *model->get_mesh();
+            auto& mesh = *model->get_gl_mesh();
             const BvhNodeModel md {
                 .cameras_flags = render_model->cameras_flags,
                 .model = Model {
                     .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                     .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
-                    .material = model->get_mat().get(),
+                    .material = model->get_gl_material().get(),
                     .render_material = render_model->get_bound_material().get(),
                     .vertex_object = mesh.vertex_object,
                     .indices_count = mesh.indices_count,
@@ -371,7 +398,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
 {
     auto& anm_mgr = *e.get_physics_engine()->get_animation_manager();
     e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
-        [&, this](
+        [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             render::model::Model* const render_model,
@@ -380,7 +407,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             physics::animation::Armature* const armature) {
             if (!render_model->get_enabled() || !render_model->get_is_transformable() || render_model->scene_id != scene_id)
                 return;
-            const auto& mesh = *gl_model->get_mesh();
+            const auto& mesh = *gl_model->get_gl_mesh();
             std::size_t first_bone_index = 0;
             std::size_t bones_count = 0;
             if (nullptr != armature) {
@@ -404,7 +431,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
                         .model = Model {
                             .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                             .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
-                            .material = gl_model->get_mat().get(),
+                            .material = gl_model->get_gl_material().get(),
                             .render_material = render_model->get_bound_material().get(),
                             .vertex_object = mesh.vertex_object,
                             .indices_count = mesh.indices_count,
@@ -527,7 +554,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 break;
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
-                auto& reflection = scene_data.reflections[camera->get_reference_id()];
+                auto& reflection = scene_data.reflections[camera->get_parent_entity_id()];
                 self_irradiance = reflection.irradiance;
                 self_radiance = reflection.radiance;
                 break;
@@ -537,7 +564,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 break;
             }
             auto& camera_data = camera_pool[camera_pool_index];
-            camera_data.clear(*camera, *camera, math::Vec3<float>(camera_location));
+            camera_data.clear(*camera, math::Vec3<float>(camera_location));
 
             // Recoding static models
             bvh.call_on_intersecting(*frustum, [&, this](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
@@ -602,7 +629,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             core::sync::ParallelFor::execi(
                 camera_data.models_data.begin(),
                 camera_data.models_data.end(),
-                [&, this](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
+                [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
                     auto& m = d_m.second;
                     if (!m.material->needs_mvp && camera->get_usage() != render::camera::Camera::Usage::Shadow)
                         return;
@@ -630,7 +657,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             core::sync::ParallelFor::exec(
                 scene_data.debug_mesh_data.begin(),
                 scene_data.debug_mesh_data.end(),
-                [&, this](DebugModel m, const unsigned int kernel_index) {
+                [&](DebugModel m, const unsigned int kernel_index) {
                     m.m = camera_data.vp * m.m;
                     camera_data.debug_meshes_threads[kernel_index].push_back(std::move(m));
                 });
@@ -678,8 +705,8 @@ void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene)
 void gearoenix::gl::submission::Manager::render_reflection_probes()
 {
     push_debug_group("render-reflection-probes");
-    e.get_world()->synchronised_system<core::ecs::All<gl::BakedReflection, RuntimeReflection, render::reflection::Runtime>>(
-        [&](const core::ecs::entity_id_t, gl::BakedReflection* const r, RuntimeReflection* const rr, render::reflection::Runtime* const rrr) {
+    e.get_world()->synchronised_system<RuntimeReflection>(
+        [&](const core::ecs::entity_id_t, RuntimeReflection* const r) {
             constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
                 std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
                 std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
@@ -688,47 +715,45 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
                 std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
                 std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
             };
-            switch (rrr->get_state()) {
+            switch (r->get_state()) {
             case render::reflection::Runtime::State::EnvironmentCubeMipMap:
-                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
                 glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
                 return;
             case render::reflection::Runtime::State::IrradianceFace: {
-                const auto fi = rrr->get_state_irradiance_face();
-                auto& target = *rr->get_irradiance_targets()[fi];
-                set_framebuffer(target.get_framebuffer());
-                const auto w = static_cast<sizei>(rrr->get_irradiance()->get_info().width);
+                const auto fi = r->get_state_irradiance_face();
+                set_framebuffer(r->get_gl_irradiance_targets_v()[fi]);
+                const auto w = static_cast<sizei>(r->get_irradiance()->get_info().get_width());
                 set_viewport_clip({ 0, 0, w, w });
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 irradiance_shader->bind(current_shader);
                 glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(irradiance_shader->get_environment_index()));
-                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
                 irradiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
                 glBindVertexArray(screen_vertex_object);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
                 return;
             }
             case render::reflection::Runtime::State::IrradianceMipMap:
-                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_irradiance_v());
+                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_irradiance_v());
                 glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
                 return;
             case render::reflection::Runtime::State::RadianceFaceLevel: {
-                const auto fi = rrr->get_state_radiance_face();
-                const auto li = rrr->get_state_radiance_level();
-                auto& target = *rr->get_radiance_targets()[fi][li];
-                set_framebuffer(target.get_framebuffer());
-                const auto w = static_cast<sizei>(rrr->get_radiance()->get_info().width >> li);
+                const auto fi = r->get_state_radiance_face();
+                const auto li = r->get_state_radiance_level();
+                set_framebuffer(r->get_gl_radiance_targets_v()[fi][li]);
+                const auto w = static_cast<sizei>(r->get_radiance()->get_info().get_width() >> li);
                 set_viewport_clip({ 0, 0, w, w });
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 radiance_shader->bind(current_shader);
                 glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(radiance_shader->get_environment_index()));
-                glBindTexture(GL_TEXTURE_CUBE_MAP, rr->get_environment_v());
+                glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
                 radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-                const auto roughness = static_cast<float>(rrr->get_roughnesses()[li]);
+                const auto roughness = static_cast<float>(r->get_roughnesses()[li]);
                 radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
                 const float roughness_p_4 = roughness * roughness * roughness * roughness;
                 radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
-                const auto resolution = static_cast<float>(rrr->get_environment()->get_info().width);
+                const auto resolution = static_cast<float>(r->get_environment()->get_info().get_width());
                 const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
                 radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
                 glBindVertexArray(screen_vertex_object);
@@ -1164,9 +1189,17 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
     , bloom_vertical_shader(new shader::BloomVertical(e))
     , bloom_upsampler_shader(new shader::BloomUpsampler(e))
     , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
-    , brdflut(std::dynamic_pointer_cast<Texture2D>(e.get_texture_manager()->get_brdflut(core::job::EndCaller([] {}))))
-    , black_cube(std::dynamic_pointer_cast<TextureCube>(e.get_texture_manager()->create_cube_from_colour(math::Vec4(0.0f), core::job::EndCaller([] {}))))
 {
+    e.get_texture_manager()->create_cube_from_colour(
+            math::Vec4(0.0f),
+            core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
+                black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
+            }));
+
+    e.get_texture_manager()->get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+        brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+    }));
+
     GX_GL_CHECK_D;
     GX_LOG_D("Creating submission manager.");
     initialise_back_buffer_sizes();
@@ -1181,12 +1214,12 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_STENCIL_TEST);
 
-    e.todos.unload();
+    core::job::execute_current_thread_jobs();
 }
 
 gearoenix::gl::submission::Manager::~Manager()
 {
-    e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_listener(resolution_cfg_listener_id);
+    e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_observer(resolution_cfg_listener_id);
 }
 
 void gearoenix::gl::submission::Manager::update()
@@ -1219,8 +1252,9 @@ void gearoenix::gl::submission::Manager::update()
 
 void gearoenix::gl::submission::Manager::window_resized()
 {
-    if (e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value)
+    if (e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value) {
         return;
+    }
     back_buffer_size_changed();
 }
 

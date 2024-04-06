@@ -11,7 +11,7 @@ gearoenix::render::reflection::Probe::Probe(
     const math::Aabb3<double>& include_box,
     std::string&& name)
     : Component(final_component_type_index, std::move(name))
-    , radiance_mips_count(static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance->get_info().width))))
+    , radiance_mips_count(static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance->get_info().get_width()))))
     , include_box(include_box)
     , irradiance(std::move(irradiance))
     , radiance(std::move(radiance))

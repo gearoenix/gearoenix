@@ -69,7 +69,7 @@ struct Runtime : Probe {
     GX_GETSET_VAL_PRT(bool, pending_to_start, false);
     GX_GET_CREF_PRT(math::Aabb3<double>, receive_box);
     GX_GET_CREF_PRT(math::Aabb3<double>, exclude_box);
-    GX_GET_CREF_PRT(std::weak_ptr<Runtime>, runtime_self);
+    GX_GET_CREF_PRT(std::weak_ptr<Runtime>, weak_runtime_self);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, environment_depth);
 
     Runtime(

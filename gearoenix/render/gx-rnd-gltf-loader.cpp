@@ -10,6 +10,7 @@
 #include "engine/gx-rnd-eng-engine.hpp"
 #include "light/gx-rnd-lt-builder.hpp"
 #include "light/gx-rnd-lt-light.hpp"
+#include "light/gx-rnd-lt-directional.hpp"
 #include "light/gx-rnd-lt-manager.hpp"
 #include "material/gx-rnd-mat-manager.hpp"
 #include "material/gx-rnd-mat-pbr.hpp"
@@ -125,20 +126,18 @@ struct DataLoader final {
                 GX_UNEXPECTED;
             }
         };
-        const texture::TextureInfo txt_info {
-            .format = texture::TextureFormat::Unknown,
-            .sampler_info = texture::SamplerInfo {
-                .min_filter = convert_filter(smp.minFilter),
-                .mag_filter = convert_filter(smp.magFilter),
-                .wrap_s = convert_wrap(smp.wrapS),
-                .wrap_t = convert_wrap(smp.wrapT),
-            },
-            .width = 0,
-            .height = 0,
-            .depth = 0,
-            .type = texture::Type::Unknown,
-            .has_mipmap = needs_mipmap,
-        };
+        const auto txt_info = texture::TextureInfo()
+            .set_format(texture::TextureFormat::Unknown)
+            .set_sampler_info(texture::SamplerInfo()
+                .set_min_filter(convert_filter(smp.minFilter))
+                .set_mag_filter(convert_filter(smp.magFilter))
+                .set_wrap_s(convert_wrap(smp.wrapS))
+                .set_wrap_t(convert_wrap(smp.wrapT)))
+            .set_width(0)
+            .set_height(0)
+            .set_depth(0)
+            .set_type(texture::Type::Unknown)
+            .set_has_mipmap(needs_mipmap);
         e.get_texture_manager()->create_2d_from_formatted(
             std::string(txt.name), img_ptr, img_sz, txt_info,
             core::job::EndCallerShared<texture::Texture2D>(
@@ -616,35 +615,43 @@ struct DataLoader final {
     }
 
     [[nodiscard]] bool process_node_camera(
-        const tinygltf::Node& node,
+        const std::size_t node_index,
+        const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
-        scene::Builder& scene_builder)
+        const std::shared_ptr<scene::Builder>& scene_builder)
     {
+        const tinygltf::Node& node = data.nodes[node_index];
         if (!is_camera(node)) {
             return false;
         }
         const tinygltf::Camera& cmr = data.cameras[node.camera];
         GX_LOG_D("Loading camera: " << cmr.name);
-        auto camera_builder = e.get_camera_manager()->build(cmr.name, core::job::EndCaller(entity_end_callback));
-        auto& rnd_cmr = camera_builder->get_camera();
-        if ("perspective" == cmr.type) {
-            GX_ASSERT(cmr.perspective.znear < cmr.perspective.zfar);
-            GX_ASSERT(cmr.perspective.znear > 0.0);
-            rnd_cmr.set_projection_data(camera::PerspectiveProjectionData {
-                .field_of_view_y = static_cast<float>(cmr.perspective.yfov) });
-            rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
-            rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
-        } else {
-            GX_ASSERT(cmr.orthographic.xmag == cmr.orthographic.ymag);
-            GX_ASSERT(cmr.orthographic.xmag > 0.0);
-            rnd_cmr.set_projection_data(camera::OrthographicProjectionData {
-                .scale = static_cast<float>(cmr.orthographic.xmag) });
-            rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
-            rnd_cmr.set_near(static_cast<float>(cmr.orthographic.znear));
-        }
-        auto& transform = camera_builder->get_transformation();
-        apply_transform(node, transform);
-        scene_builder.add(std::move(camera_builder));
+        e.get_camera_manager()->build(
+                cmr.name,
+                core::job::EndCallerShared<camera::Builder>([node_index, scene_builder, gpu_end_callback, s = weak_self.lock()](std::shared_ptr<camera::Builder>&& camera_builder) {
+                    const tinygltf::Node& node = s->data.nodes[node_index];
+                    const tinygltf::Camera& cmr = s->data.cameras[node.camera];
+                    auto& rnd_cmr = camera_builder->get_camera();
+                    if ("perspective" == cmr.type) {
+                        GX_ASSERT(cmr.perspective.znear < cmr.perspective.zfar);
+                        GX_ASSERT(cmr.perspective.znear > 0.0);
+                        rnd_cmr.set_projection_data(camera::PerspectiveProjectionData {
+                                .field_of_view_y = static_cast<float>(cmr.perspective.yfov) });
+                        rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
+                        rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
+                    } else {
+                        GX_ASSERT(cmr.orthographic.xmag == cmr.orthographic.ymag);
+                        GX_ASSERT(cmr.orthographic.xmag > 0.0);
+                        rnd_cmr.set_projection_data(camera::OrthographicProjectionData {
+                                .scale = static_cast<float>(cmr.orthographic.xmag) });
+                        rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
+                        rnd_cmr.set_near(static_cast<float>(cmr.orthographic.znear));
+                    }
+                    auto& transform = camera_builder->get_transformation();
+                    apply_transform(node, transform);
+                    scene_builder->add(std::move(camera_builder));
+                }),
+                core::job::EndCaller(entity_end_callback));
         return true;
     }
 
@@ -721,7 +728,7 @@ struct DataLoader final {
             node.name, 1024, 10.0f, 1.0f, 35.0f,
             core::job::EndCallerShared<light::Builder>([sb = scene_builder, node_index, s = weak_self.lock(), le = light_end_callback, colour](std::shared_ptr<light::Builder>&& lb) {
                 lb->get_light().colour = colour;
-                s->apply_transform(node_index, *lb->get_transformation());
+                s->apply_transform(node_index, *lb->get_shadow_caster_directional()->get_shadow_transform());
                 sb->add(std::move(lb));
             }),
             core::job::EndCaller(entity_end_callback));
@@ -736,13 +743,13 @@ struct DataLoader final {
     {
         const auto& node = data.nodes[node_index];
         GX_LOG_D("Loading node: " << node.name);
-        if (process_node_camera(node, entity_end_callback, *scene_builder)) {
+        if (process_node_camera(node_index, gpu_end_callback, entity_end_callback, scene_builder)) {
             return;
         }
         if (process_node_mesh(node, entity_end_callback, *scene_builder)) {
             return;
         }
-        if (process_node_light(node_index, entity_end_callback, gpu_end_callback, scene_builder)) {
+        if (process_node_light(node_index, gpu_end_callback, entity_end_callback, scene_builder)) {
             return;
         }
         if (node.children.size() == 2) { // This is root armature

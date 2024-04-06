@@ -36,7 +36,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
     TextureInfo txt_info;
     txt_info.read(stream);
 
-    switch (txt_info.type) {
+    switch (txt_info.get_type()) {
     case Type::Texture2D: {
         const std::lock_guard _lg(textures_2d_lock);
         if (auto search = textures_2d.find(name); textures_2d.end() != search) {
@@ -63,22 +63,22 @@ void gearoenix::render::texture::Manager::read_gx3d(
         GX_UNEXPECTED;
     }
 
-    const auto is_float = format_has_float_component(txt_info.format);
-    const auto comps_count = format_components_count(txt_info.format);
+    const auto is_float = format_has_float_component(txt_info.get_format());
+    const auto comps_count = format_components_count(txt_info.get_format());
     const auto mips_count = Texture::compute_mipmaps_count(txt_info);
-    const auto comp_bits = format_component_bits_count(txt_info.format);
+    const auto comp_bits = format_component_bits_count(txt_info.get_format());
     if (is_float) {
         GX_ASSERT(32 == comp_bits);
         if (!e.get_specification().is_float_texture_supported) {
-            txt_info.format = TextureFormat::RgbaUint8; // No other format is supported
+            txt_info.set_format(TextureFormat::RgbaUint8); // No other format is supported
         }
     } else {
         GX_ASSERT(8 == comp_bits);
     }
     const auto fill_mips = [&](std::vector<std::vector<std::uint8_t>>& pixels) {
         pixels.resize(mips_count);
-        auto mip_w = txt_info.width;
-        auto mip_h = txt_info.height;
+        auto mip_w = txt_info.get_width();
+        auto mip_h = txt_info.get_height();
         std::vector<std::uint8_t> data;
         for (std::size_t mip_index = 0; mip_index < mips_count; ++mip_index, mip_w >>= 1, mip_h >>= 1) {
             auto& mip_pixels = pixels[mip_index];
@@ -118,8 +118,8 @@ void gearoenix::render::texture::Manager::read_gx3d(
             }
         }
     };
-    if (Type::TextureCube == txt_info.type) {
-        GX_ASSERT(txt_info.width == txt_info.height);
+    if (Type::TextureCube == txt_info.get_type()) {
+        GX_ASSERT(txt_info.get_width() == txt_info.get_height());
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels(6);
         for (auto& face_pixels : pixels) {
             fill_mips(face_pixels);
@@ -132,7 +132,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
                 c.set_return(std::move(t));
             }));
     }
-    if (Type::Texture2D == txt_info.type) {
+    if (Type::Texture2D == txt_info.get_type()) {
         std::vector<std::vector<std::uint8_t>> pixels;
         fill_mips(pixels);
         return create_2d_from_pixels(
@@ -172,20 +172,18 @@ void gearoenix::render::texture::Manager::create_2d_from_colour(
     create_2d_from_pixels(
         std::move(name),
         std::move(pixels),
-        TextureInfo {
-            .format = TextureFormat::RgbaUint8,
-            .sampler_info = SamplerInfo {
-                .min_filter = Filter::Nearest,
-                .mag_filter = Filter::Nearest,
-                .wrap_s = Wrap::Repeat,
-                .wrap_t = Wrap::Repeat,
-                .wrap_r = Wrap::Repeat,
-            },
-            .width = 1,
-            .height = 1,
-            .type = Type::Texture2D,
-            .has_mipmap = false,
-        },
+        TextureInfo()
+            .set_format(TextureFormat::RgbaUint8)
+            .set_sampler_info(SamplerInfo()
+                .set_min_filter(Filter::Nearest)
+                .set_mag_filter(Filter::Nearest)
+                .set_wrap_s(Wrap::Repeat)
+                .set_wrap_t(Wrap::Repeat)
+                .set_wrap_r(Wrap::Repeat))
+            .set_width(1)
+            .set_height(1)
+            .set_type(Type::Texture2D)
+            .set_has_mipmap(false),
         std::move(c));
 }
 
@@ -220,20 +218,18 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
         }
     }
     constexpr std::size_t resolution = 256;
-    constexpr TextureInfo texture_info {
-        .format = TextureFormat::RgbaUint8,
-        .sampler_info = SamplerInfo {
-            .min_filter = Filter::Linear,
-            .mag_filter = Filter::Linear,
-            .wrap_s = Wrap::ClampToEdge,
-            .wrap_t = Wrap::ClampToEdge,
-            .wrap_r = Wrap::ClampToEdge,
-        },
-        .width = resolution,
-        .height = resolution,
-        .type = Type::Texture2D,
-        .has_mipmap = false
-    };
+    auto texture_info = TextureInfo()
+        .set_format(TextureFormat::RgbaUint8)
+        .set_sampler_info(SamplerInfo()
+            .set_min_filter(Filter::Linear)
+            .set_mag_filter(Filter::Linear)
+            .set_wrap_s(Wrap::ClampToEdge)
+            .set_wrap_t(Wrap::ClampToEdge)
+            .set_wrap_r(Wrap::ClampToEdge))
+        .set_width(resolution)
+        .set_height(resolution)
+        .set_type(Type::Texture2D)
+        .set_has_mipmap(false);
     const auto pixels_vectors = create_brdflut_pixels();
     std::vector<std::uint8_t> pixels0(pixels_vectors.size() * sizeof(math::Vec4<std::uint8_t>));
     std::memcpy(pixels0.data(), pixels_vectors.data(), pixels0.size());
@@ -262,20 +258,18 @@ void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared
             return;
         }
     }
-    constexpr TextureInfo texture_info {
-        .format = TextureFormat::RgbaUint8,
-        .sampler_info = SamplerInfo {
-            .min_filter = Filter::Nearest,
-            .mag_filter = Filter::Nearest,
-            .wrap_s = Wrap::Repeat,
-            .wrap_t = Wrap::Repeat,
-            .wrap_r = Wrap::Repeat,
-        },
-        .width = 2,
-        .height = 2,
-        .type = Type::Texture2D,
-        .has_mipmap = false
-    };
+    auto texture_info = TextureInfo()
+        .set_format(TextureFormat::RgbaUint8)
+        .set_sampler_info(SamplerInfo()
+            .set_min_filter(Filter::Nearest)
+            .set_mag_filter(Filter::Nearest)
+            .set_wrap_s(Wrap::Repeat)
+            .set_wrap_t(Wrap::Repeat)
+            .set_wrap_r(Wrap::Repeat))
+        .set_width(2)
+        .set_height(2)
+        .set_type(Type::Texture2D)
+        .set_has_mipmap(false);
     std::vector<std::vector<std::uint8_t>> pixels { {
         0u, 0u, 0u, 255u, // Pixel 0
         255u, 255u, 255u, 255u, // Pixel 1
@@ -336,10 +330,10 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
             }
         }
     }
-    GX_ASSERT(Type::Unknown == info.type); // type converting is not implemented and is not going to be implemented in near future.
-    GX_ASSERT(TextureFormat::Unknown == info.format); // format converting does not have a high priority
-    GX_ASSERT(0 == info.width); // dimension changing does not have a high priority
-    GX_ASSERT(0 != info.height); // dimension changing does not have a high priority
+    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented in near future.
+    GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
+    GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
+    GX_ASSERT(0 != info.get_height()); // dimension changing does not have a high priority
     std::size_t img_width = 0;
     std::size_t img_height = 0;
     std::size_t img_channels = 0;
@@ -349,10 +343,10 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
         pixels0, img_width, img_height, img_channels);
     GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
     TextureInfo new_info = info;
-    new_info.format = TextureFormat::RgbaUint8;
-    new_info.type = Type::Texture2D;
-    new_info.width = img_width;
-    new_info.height = img_height;
+    new_info.set_format(TextureFormat::RgbaUint8);
+    new_info.set_type(Type::Texture2D);
+    new_info.set_width(img_width);
+    new_info.set_height(img_height);
     create_2d_from_pixels(std::move(name), { pixels0 }, new_info, std::move(c));
 }
 
@@ -373,10 +367,10 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
             }
         }
     }
-    GX_ASSERT(Type::Unknown == info.type); // type converting is not implemented and is not going to be implemented in near future.
-    GX_ASSERT(TextureFormat::Unknown == info.format); // format converting does not have a high priority
-    GX_ASSERT(0 == info.width); // dimension changing does not have a high priority
-    GX_ASSERT(0 == info.height); // dimension changing does not have a high priority
+    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented in near future.
+    GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
+    GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
+    GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
     std::size_t img_width = 0;
     std::size_t img_height = 0;
     std::size_t img_channels = 0;
@@ -388,21 +382,21 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     std::vector<std::uint8_t> pixels0;
     TextureInfo new_info = info;
     if (e.get_specification().is_float_texture_supported) {
-        new_info.format = TextureFormat::RgbaFloat32;
+        new_info.set_format(TextureFormat::RgbaFloat32);
         const auto pixels0_sz = pixels0f.size() * sizeof(float);
         pixels0.resize(pixels0_sz);
         std::memcpy(pixels0.data(), pixels0f.data(), pixels0_sz);
     } else {
-        new_info.format = TextureFormat::RgbaUint8;
+        new_info.set_format(TextureFormat::RgbaUint8);
         pixels0.resize(pixels0f.size());
         core::sync::ParallelFor::execi(pixels0f.begin(), pixels0f.end(), [&](const float p, const unsigned int index, unsigned int) {
             pixels0[index] = p >= 1.0f ? 255 : p <= 0.0f ? 0
                                                          : static_cast<std::uint8_t>(p * 255.0f + 0.501f);
         });
     }
-    new_info.type = Type::Texture2D;
-    new_info.width = img_width;
-    new_info.height = img_height;
+    new_info.set_type(Type::Texture2D);
+    new_info.set_width(img_width);
+    new_info.set_height(img_height);
     create_2d_from_pixels(std::move(name), { std::move(pixels0) }, new_info, std::move(c));
 }
 
@@ -458,20 +452,18 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
     return create_cube_from_pixels(
         std::move(name),
         std::move(pixels),
-        TextureInfo {
-            .format = TextureFormat::RgbaUint8,
-            .sampler_info = SamplerInfo {
-                .min_filter = Filter::Nearest,
-                .mag_filter = Filter::Nearest,
-                .wrap_s = Wrap::Repeat,
-                .wrap_t = Wrap::Repeat,
-                .wrap_r = Wrap::Repeat,
-            },
-            .width = 1,
-            .height = 1,
-            .type = Type::TextureCube,
-            .has_mipmap = false,
-        },
+        TextureInfo()
+            .set_format(TextureFormat::RgbaUint8)
+            .set_sampler_info(SamplerInfo()
+                .set_min_filter(Filter::Nearest)
+                .set_mag_filter(Filter::Nearest)
+                .set_wrap_s(Wrap::Repeat)
+                .set_wrap_t(Wrap::Repeat)
+                .set_wrap_r(Wrap::Repeat))
+            .set_width(1)
+            .set_height(1)
+            .set_type(Type::TextureCube)
+            .set_has_mipmap(false),
         std::move(c));
 }
 
@@ -603,7 +595,7 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
     core::job::EndCaller<DefaultCameraTargets>&& callback)
 {
     static std::atomic unique_id = 0;
-    ++unique_id; // This allow to have multiple initialisations.
+    ++unique_id; // This allows to have multiple initialisations.
 
     const auto unique_id_str = std::to_string(unique_id);
 
@@ -686,20 +678,18 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
 
     const auto dim = get_default_camera_render_target_dimensions();
 
-    const TextureInfo txt_info {
-        .format = TextureFormat::RgbaFloat16,
-        .sampler_info = SamplerInfo {
-            .min_filter = Filter::LinearMipmapLinear,
-            .mag_filter = Filter::Linear,
-            .wrap_s = Wrap::ClampToEdge,
-            .wrap_t = Wrap::ClampToEdge,
-            .wrap_r = Wrap::ClampToEdge,
-        },
-        .width = dim.x,
-        .height = dim.y,
-        .type = Type::Texture2D,
-        .has_mipmap = true,
-    };
+    const auto txt_info = TextureInfo()
+        .set_format(TextureFormat::RgbaFloat16)
+        .set_sampler_info(SamplerInfo()
+            .set_min_filter(Filter::LinearMipmapLinear)
+            .set_mag_filter(Filter::Linear)
+            .set_wrap_s(Wrap::ClampToEdge)
+            .set_wrap_t(Wrap::ClampToEdge)
+            .set_wrap_r(Wrap::ClampToEdge))
+        .set_width(dim.x)
+        .set_height(dim.y)
+        .set_type(Type::Texture2D)
+        .set_has_mipmap(true);
 
     create_2d_from_pixels(
         std::move(first_colour_name), {}, txt_info,
@@ -716,10 +706,12 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
         }));
 
     auto depth_info = txt_info;
-    depth_info.format = TextureFormat::D32;
-    depth_info.sampler_info.min_filter = Filter::Nearest;
-    depth_info.sampler_info.mag_filter = Filter::Nearest;
-    depth_info.has_mipmap = false;
+    depth_info.set_format(TextureFormat::D32);
+    depth_info.set_sampler_info(
+            SamplerInfo(depth_info.get_sampler_info())
+                .set_min_filter(Filter::Nearest)
+                .set_mag_filter(Filter::Nearest));
+    depth_info.set_has_mipmap(false);
 
     create_2d_from_pixels(
         std::move(depth_name), {}, depth_info,

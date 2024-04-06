@@ -2,6 +2,7 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "gx-rnd-rfl-runtime.hpp"
 
 gearoenix::render::reflection::Builder::Builder(
     engine::Engine& e,

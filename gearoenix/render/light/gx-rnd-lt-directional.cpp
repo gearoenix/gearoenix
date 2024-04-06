@@ -2,6 +2,8 @@
 
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
@@ -46,7 +48,11 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
     if (nullptr == shadow_camera) {
         return;
     }
-    shadow_camera->e.get_world()->delayed_delete_entity(shadow_camera_entity_id, core::job::EndCaller([] {}));
+    auto*const world = shadow_camera->e.get_world();
+    if(nullptr == world) {
+        return;
+    }
+    world->delayed_delete_entity(shadow_camera_entity_id, core::job::EndCaller([] {}));
 }
 
 void gearoenix::render::light::ShadowCasterDirectional::initialise(
@@ -55,49 +61,75 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise(
     const float camera_far,
     const float camera_near,
     const float camera_aspect,
-    Builder* const builder,
+    const std::shared_ptr<Builder>& builder,
     core::job::EndCaller<>&& end_callback)
 {
-    if (nullptr == shadow_map || shadow_map->get_info().height != resolution) {
-        auto self = std::dynamic_pointer_cast<ShadowCasterDirectional>(get_component_self().lock());
-        GX_ASSERT_D(nullptr != self);
-        std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
-        std::memset(pixels0.data(), 0, pixels0.size());
-        std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
-        e.get_texture_manager()->create_2d_from_pixels(
-            name + "-shadow-map",
-            std::move(pixels),
-            texture::TextureInfo {
-                .format = texture::TextureFormat::D32,
-                .sampler_info = texture::SamplerInfo {
-                    .min_filter = texture::Filter::Nearest,
-                    .mag_filter = texture::Filter::Nearest,
-                    .wrap_s = texture::Wrap::ClampToEdge,
-                    .wrap_t = texture::Wrap::ClampToEdge,
-                },
-                .width = resolution,
-                .height = resolution,
-                .type = texture::Type::Texture2D,
-                .has_mipmap = false,
-            },
-            core::job::EndCallerShared<texture::Texture2D>([e = std::move(end_callback), self = std::move(self)](std::shared_ptr<texture::Texture2D>&& t) mutable {
-                self->set_shadow_map(std::move(t), std::move(e));
-            }));
-    }
-
     if (nullptr == shadow_camera) {
-        auto camera_builder = e.get_camera_manager()->build(name + "-shadow-camera", core::job::EndCaller([] {}));
-        shadow_camera_entity_id = camera_builder->get_id();
-        shadow_camera = camera_builder->get_camera().get_camera_self().lock();
-        shadow_camera->set_parent_entity_id(builder->get_id());
-        shadow_camera->set_usage(camera::Camera::Usage::Shadow);
+        e.get_camera_manager()->build(
+                name + "-shadow-camera",
+                core::job::EndCallerShared<camera::Builder>([this, resolution, builder, c = get_component_self(), camera_aspect, camera_near, camera_far, e = std::move(end_callback)](std::shared_ptr<camera::Builder>&& camera_builder)mutable {
+                    const auto self = c.lock();
+                    if(nullptr == self) {
+                        return;
+                    }
 
-        GX_ASSERT_D(nullptr != builder);
-        builder->camera_builders[0] = std::move(camera_builder);
+                    shadow_transform = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
+                    shadow_frustum = std::dynamic_pointer_cast<physics::collider::Frustum>(camera_builder->get_frustum().get_component_self().lock());
+
+                    shadow_camera_entity_id = camera_builder->get_id();
+                    shadow_camera = camera_builder->get_camera().get_camera_self().lock();
+                    shadow_camera->set_parent_entity_id(builder->get_id());
+                    shadow_camera->set_usage(camera::Camera::Usage::Shadow);
+
+                    GX_ASSERT_D(nullptr != builder);
+                    builder->camera_builders[0] = std::move(camera_builder);
+
+                    initialise_camera(camera_far, camera_near, camera_aspect);
+                    set_shadow_map(resolution, std::move(e));
+                }),
+                core::job::EndCaller([] {}));
+    } else {
+        initialise_camera(camera_far, camera_near, camera_aspect);
+        set_shadow_map(resolution, std::move(end_callback));
     }
-    shadow_camera->set_projection_data(camera::OrthographicProjectionData { .scale = camera_aspect });
+}
+
+void gearoenix::render::light::ShadowCasterDirectional::initialise_camera(
+        const float camera_far,
+        const float camera_near,
+        const float camera_aspect) {
+    shadow_camera->set_projection_data(camera::OrthographicProjectionData{.scale = camera_aspect});
     shadow_camera->set_far(camera_far);
     shadow_camera->set_near(camera_near);
+}
+
+void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(
+        const std::size_t resolution, core::job::EndCaller<> &&end_callback) {
+    if (nullptr != shadow_map && shadow_map->get_info().get_height() == resolution) {
+        return;
+    }
+    auto self = std::dynamic_pointer_cast<ShadowCasterDirectional>(get_component_self().lock());
+    GX_ASSERT_D(nullptr != self);
+    std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
+    std::memset(pixels0.data(), 0, pixels0.size());
+    std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
+    shadow_camera->e.get_texture_manager()->create_2d_from_pixels(
+        name + "-shadow-map",
+        std::move(pixels),
+        texture::TextureInfo()
+                .set_format(texture::TextureFormat::D32)
+                .set_sampler_info(texture::SamplerInfo()
+                  .set_min_filter(texture::Filter::Nearest)
+                  .set_mag_filter(texture::Filter::Nearest)
+                  .set_wrap_s(texture::Wrap::ClampToEdge)
+                  .set_wrap_t(texture::Wrap::ClampToEdge))
+                .set_width(resolution)
+                .set_height(resolution)
+                .set_type(texture::Type::Texture2D)
+                .set_has_mipmap(false),
+        core::job::EndCallerShared<texture::Texture2D>([e = end_callback, self = std::move(self)](std::shared_ptr<texture::Texture2D>&& t) mutable {
+            self->set_shadow_map(std::move(t), std::move(e));
+        }));
 }
 
 void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(

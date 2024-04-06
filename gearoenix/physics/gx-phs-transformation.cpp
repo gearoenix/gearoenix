@@ -398,7 +398,6 @@ const boost::container::flat_set<std::type_index>& gearoenix::physics::Transform
 {
     static const boost::container::flat_set types {
         create_this_type_index(this),
-        std::type_index(typeid(Transformation))
     };
     return types;
 }
@@ -410,5 +409,7 @@ gearoenix::physics::TransformationComponent::TransformationComponent(std::string
 
 std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(std::string&& name)
 {
-    return allocator.make_shared(std::move(name));
+    auto self = allocator.make_shared(std::move(name));
+    self->set_component_self(self);
+    return self;
 }

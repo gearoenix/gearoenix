@@ -31,7 +31,7 @@ public:
     Texture2D(
         Engine& e,
         const render::texture::TextureInfo& info,
-        std::string name);
+        std::string&& name);
     ~Texture2D() override;
     void bind(enumerated texture_unit) const;
     void generate_mipmaps();
@@ -49,7 +49,7 @@ public:
     TextureCube(
         Engine& e,
         const render::texture::TextureInfo& info,
-        std::string name);
+        std::string&& name);
     ~TextureCube() override;
     void bind(enumerated texture_unit) const;
 };

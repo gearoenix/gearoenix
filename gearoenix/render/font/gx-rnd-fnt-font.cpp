@@ -186,20 +186,18 @@ void gearoenix::render::font::Font::bake(
             }
         }
     }
-    const texture::TextureInfo txt_info {
-        .format = texture::TextureFormat::RgbaUint8,
-        .sampler_info = texture::SamplerInfo {
-            .min_filter = texture::Filter::LinearMipmapLinear,
-            .mag_filter = texture::Filter::Linear,
-            .wrap_s = texture::Wrap::ClampToEdge,
-            .wrap_t = texture::Wrap::ClampToEdge,
-            .wrap_r = texture::Wrap::ClampToEdge,
-        },
-        .width = img_width_pixels,
-        .height = img_height_pixels,
-        .type = texture::Type::Texture2D,
-        .has_mipmap = false,
-    };
+    const auto txt_info = texture::TextureInfo()
+        .set_format(texture::TextureFormat::RgbaUint8)
+        .set_sampler_info(texture::SamplerInfo()
+            .set_min_filter(texture::Filter::LinearMipmapLinear)
+            .set_mag_filter(texture::Filter::Linear)
+            .set_wrap_s(texture::Wrap::ClampToEdge)
+            .set_wrap_t(texture::Wrap::ClampToEdge)
+            .set_wrap_r(texture::Wrap::ClampToEdge))
+        .set_width(img_width_pixels)
+        .set_height(img_height_pixels)
+        .set_type(texture::Type::Texture2D)
+        .set_has_mipmap(false);
     e.get_texture_manager()->create_2d_from_pixels(
         "gearoenix-baked-tex2d-" + core::String::to_string(text),
         { std::move(img_pixels) }, txt_info, std::move(end));

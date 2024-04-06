@@ -8,6 +8,7 @@
 #include "gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-rnd-cmr-exposure.hpp"
 #include "gx-rnd-cmr-projection.hpp"
+#include "gx-rnd-cmr-target.hpp"
 #include <array>
 #include <optional>
 
@@ -33,10 +34,6 @@ namespace gearoenix::render::mesh {
 struct Mesh;
 }
 
-namespace gearoenix::render::texture {
-struct Target;
-}
-
 namespace gearoenix::render::camera {
 struct Camera : core::ecs::Component {
     friend struct Builder;
@@ -55,10 +52,8 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(math::Mat4x4<float>, projection);
     GX_GET_CREF_PRT(math::Mat4x4<float>, view_projection);
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
-    GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, customised_target);
-    // GX_GET_CREF_PRT(std::shared_ptr<texture::Target>, second_target); // todo move the logic of the render target to render graph, in here we only have to have customised_target
-    GX_GET_VAL_PRT(bool, has_customised_target_aspect_ratio, false);
-    GX_GET_VAL_PRT(float, target_aspect_ratio, 1.7f);
+    GX_GET_CREF_PRT(Target, target);
+    GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
     GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, 0); // It can be light or reflection probe or any other owner entity
     GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, 0);
     GX_GETSET_VAL_PRT(std::uint64_t, flag, 1);
@@ -73,7 +68,7 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh);
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
     GX_GET_CREF_PRT(Exposure, exposure);
-    GX_GET_VAL_PRT(std::size_t, resolution_cfg_listener, 0);
+    GX_GET_VAL_PRT(std::size_t, resolution_cfg_observer, 0);
     GX_GET_CREF_PRV(std::weak_ptr<Camera>, camera_self);
 
 protected:
@@ -81,12 +76,7 @@ protected:
         engine::Engine& e,
         std::type_index final_type,
         const std::string& name,
-        std::size_t resolution_cfg_listener,
-        std::shared_ptr<texture::Target>&& customised_target = nullptr,
-        ProjectionData projection_type = PerspectiveProjectionData {},
-        float near = 1.0f,
-        float far = 100.0f,
-        bool has_bloom = true);
+        Target&& target);
     void set_component_self(const std::shared_ptr<Component>&) override;
 
 public:
@@ -99,20 +89,23 @@ public:
         std::array<math::Vec3<double>, 8>& points) const;
     void set_view(const math::Mat4x4<float>& view);
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
+    void disable_customised_target_aspect_ratio();
+    /// This will return customised_target_aspect_ratio value if it is has been set or the actual target aspect ratio
+    [[nodiscard]] float get_target_aspect_ratio() const;
     void set_projection_data(ProjectionData);
     void update_projection();
     void set_near(float);
     void set_far(float);
     void show_debug_gui() final;
-    void enable_debug_mesh();
+    void enable_debug_mesh(core::job::EndCaller<> && end);
     void disable_debug_mesh();
-    void set_has_customised_target_aspect_ratio(bool b);
     [[nodiscard]] math::Ray3<double> generate_ray(const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const;
-    virtual void update_target_aspect_ratio();
-    virtual void set_target_aspect_ratio(float ratio);
     virtual void set_customised_target(std::shared_ptr<texture::Target>&&);
-    virtual void create_debug_mesh();
-    void disable_bloom();
+    virtual void create_debug_mesh(core::job::EndCaller<> && end);
+    virtual void disable_bloom();
+    virtual void enable_bloom(core::job::EndCaller<> && end);
+    virtual void update_bloom(core::job::EndCaller<> && end);
+    virtual void update_target(core::job::EndCaller<> && end);
 };
 }
 #endif

@@ -26,7 +26,7 @@ gearoenix::render::material::Manager::~Manager() = default;
 #define GX_RND_MAT_CONSTRUCT(x, sx)                                                                             \
     GX_RND_MAT_RETURN_IF_FOUND(x);                                                                              \
     construct_##sx(name, core::job::EndCallerShared<x>([this, c = std::move(c), name](std::shared_ptr<x>&& m) { \
-        materials.emplace(name, std::move(m));                                                                  \
+    materials.emplace(name, m);  c.set_return(std::move(m));                                                    \
     }))
 
 #define GX_RND_MAT_FUNC(x, sx)                                      \

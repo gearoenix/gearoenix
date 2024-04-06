@@ -267,6 +267,7 @@ void gearoenix::platform::BaseApplication::terminate()
     core_application = nullptr;
     render_engine = nullptr;
     ImGui::DestroyContext();
+    core::job::terminate();
 }
 
 void gearoenix::platform::BaseApplication::update()

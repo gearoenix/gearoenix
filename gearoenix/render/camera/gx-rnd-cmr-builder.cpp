@@ -11,10 +11,8 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
-    builder.set_name(name);
-    auto transform = physics::TransformationComponent::construct(name + "-transformation");
     builder.add_component(physics::collider::Frustum::construct(name + "-collider"));
-    builder.add_component(std::move(transform));
+    builder.add_component(physics::TransformationComponent::construct(name + "-transformation"));
 }
 
 gearoenix::render::camera::Builder::~Builder() = default;
@@ -27,6 +25,14 @@ gearoenix::physics::TransformationComponent& gearoenix::render::camera::Builder:
 const gearoenix::physics::TransformationComponent& gearoenix::render::camera::Builder::get_transformation() const
 {
     return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
+}
+
+gearoenix::physics::collider::Frustum &gearoenix::render::camera::Builder::get_frustum() {
+    return *entity_builder->get_builder().get_component<physics::collider::Frustum>();
+}
+
+const gearoenix::physics::collider::Frustum &gearoenix::render::camera::Builder::get_frustum() const {
+    return *entity_builder->get_builder().get_component<physics::collider::Frustum>();
 }
 
 gearoenix::render::camera::Camera& gearoenix::render::camera::Builder::get_camera()

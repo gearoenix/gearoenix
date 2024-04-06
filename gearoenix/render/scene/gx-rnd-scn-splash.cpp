@@ -93,14 +93,17 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
     scene_id = scene_builder->get_entity_builder()->get_builder().get_id();
 
     {
-        auto camera_builder = e.get_camera_manager()->build(
-            "gearoenix-splash-camera", core::job::EndCaller(entity_callback));
-        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-        auto& camera = camera_builder->get_camera();
-        camera.set_projection_data(camera::OrthographicProjectionData { .scale = 1.0 });
-        camera.disable_bloom();
-        camera.get_colour_tuning() = camera::RawColour {};
-        scene_builder->add(std::move(camera_builder));
+        e.get_camera_manager()->build(
+            "gearoenix-splash-camera",
+            core::job::EndCallerShared<camera::Builder>([scene_builder](std::shared_ptr<camera::Builder>&& cb) {
+                cb->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
+                auto& camera = cb->get_camera();
+                camera.set_projection_data(camera::OrthographicProjectionData { .scale = 1.0 });
+                camera.disable_bloom();
+                camera.get_colour_tuning() = camera::RawColour {};
+                scene_builder->add(std::move(cb));
+            }),
+            core::job::EndCaller(entity_callback));
     }
 
     struct Values {

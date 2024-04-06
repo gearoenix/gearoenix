@@ -40,8 +40,8 @@ public:
         = 0;
 
     void build(
-        std::string&& name,
-        platform::stream::Path&& texture_path,
+        const std::string& name,
+        const platform::stream::Path& texture_path,
         core::job::EndCaller<>&& entity_end_callback,
         core::job::EndCallerShared<Builder>&& builder_callback);
 

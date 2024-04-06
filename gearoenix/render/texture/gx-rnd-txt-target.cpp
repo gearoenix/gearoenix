@@ -11,9 +11,12 @@ gearoenix::render::texture::Target::~Target() = default;
 
 gearoenix::math::Vec2<std::size_t> gearoenix::render::texture::Target::get_dimension() const
 {
+    GX_ASSERT_D(!attachments.empty());
     const auto& t = attachments[0].var;
-    const auto& i = t.index() == 0 ? std::get<0>(t).txt->get_info() : std::get<1>(t).txt->get_info();
-    return { i.width, i.height };
+    const auto& i = t.index() == Attachment::ATTACHMENT_2D_VARIANT_INDEX?
+            std::get<Attachment::ATTACHMENT_2D_VARIANT_INDEX>(t).txt->get_info() :
+            std::get<Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(t).txt->get_info();
+    return { i.get_width(), i.get_height() };
 }
 
 float gearoenix::render::texture::Target::get_aspect_ratio() const

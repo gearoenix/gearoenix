@@ -84,7 +84,7 @@ void gearoenix::gl::LightBuilder::construct(
     auto builder = std::shared_ptr<LightBuilder>(new LightBuilder(e, name, info, std::move(entity_end_callback)));
     end_callback.set_return(std::shared_ptr(builder));
     builder->get_shadow_caster_directional()->initialise(
-        e, info.shadow_map_resolution, info.far, info.near, info.aspect, builder.get(),
+        e, info.shadow_map_resolution, info.far, info.near, info.aspect, builder,
         core::job::EndCaller([e = std::move(end_callback)] {}));
 }
 

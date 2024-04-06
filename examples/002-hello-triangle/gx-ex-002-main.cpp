@@ -6,6 +6,7 @@
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
@@ -16,11 +17,28 @@
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
+typedef gearoenix::render::material::Pbr GxPbr;
+typedef std::shared_ptr<GxPbr> GxPbrPtr;
+typedef gearoenix::core::job::EndCallerShared<GxPbr> GxPbrEndCaller;
+typedef gearoenix::render::mesh::Mesh GxMesh;
+typedef std::shared_ptr<GxMesh> GxMeshPtr;
+typedef gearoenix::core::job::EndCallerShared<GxMesh> GxMeshEndCaller;
+typedef gearoenix::render::camera::Builder GxCameraBuilder;
+typedef std::shared_ptr<GxCameraBuilder> GxCameraBuilderPtr;
+typedef gearoenix::core::job::EndCallerShared<GxCameraBuilder> GxCameraBuilderEndCaller;
+typedef gearoenix::render::PbrVertex GxPbrVertex;
+typedef gearoenix::core::job::EndCaller<> GxEndCaller;
+typedef gearoenix::render::scene::Builder GxSceneBuilder;
+typedef std::shared_ptr<GxSceneBuilder> GxSceneBuilderPtr;
+typedef gearoenix::render::light::Builder GxLightBuilder;
+typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
+typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndCaller;
+
 struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        std::vector<gearoenix::render::PbrVertex> vertices(3);
+        std::vector<GxPbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };
         vertices[0].normal = { 0.0f, 0.0f, 1.0f };
         vertices[0].tangent = { 0.0f, 1.0f, 0.0f, 1.0f };
@@ -36,45 +54,71 @@ struct GameApp final : public gearoenix::core::Application {
 
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
-        gearoenix::core::sync::EndCaller const end_callback([] {});
-
-        const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
-        scene_builder->get_scene().set_enabled(true);
-
-        auto mesh = render_engine.get_mesh_manager()->build(
+        render_engine.get_mesh_manager()->build(
             "triangle-mesh",
             std::move(vertices),
             std::move(indices),
-            end_callback);
+            GxMeshEndCaller([this] (GxMeshPtr&& m) {
+                set_mesh(std::move(m));
+            }));
 
-        auto material = render_engine.get_material_manager()->get_pbr("material", end_callback);
+    }
+
+    void set_mesh(GxMeshPtr&& mesh) {
+        render_engine.get_material_manager()->get_pbr(
+            "material",
+            GxPbrEndCaller([this, mesh = std::move(mesh)] (GxPbrPtr&& material) mutable {
+                set_material(std::move(material), std::move(mesh));
+            }));
+    }
+
+    void set_material(GxPbrPtr&& material, GxMeshPtr&& mesh) {
         material->get_normal_metallic_factor().w = 0.01f;
         material->get_emission_roughness_factor().w = 0.99f;
 
+        auto scene_builder = render_engine.get_scene_manager()->build(
+                "scene", 0.0, GxEndCaller([]{}));
+
         auto model_builder = render_engine.get_model_manager()->build(
-            "triangle-model",
-            std::move(mesh),
-            std::move(material),
-            gearoenix::core::sync::EndCaller(end_callback),
-            true);
-
-        auto camera_builder = render_engine.get_camera_manager()->build("camera", gearoenix::core::sync::EndCaller(end_callback));
-        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-
-        auto light_builder_0 = render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light-0",
-            1024,
-            10.0f,
-            1.0f,
-            35.0f,
-            end_callback);
-        light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder_0->get_light().colour = { 200.0f, 2.0f, 2.0f };
-
-        scene_builder->add(std::move(light_builder_0));
+                "triangle-model",
+                std::move(mesh),
+                std::move(material),
+                GxEndCaller([]{}),
+                true);
         scene_builder->add(std::move(model_builder));
+
+        render_engine.get_camera_manager()->build(
+                "camera",
+                GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
+                    set_camera_builder(std::move(camera_builder), std::move(scene_builder));
+                }),
+                GxEndCaller([]{}));
+
+    }
+
+    void set_camera_builder(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder) {
+        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
         scene_builder->add(std::move(camera_builder));
+
+        render_engine.get_light_manager()->build_shadow_caster_directional(
+                "directional-light",
+                1024,
+                10.0f,
+                1.0f,
+                35.0f,
+                GxLightBuilderEndCaller([scene_builder = std::move(scene_builder)](GxLightBuilderPtr&& light_builder){
+                    set_light_builder(std::move(light_builder), scene_builder);
+                }),
+                GxEndCaller([]{}));
+    }
+
+    static void set_light_builder(GxLightBuilderPtr&& light_builder, const GxSceneBuilderPtr& scene_builder) {
+        light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
+                { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder->get_light().colour = { 200.0f, 2.0f, 2.0f };
+        scene_builder->add(std::move(light_builder));
+
+        scene_builder->get_scene().set_enabled(true);
     }
 
     void update() noexcept final

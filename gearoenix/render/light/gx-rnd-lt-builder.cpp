@@ -40,16 +40,6 @@ gearoenix::render::light::ShadowCasterDirectional* gearoenix::render::light::Bui
     return entity_builder->get_builder().get_component<ShadowCasterDirectional>();
 }
 
-const gearoenix::physics::Transformation* gearoenix::render::light::Builder::get_transformation() const
-{
-    return entity_builder->get_builder().get_component<physics::Transformation>();
-}
-
-gearoenix::physics::Transformation* gearoenix::render::light::Builder::get_transformation()
-{
-    return entity_builder->get_builder().get_component<physics::Transformation>();
-}
-
 const gearoenix::render::light::Light& gearoenix::render::light::Builder::get_light() const
 {
     return *entity_builder->get_builder().get_component<Light>();

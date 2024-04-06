@@ -12,23 +12,6 @@ gearoenix::render::camera::Manager::Manager(engine::Engine& e)
 {
 }
 
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::render::camera::Manager::build(
-    const std::string& name, core::job::EndCaller<>&& end_caller)
-{
-    auto builder = build_v(name, std::move(end_caller));
-    const auto& cr = builder->get_camera();
-    builder->get_camera().resolution_cfg_listener = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().add_observer(
-        [wc = cr.camera_self](const Resolution&) -> bool {
-            const auto c = wc.lock();
-            if (nullptr == c)
-                return false;
-            // TODO: find a way to update it
-            // c->update_target();
-            return true;
-        });
-    return builder;
-}
-
 void gearoenix::render::camera::Manager::update()
 {
     auto* const world = e.get_world();
@@ -53,8 +36,7 @@ void gearoenix::render::camera::Manager::update()
 
 void gearoenix::render::camera::Manager::window_resized()
 {
-    e.get_world()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, const Camera* const, const unsigned int) -> void {
-        // c->update_target();
-        // TODO: find a way to update it
+    e.get_world()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) -> void {
+         c->update_target(core::job::EndCaller([]{}));
     });
 }

@@ -1,6 +1,5 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/job/gx-cr-job-manager.hpp"
 #include "../platform/stream/gx-plt-stm-local.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
@@ -192,15 +191,15 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_2D, object);
-        auto pixel_element_size = format_pixel_size(info.format);
+        auto pixel_element_size = format_pixel_size(info.get_format());
         std::vector<std::uint8_t> data;
-        auto level_width = static_cast<sizei>(info.width);
-        auto level_height = static_cast<sizei>(info.height);
+        auto level_width = static_cast<sizei>(info.get_width());
+        auto level_height = static_cast<sizei>(info.get_height());
         const auto mips_count = get_mipmaps_count();
         for (sint mip_index = 0; mip_index < static_cast<sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
             data.resize(pixel_element_size * static_cast<std::size_t>(level_width * level_height));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
-            glReadPixels(0, 0, level_width, level_height, convert_format(info.format), convert_data_format(info.format), data.data());
+            glReadPixels(0, 0, level_width, level_height, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
             flip_texture(data, level_height);
 #ifdef GX_DEBUG_TEXTURE_WRITE
             const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
@@ -208,7 +207,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
                 "texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
             write_image(l, data.data(), level_width, level_height, info.format);
 #endif
-            write_gx3d_image(*s, data.data(), level_width, level_height, info.format);
+            write_gx3d_image(*s, data.data(), level_width, level_height, info.get_format());
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
@@ -220,7 +219,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
 gearoenix::gl::Texture2D::Texture2D(
     Engine& e,
     const render::texture::TextureInfo& info,
-    std::string name)
+    std::string&& name)
     : render::texture::Texture2D(std::move(name), info, e)
     , e(e)
 {
@@ -256,15 +255,15 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
-        auto pixel_element_size = format_pixel_size(info.format);
+        auto pixel_element_size = format_pixel_size(info.get_format());
         std::vector<std::uint8_t> data;
         for (auto face : render::texture::FACES) {
-            auto level_aspect = static_cast<sizei>(info.width);
+            auto level_aspect = static_cast<sizei>(info.get_width());
             const auto mips_count = get_mipmaps_count();
             for (sint mipmap_index = 0; mipmap_index < static_cast<sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
                 data.resize(static_cast<std::size_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
-                glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.format), convert_data_format(info.format), data.data());
+                glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
                 flip_texture(data, level_aspect);
 #ifdef GX_DEBUG_TEXTURE_WRITE
                 const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
@@ -272,7 +271,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
                     "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
                 write_image(l, data.data(), level_aspect, level_aspect, info.format);
 #endif
-                write_gx3d_image(*s, data.data(), level_aspect, level_aspect, info.format);
+                write_gx3d_image(*s, data.data(), level_aspect, level_aspect, info.get_format());
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -285,7 +284,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
 gearoenix::gl::TextureCube::TextureCube(
     Engine& e,
     const render::texture::TextureInfo& info,
-    std::string name)
+    std::string&& name)
     : render::texture::TextureCube(std::move(name), info, e)
     , e(e)
 {
@@ -319,27 +318,27 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     const render::texture::TextureInfo& info,
     core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
-    flip_texture(pixels, info.height);
+    flip_texture(pixels, info.get_height());
     std::shared_ptr<Texture2D> result(new Texture2D(eng, info, std::move(name)));
-    const bool needs_mipmap_generation = info.has_mipmap && pixels.size() < 2;
-    const auto internal_format = convert_internal_format(info.format);
-    const auto format = convert_format(info.format);
-    const auto data_format = convert_data_format(info.format);
-    const auto gl_img_width = static_cast<sizei>(info.width);
-    const auto gl_img_height = static_cast<sizei>(info.height);
+    const bool needs_mipmap_generation = info.get_has_mipmap() && pixels.size() < 2;
+    const auto internal_format = convert_internal_format(info.get_format());
+    const auto format = convert_format(info.get_format());
+    const auto data_format = convert_data_format(info.get_format());
+    const auto gl_img_width = static_cast<sizei>(info.get_width());
+    const auto gl_img_height = static_cast<sizei>(info.get_height());
     c.set_return(result);
     core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
         GX_GL_CHECK_D;
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convert_min(info.sampler_info.min_filter));
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convert_mag(info.sampler_info.mag_filter));
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convert_min(info.get_sampler_info().get_min_filter()));
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convert_mag(info.get_sampler_info().get_mag_filter()));
         GX_GL_CHECK_D;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convert(info.sampler_info.wrap_s));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convert(info.sampler_info.wrap_t));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convert(info.get_sampler_info().get_wrap_s()));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convert(info.get_sampler_info().get_wrap_t()));
         GX_GL_CHECK_D;
-        if (pixels.size() > 1 || (!pixels.empty() && !info.has_mipmap)) {
+        if (pixels.size() > 1 || (!pixels.empty() && !info.get_has_mipmap())) {
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
         }
         if (GL_DEPTH_COMPONENT32F == internal_format) {
@@ -379,26 +378,26 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     core::job::EndCallerShared<render::texture::TextureCube>&& c)
 {
     std::shared_ptr<TextureCube> result(new TextureCube(eng, info, std::move(name)));
-    const bool needs_mipmap_generation = info.has_mipmap && (pixels.empty() || pixels[0].size() < 2);
-    const auto internal_format = convert_internal_format(info.format);
-    const auto format = convert_format(info.format);
-    const auto data_format = convert_data_format(info.format);
-    const auto gl_img_width = static_cast<gl::sizei>(info.width);
-    const auto gl_img_height = static_cast<gl::sizei>(info.height);
-    flip_texture(pixels, info.height);
+    const bool needs_mipmap_generation = info.get_has_mipmap() && (pixels.empty() || pixels[0].size() < 2);
+    const auto internal_format = convert_internal_format(info.get_format());
+    const auto format = convert_format(info.get_format());
+    const auto data_format = convert_data_format(info.get_format());
+    const auto gl_img_width = static_cast<gl::sizei>(info.get_width());
+    const auto gl_img_height = static_cast<gl::sizei>(info.get_height());
+    flip_texture(pixels, info.get_height());
     c.set_return(result);
     core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_CUBE_MAP, result->object);
         GX_GL_CHECK_D;
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, convert_min(info.sampler_info.min_filter));
-        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, convert_mag(info.sampler_info.mag_filter));
+        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, convert_min(info.get_sampler_info().get_min_filter()));
+        glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, convert_mag(info.get_sampler_info().get_mag_filter()));
         GX_GL_CHECK_D;
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, convert(info.sampler_info.wrap_s));
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, convert(info.sampler_info.wrap_t));
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, convert(info.get_sampler_info().get_wrap_s()));
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, convert(info.get_sampler_info().get_wrap_t()));
         GX_GL_CHECK_D;
-        if (pixels.size() > 1 || (!pixels.empty() && !info.has_mipmap)) {
+        if (pixels.size() > 1 || (!pixels.empty() && !info.get_has_mipmap())) {
             glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
         }
         if (GL_DEPTH_COMPONENT32F == internal_format) {

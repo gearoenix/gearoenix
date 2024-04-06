@@ -10,7 +10,7 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct Transformation;
+struct TransformationComponent;
 }
 
 namespace gearoenix::render::camera {
@@ -72,8 +72,6 @@ public:
     virtual ~Builder();
     [[nodiscard]] const ShadowCasterDirectional* get_shadow_caster_directional() const;
     [[nodiscard]] ShadowCasterDirectional* get_shadow_caster_directional();
-    [[nodiscard]] const physics::Transformation* get_transformation() const;
-    [[nodiscard]] physics::Transformation* get_transformation();
     [[nodiscard]] const Light& get_light() const;
     [[nodiscard]] Light& get_light();
     [[nodiscard]] core::ecs::entity_id_t get_id() const;

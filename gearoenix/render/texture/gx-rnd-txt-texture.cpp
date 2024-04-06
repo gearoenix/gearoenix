@@ -128,5 +128,5 @@ std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(
 
 std::size_t gearoenix::render::texture::Texture::compute_mipmaps_count(const TextureInfo& info)
 {
-    return info.has_mipmap ? compute_mipmaps_count(info.width, info.height) : 1;
+    return info.get_has_mipmap() ? compute_mipmaps_count(info.get_width(), info.get_height()) : 1;
 }

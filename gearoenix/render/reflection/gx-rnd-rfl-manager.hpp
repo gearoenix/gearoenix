@@ -33,7 +33,7 @@ public:
         const std::string& name,
         const platform::stream::Path& path,
         core::job::EndCallerShared<Builder>&& c,
-        core::job::EndCaller<>&& entity_end_callback) const;
+        core::job::EndCaller<>&& entity_end_callback);
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_baked(
         const std::string& name,

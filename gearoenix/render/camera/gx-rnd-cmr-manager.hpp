@@ -15,7 +15,6 @@ protected:
     engine::Engine& e;
 
     explicit Manager(engine::Engine& e);
-    [[nodiscard]] virtual std::shared_ptr<Builder> build_v(const std::string& name, core::job::EndCaller<>&& end_caller) = 0;
 
 public:
     Manager(Manager&&) = delete;
@@ -25,7 +24,10 @@ public:
 
     virtual ~Manager() = default;
 
-    [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, core::job::EndCaller<>&& end_caller);
+    virtual void build(
+            const std::string& name,
+            core::job::EndCallerShared<Builder>&& builder_end_caller,
+            core::job::EndCaller<>&& entity_end_caller) = 0;
 
     virtual void update();
     virtual void window_resized();

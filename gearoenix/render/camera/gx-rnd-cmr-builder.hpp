@@ -11,7 +11,11 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+    struct TransformationComponent;
+}
+
+namespace gearoenix::physics::collider {
+    struct Frustum;
 }
 
 namespace gearoenix::render::engine {
@@ -41,6 +45,8 @@ public:
 
     [[nodiscard]] physics::TransformationComponent& get_transformation();
     [[nodiscard]] const physics::TransformationComponent& get_transformation() const;
+    [[nodiscard]] physics::collider::Frustum& get_frustum();
+    [[nodiscard]] const physics::collider::Frustum& get_frustum() const;
     [[nodiscard]] Camera& get_camera();
     [[nodiscard]] const Camera& get_camera() const;
     [[nodiscard]] core::ecs::entity_id_t get_id() const;

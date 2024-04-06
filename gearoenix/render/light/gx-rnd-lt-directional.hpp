@@ -3,6 +3,10 @@
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-lt-light.hpp"
 
+namespace gearoenix::physics { struct TransformationComponent; }
+
+namespace gearoenix::physics::collider {struct Frustum; }
+
 namespace gearoenix::render::camera {
 struct Camera;
 }
@@ -37,6 +41,8 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, shadow_map);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
     GX_GET_CREF_PRV(std::shared_ptr<camera::Camera>, shadow_camera);
+    GX_GET_CREF_PRV(std::shared_ptr<physics::collider::Frustum>, shadow_frustum);
+    GX_GET_CREF_PRV(std::shared_ptr<physics::TransformationComponent>, shadow_transform);
     GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, 0);
 
     ShadowCasterDirectional(std::type_index final_type_index, std::string&& name);
@@ -49,8 +55,10 @@ public:
         float camera_far,
         float camera_near,
         float camera_aspect,
-        Builder* builder,
+        const std::shared_ptr<Builder>& builder,
         core::job::EndCaller<>&& end_callback);
+    virtual void initialise_camera(float camera_far, float camera_near, float camera_aspect);
+    virtual void set_shadow_map(std::size_t resolution, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map(std::shared_ptr<texture::Texture2D>&&, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map_target(std::shared_ptr<texture::Target>&&);
 };

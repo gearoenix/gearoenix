@@ -16,7 +16,8 @@ struct Camera;
 }
 
 namespace gearoenix::gl {
-struct Camera;
+    struct BloomData;
+    struct Camera;
 }
 
 namespace gearoenix::gl::submission {
@@ -27,7 +28,9 @@ struct BloomData final {
     std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT> vertical_targets { static_cast<uint>(-1) };
     std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT + 1> upsampler_targets { static_cast<uint>(-1) };
 
-    [[nodiscard]] static std::optional<BloomData> construct(const std::optional<render::camera::BloomData>& rnd_bd);
+    [[nodiscard]] static std::optional<BloomData> construct(
+            const std::optional<gl::BloomData>& gl_bd,
+            const std::optional<render::camera::BloomData>& rnd_bd);
 };
 
 struct Camera final {
@@ -56,7 +59,6 @@ struct Camera final {
     Camera();
     void clear(
         const gl::Camera& gl_cam,
-        const render::camera::Camera& rnd_cam,
         const math::Vec3<float>& location);
 };
 }

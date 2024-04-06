@@ -33,12 +33,12 @@ void gearoenix::gl::Target::construct(
         render::texture::TextureFormat format;
         if (a.var.index() == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
             const auto& a2d = std::get<render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX>(a.var);
-            format = a2d.txt->get_info().format;
+            format = a2d.txt->get_info().get_format();
             gla.texture = std::dynamic_pointer_cast<Texture2D>(a2d.txt);
             gla.target = GL_TEXTURE_2D;
         } else if (a.var.index() == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
             const auto& acb = std::get<render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(a.var);
-            format = acb.txt->get_info().format;
+            format = acb.txt->get_info().get_format();
             gla.texture = std::dynamic_pointer_cast<TextureCube>(acb.txt);
             gla.target = convert(acb.face);
         } else {
@@ -104,8 +104,8 @@ void gearoenix::gl::Target::construct(
 gearoenix::gl::Target::~Target()
 {
     attachments.clear();
-    core::job::send_job(e.get_jobs_thread_id(), [framebuffer = framebuffer] {
-        glDeleteFramebuffers(1, &framebuffer);
+    core::job::send_job(e.get_jobs_thread_id(), [f = framebuffer] {
+        glDeleteFramebuffers(1, &f);
     });
 }
 

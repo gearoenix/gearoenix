@@ -36,6 +36,7 @@ public:
         std::terminate();
     }
 
+    // true means, keep the observer alive
     [[nodiscard]] std::size_t add_observer(std::function<bool(const T&)>&& f)
     {
         const auto id = ++last_id;
@@ -43,7 +44,7 @@ public:
         return id;
     }
 
-    void remove_listener(const std::size_t id)
+    void remove_observer(const std::size_t id)
     {
         if (id == 0)
             return;
