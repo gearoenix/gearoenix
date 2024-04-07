@@ -2,15 +2,15 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
-#include "../../render/texture/gx-rnd-txt-manager.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../../render/texture/gx-rnd-txt-manager.hpp"
 #include "../gx-gl-camera.hpp"
 #include "../gx-gl-target.hpp"
 #include "../gx-gl-texture.hpp"
 #include <thread>
 
 std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::BloomData::construct(
-        const std::optional<gl::BloomData>& gl_bd,
+    const std::optional<gl::BloomData>& gl_bd,
     const std::optional<render::camera::BloomData>& rnd_bd)
 {
     if (!rnd_bd.has_value())
@@ -50,13 +50,13 @@ void gearoenix::gl::submission::Camera::clear(
     for (auto& v : threads_opaque_models_data) {
         v.clear();
     }
-    for (auto& v : threads_translucent_models_data){
+    for (auto& v : threads_translucent_models_data) {
         v.clear();
     }
-    for (auto& v : threads_mvps){
+    for (auto& v : threads_mvps) {
         v.clear();
     }
-    for (auto& v : debug_meshes_threads){
+    for (auto& v : debug_meshes_threads) {
         v.clear();
     }
 
@@ -68,7 +68,7 @@ void gearoenix::gl::submission::Camera::clear(
     second_framebuffer = static_cast<uint>(-1);
     second_colour_attachment = static_cast<uint>(-1);
 
-    if(has_customised_target) {
+    if (has_customised_target) {
         const auto& target = *gl_cam.get_gl_target().get_customised().target;
         const auto& attachments = target.get_gl_attachments();
         framebuffer = target.get_framebuffer();
@@ -77,8 +77,7 @@ void gearoenix::gl::submission::Camera::clear(
             // it means we have the main camera not shadow or reflection probe convoluter
             depth_attachment = attachments[1].texture_object;
         }
-    }
-    else {
+    } else {
         const auto& def = gl_cam.get_gl_target().get_default();
         {
             const auto& target = *def.first;

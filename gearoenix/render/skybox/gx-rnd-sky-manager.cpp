@@ -25,14 +25,14 @@ void gearoenix::render::skybox::Manager::build(
             name + "-texture",
             texture_path,
             texture::TextureInfo(
-                    texture::TextureFormat::Unknown,
+                texture::TextureFormat::Unknown,
                 texture::SamplerInfo(
                     texture::Filter::Linear,
                     texture::Filter::Linear,
                     texture::Wrap::ClampToEdge,
                     texture::Wrap::ClampToEdge,
                     texture::Wrap::ClampToEdge),
-                    0, 0, 0, texture::Type::Unknown, false),
+                0, 0, 0, texture::Type::Unknown, false),
             core::job::EndCallerShared<texture::Texture2D>([this, end = std::move(entity_end_callback), n = name, b = std::move(builder_callback)](std::shared_ptr<texture::Texture2D>&& t) mutable {
                 build(std::move(n), std::move(t), std::move(end), std::move(b));
             }));

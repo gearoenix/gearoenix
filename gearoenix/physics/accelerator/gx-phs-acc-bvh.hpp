@@ -221,8 +221,9 @@ private:
         auto& l = allocate<Leaf>();
         l.volume = volume;
         l.data_count = data_size;
-        for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index)
+        for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index) {
             allocate<Data>() = data[data_index];
+        }
     }
 
     [[nodiscard]] std::optional<std::pair<double, const Data*>> hit(

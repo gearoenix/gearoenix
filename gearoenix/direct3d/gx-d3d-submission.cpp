@@ -78,8 +78,7 @@ bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::size_t camera_p
         cmd->SetGraphicsRootConstantBufferView(0, model_data.current_frame_uniform_address);
         cmd->IASetVertexBuffers(0, 1, model_data.vertex_view);
         cmd->IASetIndexBuffer(model_data.index_view);
-        cmd->DrawIndexedInstanced(model_data.indices_count, 1, 0, 0, 0);
-    });
+        cmd->DrawIndexedInstanced(model_data.indices_count, 1, 0, 0, 0); });
 
     swapchain->transit_to_present(frame.threads_g_buffer_filler_commands.back().get_list());
     for (auto& command : frame.threads_g_buffer_filler_commands)
@@ -128,8 +127,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                 std::make_pair(camera.get_layer(), camera_id),
                 camera_pool.emplace([&] { return CameraData(*e.get_device()); }));
         });
-        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
-    });
+        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index); });
 
     world->parallel_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene, const unsigned int) {
         if (!scene.enabled)
@@ -137,13 +135,13 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
         auto& bvh = bvh_pool[scene_data.bvh_pool_index];
         bvh.reset();
-        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
+        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::TransformationComponent>(
             [&](
                 const core::ecs::entity_id_t,
                 physics::collider::Aabb3& collider,
                 render::model::Model& render_model,
                 Model& model,
-                physics::Transformation& model_transform) {
+                physics::TransformationComponent& model_transform) {
                 if (!render_model.enabled)
                     return;
                 if (render_model.scene_id != scene_id)
@@ -165,12 +163,12 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                     } });
             });
         bvh.create_nodes();
-        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>(
+        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::TransformationComponent, Camera>(
             [&](
                 const core::ecs::entity_id_t camera_id,
                 render::camera::Camera& camera,
                 physics::collider::Frustum& frustum,
-                physics::Transformation& transform,
+                physics::TransformationComponent& transform,
                 Camera& d3d_camera,
                 const unsigned int) {
                 if (!camera.get_is_enabled())
@@ -203,8 +201,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                     camera_data.tranclucent_models_data.begin(),
                     camera_data.tranclucent_models_data.end(),
                     [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-            });
-    });
+            }); });
 
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];

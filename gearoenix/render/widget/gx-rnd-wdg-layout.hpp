@@ -5,7 +5,7 @@
 #include "gx-rnd-wdg-size.hpp"
 
 namespace gearoenix::physics {
-struct Transformation;
+struct TransformationComponent;
 }
 
 namespace gearoenix::render::engine {
@@ -42,7 +42,7 @@ struct LayoutWindowBasedPlacer final : Layout {
     {
     }
     ~LayoutWindowBasedPlacer() override = default;
-    void set_location(physics::Transformation&) const;
+    void set_location(physics::TransformationComponent&) const;
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 };
 }

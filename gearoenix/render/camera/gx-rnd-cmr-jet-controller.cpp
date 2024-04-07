@@ -106,7 +106,7 @@ gearoenix::render::camera::JetController::~JetController()
 
 void gearoenix::render::camera::JetController::update()
 {
-    auto* const trn = e.get_world()->get_component<physics::Transformation>(camera_entity_id);
+    auto* const trn = e.get_world()->get_component<physics::TransformationComponent>(camera_entity_id);
     const auto delta_time = e.get_delta_time();
     if (nullptr == trn) {
         GX_LOG_D("Jet camera controller is not able to find the transformation component of the camera: " << camera_entity_id);

@@ -26,10 +26,10 @@ struct BloomData final {
     GX_GET_CREF_PRV(UpTargets, upsampler_targets);
 
     BloomData(
-            std::shared_ptr<Target>&& prefilter_target,
-            Targets&& horizontal_targets,
-            Targets&& vertical_targets,
-            UpTargets&& upsampler_targets);
+        std::shared_ptr<Target>&& prefilter_target,
+        Targets&& horizontal_targets,
+        Targets&& vertical_targets,
+        UpTargets&& upsampler_targets);
 
 public:
     ~BloomData();
@@ -49,7 +49,7 @@ struct CameraTarget final {
     static constexpr std::size_t CUSTOMISED_VAR_INDEX = 0;
     static constexpr std::size_t DEFAULT_VAR_INDEX = 1;
 
-    std::variant<Customised, Default> target = Default{};
+    std::variant<Customised, Default> target = Default {};
 
     ~CameraTarget();
     [[nodiscard]] static CameraTarget construct(const render::camera::Target& target) noexcept;
@@ -64,8 +64,8 @@ struct Camera final : render::camera::Camera {
     [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void disable_bloom() override;
-    void enable_bloom(core::job::EndCaller<> && end) override;
-    void update_target(core::job::EndCaller<> && end) override;
+    void enable_bloom(core::job::EndCaller<>&& end) override;
+    void update_target(core::job::EndCaller<>&& end) override;
 
 public:
     Camera(Engine& e, const std::string& name, render::camera::Target&& target);
@@ -78,10 +78,10 @@ struct CameraBuilder final : render::camera::Builder {
 
     CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller);
     static void construct(
-            Engine& e,
-            const std::string& name,
-            core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
-            core::job::EndCaller<>&& entity_end_caller);
+        Engine& e,
+        const std::string& name,
+        core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
+        core::job::EndCaller<>&& entity_end_caller);
     ~CameraBuilder() override;
 };
 

@@ -33,6 +33,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         vs << "\n";
         vs << "uniform mat4 bones_m_inv_m[" << (bones_count * 2) << "];\n";
     } else {
+        vs << "\n";
         vs << "uniform mat4 m;\n";
         vs << "uniform mat4 inv_m;\n";
     }
@@ -261,7 +262,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     }
 }
 
-gearoenix::gl::shader::ForwardPbr::ForwardPbr(ForwardPbr&&) = default;
+gearoenix::gl::shader::ForwardPbr::ForwardPbr(ForwardPbr&&) noexcept = default;
 
 gearoenix::gl::shader::ForwardPbr::~ForwardPbr() = default;
 

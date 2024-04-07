@@ -4,8 +4,8 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
-#include "../texture/gx-rnd-txt-target.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
+#include "../texture/gx-rnd-txt-target.hpp"
 #include <boost/mp11/algorithm.hpp>
 #include <imgui/imgui.h>
 #include <random>
@@ -46,15 +46,14 @@ gearoenix::render::camera::Camera::~Camera()
 void gearoenix::render::camera::Camera::set_component_self(const std::shared_ptr<Component>& c)
 {
     camera_self = std::dynamic_pointer_cast<Camera>(c);
-    if(0 == resolution_cfg_observer) {
+    if (0 == resolution_cfg_observer) {
         resolution_cfg_observer = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().add_observer(
-            [c = camera_self](const Resolution &) {
+            [c = camera_self](const Resolution&) {
                 auto cam = c.lock();
-                if(nullptr == cam)
-                {
+                if (nullptr == cam) {
                     return false;
                 }
-                cam->update_target(core::job::EndCaller([]{}));
+                cam->update_target(core::job::EndCaller([] {}));
                 return true;
             });
     }
@@ -118,7 +117,7 @@ void gearoenix::render::camera::Camera::disable_customised_target_aspect_ratio()
 
 float gearoenix::render::camera::Camera::get_target_aspect_ratio() const
 {
-    const auto td = customised_target_aspect_ratio.has_value()? *customised_target_aspect_ratio: static_cast<float>(target.get_aspect_ratio());
+    const auto td = customised_target_aspect_ratio.has_value() ? *customised_target_aspect_ratio : static_cast<float>(target.get_aspect_ratio());
     const auto clip = starting_clip_ending_clip.zw() - starting_clip_ending_clip.xy();
     return td * clip.x / clip.y;
 }
@@ -143,7 +142,7 @@ void gearoenix::render::camera::Camera::update_projection()
     view_projection = projection * view;
 
     if (debug_enabled) {
-        create_debug_mesh(core::job::EndCaller([]{}));
+        create_debug_mesh(core::job::EndCaller([] {}));
     }
 }
 
@@ -165,7 +164,7 @@ void gearoenix::render::camera::Camera::show_debug_gui()
         bool input_changed = false;
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");
-        if(customised_target_aspect_ratio.has_value()) {
+        if (customised_target_aspect_ratio.has_value()) {
             input_changed |= ImGui::InputFloat("Customised Target Aspect Ratio", &*customised_target_aspect_ratio, 0.01f, 1.0f, "%.3f");
         }
         if (auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
@@ -261,33 +260,39 @@ void gearoenix::render::camera::Camera::disable_bloom()
     bloom_data = std::nullopt;
 }
 
-void gearoenix::render::camera::Camera::enable_bloom(core::job::EndCaller<> &&end) {
+void gearoenix::render::camera::Camera::enable_bloom(core::job::EndCaller<>&& end)
+{
     BloomData::construct(
-            e,
+        e,
         name,
         target,
-        core::job::EndCaller<BloomData>([s = camera_self.lock(), end = std::move(end)] (BloomData&& b) {
+        core::job::EndCaller<BloomData>([s = camera_self.lock(), end = std::move(end)](BloomData&& b) {
             s->bloom_data = std::move(b);
             (void)end;
-    }));
+        }));
 }
 
-void gearoenix::render::camera::Camera::update_bloom(core::job::EndCaller<> &&end) {
-    if(bloom_data.has_value()) {
+void gearoenix::render::camera::Camera::update_bloom(core::job::EndCaller<>&& end)
+{
+    if (bloom_data.has_value()) {
         enable_bloom(std::move(end));
     }
 }
 
-void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<> &&end) {
-    if(!target.is_default()) {
+void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& end)
+{
+    if (!target.is_default()) {
         return;
     }
     e.get_texture_manager()->create_default_camera_render_target(
         name,
-        core::job::EndCaller<texture::DefaultCameraTargets>([w = camera_self, end= std::move(end)](texture::DefaultCameraTargets && t) mutable {
+        core::job::EndCaller<texture::DefaultCameraTargets>([w = camera_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
             auto s = w.lock();
-            if(nullptr == s) { return; }
+            if (nullptr == s) {
+                return;
+            }
             s->target = Target(Target::Default { .first = std::move(t.first_colour), .second = std::move(t.second_colour) });
+            s->update_projection();
             s->update_bloom(std::move(end));
         }));
 }

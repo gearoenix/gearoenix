@@ -144,8 +144,9 @@ bool gearoenix::render::texture::SamplerInfo::operator==(const SamplerInfo& o) c
     return hash == o.hash && min_filter == o.min_filter && mag_filter == o.mag_filter && wrap_s == o.wrap_s && wrap_r == o.wrap_r && wrap_t == o.wrap_t && anisotropic_level == o.anisotropic_level;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_min_filter(const Filter v) {
-    if(v == min_filter) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_min_filter(const Filter v)
+{
+    if (v == min_filter) {
         return *this;
     }
     min_filter = v;
@@ -153,8 +154,9 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_mag_filter(const Filter v) {
-    if(v == mag_filter) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_mag_filter(const Filter v)
+{
+    if (v == mag_filter) {
         return *this;
     }
     mag_filter = v;
@@ -162,8 +164,9 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_wrap_s(const Wrap v) {
-    if(v == wrap_s) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_wrap_s(const Wrap v)
+{
+    if (v == wrap_s) {
         return *this;
     }
     wrap_s = v;
@@ -171,8 +174,9 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_wrap_t(const Wrap v) {
-    if(v == wrap_t) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_wrap_t(const Wrap v)
+{
+    if (v == wrap_t) {
         return *this;
     }
     wrap_t = v;
@@ -180,8 +184,9 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_wrap_r(const Wrap v) {
-    if(v == wrap_r) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_wrap_r(const Wrap v)
+{
+    if (v == wrap_r) {
         return *this;
     }
     wrap_r = v;
@@ -189,8 +194,9 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo::set_anisotropic_level(const std::uint8_t v) {
-    if(v == anisotropic_level) {
+gearoenix::render::texture::SamplerInfo& gearoenix::render::texture::SamplerInfo::set_anisotropic_level(const std::uint8_t v)
+{
+    if (v == anisotropic_level) {
         return *this;
     }
     anisotropic_level = v;
@@ -198,7 +204,8 @@ gearoenix::render::texture::SamplerInfo &gearoenix::render::texture::SamplerInfo
     return *this;
 }
 
-void gearoenix::render::texture::SamplerInfo::update_hash() {
+void gearoenix::render::texture::SamplerInfo::update_hash()
+{
     hash = boost::hash_value(typeid(SamplerInfo));
     boost::hash_combine(hash, boost::hash_value(min_filter));
     boost::hash_combine(hash, boost::hash_value(mag_filter));

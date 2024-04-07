@@ -25,9 +25,10 @@ public:
     virtual ~Manager() = default;
 
     virtual void build(
-            const std::string& name,
-            core::job::EndCallerShared<Builder>&& builder_end_caller,
-            core::job::EndCaller<>&& entity_end_caller) = 0;
+        const std::string& name,
+        core::job::EndCallerShared<Builder>&& builder_end_caller,
+        core::job::EndCaller<>&& entity_end_caller)
+        = 0;
 
     virtual void update();
     virtual void window_resized();

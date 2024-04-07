@@ -50,7 +50,7 @@ public:
         std::size_t directional_lights_count,
         std::size_t shadow_casters_directional_lights_count,
         std::size_t bones_count);
-    ForwardPbr(ForwardPbr&&);
+    ForwardPbr(ForwardPbr&&) noexcept;
     ~ForwardPbr() final;
     void bind(uint& current_shader) const final;
     void set_shadow_caster_directional_light_normalised_vp_data(const void* data);

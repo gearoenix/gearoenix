@@ -11,7 +11,7 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct Transformation;
+struct TransformationComponent;
 }
 
 namespace gearoenix::render::engine {
@@ -44,7 +44,7 @@ public:
     Builder& operator=(const Builder&) = delete;
     virtual ~Builder();
 
-    [[nodiscard]] physics::Transformation& get_transformation() const;
+    [[nodiscard]] physics::TransformationComponent& get_transformation() const;
     [[nodiscard]] Model& get_model() const;
     [[nodiscard]] core::ecs::entity_id_t get_id() const;
 };

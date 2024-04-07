@@ -175,11 +175,11 @@ void gearoenix::render::texture::Manager::create_2d_from_colour(
         TextureInfo()
             .set_format(TextureFormat::RgbaUint8)
             .set_sampler_info(SamplerInfo()
-                .set_min_filter(Filter::Nearest)
-                .set_mag_filter(Filter::Nearest)
-                .set_wrap_s(Wrap::Repeat)
-                .set_wrap_t(Wrap::Repeat)
-                .set_wrap_r(Wrap::Repeat))
+                                  .set_min_filter(Filter::Nearest)
+                                  .set_mag_filter(Filter::Nearest)
+                                  .set_wrap_s(Wrap::Repeat)
+                                  .set_wrap_t(Wrap::Repeat)
+                                  .set_wrap_r(Wrap::Repeat))
             .set_width(1)
             .set_height(1)
             .set_type(Type::Texture2D)
@@ -219,17 +219,17 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
     }
     constexpr std::size_t resolution = 256;
     auto texture_info = TextureInfo()
-        .set_format(TextureFormat::RgbaUint8)
-        .set_sampler_info(SamplerInfo()
-            .set_min_filter(Filter::Linear)
-            .set_mag_filter(Filter::Linear)
-            .set_wrap_s(Wrap::ClampToEdge)
-            .set_wrap_t(Wrap::ClampToEdge)
-            .set_wrap_r(Wrap::ClampToEdge))
-        .set_width(resolution)
-        .set_height(resolution)
-        .set_type(Type::Texture2D)
-        .set_has_mipmap(false);
+                            .set_format(TextureFormat::RgbaUint8)
+                            .set_sampler_info(SamplerInfo()
+                                                  .set_min_filter(Filter::Linear)
+                                                  .set_mag_filter(Filter::Linear)
+                                                  .set_wrap_s(Wrap::ClampToEdge)
+                                                  .set_wrap_t(Wrap::ClampToEdge)
+                                                  .set_wrap_r(Wrap::ClampToEdge))
+                            .set_width(resolution)
+                            .set_height(resolution)
+                            .set_type(Type::Texture2D)
+                            .set_has_mipmap(false);
     const auto pixels_vectors = create_brdflut_pixels();
     std::vector<std::uint8_t> pixels0(pixels_vectors.size() * sizeof(math::Vec4<std::uint8_t>));
     std::memcpy(pixels0.data(), pixels_vectors.data(), pixels0.size());
@@ -259,17 +259,17 @@ void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared
         }
     }
     auto texture_info = TextureInfo()
-        .set_format(TextureFormat::RgbaUint8)
-        .set_sampler_info(SamplerInfo()
-            .set_min_filter(Filter::Nearest)
-            .set_mag_filter(Filter::Nearest)
-            .set_wrap_s(Wrap::Repeat)
-            .set_wrap_t(Wrap::Repeat)
-            .set_wrap_r(Wrap::Repeat))
-        .set_width(2)
-        .set_height(2)
-        .set_type(Type::Texture2D)
-        .set_has_mipmap(false);
+                            .set_format(TextureFormat::RgbaUint8)
+                            .set_sampler_info(SamplerInfo()
+                                                  .set_min_filter(Filter::Nearest)
+                                                  .set_mag_filter(Filter::Nearest)
+                                                  .set_wrap_s(Wrap::Repeat)
+                                                  .set_wrap_t(Wrap::Repeat)
+                                                  .set_wrap_r(Wrap::Repeat))
+                            .set_width(2)
+                            .set_height(2)
+                            .set_type(Type::Texture2D)
+                            .set_has_mipmap(false);
     std::vector<std::vector<std::uint8_t>> pixels { {
         0u, 0u, 0u, 255u, // Pixel 0
         255u, 255u, 255u, 255u, // Pixel 1
@@ -455,11 +455,11 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
         TextureInfo()
             .set_format(TextureFormat::RgbaUint8)
             .set_sampler_info(SamplerInfo()
-                .set_min_filter(Filter::Nearest)
-                .set_mag_filter(Filter::Nearest)
-                .set_wrap_s(Wrap::Repeat)
-                .set_wrap_t(Wrap::Repeat)
-                .set_wrap_r(Wrap::Repeat))
+                                  .set_min_filter(Filter::Nearest)
+                                  .set_mag_filter(Filter::Nearest)
+                                  .set_wrap_s(Wrap::Repeat)
+                                  .set_wrap_t(Wrap::Repeat)
+                                  .set_wrap_r(Wrap::Repeat))
             .set_width(1)
             .set_height(1)
             .set_type(Type::TextureCube)
@@ -679,17 +679,17 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
     const auto dim = get_default_camera_render_target_dimensions();
 
     const auto txt_info = TextureInfo()
-        .set_format(TextureFormat::RgbaFloat16)
-        .set_sampler_info(SamplerInfo()
-            .set_min_filter(Filter::LinearMipmapLinear)
-            .set_mag_filter(Filter::Linear)
-            .set_wrap_s(Wrap::ClampToEdge)
-            .set_wrap_t(Wrap::ClampToEdge)
-            .set_wrap_r(Wrap::ClampToEdge))
-        .set_width(dim.x)
-        .set_height(dim.y)
-        .set_type(Type::Texture2D)
-        .set_has_mipmap(true);
+                              .set_format(TextureFormat::RgbaFloat16)
+                              .set_sampler_info(SamplerInfo()
+                                                    .set_min_filter(Filter::LinearMipmapLinear)
+                                                    .set_mag_filter(Filter::Linear)
+                                                    .set_wrap_s(Wrap::ClampToEdge)
+                                                    .set_wrap_t(Wrap::ClampToEdge)
+                                                    .set_wrap_r(Wrap::ClampToEdge))
+                              .set_width(dim.x)
+                              .set_height(dim.y)
+                              .set_type(Type::Texture2D)
+                              .set_has_mipmap(true);
 
     create_2d_from_pixels(
         std::move(first_colour_name), {}, txt_info,
@@ -708,9 +708,9 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
     auto depth_info = txt_info;
     depth_info.set_format(TextureFormat::D32);
     depth_info.set_sampler_info(
-            SamplerInfo(depth_info.get_sampler_info())
-                .set_min_filter(Filter::Nearest)
-                .set_mag_filter(Filter::Nearest));
+        SamplerInfo(depth_info.get_sampler_info())
+            .set_min_filter(Filter::Nearest)
+            .set_mag_filter(Filter::Nearest));
     depth_info.set_has_mipmap(false);
 
     create_2d_from_pixels(

@@ -146,7 +146,7 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
 void gearoenix::physics::animation::Manager::update()
 {
     e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, TransformationComponent>>(
-        [this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) {
+        [this](auto, AnimationPlayer* const player, Armature* const armature, const TransformationComponent* const model_transform, auto) {
             if (nullptr != player) {
                 player->update_time(e.get_delta_time());
                 player->animate(*this);

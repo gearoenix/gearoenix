@@ -20,9 +20,9 @@ gearoenix::render::model::Builder::Builder(
 
 gearoenix::render::model::Builder::~Builder() = default;
 
-gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_transformation() const
+gearoenix::physics::TransformationComponent& gearoenix::render::model::Builder::get_transformation() const
 {
-    return *entity_builder->get_builder().get_component<physics::Transformation>();
+    return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
 }
 
 gearoenix::render::model::Model& gearoenix::render::model::Builder::get_model() const

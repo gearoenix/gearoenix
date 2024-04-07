@@ -3,9 +3,13 @@
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-lt-light.hpp"
 
-namespace gearoenix::physics { struct TransformationComponent; }
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
 
-namespace gearoenix::physics::collider {struct Frustum; }
+namespace gearoenix::physics::collider {
+struct Frustum;
+}
 
 namespace gearoenix::render::camera {
 struct Camera;

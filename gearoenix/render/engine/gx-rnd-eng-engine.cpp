@@ -4,14 +4,14 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
+#include "../light/gx-rnd-lt-manager.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
+#include "../mesh/gx-rnd-msh-manager.hpp"
+#include "../model/gx-rnd-mdl-manager.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "../scene/gx-rnd-scn-manager.hpp"
 #include "../skybox/gx-rnd-sky-manager.hpp"
-#include "../light/gx-rnd-lt-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
-#include "../model/gx-rnd-mdl-manager.hpp"
-#include "../mesh/gx-rnd-msh-manager.hpp"
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"

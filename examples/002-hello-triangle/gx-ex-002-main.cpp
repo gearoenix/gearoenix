@@ -5,8 +5,8 @@
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
-#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
@@ -58,64 +58,66 @@ struct GameApp final : public gearoenix::core::Application {
             "triangle-mesh",
             std::move(vertices),
             std::move(indices),
-            GxMeshEndCaller([this] (GxMeshPtr&& m) {
+            GxMeshEndCaller([this](GxMeshPtr&& m) {
                 set_mesh(std::move(m));
             }));
-
     }
 
-    void set_mesh(GxMeshPtr&& mesh) {
+    void set_mesh(GxMeshPtr&& mesh)
+    {
         render_engine.get_material_manager()->get_pbr(
             "material",
-            GxPbrEndCaller([this, mesh = std::move(mesh)] (GxPbrPtr&& material) mutable {
+            GxPbrEndCaller([this, mesh = std::move(mesh)](GxPbrPtr&& material) mutable {
                 set_material(std::move(material), std::move(mesh));
             }));
     }
 
-    void set_material(GxPbrPtr&& material, GxMeshPtr&& mesh) {
+    void set_material(GxPbrPtr&& material, GxMeshPtr&& mesh)
+    {
         material->get_normal_metallic_factor().w = 0.01f;
         material->get_emission_roughness_factor().w = 0.99f;
 
         auto scene_builder = render_engine.get_scene_manager()->build(
-                "scene", 0.0, GxEndCaller([]{}));
+            "scene", 0.0, GxEndCaller([] {}));
 
         auto model_builder = render_engine.get_model_manager()->build(
-                "triangle-model",
-                std::move(mesh),
-                std::move(material),
-                GxEndCaller([]{}),
-                true);
+            "triangle-model",
+            std::move(mesh),
+            std::move(material),
+            GxEndCaller([] {}),
+            true);
         scene_builder->add(std::move(model_builder));
 
         render_engine.get_camera_manager()->build(
-                "camera",
-                GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
-                    set_camera_builder(std::move(camera_builder), std::move(scene_builder));
-                }),
-                GxEndCaller([]{}));
-
+            "camera",
+            GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
+                set_camera_builder(std::move(camera_builder), std::move(scene_builder));
+            }),
+            GxEndCaller([] {}));
     }
 
-    void set_camera_builder(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder) {
+    void set_camera_builder(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder)
+    {
         camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
         scene_builder->add(std::move(camera_builder));
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
-                "directional-light",
-                1024,
-                10.0f,
-                1.0f,
-                35.0f,
-                GxLightBuilderEndCaller([scene_builder = std::move(scene_builder)](GxLightBuilderPtr&& light_builder){
-                    set_light_builder(std::move(light_builder), scene_builder);
-                }),
-                GxEndCaller([]{}));
+            "directional-light",
+            1024,
+            10.0f,
+            1.0f,
+            35.0f,
+            GxLightBuilderEndCaller([scene_builder = std::move(scene_builder)](GxLightBuilderPtr&& light_builder) {
+                set_light_builder(std::move(light_builder), scene_builder);
+            }),
+            GxEndCaller([] {}));
     }
 
-    static void set_light_builder(GxLightBuilderPtr&& light_builder, const GxSceneBuilderPtr& scene_builder) {
+    static void set_light_builder(GxLightBuilderPtr&& light_builder, const GxSceneBuilderPtr& scene_builder)
+    {
         light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
-                { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder->get_light().colour = { 200.0f, 2.0f, 2.0f };
+            { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light_builder->get_light().colour = { 2.0f, 2.0f, 2.0f };
         scene_builder->add(std::move(light_builder));
 
         scene_builder->get_scene().set_enabled(true);

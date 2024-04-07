@@ -7,7 +7,7 @@
 #include "gx-gl-sbm-model.hpp"
 
 namespace gearoenix::physics {
-struct Transformation;
+struct TransformationComponent;
 }
 
 namespace gearoenix::render::camera {
@@ -16,8 +16,8 @@ struct Camera;
 }
 
 namespace gearoenix::gl {
-    struct BloomData;
-    struct Camera;
+struct BloomData;
+struct Camera;
 }
 
 namespace gearoenix::gl::submission {
@@ -29,8 +29,8 @@ struct BloomData final {
     std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT + 1> upsampler_targets { static_cast<uint>(-1) };
 
     [[nodiscard]] static std::optional<BloomData> construct(
-            const std::optional<gl::BloomData>& gl_bd,
-            const std::optional<render::camera::BloomData>& rnd_bd);
+        const std::optional<gl::BloomData>& gl_bd,
+        const std::optional<render::camera::BloomData>& rnd_bd);
 };
 
 struct Camera final {

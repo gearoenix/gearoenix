@@ -11,11 +11,11 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-    struct TransformationComponent;
+struct TransformationComponent;
 }
 
 namespace gearoenix::physics::collider {
-    struct Frustum;
+struct Frustum;
 }
 
 namespace gearoenix::render::engine {

@@ -66,17 +66,17 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         current_roughness += roughness_move;
     }
     const auto environment_texture_info = texture::TextureInfo()
-        .set_format(e.get_specification().is_float_texture_supported ? texture::TextureFormat::RgbaFloat32 : texture::TextureFormat::RgbaUint8)
-        .set_sampler_info(texture::SamplerInfo()
-            .set_min_filter(texture::Filter::LinearMipmapLinear)
-            .set_mag_filter(texture::Filter::Linear)
-            .set_wrap_s(texture::Wrap::ClampToEdge)
-            .set_wrap_t(texture::Wrap::ClampToEdge)
-            .set_wrap_r(texture::Wrap::ClampToEdge))
-        .set_width(environment_resolution)
-        .set_height(environment_resolution)
-        .set_type(texture::Type::TextureCube)
-        .set_has_mipmap(true);
+                                              .set_format(e.get_specification().is_float_texture_supported ? texture::TextureFormat::RgbaFloat32 : texture::TextureFormat::RgbaUint8)
+                                              .set_sampler_info(texture::SamplerInfo()
+                                                                    .set_min_filter(texture::Filter::LinearMipmapLinear)
+                                                                    .set_mag_filter(texture::Filter::Linear)
+                                                                    .set_wrap_s(texture::Wrap::ClampToEdge)
+                                                                    .set_wrap_t(texture::Wrap::ClampToEdge)
+                                                                    .set_wrap_r(texture::Wrap::ClampToEdge))
+                                              .set_width(environment_resolution)
+                                              .set_height(environment_resolution)
+                                              .set_type(texture::Type::TextureCube)
+                                              .set_has_mipmap(true);
 
     const core::job::EndCaller when_all_textures_are_ready([self = runtime_self, faces, main_end_callback = std::move(end_callback), builder]() -> void {
         for (std::size_t face_index = 0; face_index < 6; ++face_index) {
@@ -181,11 +181,11 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         texture::TextureInfo()
             .set_format(texture::TextureFormat::D32)
             .set_sampler_info(texture::SamplerInfo()
-                .set_min_filter(texture::Filter::Nearest)
-                .set_mag_filter(texture::Filter::Nearest)
-                .set_wrap_s(texture::Wrap::ClampToEdge)
-                .set_wrap_t(texture::Wrap::ClampToEdge)
-                .set_wrap_r(texture::Wrap::ClampToEdge))
+                                  .set_min_filter(texture::Filter::Nearest)
+                                  .set_mag_filter(texture::Filter::Nearest)
+                                  .set_wrap_s(texture::Wrap::ClampToEdge)
+                                  .set_wrap_t(texture::Wrap::ClampToEdge)
+                                  .set_wrap_r(texture::Wrap::ClampToEdge))
             .set_width(environment_resolution)
             .set_height(environment_resolution)
             .set_type(texture::Type::Texture2D)
@@ -195,17 +195,17 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             (void)when_all_textures_are_ready;
         }));
     for (std::size_t face_index = 0; face_index < 6; ++face_index) {
-        const auto &face = faces[face_index];
+        const auto& face = faces[face_index];
         const auto name_ext = "-" + std::to_string(face.face);
         e.get_camera_manager()->build(
-                std::string(name).append("-camera").append(name_ext),
-                core::job::EndCallerShared<camera::Builder>([builder, face_index, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<camera::Builder>&& camera_builder) {
-                    auto cam = camera_builder->get_camera().get_camera_self().lock();
-                    self->cameras[face_index].cmr = cam;
-                    self->cameras[face_index].trn = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
-                    builder->set_camera_builder(std::move(camera_builder), face_index);
-                }),
-                core::job::EndCaller([]{}));
+            std::string(name).append("-camera").append(name_ext),
+            core::job::EndCallerShared<camera::Builder>([builder, face_index, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<camera::Builder>&& camera_builder) {
+                auto cam = camera_builder->get_camera().get_camera_self().lock();
+                self->cameras[face_index].cmr = cam;
+                self->cameras[face_index].trn = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
+                builder->set_camera_builder(std::move(camera_builder), face_index);
+            }),
+            core::job::EndCaller([] {}));
     }
 }
 

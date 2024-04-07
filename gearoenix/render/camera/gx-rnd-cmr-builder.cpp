@@ -27,11 +27,13 @@ const gearoenix::physics::TransformationComponent& gearoenix::render::camera::Bu
     return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
 }
 
-gearoenix::physics::collider::Frustum &gearoenix::render::camera::Builder::get_frustum() {
+gearoenix::physics::collider::Frustum& gearoenix::render::camera::Builder::get_frustum()
+{
     return *entity_builder->get_builder().get_component<physics::collider::Frustum>();
 }
 
-const gearoenix::physics::collider::Frustum &gearoenix::render::camera::Builder::get_frustum() const {
+const gearoenix::physics::collider::Frustum& gearoenix::render::camera::Builder::get_frustum() const
+{
     return *entity_builder->get_builder().get_component<physics::collider::Frustum>();
 }
 

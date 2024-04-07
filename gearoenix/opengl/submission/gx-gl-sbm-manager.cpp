@@ -89,19 +89,19 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
         return;
     auto* const txt_mgr = e.get_texture_manager();
     const auto position_depth_txt_info = render::texture::TextureInfo()
-        .set_format(render::texture::TextureFormat::RgbaFloat32)
-        .set_sampler_info(render::texture::SamplerInfo()
-            .set_min_filter(render::texture::Filter::Nearest)
-            .set_mag_filter(render::texture::Filter::Nearest)
-            .set_wrap_s(render::texture::Wrap::ClampToEdge)
-            .set_wrap_t(render::texture::Wrap::ClampToEdge)
-            .set_wrap_r(render::texture::Wrap::ClampToEdge)
-            .set_anisotropic_level(0))
-        .set_width(back_buffer_size.x)
-        .set_height(back_buffer_size.y)
-        .set_depth(0)
-        .set_type(render::texture::Type::Texture2D)
-        .set_has_mipmap(false);
+                                             .set_format(render::texture::TextureFormat::RgbaFloat32)
+                                             .set_sampler_info(render::texture::SamplerInfo()
+                                                                   .set_min_filter(render::texture::Filter::Nearest)
+                                                                   .set_mag_filter(render::texture::Filter::Nearest)
+                                                                   .set_wrap_s(render::texture::Wrap::ClampToEdge)
+                                                                   .set_wrap_t(render::texture::Wrap::ClampToEdge)
+                                                                   .set_wrap_r(render::texture::Wrap::ClampToEdge)
+                                                                   .set_anisotropic_level(0))
+                                             .set_width(back_buffer_size.x)
+                                             .set_height(back_buffer_size.y)
+                                             .set_depth(0)
+                                             .set_type(render::texture::Type::Texture2D)
+                                             .set_has_mipmap(false);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
@@ -179,19 +179,19 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
         return;
     auto* const txt_mgr = e.get_texture_manager();
     const auto txt_info = render::texture::TextureInfo()
-        .set_format(render::texture::TextureFormat::Float32)
-        .set_sampler_info(render::texture::SamplerInfo()
-            .set_min_filter(render::texture::Filter::Nearest)
-            .set_mag_filter(render::texture::Filter::Nearest)
-            .set_wrap_s(render::texture::Wrap::ClampToEdge)
-            .set_wrap_t(render::texture::Wrap::ClampToEdge)
-            .set_wrap_r(render::texture::Wrap::ClampToEdge)
-            .set_anisotropic_level(0))
-        .set_width(back_buffer_size.x)
-        .set_height(back_buffer_size.y)
-        .set_depth(0)
-        .set_type(render::texture::Type::Texture2D)
-        .set_has_mipmap(false);
+                              .set_format(render::texture::TextureFormat::Float32)
+                              .set_sampler_info(render::texture::SamplerInfo()
+                                                    .set_min_filter(render::texture::Filter::Nearest)
+                                                    .set_mag_filter(render::texture::Filter::Nearest)
+                                                    .set_wrap_s(render::texture::Wrap::ClampToEdge)
+                                                    .set_wrap_t(render::texture::Wrap::ClampToEdge)
+                                                    .set_wrap_r(render::texture::Wrap::ClampToEdge)
+                                                    .set_anisotropic_level(0))
+                              .set_width(back_buffer_size.x)
+                              .set_height(back_buffer_size.y)
+                              .set_depth(0)
+                              .set_type(render::texture::Type::Texture2D)
+                              .set_has_mipmap(false);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-ssao-resolve", {}, txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
@@ -230,12 +230,14 @@ void gearoenix::gl::submission::Manager::fill_scenes()
 {
     e.get_world()->synchronised_system<render::scene::Scene>(
         [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const scene) {
-            if (!scene->get_enabled())
+            if (!scene->get_enabled()) {
                 return;
+            }
             const auto scene_pool_index = scene_pool.emplace([] { return Scene(); });
             auto& scene_pool_ref = scene_pool[scene_pool_index];
-            if (!scenes_bvhs.contains(scene_id))
+            if (!scenes_bvhs.contains(scene_id)) {
                 scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<BvhNodeModel>());
+            }
             scene_pool_ref.skyboxes.clear();
             scene_pool_ref.cameras.clear();
             scene_pool_ref.reflections.clear();
@@ -246,23 +248,28 @@ void gearoenix::gl::submission::Manager::fill_scenes()
             scene_pool_ref.bones_data.clear();
             scene_pool_ref.debug_mesh_data.clear();
             scene_pool_ref.name = &scene->get_name();
-            e.get_world()->synchronised_system<core::ecs::All<render::camera::Camera, physics::TransformationComponent>>(
-                [&](const core::ecs::entity_id_t camera_id, render::camera::Camera* const camera, physics::TransformationComponent* const transform) {
-                    if (!camera->get_enabled())
+            e.get_world()->synchronised_system<core::ecs::All<gl::Camera, physics::TransformationComponent>>(
+                [&](const core::ecs::entity_id_t camera_id, gl::Camera* const camera, physics::TransformationComponent* const transform) {
+                    if (!camera->get_enabled()) {
                         return;
-                    if (camera->get_scene_id() != scene_id)
+                    }
+                    if (camera->get_scene_id() != scene_id) {
                         return;
+                    }
                     const auto camera_pool_index = camera_pool.emplace([&] { return Camera(); });
                     switch (camera->get_usage()) {
-                    case render::camera::Camera::Usage::Main:
+                    case render::camera::Camera::Usage::Main: {
                         scene_pool_ref.cameras.emplace(std::make_pair(camera->get_layer(), camera_id), camera_pool_index);
                         break;
-                    case render::camera::Camera::Usage::ReflectionProbe:
+                    }
+                    case render::camera::Camera::Usage::ReflectionProbe: {
                         scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
                         break;
-                    case render::camera::Camera::Usage::Shadow:
+                    }
+                    case render::camera::Camera::Usage::Shadow: {
                         scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
                         break;
+                    }
                     }
                     if (camera->get_debug_enabled()) {
                         const auto* const mesh = dynamic_cast<const Mesh*>(camera->get_debug_mesh().get());
@@ -273,37 +280,37 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                             .indices_count = mesh->indices_count });
                     }
                 });
-            e.get_world()->synchronised_system<core::ecs::All<render::light::Light, render::light::ShadowCasterDirectional, ShadowCasterDirectionalLight>>(
-                [&](const core::ecs::entity_id_t light_id, render::light::Light* const l, render::light::ShadowCasterDirectional* const rl, ShadowCasterDirectionalLight* const gll) {
-                    if (!l->get_enabled())
+            e.get_world()->synchronised_system<ShadowCasterDirectionalLight>(
+                [&](const core::ecs::entity_id_t light_id, ShadowCasterDirectionalLight* const l) {
+                    if (!l->get_enabled()) {
                         return;
-                    if (!rl->get_enabled())
+                    }
+                    if (scene_id != l->scene_id) {
                         return;
-                    if (!gll->get_enabled())
-                        return;
-                    if (scene_id != l->scene_id)
-                        return;
+                    }
                     DirectionalShadowCaster shadow_caster_directional_light_data {
-                        .frustum =rl->get_shadow_frustum()->get_frustum(),
+                        .frustum = l->get_shadow_frustum()->get_frustum(),
                         .shadow_data = DirectionalShadow {
-                            .normalised_vp = rl->get_shadow_camera()->get_view_projection(),
-                            .direction = math::Vec3<float>(rl->get_shadow_transform()->get_z_axis()),
+                            .normalised_vp = l->get_shadow_camera()->get_view_projection(),
+                            .direction = math::Vec3<float>(l->get_shadow_transform()->get_z_axis()),
                             .colour = l->colour,
-                            .shadow_map_texture = gll->get_shadow_map_texture_v(),
+                            .shadow_map_texture = l->get_shadow_map_texture_v(),
                         }
                     };
                     scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, shadow_caster_directional_light_data);
                 });
-            e.get_world()->synchronised_system<core::ecs::All<render::skybox::Skybox, gl::Skybox>>([&](const core::ecs::entity_id_t skybox_id, render::skybox::Skybox* const render_skybox, gl::Skybox* const gl_skybox) {
-                if (!render_skybox->get_enabled())
+            e.get_world()->synchronised_system<gl::Skybox>([&](const core::ecs::entity_id_t skybox_id, gl::Skybox* const skybox) {
+                if (!skybox->get_enabled()) {
                     return;
-                if (render_skybox->get_scene_id() != scene_id)
+                }
+                if (skybox->get_scene_id() != scene_id) {
                     return;
+                }
                 scene_pool_ref.skyboxes.emplace(
-                    std::make_tuple(render_skybox->get_layer(), skybox_id, render_skybox->is_equirectangular()),
+                    std::make_tuple(skybox->get_layer(), skybox_id, skybox->is_equirectangular()),
                     Skybox {
-                        .vertex_object = gl_skybox->get_vertex_object(),
-                        .albedo_txt = gl_skybox->get_texture_object(),
+                        .vertex_object = skybox->get_vertex_object(),
+                        .albedo_txt = skybox->get_texture_object(),
                     });
             });
             if (scene->get_reflection_probs_changed()) {
@@ -311,18 +318,20 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                e.get_world()->synchronised_system<core::ecs::All<render::reflection::Baked, gl::BakedReflection>>(
-                    [&](const core::ecs::entity_id_t reflection_id, render::reflection::Baked* const render_baked, gl::BakedReflection* const gl_baked) {
-                        if (!render_baked->get_enabled())
+                e.get_world()->synchronised_system<gl::BakedReflection>(
+                    [&](const core::ecs::entity_id_t reflection_id, gl::BakedReflection* const baked) {
+                        if (!baked->get_enabled()) {
                             return;
-                        if (render_baked->get_scene_id() != scene_id)
+                        }
+                        if (baked->get_scene_id() != scene_id) {
                             return;
+                        }
                         const Reflection r {
-                            .irradiance = gl_baked->get_gl_irradiance_v(),
-                            .radiance = gl_baked->get_gl_radiance_v(),
-                            .box = render_baked->get_include_box(),
-                            .size = render_baked->get_include_box().get_diameter().square_length(),
-                            .radiance_mips_count = static_cast<float>(render_baked->get_radiance_mips_count() - 1),
+                            .irradiance = baked->get_gl_irradiance_v(),
+                            .radiance = baked->get_gl_radiance_v(),
+                            .box = baked->get_include_box(),
+                            .size = baked->get_include_box().get_diameter().square_length(),
+                            .radiance_mips_count = static_cast<float>(baked->get_radiance_mips_count() - 1),
                         };
                         scene_pool_ref.reflections.emplace(reflection_id, r);
                         if (r.size > scene_pool_ref.default_reflection.second.size) {
@@ -339,8 +348,9 @@ void gearoenix::gl::submission::Manager::update_scenes()
 {
     e.get_world()->parallel_system<render::scene::Scene>(
         [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) {
-            if (!render_scene->get_enabled())
+            if (!render_scene->get_enabled()) {
                 return;
+            }
             auto& scene_data = scene_pool[scenes[std::make_pair(render_scene->get_layer(), scene_id)]];
             update_scene(scene_id, scene_data, *render_scene);
         });
@@ -359,27 +369,27 @@ void gearoenix::gl::submission::Manager::update_scene(const core::ecs::entity_id
 
 void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    if (!render_scene.get_recreate_bvh())
+    if (!render_scene.get_recreate_bvh()) {
         return;
+    }
     bvh.reset();
-    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>>(
+    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::TransformationComponent>>(
         [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
-            render::model::Model* const render_model,
             gl::Model* const model,
             physics::TransformationComponent* const model_transform) {
-            if (!render_model->get_enabled() || render_model->get_is_transformable() || render_model->scene_id != scene_id) {
+            if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
             auto& mesh = *model->get_gl_mesh();
             const BvhNodeModel md {
-                .cameras_flags = render_model->cameras_flags,
+                .cameras_flags = model->cameras_flags,
                 .model = Model {
                     .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                     .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
                     .material = model->get_gl_material().get(),
-                    .render_material = render_model->get_bound_material().get(),
+                    .render_material = model->get_bound_material().get(),
                     .vertex_object = mesh.vertex_object,
                     .indices_count = mesh.indices_count,
                     // Reflection probe data
@@ -397,17 +407,17 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
 void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
     auto& anm_mgr = *e.get_physics_engine()->get_animation_manager();
-    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, render::model::Model, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
+    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
         [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
-            render::model::Model* const render_model,
-            gl::Model* const gl_model,
+            gl::Model* const model,
             physics::TransformationComponent* const model_transform,
             physics::animation::Armature* const armature) {
-            if (!render_model->get_enabled() || !render_model->get_is_transformable() || render_model->scene_id != scene_id)
+            if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
-            const auto& mesh = *gl_model->get_gl_mesh();
+            }
+            const auto& mesh = *model->get_gl_mesh();
             std::size_t first_bone_index = 0;
             std::size_t bones_count = 0;
             if (nullptr != armature) {
@@ -427,12 +437,12 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             scene_data.dynamic_models.push_back(
                 DynamicModel {
                     .base = BvhNodeModel {
-                        .cameras_flags = render_model->cameras_flags,
+                        .cameras_flags = model->cameras_flags,
                         .model = Model {
                             .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                             .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
-                            .material = gl_model->get_gl_material().get(),
-                            .render_material = render_model->get_bound_material().get(),
+                            .material = model->get_gl_material().get(),
+                            .render_material = model->get_bound_material().get(),
                             .vertex_object = mesh.vertex_object,
                             .indices_count = mesh.indices_count,
                             // Reflection probe data
@@ -455,8 +465,9 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
         for (const auto& reflection : scene_data.reflections) {
             bvh.call_on_intersecting(reflection.second.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
-                if (reflection.second.size > m.reflection_probe_size)
+                if (reflection.second.size > m.reflection_probe_size) {
                     return;
+                }
                 m.irradiance = reflection.second.irradiance;
                 m.radiance = reflection.second.radiance;
                 m.reflection_probe_size = reflection.second.size;
@@ -467,11 +478,13 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
 
     core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& m, const unsigned int) {
         for (const auto& reflection : scene_data.reflections) {
-            if (!reflection.second.box.check_intersection(m.box))
+            if (!reflection.second.box.check_intersection(m.box)) {
                 return;
+            }
             auto& mm = m.base.model;
-            if (reflection.second.size > mm.reflection_probe_size)
+            if (reflection.second.size > mm.reflection_probe_size) {
                 return;
+            }
             mm.irradiance = reflection.second.irradiance;
             mm.radiance = reflection.second.radiance;
             mm.reflection_probe_size = reflection.second.size;
@@ -482,49 +495,52 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
 
 void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    bvh.call_on_all([&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+    bvh.call_on_all([&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
         bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
         bvh_node_data.user_data.model.directional_lights_count = 0;
     });
     for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
         bvh.call_on_intersecting(
             shadow.second.frustum,
-            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+            [&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
-                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
-                    return;
+                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count) {
+                    return; // it is full
+                }
                 m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
                 m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
                 m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
                 m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
                 ++m.shadow_caster_directional_lights_count;
             },
-            [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+            [&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
                 auto& m = bvh_node_data.user_data.model;
-                if (m.directional_lights_direction.size() == m.directional_lights_count)
+                if (m.directional_lights_direction.size() == m.directional_lights_count) {
                     return;
+                }
                 m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
                 m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
                 ++m.directional_lights_count;
             });
     }
-
     core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& md, const unsigned int) {
         auto& m = md.base.model;
         m.shadow_caster_directional_lights_count = 0;
         m.directional_lights_count = 0;
         for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
             if (shadow.second.frustum.check_intersection(md.box)) {
-                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count)
+                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count) {
                     return;
+                }
                 m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
                 m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
                 m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
                 m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
                 ++m.shadow_caster_directional_lights_count;
             } else {
-                if (m.directional_lights_direction.size() == m.directional_lights_count)
+                if (m.directional_lights_direction.size() == m.directional_lights_count) {
                     return;
+                }
                 m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
                 m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
                 ++m.directional_lights_count;
@@ -542,16 +558,18 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             physics::collider::Frustum* const frustum,
             physics::TransformationComponent* const transform,
             const unsigned int /*kernel_index*/) -> void {
-            if (!camera->get_enabled() || scene_id != camera->get_scene_id())
+            if (!camera->get_enabled() || scene_id != camera->get_scene_id()) {
                 return;
+            }
             const auto camera_location = transform->get_global_location();
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
             switch (camera->get_usage()) {
-            case render::camera::Camera::Usage::Main:
+            case render::camera::Camera::Usage::Main: {
                 camera_pool_index = scene_data.cameras[std::make_pair(camera->get_layer(), camera_id)];
                 break;
+            }
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
                 auto& reflection = scene_data.reflections[camera->get_parent_entity_id()];
@@ -559,22 +577,25 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 self_radiance = reflection.radiance;
                 break;
             }
-            case render::camera::Camera::Usage::Shadow:
+            case render::camera::Camera::Usage::Shadow: {
                 camera_pool_index = scene_data.shadow_cameras[camera_id];
                 break;
+            }
             }
             auto& camera_data = camera_pool[camera_pool_index];
             camera_data.clear(*camera, math::Vec3<float>(camera_location));
 
             // Recoding static models
-            bvh.call_on_intersecting(*frustum, [&, this](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                if ((bvh_node_data.user_data.cameras_flags & camera->get_flag()) == 0)
+            bvh.call_on_intersecting(*frustum, [&, this](const std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
+                if ((bvh_node_data.user_data.cameras_flags & camera->get_flag()) == 0) {
                     return;
+                }
                 const auto dir = camera_location - bvh_node_data.box.get_center();
                 const auto dis = dir.square_length();
                 auto m = bvh_node_data.user_data.model;
-                if (self_irradiance == m.irradiance)
+                if (self_irradiance == m.irradiance) {
                     m.irradiance = black_cube->get_object();
+                }
                 if (self_radiance == m.radiance) {
                     m.radiance = black_cube->get_object();
                     m.radiance_lod_coefficient = 0.0f;
@@ -588,15 +609,18 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
 
             // Recording dynamic models
             core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&, this](DynamicModel& m, const unsigned int kernel_index) {
-                if ((m.base.cameras_flags & camera->get_flag()) == 0)
+                if ((m.base.cameras_flags & camera->get_flag()) == 0) {
                     return;
-                if (!frustum->check_intersection(m.box))
+                }
+                if (!frustum->check_intersection(m.box)) {
                     return;
+                }
                 const auto dir = camera_location - m.box.get_center();
                 const auto dis = dir.square_length();
                 auto md = m.base.model;
-                if (self_irradiance == md.irradiance)
+                if (self_irradiance == md.irradiance) {
                     md.irradiance = black_cube->get_object();
+                }
                 if (self_radiance == md.radiance) {
                     md.radiance = black_cube->get_object();
                     md.radiance_lod_coefficient = 0.0f;
@@ -608,12 +632,13 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 }
             });
 
-            for (auto& v : camera_data.threads_opaque_models_data)
+            for (auto& v : camera_data.threads_opaque_models_data) {
                 std::move(v.begin(), v.end(), std::back_inserter(camera_data.models_data));
+            }
             const auto last_opaque_index = static_cast<decltype(camera_data.models_data)::difference_type>(camera_data.models_data.size());
-            for (auto& v : camera_data.threads_translucent_models_data)
+            for (auto& v : camera_data.threads_translucent_models_data) {
                 std::move(v.begin(), v.end(), std::back_inserter(camera_data.models_data));
-
+            }
             std::sort(
                 GX_ALGORITHM_EXECUTION
                     camera_data.models_data.begin(),
@@ -631,8 +656,9 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 camera_data.models_data.end(),
                 [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
                     auto& m = d_m.second;
-                    if (!m.material->needs_mvp && camera->get_usage() != render::camera::Camera::Usage::Shadow)
+                    if (!m.material->needs_mvp && camera->get_usage() != render::camera::Camera::Usage::Shadow) {
                         return;
+                    }
                     if (m.bones_count > 0) {
                         const auto last_bone_index = m.first_bone_index + m.bones_count;
                         for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
@@ -661,8 +687,9 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     m.m = camera_data.vp * m.m;
                     camera_data.debug_meshes_threads[kernel_index].push_back(std::move(m));
                 });
-            for (auto& v : camera_data.debug_meshes_threads)
+            for (auto& v : camera_data.debug_meshes_threads) {
                 std::move(v.begin(), v.end(), std::back_inserter(camera_data.debug_meshes));
+            }
         });
 }
 
@@ -1191,10 +1218,10 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
     , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
 {
     e.get_texture_manager()->create_cube_from_colour(
-            math::Vec4(0.0f),
-            core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
-                black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
-            }));
+        math::Vec4(0.0f),
+        core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
+            black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
+        }));
 
     e.get_texture_manager()->get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
         brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
@@ -1234,11 +1261,11 @@ void gearoenix::gl::submission::Manager::update()
     render_shadows();
     render_reflection_probes();
 
-    if (e.get_specification().is_deferred_supported)
+    if (e.get_specification().is_deferred_supported) {
         render_with_deferred();
-    else
+    } else {
         render_with_forward();
-
+    }
     GX_GL_CHECK_D;
 
     render_imgui();

@@ -21,8 +21,9 @@ gearoenix::render::texture::TextureInfo::TextureInfo(
     update_hash();
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_format(const TextureFormat v) {
-    if(v == format) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_format(const TextureFormat v)
+{
+    if (v == format) {
         return *this;
     }
     format = v;
@@ -30,8 +31,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_sampler_info(const SamplerInfo& v) {
-    if(v == sampler_info) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_sampler_info(const SamplerInfo& v)
+{
+    if (v == sampler_info) {
         return *this;
     }
     sampler_info = v;
@@ -39,8 +41,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_width(const std::size_t v) {
-    if(v == width) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_width(const std::size_t v)
+{
+    if (v == width) {
         return *this;
     }
     width = v;
@@ -48,8 +51,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_height(const std::size_t v) {
-    if(v == height) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_height(const std::size_t v)
+{
+    if (v == height) {
         return *this;
     }
     height = v;
@@ -57,8 +61,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_depth(const std::size_t v) {
-    if(v == depth) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_depth(const std::size_t v)
+{
+    if (v == depth) {
         return *this;
     }
     depth = v;
@@ -66,8 +71,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_type(const Type v) {
-    if(v == type) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_type(const Type v)
+{
+    if (v == type) {
         return *this;
     }
     type = v;
@@ -75,8 +81,9 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo::set_has_mipmap(const bool v) {
-    if(v == has_mipmap) {
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_has_mipmap(const bool v)
+{
+    if (v == has_mipmap) {
         return *this;
     }
     has_mipmap = v;
@@ -86,8 +93,7 @@ gearoenix::render::texture::TextureInfo &gearoenix::render::texture::TextureInfo
 
 bool gearoenix::render::texture::TextureInfo::operator==(const TextureInfo& o) const
 {
-    return hash == o.hash && format == o.format && sampler_info == o.sampler_info && width == o.width &&
-        height == o.height && depth == o.depth && type == o.type && has_mipmap == o.has_mipmap;
+    return hash == o.hash && format == o.format && sampler_info == o.sampler_info && width == o.width && height == o.height && depth == o.depth && type == o.type && has_mipmap == o.has_mipmap;
 }
 
 void gearoenix::render::texture::TextureInfo::read(platform::stream::Stream& s)
@@ -113,7 +119,8 @@ void gearoenix::render::texture::TextureInfo::write(platform::stream::Stream& s)
     s.write_fail_debug(has_mipmap);
 }
 
-void gearoenix::render::texture::TextureInfo::update_hash() {
+void gearoenix::render::texture::TextureInfo::update_hash()
+{
     hash = boost::hash_value(typeid(std::remove_cvref_t<std::remove_pointer_t<decltype(this)>>));
     boost::hash_combine(hash, boost::hash_value(format));
     boost::hash_combine(hash, sampler_info.get_hash());

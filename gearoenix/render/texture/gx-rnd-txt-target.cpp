@@ -13,9 +13,7 @@ gearoenix::math::Vec2<std::size_t> gearoenix::render::texture::Target::get_dimen
 {
     GX_ASSERT_D(!attachments.empty());
     const auto& t = attachments[0].var;
-    const auto& i = t.index() == Attachment::ATTACHMENT_2D_VARIANT_INDEX?
-            std::get<Attachment::ATTACHMENT_2D_VARIANT_INDEX>(t).txt->get_info() :
-            std::get<Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(t).txt->get_info();
+    const auto& i = t.index() == Attachment::ATTACHMENT_2D_VARIANT_INDEX ? std::get<Attachment::ATTACHMENT_2D_VARIANT_INDEX>(t).txt->get_info() : std::get<Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(t).txt->get_info();
     return { i.get_width(), i.get_height() };
 }
 

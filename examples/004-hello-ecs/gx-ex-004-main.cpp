@@ -114,9 +114,7 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        gearoenix::core::sync::EndCaller end_callback([this] {
-            render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->enabled = true;
-        });
+        gearoenix::core::sync::EndCaller end_callback([this] { render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->enabled = true; });
 
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
@@ -176,8 +174,8 @@ struct GameApp final : public gearoenix::core::Application {
     {
         Application::update();
         camera_controller->update();
-        render_engine.get_world()->parallel_system<And<Speed, Position, gearoenix::physics::Transformation>>(
-            [&](auto, Speed* const speed, Position* const position, gearoenix::physics::Transformation* const trn, const auto /*kernel_index*/) noexcept {
+        render_engine.get_world()->parallel_system<And<Speed, Position, gearoenix::physics::TransformationComponent>>(
+            [&](auto, Speed* const speed, Position* const position, gearoenix::physics::TransformationComponent* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);
                 speed->update(*position);
                 trn->set_local_location(position->value);

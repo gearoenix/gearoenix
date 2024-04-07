@@ -17,7 +17,6 @@ struct Scene;
 
 namespace gearoenix::gl {
 struct Engine;
-struct Material;
 struct Target;
 struct Texture2D;
 struct TextureCube;
