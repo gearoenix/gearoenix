@@ -106,7 +106,7 @@ struct GameApp final : public gearoenix::core::Application {
             1024,
             10.0f,
             1.0f,
-            35.0f,
+            10.0f,
             GxLightBuilderEndCaller([scene_builder = std::move(scene_builder)](GxLightBuilderPtr&& light_builder) {
                 set_light_builder(std::move(light_builder), scene_builder);
             }),

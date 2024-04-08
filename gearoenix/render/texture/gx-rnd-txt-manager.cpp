@@ -333,7 +333,7 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
     GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented in near future.
     GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
     GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
-    GX_ASSERT(0 != info.get_height()); // dimension changing does not have a high priority
+    GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
     std::size_t img_width = 0;
     std::size_t img_height = 0;
     std::size_t img_channels = 0;
@@ -557,7 +557,7 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
     std::vector<math::Vec4<std::uint8_t>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / static_cast<float>(resolution);
     core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::size_t index, auto) {
-        const auto roughness_index = index / resolution;
+        const auto roughness_index = (resolution - 1) - index / resolution;
         auto p = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
             (static_cast<float>(roughness_index) + 0.5f) * inv_res);
