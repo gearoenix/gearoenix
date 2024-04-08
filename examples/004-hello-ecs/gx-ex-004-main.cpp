@@ -1,4 +1,5 @@
 #define GX_PLATFORM_LOG_STD_OUT_ENABLED
+#include <gearoenix/core/allocator/gx-cr-alc-shared-array.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
@@ -9,6 +10,7 @@
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
+#include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
@@ -22,160 +24,257 @@
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <random>
 
-constexpr static double position_limit = 2.0;
-constexpr static double cube_size = 0.05;
-constexpr static double max_speed = cube_size * 2.5;
+namespace {
+constexpr double position_limit = 2.0;
+constexpr double cube_size = 0.05;
+constexpr double max_speed = cube_size * 2.5;
+constexpr std::size_t objects_count = 8000;
 
-static std::random_device random_device;
-static std::default_random_engine random_engine;
-static std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
-static std::uniform_real_distribution<double> speed_distribution(-max_speed, max_speed);
-static std::uniform_real_distribution<float> colour_distribution(0.5f, 1.0f);
+std::random_device random_device {};
+std::default_random_engine random_engine { random_device() };
+std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
+std::uniform_real_distribution<double> speed_distribution(-max_speed, max_speed);
+std::uniform_real_distribution<float> colour_distribution(0.5f, 1.0f);
 
-struct GameApp final : public gearoenix::core::Application {
-    template <typename... Ts>
-    using And = gearoenix::core::ecs::And<Ts...>;
+template <typename... Ts>
+using GxAll = gearoenix::core::ecs::All<Ts...>;
 
-    struct Position;
-    struct Speed final : public gearoenix::core::ecs::Component {
-        gearoenix::math::Vec3<double> value;
+template <typename T>
+using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
+using GxEndCaller = gearoenix::core::job::EndCaller<>;
 
-        Speed() noexcept
-            : gearoenix::core::ecs::Component(this, "speed")
-            , value(
-                  speed_distribution(random_engine),
-                  speed_distribution(random_engine),
-                  speed_distribution(random_engine))
-        {
-            value.x += value.x > 0 ? max_speed : -max_speed;
-            value.y += value.y > 0 ? max_speed : -max_speed;
-            value.z += value.z > 0 ? max_speed : -max_speed;
-        }
+using GxComp = gearoenix::core::ecs::Component;
+using GxCoreApp = gearoenix::core::Application;
+using GxPltApp = gearoenix::platform::Application;
+using GxTransformComp = gearoenix::physics::TransformationComponent;
 
-        void update(const Position& p) noexcept
-        {
-            const auto pos = p.value.abs() + 0.1f;
-            if (pos.greater(position_limit).or_elements()) {
-                gearoenix::math::Vec3<double> n;
-                if (pos.x > position_limit) {
-                    if (p.value.x < 0.0) {
-                        n = gearoenix::math::Vec3<double>(1.0, 0.0, 0.0);
-                    } else {
-                        n = gearoenix::math::Vec3<double>(-1.0, 0.0, 0.0);
-                    }
-                    value = n.reflect(value);
-                }
-                if (pos.y > position_limit) {
-                    if (p.value.y < 0.0) {
-                        n = gearoenix::math::Vec3<double>(0.0, 1.0, 0.0);
-                    } else {
-                        n = gearoenix::math::Vec3<double>(0.0, -1.0, 0.0);
-                    }
-                    value = n.reflect(value);
-                }
-                if (pos.z > position_limit) {
-                    if (p.value.z < 0.0) {
-                        n = gearoenix::math::Vec3<double>(0.0, 0.0, 1.0);
-                    } else {
-                        n = gearoenix::math::Vec3<double>(0.0, 0.0, -1.0);
-                    }
-                    value = n.reflect(value);
-                }
+using GxScene = gearoenix::render::scene::Scene;
+using GxSceneBuilder = gearoenix::render::scene::Builder;
+using GxSceneBuilderPtr = std::shared_ptr<GxSceneBuilder>;
+
+using GxCameraBuilder = gearoenix::render::camera::Builder;
+using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
+using GxCameraBuilderEndCaller = GxEndCallerShared<GxCameraBuilder>;
+using GxJetCtrl = gearoenix::render::camera::JetController;
+
+using GxLightBuilder = gearoenix::render::light::Builder;
+using GxLightBuilderPtr = std::shared_ptr<GxLightBuilder>;
+using GxLightBuilderEndCaller = GxEndCallerShared<GxLightBuilder>;
+
+using GxMesh = gearoenix::render::mesh::Mesh;
+using GxMeshPtr = std::shared_ptr<GxMesh>;
+using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
+
+using GxPbr = gearoenix::render::material::Pbr;
+using GxPbrPtr = std::shared_ptr<GxPbr>;
+using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
+
+using GxTxt2D = gearoenix::render::texture::Texture2D;
+using GxTxt2DPtr = std::shared_ptr<GxTxt2D>;
+using GxTxt2DEndCaller = GxEndCallerShared<GxTxt2D>;
+
+template <typename T>
+using GxAllocator = gearoenix::core::allocator::SharedArray<T, objects_count>;
+
+struct Position;
+struct Speed final : GxComp {
+    gearoenix::math::Vec3<double> value;
+
+    Speed();
+    [[nodiscard]] static std::shared_ptr<Speed> construct();
+    void update(const Position& p);
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+};
+
+struct Position final : GxComp {
+    gearoenix::math::Vec3<double> value;
+
+    Position();
+    [[nodiscard]] static std::shared_ptr<Position> construct();
+    void update(double delta_time, const Speed& speed);
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+};
+
+Speed::Speed()
+    : GxComp(create_this_type_index(this), "speed")
+    , value(
+          speed_distribution(random_engine),
+          speed_distribution(random_engine),
+          speed_distribution(random_engine))
+{
+    value.x += value.x > 0 ? max_speed : -max_speed;
+    value.y += value.y > 0 ? max_speed : -max_speed;
+    value.z += value.z > 0 ? max_speed : -max_speed;
+}
+
+std::shared_ptr<Speed> Speed::construct()
+{
+    static GxAllocator<Speed> allocator;
+    return allocator.make_shared();
+}
+
+void Speed::update(const Position& p)
+{
+    const auto pos = p.value.abs() + 0.1f;
+    if (pos.greater(position_limit).or_elements()) {
+        gearoenix::math::Vec3<double> n;
+        if (pos.x > position_limit) {
+            if (p.value.x < 0.0) {
+                n = gearoenix::math::Vec3<double>(1.0, 0.0, 0.0);
+            } else {
+                n = gearoenix::math::Vec3<double>(-1.0, 0.0, 0.0);
             }
+            value = n.reflect(value);
         }
-
-        Speed(Speed&&) noexcept = default;
-    };
-
-    struct Position final : public gearoenix::core::ecs::Component {
-        gearoenix::math::Vec3<double> value;
-
-        Position() noexcept
-            : gearoenix::core::ecs::Component(this, "position")
-            , value(
-                  space_distribution(random_engine),
-                  space_distribution(random_engine),
-                  space_distribution(random_engine))
-        {
+        if (pos.y > position_limit) {
+            if (p.value.y < 0.0) {
+                n = gearoenix::math::Vec3<double>(0.0, 1.0, 0.0);
+            } else {
+                n = gearoenix::math::Vec3<double>(0.0, -1.0, 0.0);
+            }
+            value = n.reflect(value);
         }
-
-        void update(const double delta_time, const Speed& speed) noexcept
-        {
-            value += speed.value * delta_time;
-            value.clamp(-position_limit, position_limit);
+        if (pos.z > position_limit) {
+            if (p.value.z < 0.0) {
+                n = gearoenix::math::Vec3<double>(0.0, 0.0, 1.0);
+            } else {
+                n = gearoenix::math::Vec3<double>(0.0, 0.0, -1.0);
+            }
+            value = n.reflect(value);
         }
+    }
+}
 
-        Position(Position&&) noexcept = default;
-    };
+const boost::container::flat_set<std::type_index>& Speed::get_all_the_hierarchy_types_except_component() const
+{
+    const static boost::container::flat_set<std::type_index> types { create_this_type_index(this) };
+    return types;
+}
 
-    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
+Position::Position()
+    : GxComp(create_this_type_index(this), "position")
+    , value(
+          space_distribution(random_engine),
+          space_distribution(random_engine),
+          space_distribution(random_engine))
+{
+}
+
+std::shared_ptr<Position> Position::construct()
+{
+    static GxAllocator<Position> allocator;
+    return allocator.make_shared();
+}
+
+void Position::update(const double delta_time, const Speed& speed)
+{
+    value += speed.value * delta_time;
+    value.clamp(-position_limit, position_limit);
+}
+
+const boost::container::flat_set<std::type_index>& Position::get_all_the_hierarchy_types_except_component() const
+{
+    const static boost::container::flat_set<std::type_index> types { create_this_type_index(this) };
+    return types;
+}
+}
+
+struct GameApp final : GxCoreApp {
+    std::unique_ptr<GxJetCtrl> camera_controller;
     gearoenix::core::ecs::entity_id_t scene_id;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
-        : Application(plt_app)
+    explicit GameApp(GxPltApp& plt_app) noexcept
+        : GxCoreApp(plt_app)
     {
-        gearoenix::core::sync::EndCaller end_callback([this] { render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->enabled = true; });
+        struct DataCollector final {
+            GameApp* const app;
+            const GxSceneBuilderPtr scene_builder;
+            GxMeshPtr cube_mesh;
+            std::array<GxPbrPtr, objects_count> materials;
+            std::array<GxTxt2DPtr, objects_count> colours;
+
+            ~DataCollector()
+            {
+                for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+                    materials[model_index]->set_albedo(std::move(colours[model_index]));
+                    auto model_builder = app->render_engine.get_model_manager()->build(
+                        "triangle" + std::to_string(model_index),
+                        GxMeshPtr(cube_mesh),
+                        std::move(materials[model_index]),
+                        GxEndCaller([] {}),
+                        true);
+                    auto speed = Speed::construct();
+                    auto position = Position::construct();
+                    auto& model_transformation = model_builder->get_transformation();
+                    model_transformation.set_local_location(position->value);
+                    model_transformation.local_scale(cube_size);
+                    model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
+                    scene_builder->add(std::move(model_builder));
+                }
+            }
+        };
 
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
+            "scene", 0.0, GxEndCaller([this] {
+                render_engine.get_world()->get_component<GxScene>(scene_id)->set_enabled(true);
+            }));
         scene_id = scene_builder->get_id();
 
-        auto cube_mesh = render_engine.get_mesh_manager()->build_cube(
-            gearoenix::core::sync::EndCaller(end_callback));
+        const auto data_collector = std::make_shared<DataCollector>(this, scene_builder);
 
-        const auto threads_count = std::thread::hardware_concurrency();
-        const auto models_count = threads_count * 1000;
-        for (auto model_index = decltype(threads_count) { 0 }; model_index < models_count; ++model_index) {
-            auto material = render_engine.get_material_manager()->get_pbr(
+        render_engine.get_mesh_manager()->build_cube(
+            GxMeshEndCaller([data_collector](GxMeshPtr&& mesh) {
+                data_collector->cube_mesh = std::move(mesh);
+            }));
+
+        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+            render_engine.get_material_manager()->get_pbr(
                 "material" + std::to_string(model_index),
-                end_callback);
-            material->set_albedo(render_engine.get_texture_manager()->create_2d_from_colour(
+                GxPbrEndCaller([model_index, data_collector](GxPbrPtr&& m) {
+                    data_collector->materials[model_index] = std::move(m);
+                }));
+            render_engine.get_texture_manager()->create_2d_from_colour(
                 { colour_distribution(random_engine),
                     colour_distribution(random_engine),
                     colour_distribution(random_engine),
                     1.0f },
-                end_callback));
-            auto model_builder = render_engine.get_model_manager()->build(
-                "triangle" + std::to_string(model_index),
-                std::shared_ptr<gearoenix::render::mesh::Mesh>(cube_mesh),
-                std::move(material),
-                gearoenix::core::sync::EndCaller(end_callback),
-                true);
-            Speed speed;
-            Position position;
-            auto& model_transformation = model_builder->get_transformation();
-            model_transformation.set_local_location(position.value);
-            model_transformation.local_scale(cube_size);
-            model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
-            scene_builder->add(std::move(model_builder));
+                GxTxt2DEndCaller([model_index, data_collector](GxTxt2DPtr&& t) {
+                    data_collector->colours[model_index] = std::move(t);
+                }));
         }
 
-        auto camera_builder = render_engine.get_camera_manager()->build(
-            "camera", gearoenix::core::sync::EndCaller(end_callback));
-        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-        camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
-            render_engine,
-            camera_builder->get_entity_builder()->get_builder().get_id());
-        scene_builder->add(std::move(camera_builder));
+        render_engine.get_camera_manager()->build(
+            "camera",
+            GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
+                camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
+                camera_controller = std::make_unique<GxJetCtrl>(
+                    render_engine,
+                    camera_builder->get_id());
+                scene_builder->add(std::move(camera_builder));
+            }),
+            GxEndCaller([] {}));
 
-        auto light_builder_0 = render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light-0",
+        render_engine.get_light_manager()->build_shadow_caster_directional(
+            "directional-light",
             1024,
             10.0f,
             1.0f,
-            35.0f,
-            end_callback);
-        light_builder_0->get_transformation().local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder_0->get_light().colour = { 2.0f, 2.0f, 2.0f };
-        scene_builder->add(std::move(light_builder_0));
+            20.0f,
+            GxLightBuilderEndCaller([scene_builder](GxLightBuilderPtr&& light_builder) {
+                light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
+                    { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+                light_builder->get_light().colour = { 8.0f, 8.0f, 8.0f };
+                scene_builder->add(std::move(light_builder));
+            }),
+            GxEndCaller([] {}));
     }
 
-    void update() noexcept final
+    void update() noexcept override
     {
         Application::update();
         camera_controller->update();
-        render_engine.get_world()->parallel_system<And<Speed, Position, gearoenix::physics::TransformationComponent>>(
-            [&](auto, Speed* const speed, Position* const position, gearoenix::physics::TransformationComponent* const trn, const auto /*kernel_index*/) noexcept {
+        render_engine.get_world()->parallel_system<GxAll<Speed, Position, GxTransformComp>>(
+            [&](auto, Speed* const speed, Position* const position, GxTransformComp* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);
                 speed->update(*position);
                 trn->set_local_location(position->value);

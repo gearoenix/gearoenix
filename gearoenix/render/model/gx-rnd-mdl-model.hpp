@@ -14,7 +14,7 @@ struct Mesh;
 
 namespace gearoenix::render::model {
 struct Model : core::ecs::Component {
-    static constexpr std::size_t MAX_COUNT = 1024;
+    static constexpr std::size_t MAX_COUNT = 8192;
 
     GX_GET_VAL_PRT(bool, is_transformable, false);
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);

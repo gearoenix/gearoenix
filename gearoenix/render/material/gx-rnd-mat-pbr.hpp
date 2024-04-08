@@ -5,7 +5,7 @@
 
 namespace gearoenix::render::material {
 struct Pbr : Material {
-    static constexpr std::size_t MAX_COUNT = 64;
+    static constexpr std::size_t MAX_COUNT = 8192; // we need this number because of example 004 but for your need change it
 
     GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
     GX_GET_REF_PRT(math::Vec4<float>, emission_roughness_factor);

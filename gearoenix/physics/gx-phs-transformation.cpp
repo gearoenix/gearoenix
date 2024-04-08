@@ -3,7 +3,7 @@
 #include <imgui/imgui.h>
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 256> allocator;
+gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192> allocator;
 }
 
 gearoenix::physics::Transformation::Transformation()

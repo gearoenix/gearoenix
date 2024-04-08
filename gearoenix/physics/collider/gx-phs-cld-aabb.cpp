@@ -2,7 +2,7 @@
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 16> allocator;
+gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 8192> allocator;
 }
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)

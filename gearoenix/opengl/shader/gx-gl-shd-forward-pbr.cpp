@@ -78,6 +78,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "precision highp int;\n";
     fs << "precision highp sampler2D;\n";
     fs << "precision highp samplerCube;\n";
+    fs << "precision highp sampler2DShadow;\n";
     fs << "\n";
     fs << "uniform vec4 camera_position_reserved;\n";
     fs << "uniform vec4 albedo_factor;\n";
@@ -93,7 +94,8 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "uniform vec3 shadow_caster_directional_light_direction[" << shadow_casters_directional_lights_count << "];\n";
         fs << "uniform vec3 shadow_caster_directional_light_colour[" << shadow_casters_directional_lights_count << "];\n";
         fs << "uniform mat4 shadow_caster_directional_light_normalised_vp[" << shadow_casters_directional_lights_count << "];\n";
-        fs << "uniform sampler2D shadow_caster_directional_light_shadow_map[" << shadow_casters_directional_lights_count << "];\n";
+        fs << "\n";
+        fs << "uniform sampler2DShadow shadow_caster_directional_light_shadow_map[" << shadow_casters_directional_lights_count << "];\n";
     }
     fs << "\n";
     fs << "uniform sampler2D albedo;\n";
@@ -194,10 +196,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "        light_uv_depth.xyz /= light_uv_depth.w;\n";
         fs << "        light_uv_depth.xyz *= 0.5;\n";
         fs << "        light_uv_depth.xyz += 0.5;\n";
+        fs << "        light_uv_depth.z += shadow_bias;\n";
         fs << "        vec2 uv_bounds = step(vec2(0.0), light_uv_depth.xy) * step(light_uv_depth.xy, vec2(1.0));\n";
         fs << "        float shadow_w = uv_bounds.x * uv_bounds.y;\n";
-        fs << "        float depth = texture(shadow_caster_directional_light_shadow_map[" << dir_i << "], light_uv_depth.xy, 0.0).x;\n";
-        fs << "        float light_w = 1.0 - (step(depth + shadow_bias, light_uv_depth.z) * shadow_w);\n";
+        fs << "        shadow_w *= texture(shadow_caster_directional_light_shadow_map[" << dir_i << "], light_uv_depth.xyz, 0.0).x;\n";
+        fs << "        float light_w = 1.0 - shadow_w;\n";
         fs << "        illumination += light_w * compute_light(\n";
         fs << "            shadow_caster_directional_light_direction[" << dir_i << "],\n";
         fs << "            shadow_caster_directional_light_colour[" << dir_i << "],\n";
