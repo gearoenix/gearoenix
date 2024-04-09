@@ -417,6 +417,7 @@ void gearoenix::render::texture::Manager::create_2d_from_file(
         }
     }
     const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
+    GX_ASSERT(nullptr != stream);
     const auto data = stream->get_file_content();
     if (path.get_raw_data().ends_with(".hdr")) {
         create_2df_from_formatted(std::move(name), data.data(), data.size(), info, std::move(c));

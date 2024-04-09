@@ -16,24 +16,28 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
-        auto end_callback = gearoenix::core::sync::EndCaller([] {});
-
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, gearoenix::core::sync::EndCaller(end_callback));
-        scene_builder->get_scene().enabled = true;
+            "scene", 0.0, gearoenix::core::job::EndCaller([] {}));
+        scene_builder->get_scene().set_enabled(true);
 
-        auto skybox_builder = render_engine.get_skybox_manager()->build(
+        render_engine.get_skybox_manager()->build(
             "hello-skybox",
             gearoenix::platform::stream::Path::create_asset("sky.hdr"),
-            end_callback);
-        scene_builder->add(std::move(skybox_builder));
+            gearoenix::core::job::EndCaller([] {}),
+            gearoenix::core::job::EndCallerShared<gearoenix::render::skybox::Builder>([scene_builder](auto&& skybox_builder) {
+                scene_builder->add(std::move(skybox_builder));
+            }));
 
-        auto camera_builder = render_engine.get_camera_manager()->build(
-            "camera", gearoenix::core::sync::EndCaller(end_callback));
-        camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
-            render_engine,
-            camera_builder->get_entity_builder()->get_builder().get_id());
-        scene_builder->add(std::move(camera_builder));
+        render_engine.get_camera_manager()->build(
+            "camera",
+            gearoenix::core::job::EndCallerShared<gearoenix::render::camera::Builder>([this, scene_builder](auto&& camera_builder) {
+                camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
+                    render_engine,
+                    camera_builder->get_id());
+                scene_builder->add(std::move(camera_builder));
+            }),
+            gearoenix::core::job::EndCaller([] {}));
+
         GX_LOG_D("Initialised");
     }
 

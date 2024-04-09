@@ -36,7 +36,9 @@ void gearoenix::render::skybox::Manager::build(
             core::job::EndCallerShared<texture::Texture2D>([this, end = std::move(entity_end_callback), n = name, b = std::move(builder_callback)](std::shared_ptr<texture::Texture2D>&& t) mutable {
                 build(std::move(n), std::move(t), std::move(end), std::move(b));
             }));
-    } else if (texture_path.get_raw_data().ends_with(".gx-cube-texture")) {
+        return;
+    }
+    if (texture_path.get_raw_data().ends_with(".gx-cube-texture")) {
         e.get_texture_manager()->read_gx3d(
             texture_path,
             core::job::EndCallerShared<texture::Texture>([this, end = std::move(entity_end_callback), n = name, b = std::move(builder_callback)](std::shared_ptr<texture::Texture>&& t) mutable {
@@ -44,6 +46,7 @@ void gearoenix::render::skybox::Manager::build(
                 GX_ASSERT(nullptr != cube);
                 build(std::move(n), std::move(cube), std::move(end), std::move(b));
             }));
+        return;
     }
     GX_UNEXPECTED;
 }
