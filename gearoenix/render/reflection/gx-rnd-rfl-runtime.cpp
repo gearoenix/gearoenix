@@ -21,7 +21,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
     std::string&& name)
-    : Probe(e, final_component_type_index, std::shared_ptr<texture::TextureCube>(), std::shared_ptr<texture::TextureCube>(), include_box, std::move(name))
+    : Probe(e, final_component_type_index, include_box, std::move(name))
     , on_rendered([] {})
     , receive_box(receive_box)
     , exclude_box(exclude_box)
@@ -172,7 +172,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     e.get_texture_manager()->create_cube_from_pixels(
         name + "-radiance", {}, radiance_texture_info,
         core::job::EndCallerShared<texture::TextureCube>([when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
-            self->radiance = std::move(t);
+            self->set_radiance(std::move(t));
             (void)when_all_textures_are_ready;
         }));
     e.get_texture_manager()->create_2d_from_pixels(

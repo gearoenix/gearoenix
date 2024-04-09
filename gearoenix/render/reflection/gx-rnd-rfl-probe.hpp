@@ -29,11 +29,17 @@ protected:
         std::shared_ptr<texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
         std::string&& name);
+    Probe(
+        engine::Engine& e,
+        std::type_index final_component_type_index,
+        const math::Aabb3<double>& include_box,
+        std::string&& name);
 
 public:
     ~Probe() override;
 
     virtual void set_scene_id(core::ecs::entity_id_t id);
+    virtual void set_radiance(std::shared_ptr<texture::TextureCube>&&);
 };
 }
 #endif

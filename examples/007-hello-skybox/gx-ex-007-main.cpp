@@ -13,7 +13,7 @@
 struct GameApp final : public gearoenix::core::Application {
     std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
+    explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(

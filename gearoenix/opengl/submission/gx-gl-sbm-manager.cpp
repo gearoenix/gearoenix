@@ -318,20 +318,35 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                e.get_world()->synchronised_system<gl::BakedReflection>(
-                    [&](const core::ecs::entity_id_t reflection_id, gl::BakedReflection* const baked) {
-                        if (!baked->get_enabled()) {
-                            return;
-                        }
-                        if (baked->get_scene_id() != scene_id) {
-                            return;
+                e.get_world()->synchronised_system<core::ecs::Any<gl::BakedReflection, gl::RuntimeReflection>>(
+                    [&](const core::ecs::entity_id_t reflection_id, gl::BakedReflection* const baked, gl::RuntimeReflection* const runtime) {
+                        gl::ReflectionProbe* gl_probe = nullptr;
+                        render::reflection::Probe* render_probe = nullptr;
+                        if (nullptr == runtime) {
+                            if (!baked->get_enabled()) {
+                                return;
+                            }
+                            if (baked->get_scene_id() != scene_id) {
+                                return;
+                            }
+                            gl_probe = baked;
+                            render_probe = baked;
+                        } else {
+                            if (!runtime->get_enabled()) {
+                                return;
+                            }
+                            if (runtime->get_scene_id() != scene_id) {
+                                return;
+                            }
+                            gl_probe = runtime;
+                            render_probe = runtime;
                         }
                         const Reflection r {
-                            .irradiance = baked->get_gl_irradiance_v(),
-                            .radiance = baked->get_gl_radiance_v(),
-                            .box = baked->get_include_box(),
-                            .size = baked->get_include_box().get_diameter().square_length(),
-                            .radiance_mips_count = static_cast<float>(baked->get_radiance_mips_count() - 1),
+                            .irradiance = gl_probe->get_gl_irradiance_v(),
+                            .radiance = gl_probe->get_gl_radiance_v(),
+                            .box = render_probe->get_include_box(),
+                            .size = render_probe->get_include_box().get_diameter().square_length(),
+                            .radiance_mips_count = static_cast<float>(render_probe->get_radiance_mips_count() - 1),
                         };
                         scene_pool_ref.reflections.emplace(reflection_id, r);
                         if (r.size > scene_pool_ref.default_reflection.second.size) {

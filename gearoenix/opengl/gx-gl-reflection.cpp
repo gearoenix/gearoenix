@@ -5,6 +5,8 @@
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
+gearoenix::gl::ReflectionProbe::~ReflectionProbe() = default;
+
 gearoenix::gl::BakedReflection::BakedReflection(
     std::string&& name,
     Engine& e,
@@ -12,11 +14,12 @@ gearoenix::gl::BakedReflection::BakedReflection(
     std::shared_ptr<TextureCube>&& rad,
     const math::Aabb3<double>& include_box)
     : Baked(e, create_this_type_index(this), std::move(irr), std::move(rad), include_box, std::move(name))
-    , gl_irradiance(std::dynamic_pointer_cast<TextureCube>(irradiance))
-    , gl_radiance(std::dynamic_pointer_cast<TextureCube>(radiance))
-    , gl_irradiance_v(gl_irradiance->get_object())
-    , gl_radiance_v(gl_radiance->get_object())
 {
+    gl_irradiance = std::dynamic_pointer_cast<TextureCube>(irradiance);
+    gl_radiance = std::dynamic_pointer_cast<TextureCube>(radiance);
+    gl_irradiance_v = gl_irradiance->get_object();
+    gl_radiance_v = gl_radiance->get_object();
+
     GX_ASSERT_D(nullptr != gl_irradiance);
     GX_ASSERT_D(0 != gl_irradiance_v);
     GX_ASSERT_D(nullptr != gl_radiance);
@@ -154,11 +157,11 @@ void gearoenix::gl::ReflectionBuilder::construct_runtime(
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<ReflectionBuilder>&& probe_end_callback)
 {
-    std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(e, std::string(name), std::move(entity_end_callback)));
+    const std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(e, std::string(name), std::move(entity_end_callback)));
     RuntimeReflection::construct(
         e, builder, receive_box, exclude_box, include_box, std::string(name),
         environment_resolution, irradiance_resolution, radiance_resolution,
-        core::job::EndCallerShared<RuntimeReflection>([e = std::move(probe_end_callback), b = std::move(builder)](std::shared_ptr<RuntimeReflection>&& t) mutable -> void {
+        core::job::EndCallerShared<RuntimeReflection>([e = std::move(probe_end_callback), b = builder](std::shared_ptr<RuntimeReflection>&& t) mutable -> void {
             b->entity_builder->get_builder().add_component(std::move(t));
             e.set_return(std::move(b));
         }));

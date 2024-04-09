@@ -16,12 +16,16 @@ struct Engine;
 struct Target;
 struct TextureCube;
 
-struct BakedReflection final : render::reflection::Baked {
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_irradiance);
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_radiance);
-    GX_GET_VAL_PRV(uint, gl_irradiance_v, static_cast<uint>(-1));
-    GX_GET_VAL_PRV(uint, gl_radiance_v, static_cast<uint>(-1));
+struct ReflectionProbe {
+    GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_irradiance);
+    GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_radiance);
+    GX_GET_VAL_PRT(uint, gl_irradiance_v, static_cast<uint>(-1));
+    GX_GET_VAL_PRT(uint, gl_radiance_v, static_cast<uint>(-1));
 
+    virtual ~ReflectionProbe();
+};
+
+struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 
 public:
@@ -40,22 +44,18 @@ public:
     ~BakedReflection() override;
 };
 
-struct RuntimeReflection final : render::reflection::Runtime {
+struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     typedef std::array<std::shared_ptr<Target>, 6> GlCubeTarget;
     typedef std::array<boost::container::static_vector<std::shared_ptr<Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTarget;
     typedef std::array<uint, 6> GlCubeTargetV;
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTargetV;
 
     GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_environment);
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_irradiance);
-    GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_radiance);
     GX_GET_CREF_PRV(GlCubeTarget, gl_environment_targets);
     GX_GET_CREF_PRV(GlCubeTarget, gl_irradiance_targets);
     GX_GET_CREF_PRV(GlMippedCubeTarget, gl_radiance_targets);
 
     GX_GET_VAL_PRV(uint, gl_environment_v, static_cast<uint>(-1));
-    GX_GET_VAL_PRV(uint, gl_irradiance_v, static_cast<uint>(-1));
-    GX_GET_VAL_PRV(uint, gl_radiance_v, static_cast<uint>(-1));
     GX_GET_CREF_PRV(GlCubeTargetV, gl_environment_targets_v);
     GX_GET_CREF_PRV(GlCubeTargetV, gl_irradiance_targets_v);
     GX_GET_CREF_PRV(GlMippedCubeTargetV, gl_radiance_targets_v);
