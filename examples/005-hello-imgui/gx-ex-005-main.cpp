@@ -14,16 +14,24 @@ GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
 
 void GameApp::update() noexcept
 {
-    static bool show_window = true;
+    static bool show_demo_window = true;
+    static bool show_hello_window = true;
+
     Application::update();
 
-    ImGui::ShowDemoWindow(&show_window);
+    if (show_demo_window) {
+        ImGui::ShowDemoWindow(&show_demo_window);
+    }
 
-    ImGui::Begin("Hello Window!", &show_window);
-    ImGui::Text("Hello Label!");
-    if (ImGui::Button("Close"))
-        show_window = false;
-    ImGui::End();
+    if (show_hello_window) {
+        if (ImGui::Begin("Hello Window!", &show_hello_window)) {
+            ImGui::Text("Hello Label!");
+            if (ImGui::Button("Close")) {
+                show_hello_window = false;
+            }
+        }
+        ImGui::End();
+    }
 }
 
 GEAROENIX_START(GameApp)

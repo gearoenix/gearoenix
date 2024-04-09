@@ -18,17 +18,21 @@ struct GameApp final : public gearoenix::core::Application {
 GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
     : Application(plt_app)
 {
-    gearoenix::core::sync::EndCaller end_callback([this] {
-        render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->enabled = true;
+    gearoenix::core::job::EndCaller<> end_callback([this] {
+        render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->set_enabled(true);
     });
-    auto scene_builder = gearoenix::render::load_gltf(
+
+    gearoenix::render::gltf::load(
         render_engine,
         gearoenix::platform::stream::Path::create_asset("1.glb"),
-        end_callback)[0];
-    scene_id = scene_builder->get_id();
-    camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
-        render_engine,
-        *scene_builder->get_scene().get_camera_entities().begin());
+        gearoenix::core::job::EndCaller<std::vector<std::shared_ptr<gearoenix::render::scene::Builder>>>([this, end_callback](auto&& ss) {
+            auto scene_builder = std::move(ss[0]);
+            scene_id = scene_builder->get_id();
+            camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
+                render_engine,
+                *scene_builder->get_scene().get_camera_entities().begin());
+        }),
+        end_callback);
 }
 
 void GameApp::update() noexcept

@@ -712,20 +712,21 @@ struct DataLoader final {
         const auto& json_light_colour = light_info.Get("color");
         GX_ASSERT_D(json_light_colour.IsArray());
         GX_ASSERT_D(3 == json_light_colour.ArrayLen());
-        GX_ASSERT_D(0.0 <= json_light_colour.Get(0).GetNumberAsDouble());
-        GX_ASSERT_D(1.0 >= json_light_colour.Get(0).GetNumberAsDouble());
-        GX_ASSERT_D(0.0 <= json_light_colour.Get(1).GetNumberAsDouble());
-        GX_ASSERT_D(1.0 >= json_light_colour.Get(1).GetNumberAsDouble());
-        GX_ASSERT_D(0.0 <= json_light_colour.Get(2).GetNumberAsDouble());
-        GX_ASSERT_D(1.0 >= json_light_colour.Get(2).GetNumberAsDouble());
-        const auto colour = math::Vec3<float>(
-                                static_cast<float>(json_light_colour.Get(0).GetNumberAsDouble()),
-                                static_cast<float>(json_light_colour.Get(1).GetNumberAsDouble()),
-                                static_cast<float>(json_light_colour.Get(2).GetNumberAsDouble()))
-            * static_cast<float>(light_info.Get("intensity").GetNumberAsDouble());
+        const auto colour_x = static_cast<float>(json_light_colour.Get(0).GetNumberAsDouble());
+        const auto colour_y = static_cast<float>(json_light_colour.Get(1).GetNumberAsDouble());
+        const auto colour_z = static_cast<float>(json_light_colour.Get(2).GetNumberAsDouble());
+        GX_ASSERT_D(0.0f <= colour_x);
+        GX_ASSERT_D(1.0f >= colour_x);
+        GX_ASSERT_D(0.0f <= colour_y);
+        GX_ASSERT_D(1.0f >= colour_y);
+        GX_ASSERT_D(0.0f <= colour_z);
+        GX_ASSERT_D(1.0f >= colour_z);
+        const auto intensity = static_cast<float>(light_info.Get("intensity").GetNumberAsDouble() / 683.0);
+        const auto colour = math::Vec3(colour_x, colour_y, colour_z) * intensity;
         const auto light_type = light_info.Get("type").Get<std::string>();
+        GX_ASSERT_D(light_type == "directional");
         e.get_light_manager()->build_shadow_caster_directional(
-            node.name, 1024, 10.0f, 1.0f, 35.0f,
+            node.name, 1024, 20.0f, 1.0f, 35.0f,
             core::job::EndCallerShared<light::Builder>([sb = scene_builder, node_index, s = weak_self.lock(), le = light_end_callback, colour](std::shared_ptr<light::Builder>&& lb) {
                 lb->get_light().colour = colour;
                 s->apply_transform(node_index, *lb->get_shadow_caster_directional()->get_shadow_transform());

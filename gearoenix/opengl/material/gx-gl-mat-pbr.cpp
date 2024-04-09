@@ -77,7 +77,7 @@ void gearoenix::gl::material::Pbr::set_occlusion(std::shared_ptr<render::texture
 void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::Texture2D>&& o)
 {
     gl_brdflut = std::dynamic_pointer_cast<Texture2D>(o);
-    render::material::Pbr::set_occlusion(std::move(o));
+    render::material::Pbr::set_brdflut(std::move(o));
 }
 
 void gearoenix::gl::material::Pbr::forward_render(
