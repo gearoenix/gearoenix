@@ -84,8 +84,9 @@ public:
     [[nodiscard]] ForwardPbr& get(const std::size_t bones_count, const std::size_t shadow_casters_directional_lights_count, const std::size_t directional_lights_count)
     {
         auto& s = combinations[bones_count][shadow_casters_directional_lights_count][directional_lights_count];
-        if (s.has_value())
+        if (s.has_value()) {
             return s.value();
+        }
         s.emplace(e, directional_lights_count, shadow_casters_directional_lights_count, bones_count);
         return s.value();
     }
