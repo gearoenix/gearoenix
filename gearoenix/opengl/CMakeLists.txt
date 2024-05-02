@@ -56,6 +56,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-light.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-manager.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-manager.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-mesh.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-mesh.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-model.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-model.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/submission/gx-gl-sbm-scene.cpp

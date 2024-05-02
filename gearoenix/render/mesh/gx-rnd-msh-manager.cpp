@@ -1,4 +1,6 @@
 #include "gx-rnd-msh-manager.hpp"
+#include "../material/gx-rnd-mat-material.hpp"
+#include "gx-rnd-msh-mesh.hpp"
 #include <boost/container/flat_map.hpp>
 
 gearoenix::render::mesh::Manager::Manager(engine::Engine& e)
@@ -8,14 +10,17 @@ gearoenix::render::mesh::Manager::Manager(engine::Engine& e)
 
 gearoenix::render::mesh::Manager::~Manager() = default;
 
-void gearoenix::render::mesh::Manager::build_icosphere(const std::size_t subdivisions, core::job::EndCallerShared<Mesh>&& end_callback)
+void gearoenix::render::mesh::Manager::build_icosphere(
+    const std::size_t subdivisions,
+    std::shared_ptr<material::Material>&& material,
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-icosphere-" + std::to_string(subdivisions);
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -173,17 +178,20 @@ void gearoenix::render::mesh::Manager::build_icosphere(const std::size_t subdivi
         std::move(name),
         std::move(vertices),
         std::move(indices),
+        std::move(material),
         std::move(end_callback));
 }
 
-void gearoenix::render::mesh::Manager::build_plate(core::job::EndCallerShared<Mesh>&& end_callback)
+void gearoenix::render::mesh::Manager::build_plate(
+    std::shared_ptr<material::Material>&& material,
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-plate-mesh";
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -213,17 +221,20 @@ void gearoenix::render::mesh::Manager::build_plate(core::job::EndCallerShared<Me
                 math::Vec2(1.0f, 1.0f)),
         },
         std::vector<std::uint32_t> { 0, 1, 2, 1, 3, 2 },
+        std::move(material),
         std::move(end_callback));
 }
 
-void gearoenix::render::mesh::Manager::build_cube(core::job::EndCallerShared<Mesh>&& end_callback)
+void gearoenix::render::mesh::Manager::build_cube(
+    std::shared_ptr<material::Material>&& material,
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-cube-mesh";
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -371,17 +382,20 @@ void gearoenix::render::mesh::Manager::build_cube(core::job::EndCallerShared<Mes
             20, 22, 21, // 11
             21, 22, 23, // 12
         },
+        std::move(material),
         std::move(end_callback));
 }
 
-void gearoenix::render::mesh::Manager::build_inward_cube(core::job::EndCallerShared<Mesh>&& end_callback)
+void gearoenix::render::mesh::Manager::build_inward_cube(
+    std::shared_ptr<material::Material>&& material,
+    core::job::EndCallerShared<Mesh>&& end_callback)
 {
     std::string name = "default-cube-mesh";
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -529,20 +543,51 @@ void gearoenix::render::mesh::Manager::build_inward_cube(core::job::EndCallerSha
             20, 21, 22, // 11
             21, 23, 22, // 12
         },
+        std::move(material),
         std::move(end_callback));
+}
+
+void gearoenix::render::mesh::Manager::build(
+    std::string&& name,
+    Vertices&& vertices,
+    std::vector<std::uint32_t>&& indices,
+    const math::Aabb3<double>& occlusion_box,
+    std::shared_ptr<material::Material>&& material,
+    core::job::EndCallerShared<Mesh>&& end_callback)
+{
+    {
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
+                return;
+            }
+        }
+    }
+    std::string name_copy = name;
+    build(
+        std::move(name_copy), std::move(vertices), std::move(indices), occlusion_box,
+        core::job::EndCallerShared<Buffer>([this, end = std::move(end_callback), mat = std::move(material), name = std::move(name)](std::shared_ptr<Buffer>&& buffer) mutable {
+            {
+                const std::lock_guard _lg(buffers_lock);
+                buffers.emplace(std::move(name), buffer);
+            }
+            build(std::move(buffer), std::move(mat), std::move(end));
+        }));
 }
 
 void gearoenix::render::mesh::Manager::build(
     std::string&& name,
     std::vector<PbrVertex>&& vertices,
     std::vector<std::uint32_t>&& indices,
+    std::shared_ptr<material::Material>&& material,
     core::job::EndCallerShared<Mesh>&& end_callback)
 {
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -552,20 +597,21 @@ void gearoenix::render::mesh::Manager::build(
         occlusion_box.put_without_update(math::Vec3<double>(vertex.position));
     }
     occlusion_box.update();
-    return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
+    return build(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(material), std::move(end_callback));
 }
 
 void gearoenix::render::mesh::Manager::build(
     std::string&& name,
     std::vector<PbrVertexAnimated>&& vertices,
     std::vector<std::uint32_t>&& indices,
+    std::shared_ptr<material::Material>&& material,
     core::job::EndCallerShared<Mesh>&& end_callback)
 {
     {
-        const std::lock_guard _lg(meshes_lock);
-        if (const auto search = meshes.find(name); meshes.end() != search) {
-            if (auto m = search->second.lock(); nullptr != m) {
-                end_callback.set_return(std::move(m));
+        const std::lock_guard _lg(buffers_lock);
+        if (const auto search = buffers.find(name); buffers.end() != search) {
+            if (auto buffer = search->second.lock(); nullptr != buffer) {
+                build(std::move(buffer), std::move(material), std::move(end_callback));
                 return;
             }
         }
@@ -575,16 +621,16 @@ void gearoenix::render::mesh::Manager::build(
         occlusion_box.put_without_update(math::Vec3<double>(vertex.base.position));
     }
     occlusion_box.update();
-    return build(std::move(name), std::move(vertices), std::move(indices), std::move(occlusion_box), std::move(end_callback));
+    return build(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(material), std::move(end_callback));
 }
 
 bool gearoenix::render::mesh::Manager::remove_if_exist(const std::string& name)
 {
-    const std::lock_guard _lg(meshes_lock);
-    const auto search = meshes.find(name);
-    if (meshes.end() == search) {
+    const std::lock_guard _lg(buffers_lock);
+    const auto search = buffers.find(name);
+    if (buffers.end() == search) {
         return false;
     }
-    meshes.erase(search);
+    buffers.erase(search);
     return true;
 }

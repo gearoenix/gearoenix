@@ -20,9 +20,9 @@ public:
     Sprite(Engine& e, const std::string& name);
     static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c);
     ~Sprite() final;
-    void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) final;
-    void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) final;
+    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) final;
 };
 }

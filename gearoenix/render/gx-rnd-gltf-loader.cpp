@@ -26,15 +26,17 @@
 
 #include <boost/container/flat_map.hpp>
 
+#include <unordered_set>
+
 #define TINYGLTF_NOEXCEPTION
 #define TINYGLTF_IMPLEMENTATION
 #include <tinygltf/tiny_gltf.h>
 
 namespace gearoenix::render::gltf {
-static constexpr auto LIGHT_EXT_NAME = "KHR_lights_punctual";
+constexpr auto LIGHT_EXT_NAME = "KHR_lights_punctual";
 
 struct MeshData final {
-    std::shared_ptr<mesh::Mesh> mesh;
+    std::vector<std::shared_ptr<mesh::Mesh>> meshes;
     std::vector<int> bone_index_map;
     std::optional<physics::animation::BoneInfo> bones_info;
 };
@@ -45,6 +47,9 @@ struct DataLoader final {
     tinygltf::Model data;
 
     std::vector<std::shared_ptr<texture::Texture2D>> gx_texture_2ds;
+#if GX_DEBUG_MODE
+    std::unordered_set<std::string> gx_textures_names;
+#endif
     std::vector<MeshData> gx_meshes;
     std::vector<std::shared_ptr<material::Pbr>> gx_materials;
     boost::container::flat_map<int /*bone-node-index*/, physics::animation::BoneChannelBuilder> gx_bones_channels;
@@ -82,6 +87,14 @@ struct DataLoader final {
         GX_LOG_D("Loading texture: " << txt.name);
         const tinygltf::Image& img = data.images[txt.source];
         GX_LOG_D("Loading image: " << img.name);
+#if GX_DEBUG_MODE
+        {
+            const auto sz_before = gx_textures_names.size();
+            gx_textures_names.insert(img.name);
+            const auto sz_after = gx_textures_names.size();
+            GX_ASSERT_D(sz_before < sz_after);
+        }
+#endif
         GX_ASSERT(!img.as_is); // Only image through bufferView is supported.
         GX_ASSERT(img.bufferView >= 0); // Only image through bufferView is supported.
         GX_ASSERT(img.mimeType.ends_with("jpeg") || img.mimeType.ends_with("png")); // Only these formats are supported.
@@ -139,7 +152,7 @@ struct DataLoader final {
                                   .set_type(texture::Type::Unknown)
                                   .set_has_mipmap(needs_mipmap);
         e.get_texture_manager()->create_2d_from_formatted(
-            std::string(txt.name), img_ptr, img_sz, txt_info,
+            std::string(img.name), img_ptr, img_sz, txt_info,
             core::job::EndCallerShared<texture::Texture2D>(
                 [index, s = weak_self.lock(), end = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& t) {
                     s->gx_texture_2ds[index] = std::move(t);
@@ -189,7 +202,7 @@ struct DataLoader final {
                 continue;
             }
             auto [bone_index_map, bones_info] = process_skin(n);
-            load_mesh(n.mesh, core::job::EndCaller(end_callback), bone_index_map);
+            load_mesh(n.mesh, end_callback, bone_index_map);
             gx_meshes[index].bone_index_map = std::move(bone_index_map);
             gx_meshes[index].bones_info = std::move(bones_info);
             ++index;
@@ -197,14 +210,26 @@ struct DataLoader final {
     }
 
     void load_mesh(
-        const std::size_t index,
-        core::job::EndCaller<>&& end_callback,
+        const std::size_t mesh_index,
+        const core::job::EndCaller<>& end_callback,
+        const std::vector<int>& bone_index_map)
+    {
+        const tinygltf::Mesh& msh = data.meshes[mesh_index];
+        GX_LOG_D("Loading mesh: " << msh.name);
+        gx_meshes[mesh_index].meshes.resize(msh.primitives.size());
+        for (std::size_t primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
+            load_mesh(mesh_index, primitive_index, end_callback, bone_index_map);
+        }
+    }
+
+    void load_mesh(
+        const std::size_t mesh_index,
+        const std::size_t primitive_index,
+        const core::job::EndCaller<>& end_callback,
         const std::vector<int>& bone_index_map) const
     {
-        const tinygltf::Mesh& msh = data.meshes[index];
-        GX_LOG_D("Loading mesh: " << msh.name);
-        GX_ASSERT(msh.primitives.size() == 1); // Only one primitive for each mesh
-        const tinygltf::Primitive& primitive = msh.primitives[0];
+        const tinygltf::Mesh& msh = data.meshes[mesh_index];
+        const tinygltf::Primitive& primitive = msh.primitives[primitive_index];
         GX_ASSERT(TINYGLTF_MODE_TRIANGLES == primitive.mode);
         const auto& acs = data.accessors;
         const auto& bvs = data.bufferViews;
@@ -216,7 +241,7 @@ struct DataLoader final {
         auto bwt_ai = static_cast<std::size_t>(-1);
         auto bin_ai = static_cast<std::size_t>(-1);
         const auto& attrs = primitive.attributes;
-        GX_ASSERT(attrs.size() == 4 || attrs.size() == 6);
+        GX_ASSERT((attrs.size() == 4 && bone_index_map.empty()) || (attrs.size() == 6 && !bone_index_map.empty()));
         const bool is_animated = attrs.size() == 6;
         for (const auto& att : attrs) {
             if ("POSITION" == att.first) {
@@ -231,8 +256,9 @@ struct DataLoader final {
                 bwt_ai = static_cast<std::size_t>(att.second);
             } else if (is_animated && "JOINTS_0" == att.first) {
                 bin_ai = static_cast<std::size_t>(att.second);
-            } else
+            } else {
                 GX_UNEXPECTED;
+            }
         }
         GX_ASSERT(pos_ai != static_cast<std::size_t>(-1));
         GX_ASSERT(nrm_ai != static_cast<std::size_t>(-1));
@@ -453,7 +479,7 @@ struct DataLoader final {
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
         case TINYGLTF_COMPONENT_TYPE_BYTE:
             for (auto& i : indices) {
-                i = *reinterpret_cast<const std::uint16_t*>(&ids_b[bi]);
+                i = *reinterpret_cast<const std::uint8_t*>(&ids_b[bi]);
                 bi += ids_bi_inc;
             }
             break;
@@ -465,24 +491,27 @@ struct DataLoader final {
             animated_vertices[vi].base = vertices[vi];
         }
 
-        core::job::EndCallerShared<mesh::Mesh> mesh_end_callback([index, s = weak_self.lock(), end = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& m) {
-            s->gx_meshes[index].mesh = std::move(m);
-            (void)end;
+        core::job::EndCallerShared<mesh::Mesh> mesh_end_callback([mesh_index, primitive_index, s = weak_self.lock(), end_callback](std::shared_ptr<mesh::Mesh>&& m) {
+            s->gx_meshes[mesh_index].meshes[primitive_index] = std::move(m);
+            (void)end_callback;
         });
 
+        auto name = msh.name + "-primitive:" + std::to_string(primitive_index);
         if (is_animated) {
             e.get_mesh_manager()->build(
-                std::string(msh.name),
+                std::move(name),
                 std::move(animated_vertices),
                 std::move(indices),
                 box,
+                std::shared_ptr(gx_materials[primitive.material]),
                 std::move(mesh_end_callback));
         } else {
             e.get_mesh_manager()->build(
-                std::string(msh.name),
+                std::move(name),
                 std::move(vertices),
                 std::move(indices),
                 box,
+                std::shared_ptr(gx_materials[primitive.material]),
                 std::move(mesh_end_callback));
         }
     }
@@ -665,8 +694,7 @@ struct DataLoader final {
         }
         auto model_builder = e.get_model_manager()->build(
             std::string(node.name),
-            std::shared_ptr(gx_meshes[node.mesh].mesh),
-            gx_materials[data.meshes[node.mesh].primitives[0].material],
+            std::vector(gx_meshes[node.mesh].meshes),
             core::job::EndCaller(entity_end_callback),
             true);
         if (gx_meshes[node.mesh].bone_index_map.size() > 1) {
@@ -962,7 +990,7 @@ struct DataLoader final {
 
         load_animations();
 
-        const core::job::EndCaller<> materials_ready([this, s = weak_self.lock(), scenes_end_callback, entity_end_callback] {
+        const core::job::EndCaller<> meshes_ready([this, s = weak_self.lock(), scenes_end_callback, entity_end_callback] {
             const core::job::EndCaller<> gpu_end_callback([s = scenes_end_callback] { (void)s; });
             for (std::size_t index = 0; index < data.scenes.size(); ++index) {
                 const tinygltf::Scene& scn = data.scenes[index];
@@ -976,12 +1004,15 @@ struct DataLoader final {
             (void)s;
         });
 
-        const core::job::EndCaller<> meshes_and_textures_ready([s = weak_self.lock(), end = materials_ready] {
+        const core::job::EndCaller<> materials_ready([s = weak_self.lock(), end = meshes_ready] {
+            s->load_meshes(end);
+        });
+
+        const core::job::EndCaller<> textures_ready([s = weak_self.lock(), end = materials_ready] {
             s->load_materials(end);
         });
 
-        load_texture_2ds(meshes_and_textures_ready);
-        load_meshes(meshes_and_textures_ready);
+        load_texture_2ds(textures_ready);
     }
 
     void read_gltf(const platform::stream::Path& file)
@@ -1008,8 +1039,10 @@ void load(
     const core::job::EndCaller<std::vector<std::shared_ptr<scene::Builder>>>& scenes_end_callback,
     const core::job::EndCaller<>& entity_end_callback)
 {
-    auto loader = gltf::DataLoader::construct(e);
-    loader->read_gltf(file);
-    loader->load_scenes(scenes_end_callback, entity_end_callback);
+    core::job::send_job_io1([&, file = file, scenes_end_callback, entity_end_callback] {
+        auto loader = gltf::DataLoader::construct(e);
+        loader->read_gltf(file);
+        loader->load_scenes(scenes_end_callback, entity_end_callback);
+    });
 }
 }

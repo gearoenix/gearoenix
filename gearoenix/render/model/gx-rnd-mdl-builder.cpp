@@ -3,18 +3,23 @@
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../mesh/gx-rnd-msh-buffer.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "gx-rnd-mdl-model.hpp"
 
 gearoenix::render::model::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
-    const std::shared_ptr<mesh::Mesh>& bound_mesh,
+    const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
     core::job::EndCaller<>&& end_caller)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(physics::collider::Aabb3::construct(bound_mesh->box, name + "-collider"));
+    math::Aabb3<double> box;
+    for (const auto& m : bound_meshes) {
+        box.put(m->get_buffer()->get_box());
+    }
+    builder.add_component(physics::collider::Aabb3::construct(box, name + "-collider"));
     builder.add_component(physics::TransformationComponent::construct(name + "-transformation"));
 }
 

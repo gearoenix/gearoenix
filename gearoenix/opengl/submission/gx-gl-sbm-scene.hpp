@@ -6,8 +6,13 @@
 #include "gx-gl-sbm-animation.hpp"
 #include "gx-gl-sbm-environment.hpp"
 #include "gx-gl-sbm-light.hpp"
+#include "gx-gl-sbm-mesh.hpp"
 #include "gx-gl-sbm-model.hpp"
 #include <boost/container/flat_map.hpp>
+
+namespace gearoenix::gl {
+struct Mesh;
+}
 
 namespace gearoenix::gl::submission {
 struct Scene final {
@@ -22,7 +27,10 @@ struct Scene final {
     std::vector<DynamicModel> dynamic_models;
     std::vector<DebugModel> debug_mesh_data;
     std::vector<Bone> bones_data;
+    std::vector<Mesh> meshes;
     const std::string* name = nullptr;
+
+    [[nodiscard]] std::pair<std::size_t, std::size_t> add_meshes(const std::vector<std::shared_ptr<gl::Mesh>>& gl_meshes);
 };
 }
 

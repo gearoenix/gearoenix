@@ -10,7 +10,6 @@
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
-#include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
@@ -100,12 +99,13 @@ struct GameApp final : public gearoenix::core::Application {
         material->set_albedo(std::move(texture));
 
         render_engine.get_mesh_manager()->build_plate(
-            GxMeshEndCaller([this, m = std::move(material)](GxMeshPtr&& mesh) mutable {
-                mesh_is_ready(std::move(m), std::move(mesh));
+            std::move(material),
+            GxMeshEndCaller([this](GxMeshPtr&& mesh) mutable {
+                mesh_is_ready(std::move(mesh));
             }));
     }
 
-    void mesh_is_ready(GxPbrPtr&& material, GxMeshPtr&& mesh)
+    void mesh_is_ready(GxMeshPtr&& mesh)
     {
         auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0,
@@ -117,8 +117,7 @@ struct GameApp final : public gearoenix::core::Application {
 
         auto model_builder = render_engine.get_model_manager()->build(
             "triangle",
-            std::move(mesh),
-            std::move(material),
+            { std::move(mesh) },
             GxEndCaller([] {
                 // Here, it is not important for us to know when the model entity is actually in the world and
                 // functioning, if it was, we had to add some code for handling this callback properly.

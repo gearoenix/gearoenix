@@ -108,7 +108,7 @@ private:
     void update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh);
     void update_scene_cameras(core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh);
     void render_shadows();
-    void render_shadows(const Camera& camera);
+    void render_shadows(const Scene& scene, const Camera& camera);
     void render_shadows(const Scene& scene);
     void render_reflection_probes();
     void render_reflection_probes(const Scene& scene);

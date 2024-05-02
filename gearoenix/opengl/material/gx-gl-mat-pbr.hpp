@@ -12,7 +12,7 @@ struct GBuffersFiller;
 }
 
 namespace gearoenix::gl::material {
-struct Pbr final : public render::material::Pbr, public Material {
+struct Pbr final : render::material::Pbr, Material {
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_albedo);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_normal);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_emission);
@@ -27,9 +27,9 @@ public:
     static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c);
     Pbr(Engine& e, const std::string& name);
     ~Pbr() final;
-    void shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader) final;
-    void forward_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) final;
+    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
+    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) final;
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) final;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) final;

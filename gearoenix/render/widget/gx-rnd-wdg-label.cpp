@@ -62,10 +62,13 @@ void gearoenix::render::widget::Label::construct(
     core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback)
 {
     auto& e = scene_builder->e;
-    e.get_mesh_manager()->build_plate(core::job::EndCallerShared<mesh::Mesh>(
-        [n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
-            construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(s), std::move(e));
-        }));
+    auto copy_mat = std::shared_ptr(mat);
+    e.get_mesh_manager()->build_plate(
+        std::move(copy_mat),
+        core::job::EndCallerShared<mesh::Mesh>(
+            [n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
+                construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(s), std::move(e));
+            }));
 }
 
 void gearoenix::render::widget::Label::construct(
@@ -83,8 +86,7 @@ void gearoenix::render::widget::Label::construct(
     auto& e = scene_builder->e;
     auto model_builder = e.get_model_manager()->build(
         name + "-model",
-        std::move(msh),
-        std::shared_ptr(mat),
+        { std::move(msh) },
         core::job::EndCaller([] {}),
         true);
     scene_builder->add(std::shared_ptr(model_builder));

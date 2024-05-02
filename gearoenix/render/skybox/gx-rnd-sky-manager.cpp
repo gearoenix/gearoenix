@@ -1,6 +1,8 @@
 #include "gx-rnd-sky-manager.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../material/gx-rnd-mat-manager.hpp"
+#include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
@@ -57,8 +59,13 @@ void gearoenix::render::skybox::Manager::build(
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<Builder>&& builder_callback)
 {
-    e.get_mesh_manager()->build_inward_cube(
-        core::job::EndCallerShared<mesh::Mesh>([this, t = std::move(bound_texture), end = std::move(entity_end_callback), n = std::move(name), b = std::move(builder_callback)](std::shared_ptr<mesh::Mesh>&& m) mutable {
-            b.set_return(build(std::move(n), std::move(t), std::move(m), std::move(end)));
+    e.get_material_manager()->get_unlit(
+        "dummy",
+        core::job::EndCallerShared<material::Unlit>([this, t = std::move(bound_texture), end = std::move(entity_end_callback), n = std::move(name), b = std::move(builder_callback)](std::shared_ptr<material::Unlit>&& mat) mutable {
+            e.get_mesh_manager()->build_inward_cube(
+                std::move(mat),
+                core::job::EndCallerShared<mesh::Mesh>([this, t = std::move(t), end = std::move(end), n = std::move(n), b = std::move(b)](std::shared_ptr<mesh::Mesh>&& m) mutable {
+                    b.set_return(build(std::move(n), std::move(t), std::move(m), std::move(end)));
+                }));
         }));
 }

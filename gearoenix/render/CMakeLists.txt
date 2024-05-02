@@ -49,6 +49,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-transparency.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/material/gx-rnd-mat-unlit.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-buffer.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-buffer.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp

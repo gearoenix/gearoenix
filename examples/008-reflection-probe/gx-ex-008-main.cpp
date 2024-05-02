@@ -27,22 +27,60 @@
 #define GX_EXAMPLE_008_EXPORT_ENVIRONMENT
 #define GX_EXAMPLE_008_EXPORT_REFLECTION
 
-struct GameApp final : public gearoenix::core::Application {
-    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
+template <typename T>
+using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
+using GxEndCaller = gearoenix::core::job::EndCaller<>;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
+using GxComp = gearoenix::core::ecs::Component;
+using GxCoreApp = gearoenix::core::Application;
+using GxPltApp = gearoenix::platform::Application;
+using GxTransformComp = gearoenix::physics::TransformationComponent;
+
+using GxScene = gearoenix::render::scene::Scene;
+using GxSceneBuilder = gearoenix::render::scene::Builder;
+using GxSceneBuilderPtr = std::shared_ptr<GxSceneBuilder>;
+
+using GxCameraBuilder = gearoenix::render::camera::Builder;
+using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
+using GxCameraBuilderEndCaller = GxEndCallerShared<GxCameraBuilder>;
+using GxJetCtrl = gearoenix::render::camera::JetController;
+
+using GxLightBuilder = gearoenix::render::light::Builder;
+using GxLightBuilderPtr = std::shared_ptr<GxLightBuilder>;
+using GxLightBuilderEndCaller = GxEndCallerShared<GxLightBuilder>;
+
+using GxMesh = gearoenix::render::mesh::Mesh;
+using GxMeshPtr = std::shared_ptr<GxMesh>;
+using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
+
+using GxPbr = gearoenix::render::material::Pbr;
+using GxPbrPtr = std::shared_ptr<GxPbr>;
+using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
+
+using GxSkyboxBuilder = gearoenix::render::skybox::Builder;
+using GxSkyboxBuilderPtr = std::shared_ptr<GxSkyboxBuilder>;
+using GxSkyboxBuilderEndCaller = GxEndCallerShared<GxSkyboxBuilder>;
+
+using GxReflectionBuilder = gearoenix::render::reflection::Builder;
+using GxReflectionBuilderPtr = std::shared_ptr<GxReflectionBuilder>;
+using GxReflectionBuilderEndCaller = GxEndCallerShared<GxReflectionBuilder>;
+using GxReflectionRuntime = gearoenix::render::reflection::Runtime;
+
+using GxPath = gearoenix::platform::stream::Path;
+using GxStream = gearoenix::platform::stream::Stream;
+using GxLocal = gearoenix::platform::stream::Local;
+
+using GxAabb3 = gearoenix::math::Aabb3<double>;
+using GxVec3 = gearoenix::math::Vec3<double>;
+
+struct GameApp final : public GxCoreApp {
+    std::unique_ptr<GxJetCtrl> camera_controller;
+
+    explicit GameApp(GxPltApp& plt_app)
         : Application(plt_app)
     {
-        render_engine.get_mesh_manager()->build_icosphere(4,
-            gearoenix::core::job::EndCallerShared<gearoenix::render::mesh::Mesh>([this](std::shared_ptr<gearoenix::render::mesh::Mesh>&& m) {
-                mesh_is_ready(m);
-            }));
-    }
-
-    void mesh_is_ready(const std::shared_ptr<gearoenix::render::mesh::Mesh>& icosphere_mesh)
-    {
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, gearoenix::core::job::EndCaller([] {}));
+            "scene", 0.0, GxEndCaller([] {}));
         scene_builder->get_scene().set_enabled(true);
 
         for (int metallic_i = 0; metallic_i < 10; ++metallic_i) {
@@ -51,68 +89,56 @@ struct GameApp final : public gearoenix::core::Application {
                 const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "-metallic:" + std::to_string(metallic) + "-roughness:" + std::to_string(roughness);
                 render_engine.get_material_manager()->get_pbr(
-                    "material" + postfix,
-                    gearoenix::core::job::EndCallerShared<gearoenix::render::material::Pbr>(
-                        [this, metallic, roughness, postfix, icosphere_mesh, scene_builder](std::shared_ptr<gearoenix::render::material::Pbr>&& material) noexcept {
-                            material->get_normal_metallic_factor().w = metallic;
-                            material->get_emission_roughness_factor().w = roughness;
-                            auto model_builder = render_engine.get_model_manager()->build(
-                                "icosphere" + postfix,
-                                std::shared_ptr(icosphere_mesh),
-                                std::move(material),
-                                gearoenix::core::job::EndCaller([] {}),
-                                true);
-                            model_builder->get_transformation().local_translate(
-                                { static_cast<double>(metallic) * 30.0 - 15.0,
-                                    static_cast<double>(roughness) * 30.0 - 15.0,
-                                    0.0 });
-                            scene_builder->add(std::move(model_builder));
+                    "material-" + postfix,
+                    GxPbrEndCaller(
+                        [this, metallic, roughness, p = postfix, sb = scene_builder](GxPbrPtr&& material) mutable {
+                            material_is_ready(std::move(material), metallic, roughness, std::move(p), std::move(sb));
                         }));
             }
         }
 
         render_engine.get_skybox_manager()->build(
             "hello-skybox",
-            gearoenix::platform::stream::Path::create_asset("sky.hdr"),
-            gearoenix::core::job::EndCaller([] {}),
-            gearoenix::core::job::EndCallerShared<gearoenix::render::skybox::Builder>([scene_builder](std::shared_ptr<gearoenix::render::skybox::Builder>&& skybox_builder) {
+            GxPath::create_asset("sky.hdr"),
+            GxEndCaller([] {}),
+            GxSkyboxBuilderEndCaller([scene_builder](GxSkyboxBuilderPtr&& skybox_builder) {
                 scene_builder->add(std::move(skybox_builder));
             }));
 
         render_engine.get_camera_manager()->build(
             "camera",
-            gearoenix::core::job::EndCallerShared<gearoenix::render::camera::Builder>([this, scene_builder](std::shared_ptr<gearoenix::render::camera::Builder>&& camera_builder) {
+            GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
                 auto& camera_transform = camera_builder->get_transformation();
                 camera_transform.local_translate({ -19.0, -19.0, 5.0 });
                 camera_transform.local_look_at({ -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
-                camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
+                camera_controller = std::make_unique<GxJetCtrl>(
                     render_engine,
                     camera_builder->get_entity_builder()->get_builder().get_id());
                 scene_builder->add(std::move(camera_builder));
             }),
-            gearoenix::core::job::EndCaller([] {}));
+            GxEndCaller([] {}));
 
         render_engine.get_reflection_manager()->build_runtime(
             "hello-runtime-reflection-probe",
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(20.0), gearoenix::math::Vec3(-20.0)),
-            gearoenix::math::Aabb3(gearoenix::math::Vec3(100.0), gearoenix::math::Vec3(-100.0)),
+            GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
+            GxAabb3(GxVec3(20.0), GxVec3(-20.0)),
+            GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
             1024, 256, 512,
-            gearoenix::core::job::EndCaller([] {}),
-            gearoenix::core::job::EndCallerShared<gearoenix::render::reflection::Builder>([this, scene_builder = std::move(scene_builder)](std::shared_ptr<gearoenix::render::reflection::Builder>&& runtime_reflection_probe_builder) {
+            GxEndCaller([] {}),
+            GxReflectionBuilderEndCaller([this, scene_builder](GxReflectionBuilderPtr&& runtime_reflection_probe_builder) {
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT) || defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
                 const auto id = runtime_reflection_probe_builder->get_id();
                 runtime_reflection_probe_builder->get_runtime().set_on_rendered([id, this] {
-                    const auto* const r = render_engine.get_world()->get_component<gearoenix::render::reflection::Runtime>(id);
+                    const auto* const r = render_engine.get_world()->get_component<GxReflectionRuntime>(id);
 #if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
-                    const std::shared_ptr<gearoenix::platform::stream::Stream> rl(
-                        new gearoenix::platform::stream::Local(platform_application, "exported.gx-reflection", true));
-                    r->export_baked(rl, gearoenix::core::job::EndCaller([] {}));
+                    const std::shared_ptr<GxStream> rl(
+                        new GxLocal(platform_application, "exported.gx-reflection", true));
+                    r->export_baked(rl, GxEndCaller([] {}));
 #endif
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT)
-                    const std::shared_ptr<gearoenix::platform::stream::Stream> tl(
-                        new gearoenix::platform::stream::Local(platform_application, "sky.gx-cube-texture", true));
-                    r->get_environment()->write(tl, gearoenix::core::job::EndCaller([] {}));
+                    const std::shared_ptr<GxStream> tl(
+                        new GxLocal(platform_application, "sky.gx-cube-texture", true));
+                    r->get_environment()->write(tl, GxEndCaller([] {}));
 #endif
                 });
 #endif
@@ -122,7 +148,35 @@ struct GameApp final : public gearoenix::core::Application {
         GX_LOG_D("Initialised");
     }
 
-    void update() noexcept final
+    void material_is_ready(
+        GxPbrPtr&& material, const float metallic, const float roughness, std::string&& postfix, GxSceneBuilderPtr&& scene_builder)
+    {
+        material->get_normal_metallic_factor().w = metallic;
+        material->get_emission_roughness_factor().w = roughness;
+
+        render_engine.get_mesh_manager()->build_icosphere(
+            4,
+            std::move(material),
+            GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), sb = std::move(scene_builder)](GxMeshPtr&& m) mutable {
+                mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(sb));
+            }));
+    }
+
+    void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxSceneBuilderPtr&& scene_builder)
+    {
+        auto model_builder = render_engine.get_model_manager()->build(
+            "icosphere" + postfix,
+            { std::move(mesh) },
+            GxEndCaller([] {}),
+            true);
+        model_builder->get_transformation().local_translate(
+            { static_cast<double>(metallic) * 30.0 - 15.0,
+                static_cast<double>(roughness) * 30.0 - 15.0,
+                0.0 });
+        scene_builder->add(std::move(model_builder));
+    }
+
+    void update() override
     {
         Application::update();
         camera_controller->update();

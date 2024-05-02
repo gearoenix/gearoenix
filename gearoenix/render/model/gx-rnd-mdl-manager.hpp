@@ -33,8 +33,7 @@ public:
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
-        std::shared_ptr<mesh::Mesh>&& bound_mesh,
-        std::shared_ptr<material::Material>&& bound_material,
+        std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
         core::job::EndCaller<>&& c,
         bool is_transformable)
         = 0;

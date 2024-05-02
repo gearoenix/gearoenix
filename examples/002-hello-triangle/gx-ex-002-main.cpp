@@ -38,6 +38,38 @@ struct GameApp final : public gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
         : Application(plt_app)
     {
+        render_engine.get_material_manager()->get_pbr(
+            "material",
+            GxPbrEndCaller([this](GxPbrPtr&& material) mutable {
+                set_material(std::move(material));
+            }));
+    }
+
+    void set_mesh(GxMeshPtr&& mesh)
+    {
+        auto scene_builder = render_engine.get_scene_manager()->build(
+            "scene", 0.0, GxEndCaller([] {}));
+
+        auto model_builder = render_engine.get_model_manager()->build(
+            "triangle-model",
+            { std::move(mesh) },
+            GxEndCaller([] {}),
+            true);
+        scene_builder->add(std::move(model_builder));
+
+        render_engine.get_camera_manager()->build(
+            "camera",
+            GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
+                set_camera_builder(std::move(camera_builder), std::move(scene_builder));
+            }),
+            GxEndCaller([] {}));
+    }
+
+    void set_material(GxPbrPtr&& material)
+    {
+        material->get_normal_metallic_factor().w = 0.01f;
+        material->get_emission_roughness_factor().w = 0.99f;
+
         std::vector<GxPbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };
         vertices[0].normal = { 0.0f, 0.0f, 1.0f };
@@ -58,42 +90,10 @@ struct GameApp final : public gearoenix::core::Application {
             "triangle-mesh",
             std::move(vertices),
             std::move(indices),
+            std::move(material),
             GxMeshEndCaller([this](GxMeshPtr&& m) {
                 set_mesh(std::move(m));
             }));
-    }
-
-    void set_mesh(GxMeshPtr&& mesh)
-    {
-        render_engine.get_material_manager()->get_pbr(
-            "material",
-            GxPbrEndCaller([this, mesh = std::move(mesh)](GxPbrPtr&& material) mutable {
-                set_material(std::move(material), std::move(mesh));
-            }));
-    }
-
-    void set_material(GxPbrPtr&& material, GxMeshPtr&& mesh)
-    {
-        material->get_normal_metallic_factor().w = 0.01f;
-        material->get_emission_roughness_factor().w = 0.99f;
-
-        auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([] {}));
-
-        auto model_builder = render_engine.get_model_manager()->build(
-            "triangle-model",
-            std::move(mesh),
-            std::move(material),
-            GxEndCaller([] {}),
-            true);
-        scene_builder->add(std::move(model_builder));
-
-        render_engine.get_camera_manager()->build(
-            "camera",
-            GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
-                set_camera_builder(std::move(camera_builder), std::move(scene_builder));
-            }),
-            GxEndCaller([] {}));
     }
 
     void set_camera_builder(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder)

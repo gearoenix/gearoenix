@@ -7,31 +7,24 @@
 #include "../render/model/gx-rnd-mdl-manager.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 
-namespace gearoenix::gl::material {
-struct Material;
-}
-
 namespace gearoenix::gl {
 struct Engine;
 struct Mesh;
 
 struct Model final : render::model::Model {
-    GX_GET_CREF_PRV(std::shared_ptr<Mesh>, gl_mesh);
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, gl_material);
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
 
     [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 
 public:
     Model(
         Engine& e,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
-        std::shared_ptr<render::material::Material>&& mat,
+        std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
         std::string&& name,
         bool is_transformable);
     [[nodiscard]] static std::shared_ptr<Model> construct(
         Engine& e,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
-        std::shared_ptr<render::material::Material>&& mat,
+        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         std::string&& name,
         bool is_transformable);
     ~Model() override;
@@ -46,8 +39,7 @@ private:
     ModelBuilder(
         Engine& e,
         std::string&& name,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
-        std::shared_ptr<render::material::Material>&& mat,
+        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         core::job::EndCaller<>&& end_caller,
         bool is_transformable);
 
@@ -59,8 +51,7 @@ struct ModelManager final : render::model::Manager {
 private:
     [[nodiscard]] std::shared_ptr<render::model::Builder> build(
         std::string&& name,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
-        std::shared_ptr<render::material::Material>&& mat,
+        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         core::job::EndCaller<>&& c,
         bool is_transformable) override;
 

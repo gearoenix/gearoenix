@@ -52,12 +52,12 @@ gearoenix::gl::Skybox::~Skybox() = default;
 
 gearoenix::gl::uint gearoenix::gl::Skybox::get_vertex_object() const
 {
-    return gl_mesh->vertex_object;
+    return gl_mesh->get_cached_vertex_object(); // todo these can be cached for improving
 }
 
 gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const
 {
-    return gl_mesh->index_buffer;
+    return gl_mesh->get_cached_index_buffer();
 }
 
 gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const

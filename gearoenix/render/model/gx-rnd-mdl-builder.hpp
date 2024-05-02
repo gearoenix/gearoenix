@@ -34,7 +34,7 @@ struct Builder {
     Builder(
         engine::Engine& e,
         const std::string& name,
-        const std::shared_ptr<mesh::Mesh>& bound_mesh,
+        const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
         core::job::EndCaller<>&& end_caller);
 
 public:

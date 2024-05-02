@@ -6,7 +6,6 @@ namespace gearoenix::physics::animation {
 struct Manager;
 struct Armature final : core::ecs::Component {
     std::size_t root_bone_index = static_cast<std::size_t>(-1);
-    std::size_t bones_count = static_cast<std::size_t>(-1);
 
     explicit Armature(std::string&& name);
     [[nodiscard]] static std::shared_ptr<Armature> construct(std::string&& name);

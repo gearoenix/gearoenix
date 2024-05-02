@@ -2,7 +2,6 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-profiler.hpp"
-#include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
@@ -246,6 +245,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
             scene_pool_ref.dynamic_models.clear();
             scene_pool_ref.shadow_caster_directional_lights.clear();
             scene_pool_ref.bones_data.clear();
+            scene_pool_ref.meshes.clear();
             scene_pool_ref.debug_mesh_data.clear();
             scene_pool_ref.name = &scene->get_name();
             e.get_world()->synchronised_system<core::ecs::All<gl::Camera, physics::TransformationComponent>>(
@@ -272,12 +272,12 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                     }
                     }
                     if (camera->get_debug_enabled()) {
-                        const auto* const mesh = dynamic_cast<const Mesh*>(camera->get_debug_mesh().get());
+                        const auto* const mesh = dynamic_cast<const gl::Mesh*>(camera->get_debug_mesh().get());
                         scene_pool_ref.debug_mesh_data.push_back(DebugModel {
                             .m = math::Mat4x4<float>(transform->get_global_matrix()),
                             .colour = camera->get_debug_colour(),
-                            .vertex_object = mesh->vertex_object,
-                            .indices_count = mesh->indices_count });
+                            .vertex_object = mesh->get_cached_vertex_object(),
+                            .indices_count = mesh->get_cached_indices_count() });
                     }
                 });
             e.get_world()->synchronised_system<ShadowCasterDirectionalLight>(
@@ -397,16 +397,14 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
             if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            auto& mesh = *model->get_gl_mesh();
+            const auto [first_mesh_index, last_mesh_index] = scene_data.add_meshes(model->get_gl_meshes());
             const BvhNodeModel md {
                 .cameras_flags = model->cameras_flags,
                 .model = Model {
                     .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                     .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
-                    .material = model->get_gl_material().get(),
-                    .render_material = model->get_bound_material().get(),
-                    .vertex_object = mesh.vertex_object,
-                    .indices_count = mesh.indices_count,
+                    .first_mesh_index = first_mesh_index,
+                    .last_mesh_index = last_mesh_index,
                     // Reflection probe data
                     .irradiance = scene_data.default_reflection.second.irradiance,
                     .radiance = scene_data.default_reflection.second.radiance,
@@ -432,7 +430,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            const auto& mesh = *model->get_gl_mesh();
+            const auto [first_mesh_index, last_mesh_index] = scene_data.add_meshes(model->get_gl_meshes());
             std::size_t first_bone_index = 0;
             std::size_t bones_count = 0;
             if (nullptr != armature) {
@@ -456,17 +454,15 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
                         .model = Model {
                             .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
                             .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
-                            .material = model->get_gl_material().get(),
-                            .render_material = model->get_bound_material().get(),
-                            .vertex_object = mesh.vertex_object,
-                            .indices_count = mesh.indices_count,
+                            .first_mesh_index = first_mesh_index,
+                            .last_mesh_index = last_mesh_index,
+                            .first_bone_index = first_bone_index,
+                            .bones_count = bones_count,
                             // Reflection probe data
                             .irradiance = scene_data.default_reflection.second.irradiance,
                             .radiance = scene_data.default_reflection.second.radiance,
                             .radiance_lod_coefficient = scene_data.default_reflection.second.radiance_mips_count,
                             .reflection_probe_size = scene_data.default_reflection.second.size,
-                            .bones_count = bones_count,
-                            .first_bone_index = first_bone_index,
                         },
                     },
                     .box = collider->get_updated_box(),
@@ -615,7 +611,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     m.radiance = black_cube->get_object();
                     m.radiance_lod_coefficient = 0.0f;
                 }
-                if (m.render_material->get_transparency() == render::material::Transparency::Transparent) {
+                if (m.has_transparent_material(scene_data)) {
                     camera_data.threads_translucent_models_data[0].emplace_back(dis, m);
                 } else {
                     camera_data.threads_opaque_models_data[0].emplace_back(dis, m);
@@ -640,7 +636,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     md.radiance = black_cube->get_object();
                     md.radiance_lod_coefficient = 0.0f;
                 }
-                if (md.render_material->get_transparency() == render::material::Transparency::Transparent) {
+                if (md.has_transparent_material(scene_data)) {
                     camera_data.threads_translucent_models_data[kernel_index].emplace_back(dis, md);
                 } else {
                     camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
@@ -671,7 +667,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 camera_data.models_data.end(),
                 [&](std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
                     auto& m = d_m.second;
-                    if (!m.material->needs_mvp && camera->get_usage() != render::camera::Camera::Usage::Shadow) {
+                    if (!m.needs_mvp(scene_data) && camera->get_usage() != render::camera::Camera::Usage::Shadow) {
                         return;
                     }
                     if (m.bones_count > 0) {
@@ -688,7 +684,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             for (auto& ms : camera_data.threads_mvps) {
                 for (auto& im : ms) {
                     if (current_model_index != im.first) {
-                        camera_data.models_data[im.first].second.fist_mvp_index = camera_data.mvps.size();
+                        camera_data.models_data[im.first].second.first_mvp_index = camera_data.mvps.size();
                         current_model_index = im.first;
                     }
                     camera_data.mvps.push_back(im.second);
@@ -721,7 +717,7 @@ void gearoenix::gl::submission::Manager::render_shadows()
     pop_debug_group();
 }
 
-void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera)
+void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene, const Camera& camera)
 {
     push_debug_group("render-shadows for camera " + *camera.name);
     set_framebuffer(camera.framebuffer);
@@ -729,7 +725,7 @@ void gearoenix::gl::submission::Manager::render_shadows(const Camera& camera)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     for (auto& distance_model_data : camera.models_data) {
         auto& model_data = distance_model_data.second;
-        model_data.material->shadow(model_data, camera, current_shader);
+        model_data.render_shadow(scene, camera, current_shader);
     }
     pop_debug_group();
 }
@@ -739,7 +735,7 @@ void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene)
     push_debug_group("render-shadows for scene " + *scene.name);
     for (auto& camera_pool_index : scene.shadow_cameras) {
         auto& camera = camera_pool[camera_pool_index.second];
-        render_shadows(camera);
+        render_shadows(scene, camera);
     }
     pop_debug_group();
 }
@@ -869,7 +865,7 @@ void gearoenix::gl::submission::Manager::render_forward_camera(const Scene& scen
     // Rendering forward pbr
     for (auto& distance_model_data : camera.models_data) {
         auto& model_data = distance_model_data.second;
-        model_data.material->forward_render(model_data, camera, scene, current_shader);
+        model_data.render_forward(scene, camera, current_shader);
         GX_GL_CHECK_D;
     }
     glDisable(GL_BLEND); /// TODO: take it into a context and material must decide
@@ -893,7 +889,7 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             for (auto& distance_model_data : camera.models_data) {
                 auto& model_data = distance_model_data.second;
-                model_data.material->deferred_gbuffer_render(model_data, camera, scene, current_shader);
+                model_data.render_deferred_gbuffers(scene, camera, current_shader);
             }
         }
 

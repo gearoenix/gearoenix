@@ -1,9 +1,11 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/animation/gx-phs-anm-animation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-gltf-loader.hpp>
+#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/reflection/gx-rnd-rfl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
@@ -44,11 +46,9 @@ using GxReflectionBuilder = gearoenix::render::reflection::Builder;
 using GxReflectionBuilderPtr = std::shared_ptr<GxReflectionBuilder>;
 using GxReflectionBuilderEndCaller = GxEndCallerShared<GxReflectionBuilder>;
 
-using GxTxt2D = gearoenix::render::texture::Texture2D;
-using GxTxt2DPtr = std::shared_ptr<GxTxt2D>;
-using GxTxt2DEndCaller = GxEndCallerShared<GxTxt2D>;
-
 using GxPath = gearoenix::platform::stream::Path;
+
+using GxAnimationPlayer = gearoenix::physics::animation::AnimationPlayer;
 
 struct GameApp final : GxCoreApp {
     std::unique_ptr<GxJetCtrl> camera_controller;
@@ -67,17 +67,24 @@ GameApp::GameApp(GxPltApp& plt_app)
         GxEndCallerT<std::vector<GxSceneBuilderPtr>>([this](auto&& scene_builders) {
             gltf_is_ready(scene_builders[0]);
         }),
-        gearoenix::core::job::EndCaller([] {}));
+        GxEndCaller([] {}));
 }
 
 void GameApp::update()
 {
     GxCoreApp::update();
-    camera_controller->update();
+    if (nullptr != camera_controller) {
+        camera_controller->update();
+    }
 }
 
 void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
 {
+    if (const auto search = scene_builder->get_model_builders().find("Ch10"); scene_builder->get_model_builders().end() != search) {
+        auto* const player = search->second->get_entity_builder()->get_builder().get_component<GxAnimationPlayer>();
+        player->set_loop_range_time(1.0e-10, 0.6);
+    }
+
     render_engine.get_skybox_manager()->build(
         "hello-skybox",
         GxPath::create_asset("sky.gx-cube-texture"),

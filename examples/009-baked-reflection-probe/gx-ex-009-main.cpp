@@ -62,27 +62,30 @@ using GxReflectionBuilder = gearoenix::render::reflection::Builder;
 using GxReflectionBuilderPtr = std::shared_ptr<GxReflectionBuilder>;
 using GxReflectionBuilderEndCaller = GxEndCallerShared<GxReflectionBuilder>;
 
-using GxTxt2D = gearoenix::render::texture::Texture2D;
-using GxTxt2DPtr = std::shared_ptr<GxTxt2D>;
-using GxTxt2DEndCaller = GxEndCallerShared<GxTxt2D>;
-
 using GxPath = gearoenix::platform::stream::Path;
 
 struct GameApp final : public GxCoreApp {
     std::unique_ptr<GxJetCtrl> camera_controller;
 
-    explicit GameApp(GxPltApp& plt_app) noexcept
+    explicit GameApp(GxPltApp& plt_app)
         : GxCoreApp(plt_app)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, GxEndCaller([] {}));
         scene_builder->get_scene().set_enabled(true);
 
-        render_engine.get_mesh_manager()->build_icosphere(
-            4,
-            GxMeshEndCaller([this, scene_builder](GxMeshPtr&& icosphere_mesh) {
-                mesh_is_ready(icosphere_mesh, scene_builder);
-            }));
+        for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
+            for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
+                const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
+                const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
+                const auto postfix = "metallic: " + std::to_string(metallic) + ", roughness: " + std::to_string(roughness);
+                render_engine.get_material_manager()->get_pbr(
+                    "material" + postfix,
+                    GxPbrEndCaller([this, metallic, p = postfix, roughness, sb = scene_builder](GxPbrPtr&& material) mutable {
+                        material_is_ready(std::move(material), std::move(p), metallic, roughness, std::move(sb));
+                    }));
+            }
+        }
 
         render_engine.get_skybox_manager()->build(
             "hello-skybox",
@@ -116,35 +119,13 @@ struct GameApp final : public GxCoreApp {
         GX_LOG_D("Initialised");
     }
 
-    void mesh_is_ready(const GxMeshPtr& icosphere_mesh, const GxSceneBuilderPtr& scene_builder)
+    void mesh_is_ready(
+        GxMeshPtr&& mesh, const std::string& postfix, const GxSceneBuilderPtr& scene_builder,
+        const float metallic, const float roughness)
     {
-        for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
-            for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
-                const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
-                const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
-                const auto postfix = "metallic: " + std::to_string(metallic) + ", roughness: " + std::to_string(roughness);
-                render_engine.get_material_manager()->get_pbr(
-                    "material" + postfix,
-                    GxPbrEndCaller([this, metallic, postfix, roughness, icosphere_mesh, scene_builder](GxPbrPtr&& material) mutable {
-                        material_is_ready(std::move(material), postfix, metallic, roughness, icosphere_mesh, scene_builder);
-                    }));
-            }
-        }
-    }
-
-    void material_is_ready(
-        GxPbrPtr&& material, const std::string& postfix, const float metallic, const float roughness,
-        const GxMeshPtr& icosphere_mesh, const GxSceneBuilderPtr& scene_builder)
-    {
-        material->get_albedo_factor().x = 0.999f;
-        material->get_albedo_factor().y = 0.1f;
-        material->get_albedo_factor().z = 0.4f;
-        material->get_normal_metallic_factor().w = metallic;
-        material->get_emission_roughness_factor().w = roughness;
         auto model_builder = render_engine.get_model_manager()->build(
             "icosphere" + postfix,
-            std::shared_ptr(icosphere_mesh),
-            std::move(material),
+            { std::move(mesh) },
             GxEndCaller([] {}),
             true);
         model_builder->get_transformation().local_translate(
@@ -154,7 +135,25 @@ struct GameApp final : public GxCoreApp {
         scene_builder->add(std::move(model_builder));
     }
 
-    void update() noexcept final
+    void material_is_ready(
+        GxPbrPtr&& material, std::string&& postfix, const float metallic, const float roughness,
+        GxSceneBuilderPtr&& scene_builder)
+    {
+        material->get_albedo_factor().x = 0.999f;
+        material->get_albedo_factor().y = 0.1f;
+        material->get_albedo_factor().z = 0.4f;
+        material->get_normal_metallic_factor().w = metallic;
+        material->get_emission_roughness_factor().w = roughness;
+
+        render_engine.get_mesh_manager()->build_icosphere(
+            4,
+            std::move(material),
+            GxMeshEndCaller([this, p = std::move(postfix), sb = std::move(scene_builder), metallic, roughness](GxMeshPtr&& mesh) mutable {
+                mesh_is_ready(std::move(mesh), std::move(p), sb, metallic, roughness);
+            }));
+    }
+
+    void update() override
     {
         Application::update();
         camera_controller->update();

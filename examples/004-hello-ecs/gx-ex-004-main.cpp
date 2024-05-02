@@ -69,10 +69,6 @@ using GxPbr = gearoenix::render::material::Pbr;
 using GxPbrPtr = std::shared_ptr<GxPbr>;
 using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
 
-using GxTxt2D = gearoenix::render::texture::Texture2D;
-using GxTxt2DPtr = std::shared_ptr<GxTxt2D>;
-using GxTxt2DEndCaller = GxEndCallerShared<GxTxt2D>;
-
 template <typename T>
 using GxAllocator = gearoenix::core::allocator::SharedArray<T, objects_count>;
 
@@ -186,61 +182,61 @@ struct GameApp final : GxCoreApp {
     explicit GameApp(GxPltApp& plt_app) noexcept
         : GxCoreApp(plt_app)
     {
-        struct DataCollector final {
-            GameApp* const app;
-            const GxSceneBuilderPtr scene_builder;
-            GxMeshPtr cube_mesh;
-            std::array<GxPbrPtr, objects_count> materials;
-            std::array<GxTxt2DPtr, objects_count> colours;
+        const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
 
-            ~DataCollector()
-            {
-                for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
-                    materials[model_index]->set_albedo(std::move(colours[model_index]));
-                    auto model_builder = app->render_engine.get_model_manager()->build(
-                        "triangle" + std::to_string(model_index),
-                        GxMeshPtr(cube_mesh),
-                        std::move(materials[model_index]),
-                        GxEndCaller([] {}),
-                        true);
-                    auto speed = Speed::construct();
-                    auto position = Position::construct();
-                    auto& model_transformation = model_builder->get_transformation();
-                    model_transformation.set_local_location(position->value);
-                    model_transformation.local_scale(cube_size);
-                    model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
-                    scene_builder->add(std::move(model_builder));
-                }
-            }
-        };
+        const GxEndCaller end([this, materials] { materials_ready(*materials); });
 
+        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+            render_engine.get_material_manager()->get_pbr(
+                "material-" + std::to_string(model_index),
+                GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
+                    m->get_albedo_factor() = {
+                        colour_distribution(random_engine),
+                        colour_distribution(random_engine),
+                        colour_distribution(random_engine),
+                        1.0f
+                    };
+                    (*materials)[model_index] = std::move(m);
+                }));
+        }
+    }
+
+    void materials_ready(std::array<GxPbrPtr, objects_count>& materials)
+    {
+        const auto meshes = std::make_shared<std::array<GxMeshPtr, objects_count>>();
+
+        const GxEndCaller end([this, meshes] { meshes_ready(*meshes); });
+
+        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+            render_engine.get_mesh_manager()->build_cube(
+                std::move(materials[model_index]),
+                GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
+                    (*meshes)[model_index] = std::move(mesh);
+                }));
+        }
+    }
+
+    void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
+    {
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, GxEndCaller([this] {
                 render_engine.get_world()->get_component<GxScene>(scene_id)->set_enabled(true);
             }));
         scene_id = scene_builder->get_id();
 
-        const auto data_collector = std::make_shared<DataCollector>(this, scene_builder);
-
-        render_engine.get_mesh_manager()->build_cube(
-            GxMeshEndCaller([data_collector](GxMeshPtr&& mesh) {
-                data_collector->cube_mesh = std::move(mesh);
-            }));
-
         for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
-            render_engine.get_material_manager()->get_pbr(
-                "material" + std::to_string(model_index),
-                GxPbrEndCaller([model_index, data_collector](GxPbrPtr&& m) {
-                    data_collector->materials[model_index] = std::move(m);
-                }));
-            render_engine.get_texture_manager()->create_2d_from_colour(
-                { colour_distribution(random_engine),
-                    colour_distribution(random_engine),
-                    colour_distribution(random_engine),
-                    1.0f },
-                GxTxt2DEndCaller([model_index, data_collector](GxTxt2DPtr&& t) {
-                    data_collector->colours[model_index] = std::move(t);
-                }));
+            auto model_builder = render_engine.get_model_manager()->build(
+                "triangle" + std::to_string(model_index),
+                { std::move(meshes[model_index]) },
+                GxEndCaller([] {}),
+                true);
+            auto speed = Speed::construct();
+            auto position = Position::construct();
+            auto& model_transformation = model_builder->get_transformation();
+            model_transformation.set_local_location(position->value);
+            model_transformation.local_scale(cube_size);
+            model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
+            scene_builder->add(std::move(model_builder));
         }
 
         render_engine.get_camera_manager()->build(

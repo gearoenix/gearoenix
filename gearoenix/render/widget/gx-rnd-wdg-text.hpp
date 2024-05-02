@@ -54,7 +54,7 @@ public:
     static void construct(
         std::string&& name,
         core::ecs::entity_id_t camera_id,
-        std::shared_ptr<mesh::Mesh>&& msh,
+        std::shared_ptr<material::Unlit>&& mat,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
         core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback);
@@ -62,7 +62,6 @@ public:
         std::string&& name,
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<mesh::Mesh>&& msh,
-        std::shared_ptr<material::Unlit>&& mat,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
         core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback);

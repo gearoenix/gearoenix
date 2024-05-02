@@ -5,6 +5,7 @@
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
+#include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
@@ -16,7 +17,7 @@ void gearoenix::render::widget::Button::set_on_press_impl(const std::function<vo
 {
     on_press = [this, fun = fun](const math::Vec3<double>& p) -> void {
         if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
+            mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         fun(p);
     };
 }
@@ -25,7 +26,7 @@ void gearoenix::render::widget::Button::set_on_release_impl(const std::function<
 {
     on_release = [this, fun = fun](const math::Vec3<double>& p) -> void {
         if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
+            mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun(p);
     };
 }
@@ -34,7 +35,7 @@ void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<v
 {
     on_cancel = [this, fun = fun]() -> void {
         if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
-            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
+            mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun();
     };
 }
@@ -121,7 +122,9 @@ void gearoenix::render::widget::Button::construct(
     core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
 {
     engine::Engine& e = parent->e;
+    auto copy_mat = std::shared_ptr(mat);
     e.get_mesh_manager()->build_plate(
+        std::move(copy_mat),
         core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), m = std::move(mat), pt = std::move(pressed_texture), r = std::move(rest_texture), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& bm) mutable {
             construct(std::move(n), std::move(m), std::move(pt), std::move(r), std::move(bm), c, std::move(p), std::move(s), std::move(e));
         }));
@@ -142,8 +145,7 @@ void gearoenix::render::widget::Button::construct(
     mat->set_albedo(std::shared_ptr(rest_texture));
     auto model_builder = parent->e.get_model_manager()->build(
         name + "-model",
-        std::move(button_mesh),
-        std::move(mat),
+        { std::move(button_mesh) },
         core::job::EndCaller([] {}),
         true);
     const auto id = model_builder->get_id();
@@ -178,7 +180,7 @@ void gearoenix::render::widget::Button::set_rest_texture(std::shared_ptr<texture
     rest_texture = std::move(t);
     if (!is_pressed) {
         if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
-            mdl->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
+            mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         }
     }
 }
@@ -188,7 +190,7 @@ void gearoenix::render::widget::Button::set_pressed_texture(std::shared_ptr<text
     pressed_texture = std::move(t);
     if (is_pressed) {
         if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
-            mdl->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
+            mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         }
     }
 }

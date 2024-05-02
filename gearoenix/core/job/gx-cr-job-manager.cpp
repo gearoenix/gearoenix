@@ -66,7 +66,6 @@ std::thread::id gearoenix::core::job::register_new_thread()
     worker->thread_data.emplace();
     worker->thread = std::thread([data = worker.get()] {
         data->thread_data->state = ThreadState::Working;
-        data->thread_data->signal.lock();
         while (ThreadState::Working == data->thread_data->state) {
             data->thread_data->signal.lock();
             if (ThreadState::Working != data->thread_data->state) {
@@ -92,7 +91,11 @@ void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, st
     } else {
         const auto& search = workers.find(receiver_thread_id);
         GX_ASSERT(workers.end() != search);
-        search->second->function_loader.load(std::move(job));
+        auto& worker = *search->second;
+        worker.function_loader.load(std::move(job));
+        if (worker.thread_data.has_value()) {
+            worker.thread_data->signal.release();
+        }
     }
 }
 
@@ -102,6 +105,7 @@ void gearoenix::core::job::send_job_io1(std::function<void()>&& job)
         job();
     } else {
         io1_worker->function_loader.load(std::move(job));
+        io1_worker->thread_data->signal.release();
     }
 }
 
@@ -111,6 +115,7 @@ void gearoenix::core::job::send_job_net1(std::function<void()>&& job)
         job();
     } else {
         net1_worker->function_loader.load(std::move(job));
+        net1_worker->thread_data->signal.release();
     }
 }
 

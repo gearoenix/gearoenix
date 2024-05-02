@@ -7,20 +7,16 @@
 #include "../gx-gl-types.hpp"
 #include <array>
 
-namespace gearoenix::render::material {
-struct Material;
-}
-
-namespace gearoenix::gl::material {
-struct Material;
-}
-
 namespace gearoenix::gl::submission {
+struct Camera;
+struct Scene;
 struct Model final {
     math::Mat4x4<float> m;
     math::Mat4x4<float> inv_m;
-    material::Material* material = nullptr;
-    render::material::Material* render_material = nullptr;
+    std::size_t first_mesh_index = 0;
+    std::size_t last_mesh_index = 0;
+    std::size_t first_bone_index = 0;
+    std::size_t bones_count = 0;
     std::size_t directional_lights_count = 0;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_direction;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_colour;
@@ -29,16 +25,18 @@ struct Model final {
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_direction;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_colour;
     std::array<uint, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_shadow_map_texture;
-    uint vertex_object = 0;
-    sizei indices_count = 0;
     // Reflection probe data
     uint irradiance = static_cast<uint>(-1);
     uint radiance = static_cast<uint>(-1);
     float radiance_lod_coefficient = 0.0;
     double reflection_probe_size = std::numeric_limits<double>::max();
-    std::size_t bones_count = 0;
-    std::size_t first_bone_index = 0;
-    std::size_t fist_mvp_index = 0; // It is used for shadow
+    std::size_t first_mvp_index = 0; // It is used for shadow
+
+    [[nodiscard]] bool has_transparent_material(const Scene& scene) const;
+    [[nodiscard]] bool needs_mvp(const Scene& scene) const;
+    void render_shadow(const Scene& scene, const Camera& camera, uint& current_shader) const;
+    void render_forward(const Scene& scene, const Camera& camera, uint& current_shader) const;
+    void render_deferred_gbuffers(const Scene& scene, const Camera& camera, uint& current_shader) const;
 };
 
 struct BvhNodeModel final {

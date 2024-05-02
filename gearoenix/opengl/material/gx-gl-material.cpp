@@ -11,6 +11,7 @@ gearoenix::gl::material::Material::~Material() = default;
 
 void gearoenix::gl::material::Material::shadow(
     const submission::Model&,
+    const submission::Mesh&,
     const submission::Camera&,
     uint&)
 {
@@ -19,6 +20,7 @@ void gearoenix::gl::material::Material::shadow(
 
 void gearoenix::gl::material::Material::forward_render(
     const submission::Model&,
+    const submission::Mesh&,
     const submission::Camera&,
     const submission::Scene&,
     uint&)
@@ -28,6 +30,7 @@ void gearoenix::gl::material::Material::forward_render(
 
 void gearoenix::gl::material::Material::deferred_gbuffer_render(
     const submission::Model&,
+    const submission::Mesh&,
     const submission::Camera&,
     const submission::Scene&,
     uint&)

@@ -3,6 +3,8 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
+#include "../material/gx-rnd-mat-manager.hpp"
+#include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
@@ -227,31 +229,40 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
 
 void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>&& end)
 {
-    std::array<math::Vec3<double>, 8> points;
-    generate_frustum_points(
-        math::Vec3(0.0),
-        math::X3D<double>,
-        math::Y3D<double>,
-        math::Z3D<double>,
-        points);
-    std::vector<PbrVertex> vertices(points.size());
-    for (std::size_t i = 0; i < points.size(); ++i)
-        vertices[i].position = math::Vec3<float>(points[i]);
-    std::vector<std::uint32_t> indices {
-        0, 1, 0, 2, 1, 3, 2, 3, // far
-        0, 4, 1, 5, 2, 6, 3, 7, // edges
-        4, 5, 4, 6, 5, 7, 6, 7, // near
-    };
-    std::string mesh_name = "camera-debug-mesh" + std::to_string(reinterpret_cast<std::size_t>(this));
-    (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
-    e.get_mesh_manager()->build(
-        std::move(mesh_name),
-        std::move(vertices),
-        std::move(indices),
-        core::job::EndCallerShared<mesh::Mesh>([self = camera_self.lock(), end = std::move(end)](std::shared_ptr<mesh::Mesh>&& m) {
-            if (nullptr == self)
+    e.get_material_manager()->get_unlit(
+        "dummy",
+        core::job::EndCallerShared<material::Unlit>([this, self = camera_self.lock(), end = std::move(end)](std::shared_ptr<material::Unlit>&& material) mutable {
+            if (nullptr == self) {
                 return;
-            self->debug_mesh = std::move(m);
+            }
+            std::string mesh_name = name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::size_t>(this));
+            (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
+            std::array<math::Vec3<double>, 8> points;
+            generate_frustum_points(
+                math::Vec3(0.0),
+                math::X3D<double>,
+                math::Y3D<double>,
+                math::Z3D<double>,
+                points);
+            std::vector<PbrVertex> vertices(points.size());
+            for (std::size_t i = 0; i < points.size(); ++i) {
+                vertices[i].position = math::Vec3<float>(points[i]);
+            }
+            std::vector<std::uint32_t> indices {
+                0, 1, 0, 2, 1, 3, 2, 3, // far
+                0, 4, 1, 5, 2, 6, 3, 7, // edges
+                4, 5, 4, 6, 5, 7, 6, 7, // near
+            };
+            e.get_mesh_manager()->build(
+                std::move(mesh_name),
+                std::move(vertices),
+                std::move(indices),
+                std::move(material),
+                core::job::EndCallerShared<mesh::Mesh>([this, self = std::move(self), end = std::move(end)](std::shared_ptr<mesh::Mesh>&& m) {
+                    debug_mesh = std::move(m);
+                    (void)self;
+                    (void)end;
+                }));
         }));
 }
 
@@ -294,5 +305,6 @@ void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& e
             s->target = Target(Target::Default { .first = std::move(t.first_colour), .second = std::move(t.second_colour) });
             s->update_projection();
             s->update_bloom(std::move(end));
+            (void)std::move(t);
         }));
 }

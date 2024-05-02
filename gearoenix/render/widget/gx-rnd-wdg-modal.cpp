@@ -58,8 +58,7 @@ void gearoenix::render::widget::Modal::construct(
         values->mat->set_albedo(std::move(values->background_texture));
         values->return_value.background_model_builder = values->return_value.modal->e.get_model_manager()->build(
             values->return_value.modal->name + "-background-model",
-            std::move(values->msh),
-            std::move(values->mat),
+            { values->msh },
             core::job::EndCaller([] {}),
             true);
         values->return_value.modal->set_model_entity_id(values->return_value.background_model_builder->get_id());
@@ -76,7 +75,12 @@ void gearoenix::render::widget::Modal::construct(
         values->return_value.modal->name + "-material",
         core::job::EndCallerShared<material::Unlit>([values, values_ready](std::shared_ptr<material::Unlit>&& mat) {
             values->mat = std::move(mat);
-            (void)values_ready;
+            values->mat->e.get_mesh_manager()->build_plate(
+                std::shared_ptr<material::Material>(values->mat),
+                core::job::EndCallerShared<mesh::Mesh>([values, values_ready](std::shared_ptr<mesh::Mesh>&& msh) {
+                    values->msh = std::move(msh);
+                    (void)values_ready;
+                }));
         }));
 
     const auto path = platform::stream::Path::create_asset(background_texture_asset);
@@ -86,11 +90,6 @@ void gearoenix::render::widget::Modal::construct(
             values->background_texture = std::move(tex);
             (void)values_ready;
         }));
-
-    e.get_mesh_manager()->build_plate(core::job::EndCallerShared<mesh::Mesh>([values, values_ready](std::shared_ptr<mesh::Mesh>&& msh) {
-        values->msh = std::move(msh);
-        (void)values_ready;
-    }));
 
     auto& result = values->return_value.modal;
 

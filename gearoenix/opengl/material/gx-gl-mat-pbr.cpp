@@ -29,19 +29,23 @@ void gearoenix::gl::material::Pbr::construct(Engine& e, const std::string& name,
 
 gearoenix::gl::material::Pbr::~Pbr() = default;
 
-void gearoenix::gl::material::Pbr::shadow(const submission::Model& model, const submission::Camera& camera, uint& current_shader)
+void gearoenix::gl::material::Pbr::shadow(
+    const submission::Model& model,
+    const submission::Mesh& mesh,
+    const submission::Camera& camera,
+    uint& current_shader)
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(model.bones_count);
     shadow_caster_shader.bind(current_shader);
-    shadow_caster_shader.set_mvp_data(&camera.mvps[model.fist_mvp_index]);
+    shadow_caster_shader.set_mvp_data(&camera.mvps[model.first_mvp_index]);
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
     shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
 
     glActiveTexture(GL_TEXTURE0 + shadow_caster_shader.get_albedo_index());
     glBindTexture(GL_TEXTURE_2D, gl_albedo->get_object());
 
-    glBindVertexArray(model.vertex_object);
-    glDrawElements(GL_TRIANGLES, model.indices_count, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.vertex_object);
+    glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
 void gearoenix::gl::material::Pbr::set_albedo(std::shared_ptr<render::texture::Texture2D>&& o)
@@ -82,6 +86,7 @@ void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::
 
 void gearoenix::gl::material::Pbr::forward_render(
     const submission::Model& model,
+    const submission::Mesh& mesh,
     const submission::Camera& camera,
     const submission::Scene& scene,
     uint& current_shader)
@@ -137,12 +142,13 @@ void gearoenix::gl::material::Pbr::forward_render(
         }
     }
 
-    glBindVertexArray(model.vertex_object);
-    glDrawElements(GL_TRIANGLES, model.indices_count, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.vertex_object);
+    glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
 void gearoenix::gl::material::Pbr::deferred_gbuffer_render(
     const submission::Model& model,
+    const submission::Mesh& mesh,
     const submission::Camera& camera,
     const submission::Scene&,
     uint& current_shader)
@@ -172,8 +178,8 @@ void gearoenix::gl::material::Pbr::deferred_gbuffer_render(
     glBindTexture(GL_TEXTURE_CUBE_MAP, model.irradiance);
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_radiance_index()));
     glBindTexture(GL_TEXTURE_CUBE_MAP, model.radiance);
-    glBindVertexArray(model.vertex_object);
-    glDrawElements(GL_TRIANGLES, model.indices_count, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.vertex_object);
+    glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_INT, nullptr);
 }
 
 #endif
