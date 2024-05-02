@@ -55,7 +55,7 @@ public:
     template <typename... Args>
     [[nodiscard]] std::shared_ptr<T> make_shared(Args&&... args)
     {
-        auto* const ptr = [this]() constexpr {
+        auto* const ptr = [this]() {
             const std::lock_guard<std::mutex> _lg(gx_core_shared_array_lock);
 
             if (gx_core_shared_array_free_pointers.empty()) {
