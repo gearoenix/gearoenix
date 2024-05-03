@@ -30,9 +30,11 @@ jobs:
           tar -xf ~/llvm.tar.xz -C ~/llvm --strip-components=1 &&
           ls ~ &&
           ls ~/llvm/ &&
+          echo "ls ~/llvm/bin ----------------------------" &&
+          ls ~/llvm/bin &&
           echo "${HOME}/llvm/bin" >> $GITHUB_PATH &&
-          echo "CC=${HOME}/llvm/bin/clang" >> $GITHUB_ENV &&
-          echo "CXX=${HOME}/llvm/bin/clang++" >> $GITHUB_ENV &&
+          echo "CC=${HOME}/llvm/bin/clang-18" >> $GITHUB_ENV &&
+          echo "CXX=${HOME}/llvm/bin/clang-18" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
       - name: Setup Vulkan SDK
