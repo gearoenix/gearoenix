@@ -24,9 +24,9 @@ jobs:
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
       - name: Install dependencies
         run: |
-          sudo apt-get install clang-16 libsdl2-dev libdrm-dev libgbm-dev -y &&
+          sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev -y &&
           curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.4/clang+llvm-18.1.4-x86_64-linux-gnu-ubuntu-18.04.tar.xz --output ~/llvm.tar.xz &&
-          mkdir ~/llvm &&
+          mkdir -p ~/llvm &&
           tar -xf ~/llvm.tar.xz -C ~/llvm --strip-components=1 &&
           ls ~ &&
           ls ~/llvm/ &&
