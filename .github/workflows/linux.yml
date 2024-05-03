@@ -25,17 +25,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev -y &&
-          curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.4/clang+llvm-18.1.4-x86_64-linux-gnu-ubuntu-18.04.tar.xz --output ~/llvm.tar.xz &&
-          mkdir -p ~/llvm &&
-          tar -xf ~/llvm.tar.xz -C ~/llvm --strip-components=1 &&
-          ls ~ &&
-          ls ~/llvm/ &&
-          echo "ls ~/llvm/bin ----------------------------" &&
-          ls ~/llvm/bin &&
-          echo "${HOME}/llvm/bin" >> $GITHUB_PATH &&
-          echo "CC=${HOME}/llvm/bin/clang-18" >> $GITHUB_ENV &&
-          echo "CXX=${HOME}/llvm/bin/clang-18" >> $GITHUB_ENV &&
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/llvm/lib" >> $GITHUB_ENV &&
+          echo "CC=/usr/bin/clang-15" >> $GITHUB_ENV &&
+          echo "CXX=/usr/bin/clang++-15" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
       - name: Setup Vulkan SDK
