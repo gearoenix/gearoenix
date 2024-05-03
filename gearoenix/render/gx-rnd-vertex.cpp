@@ -13,7 +13,7 @@ void gearoenix::render::PbrVertex::read(platform::stream::Stream& f)
     uv.read(f);
 }
 
-std::ostream& gearoenix::render::operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v)
+std::ostream& operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v)
 {
     os << R"({ "type": "PbrVertex", "position": )" << v.position
        << ", \"normal\": " << v.normal

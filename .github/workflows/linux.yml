@@ -24,9 +24,9 @@ jobs:
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
       - name: Install dependencies
         run: |
-          sudo apt-get install clang-14 libsdl2-dev libdrm-dev libgbm-dev -y &&
-          echo "CC=/usr/bin/clang-14" >> $GITHUB_ENV &&
-          echo "CXX=/usr/bin/clang++-14" >> $GITHUB_ENV &&
+          sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev -y &&
+          echo "CC=/usr/bin/clang-15" >> $GITHUB_ENV &&
+          echo "CXX=/usr/bin/clang++-15" >> $GITHUB_ENV &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
       - name: Setup Vulkan SDK
