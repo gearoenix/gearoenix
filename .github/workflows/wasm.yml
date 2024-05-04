@@ -1,0 +1,62 @@
+name: 'WASM  '
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            ~/emsdk
+            ~/cmake
+            build-webassembly/
+          key: ${{ runner.os }}-webassembly-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
+      - name: Update OS
+        run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
+      - name: Install dependencies
+        run: |
+          sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev git -y &&
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
+          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
+      - name: Setup Emscripten SDK
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          cd ~ &&
+          git clone https://github.com/emscripten-core/emsdk.git &&
+          cd ~/emsdk &&
+          ./emsdk install latest &&
+          ./emsdk activate latest
+      - name: Install CMake
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          CMAKE_VER="3.29.2" &&
+          curl -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" -o ~/cmake.tar.gz &&
+          mkdir -p ~/cmake &&
+          tar -xf ~/cmake.tar.gz -C ~/cmake --strip-components=1 &&
+          rm ~/cmake.tar.gz &&
+          echo "$HOME/cmake/bin" >> $GITHUB_PATH
+      - name: Echos
+        run: |
+          echo $HOME
+          echo `pwd`
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL}"
+          echo "LLVM_PROFILE_FILE=${LLVM_PROFILE_FILE}"
+          echo "PATH=${PATH}"
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+          echo "GITHUB_ENV="
+          cat $GITHUB_ENV
+      - name: Building Release
+        run: |
+          mkdir -p build-release &&
+          cd build-release &&
+          source "$HOME/emsdk/emsdk_env.sh" &&
+          emcmake cmake -DCMAKE_BUILD_TYPE=MinRelSize -DGX_TEST_ENABLED=OFF .. &&
+          cmake --build . --config MinRelSize

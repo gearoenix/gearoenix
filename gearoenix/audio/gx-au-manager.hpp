@@ -33,10 +33,7 @@ struct Manager {
     [[nodiscard]] std::size_t create_audio(const platform::stream::Path& asset_path, const std::string& name);
     [[nodiscard]] std::size_t create_audio(platform::stream::Stream& asset_stream, const std::string& name);
     [[nodiscard]] std::size_t create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name);
-    [[nodiscard]] std::size_t create_player(
-        const std::string& name,
-        std::size_t audio_index,
-        bool is_loop = true);
+    [[nodiscard]] std::size_t create_player(const std::string& name, std::size_t audio_index, bool is_loop = true);
 };
 }
 #endif

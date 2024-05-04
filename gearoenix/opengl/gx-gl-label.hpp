@@ -13,31 +13,49 @@ namespace gearoenix::gl {
 #ifdef GX_GL_LABELING_ENABLED
 inline void set_buffer_label(const uint value, const std::string& name)
 {
+    if (0 == reinterpret_cast<std::size_t>(glObjectLabel)) {
+        return;
+    }
     glObjectLabel(GL_BUFFER, value, static_cast<sizei>(name.size()), name.data());
 }
 
 inline void set_vertex_array_label(const uint value, const std::string& name)
 {
+    if (0 == reinterpret_cast<std::size_t>(glObjectLabel)) {
+        return;
+    }
     glObjectLabel(GL_VERTEX_ARRAY, value, static_cast<sizei>(name.size()), name.data());
 }
 
 inline void set_texture_label(const uint value, const std::string& name)
 {
+    if (0 == reinterpret_cast<std::size_t>(glObjectLabel)) {
+        return;
+    }
     glObjectLabel(GL_TEXTURE, value, static_cast<sizei>(name.size()), name.data());
 }
 
 inline void set_framebuffer_label(const uint value, const std::string& name)
 {
+    if (0 == reinterpret_cast<std::size_t>(glObjectLabel)) {
+        return;
+    }
     glObjectLabel(GL_FRAMEBUFFER, value, static_cast<sizei>(name.size()), name.data());
 }
 
 inline void push_debug_group(const std::string& name)
 {
+    if (0 == reinterpret_cast<std::size_t>(glPushDebugGroup)) {
+        return;
+    }
     glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, static_cast<sizei>(name.size()), name.data());
 }
 
 inline void pop_debug_group()
 {
+    if (0 == reinterpret_cast<std::size_t>(glPopDebugGroup)) {
+        return;
+    }
     glPopDebugGroup();
 }
 #else

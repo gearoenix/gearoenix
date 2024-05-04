@@ -127,7 +127,7 @@ public:
         auto entity_search = entities.find(id);
         if (entities.end() == entity_search)
             return {
-                reinterpret_cast<ComponentTypes*>(std::size_t{0})...,
+                reinterpret_cast<ComponentTypes*>(std::size_t { 0 })...,
             };
         const auto& e = entity_search->second;
         return {

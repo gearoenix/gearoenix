@@ -212,8 +212,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
-        (void)c;
-    });
+        (void)c; });
 }
 
 gearoenix::gl::Texture2D::Texture2D(
@@ -229,8 +228,7 @@ gearoenix::gl::Texture2D::~Texture2D()
 {
     core::job::send_job(e.get_jobs_thread_id(), [o = object] {
         glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &o);
-    });
+        glDeleteTextures(1, &o); });
 }
 
 void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) const
@@ -277,8 +275,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
-        (void)c;
-    });
+        (void)c; });
 }
 
 gearoenix::gl::TextureCube::TextureCube(
@@ -294,8 +291,7 @@ gearoenix::gl::TextureCube::~TextureCube()
 {
     core::job::send_job(e.get_jobs_thread_id(), [o = object]() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-        glDeleteTextures(1, &o);
-    });
+        glDeleteTextures(1, &o); });
 }
 
 void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) const
@@ -367,8 +363,7 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
         }
         glBindTexture(GL_TEXTURE_2D, 0);
         set_texture_label(result->object, result->name);
-        GX_GL_CHECK_D;
-    });
+        GX_GL_CHECK_D; });
 }
 
 void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
@@ -428,8 +423,7 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
         }
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         set_texture_label(result->object, result->name);
-        GX_GL_CHECK_D;
-    });
+        GX_GL_CHECK_D; });
 }
 
 void gearoenix::gl::TextureManager::create_target_v(

@@ -15,8 +15,8 @@ for ((i = 0; i < np; i++)); do
   pids[$i]=0
 done
 
-if command -v clang-format-16 &>/dev/null; then
-  clang_format=clang-format-16
+if command -v clang-format-18 &>/dev/null; then
+  clang_format=clang-format-18
 else
   clang_format=clang-format
 fi
@@ -34,7 +34,7 @@ else
   exit 1
 fi
 
-expected_version=16
+expected_version=18
 
 if ((major_version < expected_version)); then
   echo "${text_red}Error clang-format major version is equal to or greater than ${expected_version}.${text_reset}"

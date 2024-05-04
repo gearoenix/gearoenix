@@ -48,7 +48,7 @@
 
 #include <algorithm>
 
-#if defined(GX_PLATFORM_INTERFACE_ANDROID)
+#if GX_PLATFORM_INTERFACE_ANDROID || GX_PLATFORM_WEBASSEMBLY
 #define GX_ALGORITHM_EXECUTION
 #else
 #include <execution>
@@ -67,8 +67,7 @@ void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes()
     back_buffer_size_changed();
     resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) -> bool {
         back_buffer_size_changed();
-        return true;
-    });
+        return true; });
 }
 
 void gearoenix::gl::submission::Manager::back_buffer_size_changed()
@@ -103,57 +102,43 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
                                              .set_has_mipmap(false);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto irradiance_txt_info = position_depth_txt_info;
     irradiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto radiance_txt_info = position_depth_txt_info;
     radiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto depth_txt_info = position_depth_txt_info;
     depth_txt_info.set_format(render::texture::TextureFormat::D32);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
@@ -165,9 +150,7 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
     attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
     e.get_texture_manager()->create_target(
         "gearoenix-gbuffers", std::move(attachments),
-        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) {
-            gbuffers_target = std::dynamic_pointer_cast<Target>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) { gbuffers_target = std::dynamic_pointer_cast<Target>(std::move(t)); }));
 
     GX_LOG_D("GBuffers have been created.");
 }
@@ -193,17 +176,13 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
                               .set_has_mipmap(false);
     txt_mgr->create_2d_from_pixels(
         "gearoenix-opengl-texture-ssao-resolve", {}, txt_info,
-        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-            ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(1);
     attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
     e.get_texture_manager()->create_target(
         "gearoenix-ssao", std::move(attachments),
-        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) {
-            ssao_resolve_target = std::dynamic_pointer_cast<Target>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) { ssao_resolve_target = std::dynamic_pointer_cast<Target>(std::move(t)); }));
 
     GX_LOG_D("SSAO resolve buffer has been created.");
 }
@@ -311,8 +290,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                     Skybox {
                         .vertex_object = skybox->get_vertex_object(),
                         .albedo_txt = skybox->get_texture_object(),
-                    });
-            });
+                    }); });
             if (scene->get_reflection_probs_changed()) {
                 scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
@@ -482,8 +460,7 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
                 m.irradiance = reflection.second.irradiance;
                 m.radiance = reflection.second.radiance;
                 m.reflection_probe_size = reflection.second.size;
-                m.radiance_lod_coefficient = reflection.second.radiance_mips_count;
-            });
+                m.radiance_lod_coefficient = reflection.second.radiance_mips_count; });
         }
     }
 
@@ -500,16 +477,14 @@ void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& s
             mm.radiance = reflection.second.radiance;
             mm.reflection_probe_size = reflection.second.size;
             mm.radiance_lod_coefficient = reflection.second.radiance_mips_count;
-        }
-    });
+        } });
 }
 
 void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
     bvh.call_on_all([&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
         bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
-        bvh_node_data.user_data.model.directional_lights_count = 0;
-    });
+        bvh_node_data.user_data.model.directional_lights_count = 0; });
     for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
         bvh.call_on_intersecting(
             shadow.second.frustum,
@@ -556,8 +531,7 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
                 m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
                 ++m.directional_lights_count;
             }
-        }
-    });
+        } });
 }
 
 void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
@@ -615,8 +589,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     camera_data.threads_translucent_models_data[0].emplace_back(dis, m);
                 } else {
                     camera_data.threads_opaque_models_data[0].emplace_back(dis, m);
-                }
-            });
+                } });
 
             // Recording dynamic models
             core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&, this](DynamicModel& m, const unsigned int kernel_index) {
@@ -640,8 +613,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                     camera_data.threads_translucent_models_data[kernel_index].emplace_back(dis, md);
                 } else {
                     camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
-                }
-            });
+                } });
 
             for (auto& v : camera_data.threads_opaque_models_data) {
                 std::move(v.begin(), v.end(), std::back_inserter(camera_data.models_data));
@@ -1230,13 +1202,15 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
 {
     e.get_texture_manager()->create_cube_from_colour(
         math::Vec4(0.0f),
-        core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
-            black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
-        }));
+        core::job::EndCallerShared<render::texture::TextureCube>(
+            [this](std::shared_ptr<render::texture::TextureCube>&& t) {
+                black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
+            }));
 
-    e.get_texture_manager()->get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
-        brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-    }));
+    e.get_texture_manager()->get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>(
+        [this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+        }));
 
     GX_GL_CHECK_D;
     GX_LOG_D("Creating submission manager.");
