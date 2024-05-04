@@ -26,6 +26,20 @@ jobs:
           sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev git -y &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
+      - name: Setup Vulkan SDK
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -L https://vulkan.lunarg.com/sdk/download/latest/linux/vulkan-sdk.tar.gz --output ~/vulkan-sdk.tar.gz &&
+          mkdir -p ~/vulkan-sdk &&
+          tar -xf ~/vulkan-sdk.tar.gz -C ~/vulkan-sdk --strip-components=1 &&
+          rm ~/vulkan-sdk.tar.gz &&
+          ls ~ &&
+          ls ~/vulkan-sdk/ &&
+          . ~/vulkan-sdk/setup-env.sh &&
+          echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV &&
+          echo "${VULKAN_SDK}/bin" >> $GITHUB_PATH &&
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> $GITHUB_ENV &&
+          echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}" >> $GITHUB_ENV
       - name: Setup Emscripten SDK
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
