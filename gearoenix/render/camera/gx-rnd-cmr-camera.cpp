@@ -6,7 +6,6 @@
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
-#include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
 #include <boost/mp11/algorithm.hpp>
 #include <imgui/imgui.h>
@@ -271,23 +270,16 @@ void gearoenix::render::camera::Camera::disable_bloom()
     bloom_data = std::nullopt;
 }
 
-void gearoenix::render::camera::Camera::enable_bloom(core::job::EndCaller<>&& end)
-{
-    BloomData::construct(
-        e,
-        name,
-        target,
-        core::job::EndCaller<BloomData>([s = camera_self.lock(), end = std::move(end)](BloomData&& b) {
-            s->bloom_data = std::move(b);
-            (void)end;
-        }));
-}
-
-void gearoenix::render::camera::Camera::update_bloom(core::job::EndCaller<>&& end)
+void gearoenix::render::camera::Camera::enable_bloom()
 {
     if (bloom_data.has_value()) {
-        enable_bloom(std::move(end));
+        return;
     }
+    bloom_data.emplace();
+}
+
+void gearoenix::render::camera::Camera::update_bloom()
+{
 }
 
 void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& end)
@@ -302,9 +294,8 @@ void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& e
             if (nullptr == s) {
                 return;
             }
-            s->target = Target(Target::Default { .first = std::move(t.first_colour), .second = std::move(t.second_colour) });
+            s->target = Target(std::move(t));
             s->update_projection();
-            s->update_bloom(std::move(end));
-            (void)std::move(t);
+            s->update_bloom();
         }));
 }

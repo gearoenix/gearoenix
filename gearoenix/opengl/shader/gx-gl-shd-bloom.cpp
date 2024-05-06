@@ -11,7 +11,7 @@ static constexpr const char* const vertex_shader_src = "#version 300 es\n"
                                                        "\n"
                                                        "void main() {\n"
                                                        "    gl_Position = vec4(position, 0.0, 1.0);\n"
-                                                       "    out_uv = position* 0.5 + 0.5;\n"
+                                                       "    out_uv = position * 0.5 + 0.5;\n"
                                                        "}";
 
 gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e)
@@ -229,8 +229,9 @@ gearoenix::gl::shader::BloomUpsampler::~BloomUpsampler() = default;
 
 void gearoenix::gl::shader::BloomUpsampler::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(low_texture);

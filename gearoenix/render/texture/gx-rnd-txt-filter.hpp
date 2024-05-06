@@ -1,6 +1,8 @@
 #ifndef GEAROENIX_RENDER_TEXTURE_FILTER_HPP
 #define GEAROENIX_RENDER_TEXTURE_FILTER_HPP
 #include "../../core/gx-cr-types.hpp"
+#include <string>
+
 namespace gearoenix::render::texture {
 enum struct Filter : core::TypeId {
     Cubic = 1,
@@ -16,5 +18,9 @@ enum struct Filter : core::TypeId {
     NearestMipmapLinear = 11,
     NearestMipmapNearest = 12,
 };
+}
+
+namespace std {
+[[nodiscard]] std::string to_string(gearoenix::render::texture::Filter f);
 }
 #endif

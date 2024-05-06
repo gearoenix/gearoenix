@@ -2,8 +2,10 @@
 #define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
+#include "../gx-rnd-build-configuration.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
+#include <array>
 #include <map>
 #include <memory>
 
@@ -23,8 +25,8 @@ struct TextureCube;
 struct Target;
 
 struct DefaultCameraTargets final {
-    std::shared_ptr<Target> first_colour;
-    std::shared_ptr<Target> second_colour;
+    std::shared_ptr<Target> main;
+    std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
 };
 
 struct Manager {

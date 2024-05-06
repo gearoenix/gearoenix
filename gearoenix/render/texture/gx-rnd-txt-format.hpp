@@ -2,6 +2,7 @@
 #define GEAROENIX_RENDER_TEXTURE_FORMAT_HPP
 #include "../../core/gx-cr-types.hpp"
 #include <cstdlib>
+#include <string>
 
 namespace gearoenix::render::texture {
 enum struct TextureFormat : core::TypeId {
@@ -152,6 +153,9 @@ enum struct TextureFormat : core::TypeId {
         return static_cast<std::size_t>(-1);
     }
 }
+}
 
+namespace std {
+[[nodiscard]] std::string to_string(gearoenix::render::texture::TextureFormat f);
 }
 #endif

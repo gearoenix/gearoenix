@@ -127,7 +127,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
                     self->name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
                     std::vector {
                         texture::Attachment {
-                            .mipmap_level = static_cast<unsigned int>(mip_index),
+                            .mipmap_level = static_cast<std::uint8_t>(mip_index),
                             .var = texture::AttachmentCube {
                                 .txt = self->radiance,
                                 .face = face.face,

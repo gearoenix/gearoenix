@@ -4,6 +4,7 @@
 #include "gx-rnd-txt-filter.hpp"
 #include "gx-rnd-txt-wrap.hpp"
 #include <cstdlib>
+#include <string>
 
 namespace gearoenix::platform::stream {
 struct Stream;
@@ -46,5 +47,9 @@ public:
 struct SamplerInfoHasher final {
     [[nodiscard]] inline std::size_t operator()(const SamplerInfo& sampler) const { return sampler.get_hash(); }
 };
+}
+
+namespace std {
+[[nodiscard]] std::string to_string(const gearoenix::render::texture::SamplerInfo& s);
 }
 #endif

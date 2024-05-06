@@ -36,6 +36,8 @@ void gearoenix::render::texture::Manager::read_gx3d(
     TextureInfo txt_info;
     txt_info.read(stream);
 
+    GX_LOG_D("Texture Info: " << std::to_string(txt_info));
+
     switch (txt_info.get_type()) {
     case Type::Texture2D: {
         const std::lock_guard _lg(textures_2d_lock);
@@ -455,12 +457,13 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
         std::move(pixels),
         TextureInfo()
             .set_format(TextureFormat::RgbaUint8)
-            .set_sampler_info(SamplerInfo()
-                                  .set_min_filter(Filter::Nearest)
-                                  .set_mag_filter(Filter::Nearest)
-                                  .set_wrap_s(Wrap::Repeat)
-                                  .set_wrap_t(Wrap::Repeat)
-                                  .set_wrap_r(Wrap::Repeat))
+            .set_sampler_info(
+                SamplerInfo()
+                    .set_min_filter(Filter::Nearest)
+                    .set_mag_filter(Filter::Nearest)
+                    .set_wrap_s(Wrap::Repeat)
+                    .set_wrap_t(Wrap::Repeat)
+                    .set_wrap_r(Wrap::Repeat))
             .set_width(1)
             .set_height(1)
             .set_type(Type::TextureCube)
@@ -606,22 +609,18 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
 
     struct TargetGatherer {
         core::job::EndCaller<DefaultCameraTargets> callback;
-        std::shared_ptr<Target> first;
-        std::shared_ptr<Target> second;
 
-        void update()
+        DefaultCameraTargets targets;
+
+        ~TargetGatherer()
         {
-            if (nullptr == first) {
-                return;
-            }
-            if (nullptr == second) {
-                return;
+            for (const auto& ts : targets.targets) {
+                for (const auto& t : ts) {
+                    GX_ASSERT_D(nullptr != t);
+                }
             }
 
-            callback.set_return(DefaultCameraTargets {
-                .first_colour = std::move(first),
-                .second_colour = std::move(second),
-            });
+            callback.set_return(std::move(targets));
         }
     };
 
@@ -631,47 +630,45 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
         const std::string camera_name;
         const std::string unique_id_str;
 
-        std::shared_ptr<Texture2D> first;
+        std::array<std::shared_ptr<Texture2D>, 2> colours;
         std::shared_ptr<Texture2D> depth;
-        std::shared_ptr<Texture2D> second;
 
-        void update()
+        ~TextureGatherer()
         {
-            if (nullptr == first) {
-                return;
-            }
-            if (nullptr == depth) {
-                return;
-            }
-            if (nullptr == second) {
-                return;
-            }
+            GX_ASSERT_D(nullptr != colours[0]);
+            GX_ASSERT_D(nullptr != colours[1]);
+            GX_ASSERT_D(nullptr != depth);
 
             auto target_gatherer = std::make_shared<TargetGatherer>(std::move(callback));
 
-            auto first_target_name = camera_name + "-first-render-target-" + unique_id_str;
-            auto second_target_name = camera_name + "-second-render-target-" + unique_id_str;
+            const auto target_name = camera_name + "-render-target-uid:" + unique_id_str;
 
             manager->create_target(
-                std::move(first_target_name),
+                target_name + "-main",
                 std::vector {
-                    Attachment { .var = Attachment2D { .txt = std::move(first) } },
+                    Attachment { .var = Attachment2D { .txt = colours[0] } },
                     Attachment { .var = Attachment2D { .txt = std::move(depth) } },
                 },
                 core::job::EndCallerShared<Target>([target_gatherer](std::shared_ptr<Target>&& t) {
-                    target_gatherer->first = std::move(t);
-                    target_gatherer->update();
+                    target_gatherer->targets.main = std::move(t);
                 }));
 
-            manager->create_target(
-                std::move(second_target_name),
-                std::vector {
-                    Attachment { .var = Attachment2D { .txt = std::move(second) } },
-                },
-                core::job::EndCallerShared<Target>([target_gatherer = std::move(target_gatherer)](std::shared_ptr<Target>&& t) {
-                    target_gatherer->second = std::move(t);
-                    target_gatherer->update();
-                }));
+            for (std::size_t target_index = 0; target_index < target_gatherer->targets.targets.size(); ++target_index) {
+                const auto target_target_name = target_name + "-index:" + std::to_string(target_index) + "-mip:";
+                for (std::size_t mip_index = 0; mip_index < target_gatherer->targets.targets[0].size(); ++mip_index) {
+                    manager->create_target(
+                        target_target_name + std::to_string(mip_index),
+                        std::vector {
+                            Attachment {
+                                .mipmap_level = static_cast<decltype(Attachment::mipmap_level)>(mip_index),
+                                .var = Attachment2D { .txt = colours[target_index] } },
+                        },
+                        core::job::EndCallerShared<Target>(
+                            [target_gatherer, mip_index, target_index](std::shared_ptr<Target>&& t) {
+                                target_gatherer->targets.targets[target_index][mip_index] = std::move(t);
+                            }));
+                }
+            }
         }
     };
 
@@ -695,15 +692,13 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
     create_2d_from_pixels(
         std::move(first_colour_name), {}, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
-            texture_gatherer->first = std::move(t);
-            texture_gatherer->update();
+            texture_gatherer->colours[0] = std::move(t);
         }));
 
     create_2d_from_pixels(
         std::move(second_colour_name), {}, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
-            texture_gatherer->second = std::move(t);
-            texture_gatherer->update();
+            texture_gatherer->colours[1] = std::move(t);
         }));
 
     auto depth_info = txt_info;
@@ -718,6 +713,5 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
         std::move(depth_name), {}, depth_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer = std::move(texture_gatherer)](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->depth = std::move(t);
-            texture_gatherer->update();
         }));
 }

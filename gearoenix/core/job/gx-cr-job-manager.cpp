@@ -88,14 +88,18 @@ void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, st
 {
     if (std::this_thread::get_id() == receiver_thread_id) {
         job();
-    } else {
-        const auto& search = workers.find(receiver_thread_id);
-        GX_ASSERT(workers.end() != search);
-        auto& worker = *search->second;
-        worker.function_loader.load(std::move(job));
-        if (worker.thread_data.has_value()) {
-            worker.thread_data->signal.release();
-        }
+        return;
+    }
+    const auto& search = workers.find(receiver_thread_id);
+    if (workers.end() == search) {
+        GX_LOG_I("Worker job thread hasn't found for thread-id: " << receiver_thread_id);
+        job();
+        return;
+    }
+    auto& worker = *search->second;
+    worker.function_loader.load(std::move(job));
+    if (worker.thread_data.has_value()) {
+        worker.thread_data->signal.release();
     }
 }
 

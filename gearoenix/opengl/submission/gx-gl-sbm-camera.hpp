@@ -12,34 +12,25 @@ struct TransformationComponent;
 
 namespace gearoenix::render::camera {
 struct BloomData;
-struct Camera;
 }
 
 namespace gearoenix::gl {
-struct BloomData;
 struct Camera;
 }
 
 namespace gearoenix::gl::submission {
 struct BloomData final {
     math::Vec4<float> scatter_clamp_max_threshold_threshold_knee;
-    uint prefilter_target = static_cast<uint>(-1);
-    std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT> horizontal_targets { static_cast<uint>(-1) };
-    std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT> vertical_targets { static_cast<uint>(-1) };
-    std::array<uint, GX_RENDER_MAX_BLOOM_DOWN_SAMPLE_COUNT + 1> upsampler_targets { static_cast<uint>(-1) };
 
-    [[nodiscard]] static std::optional<BloomData> construct(
-        const std::optional<gl::BloomData>& gl_bd,
-        const std::optional<render::camera::BloomData>& rnd_bd);
+    [[nodiscard]] static std::optional<BloomData> construct(const std::optional<render::camera::BloomData>& b);
 };
 
 struct Camera final {
     std::optional<BloomData> bloom_data = std::nullopt;
-    uint framebuffer = static_cast<uint>(-1);
-    uint colour_attachment = static_cast<uint>(-1);
+    std::array<uint, 2> colour_attachments {};
     uint depth_attachment = static_cast<uint>(-1);
-    uint second_framebuffer = static_cast<uint>(-1);
-    uint second_colour_attachment = static_cast<uint>(-1);
+    uint main_framebuffer = static_cast<uint>(-1);
+    std::array<std::array<uint, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> framebuffers {};
     math::Vec4<sizei> viewport_clip;
     math::Mat4x4<float> vp;
     math::Vec3<float> pos;

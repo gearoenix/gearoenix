@@ -11,6 +11,6 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    server_address = ("", 8080)  # An address of localhost with port 8000
+    server_address = ("0.0.0.0", 8080)
     httpd = http.server.HTTPServer(server_address, MyHTTPRequestHandler)
     httpd.serve_forever()

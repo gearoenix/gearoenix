@@ -214,3 +214,64 @@ void gearoenix::render::texture::SamplerInfo::update_hash()
     boost::hash_combine(hash, boost::hash_value(wrap_r));
     boost::hash_combine(hash, boost::hash_value(anisotropic_level));
 }
+
+std::string std::to_string(const gearoenix::render::texture::SamplerInfo& s)
+{
+    std::string result = "SamplerInfo {\n";
+
+    result += "    .min_filter = " + std::to_string(s.get_min_filter()) + ",\n";
+    result += "    .mag_filter = " + std::to_string(s.get_mag_filter()) + ",\n";
+    result += "    .wrap_s = " + std::to_string(s.get_wrap_s()) + ",\n";
+    result += "    .wrap_t = " + std::to_string(s.get_wrap_t()) + ",\n";
+    result += "    .wrap_r = " + std::to_string(s.get_wrap_r()) + ",\n";
+    result += "    .anisotropic_level = " + std::to_string(s.get_anisotropic_level()) + "\n";
+    result += "};\n";
+
+    return result;
+}
+
+std::string std::to_string(const gearoenix::render::texture::Filter f)
+{
+    switch (f) {
+    case gearoenix::render::texture::Filter::Cubic:
+        return "Cubic";
+    case gearoenix::render::texture::Filter::CubicMipmapCubic:
+        return "CubicMipmapCubic";
+    case gearoenix::render::texture::Filter::CubicMipmapLinear:
+        return "CubicMipmapLinear";
+    case gearoenix::render::texture::Filter::CubicMipmapNearest:
+        return "CubicMipmapNearest";
+    case gearoenix::render::texture::Filter::Linear:
+        return "Linear";
+    case gearoenix::render::texture::Filter::LinearMipmapCubic:
+        return "LinearMipmapCubic";
+    case gearoenix::render::texture::Filter::LinearMipmapLinear:
+        return "LinearMipmapLinear";
+    case gearoenix::render::texture::Filter::LinearMipmapNearest:
+        return "LinearMipmapNearest";
+    case gearoenix::render::texture::Filter::Nearest:
+        return "Nearest";
+    case gearoenix::render::texture::Filter::NearestMipmapCubic:
+        return "NearestMipmapCubic";
+    case gearoenix::render::texture::Filter::NearestMipmapLinear:
+        return "NearestMipmapLinear";
+    case gearoenix::render::texture::Filter::NearestMipmapNearest:
+        return "NearestMipmapNearest";
+    default:
+        return "Unexpected";
+    }
+}
+
+std::string std::to_string(const gearoenix::render::texture::Wrap w)
+{
+    switch (w) {
+    case gearoenix::render::texture::Wrap::ClampToEdge:
+        return "ClampToEdge";
+    case gearoenix::render::texture::Wrap::Mirror:
+        return "Mirror";
+    case gearoenix::render::texture::Wrap::Repeat:
+        return "Repeat";
+    default:
+        return "Unexpected";
+    }
+}

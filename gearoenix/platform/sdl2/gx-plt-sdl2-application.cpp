@@ -248,7 +248,7 @@ void gearoenix::platform::Application::run(core::Application* core_app)
     base.initialize_core_application(*this, core_app);
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
-    emscripten_set_main_loop_arg(gearoenix_platform_application_loop, this, 120, 1);
+    emscripten_set_main_loop_arg(gearoenix_platform_application_loop, this, 0, 1);
 #else
     while (base.running) {
         loop();

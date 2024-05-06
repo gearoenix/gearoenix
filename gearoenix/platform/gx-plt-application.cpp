@@ -15,6 +15,7 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, co
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
 {
+    GX_LOG_D("This machine has " << std::thread::hardware_concurrency() << " number of thread cores.");
     core::job::initialise();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

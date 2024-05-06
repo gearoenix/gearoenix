@@ -1,4 +1,4 @@
-#include "gx-gl-shd-exposure.hpp"
+#include "gx-gl-shd-multiply.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 static constexpr const char* const vertex_shader_src = "\
@@ -21,7 +21,7 @@ static constexpr const char* const fragment_shader_src = "\
 precision highp float;\n\
 precision highp sampler2D;\n\
 \n\
-uniform float value;\n\
+uniform vec4 value_mip_index;\n\
 uniform sampler2D source_texture;\n\
 \n\
 in vec2 out_uv;\n\
@@ -29,29 +29,29 @@ in vec2 out_uv;\n\
 layout(location = 0) out vec4 frag_colour;\n\
 \n\
 void main() {\n\
-    frag_colour = textureLod(source_texture, out_uv, 0.0);\n\
-    frag_colour.xyz *= value;\n\
+    frag_colour = textureLod(source_texture, out_uv, value_mip_index.w);\n\
+    frag_colour.xyz *= value_mip_index.xyz;\n\
 }";
 
-gearoenix::gl::shader::Exposure::Exposure(Engine& e)
+gearoenix::gl::shader::Multiply::Multiply(Engine& e)
     : Shader(e)
 {
-
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
 
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
-    GX_GL_THIS_GET_UNIFORM(value);
+    GX_GL_THIS_GET_UNIFORM(value_mip_index);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(source_texture);
 }
 
-gearoenix::gl::shader::Exposure::~Exposure() = default;
+gearoenix::gl::shader::Multiply::~Multiply() = default;
 
-void gearoenix::gl::shader::Exposure::bind(uint& current_shader) const
+void gearoenix::gl::shader::Multiply::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }

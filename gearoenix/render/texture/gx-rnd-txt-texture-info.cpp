@@ -130,3 +130,76 @@ void gearoenix::render::texture::TextureInfo::update_hash()
     boost::hash_combine(hash, boost::hash_value(type));
     boost::hash_combine(hash, boost::hash_value(has_mipmap));
 }
+
+std::string std::to_string(const gearoenix::render::texture::TextureInfo& info)
+{
+    auto result = std::string("TextureInfo {\n");
+
+    result += "    .hash = " + std::to_string(info.get_hash()) + ";\n";
+    result += "    .format = " + std::to_string(info.get_format()) + ";\n";
+    result += "    .sampler_info = " + std::to_string(info.get_sampler_info()) + ";\n";
+    result += "    .width = " + std::to_string(info.get_width()) + ";\n";
+    result += "    .height = " + std::to_string(info.get_height()) + ";\n";
+    result += "    .depth = " + std::to_string(info.get_depth()) + ";\n";
+    result += "    .type = " + std::to_string(info.get_type()) + ";\n";
+    result += "    .has_mipmap = " + std::to_string(info.get_has_mipmap()) + ";\n";
+    result += "};\n";
+
+    return result;
+}
+
+std::string std::to_string(const gearoenix::render::texture::Type t)
+{
+    switch (t) {
+    case gearoenix::render::texture::Type::Texture2D:
+        return "Texture2D";
+    case gearoenix::render::texture::Type::Texture3D:
+        return "Texture3D";
+    case gearoenix::render::texture::Type::TextureCube:
+        return "TextureCube";
+    case gearoenix::render::texture::Type::Target:
+        return "Target";
+    default:
+        return "Unexpected";
+    }
+}
+
+std::string std::to_string(const gearoenix::render::texture::TextureFormat f)
+{
+    switch (f) {
+    case gearoenix::render::texture::TextureFormat::RgbaFloat16:
+        return "RgbaFloat16";
+    case gearoenix::render::texture::TextureFormat::RgbFloat16:
+        return "RgbFloat16";
+    case gearoenix::render::texture::TextureFormat::RgFloat16:
+        return "RgFloat16";
+    case gearoenix::render::texture::TextureFormat::Float16:
+        return "Float16";
+    case gearoenix::render::texture::TextureFormat::RgbaFloat24:
+        return "RgbaFloat24";
+    case gearoenix::render::texture::TextureFormat::RgbFloat24:
+        return "RgbFloat24";
+    case gearoenix::render::texture::TextureFormat::RgFloat24:
+        return "RgFloat24";
+    case gearoenix::render::texture::TextureFormat::Float24:
+        return "Float24";
+    case gearoenix::render::texture::TextureFormat::RgbaFloat32:
+        return "RgbaFloat32";
+    case gearoenix::render::texture::TextureFormat::RgbFloat32:
+        return "RgbFloat32 ";
+    case gearoenix::render::texture::TextureFormat::RgFloat32:
+        return "RgFloat32 ";
+    case gearoenix::render::texture::TextureFormat::Float32:
+        return "Float32 ";
+    case gearoenix::render::texture::TextureFormat::RgbaUint8:
+        return "RgbaUint8 ";
+    case gearoenix::render::texture::TextureFormat::D16:
+        return "D16";
+    case gearoenix::render::texture::TextureFormat::D24:
+        return "D24";
+    case gearoenix::render::texture::TextureFormat::D32:
+        return "D32";
+    default:
+        return "Unexpected";
+    }
+}

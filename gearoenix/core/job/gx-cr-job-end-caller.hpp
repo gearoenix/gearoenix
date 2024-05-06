@@ -1,11 +1,29 @@
 #ifndef GEAROENIX_CORE_JOB_END_CALLER_HPP
 #define GEAROENIX_CORE_JOB_END_CALLER_HPP
+#include "../gx-cr-build-configuration.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "gx-cr-job-manager.hpp"
 #include <functional>
 #include <memory>
 #include <optional>
 #include <type_traits>
+
+#if GX_DEBUG_MODE
+#define GX_END_CALLER_CATCH_CALLER_LOCATION true
+#endif
+
+#if GX_END_CALLER_CATCH_CALLER_LOCATION
+#include <source_location>
+
+#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(a) a
+#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a0, a1) a0, a1
+
+#else
+
+#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(a)
+#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a0, a1)
+
+#endif
 
 namespace gearoenix::core::job {
 
@@ -20,10 +38,12 @@ private:
         Function function;
         const std::thread::id context_thread;
         std::optional<Type> value = std::nullopt;
+        GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const std::source_location source_location;)
 
-        explicit Caller(Function&& f)
+        explicit Caller(Function&& f GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, const std::source_location& source_location))
             : function(std::move(f))
             , context_thread(std::this_thread::get_id())
+                  GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, source_location(source_location))
         {
         }
 
@@ -51,8 +71,8 @@ private:
     std::shared_ptr<Caller> caller;
 
 public:
-    explicit EndCaller(Function&& f)
-        : caller(new Caller(std::move(f)))
+    explicit EndCaller(Function&& f GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, const std::source_location& source_location = std::source_location::current()))
+        : caller(new Caller(std::move(f) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, source_location)))
     {
     }
 

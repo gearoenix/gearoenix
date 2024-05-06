@@ -10,66 +10,21 @@ namespace {
 gearoenix::core::allocator::SharedArray<gearoenix::gl::Camera, gearoenix::render::camera::Camera::MAX_COUNT> allocator;
 }
 
-gearoenix::gl::BloomData::BloomData(
-    std::shared_ptr<Target>&& prefilter_target,
-    Targets&& horizontal_targets,
-    Targets&& vertical_targets,
-    UpTargets&& upsampler_targets)
-    : prefilter_target(std::move(prefilter_target))
-    , horizontal_targets(std::move(horizontal_targets))
-    , vertical_targets(std::move(vertical_targets))
-    , upsampler_targets(std::move(upsampler_targets))
-{
-}
-
-gearoenix::gl::BloomData::~BloomData() = default;
-
-std::optional<gearoenix::gl::BloomData> gearoenix::gl::BloomData::construct(const std::optional<render::camera::BloomData>& bloom_data)
-{
-    if (!bloom_data.has_value()) {
-        return std::nullopt;
-    }
-    return BloomData(
-        std::dynamic_pointer_cast<Target>(bloom_data->get_prefilter_target()),
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_horizontal_targets()[5]),
-        },
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_vertical_targets()[5]),
-        },
-        {
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[0]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[1]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[2]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[3]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[4]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[5]),
-            std::dynamic_pointer_cast<Target>(bloom_data->get_upsampler_targets()[6]),
-        });
-}
-
 gearoenix::gl::CameraTarget::~CameraTarget() = default;
 
-gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render::camera::Target& target) noexcept
+gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render::camera::Target& target)
 {
     if (target.is_default()) {
         const auto& d = target.get_default();
-        return CameraTarget {
-            .target = Default {
-                .first = std::dynamic_pointer_cast<Target>(d.first),
-                .second = std::dynamic_pointer_cast<Target>(d.second),
+        CameraTarget result { .target = Default {} };
+        auto& gd = std::get<DEFAULT_VAR_INDEX>(result.target);
+        gd.main = std::dynamic_pointer_cast<Target>(d.main);
+        for (std::size_t ti = 0; ti < d.targets.size(); ++ti) {
+            for (std::size_t mi = 0; mi < d.targets[ti].size(); ++mi) {
+                gd.targets[ti][mi] = std::dynamic_pointer_cast<Target>(d.targets[ti][mi]);
             }
-        };
+        }
+        return result;
     }
     if (target.is_customised()) {
         const auto& d = target.get_customised();
@@ -102,21 +57,6 @@ void gearoenix::gl::Camera::set_customised_target(std::shared_ptr<render::textur
     render::camera::Camera::set_customised_target(std::move(t));
 }
 
-void gearoenix::gl::Camera::disable_bloom()
-{
-    render::camera::Camera::disable_bloom();
-    gl_bloom_data = std::nullopt;
-}
-
-void gearoenix::gl::Camera::enable_bloom(core::job::EndCaller<>&& end)
-{
-    render::camera::Camera::enable_bloom(core::job::EndCaller([this, self = get_camera_self().lock(), end = std::move(end)] {
-        (void)end;
-        (void)self;
-        gl_bloom_data = BloomData::construct(bloom_data);
-    }));
-}
-
 void gearoenix::gl::Camera::update_target(gearoenix::core::job::EndCaller<>&& end)
 {
     render::camera::Camera::update_target(core::job::EndCaller([this, self = get_camera_self().lock(), end = std::move(end)] {
@@ -136,9 +76,7 @@ void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::
     c.set_return(allocator.make_shared(e, name, render::camera::Target()));
     c.get_return()->set_component_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
-        c.get_return()->enable_bloom(core::job::EndCaller([c] {
-            (void)c;
-        }));
+        c.get_return()->enable_bloom();
     }));
 }
 

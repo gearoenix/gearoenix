@@ -117,7 +117,7 @@ struct GameApp final : public gearoenix::core::Application {
     {
         light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
             { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder->get_light().colour = { 2.0f, 2.0f, 2.0f };
+        light_builder->get_light().colour = { 10.0f, 10.0f, 10.0f };
         scene_builder->add(std::move(light_builder));
 
         scene_builder->get_scene().set_enabled(true);

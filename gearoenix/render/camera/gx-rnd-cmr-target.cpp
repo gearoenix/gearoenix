@@ -8,7 +8,7 @@ gearoenix::render::camera::Target::Target(Customised&& c)
 {
 }
 
-gearoenix::render::camera::Target::Target(Default&& d)
+gearoenix::render::camera::Target::Target(texture::DefaultCameraTargets&& d)
     : target(std::move(d))
 {
 }
@@ -20,10 +20,9 @@ gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_c
 }
 
 gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_default(
-    std::shared_ptr<texture::Target>&& first,
-    std::shared_ptr<texture::Target>&& second)
+    texture::DefaultCameraTargets&& targets)
 {
-    return Target(Default { .first = std::move(first), .second = std::move(second) });
+    return Target(std::move(targets));
 }
 
 bool gearoenix::render::camera::Target::is_customised() const
@@ -48,7 +47,7 @@ double gearoenix::render::camera::Target::get_aspect_ratio() const
         return std::get<CUSTOMISED_VAR_INDEX>(target).target->get_aspect_ratio();
     }
     case DEFAULT_VAR_INDEX: {
-        return std::get<DEFAULT_VAR_INDEX>(target).first->get_aspect_ratio();
+        return std::get<DEFAULT_VAR_INDEX>(target).main->get_aspect_ratio();
     }
     default: {
         GX_UNEXPECTED;
@@ -63,7 +62,7 @@ gearoenix::math::Vec2<size_t> gearoenix::render::camera::Target::get_dimension()
         return std::get<CUSTOMISED_VAR_INDEX>(target).target->get_dimension();
     }
     case DEFAULT_VAR_INDEX: {
-        return std::get<DEFAULT_VAR_INDEX>(target).first->get_dimension();
+        return std::get<DEFAULT_VAR_INDEX>(target).main->get_dimension();
     }
     default: {
         GX_UNEXPECTED;
@@ -71,7 +70,7 @@ gearoenix::math::Vec2<size_t> gearoenix::render::camera::Target::get_dimension()
     }
 }
 
-const gearoenix::render::camera::Target::Default& gearoenix::render::camera::Target::get_default() const
+const gearoenix::render::texture::DefaultCameraTargets& gearoenix::render::camera::Target::get_default() const
 {
     GX_ASSERT(is_default());
     return std::get<DEFAULT_VAR_INDEX>(target);

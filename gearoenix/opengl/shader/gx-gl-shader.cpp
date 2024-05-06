@@ -22,7 +22,7 @@ void gearoenix::gl::shader::Shader::link() const
     if (is_success == 0) {
         info_log[max_length - 1] = '\n';
         GX_LOG_F("Error linking shader program: " << info_log);
-    } else if (!info_log.empty()) {
+    } else if (info_log.size() > 5) {
         info_log[max_length - 1] = '\n';
         GX_LOG_D("Shader linking log is: " << info_log);
     }
@@ -121,12 +121,15 @@ gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&&
 
 gearoenix::gl::shader::Shader::~Shader()
 {
-    if (static_cast<uint>(-1) != vertex_object)
+    if (static_cast<uint>(-1) != vertex_object) {
         glDeleteShader(vertex_object);
-    if (static_cast<uint>(-1) != fragment_object)
+    }
+    if (static_cast<uint>(-1) != fragment_object) {
         glDeleteShader(fragment_object);
-    if (static_cast<uint>(-1) != shader_program)
+    }
+    if (static_cast<uint>(-1) != shader_program) {
         glDeleteProgram(shader_program);
+    }
 }
 
 gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const
