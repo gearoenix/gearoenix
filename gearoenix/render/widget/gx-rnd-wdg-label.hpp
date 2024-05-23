@@ -25,6 +25,11 @@ struct Texture2D;
 
 namespace gearoenix::render::widget {
 struct Label final : Widget {
+    struct ConstructorReturn final {
+        std::shared_ptr<model::Builder> model_builder;
+        std::shared_ptr<Label> label;
+    };
+
     Label(std::string&& name, engine::Engine& e);
     ~Label() override;
     static void construct(
@@ -33,14 +38,14 @@ struct Label final : Widget {
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<texture::Texture2D>&& background_texture,
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<texture::Texture2D>&& background_texture,
@@ -48,7 +53,7 @@ struct Label final : Widget {
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<texture::Texture2D>&& background_texture,
@@ -57,7 +62,7 @@ struct Label final : Widget {
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
 };
 }
 #endif

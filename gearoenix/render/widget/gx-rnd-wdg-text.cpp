@@ -25,7 +25,7 @@ void gearoenix::render::widget::Text::construct(
     std::shared_ptr<material::Unlit>&& mat,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
     e.get_mesh_manager()->build_plate(std::move(mat), core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
@@ -38,7 +38,7 @@ void gearoenix::render::widget::Text::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
     const auto mat_name = name + "-material";
@@ -53,7 +53,7 @@ void gearoenix::render::widget::Text::construct(
     std::shared_ptr<mesh::Mesh>&& msh,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<Text>, std::shared_ptr<model::Builder>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
     std::shared_ptr<Text> r(new Text(std::move(name), e));

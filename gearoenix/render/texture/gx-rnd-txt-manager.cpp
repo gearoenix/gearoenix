@@ -403,17 +403,16 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
 }
 
 void gearoenix::render::texture::Manager::create_2d_from_file(
-    std::string&& name,
     const platform::stream::Path& path,
     const TextureInfo& info,
     core::job::EndCallerShared<Texture2D>&& c)
 {
     {
         const std::lock_guard _lg(textures_2d_lock);
-        if (const auto search = textures_2d.find(name); textures_2d.end() != search) {
+        if (const auto search = textures_2d.find(path.get_raw_data()); textures_2d.end() != search) {
             if (auto r = search->second.lock(); nullptr != r) {
                 c.set_return(std::move(r));
-                GX_LOG_D("Texture2D " << name << " successfully cached.");
+                GX_LOG_D("Texture2D " << path.get_raw_data() << " successfully cached.");
                 return;
             }
         }
@@ -422,10 +421,10 @@ void gearoenix::render::texture::Manager::create_2d_from_file(
     GX_ASSERT(nullptr != stream);
     const auto data = stream->get_file_content();
     if (path.get_raw_data().ends_with(".hdr")) {
-        create_2df_from_formatted(std::move(name), data.data(), data.size(), info, std::move(c));
+        create_2df_from_formatted(std::string(path.get_raw_data()), data.data(), data.size(), info, std::move(c));
         return;
     }
-    return create_2d_from_formatted(std::move(name), data.data(), data.size(), info, std::move(c));
+    return create_2d_from_formatted(std::string(path.get_raw_data()), data.data(), data.size(), info, std::move(c));
 }
 
 void gearoenix::render::texture::Manager::create_cube_from_colour(

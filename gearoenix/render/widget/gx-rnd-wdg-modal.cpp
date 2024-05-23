@@ -83,9 +83,9 @@ void gearoenix::render::widget::Modal::construct(
                 }));
         }));
 
-    const auto path = platform::stream::Path::create_asset(background_texture_asset);
+    const auto path = platform::stream::Path::create_asset(std::move(background_texture_asset));
     e.get_texture_manager()->create_2d_from_file(
-        std::move(background_texture_asset), path, texture::TextureInfo(),
+        path, texture::TextureInfo(),
         core::job::EndCallerShared<texture::Texture2D>([values, values_ready](std::shared_ptr<texture::Texture2D>&& tex) {
             values->background_texture = std::move(tex);
             (void)values_ready;
@@ -97,9 +97,9 @@ void gearoenix::render::widget::Modal::construct(
         Button::construct(
             result->name + "-close-button", std::string(close_button_texture_asset->first), std::string(close_button_texture_asset->second), camera_id,
             std::shared_ptr(result), std::shared_ptr(scene_builder),
-            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
-                values->return_value.modal->close = std::move(bb.second);
-                values->return_value.close_button_model_builder = std::move(bb.first);
+            core::job::EndCaller<Button::ConstructorReturn>([values, values_ready](auto&& bb) {
+                values->return_value.modal->close = std::move(bb.button);
+                values->return_value.close_button_model_builder = std::move(bb.model_builder);
                 (void)values_ready;
             }));
     }
@@ -108,9 +108,9 @@ void gearoenix::render::widget::Modal::construct(
         Button::construct(
             result->name + "-cancel-button", std::string(cancel_button_texture_asset->first), std::string(cancel_button_texture_asset->second), camera_id,
             std::shared_ptr(result), std::shared_ptr(scene_builder),
-            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
-                values->return_value.modal->cancel = std::move(bb.second);
-                values->return_value.cancel_button_model_builder = std::move(bb.first);
+            core::job::EndCaller<Button::ConstructorReturn>([values, values_ready](auto&& bb) {
+                values->return_value.modal->cancel = std::move(bb.button);
+                values->return_value.cancel_button_model_builder = std::move(bb.model_builder);
                 (void)values_ready;
             }));
     }
@@ -119,9 +119,9 @@ void gearoenix::render::widget::Modal::construct(
         Button::construct(
             result->name + "-ok-button", std::string(ok_button_texture_asset->first), std::string(ok_button_texture_asset->second), camera_id,
             std::shared_ptr(result), std::move(scene_builder),
-            core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>([values, values_ready](auto&& bb) {
-                values->return_value.modal->ok = std::move(bb.second);
-                values->return_value.ok_button_model_builder = std::move(bb.first);
+            core::job::EndCaller<Button::ConstructorReturn>([values, values_ready](auto&& bb) {
+                values->return_value.modal->ok = std::move(bb.button);
+                values->return_value.ok_button_model_builder = std::move(bb.model_builder);
                 (void)values_ready;
             }));
     }

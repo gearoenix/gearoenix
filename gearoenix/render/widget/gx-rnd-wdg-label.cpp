@@ -23,12 +23,11 @@ void gearoenix::render::widget::Label::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
-    const auto path = platform::stream::Path::create_asset(background_texture_asset);
+    const auto path = platform::stream::Path::create_asset(std::move(background_texture_asset));
     e.get_texture_manager()->create_2d_from_file(
-        std::move(background_texture_asset),
         path,
         texture::TextureInfo(),
         core::job::EndCallerShared<texture::Texture2D>(
@@ -43,7 +42,7 @@ void gearoenix::render::widget::Label::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
     const auto material_name = name + "-material";
@@ -59,7 +58,7 @@ void gearoenix::render::widget::Label::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     auto& e = scene_builder->e;
     auto copy_mat = std::shared_ptr(mat);
@@ -79,7 +78,7 @@ void gearoenix::render::widget::Label::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Label>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::move(background_texture));

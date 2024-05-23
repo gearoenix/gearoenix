@@ -16,7 +16,7 @@ struct Builder;
 namespace gearoenix::render::widget {
 struct Button;
 struct Modal final : Widget {
-    struct ConstructorReturn {
+    struct ConstructorReturn final {
         std::shared_ptr<model::Builder> background_model_builder;
         std::shared_ptr<model::Builder> close_button_model_builder;
         std::shared_ptr<model::Builder> cancel_button_model_builder;

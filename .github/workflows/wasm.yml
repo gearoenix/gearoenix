@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev git -y &&
           echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-      - name: Setup Vulkan SDK
+      - name: Install Vulkan SDK
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           curl -L https://vulkan.lunarg.com/sdk/download/latest/linux/vulkan-sdk.tar.gz --output ~/vulkan-sdk.tar.gz &&
@@ -34,7 +34,9 @@ jobs:
           tar -xf ~/vulkan-sdk.tar.gz -C ~/vulkan-sdk --strip-components=1 &&
           rm ~/vulkan-sdk.tar.gz &&
           ls ~ &&
-          ls ~/vulkan-sdk/ &&
+          ls ~/vulkan-sdk/
+      - name: Setup Vulkan SDK
+        run: |
           . ~/vulkan-sdk/setup-env.sh &&
           echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV &&
           echo "${VULKAN_SDK}/bin" >> $GITHUB_PATH &&
@@ -55,7 +57,9 @@ jobs:
           curl -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" -o ~/cmake.tar.gz &&
           mkdir -p ~/cmake &&
           tar -xf ~/cmake.tar.gz -C ~/cmake --strip-components=1 &&
-          rm ~/cmake.tar.gz &&
+          rm ~/cmake.tar.gz
+      - name: Setup CMake
+        run: |
           echo "$HOME/cmake/bin" >> $GITHUB_PATH
       - name: Echos
         run: |

@@ -16,7 +16,6 @@
 #include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
-#include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-scn-builder.hpp"
 #include "gx-rnd-scn-manager.hpp"
@@ -226,7 +225,6 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
         }));
 
     e.get_texture_manager()->create_2d_from_file(
-        "gearoenix-splash-gear",
         platform::stream::Path::create_asset("gearoenix-splash/gear.png"),
         texture::TextureInfo {},
         core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
@@ -246,7 +244,6 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
         }));
 
     e.get_texture_manager()->create_2d_from_file(
-        "gearoenix-splash-glare",
         platform::stream::Path::create_asset("gearoenix-splash/glare.png"),
         texture::TextureInfo(),
         core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
@@ -271,7 +268,6 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
             [values, lv = std::move(left_wing_vertices), rv = std::move(right_wing_vertices), ib = std::move(plane_indices)](std::shared_ptr<material::Unlit>&& m) mutable {
                 m->set_transparency(material::Transparency::Transparent);
                 values->e.get_texture_manager()->create_2d_from_file(
-                    "gearoenix-splash-wing",
                     gearoenix::platform::stream::Path::create_asset("gearoenix-splash/wing.png"),
                     gearoenix::render::texture::TextureInfo(),
                     core::job::EndCallerShared<texture::Texture2D>(

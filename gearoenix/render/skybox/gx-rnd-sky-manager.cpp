@@ -24,7 +24,6 @@ void gearoenix::render::skybox::Manager::build(
 {
     if (texture_path.get_raw_data().ends_with(".hdr") || texture_path.get_raw_data().ends_with(".png")) {
         e.get_texture_manager()->create_2d_from_file(
-            name + "-texture",
             texture_path,
             texture::TextureInfo(
                 texture::TextureFormat::Unknown,

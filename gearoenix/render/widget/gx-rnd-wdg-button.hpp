@@ -25,6 +25,11 @@ struct Texture2D;
 
 namespace gearoenix::render::widget {
 struct Button final : Widget {
+    struct ConstructorReturn final {
+        std::shared_ptr<model::Builder> model_builder;
+        std::shared_ptr<Button> button;
+    };
+
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, rest_texture);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, pressed_texture);
 
@@ -42,7 +47,7 @@ public:
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<material::Material>&& mat,
@@ -51,7 +56,7 @@ public:
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<material::Material>&& mat,
@@ -60,7 +65,7 @@ public:
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<material::Material>&& mat,
@@ -69,7 +74,7 @@ public:
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     static void construct(
         std::string&& name,
         std::shared_ptr<material::Material>&& mat,
@@ -79,7 +84,7 @@ public:
         core::ecs::entity_id_t camera_id,
         std::shared_ptr<Widget>&& parent,
         std::shared_ptr<scene::Builder>&& scene_builder,
-        core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback);
+        core::job::EndCaller<ConstructorReturn>&& end_callback);
     void set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) override;
     void set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) override;
     void set_on_cancel(const std::function<void()>& fun) override;

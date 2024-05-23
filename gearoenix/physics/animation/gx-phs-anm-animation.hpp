@@ -58,7 +58,7 @@ struct SpriteAnimation final : public Animation {
     void animate(Manager& manager, double time) final;
 };
 
-struct AnimationPlayer final : public core::ecs::Component {
+struct AnimationPlayer final : core::ecs::Component {
     friend struct Manager;
 
     GX_GET_VAL_PRV(double, time, 0.0);

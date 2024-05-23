@@ -57,7 +57,7 @@ void gearoenix::render::widget::Button::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     engine::Engine& e = parent->e;
     const auto material_name = name + "-material";
@@ -75,15 +75,14 @@ void gearoenix::render::widget::Button::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     engine::Engine& e = parent->e;
-    const auto path = platform::stream::Path::create_asset(pressed_texture_asset);
+    const auto path = platform::stream::Path::create_asset(std::move(pressed_texture_asset));
     core::job::EndCallerShared<texture::Texture2D> te([n = std::move(name), m = std::move(mat), r = std::move(rest_texture_asset), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& pt) mutable {
         construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(s), std::move(e));
     });
     e.get_texture_manager()->create_2d_from_file(
-        std::move(pressed_texture_asset),
         path,
         texture::TextureInfo(),
         std::move(te));
@@ -97,15 +96,14 @@ void gearoenix::render::widget::Button::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     engine::Engine& e = parent->e;
-    const auto path = platform::stream::Path::create_asset(rest_texture_asset);
+    const auto path = platform::stream::Path::create_asset(std::move(rest_texture_asset));
     core::job::EndCallerShared<texture::Texture2D> te([n = std::move(name), m = std::move(mat), pt = std::move(pressed_texture), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& r) mutable {
         construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(s), std::move(e));
     });
     e.get_texture_manager()->create_2d_from_file(
-        std::move(rest_texture_asset),
         path,
         texture::TextureInfo(),
         std::move(te));
@@ -119,7 +117,7 @@ void gearoenix::render::widget::Button::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     engine::Engine& e = parent->e;
     auto copy_mat = std::shared_ptr(mat);
@@ -139,7 +137,7 @@ void gearoenix::render::widget::Button::construct(
     const core::ecs::entity_id_t camera_id,
     std::shared_ptr<Widget>&& parent,
     std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<std::pair<std::shared_ptr<model::Builder>, std::shared_ptr<Button>>>&& end_callback)
+    core::job::EndCaller<ConstructorReturn>&& end_callback)
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::shared_ptr(rest_texture));

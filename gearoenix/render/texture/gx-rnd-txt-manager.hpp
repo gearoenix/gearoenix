@@ -88,7 +88,6 @@ public:
         const TextureInfo& info,
         core::job::EndCallerShared<Texture2D>&& c);
     void create_2d_from_file(
-        std::string&& name,
         const platform::stream::Path& path,
         const TextureInfo& info,
         core::job::EndCallerShared<Texture2D>&& c);
