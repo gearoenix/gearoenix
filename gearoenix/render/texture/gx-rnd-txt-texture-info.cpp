@@ -5,9 +5,9 @@
 gearoenix::render::texture::TextureInfo::TextureInfo(
     const TextureFormat format,
     const SamplerInfo& sampler_info,
-    const std::size_t width,
-    const std::size_t height,
-    const std::size_t depth,
+    const std::uint32_t width,
+    const std::uint32_t height,
+    const std::uint32_t depth,
     const Type type,
     const bool has_mipmap)
     : format(format)
@@ -41,7 +41,7 @@ gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_width(const std::size_t v)
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_width(const std::uint32_t v)
 {
     if (v == width) {
         return *this;
@@ -51,7 +51,7 @@ gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_height(const std::size_t v)
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_height(const std::uint32_t v)
 {
     if (v == height) {
         return *this;
@@ -61,7 +61,7 @@ gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo
     return *this;
 }
 
-gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_depth(const std::size_t v)
+gearoenix::render::texture::TextureInfo& gearoenix::render::texture::TextureInfo::set_depth(const std::uint32_t v)
 {
     if (v == depth) {
         return *this;

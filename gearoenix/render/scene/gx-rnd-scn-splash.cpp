@@ -301,6 +301,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
     e.get_material_manager()->get_unlit(
         "gearoenix-splash-text",
         core::job::EndCallerShared<material::Unlit>([values, font = std::move(font)](std::shared_ptr<material::Unlit>&& m) mutable {
+            m->set_transparency(material::Transparency::Transparent);
             m->get_albedo_factor() = { 0.4f, 0.0f, 0.0f, 0.0f };
             font->bake(
                 L"Gearoenix", math::Vec4(1.0), values->text_height, values->text_width,

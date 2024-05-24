@@ -48,9 +48,9 @@ public:
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::size_t environment_resolution,
-        std::size_t irradiance_resolution,
-        std::size_t radiance_resolution,
+        std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution,
+        std::uint32_t radiance_resolution,
         core::job::EndCaller<>&& entity_end_callback,
         core::job::EndCallerShared<Builder>&& probe_end_callback)
         = 0;

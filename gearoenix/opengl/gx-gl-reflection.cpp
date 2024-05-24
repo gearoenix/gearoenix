@@ -72,9 +72,9 @@ void gearoenix::gl::RuntimeReflection::construct(
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
     std::string&& name,
-    const std::size_t environment_resolution,
-    const std::size_t irradiance_resolution,
-    const std::size_t radiance_resolution,
+    const std::uint32_t environment_resolution,
+    const std::uint32_t irradiance_resolution,
+    const std::uint32_t radiance_resolution,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
     static core::allocator::SharedArray<RuntimeReflection, MAX_COUNT> allocator;
@@ -151,9 +151,9 @@ void gearoenix::gl::ReflectionBuilder::construct_runtime(
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
-    const std::size_t environment_resolution,
-    const std::size_t irradiance_resolution,
-    const std::size_t radiance_resolution,
+    const std::uint32_t environment_resolution,
+    const std::uint32_t irradiance_resolution,
+    const std::uint32_t radiance_resolution,
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<ReflectionBuilder>&& probe_end_callback)
 {
@@ -190,9 +190,9 @@ void gearoenix::gl::ReflectionManager::build_runtime(
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
-    const std::size_t environment_resolution,
-    const std::size_t irradiance_resolution,
-    const std::size_t radiance_resolution,
+    const std::uint32_t environment_resolution,
+    const std::uint32_t irradiance_resolution,
+    const std::uint32_t radiance_resolution,
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<render::reflection::Builder>&& probe_end_callback)
 {

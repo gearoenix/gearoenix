@@ -18,8 +18,8 @@ gearoenix::render::texture::Texture::Texture(
 void gearoenix::render::texture::Texture::write_image(
     platform::stream::Stream& s,
     const std::uint8_t* const data,
-    const std::size_t img_width,
-    const std::size_t img_height,
+    const std::uint32_t img_width,
+    const std::uint32_t img_height,
     const TextureFormat format)
 {
     if (format_has_float_component(format)) {
@@ -38,8 +38,8 @@ void gearoenix::render::texture::Texture::write_image(
 void gearoenix::render::texture::Texture::write_gx3d_image(
     platform::stream::Stream& s,
     const std::uint8_t* const data,
-    const std::size_t img_width,
-    const std::size_t img_height,
+    const std::uint32_t img_width,
+    const std::uint32_t img_height,
     const TextureFormat format)
 {
     const auto offset_of_size = s.tell();

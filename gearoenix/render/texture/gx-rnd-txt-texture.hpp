@@ -28,15 +28,15 @@ struct Texture {
     static void write_image(
         platform::stream::Stream& s,
         const std::uint8_t* data,
-        std::size_t img_width,
-        std::size_t img_height,
+        std::uint32_t img_width,
+        std::uint32_t img_height,
         TextureFormat format);
 
     static void write_gx3d_image(
         platform::stream::Stream& s,
         const std::uint8_t* data,
-        std::size_t img_width,
-        std::size_t img_height,
+        std::uint32_t img_width,
+        std::uint32_t img_height,
         TextureFormat format);
 
 public:

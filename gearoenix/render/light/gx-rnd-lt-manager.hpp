@@ -23,7 +23,7 @@ struct Manager {
         = 0;
     virtual void build_shadow_caster_directional(
         const std::string& name,
-        std::size_t shadow_map_resolution,
+        std::uint32_t shadow_map_resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,

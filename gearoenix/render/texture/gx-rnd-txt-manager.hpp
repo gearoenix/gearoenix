@@ -108,7 +108,7 @@ public:
         float roughness);
     [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness);
     [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(std::size_t resolution = 256);
-    [[nodiscard]] math::Vec2<std::size_t> get_default_camera_render_target_dimensions() const;
+    [[nodiscard]] math::Vec2<std::uint32_t> get_default_camera_render_target_dimensions() const;
     void create_default_camera_render_target(
         const std::string& camera_name,
         core::job::EndCaller<DefaultCameraTargets>&& callback);

@@ -110,9 +110,11 @@ public:
     template <typename ComponentType>
     [[nodiscard]] ComponentType* get_component(const entity_id_t id) const
     {
+        static_assert(std::is_base_of_v<Component, ComponentType>);
         auto entity_search = entities.find(id);
-        if (entities.end() == entity_search)
+        if (entities.end() == entity_search) {
             return nullptr;
+        }
         const auto& e = entity_search->second;
         return e.archetype->get_component<ComponentType>(e.components);
     }

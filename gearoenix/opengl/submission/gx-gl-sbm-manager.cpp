@@ -251,12 +251,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                     }
                     }
                     if (camera->get_debug_enabled()) {
-                        const auto* const mesh = dynamic_cast<const gl::Mesh*>(camera->get_debug_mesh().get());
-                        scene_pool_ref.debug_mesh_data.push_back(DebugModel {
-                            .m = math::Mat4x4<float>(transform->get_global_matrix()),
-                            .colour = camera->get_debug_colour(),
-                            .vertex_object = mesh->get_cached_vertex_object(),
-                            .indices_count = mesh->get_cached_indices_count() });
+                        scene_pool_ref.debug_mesh_data.emplace_back(camera, transform);
                     }
                 });
             e.get_world()->synchronised_system<ShadowCasterDirectionalLight>(
@@ -375,29 +370,13 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
             if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            const auto [first_mesh_index, last_mesh_index] = scene_data.add_meshes(model->get_gl_meshes());
-            const BvhNodeModel md {
-                .cameras_flags = model->cameras_flags,
-                .model = Model {
-                    .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
-                    .inv_m = math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()),
-                    .first_mesh_index = first_mesh_index,
-                    .last_mesh_index = last_mesh_index,
-                    // Reflection probe data
-                    .irradiance = scene_data.default_reflection.second.irradiance,
-                    .radiance = scene_data.default_reflection.second.radiance,
-                    .radiance_lod_coefficient = scene_data.default_reflection.second.radiance_mips_count,
-                    .reflection_probe_size = scene_data.default_reflection.second.size,
-                }
-            };
-            bvh.add({ collider->get_updated_box(), md });
+            bvh.add({ collider->get_updated_box(), BvhNodeModel(e, model, model_transform, scene_data, nullptr) });
         });
     bvh.create_nodes();
 }
 
 void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
-    auto& anm_mgr = *e.get_physics_engine()->get_animation_manager();
     e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
         [&](
             const core::ecs::entity_id_t,
@@ -408,43 +387,7 @@ void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core:
             if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            const auto [first_mesh_index, last_mesh_index] = scene_data.add_meshes(model->get_gl_meshes());
-            std::size_t first_bone_index = 0;
-            std::size_t bones_count = 0;
-            if (nullptr != armature) {
-                first_bone_index = scene_data.bones_data.size();
-                anm_mgr.loop_over_bones(
-                    [&](const physics::animation::Bone& bone) {
-                        ++bones_count;
-                        scene_data.bones_data.push_back(Bone {
-                            .m = bone.m,
-                            .inv_m = bone.inv_m,
-                        });
-                    },
-                    *armature);
-            } else {
-                first_bone_index = 0;
-            }
-            scene_data.dynamic_models.push_back(
-                DynamicModel {
-                    .base = BvhNodeModel {
-                        .cameras_flags = model->cameras_flags,
-                        .model = Model {
-                            .m = math::Mat4x4<float>(model_transform->get_global_matrix()),
-                            .inv_m = bones_count == 0 ? math::Mat4x4<float>(model_transform->get_inverted_global_matrix().transposed()) : math::Mat4x4<float> {},
-                            .first_mesh_index = first_mesh_index,
-                            .last_mesh_index = last_mesh_index,
-                            .first_bone_index = first_bone_index,
-                            .bones_count = bones_count,
-                            // Reflection probe data
-                            .irradiance = scene_data.default_reflection.second.irradiance,
-                            .radiance = scene_data.default_reflection.second.radiance,
-                            .radiance_lod_coefficient = scene_data.default_reflection.second.radiance_mips_count,
-                            .reflection_probe_size = scene_data.default_reflection.second.size,
-                        },
-                    },
-                    .box = collider->get_updated_box(),
-                });
+            scene_data.dynamic_models.emplace_back(e, model, model_transform, scene_data, armature, collider);
         });
 }
 

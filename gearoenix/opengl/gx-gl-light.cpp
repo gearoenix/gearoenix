@@ -99,7 +99,7 @@ std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::
 
 void gearoenix::gl::LightManager::build_shadow_caster_directional(
     const std::string& name,
-    const std::size_t shadow_map_resolution,
+    const std::uint32_t shadow_map_resolution,
     const float camera_far,
     const float camera_near,
     const float camera_aspect,

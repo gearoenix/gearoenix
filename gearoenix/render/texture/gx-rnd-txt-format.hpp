@@ -82,7 +82,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr std::size_t format_components_count(const TextureFormat f)
+[[nodiscard]] constexpr std::uint32_t format_components_count(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:

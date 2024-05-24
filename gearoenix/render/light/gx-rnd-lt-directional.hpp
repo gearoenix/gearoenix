@@ -55,14 +55,14 @@ public:
     ~ShadowCasterDirectional() override;
     virtual void initialise(
         engine::Engine&,
-        std::size_t resolution,
+        std::uint32_t resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,
         const std::shared_ptr<Builder>& builder,
         core::job::EndCaller<>&& end_callback);
     virtual void initialise_camera(float camera_far, float camera_near, float camera_aspect);
-    virtual void set_shadow_map(std::size_t resolution, core::job::EndCaller<>&& end_callback);
+    virtual void set_shadow_map(std::uint32_t resolution, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map(std::shared_ptr<texture::Texture2D>&&, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map_target(std::shared_ptr<texture::Target>&&);
 };

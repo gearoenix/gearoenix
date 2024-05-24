@@ -27,13 +27,14 @@ private:
     std::shared_ptr<Component>* components = nullptr;
     std::string name;
 
-    Entity(Archetype* archetype, std::shared_ptr<Component>* components, std::string&& name) noexcept;
+    Entity(Archetype* archetype, std::shared_ptr<Component>* components, std::string&& name);
 
 public:
     Entity(Entity&&) noexcept;
     Entity(const Entity&) = delete;
     Entity& operator=(Entity&&) = default;
     Entity& operator=(const Entity&) = delete;
+    ~Entity();
     void show_debug_gui();
 };
 
@@ -52,14 +53,15 @@ struct EntityBuilder final {
     bases_to_leaves_t bases_to_leaves;
     job::EndCaller<> end_caller;
 
-    EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<void>&& end_caller) noexcept;
+    EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<void>&& end_caller);
 
 public:
-    EntityBuilder(std::string&& name, job::EndCaller<void>&& end_caller) noexcept;
+    EntityBuilder(std::string&& name, job::EndCaller<void>&& end_caller);
     EntityBuilder(EntityBuilder&&) noexcept;
     EntityBuilder(const EntityBuilder&) = delete;
     EntityBuilder& operator=(EntityBuilder&&) = delete;
     EntityBuilder& operator=(const EntityBuilder&) = delete;
+    ~EntityBuilder();
 
     void add_component(std::shared_ptr<Component>&& component);
 
@@ -75,6 +77,7 @@ public:
     template <typename ComponentType>
     ComponentType* get_component() const
     {
+        static_assert(std::is_base_of_v<Component, ComponentType>);
         if constexpr (std::is_final_v<ComponentType>) {
             return static_cast<ComponentType*>(get_component_final_type(std::type_index(typeid(ComponentType))).get());
         } else {

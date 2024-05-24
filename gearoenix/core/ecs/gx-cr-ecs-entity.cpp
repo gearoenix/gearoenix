@@ -9,7 +9,7 @@ std::shared_ptr<gearoenix::core::ecs::Component> null_component(nullptr);
 gearoenix::core::ecs::Entity::Entity(
     Archetype* const archetype,
     std::shared_ptr<Component>* const components,
-    std::string&& name) noexcept
+    std::string&& name)
     : archetype(archetype)
     , components(components)
     , name(std::move(name))
@@ -21,9 +21,13 @@ gearoenix::core::ecs::Entity::Entity(Entity&& o) noexcept
     , components(o.components)
     , name(std::move(o.name))
 {
+    o.archetype = nullptr;
+    o.components = nullptr;
 }
 
 std::atomic<gearoenix::core::ecs::entity_id_t> gearoenix::core::ecs::Entity::last_id(1028);
+
+gearoenix::core::ecs::Entity::~Entity() = default;
 
 void gearoenix::core::ecs::Entity::show_debug_gui()
 {
@@ -35,14 +39,14 @@ void gearoenix::core::ecs::Entity::show_debug_gui()
     }
 }
 
-gearoenix::core::ecs::EntityBuilder::EntityBuilder(const entity_id_t id, std::string&& name, job::EndCaller<>&& end_caller) noexcept
+gearoenix::core::ecs::EntityBuilder::EntityBuilder(const entity_id_t id, std::string&& name, job::EndCaller<>&& end_caller)
     : id(id)
     , name(std::move(name))
     , end_caller(std::move(end_caller))
 {
 }
 
-gearoenix::core::ecs::EntityBuilder::EntityBuilder(std::string&& name, job::EndCaller<>&& end_caller) noexcept
+gearoenix::core::ecs::EntityBuilder::EntityBuilder(std::string&& name, job::EndCaller<>&& end_caller)
     : id(++Entity::last_id)
     , name(std::move(name))
     , end_caller(std::move(end_caller))
@@ -53,9 +57,12 @@ gearoenix::core::ecs::EntityBuilder::EntityBuilder(EntityBuilder&& o) noexcept
     : id(o.id)
     , name(std::move(o.name))
     , components(std::move(o.components))
+    , bases_to_leaves(std::move(o.bases_to_leaves))
     , end_caller(std::move(o.end_caller))
 {
 }
+
+gearoenix::core::ecs::EntityBuilder::~EntityBuilder() = default;
 
 const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::EntityBuilder::get_component(
     const std::type_index component_type) const

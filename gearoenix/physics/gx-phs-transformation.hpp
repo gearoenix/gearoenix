@@ -72,6 +72,7 @@ private:
 public:
     explicit TransformationComponent(std::string&& name);
     [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(std::string&& name);
+    void show_debug_gui() override;
 };
 }
 #endif

@@ -32,7 +32,7 @@ struct Builder {
     };
 
     struct ShadowCasterDirectionalInfo final {
-        std::size_t shadow_map_resolution = 0;
+        std::uint32_t shadow_map_resolution = 0;
         float far = 100.0;
         float near = 1.0;
         float aspect = 20;

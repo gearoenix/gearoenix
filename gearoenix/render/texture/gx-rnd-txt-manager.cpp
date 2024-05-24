@@ -12,6 +12,10 @@
 #include <array>
 #include <boost/mp11/algorithm.hpp>
 
+#ifdef main
+#undef main
+#endif
+
 gearoenix::render::texture::Manager::Manager(engine::Engine& e)
     : e(e)
 {
@@ -87,7 +91,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
             stream.read(data);
             if (is_float) {
                 std::vector<float> float_pixels;
-                std::size_t decode_w = 0, decode_h = 0, ignored = 0;
+                std::uint32_t decode_w = 0, decode_h = 0, ignored = 0;
                 Image::decode(data.data(), data.size(), comps_count, float_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
@@ -113,7 +117,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
                     }
                 }
             } else {
-                std::size_t decode_w = 0, decode_h = 0, ignored = 0;
+                std::uint32_t decode_w = 0, decode_h = 0, ignored = 0;
                 Image::decode(data.data(), data.size(), comps_count, mip_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
@@ -336,9 +340,9 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
     GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
     GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
     GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
-    std::size_t img_width = 0;
-    std::size_t img_height = 0;
-    std::size_t img_channels = 0;
+    std::uint32_t img_width = 0;
+    std::uint32_t img_height = 0;
+    std::uint32_t img_channels = 0;
     std::vector<std::uint8_t> pixels0;
     Image::decode(
         static_cast<const unsigned char*>(data), size, 4,
@@ -373,9 +377,9 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
     GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
     GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
-    std::size_t img_width = 0;
-    std::size_t img_height = 0;
-    std::size_t img_channels = 0;
+    std::uint32_t img_width = 0;
+    std::uint32_t img_height = 0;
+    std::uint32_t img_channels = 0;
     std::vector<float> pixels0f;
     Image::decode(
         static_cast<const unsigned char*>(data), size, 4,
@@ -576,7 +580,7 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
     return pixels;
 }
 
-gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const
+gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const
 {
     switch (auto& resolution = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get(); resolution.index()) {
     case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
@@ -586,7 +590,7 @@ gearoenix::math::Vec2<size_t> gearoenix::render::texture::Manager::get_default_c
     case boost::mp11::mp_find<Resolution, ScreenBasedResolution>::value: {
         const auto [nom, dom] = std::get<ScreenBasedResolution>(resolution);
         const auto wh = (e.get_platform_application().get_base().get_window_size() * static_cast<int>(nom)) / static_cast<int>(dom);
-        return math::Vec2<size_t> { wh };
+        return math::Vec2<std::uint32_t> { wh };
     }
     default:
         GX_UNEXPECTED;

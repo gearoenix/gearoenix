@@ -413,3 +413,8 @@ std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics:
     self->set_component_self(self);
     return self;
 }
+
+void gearoenix::physics::TransformationComponent::show_debug_gui()
+{
+    Transformation::show_debug_gui();
+}

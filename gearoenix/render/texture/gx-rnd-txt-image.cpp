@@ -1,5 +1,4 @@
 #include "gx-rnd-txt-image.hpp"
-#include "../../core/gx-cr-build-configuration.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 // This is a workaround for warnings in stb
@@ -22,12 +21,12 @@ void gearoenix::render::texture::Image::encode_write_func(void* const context, v
 void gearoenix::render::texture::Image::decode(
     platform::stream::Stream* const file,
     std::vector<unsigned char>& encoded_data,
-    std::size_t& img_width,
-    std::size_t& img_height)
+    std::uint32_t& img_width,
+    std::uint32_t& img_height)
 {
     std::vector<unsigned char> img;
     file->read(img);
-    std::size_t img_channels = 0;
+    std::uint32_t img_channels = 0;
     decode(img.data(), img.size(), 4, encoded_data, img_width, img_height, img_channels);
 }
 
@@ -36,9 +35,9 @@ void gearoenix::render::texture::Image::decode(
     const std::size_t formatted_size,
     const std::optional<std::size_t> requested_channels,
     std::vector<unsigned char>& decoded_data,
-    std::size_t& img_width,
-    std::size_t& img_height,
-    std::size_t& img_channels)
+    std::uint32_t& img_width,
+    std::uint32_t& img_height,
+    std::uint32_t& img_channels)
 {
     int iw = 0, ih = 0, chs = 0;
     unsigned char* const dd = stbi_load_from_memory(formatted_data, static_cast<int>(formatted_size), &iw, &ih, &chs,
@@ -46,9 +45,9 @@ void gearoenix::render::texture::Image::decode(
     if (dd == nullptr) {
         GX_LOG_F("Image decoder error.");
     }
-    img_width = static_cast<unsigned int>(iw);
-    img_height = static_cast<unsigned int>(ih);
-    img_channels = static_cast<unsigned int>(chs);
+    img_width = static_cast<std::uint32_t>(iw);
+    img_height = static_cast<std::uint32_t>(ih);
+    img_channels = static_cast<std::uint32_t>(chs);
     chs = requested_channels.has_value() ? static_cast<int>(requested_channels.value()) : chs;
     const auto img_size = static_cast<unsigned int>(img_width * img_height * chs);
     decoded_data.resize(img_size);
@@ -61,9 +60,9 @@ void gearoenix::render::texture::Image::decode(
     const std::size_t formatted_size,
     const std::optional<std::size_t> requested_channels,
     std::vector<float>& decoded_data,
-    std::size_t& img_width,
-    std::size_t& img_height,
-    std::size_t& img_channels)
+    std::uint32_t& img_width,
+    std::uint32_t& img_height,
+    std::uint32_t& img_channels)
 {
     int iw = 0, ih = 0, chs = 0;
     float* const dd = stbi_loadf_from_memory(formatted_data, static_cast<int>(formatted_size), &iw, &ih, &chs,
@@ -82,9 +81,9 @@ void gearoenix::render::texture::Image::decode(
 void gearoenix::render::texture::Image::encode_png(
     platform::stream::Stream& file,
     const std::uint8_t* const data,
-    const std::size_t img_width,
-    const std::size_t img_height,
-    const std::size_t components_count)
+    const std::uint32_t img_width,
+    const std::uint32_t img_height,
+    const std::uint32_t components_count)
 {
     stbi_write_png_compression_level = 100;
     stbi_write_png_to_func(
@@ -100,9 +99,9 @@ void gearoenix::render::texture::Image::encode_png(
 void gearoenix::render::texture::Image::encode_hdr(
     platform::stream::Stream& file,
     const void* const data,
-    const std::size_t img_width,
-    const std::size_t img_height,
-    const std::size_t components_count)
+    const std::uint32_t img_width,
+    const std::uint32_t img_height,
+    const std::uint32_t components_count)
 {
     stbi_write_hdr_to_func(
         encode_write_func,

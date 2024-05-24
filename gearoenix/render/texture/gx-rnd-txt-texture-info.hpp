@@ -24,17 +24,17 @@ public:
     explicit TextureInfo(
         TextureFormat format = TextureFormat::Unknown,
         const SamplerInfo& sampler_info = SamplerInfo(),
-        std::size_t width = 0,
-        std::size_t height = 0,
-        std::size_t depth = 0,
+        std::uint32_t width = 0,
+        std::uint32_t height = 0,
+        std::uint32_t depth = 0,
         Type type = Type::Unknown,
         bool has_mipmap = true);
 
     TextureInfo& set_format(TextureFormat v);
     TextureInfo& set_sampler_info(const SamplerInfo& v);
-    TextureInfo& set_width(std::size_t v);
-    TextureInfo& set_height(std::size_t v);
-    TextureInfo& set_depth(std::size_t v);
+    TextureInfo& set_width(std::uint32_t v);
+    TextureInfo& set_height(std::uint32_t v);
+    TextureInfo& set_depth(std::uint32_t v);
     TextureInfo& set_type(Type v);
     TextureInfo& set_has_mipmap(bool v);
     [[nodiscard]] bool operator==(const TextureInfo& o) const;

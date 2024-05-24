@@ -8,7 +8,6 @@
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
-#include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-lt-builder.hpp"
 
@@ -57,7 +56,7 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
 
 void gearoenix::render::light::ShadowCasterDirectional::initialise(
     engine::Engine& e,
-    const std::size_t resolution,
+    const std::uint32_t resolution,
     const float camera_far,
     const float camera_near,
     const float camera_aspect,
@@ -105,7 +104,7 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise_camera(
 }
 
 void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(
-    const std::size_t resolution, core::job::EndCaller<>&& end_callback)
+    const std::uint32_t resolution, core::job::EndCaller<>&& end_callback)
 {
     if (nullptr != shadow_map && shadow_map->get_info().get_height() == resolution) {
         return;

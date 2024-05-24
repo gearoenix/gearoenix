@@ -82,9 +82,9 @@ struct Runtime : Probe {
     void set_runtime_reflection_self(
         const std::shared_ptr<Runtime>& runtime_self,
         const std::shared_ptr<Builder>& builder,
-        std::size_t environment_resolution,
-        std::size_t irradiance_resolution,
-        std::size_t radiance_resolution,
+        std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution,
+        std::uint32_t radiance_resolution,
         core::job::EndCaller<>&& end_callback);
 
 public:

@@ -46,8 +46,9 @@ void gearoenix::core::ecs::World::delayed_delete_entity(const entity_id_t id, jo
 
 void gearoenix::core::ecs::World::add_components_map(const entity_id_t id, EntityBuilder::components_t&& c)
 {
-    if (c.empty())
+    if (c.empty()) {
         return;
+    }
     auto* const entity = get_entity(id);
     if (nullptr == entity) {
         GX_LOG_E("Entity: " << id << " does not exist.");

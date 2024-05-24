@@ -33,9 +33,9 @@ gearoenix::render::reflection::Runtime::Runtime(
 void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     const std::shared_ptr<Runtime>& runtime_self,
     const std::shared_ptr<Builder>& builder,
-    const std::size_t environment_resolution,
-    const std::size_t irradiance_resolution,
-    const std::size_t radiance_resolution,
+    const std::uint32_t environment_resolution,
+    const std::uint32_t irradiance_resolution,
+    const std::uint32_t radiance_resolution,
     core::job::EndCaller<>&& end_callback)
 {
     weak_runtime_self = runtime_self;
