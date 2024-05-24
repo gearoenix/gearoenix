@@ -15,10 +15,11 @@ jobs:
         id: cache
         with:
           path: |
+            ~/vulkan-sdk/
             ~/emsdk
             ~/cmake
             build-webassembly/
-          key: ${{ runner.os }}-webassembly-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
+          key: ${{ runner.os }}-webassembly-gearoenix-${{ hashFiles('.github/workflows/wasm.yml') }}
       - name: Update OS
         run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
       - name: Install dependencies
