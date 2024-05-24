@@ -10,12 +10,6 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@v1.2.0
-        with:
-          vulkan-query-version: latest
-          vulkan-components: Glslang
-          vulkan-use-cache: true
       - name: Install CMake
         shell: powershell
         run: |
@@ -25,7 +19,7 @@ jobs:
           Get-Content "$env:GITHUB_ENV"
           New-Item -ItemType Directory -Force -Path build
           Set-Location -Path build
-          $cmake_ver = "3.23.2"
+          $cmake_ver = "3.29.3"
           $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-windows-x86_64.zip"
           Write-Host "Going to download CMake from: ${cmake_address}."
           Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
@@ -36,6 +30,12 @@ jobs:
           Write-Host "Add cmake to PATH."
           Add-Content -Path "$env:GITHUB_PATH" -Value "$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-windows-x86_64\bin"
           Add-Content -Path "$env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+      - name: Setup Vulkan SDK
+        uses: humbletim/setup-vulkan-sdk@v1.2.0
+        with:
+          vulkan-query-version: latest
+          vulkan-components: Glslang
+          vulkan-use-cache: true
       - name: Echo settings
         shell: powershell
         run: |
