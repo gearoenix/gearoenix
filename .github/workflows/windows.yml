@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     container:
       image: noroozpour/gearoenix:windows-0.1
     defaults:
