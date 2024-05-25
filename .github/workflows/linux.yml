@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Use secret
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          CODECOV_TOKEN: ${{ secrets.KOSKESH }}
         run: |
           echo "My secret is $CODECOV_TOKEN"
 #      - uses: actions/checkout@v3
