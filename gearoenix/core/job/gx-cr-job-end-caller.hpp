@@ -49,7 +49,6 @@ private:
 
         ~Caller()
         {
-            GX_ASSERT_D(nullptr != this);
             if constexpr (std::is_same_v<void, T>) {
                 send_job(context_thread, [f = std::move(function)]() mutable {
                     f();

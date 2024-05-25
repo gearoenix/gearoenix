@@ -25,6 +25,7 @@ jobs:
           key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Echos
         run: |
+          echo ${{ secrets.CODECOV_TOKEN }}
           echo "SHELL=$SHELL"
           echo "SHELL=$0"
           echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
@@ -35,7 +36,6 @@ jobs:
           echo "/root/vulkan-sdk/x86_64/bin" >> $GITHUB_PATH
       - name: Building Release
         run: |
-          echo "$PATH"
           mkdir -p build-release &&
           pwd &&
           cd build-release &&
