@@ -1,4 +1,4 @@
-name: 'Ubuntu-22.04  '
+name: 'Ubuntu-24.04  '
 on:
   push:
     branches: [ master ]
@@ -7,7 +7,9 @@ on:
     
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container:
+      image: noroozpour/gearoenix:linux-0.1
     steps:
       - uses: actions/checkout@v3
       - name: Setup cache
@@ -15,43 +17,9 @@ jobs:
         id: cache
         with:
           path: |
-            ~/vulkan-sdk
-            ~/cmake
             build-release/
             build-debug/
-          key: ${{ runner.os }}-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
-      - name: Update OS
-        run: sudo apt-get update -y && sudo apt-get dist-upgrade -y
-      - name: Install dependencies
-        run: |
-          sudo apt-get install clang-15 libsdl2-dev libdrm-dev libgbm-dev -y &&
-          echo "CC=/usr/bin/clang-15" >> $GITHUB_ENV &&
-          echo "CXX=/usr/bin/clang++-15" >> $GITHUB_ENV &&
-          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(expr $(nproc --all) \* 8)" >> $GITHUB_ENV &&
-          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-      - name: Setup Vulkan SDK
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          curl -L https://vulkan.lunarg.com/sdk/download/latest/linux/vulkan-sdk.tar.gz --output ~/vulkan-sdk.tar.gz &&
-          mkdir -p ~/vulkan-sdk &&
-          tar -xf ~/vulkan-sdk.tar.gz -C ~/vulkan-sdk --strip-components=1 &&
-          rm ~/vulkan-sdk.tar.gz &&
-          ls ~ &&
-          ls ~/vulkan-sdk/ &&
-          . ~/vulkan-sdk/setup-env.sh &&
-          echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV &&
-          echo "${VULKAN_SDK}/bin" >> $GITHUB_PATH &&
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> $GITHUB_ENV &&
-          echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}" >> $GITHUB_ENV
-      - name: Install CMake
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          CMAKE_VER="3.29.2" &&
-          curl -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VER}/cmake-${CMAKE_VER}-linux-x86_64.tar.gz" -o ~/cmake.tar.gz &&
-          mkdir -p ~/cmake &&
-          tar -xf ~/cmake.tar.gz -C ~/cmake --strip-components=1 &&
-          rm ~/cmake.tar.gz &&
-          echo "$HOME/cmake/bin" >> $GITHUB_PATH
+          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Echos
         run: |
           echo $HOME
@@ -62,24 +30,24 @@ jobs:
           echo "PATH=${PATH}"
           echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
           echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}"
-          echo "GITHUB_ENV="
-          cat $GITHUB_ENV
       - name: Building Release
         run: |
           mkdir -p build-release &&
+          pwd &&
           cd build-release &&
           cmake .. -DCMAKE_BUILD_TYPE=Release &&
           cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
           mkdir -p build-debug &&
+          pwd &&
           cd build-debug &&
           cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
           cmake --build . --config Debug &&
           cd tests &&
           ctest &&
-          llvm-profdata-14 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
-          llvm-cov-14 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
+          llvm-profdata-18 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
+          llvm-cov-18 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

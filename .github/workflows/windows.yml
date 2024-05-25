@@ -41,7 +41,7 @@ jobs:
         run: |
           Write-Host "Path: $env:Path"
           Write-Host "CMake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
-      - name: Realse build
+      - name: Release build
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path build
