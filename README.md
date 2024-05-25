@@ -4,9 +4,9 @@
 
 Gearoenix game engine.
 
-![Ubuntu 22.04  ](https://github.com/gearoenix/gearoenix/workflows/Ubuntu-22.04%20%20/badge.svg)
-![Windows-2022  ](https://github.com/gearoenix/gearoenix/workflows/Windows-2022%20%20/badge.svg)
-![WASM  ](https://github.com/gearoenix/gearoenix/workflows/WASM%20%20/badge.svg)
+[![Ubuntu-24.04  ](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml)
+[![Windows-2022  ](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml)
+[![WASM  ](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml)
 [![codecov](https://codecov.io/gh/gearoenix/gearoenix/branch/master/graph/badge.svg?token=48NJY46U15)](https://codecov.io/gh/gearoenix/gearoenix)
 [![Discord](https://img.shields.io/discord/700169912605474856.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/uGs66W6AM3)
 

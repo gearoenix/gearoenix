@@ -8,51 +8,35 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+    container:
+      image: noroozpour/gearoenix:windows-0.1
+    defaults:
+      run:
+        shell: powershell
     steps:
       - uses: actions/checkout@v3
-      - name: Install CMake
-        shell: powershell
-        run: |
-          Write-Host "GITHUB_PATH: $env:GITHUB_PATH"
-          Write-Host "GITHUB_ENV: $env:GITHUB_ENV"
-          Get-Content "$env:GITHUB_PATH"
-          Get-Content "$env:GITHUB_ENV"
-          New-Item -ItemType Directory -Force -Path build
-          Set-Location -Path build
-          $cmake_ver = "3.29.3"
-          $cmake_address = "https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}-windows-x86_64.zip"
-          Write-Host "Going to download CMake from: ${cmake_address}."
-          Invoke-WebRequest "${cmake_address}" -OutFile "cmake.zip"
-          Write-Host "Going to uncompress the cmake.zip."
-          Expand-Archive "cmake.zip" -DestinationPath "cmake"
-          Write-Host "Going to delete cmake.zip."
-          Remove-Item -Path "cmake.zip"
-          Write-Host "Add cmake to PATH."
-          Add-Content -Path "$env:GITHUB_PATH" -Value "$((Get-Item .).FullName)\cmake\cmake-${cmake_ver}-windows-x86_64\bin"
-          Add-Content -Path "$env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
-      - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@v1.2.0
+      - name: Setup cache
+        uses: actions/cache@v3
+        id: cache
         with:
-          vulkan-query-version: latest
-          vulkan-components: Glslang
-          vulkan-use-cache: true
+          path: |
+            build-release/
+            build-debug/
+          key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Echo settings
-        shell: powershell
         run: |
           Write-Host "Path: $env:Path"
           Write-Host "CMake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
       - name: Release build
-        shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path build
-          Set-Location -Path build
+          New-Item -ItemType Directory -Force -Path build-release
+          Set-Location -Path build-release
           cmake ..
           cmake --build . --config Release
       - name: Building debug and tests
-        shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path debug-build
-          Set-Location -Path debug-build
+          New-Item -ItemType Directory -Force -Path build-debug
+          Set-Location -Path build-debug
           cmake ..
           cmake --build . --config Debug
           Set-Location -Path tests
