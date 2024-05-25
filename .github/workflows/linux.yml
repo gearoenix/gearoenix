@@ -28,10 +28,9 @@ jobs:
           echo "LLVM_PROFILE_FILE=${LLVM_PROFILE_FILE}"
           echo "VULKAN_SDK=${VULKAN_SDK}"
           echo "PATH=${PATH}"
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-          echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}"
       - name: Building Release
         run: |
+          . $VULKAN_SDK/setup-env.sh &&
           mkdir -p build-release &&
           pwd &&
           cd build-release &&
@@ -39,6 +38,7 @@ jobs:
           cmake --build . --config Release
       - name: Building debug, tests and coverage
         run: |
+          . $VULKAN_SDK/setup-env.sh &&
           mkdir -p build-debug &&
           pwd &&
           cd build-debug &&
