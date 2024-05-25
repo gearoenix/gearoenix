@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: noroozpour/gearoenix:linux-0.1
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v3
       - name: Setup cache
@@ -27,7 +30,7 @@ jobs:
           echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
           ls /root/vulkan-sdk
-          bash -c "source /root/vulkan-sdk/setup-env.sh" &&
+          . /root/vulkan-sdk/setup-env.sh &&
           echo "VULKAN_SDK=${VULKAN_SDK}" &&
           echo "${VULKAN_SDK}/bin" &&
           echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" &&
