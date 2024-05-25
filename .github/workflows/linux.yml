@@ -12,6 +12,14 @@ jobs:
       image: noroozpour/gearoenix:linux-0.1
     steps:
       - uses: actions/checkout@v3
+      - name: Setup cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            build-release/
+            build-debug/
+          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Echos
         run: |
           echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
@@ -19,7 +27,7 @@ jobs:
           echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
           ls /root/vulkan-sdk
-          . /root/vulkan-sdk/setup-env.sh &&
+          bash -c "source /root/vulkan-sdk/setup-env.sh" &&
           echo "VULKAN_SDK=${VULKAN_SDK}" &&
           echo "${VULKAN_SDK}/bin" &&
           echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" &&
