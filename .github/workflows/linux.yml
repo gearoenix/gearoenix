@@ -31,15 +31,8 @@ jobs:
           echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
           echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
           echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-          ls /root/vulkan-sdk
-          echo "VULKAN_SDK=${VULKAN_SDK}"
-          echo "${VULKAN_SDK}/bin"
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-          echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}"
-          echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV
-          echo "${VULKAN_SDK}/bin" >> $GITHUB_PATH
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> $GITHUB_ENV
-          echo "VK_ADD_LAYER_PATH=${VK_ADD_LAYER_PATH}" >> $GITHUB_ENV
+          echo "VULKAN_SDK=/root/vulkan-sdk" >> $GITHUB_ENV
+          echo "/root/vulkan-sdk/bin" >> $GITHUB_PATH
       - name: Building Release
         run: |
           mkdir -p build-release &&
