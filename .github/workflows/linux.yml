@@ -25,6 +25,8 @@ jobs:
           key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Echos
         run: |
+          echo "SHELL=$SHELL"
+          echo "SHELL=$0"
           echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
           echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
           echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
