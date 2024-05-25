@@ -4,67 +4,58 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-#    container:
-#      image: noroozpour/gearoenix:linux-0.1
-#    defaults:
-#      run:
-#        shell: bash
+    container:
+      image: noroozpour/gearoenix:linux-0.1
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: Use secret
-        env:
-          CODECOV_TOKEN: ${{ secrets.KOSKESH }}
+      - uses: actions/checkout@v3
+      - name: Setup cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            build-release/
+            build-debug/
+          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
+      - name: Echos
         run: |
-          echo "My secret is $CODECOV_TOKEN"
-#      - uses: actions/checkout@v3
-#      - name: Setup cache
-#        uses: actions/cache@v3
-#        id: cache
-#        with:
-#          path: |
-#            build-release/
-#            build-debug/
-#          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
-#      - name: Echos
-#        run: |
-#          echo ${{ secrets }}
-#          echo ${{ secrets.GITHUB_TOKEN }}
-#          echo ${{ secrets.CODECOV_TOKEN }}
-#          echo "SHELL=$SHELL"
-#          echo "SHELL=$0"
-#          echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
-#          echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
-#          echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
-#          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-#          echo "VULKAN_SDK=/root/vulkan-sdk/x86_64" >> $GITHUB_ENV
-#          echo "/root/vulkan-sdk/x86_64/bin" >> $GITHUB_PATH
-#      - name: Building Release
-#        run: |
-#          mkdir -p build-release &&
-#          pwd &&
-#          cd build-release &&
-#          cmake .. -DCMAKE_BUILD_TYPE=Release &&
-#          cmake --build . --config Release
-#      - name: Building debug, tests and coverage
-#        run: |
-#          mkdir -p build-debug &&
-#          pwd &&
-#          cd build-debug &&
-#          cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
-#          cmake --build . --config Debug &&
-#          cd tests &&
-#          ctest &&
-#          llvm-profdata-18 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
-#          llvm-cov-18 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
-#      - uses: codecov/codecov-action@v3
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          files: build-debug/tests/coverage.txt
-#          flags: unittests
-#          name: gearoenix-test-coverage
-#          fail_ci_if_error: true
-#          verbose: true
+          echo "SHELL=$SHELL"
+          echo "SHELL=$0"
+          echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
+          echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
+          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
+          echo "VULKAN_SDK=/root/vulkan-sdk/x86_64" >> $GITHUB_ENV
+          echo "/root/vulkan-sdk/x86_64/bin" >> $GITHUB_PATH
+      - name: Building Release
+        run: |
+          mkdir -p build-release &&
+          pwd &&
+          cd build-release &&
+          cmake .. -DCMAKE_BUILD_TYPE=Release &&
+          cmake --build . --config Release
+      - name: Building debug, tests and coverage
+        run: |
+          mkdir -p build-debug &&
+          pwd &&
+          cd build-debug &&
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
+          cmake --build . --config Debug &&
+          cd tests &&
+          ctest &&
+          llvm-profdata-18 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
+          llvm-cov-18 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build-debug/tests/coverage.txt
+          flags: unittests
+          name: gearoenix-test-coverage
+          fail_ci_if_error: true
+          verbose: true
