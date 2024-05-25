@@ -7,9 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: noroozpour/gearoenix:windows-0.1
+    runs-on: windows-2022
     defaults:
       run:
         shell: powershell
@@ -22,18 +20,41 @@ jobs:
           path: |
             build-release/
             build-debug/
+            cmake/
           key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
+      - name: Install CMake
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3-windows-x86_64.zip" -OutFile "cmake.zip"
+          Expand-Archive "cmake.zip" -DestinationPath "cmake"
+          Remove-Item -Path "cmake.zip"
+      - name: Setup CMake
+        run: |
+          $NewPath = (Get-Location).Path + "\cmake\cmake-3.29.3-windows-x86_64\bin"
+          Write-Host "CMake Path: $NewPath"
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
+          Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+      - name: Install VC Redist
+        run: |
+          Invoke-WebRequest "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.exe"
+          ./vc_redist.exe /install /quiet /norestart
+          Remove-Item -Path "vc_redist.exe"
+      - name: Install Vulkan
+        run: |
+          Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile "vulkan.exe"
+          ./vulkan.exe --accept-licenses --default-answer --confirm-command install
+          Remove-Item -Path "vulkan.exe"
       - name: Echo settings
         run: |
-          Write-Host "Path: $env:Path"
-          Write-Host "CMake thread option: $env:CMAKE_BUILD_PARALLEL_LEVEL"
-      - name: Release build
+          Write-Host "Path: $Env:Path"
+          Write-Host "CMake thread option: $Env:CMAKE_BUILD_PARALLEL_LEVEL"
+      - name: Release Build
         run: |
           New-Item -ItemType Directory -Force -Path build-release
           Set-Location -Path build-release
           cmake ..
           cmake --build . --config Release
-      - name: Building debug and tests
+      - name: Building Debug and Tests
         run: |
           New-Item -ItemType Directory -Force -Path build-debug
           Set-Location -Path build-debug
