@@ -24,8 +24,10 @@ jobs:
             build-debug/
           key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
       - name: Echos
+        env:
+          SUPER_SECRET: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          echo ${{ secrets.CODECOV_TOKEN }}
+          echo $SUPER_SECRET
           echo "SHELL=$SHELL"
           echo "SHELL=$0"
           echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
