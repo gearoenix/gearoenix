@@ -42,6 +42,9 @@ jobs:
         run: |
           Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile "vulkan.exe"
           ./vulkan.exe --accept-licenses --default-answer --confirm-command install
+          Write-Host "Vulkan Path: $Env:VULKAN_SDK"
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:VULKAN_SDK/Bin"
+          Add-Content -Path "$Env:GITHUB_ENV" -Value "VULKAN_SDK=$Env:VULKAN_SDK"
       - name: Echo settings
         run: |
           Write-Host "Path: $Env:Path"
