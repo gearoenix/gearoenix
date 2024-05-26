@@ -38,12 +38,10 @@ jobs:
         run: |
           Invoke-WebRequest "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.exe"
           ./vc_redist.exe /install /quiet /norestart
-          Remove-Item -Path "vc_redist.exe"
       - name: Install Vulkan
         run: |
           Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile "vulkan.exe"
           ./vulkan.exe --accept-licenses --default-answer --confirm-command install
-          Remove-Item -Path "vulkan.exe"
       - name: Echo settings
         run: |
           Write-Host "Path: $Env:Path"
