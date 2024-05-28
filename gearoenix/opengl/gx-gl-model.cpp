@@ -7,7 +7,7 @@
 #include "material/gx-gl-material.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::gl::Model, gearoenix::gl::Model::MAX_COUNT> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Model, gearoenix::gl::Model::MAX_COUNT>::construct();
 }
 
 const boost::container::flat_set<std::type_index>& gearoenix::gl::Model::get_all_the_hierarchy_types_except_component() const
@@ -39,7 +39,7 @@ std::shared_ptr<gearoenix::gl::Model> gearoenix::gl::Model::Model::construct(
     std::string&& name,
     const bool is_transformable)
 {
-    auto self = allocator.make_shared(e, std::move(meshes), std::move(name), is_transformable);
+    auto self = allocator->make_shared(e, std::move(meshes), std::move(name), is_transformable);
     self->set_component_self(self);
     return self;
 }

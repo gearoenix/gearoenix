@@ -16,7 +16,7 @@ public:
     Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points);
     [[nodiscard]] static std::shared_ptr<Frustum> construct(
         std::string&& name,
-        const std::array<math::Vec3<double>, 8>& points = {
+        const std::array<math::Vec3<double>, 8>& points = std::array<math::Vec3<double>, 8> {
             math::Vec3<double>(-1.0, 1.0, 1.0),
             math::Vec3<double>(1.0, 1.0, 1.0),
             math::Vec3<double>(-1.0, 1.0, -1.0),

@@ -27,7 +27,7 @@ void gearoenix::render::reflection::Manager::build_baked(
         Manager* const manager;
         std::string name;
         core::job::EndCallerShared<Builder> c;
-        core::job::EndCaller<>&& entity_end_callback;
+        core::job::EndCaller<> entity_end_callback;
         math::Aabb3<double> include_box;
         std::shared_ptr<texture::TextureCube> irradiance;
         std::shared_ptr<texture::TextureCube> radiance;

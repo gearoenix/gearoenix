@@ -21,8 +21,8 @@ gearoenix::gl::material::Sprite::Sprite(
 
 void gearoenix::gl::material::Sprite::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c)
 {
-    static core::allocator::SharedArray<gl::material::Sprite, render::material::Sprite::MAX_COUNT> allocator;
-    auto result = allocator.make_shared(e, name);
+    static auto allocator = core::allocator::SharedArray<gl::material::Sprite, render::material::Sprite::MAX_COUNT>::construct();
+    auto result = allocator->make_shared(e, name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

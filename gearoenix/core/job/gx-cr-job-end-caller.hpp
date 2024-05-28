@@ -7,21 +7,21 @@
 #include <memory>
 #include <optional>
 #include <type_traits>
+#include <vector>
 
 #if GX_DEBUG_MODE
 #define GX_END_CALLER_CATCH_CALLER_LOCATION true
 #endif
 
 #if GX_END_CALLER_CATCH_CALLER_LOCATION
-#include <source_location>
+#include <boost/stacktrace.hpp>
 
 #define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(a) a
-#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a0, a1) a0, a1
+#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a1, a2) a1, a2
 
 #else
 
 #define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(a)
-#define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a0, a1)
 
 #endif
 
@@ -38,12 +38,12 @@ private:
         Function function;
         const std::thread::id context_thread;
         std::optional<Type> value = std::nullopt;
-        GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const std::source_location source_location;)
+        GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const boost::stacktrace::stacktrace stack_trace;)
 
-        explicit Caller(Function&& f GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, const std::source_location& source_location))
+        explicit Caller(Function&& f)
             : function(std::move(f))
             , context_thread(std::this_thread::get_id())
-                  GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, source_location(source_location))
+                  GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
         {
         }
 
@@ -69,15 +69,37 @@ private:
     };
 
     std::shared_ptr<Caller> caller;
+    GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const boost::stacktrace::stacktrace stack_trace;)
 
 public:
-    explicit EndCaller(Function&& f GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, const std::source_location& source_location = std::source_location::current()))
-        : caller(new Caller(std::move(f) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, source_location)))
+    explicit EndCaller(Function&& f)
+        : caller(new Caller(std::move(f)))
+              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
     }
 
-    EndCaller(const EndCaller& o) = default;
-    EndCaller(EndCaller&&) noexcept = default;
+    EndCaller(const EndCaller<T>& o)
+        : caller(o.caller)
+              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+    {
+        GX_ASSERT_D(nullptr != caller);
+    }
+
+    EndCaller(EndCaller<T>&& o) noexcept
+        : caller(std::move(o.caller))
+              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+    {
+        GX_ASSERT_D(nullptr != caller);
+    }
+
+#ifdef GX_DEBUG_MODE
+    ~EndCaller()
+    {
+        caller = nullptr;
+    }
+#else
+    ~EndCaller() = default;
+#endif
 
     template <typename TT = T>
     std::enable_if_t<!std::is_same_v<void, TT>, void> set_return(Type&& v) const

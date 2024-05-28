@@ -1,5 +1,7 @@
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "../gx-gl-check.hpp"
 #include "../gx-gl-engine.hpp"
 #include <vector>
 
@@ -121,15 +123,20 @@ gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&&
 
 gearoenix::gl::shader::Shader::~Shader()
 {
-    if (static_cast<uint>(-1) != vertex_object) {
-        glDeleteShader(vertex_object);
-    }
-    if (static_cast<uint>(-1) != fragment_object) {
-        glDeleteShader(fragment_object);
-    }
-    if (static_cast<uint>(-1) != shader_program) {
-        glDeleteProgram(shader_program);
-    }
+    core::job::send_job(e.get_jobs_thread_id(), [vo = vertex_object, fo = fragment_object, sp = shader_program] {
+        GX_GL_CHECK_D;
+        if (static_cast<uint>(-1) != vo) {
+            glDeleteShader(vo);
+        }
+        if (static_cast<uint>(-1) != fo) {
+            glDeleteShader(fo);
+        }
+        if (static_cast<uint>(-1) != sp) {
+            glDeleteProgram(sp);
+        }
+        GX_GL_CHECK_D;
+    });
+    vertex_object = fragment_object = shader_program = static_cast<uint>(-1);
 }
 
 gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const

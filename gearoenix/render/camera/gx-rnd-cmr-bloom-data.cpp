@@ -2,7 +2,7 @@
 #include <imgui.h>
 
 gearoenix::render::camera::BloomData::BloomData()
-    : scatter_clamp_max_threshold_threshold_knee(1.0f, 7.0f, 0.9f, 0.5f)
+    : scatter_clamp_max_threshold_threshold_knee(0.5f, 7.0f, 0.9f, 0.5f)
 {
 }
 

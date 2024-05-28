@@ -8,7 +8,7 @@
 #include "gx-gl-texture.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::gl::ShadowCasterDirectionalLight, gearoenix::render::light::ShadowCasterDirectional::MAX_COUNT> shadow_caster_directional_allocator;
+const auto shadow_caster_directional_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::ShadowCasterDirectionalLight, gearoenix::render::light::ShadowCasterDirectional::MAX_COUNT>::construct();
 }
 
 const boost::container::flat_set<std::type_index>& gearoenix::gl::ShadowCasterDirectionalLight::get_all_the_hierarchy_types_except_component() const
@@ -29,7 +29,7 @@ gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(std::s
 std::shared_ptr<gearoenix::gl::ShadowCasterDirectionalLight> gearoenix::gl::ShadowCasterDirectionalLight::construct(
     std::string&& name)
 {
-    auto self = shadow_caster_directional_allocator.make_shared(std::move(name));
+    auto self = shadow_caster_directional_allocator->make_shared(std::move(name));
     self->set_component_self(self);
     return self;
 }

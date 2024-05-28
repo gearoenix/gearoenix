@@ -47,17 +47,18 @@ void main() {\n\
     vec3 right = normalize(cross(up, nrm));\n\
     up = normalize(cross(nrm, right));\n\
     float sample_delta = 0.005;\n\
-    float samples_count = 0.0f;\n\
-    for(float phi = 0.0; phi < 2.0 * GX_PI; phi += sample_delta) {\n\
-        for(float theta = 0.0; theta < 0.5 * GX_PI; theta += sample_delta, ++samples_count) {\n\
+    float phi_samples_count = 0.001f;\n\
+    for(float phi = 0.0; phi < 2.0 * GX_PI; phi += sample_delta, ++phi_samples_count) {\n\
+        float theta_samples_count = 0.001f;\n\
+        vec3 irradiance_temp = vec3(0.0);\n\
+        for(float theta = 0.0; theta < 0.5 * GX_PI; theta += sample_delta, ++theta_samples_count) {\n\
             vec3 tangent_sample = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));\n\
             vec3 sample_vec = tangent_sample.x * right + tangent_sample.y * up + tangent_sample.z * nrm;\n\
-            irradiance += texture(environment, normalize(sample_vec)).rgb * cos(theta) * sin(theta);\n\
+            irradiance_temp += texture(environment, normalize(sample_vec)).rgb * cos(theta) * sin(theta);\n\
         }\n\
+        irradiance += irradiance_temp / theta_samples_count;\n\
     }\n\
-    irradiance *= GX_PI / samples_count;\n\
-    irradiance /= irradiance + 1.0f;\n\
-    irradiance = pow(irradiance, vec3(1.0f / 2.2f));\n\
+    irradiance *= GX_PI / phi_samples_count;\n\
     frag_out = vec4(irradiance, 1.0);\n\
 }\n";
 
@@ -76,8 +77,9 @@ gearoenix::gl::shader::Irradiance::~Irradiance() = default;
 
 void gearoenix::gl::shader::Irradiance::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(environment);
 }

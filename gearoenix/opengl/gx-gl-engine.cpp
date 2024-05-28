@@ -40,8 +40,6 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT;
     specification.is_raytracing_supported = false;
     specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
-
-    specification.is_float_texture_supported = false;
     specification.is_deferred_supported = false;
 
     GX_GL_CHECK_D;

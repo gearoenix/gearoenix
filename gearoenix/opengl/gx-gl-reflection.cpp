@@ -39,8 +39,8 @@ std::shared_ptr<gearoenix::gl::BakedReflection> gearoenix::gl::BakedReflection::
     std::shared_ptr<TextureCube>&& rad,
     const math::Aabb3<double>& include_box)
 {
-    static core::allocator::SharedArray<BakedReflection, MAX_COUNT> allocator;
-    auto self = allocator.make_shared(std::move(name), e, std::move(irr), std::move(rad), include_box);
+    static const auto allocator = core::allocator::SharedArray<BakedReflection, MAX_COUNT>::construct();
+    auto self = allocator->make_shared(std::move(name), e, std::move(irr), std::move(rad), include_box);
     self->set_component_self(self);
     return self;
 }
@@ -77,8 +77,8 @@ void gearoenix::gl::RuntimeReflection::construct(
     const std::uint32_t radiance_resolution,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
-    static core::allocator::SharedArray<RuntimeReflection, MAX_COUNT> allocator;
-    auto self = allocator.make_shared(e, receive_box, exclude_box, include_box, std::move(name));
+    static const auto allocator = core::allocator::SharedArray<RuntimeReflection, MAX_COUNT>::construct();
+    auto self = allocator->make_shared(e, receive_box, exclude_box, include_box, std::move(name));
     end_callback.set_return(std::shared_ptr(self));
     self->set_runtime_reflection_self(
         self, builder, environment_resolution, irradiance_resolution, radiance_resolution,

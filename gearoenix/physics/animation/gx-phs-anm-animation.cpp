@@ -137,7 +137,7 @@ void gearoenix::physics::animation::SpriteAnimation::animate(
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::AnimationPlayer, 16> animation_player_allocator;
+auto animation_player_allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::AnimationPlayer, 16>::construct();
 }
 
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
@@ -157,7 +157,7 @@ std::shared_ptr<gearoenix::physics::animation::AnimationPlayer> gearoenix::physi
     std::string&& name,
     const double starting_time)
 {
-    auto self = animation_player_allocator.make_shared(std::move(animation), std::move(name), starting_time);
+    auto self = animation_player_allocator->make_shared(std::move(animation), std::move(name), starting_time);
     self->set_component_self(self);
     return self;
 }

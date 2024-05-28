@@ -7,7 +7,7 @@
 #include <boost/mp11/algorithm.hpp>
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::gl::Skybox, gearoenix::gl::Skybox::MAX_COUNT> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Skybox, gearoenix::gl::Skybox::MAX_COUNT>::construct();
 
 template <typename T>
 constexpr size_t index_of_texture = boost::mp11::mp_find<gearoenix::render::skybox::Texture, std::shared_ptr<T>>::value;
@@ -77,7 +77,7 @@ std::shared_ptr<gearoenix::gl::Skybox> gearoenix::gl::Skybox::construct(
     std::shared_ptr<render::mesh::Mesh>&& mesh,
     std::string&& name)
 {
-    auto self = allocator.make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name));
+    auto self = allocator->make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name));
     self->set_component_self(self);
     return self;
 }

@@ -53,10 +53,10 @@ struct EntityBuilder final {
     bases_to_leaves_t bases_to_leaves;
     job::EndCaller<> end_caller;
 
-    EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<void>&& end_caller);
+    EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<>&& end_caller);
 
 public:
-    EntityBuilder(std::string&& name, job::EndCaller<void>&& end_caller);
+    EntityBuilder(std::string&& name, job::EndCaller<>&& end_caller);
     EntityBuilder(EntityBuilder&&) noexcept;
     EntityBuilder(const EntityBuilder&) = delete;
     EntityBuilder& operator=(EntityBuilder&&) = delete;

@@ -106,5 +106,5 @@ gearoenix::core::ecs::EntitySharedBuilder::EntitySharedBuilder(World* const worl
 
 gearoenix::core::ecs::EntitySharedBuilder::~EntitySharedBuilder()
 {
-    world->delayed_create_entity(std::move(builder), job::EndCaller(builder.end_caller));
+    world->delayed_create_entity(std::move(builder));
 }

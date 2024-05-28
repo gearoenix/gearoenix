@@ -2,7 +2,6 @@
 #include "../audio/gx-au-engine.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
-#include "../core/job/gx-cr-job-manager.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include <imgui/imgui.h>

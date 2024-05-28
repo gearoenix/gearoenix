@@ -5,6 +5,14 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <array>
 
+#ifdef far
+#undef far
+#endif
+
+#ifdef near
+#undef near
+#endif
+
 namespace gearoenix::core::ecs {
 struct EntitySharedBuilder;
 }
@@ -33,9 +41,9 @@ struct Builder {
 
     struct ShadowCasterDirectionalInfo final {
         std::uint32_t shadow_map_resolution = 0;
-        float far = 100.0;
-        float near = 1.0;
-        float aspect = 20;
+        float far = 100.0f;
+        float near = 1.0f;
+        float aspect = 20.0f;
     };
 
     struct PointInfo final {

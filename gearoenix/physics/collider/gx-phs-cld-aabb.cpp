@@ -2,7 +2,7 @@
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 8192> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 8192>::construct();
 }
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
@@ -24,7 +24,7 @@ std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collide
     const math::Vec3<double>& lower,
     std::string&& name)
 {
-    auto self = allocator.make_shared(upper, lower, std::move(name));
+    auto self = allocator->make_shared(upper, lower, std::move(name));
     return self;
 }
 
@@ -32,7 +32,7 @@ std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collide
     const math::Aabb3<double>& original_box,
     std::string&& name)
 {
-    auto self = allocator.make_shared(original_box, std::move(name));
+    auto self = allocator->make_shared(original_box, std::move(name));
     return self;
 }
 

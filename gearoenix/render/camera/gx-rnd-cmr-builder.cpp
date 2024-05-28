@@ -11,7 +11,8 @@ gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(physics::collider::Frustum::construct(name + "-collider"));
+    auto frustum = physics::collider::Frustum::construct(name + "-collider");
+    builder.add_component(std::move(frustum));
     builder.add_component(physics::TransformationComponent::construct(name + "-transformation"));
 }
 

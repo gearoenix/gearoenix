@@ -3,7 +3,7 @@
 #include <imgui/imgui.h>
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192>::construct();
 }
 
 gearoenix::physics::Transformation::Transformation()
@@ -409,7 +409,7 @@ gearoenix::physics::TransformationComponent::TransformationComponent(std::string
 
 std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(std::string&& name)
 {
-    auto self = allocator.make_shared(std::move(name));
+    auto self = allocator->make_shared(std::move(name));
     self->set_component_self(self);
     return self;
 }

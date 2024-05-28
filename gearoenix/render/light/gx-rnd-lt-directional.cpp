@@ -12,7 +12,7 @@
 #include "gx-rnd-lt-builder.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::render::light::Directional, gearoenix::render::light::Directional::MAX_COUNT> directional_allocator;
+const auto directional_allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::light::Directional, gearoenix::render::light::Directional::MAX_COUNT>::construct();
 }
 
 gearoenix::render::light::Directional::Directional(std::string&& name)
@@ -29,7 +29,7 @@ const boost::container::flat_set<std::type_index>& gearoenix::render::light::Dir
 
 std::shared_ptr<gearoenix::render::light::Directional> gearoenix::render::light::Directional::construct(std::string&& name)
 {
-    auto self = directional_allocator.make_shared(std::move(name));
+    auto self = directional_allocator->make_shared(std::move(name));
     self->set_component_self(self);
     return self;
 }

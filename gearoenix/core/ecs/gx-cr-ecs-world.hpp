@@ -51,7 +51,7 @@ public:
     void create_entity(EntityBuilder&&);
 
     /// Recommended way to add an entity, in case you do not know the context you're in.
-    void delayed_create_entity(EntityBuilder&&, job::EndCaller<>&& callback);
+    void delayed_create_entity(EntityBuilder&&);
     //--------------------------------------Entity deletion----------------------------------------------
     void delete_entity(entity_id_t);
 

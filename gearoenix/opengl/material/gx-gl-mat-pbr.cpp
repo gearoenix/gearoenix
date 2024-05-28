@@ -21,8 +21,8 @@ gearoenix::gl::material::Pbr::Pbr(Engine& e, const std::string& name)
 
 void gearoenix::gl::material::Pbr::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c)
 {
-    static core::allocator::SharedArray<Pbr, MAX_COUNT> allocator;
-    const auto result = allocator.make_shared(e, name);
+    static const auto allocator = core::allocator::SharedArray<Pbr, MAX_COUNT>::construct();
+    const auto result = allocator->make_shared(e, name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

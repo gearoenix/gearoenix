@@ -1,10 +1,10 @@
 #include "gx-gl-target.hpp"
 
-#include "gx-gl-label.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
+#include "gx-gl-label.hpp"
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 

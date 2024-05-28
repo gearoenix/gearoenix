@@ -19,13 +19,25 @@ private:
     std::mutex gx_core_shared_array_lock;
     std::array<std::uint8_t, gx_core_shared_array_size> gx_core_shared_array_objects;
     boost::container::static_vector<T*, S> gx_core_shared_array_free_pointers;
+    std::weak_ptr<SharedArray> weak_self;
+
+    SharedArray()
+    {
+#if GX_DEBUG_MODE
+        std::memset(gx_core_shared_array_objects.data(), 0, gx_core_shared_array_objects.size());
+#endif
+        for (std::size_t i = S * gx_core_shared_array_element_size; i > 0;) {
+            i -= gx_core_shared_array_element_size;
+            gx_core_shared_array_free_pointers.push_back(reinterpret_cast<T*>(&gx_core_shared_array_objects[i]));
+        }
+    }
 
 public:
     struct StdDeleter final {
-        SharedArray* const allocator;
+        const std::shared_ptr<SharedArray> allocator;
 
-        explicit StdDeleter(SharedArray* const allocator)
-            : allocator(allocator)
+        explicit StdDeleter(std::shared_ptr<SharedArray>&& allocator)
+            : allocator(std::move(allocator))
         {
         }
 
@@ -40,16 +52,11 @@ public:
         }
     };
 
-    SharedArray()
+    [[nodiscard]] static std::shared_ptr<SharedArray> construct()
     {
-#if GX_DEBUG_MODE
-        for (auto& b : gx_core_shared_array_objects)
-            b = 0;
-#endif
-        for (std::size_t i = S * gx_core_shared_array_element_size; i > 0;) {
-            i -= gx_core_shared_array_element_size;
-            gx_core_shared_array_free_pointers.push_back(reinterpret_cast<T*>(&gx_core_shared_array_objects[i]));
-        }
+        std::shared_ptr<SharedArray> result(new SharedArray());
+        result->weak_self = result;
+        return result;
     }
 
     template <typename... Args>
@@ -71,7 +78,7 @@ public:
             GX_ASSERT(bs[i] == 0);
         }
 #endif
-        return std::shared_ptr<T>(new (ptr) T(std::forward<Args>(args)...), StdDeleter(this));
+        return std::shared_ptr<T>(new (ptr) T(std::forward<Args>(args)...), StdDeleter(weak_self.lock()));
     }
 };
 }

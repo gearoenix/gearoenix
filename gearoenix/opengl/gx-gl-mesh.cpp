@@ -10,8 +10,8 @@
 #include "material/gx-gl-material.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::gl::Buffer, gearoenix::render::mesh::Buffer::MAX_COUNT> buffer_allocator;
-gearoenix::core::allocator::SharedArray<gearoenix::gl::Mesh, gearoenix::render::mesh::Mesh::MAX_COUNT> mesh_allocator;
+const auto buffer_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Buffer, gearoenix::render::mesh::Buffer::MAX_COUNT>::construct();
+const auto mesh_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Mesh, gearoenix::render::mesh::Mesh::MAX_COUNT>::construct();
 }
 
 gearoenix::gl::Buffer::Buffer(Engine& e, const math::Aabb3<double>& box)
@@ -22,6 +22,7 @@ gearoenix::gl::Buffer::Buffer(Engine& e, const math::Aabb3<double>& box)
 
 gearoenix::gl::Buffer::~Buffer()
 {
+    GX_ASSERT_D(static_cast<uint>(-1) != vertex_object);
     core::job::send_job(e.get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
         GX_GL_CHECK_D;
         glBindVertexArray(0);
@@ -32,6 +33,7 @@ gearoenix::gl::Buffer::~Buffer()
         glDeleteBuffers(1, &ib);
         GX_GL_CHECK_D;
     });
+    vertex_object = vertex_buffer = index_buffer = static_cast<uint>(-1);
 }
 
 void gearoenix::gl::Buffer::construct(
@@ -42,7 +44,7 @@ void gearoenix::gl::Buffer::construct(
     const math::Aabb3<double>& occlusion_box,
     core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
-    auto buffer = buffer_allocator.make_shared(e, occlusion_box);
+    auto buffer = buffer_allocator->make_shared(e, occlusion_box);
     buffer->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
@@ -115,7 +117,7 @@ void gearoenix::gl::Mesh::construct(
     std::shared_ptr<render::material::Material>&& material,
     const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
 {
-    end_callback.set_return(mesh_allocator.make_shared(e, std::move(buffer), std::move(material)));
+    end_callback.set_return(mesh_allocator->make_shared(e, std::move(buffer), std::move(material)));
 }
 
 gearoenix::gl::MeshManager::MeshManager(Engine& e)

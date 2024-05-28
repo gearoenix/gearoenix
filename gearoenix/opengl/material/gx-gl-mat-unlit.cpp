@@ -19,8 +19,8 @@ gearoenix::gl::material::Unlit::Unlit(Engine& e, const std::string& name)
 
 void gearoenix::gl::material::Unlit::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c)
 {
-    static core::allocator::SharedArray<gl::material::Unlit, render::material::Unlit::MAX_COUNT> allocator;
-    auto result = allocator.make_shared(e, name);
+    static auto allocator = core::allocator::SharedArray<gl::material::Unlit, render::material::Unlit::MAX_COUNT>::construct();
+    auto result = allocator->make_shared(e, name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

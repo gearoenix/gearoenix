@@ -1,9 +1,8 @@
 #include "gx-phs-cld-frustum.hpp"
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../../core/job/gx-cr-job-end-caller.hpp"
 
 namespace {
-auto frustum_allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Frustum, 16>();
+const auto frustum_allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Frustum, 16>::construct();
 }
 
 const boost::container::flat_set<std::type_index>& gearoenix::physics::collider::Frustum::get_all_the_hierarchy_types_except_component() const
@@ -24,7 +23,7 @@ gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::ar
 std::shared_ptr<gearoenix::physics::collider::Frustum> gearoenix::physics::collider::Frustum::construct(
     std::string&& name, const std::array<math::Vec3<double>, 8>& points)
 {
-    auto self = frustum_allocator.make_shared(std::move(name), points);
+    auto self = frustum_allocator->make_shared(std::move(name), points);
     self->set_component_self(self);
     return self;
 }

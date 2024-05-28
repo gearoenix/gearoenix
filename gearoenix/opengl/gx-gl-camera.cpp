@@ -7,7 +7,7 @@
 #include "gx-gl-texture.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::gl::Camera, gearoenix::render::camera::Camera::MAX_COUNT> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Camera, gearoenix::render::camera::Camera::MAX_COUNT>::construct();
 }
 
 gearoenix::gl::CameraTarget::~CameraTarget() = default;
@@ -73,7 +73,7 @@ gearoenix::gl::Camera::Camera(Engine& e, const std::string& name, render::camera
 
 void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c)
 {
-    c.set_return(allocator.make_shared(e, name, render::camera::Target()));
+    c.set_return(allocator->make_shared(e, name, render::camera::Target()));
     c.get_return()->set_component_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();

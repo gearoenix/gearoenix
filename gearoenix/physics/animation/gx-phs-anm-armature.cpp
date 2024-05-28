@@ -1,9 +1,8 @@
 #include "gx-phs-anm-armature.hpp"
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../../core/job/gx-cr-job-end-caller.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::Armature, 16> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::Armature, 16>::construct();
 }
 
 gearoenix::physics::animation::Armature::Armature(std::string&& name)
@@ -13,7 +12,7 @@ gearoenix::physics::animation::Armature::Armature(std::string&& name)
 
 std::shared_ptr<gearoenix::physics::animation::Armature> gearoenix::physics::animation::Armature::construct(std::string&& name)
 {
-    auto self = allocator.make_shared(std::move(name));
+    auto self = allocator->make_shared(std::move(name));
     self->set_component_self(self);
     return self;
 }

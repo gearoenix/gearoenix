@@ -7,7 +7,7 @@
 #include "../model/gx-rnd-mdl-model.hpp"
 
 namespace {
-gearoenix::core::allocator::SharedArray<gearoenix::render::scene::Scene, 16> allocator;
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::scene::Scene, 16>::construct();
 }
 
 gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, std::string&& name)
@@ -22,7 +22,7 @@ gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, st
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::render::scene::Scene::construct(
     engine::Engine& e, const double layer, std::string&& name)
 {
-    auto self = allocator.make_shared(e, layer, std::move(name));
+    auto self = allocator->make_shared(e, layer, std::move(name));
     self->set_component_self(self);
     return self;
 }

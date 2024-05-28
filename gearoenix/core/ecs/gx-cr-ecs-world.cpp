@@ -7,16 +7,17 @@ void gearoenix::core::ecs::World::create_entity(EntityBuilder&& b)
     auto* const a = get_archetype(b.components);
     auto* const cs = a->allocate_entity(b.id, b.components);
     entities.emplace(b.id, Entity(a, cs, std::string(b.name)));
-    if (name_to_entity_id.contains(b.name))
+    if (name_to_entity_id.contains(b.name)) {
         GX_LOG_F("Entity with name `" << b.name << "' is already in the world.");
+    }
     name_to_entity_id.emplace(std::move(b.name), b.id);
 }
 
-void gearoenix::core::ecs::World::delayed_create_entity(EntityBuilder&& b, job::EndCaller<>&& callback)
+void gearoenix::core::ecs::World::delayed_create_entity(EntityBuilder&& b)
 {
     const std::lock_guard _lg(delayed_actions_lock);
     delayed_actions.push_back(Action {
-        .callback = std::move(callback),
+        .callback = job::EndCaller([] {}),
         .variant = Action::CreateEntity { .builder = std::move(b) },
     });
 }
@@ -150,8 +151,9 @@ gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const enti
 const gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const entity_id_t id) const
 {
     const auto search = entities.find(id);
-    if (entities.end() == search)
+    if (entities.end() == search) {
         return nullptr;
+    }
     return &search->second;
 }
 
