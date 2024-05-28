@@ -105,8 +105,8 @@ Speed::Speed()
 
 std::shared_ptr<Speed> Speed::construct()
 {
-    static GxAllocator<Speed> allocator;
-    return allocator.make_shared();
+    static auto allocator = GxAllocator<Speed>::construct();
+    return allocator->make_shared();
 }
 
 void Speed::update(const Position& p)
@@ -158,8 +158,8 @@ Position::Position()
 
 std::shared_ptr<Position> Position::construct()
 {
-    static GxAllocator<Position> allocator;
-    return allocator.make_shared();
+    static const auto allocator = GxAllocator<Position>::construct();
+    return allocator->make_shared();
 }
 
 void Position::update(const double delta_time, const Speed& speed)

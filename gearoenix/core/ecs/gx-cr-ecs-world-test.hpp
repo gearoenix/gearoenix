@@ -322,34 +322,34 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         auto b = EntityBuilder("1", EndCaller<>([] {}));
         b.add_components(std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
         e1 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("2", EndCaller<>([] {}));
         b.add_components(std::make_shared<Position>(6.0, 7.0));
         e2 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("3", EndCaller<>([] {}));
         b.add_components(std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
         e3 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("4", EndCaller<>([] {}));
         b.add_components(std::make_shared<Speed>(12.0, 13.0));
         e4 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("5", EndCaller<>([] {}));
         e5 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     w.update();
@@ -367,15 +367,15 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     b24.add_components(std::make_shared<Speed>(12.0, 13.0));
 
     e1 = b21.get_id();
-    w.delayed_create_entity(std::move(b21), EndCaller<>([] {}));
+    w.delayed_create_entity(std::move(b21));
     e2 = b22.get_id();
-    w.delayed_create_entity(std::move(b22), EndCaller<>([] {}));
+    w.delayed_create_entity(std::move(b22));
     e3 = b23.get_id();
-    w.delayed_create_entity(std::move(b23), EndCaller<>([] {}));
+    w.delayed_create_entity(std::move(b23));
     e4 = b24.get_id();
-    w.delayed_create_entity(std::move(b24), EndCaller<>([] {}));
+    w.delayed_create_entity(std::move(b24));
     e5 = b25.get_id();
-    w.delayed_create_entity(std::move(b25), EndCaller<>([] {}));
+    w.delayed_create_entity(std::move(b25));
 
     w.update();
     end_of_step();
@@ -383,31 +383,31 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     {
         auto b = EntityBuilder("1", EndCaller<>([] {}));
         e1 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("2", EndCaller<>([] {}));
         e2 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("3", EndCaller<>([] {}));
         e3 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("4", EndCaller<>([] {}));
         e4 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("5", EndCaller<>([] {}));
         e5 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     w.delayed_add_components(e1, EndCaller<>([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
@@ -421,31 +421,31 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     {
         auto b = EntityBuilder("1", EndCaller<>([] {}));
         e1 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("2", EndCaller<>([] {}));
         e2 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("3", EndCaller<>([] {}));
         e3 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("4", EndCaller<>([] {}));
         e4 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("5", EndCaller<>([] {}));
         e5 = b.get_id();
-        w.delayed_create_entity(std::move(b), EndCaller<>([] {}));
+        w.delayed_create_entity(std::move(b));
     }
 
     w.delayed_add_components(e1, EndCaller<>([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
