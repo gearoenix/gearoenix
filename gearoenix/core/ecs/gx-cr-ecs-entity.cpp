@@ -31,9 +31,14 @@ gearoenix::core::ecs::Entity::~Entity() = default;
 
 void gearoenix::core::ecs::Entity::show_debug_gui()
 {
+    static boost::container::flat_set<std::size_t> indices;
     if (ImGui::TreeNode(name.c_str())) {
+        indices.clear();
         for (const auto& ci : archetype->components_indices) {
-            components[ci.second]->show_debug_gui();
+            indices.emplace(ci.second);
+        }
+        for (const auto i : indices) {
+            components[i]->show_debug_gui();
         }
         ImGui::TreePop();
     }

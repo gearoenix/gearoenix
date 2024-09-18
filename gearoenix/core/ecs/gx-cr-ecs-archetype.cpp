@@ -4,8 +4,9 @@
 std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBuilder::components_t& cs)
 {
     std::size_t s = 0;
-    for (const auto& c : cs)
+    for (const auto& c : cs) {
         s += sizeof(c.second);
+    }
     return s;
 }
 
@@ -43,7 +44,7 @@ std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetyp
     entities.emplace(entity);
     std::memset(entity, 0, entity_size); // we need it because of the std::shared_ptr moves
     *reinterpret_cast<entity_id_t*>(entity) = id;
-    return reinterpret_cast<std::shared_ptr<gearoenix::core::ecs::Component>*>(&entity[header_size]);
+    return reinterpret_cast<std::shared_ptr<Component>*>(&entity[header_size]);
 }
 
 std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(
@@ -75,8 +76,9 @@ void gearoenix::core::ecs::Archetype::move_out_entity(
 {
     for (auto& ci : components_indices) {
         auto& c = cs[ci.second];
-        if (nullptr == c)
+        if (nullptr == c) {
             continue;
+        }
         const auto t = c->get_final_type_index();
         if (const auto search = components.find(t); components.end() != search) {
             GX_LOG_F("Component already exists in the component map, name: " << c->get_name());
