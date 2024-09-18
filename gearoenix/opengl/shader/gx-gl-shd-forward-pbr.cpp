@@ -215,7 +215,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "    }\n";
     }
     fs << "\n";
-    fs << "    vec3 irr = texture(irradiance, nrm).xyz * 1.1;\n";
+    fs << "    vec3 irr = texture(irradiance, nrm).xyz;\n";
     fs << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
     fs << "    vec3 ambient = irr * alb.xyz * (vec3(f90) - fresnel) * (f90 - metallic);\n";
     fs << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, roughness)).rg;\n";

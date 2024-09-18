@@ -92,11 +92,11 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
         // fs << "    float c_max = max(frag_colour.x, max(frag_colour.y, frag_colour.z));\n";
         // fs << "    frag_colour.xyz = frag_colour.xyz * (2.0 / (c_max * c_max + 1.0f));\n";
 
-        // fs << "    frag_colour.xyz = frag_colour.xyz / (frag_colour.xyz + 1.0f);\n";
+        fs << "    frag_colour.xyz = frag_colour.xyz / (frag_colour.xyz + 1.0f);\n";
 
-        //        fs << "    frag_colour.xyz = uncharted2_filmic(frag_colour.xyz);\n";
-        fs << "    frag_colour.xyz *= (clamp(1.0 - sqrt(frag_colour.xyz), 0.0, 1.0) * 1.3 + 1.0) /* 0.00001 + 1.0*/;\n";
-        fs << "    frag_colour.xyz += pow(frag_colour.xyz, gamma_exponent) * 0.00001;\n";
+        // fs << "    frag_colour.xyz = uncharted2_filmic(frag_colour.xyz);\n";
+        // fs << "    frag_colour.xyz *= (clamp(0.6 - frag_colour.xyz, 0.0, 1.0) * 1.3 + 1.0) /* 0.00001 + 1.0*/;\n";
+        fs << "    frag_colour.xyz += pow(frag_colour.xyz, gamma_exponent);\n";
     } else if (is_colour_scale_index) {
         fs << "    frag_colour.xyz *= colour_scale;\n";
     }

@@ -4,6 +4,7 @@
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
 #include <utility>
+#include <algorithm>
 
 void gearoenix::physics::animation::ArmatureAnimationInfo::optimise()
 {
