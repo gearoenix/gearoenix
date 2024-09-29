@@ -354,7 +354,7 @@ struct DataLoader final {
 
         if (has_tangent) {
             const auto* const tng_b = &bfs[tng_bv->buffer].data[tng_bv->byteOffset];
-            GX_ASSERT_D(tng_bv->byteStride > 0 && tng_bv->byteStride >= sizeof(math::Vec4<float>));
+            GX_ASSERT_D(tng_bv->byteStride <= 0 || tng_bv->byteStride >= sizeof(math::Vec4<float>));
             const std::size_t tng_bi_inc = tng_bv->byteStride > 0 ? tng_bv->byteStride : sizeof(math::Vec4<float>);
             std::size_t bi = 0;
             for (auto& vertex : vertices) {

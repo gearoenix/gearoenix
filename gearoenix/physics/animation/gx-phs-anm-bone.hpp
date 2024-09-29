@@ -23,9 +23,9 @@ struct BoneInfo final {
 
 struct Bone final {
     Transformation transform;
-    math::Mat4x4<float> inverse_bind;
-    math::Mat4x4<float> m;
-    math::Mat4x4<float> inv_m;
+    math::Mat4x4<float> inverse_bind; // TODO: this should remove if we make bones as entity
+    math::Mat4x4<float> m; // TODO: this should remove if we make bones as entity
+    math::Mat4x4<float> inv_m; // TODO: this should remove if we make bones as entity
     std::string name;
     std::size_t parent_index = static_cast<std::size_t>(-1);
     std::size_t children_count = 0;

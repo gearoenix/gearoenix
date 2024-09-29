@@ -1,14 +1,18 @@
 #include "gx-editor-ui-menu-bar.hpp"
+#include "gx-editor-ui-menu-window.hpp"
+#include "gx-editor-ui-manager.hpp"
+#include "gx-editor-ui-window-overlay-progress-bar.hpp"
 #include "../control/gx-editor-ctrl-manager.hpp"
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
+#include <gearoenix/render/gx-rnd-gltf-loader.hpp>
 #include <imgui/imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
+#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 constexpr static auto key_gltf_file_chooser = "key_gltf_file_chooser";
-constexpr static auto filter_gltf_file = ".gltf,.glb";
+constexpr static auto filter_gltf_file = ".glb,.gltf";
 
 void gearoenix::editor::ui::MenuBar::show_project()
 {
@@ -36,7 +40,7 @@ void gearoenix::editor::ui::MenuBar::show_project()
 
     if (show_project_new_popup) {
         ImGui::OpenPopup("New Project");
-        ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+        const ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         if (ImGui::BeginPopupModal("New Project", &show_project_new_popup, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::InputText("New project name", &project.get_project_name());
@@ -59,40 +63,42 @@ void gearoenix::editor::ui::MenuBar::show_scene()
         auto& project = control_manager.get_project();
         if (ImGui::MenuItem("New", "Alt+S,Alt+N", false, project.is_project_opened())) { }
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false, project.is_project_opened())) {
-            //            show_scene_import_popup = true;
-            // ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file, ".");
+            ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file);
         }
         if (ImGui::MenuItem("Delete", "Alt+S,Alt+Del", false, false)) { }
         if (ImGui::MenuItem("Settings", "Alt+S,Alt+S", false, false)) { }
         ImGui::EndMenu();
     }
-    //    if(show_scene_import_popup) {
 
-    // display
-    // if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser))
-    //{
-    //    // action if OK
-    //    if (ImGuiFileDialog::Instance()->IsOk())
-    //    {
-    //        std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-    //        GX_TODO;
-    //        // platform_application.get_base().get_render_engine()->get_scene_manager()->load_gltf(
-    //        //         platform::stream::AbsolutePath(file_path_name));
-    //    }
-
-    //    // close
-    //    ImGuiFileDialog::Instance()->Close();
-    //}
-    //    }
+     if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser)) {
+         if (ImGuiFileDialog::Instance()->IsOk())
+         {
+            const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Scenes from GLTF File...");
+             std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
+             render::gltf::load(
+                *platform_application.get_base().get_render_engine(),
+                platform::stream::Path::create_absolute(std::move(file_path_name)),
+                core::job::EndCaller<std::vector<std::shared_ptr<render::scene::Builder>>>([this, progress_bar_id](auto&& /*scene_builders*/) {
+                    manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
+                }),
+                core::job::EndCaller([] {}));
+         }
+         ImGuiFileDialog::Instance()->Close();
+     }
 }
 
 gearoenix::editor::ui::MenuBar::MenuBar(
     platform::Application& platform_application,
-    control::Manager& control_manager)
+    control::Manager& control_manager,
+    Manager& manager)
     : platform_application(platform_application)
     , control_manager(control_manager)
+    , manager(manager)
+    , window(new MenuWindow(manager))
 {
 }
+
+gearoenix::editor::ui::MenuBar::~MenuBar() = default;
 
 void gearoenix::editor::ui::MenuBar::update()
 {
@@ -109,51 +115,10 @@ void gearoenix::editor::ui::MenuBar::update()
             if (ImGui::MenuItem("Settings", "Ctrl+Alt+A", false, false)) { }
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Window")) {
-            const bool is_fullscreen = platform_application.get_base().get_configuration().get_fullscreen();
-            if (ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
-                platform_application.set_window_fullscreen(!is_fullscreen);
-            }
-            ImGui::EndMenu();
-        }
+        window->update();
         if (ImGui::BeginMenu("Help")) {
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
-    }
-
-    {
-        static float h_splitter = 150.0f;
-        static float v_splitter = 200.0f;
-        static bool p_open = true;
-
-        ImGui::Begin("Example: Horizontal Splitter", &p_open, ImGuiWindowFlags_MenuBar);
-
-        ImGui::Text("Drag the splitter to resize the sections.");
-
-        ImVec2 window_size = ImGui::GetContentRegionAvail();
-        float x_offset = window_size.x;
-
-        ImGui::Separator();
-        ImGui::BeginChild("TopRegion", ImVec2(0, h_splitter), true);
-        ImGui::Text("Top Region");
-        ImGui::EndChild();
-
-        ImGui::Separator();
-        ImGui::BeginChild("Splitter", ImVec2(0, 4), false);
-        if (ImGui::Button("##splitter", ImVec2(-1, 4))) {
-            ImGui::SetItemDefaultFocus();
-            if (ImGui::IsItemActive()) {
-                h_splitter += ImGui::GetIO().MouseDelta.y;
-            }
-        }
-        ImGui::EndChild();
-        ImGui::Separator();
-
-        ImGui::BeginChild("BottomRegion", ImVec2(0, 0), true);
-        ImGui::Text("Bottom Region");
-        ImGui::EndChild();
-
-        ImGui::End();
     }
 }

@@ -6,7 +6,7 @@ const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physic
 }
 
 gearoenix::physics::animation::Armature::Armature(std::string&& name)
-    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
+    : Component(create_this_type_index(this), std::move(name))
 {
 }
 
@@ -21,6 +21,6 @@ gearoenix::physics::animation::Armature::~Armature() = default;
 
 const boost::container::flat_set<std::type_index>& gearoenix::physics::animation::Armature::get_all_the_hierarchy_types_except_component() const
 {
-    static const boost::container::flat_set<std::type_index> types { core::ecs::Component::create_this_type_index(this) };
+    static const boost::container::flat_set types { create_this_type_index(this) };
     return types;
 }

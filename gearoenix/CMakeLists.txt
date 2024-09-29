@@ -54,10 +54,12 @@ SET(GX_ENGINE_IMGUI_SRC
         ${GX_IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
         ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp
         ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp)
-
 SOURCE_GROUP("imgui" FILES ${GX_ENGINE_IMGUI_SRC})
-
 SET(GX_ENGINE_SRC ${GX_ENGINE_SRC} ${GX_ENGINE_IMGUI_SRC})
+
+SET(GX_ENGINE_IMGUI_FB_SRC ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
+SOURCE_GROUP("imgui-fb" FILES ${GX_ENGINE_IMGUI_FB_SRC})
+SET(GX_ENGINE_SRC ${GX_ENGINE_SRC} ${GX_ENGINE_IMGUI_FB_SRC})
 
 ADD_LIBRARY(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
 

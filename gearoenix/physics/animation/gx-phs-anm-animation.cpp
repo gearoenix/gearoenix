@@ -201,6 +201,6 @@ void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager)
 
 const boost::container::flat_set<std::type_index>& gearoenix::physics::animation::AnimationPlayer::get_all_the_hierarchy_types_except_component() const
 {
-    static const boost::container::flat_set<std::type_index> types { core::ecs::Component::create_this_type_index(this) };
+    static const boost::container::flat_set types { create_this_type_index(this) };
     return types;
 }
