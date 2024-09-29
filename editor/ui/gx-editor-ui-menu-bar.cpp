@@ -1,15 +1,15 @@
 #include "gx-editor-ui-menu-bar.hpp"
-#include "gx-editor-ui-menu-window.hpp"
-#include "gx-editor-ui-manager.hpp"
-#include "gx-editor-ui-window-overlay-progress-bar.hpp"
 #include "../control/gx-editor-ctrl-manager.hpp"
+#include "gx-editor-ui-manager.hpp"
+#include "gx-editor-ui-menu-window.hpp"
+#include "gx-editor-ui-window-overlay-progress-bar.hpp"
+#include <ImGuiFileDialog/ImGuiFileDialog.h>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/gx-rnd-gltf-loader.hpp>
+#include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <imgui/imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
-#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 constexpr static auto key_gltf_file_chooser = "key_gltf_file_chooser";
 constexpr static auto filter_gltf_file = ".glb,.gltf";
@@ -70,21 +70,20 @@ void gearoenix::editor::ui::MenuBar::show_scene()
         ImGui::EndMenu();
     }
 
-     if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser)) {
-         if (ImGuiFileDialog::Instance()->IsOk())
-         {
+    if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
             const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Scenes from GLTF File...");
-             std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-             render::gltf::load(
+            std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
+            render::gltf::load(
                 *platform_application.get_base().get_render_engine(),
                 platform::stream::Path::create_absolute(std::move(file_path_name)),
                 core::job::EndCaller<std::vector<std::shared_ptr<render::scene::Builder>>>([this, progress_bar_id](auto&& /*scene_builders*/) {
                     manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
                 }),
                 core::job::EndCaller([] {}));
-         }
-         ImGuiFileDialog::Instance()->Close();
-     }
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
 }
 
 gearoenix::editor::ui::MenuBar::MenuBar(
