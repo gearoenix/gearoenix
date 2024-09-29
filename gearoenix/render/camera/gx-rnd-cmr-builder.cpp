@@ -7,13 +7,15 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-gearoenix::render::camera::Builder::Builder(engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback)
+gearoenix::render::camera::Builder::Builder(
+    engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback,
+    physics::TransformationComponent* const parent_transform)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
     auto frustum = physics::collider::Frustum::construct(name + "-collider");
     builder.add_component(std::move(frustum));
-    builder.add_component(physics::TransformationComponent::construct(name + "-transformation"));
+    builder.add_component(physics::TransformationComponent::construct(name + "-transformation", parent_transform));
 }
 
 gearoenix::render::camera::Builder::~Builder() = default;

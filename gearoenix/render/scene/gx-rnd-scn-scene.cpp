@@ -65,9 +65,10 @@ void gearoenix::render::scene::Scene::add_light(const core::ecs::entity_id_t ent
     entities.insert(entity);
 }
 
-void gearoenix::render::scene::Scene::add_empty(const std::string& n, const math::Vec3<double>& location)
+void gearoenix::render::scene::Scene::add_empty(const core::ecs::entity_id_t entity)
 {
-    empties.emplace(n, location);
+    empty_entities.insert(entity);
+    entities.insert(entity);
 }
 
 void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_entity_id)

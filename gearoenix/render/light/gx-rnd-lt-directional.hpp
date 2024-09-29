@@ -55,6 +55,7 @@ public:
     ~ShadowCasterDirectional() override;
     virtual void initialise(
         engine::Engine&,
+        physics::TransformationComponent* parent_transform,
         std::uint32_t resolution,
         float camera_far,
         float camera_near,

@@ -1,16 +1,18 @@
 #include "gx-phs-transformation.hpp"
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
+#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include <imgui/imgui.h>
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192>::construct();
 }
 
-gearoenix::physics::Transformation::Transformation()
+gearoenix::physics::Transformation::Transformation(const Transformation* const parent)
     : x_axis(1.0, 0.0, 0.0)
     , y_axis(0.0, 1.0, 0.0)
     , z_axis(0.0, 0.0, 1.0)
     , scale(1.0)
+    , parent(parent)
 {
 }
 
@@ -265,37 +267,36 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     scale = math::Vec3<double>(1.0);
 }
 
-void gearoenix::physics::Transformation::local_update()
+void gearoenix::physics::Transformation::update_without_inverse_root()
 {
+    if (nullptr != parent) {
+        return;
+    }
     if (changed) {
         global_matrix = local_matrix;
+    }
+    for (const auto& child : children) {
+        child->update_without_inverse_child();
+    }
+}
+
+void gearoenix::physics::Transformation::update_inverse()
+{
+    if (changed) {
         inverted_global_matrix = global_matrix.inverted();
     }
 }
 
-void gearoenix::physics::Transformation::update(const Transformation& parent)
+void gearoenix::physics::Transformation::update_without_inverse_child()
 {
-    if (parent.changed)
+    if (parent->changed) {
         changed = true;
-    if (changed) {
-        global_matrix = parent.global_matrix * local_matrix;
-        inverted_global_matrix = global_matrix.inverted();
     }
-}
-
-void gearoenix::physics::Transformation::local_update_without_inverse()
-{
     if (changed) {
-        global_matrix = local_matrix;
+        global_matrix = parent->global_matrix * local_matrix;
     }
-}
-
-void gearoenix::physics::Transformation::update_without_inverse(const Transformation& parent)
-{
-    if (parent.changed)
-        changed = true;
-    if (changed) {
-        global_matrix = parent.global_matrix * local_matrix;
+    for (const auto& child : children) {
+        child->update_without_inverse_child();
     }
 }
 
@@ -327,6 +328,19 @@ void gearoenix::physics::Transformation::reset(
     local_matrix.local_scale(s);
     local_matrix.set_location(l);
     changed = true;
+}
+
+void gearoenix::physics::Transformation::add_child(const std::shared_ptr<Transformation>& child)
+{
+    if (nullptr == child) {
+        return;
+    }
+    children.insert(child);
+}
+
+void gearoenix::physics::Transformation::set_parent(const Transformation* const parent)
+{
+    this->parent = parent;
 }
 
 void gearoenix::physics::Transformation::show_debug_gui()
@@ -402,19 +416,35 @@ const boost::container::flat_set<std::type_index>& gearoenix::physics::Transform
     return types;
 }
 
-gearoenix::physics::TransformationComponent::TransformationComponent(std::string&& name)
+gearoenix::physics::TransformationComponent::TransformationComponent(
+    std::string&& name, const TransformationComponent* const parent)
     : Component(create_this_type_index(this), std::move(name))
+    , Transformation(parent)
 {
 }
 
-std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(std::string&& name)
+std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(
+    std::string&& name, TransformationComponent* const parent)
 {
-    auto self = allocator->make_shared(std::move(name));
+    auto self = allocator->make_shared(std::move(name), parent);
     self->set_component_self(self);
+    if (nullptr != parent) {
+        parent->add_child(self);
+    }
     return self;
 }
 
 void gearoenix::physics::TransformationComponent::show_debug_gui()
 {
     Transformation::show_debug_gui();
+}
+
+void gearoenix::physics::TransformationComponent::update(core::ecs::World* const world)
+{
+    world->parallel_system<core::ecs::All<TransformationComponent>>([&](const auto, TransformationComponent* const transform, const auto) {
+        transform->update_without_inverse_root();
+    });
+    world->parallel_system<core::ecs::All<TransformationComponent>>([&](const auto, TransformationComponent* const transform, const auto) {
+        transform->update_inverse();
+    });
 }

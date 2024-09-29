@@ -41,12 +41,23 @@ struct PbrVertexAnimated final {
     math::Vec4<float> bone_indices;
 };
 
-typedef std::variant<std::vector<PbrVertex>, std::vector<PbrVertexAnimated>> Vertices;
+typedef std::vector<PbrVertex> PbrVertices;
+typedef std::vector<PbrVertexAnimated> PbrAnimatedVertices;
 
-[[nodiscard]] const void* get_data(const render::Vertices& vertices);
-[[nodiscard]] std::size_t get_element_size(const render::Vertices& vertices);
-[[nodiscard]] bool has_bone_weights(const render::Vertices& vertices);
-[[nodiscard]] bool has_bone_indices(const render::Vertices& vertices);
+typedef std::variant<PbrVertices, PbrAnimatedVertices> Vertices;
+
+constexpr std::size_t PBR_VERTEX_VARIANT_TYPE_INDEX = 0;
+constexpr std::size_t PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX = 1;
+
+[[nodiscard]] const void* get_data(const Vertices& vertices);
+[[nodiscard]] std::size_t get_element_size(const Vertices& vertices);
+[[nodiscard]] bool has_bone_weights(const Vertices& vertices);
+[[nodiscard]] bool has_bone_indices(const Vertices& vertices);
+[[nodiscard]] math::Vec3<float>& get_position(Vertices& vertices, std::uint32_t index);
+[[nodiscard]] math::Vec3<float>& get_normal(Vertices& vertices, std::uint32_t index);
+[[nodiscard]] math::Vec4<float>& get_tangent(Vertices& vertices, std::uint32_t index);
+[[nodiscard]] math::Vec2<float>& get_uv(Vertices& vertices, std::uint32_t index);
+void calculate_tangents(PbrVertices& vertices, const std::vector<std::uint32_t>& indices);
 }
 
 namespace gearoenix::core {

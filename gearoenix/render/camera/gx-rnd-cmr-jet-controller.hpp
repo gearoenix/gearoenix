@@ -8,7 +8,7 @@ struct Engine;
 }
 
 namespace gearoenix::render::camera {
-struct JetController final : public core::event::Listener {
+struct JetController final : core::event::Listener {
     GX_GETSET_VAL_PRV(core::ecs::entity_id_t, camera_entity_id, 0);
     GX_GETSET_VAL_PRV(double, movement_speed, 0.5);
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
@@ -26,11 +26,11 @@ private:
     bool rotate_right = false;
     bool rotate = false;
 
-    [[nodiscard]] Response on_event(const core::event::Data& event_data) final;
+    [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 
 public:
     JetController(engine::Engine& e, core::ecs::entity_id_t camera_entity_id);
-    ~JetController() final;
+    ~JetController() override;
     void update();
 };
 }

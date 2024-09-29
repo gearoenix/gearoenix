@@ -61,7 +61,7 @@ void gearoenix::render::widget::Text::construct(
     r->text_material->set_transparency(material::Transparency::Transparent);
     r->text_self = r;
     auto model_builder = e.get_model_manager()->build(
-        r->name + "-model-text",
+        r->name + "-model-text", parent ? parent->get_transform().get() : nullptr,
         { std::move(msh) },
         core::job::EndCaller([] {}),
         true);
@@ -95,6 +95,7 @@ void gearoenix::render::widget::Text::update_text(const core::job::EndCaller<>& 
         text, text_colour, img_dim.y, width,
         core::job::EndCallerShared<texture::Texture2D>([c, self = text_self.lock()](std::shared_ptr<texture::Texture2D>&& t) {
             self->text_material->set_albedo(std::move(t));
+            (void)c;
         }));
     e.get_world()->get_component<physics::TransformationComponent>(model_entity_id)->local_x_scale(width / img_dim.x);
 }

@@ -116,7 +116,7 @@ struct GameApp final : public gearoenix::core::Application {
         scene_id = scene_builder->get_id();
 
         auto model_builder = render_engine.get_model_manager()->build(
-            "triangle",
+            "triangle", nullptr,
             { std::move(mesh) },
             GxEndCaller([] {
                 // Here, it is not important for us to know when the model entity is actually in the world and
@@ -126,7 +126,7 @@ struct GameApp final : public gearoenix::core::Application {
         scene_builder->add(std::move(model_builder));
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             GxCameraBuilderEndCaller([this, sb = std::move(scene_builder)](GxCameraBuilderPtr&& cb) mutable {
                 camera_is_ready(std::move(cb), std::move(sb));
             }),
@@ -145,6 +145,7 @@ struct GameApp final : public gearoenix::core::Application {
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
             "directional-light",
+            nullptr,
             1024,
             10.0f,
             1.0f,

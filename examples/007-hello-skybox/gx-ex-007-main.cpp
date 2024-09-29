@@ -29,7 +29,7 @@ struct GameApp final : public gearoenix::core::Application {
             }));
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             gearoenix::core::job::EndCallerShared<gearoenix::render::camera::Builder>([this, scene_builder](auto&& camera_builder) {
                 camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
                     render_engine,

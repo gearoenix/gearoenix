@@ -19,7 +19,7 @@ void gearoenix::platform::key::initialize_imgui_keymap()
     io.KeyMap[ImGuiKey_Space] = static_cast<int>(Id::Space);
     io.KeyMap[ImGuiKey_Enter] = static_cast<int>(Id::Enter);
     io.KeyMap[ImGuiKey_Escape] = static_cast<int>(Id::Escape);
-    io.KeyMap[ImGuiKey_KeyPadEnter] = static_cast<int>(Id::NumpadEnter);
+    io.KeyMap[ImGuiKey_KeypadEnter] = static_cast<int>(Id::NumpadEnter);
     io.KeyMap[ImGuiKey_A] = static_cast<int>(Id::A);
     io.KeyMap[ImGuiKey_C] = static_cast<int>(Id::C);
     io.KeyMap[ImGuiKey_V] = static_cast<int>(Id::V);

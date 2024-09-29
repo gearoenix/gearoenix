@@ -3,20 +3,20 @@
 #include "gx-editor-ctrl-project.hpp"
 
 namespace gearoenix::platform {
-    struct Application;
+struct Application;
 }
 
 namespace gearoenix::editor::control {
-    struct Manager final {
-        GX_GET_REF_PRV(Project, project);
+struct Manager final {
+    GX_GET_REF_PRV(Project, project);
 
-    private:
-        platform::Application& platform_application;
+private:
+    platform::Application& platform_application;
 
-    public:
-        explicit Manager(platform::Application& platform_application) noexcept;
-        void caption_changed() noexcept;
-    };
+public:
+    explicit Manager(platform::Application& platform_application);
+    void caption_changed();
+};
 }
 
 #endif

@@ -89,12 +89,14 @@ private:
     ReflectionBuilder(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         core::job::EndCaller<>&& end_callback);
 
 public:
     ReflectionBuilder(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const math::Aabb3<double>& include_box,
         std::shared_ptr<render::texture::TextureCube>&& irradiance_texture,
         std::shared_ptr<render::texture::TextureCube>&& radiance_texture,
@@ -102,6 +104,7 @@ public:
     static void construct_runtime(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
@@ -119,6 +122,7 @@ struct ReflectionManager final : render::reflection::Manager {
 private:
     [[nodiscard]] std::shared_ptr<render::reflection::Builder> build_baked(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         std::shared_ptr<render::texture::TextureCube>&& irradiance,
         std::shared_ptr<render::texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
@@ -126,6 +130,7 @@ private:
 
     void build_runtime(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,

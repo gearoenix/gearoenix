@@ -3,7 +3,6 @@
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
-#include "gx-gl-loader.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
@@ -55,9 +54,10 @@ void gearoenix::gl::ShadowCasterDirectionalLight::set_shadow_map_target(std::sha
 gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const ShadowCasterDirectionalInfo& info,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, name, info, std::move(end_callback))
+    : Builder(e, name, parent_transform, info, std::move(end_callback))
     , eng(e)
 {
     auto& b = entity_builder->get_builder();
@@ -67,9 +67,10 @@ gearoenix::gl::LightBuilder::LightBuilder(
 gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const DirectionalInfo& info,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, name, info, std::move(end_callback))
+    : Builder(e, name, parent_transform, info, std::move(end_callback))
     , eng(e)
 {
 }
@@ -77,28 +78,32 @@ gearoenix::gl::LightBuilder::LightBuilder(
 void gearoenix::gl::LightBuilder::construct(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const ShadowCasterDirectionalInfo& info,
     core::job::EndCallerShared<Builder>&& end_callback,
     core::job::EndCaller<>&& entity_end_callback)
 {
-    auto builder = std::shared_ptr<LightBuilder>(new LightBuilder(e, name, info, std::move(entity_end_callback)));
+    auto builder = std::shared_ptr<LightBuilder>(new LightBuilder(e, name, parent_transform, info, std::move(entity_end_callback)));
     end_callback.set_return(std::shared_ptr(builder));
     builder->get_shadow_caster_directional()->initialise(
-        e, info.shadow_map_resolution, info.far, info.near, info.aspect, builder,
+        e, parent_transform, info.shadow_map_resolution, info.far, info.near, info.aspect, builder,
         core::job::EndCaller([e = std::move(end_callback)] {}));
 }
 
 gearoenix::gl::LightBuilder::~LightBuilder() = default;
 
 std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::build_directional(
-    const std::string& name, core::job::EndCaller<>&& end_callback)
+    const std::string& name,
+    physics::TransformationComponent* const parent_transform,
+    core::job::EndCaller<>&& end_callback)
 {
     return std::make_shared<LightBuilder>(
-        eng, name, render::light::Builder::DirectionalInfo {}, std::move(end_callback));
+        eng, name, parent_transform, render::light::Builder::DirectionalInfo {}, std::move(end_callback));
 }
 
 void gearoenix::gl::LightManager::build_shadow_caster_directional(
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const std::uint32_t shadow_map_resolution,
     const float camera_far,
     const float camera_near,
@@ -107,8 +112,7 @@ void gearoenix::gl::LightManager::build_shadow_caster_directional(
     core::job::EndCaller<>&& entity_end_callback)
 {
     return LightBuilder::construct(
-        eng,
-        name,
+        eng, name, parent_transform,
         render::light::Builder::ShadowCasterDirectionalInfo {
             .shadow_map_resolution = shadow_map_resolution,
             .far = camera_far,

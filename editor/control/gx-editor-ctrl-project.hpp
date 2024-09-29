@@ -5,27 +5,27 @@
 #include <optional>
 
 namespace gearoenix::platform {
-    struct Application;
+struct Application;
 }
 
 namespace gearoenix::editor::control {
-    struct Manager;
-    struct Project final {
+struct Manager;
+struct Project final {
     GX_GET_CREF_PRV(std::vector<std::string>, recent_file_addresses);
     GX_GET_REF_PRV(std::string, project_name);
     GX_GET_CREF_PRV(std::optional<core::Project>, project);
 
-    private:
-        platform::Application& platform_application;
-        Manager& manager;
+private:
+    platform::Application& platform_application;
+    Manager& manager;
 
-    public:
-        explicit Project(platform::Application& platform_application, Manager& manager) noexcept;
-        void create_project() noexcept;
-        void caption_changed() noexcept;
-        [[nodiscard]] std::string get_caption() noexcept;
-        [[nodiscard]] bool is_project_opened() noexcept;
-    };
+public:
+    Project(platform::Application& platform_application, Manager& manager);
+    void create_project();
+    void caption_changed();
+    [[nodiscard]] std::string get_caption();
+    [[nodiscard]] bool is_project_opened();
+};
 }
 
 #endif

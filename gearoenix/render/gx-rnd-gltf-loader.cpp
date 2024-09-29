@@ -1,4 +1,5 @@
 #include "gx-rnd-gltf-loader.hpp"
+#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/animation/gx-phs-anm-bone.hpp"
 #include "../physics/animation/gx-phs-anm-interpolation.hpp"
 #include "../physics/animation/gx-phs-anm-manager.hpp"
@@ -63,7 +64,8 @@ struct DataLoader final {
         return result;
     }
 
-    static bool is_gltf_node_a_bone(const tinygltf::Node& n)
+    /// It can not be used everywhere, it has its own context. It must be used in bone tracing code.
+    [[nodiscard]] static bool is_gltf_node_a_bone(const tinygltf::Node& n)
     {
         return n.skin == -1 && n.mesh == -1 && n.camera == -1 && n.extensions.empty();
     }
@@ -179,6 +181,8 @@ struct DataLoader final {
         if (node.mesh != -1) {
             GX_ASSERT(node.children.empty());
             GX_ASSERT(node.camera == -1);
+            GX_ASSERT(node.emitter == -1);
+            GX_ASSERT(node.light == -1);
             return true;
         }
         return false;
@@ -186,7 +190,11 @@ struct DataLoader final {
 
     [[nodiscard]] static bool is_skin(const tinygltf::Node& node)
     {
-        if (is_mesh(node) && node.skin != -1) {
+        if (node.mesh != -1 && node.skin != -1) {
+            GX_ASSERT(node.children.empty());
+            GX_ASSERT(node.camera == -1);
+            GX_ASSERT(node.emitter == -1);
+            GX_ASSERT(node.light == -1);
             return true;
         }
         return false;
@@ -241,8 +249,7 @@ struct DataLoader final {
         auto bwt_ai = static_cast<std::size_t>(-1);
         auto bin_ai = static_cast<std::size_t>(-1);
         const auto& attrs = primitive.attributes;
-        GX_ASSERT((attrs.size() == 4 && bone_index_map.empty()) || (attrs.size() == 6 && !bone_index_map.empty()));
-        const bool is_animated = attrs.size() == 6;
+        const bool is_animated = !bone_index_map.empty();
         for (const auto& att : attrs) {
             if ("POSITION" == att.first) {
                 pos_ai = static_cast<std::size_t>(att.second);
@@ -262,7 +269,7 @@ struct DataLoader final {
         }
         GX_ASSERT(pos_ai != static_cast<std::size_t>(-1));
         GX_ASSERT(nrm_ai != static_cast<std::size_t>(-1));
-        GX_ASSERT(tng_ai != static_cast<std::size_t>(-1));
+        const auto has_tangent = tng_ai != static_cast<std::size_t>(-1);
         GX_ASSERT(txc_ai != static_cast<std::size_t>(-1));
         GX_ASSERT(!is_animated || bwt_ai != static_cast<std::size_t>(-1));
         GX_ASSERT(!is_animated || bin_ai != static_cast<std::size_t>(-1));
@@ -272,21 +279,25 @@ struct DataLoader final {
 
         const auto& pos_a = acs[pos_ai];
         const auto& nrm_a = acs[nrm_ai];
-        const auto& tng_a = acs[tng_ai];
+        const auto* const tng_a = has_tangent ? &acs[tng_ai] : nullptr;
         const auto& txc_a = acs[txc_ai];
         const auto& bwt_a = is_animated ? acs[bwt_ai] : acs[txc_ai];
         const auto& bin_a = is_animated ? acs[bin_ai] : acs[txc_ai];
         const auto& ids_a = acs[primitive.indices];
 
         GX_CHECK_EQUAL(pos_a.count, nrm_a.count);
-        GX_CHECK_EQUAL(pos_a.count, tng_a.count);
+        if (has_tangent) {
+            GX_CHECK_EQUAL(pos_a.count, tng_a->count);
+        }
         GX_CHECK_EQUAL(pos_a.count, txc_a.count);
         GX_ASSERT(!is_animated || pos_a.count == bwt_a.count);
         GX_ASSERT(!is_animated || pos_a.count == bin_a.count);
 
         GX_CHECK_EQUAL(pos_a.type, TINYGLTF_TYPE_VEC3);
         GX_CHECK_EQUAL(nrm_a.type, TINYGLTF_TYPE_VEC3);
-        GX_CHECK_EQUAL(tng_a.type, TINYGLTF_TYPE_VEC4);
+        if (has_tangent) {
+            GX_CHECK_EQUAL(tng_a->type, TINYGLTF_TYPE_VEC4);
+        }
         GX_CHECK_EQUAL(txc_a.type, TINYGLTF_TYPE_VEC2);
         GX_ASSERT(!is_animated || bwt_a.type == TINYGLTF_TYPE_VEC4);
         GX_ASSERT(!is_animated || bin_a.type == TINYGLTF_TYPE_VEC4);
@@ -294,7 +305,9 @@ struct DataLoader final {
 
         GX_CHECK_EQUAL(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
         GX_CHECK_EQUAL(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-        GX_CHECK_EQUAL(tng_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+        if (has_tangent) {
+            GX_CHECK_EQUAL(tng_a->componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+        }
         GX_CHECK_EQUAL(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
         GX_ASSERT(!is_animated || bwt_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 
@@ -313,7 +326,7 @@ struct DataLoader final {
 
         const auto& pos_bv = bvs[pos_a.bufferView];
         const auto& nrm_bv = bvs[nrm_a.bufferView];
-        const auto& tng_bv = bvs[tng_a.bufferView];
+        const auto* const tng_bv = has_tangent ? &bvs[tng_a->bufferView] : nullptr;
         const auto& txc_bv = bvs[txc_a.bufferView];
         const auto& bwt_bv = is_animated ? bvs[bwt_a.bufferView] : bvs[txc_a.bufferView];
         const auto& bin_bv = is_animated ? bvs[bin_a.bufferView] : bvs[txc_a.bufferView];
@@ -339,9 +352,10 @@ struct DataLoader final {
             }
         }
 
-        {
-            const auto* const tng_b = &bfs[tng_bv.buffer].data[tng_bv.byteOffset];
-            const std::size_t tng_bi_inc = tng_bv.byteStride > 0 ? tng_bv.byteStride : sizeof(math::Vec4<float>);
+        if (has_tangent) {
+            const auto* const tng_b = &bfs[tng_bv->buffer].data[tng_bv->byteOffset];
+            GX_ASSERT_D(tng_bv->byteStride > 0 && tng_bv->byteStride >= sizeof(math::Vec4<float>));
+            const std::size_t tng_bi_inc = tng_bv->byteStride > 0 ? tng_bv->byteStride : sizeof(math::Vec4<float>);
             std::size_t bi = 0;
             for (auto& vertex : vertices) {
                 vertex.tangent = *reinterpret_cast<const math::Vec4<float>*>(&tng_b[bi]);
@@ -487,6 +501,10 @@ struct DataLoader final {
             GX_UNEXPECTED;
         }
 
+        if (!has_tangent) {
+            calculate_tangents(vertices, indices);
+        }
+
         for (std::size_t vi = 0; vi < animated_vertices.size(); ++vi) {
             animated_vertices[vi].base = vertices[vi];
         }
@@ -520,7 +538,12 @@ struct DataLoader final {
 
     [[nodiscard]] static bool is_light(const tinygltf::Node& node)
     {
-        if (node.extensions.size() == 1 && node.extensions.begin()->first == LIGHT_EXT_NAME) {
+        if (node.light != -1 || (node.extensions.size() == 1 && node.extensions.begin()->first == LIGHT_EXT_NAME)) {
+            GX_ASSERT_D(node.children.empty());
+            GX_ASSERT_D(node.camera == -1);
+            GX_ASSERT_D(node.emitter == -1);
+            GX_ASSERT_D(node.mesh == -1);
+            GX_ASSERT_D(node.skin == -1);
             return true;
         }
         return false;
@@ -529,15 +552,17 @@ struct DataLoader final {
     [[nodiscard]] static bool is_camera(const tinygltf::Node& node)
     {
         if (node.camera != -1) {
-            GX_ASSERT(node.children.empty());
-            GX_ASSERT(node.mesh == -1);
-            GX_ASSERT(node.skin == -1);
+            GX_ASSERT_D(node.children.empty());
+            GX_ASSERT_D(node.emitter == -1);
+            GX_ASSERT_D(node.light == -1);
+            GX_ASSERT_D(node.mesh == -1);
+            GX_ASSERT_D(node.skin == -1);
             return true;
         }
         return false;
     }
 
-    void apply_transform(const std::size_t node_index, physics::Transformation& transform)
+    void apply_transform(const std::size_t node_index, physics::Transformation& transform) const
     {
         apply_transform(data.nodes[node_index], transform);
     }
@@ -645,9 +670,10 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_camera(
         const std::size_t node_index,
+        physics::TransformationComponent* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
-        const std::shared_ptr<scene::Builder>& scene_builder)
+        const std::shared_ptr<scene::Builder>& scene_builder) const
     {
         const tinygltf::Node& node = data.nodes[node_index];
         if (!is_camera(node)) {
@@ -657,6 +683,7 @@ struct DataLoader final {
         GX_LOG_D("Loading camera: " << cmr.name);
         e.get_camera_manager()->build(
             cmr.name,
+            parent_transform,
             core::job::EndCallerShared<camera::Builder>([node_index, scene_builder, gpu_end_callback, s = weak_self.lock()](std::shared_ptr<camera::Builder>&& camera_builder) {
                 const tinygltf::Node& node = s->data.nodes[node_index];
                 const tinygltf::Camera& cmr = s->data.cameras[node.camera];
@@ -679,6 +706,7 @@ struct DataLoader final {
                 auto& transform = camera_builder->get_transformation();
                 apply_transform(node, transform);
                 scene_builder->add(std::move(camera_builder));
+                (void)gpu_end_callback;
             }),
             core::job::EndCaller(entity_end_callback));
         return true;
@@ -686,6 +714,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_mesh(
         const tinygltf::Node& node,
+        physics::TransformationComponent* const parent_transform,
         const core::job::EndCaller<>& entity_end_callback,
         scene::Builder& scene_builder)
     {
@@ -694,6 +723,7 @@ struct DataLoader final {
         }
         auto model_builder = e.get_model_manager()->build(
             std::string(node.name),
+            parent_transform,
             std::vector(gx_meshes[node.mesh].meshes),
             core::job::EndCaller(entity_end_callback),
             true);
@@ -720,6 +750,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_light(
         const std::size_t node_index,
+        physics::TransformationComponent* const parent_transform,
         const core::job::EndCaller<>& light_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)
@@ -754,55 +785,161 @@ struct DataLoader final {
         const auto light_type = light_info.Get("type").Get<std::string>();
         GX_ASSERT_D(light_type == "directional");
         e.get_light_manager()->build_shadow_caster_directional(
-            node.name, 1024, 20.0f, 1.0f, 35.0f,
+            node.name, parent_transform, 1024, 20.0f, 1.0f, 35.0f,
             core::job::EndCallerShared<light::Builder>([sb = scene_builder, node_index, s = weak_self.lock(), le = light_end_callback, colour](std::shared_ptr<light::Builder>&& lb) {
                 lb->get_light().colour = colour;
                 s->apply_transform(node_index, *lb->get_shadow_caster_directional()->get_shadow_transform());
                 sb->add(std::move(lb));
+                (void)le;
             }),
             core::job::EndCaller(entity_end_callback));
         return true;
     }
 
+    [[nodiscard]] bool is_armature(const tinygltf::Node& node) const
+    {
+        if (node.camera != -1) {
+            return false;
+        }
+        if (node.emitter != -1) {
+            return false;
+        }
+        if (node.light != -1) {
+            return false;
+        }
+        if (node.mesh != -1) {
+            return false;
+        }
+        if (node.skin != -1) {
+            return false;
+        }
+        if (node.children.size() != 2) {
+            return false;
+        }
+        const auto first_skin = is_skin(data.nodes[node.children[0]]);
+        const auto second_skin = is_skin(data.nodes[node.children[1]]);
+        if (!first_skin && !second_skin) {
+            return false;
+        }
+        GX_ASSERT_D(first_skin != second_skin);
+        return true;
+    }
+
+    [[nodiscard]] bool is_empty(const tinygltf::Node& node) const
+    {
+        if (node.camera != -1) {
+            return false;
+        }
+        if (node.emitter != -1) {
+            return false;
+        }
+        if (node.light != -1) {
+            return false;
+        }
+        if (node.mesh != -1) {
+            return false;
+        }
+        if (node.skin != -1) {
+            return false;
+        }
+        if (is_armature(node)) {
+            return false;
+        }
+        GX_COMPLAIN_D(node.children.size() != 1 || !has_transformation(node),
+            "What is expected here is an empty node for parenting several other entities and "
+            "parenting only one child is a waste of transform operation, obviously child can replace this one.");
+        return true;
+    }
+
+    [[nodiscard]] bool process_node_armature(
+        const int node_index,
+        physics::TransformationComponent* const parent_transform,
+        const core::job::EndCaller<>& gpu_end_callback,
+        const core::job::EndCaller<>& entity_end_callback,
+        const std::shared_ptr<scene::Builder>& scene_builder)
+    {
+        const auto& node = data.nodes[node_index];
+        if (!is_armature(node)) {
+            return false;
+        }
+        auto* const transform = create_empty_entity_transform(parent_transform, node, entity_end_callback, scene_builder);
+        if (const auto mesh_node_index = node.children[0]; is_skin(data.nodes[mesh_node_index])) {
+            process_node(mesh_node_index, transform, gpu_end_callback, entity_end_callback, scene_builder);
+            return true;
+        }
+        if (const auto mesh_node_index = node.children[1]; is_skin(data.nodes[mesh_node_index])) {
+            process_node(mesh_node_index, transform, gpu_end_callback, entity_end_callback, scene_builder);
+            return true;
+        }
+        GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
+    }
+
+    [[nodiscard]] static bool has_transformation(const tinygltf::Node& node)
+    {
+        return node.rotation.empty() && node.scale.empty() && node.translation.empty();
+    }
+
+    [[nodiscard]] physics::TransformationComponent* create_empty_entity_transform(
+        physics::TransformationComponent* const parent_transform,
+        const tinygltf::Node& node,
+        const core::job::EndCaller<>& entity_end_callback,
+        const std::shared_ptr<scene::Builder>& scene_builder) const
+    {
+        if (has_transformation(node)) {
+            return parent_transform;
+        } else {
+            GX_ASSERT_D(!node.name.empty());
+            const auto entity_builder = e.get_world()->create_shared_builder(
+                std::string(node.name),
+                core::job::EndCaller(entity_end_callback));
+            auto transform = physics::TransformationComponent::construct(node.name + "-transformation", parent_transform);
+            entity_builder->get_builder().add_component(transform);
+            scene_builder->get_scene().add_empty(entity_builder->get_id());
+            apply_transform(node, *transform);
+            return transform.get();
+        }
+    }
+
+    [[nodiscard]] bool process_node_empty(
+        const int node_index,
+        physics::TransformationComponent* const parent_transform,
+        const core::job::EndCaller<>& gpu_end_callback,
+        const core::job::EndCaller<>& entity_end_callback,
+        const std::shared_ptr<scene::Builder>& scene_builder)
+    {
+        const auto& node = data.nodes[node_index];
+        if (!is_empty(node)) {
+            return false;
+        }
+        const auto transform = create_empty_entity_transform(parent_transform, node, entity_end_callback, scene_builder);
+        for (const auto child : node.children) {
+            process_node(child, transform, gpu_end_callback, entity_end_callback, scene_builder);
+        }
+        return true;
+    }
+
     void process_node(
         const int node_index,
+        physics::TransformationComponent* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)
     {
         const auto& node = data.nodes[node_index];
         GX_LOG_D("Loading node: " << node.name);
-        if (process_node_camera(node_index, gpu_end_callback, entity_end_callback, scene_builder)) {
+        if (process_node_camera(node_index, parent_transform, gpu_end_callback, entity_end_callback, scene_builder)) {
             return;
         }
-        if (process_node_mesh(node, entity_end_callback, *scene_builder)) {
+        if (process_node_mesh(node, parent_transform, entity_end_callback, *scene_builder)) {
             return;
         }
-        if (process_node_light(node_index, gpu_end_callback, entity_end_callback, scene_builder)) {
+        if (process_node_light(node_index, parent_transform, gpu_end_callback, entity_end_callback, scene_builder)) {
             return;
         }
-        if (node.children.size() == 2) { // This is root armature
-            GX_ASSERT_D(node.rotation.empty());
-            GX_ASSERT_D(node.scale.empty());
-            GX_ASSERT_D(node.translation.empty());
-            auto mesh_node_index = node.children[0];
-            if (is_skin(data.nodes[mesh_node_index])) {
-                process_node(mesh_node_index, gpu_end_callback, entity_end_callback, scene_builder);
-                return;
-            }
-            mesh_node_index = node.children[1];
-            if (is_skin(data.nodes[mesh_node_index])) {
-                process_node(mesh_node_index, gpu_end_callback, entity_end_callback, scene_builder);
-                return;
-            }
-            GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
+        if (process_node_armature(node_index, parent_transform, gpu_end_callback, entity_end_callback, scene_builder)) {
+            return;
         }
-        if (node.children.empty()) { // This is empty
-            GX_ASSERT_D(node.rotation.empty());
-            GX_ASSERT_D(node.scale.empty());
-            GX_ASSERT_D(3 == node.translation.size());
-            auto& s = scene_builder->get_scene();
-            s.add_empty(node.name, math::Vec3<double>(node.translation[0], node.translation[1], node.translation[2]));
+        if (process_node_empty(node_index, parent_transform, gpu_end_callback, entity_end_callback, scene_builder)) {
             return;
         }
         GX_LOG_F("Unexpected node in the scene nodes. Node: " << node.name);
@@ -819,10 +956,12 @@ struct DataLoader final {
         const std::vector<float>& times)
     {
         keyframes.reserve(input.count);
-        GX_ASSERT_D(output.count * sizeof(Value<float>) == output_bv.byteLength);
+        const auto output_bytes_count = output.count * sizeof(Value<float>);
+        GX_COMPLAIN_D(output_bytes_count == output_bv.byteLength, "Inefficient gltf exporter for keyframes.");
+        GX_ASSERT_D(output_bytes_count <= output_bv.byteLength);
         switch (interpolation) {
         case physics::animation::Interpolation::Gltf2CubicSPLine: {
-            GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bv.byteLength);
+            GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
                  data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 const std::size_t in_ptr = curr_output_ptr;
@@ -845,7 +984,7 @@ struct DataLoader final {
             break;
         }
         case physics::animation::Interpolation::Linear: {
-            GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bv.byteLength);
+            GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
                  data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
@@ -856,7 +995,7 @@ struct DataLoader final {
             break;
         }
         case physics::animation::Interpolation::Step: {
-            GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bv.byteLength);
+            GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
                  data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
@@ -961,10 +1100,12 @@ struct DataLoader final {
                 std::vector<float> times(input.count);
                 const tinygltf::BufferView& input_bv = data.bufferViews[input.bufferView];
                 const tinygltf::BufferView& output_bv = data.bufferViews[output.bufferView];
-                GX_ASSERT_D(input.count * sizeof(float) == input_bv.byteLength);
+                const auto input_byte_length = input.count * sizeof(float);
+                GX_COMPLAIN_D(input_byte_length == input_bv.byteLength, "Wast of memory in gltf animation sample, probably inefficient exporter");
+                GX_ASSERT_D(input_byte_length <= input_bv.byteLength);
                 GX_ASSERT_D(0 == input_bv.byteStride);
                 GX_ASSERT_D(0 == output_bv.byteStride);
-                std::memcpy(times.data(), &data.buffers[input_bv.buffer].data[input_bv.byteOffset], input_bv.byteLength);
+                std::memcpy(times.data(), &data.buffers[input_bv.buffer].data[input_bv.byteOffset], input_byte_length);
                 const std::vector<std::uint8_t>& output_b = data.buffers[output_bv.buffer].data;
                 const auto output_b_ptr = reinterpret_cast<std::size_t>(&output_b[output_bv.byteOffset]);
                 if ("translation" == chn.target_path) {
@@ -997,7 +1138,7 @@ struct DataLoader final {
                 GX_LOG_D("Loading scene: " << scn.name);
                 auto scene_builder = e.get_scene_manager()->build(scn.name, 0.0, core::job::EndCaller(entity_end_callback));
                 for (const int scene_node_index : scn.nodes) {
-                    process_node(scene_node_index, gpu_end_callback, entity_end_callback, scene_builder);
+                    process_node(scene_node_index, nullptr, gpu_end_callback, entity_end_callback, scene_builder);
                 }
                 scenes_end_callback.get_return()[index] = std::move(scene_builder);
             }
@@ -1040,7 +1181,7 @@ void load(
     const core::job::EndCaller<>& entity_end_callback)
 {
     core::job::send_job_io1([&, file = file, scenes_end_callback, entity_end_callback] {
-        auto loader = gltf::DataLoader::construct(e);
+        auto loader = DataLoader::construct(e);
         loader->read_gltf(file);
         loader->load_scenes(scenes_end_callback, entity_end_callback);
     });

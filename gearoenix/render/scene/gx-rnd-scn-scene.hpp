@@ -34,8 +34,6 @@ struct Skybox;
 
 namespace gearoenix::render::scene {
 struct Scene final : core::ecs::Component {
-    typedef boost::container::flat_map<std::string, math::Vec3<double>> EmptyMap;
-
     GX_GET_RRF_PRV(engine::Engine, e);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, model_entities);
@@ -44,7 +42,7 @@ struct Scene final : core::ecs::Component {
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, runtime_reflection_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, skybox_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, light_entities);
-    GX_GET_REF_PRV(EmptyMap, empties);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, empty_entities);
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRV(math::Vec4<float>, ssao_settings);
     GX_GETSET_VAL_PRV(double, layer, 0.0);
@@ -63,9 +61,9 @@ public:
     void add_runtime_reflection(core::ecs::entity_id_t entity, reflection::Runtime& r);
     void add_skybox(core::ecs::entity_id_t entity, skybox::Skybox& s);
     void add_light(core::ecs::entity_id_t entity, light::Light& l);
-    void add_empty(const std::string& name, const math::Vec3<double>& location);
+    void add_empty(core::ecs::entity_id_t entity);
     void update(core::ecs::entity_id_t scene_entity_id);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final;
+    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 };
 }
 #endif

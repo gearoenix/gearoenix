@@ -4,6 +4,9 @@
 #include "../../math/gx-math-aabb.hpp"
 #include <string>
 
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
 namespace gearoenix::platform::stream {
 struct Path;
 }
@@ -31,12 +34,14 @@ public:
 
     void build_baked(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const platform::stream::Path& path,
         core::job::EndCallerShared<Builder>&& c,
         core::job::EndCaller<>&& entity_end_callback);
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build_baked(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         std::shared_ptr<texture::TextureCube>&& irradiance,
         std::shared_ptr<texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
@@ -45,6 +50,7 @@ public:
 
     virtual void build_runtime(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,

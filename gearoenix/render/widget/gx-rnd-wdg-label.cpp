@@ -1,4 +1,6 @@
 #include "gx-rnd-wdg-label.hpp"
+
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
@@ -85,11 +87,13 @@ void gearoenix::render::widget::Label::construct(
     auto& e = scene_builder->e;
     auto model_builder = e.get_model_manager()->build(
         name + "-model",
+        parent ? parent->get_transform().get() : nullptr,
         { std::move(msh) },
         core::job::EndCaller([] {}),
         true);
     scene_builder->add(std::shared_ptr(model_builder));
     auto result = std::make_shared<Label>(std::move(name), e);
+    result->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(model_builder->get_transformation().get_component_self().lock());
     result->set_model_entity_id(model_builder->get_id());
     result->set_camera_entity_id(camera_id);
     if (nullptr != parent) {

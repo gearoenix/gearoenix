@@ -123,19 +123,21 @@ gearoenix::gl::RuntimeReflection::~RuntimeReflection() = default;
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, std::string(name), std::move(end_callback))
+    : Builder(e, std::string(name), parent_transform, std::move(end_callback))
 {
 }
 
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const math::Aabb3<double>& include_box,
     std::shared_ptr<render::texture::TextureCube>&& irradiance_texture,
     std::shared_ptr<render::texture::TextureCube>&& radiance_texture,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, std::string(name), std::move(end_callback))
+    : Builder(e, std::string(name), parent_transform, std::move(end_callback))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(BakedReflection::construct(
@@ -148,6 +150,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
 void gearoenix::gl::ReflectionBuilder::construct_runtime(
     Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
@@ -157,7 +160,7 @@ void gearoenix::gl::ReflectionBuilder::construct_runtime(
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<ReflectionBuilder>&& probe_end_callback)
 {
-    const std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(e, std::string(name), std::move(entity_end_callback)));
+    const std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(e, std::string(name), parent_transform, std::move(entity_end_callback)));
     RuntimeReflection::construct(
         e, builder, receive_box, exclude_box, include_box, std::string(name),
         environment_resolution, irradiance_resolution, radiance_resolution,
@@ -171,6 +174,7 @@ gearoenix::gl::ReflectionBuilder::~ReflectionBuilder() = default;
 
 std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::ReflectionManager::build_baked(
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     std::shared_ptr<render::texture::TextureCube>&& irradiance,
     std::shared_ptr<render::texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box,
@@ -179,6 +183,7 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::Reflectio
     return std::make_shared<ReflectionBuilder>(
         eng,
         name,
+        parent_transform,
         include_box,
         std::move(irradiance),
         std::move(radiance),
@@ -187,6 +192,7 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::Reflectio
 
 void gearoenix::gl::ReflectionManager::build_runtime(
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
@@ -199,6 +205,7 @@ void gearoenix::gl::ReflectionManager::build_runtime(
     ReflectionBuilder::construct_runtime(
         eng,
         name,
+        parent_transform,
         receive_box,
         exclude_box,
         include_box,

@@ -34,6 +34,7 @@ struct Builder {
     Builder(
         engine::Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
         core::job::EndCaller<>&& end_caller);
 

@@ -10,6 +10,10 @@
 #include <memory>
 #include <string>
 
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -25,6 +29,7 @@ struct Widget : core::event::Listener {
 
     GX_GET_VAL_PRT(bool, sensitivity, true);
     GX_GET_CREF_PRT(std::weak_ptr<Widget>, parent);
+    GX_GET_CREF_PRT(std::shared_ptr<physics::TransformationComponent>, transform);
     GX_GET_CREF_PRT(ChildrenMap, children);
     GX_GET_CREF_PRT(std::shared_ptr<Layout>, layout);
     GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_press);

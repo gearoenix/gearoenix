@@ -1,10 +1,8 @@
 #include "gx-gl-model.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../render/material/gx-rnd-mat-material.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
-#include "material/gx-gl-material.hpp"
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Model, gearoenix::gl::Model::MAX_COUNT>::construct();
@@ -49,10 +47,11 @@ gearoenix::gl::Model::~Model() = default;
 gearoenix::gl::ModelBuilder::ModelBuilder(
     Engine& e,
     std::string&& name,
+    physics::TransformationComponent* const parent_transform,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     core::job::EndCaller<>&& end_caller,
     const bool is_transformable)
-    : render::model::Builder(e, name, meshes, std::move(end_caller))
+    : Builder(e, name, parent_transform, meshes, std::move(end_caller))
     , e(e)
 {
     entity_builder->get_builder().add_component(Model::construct(
@@ -63,16 +62,17 @@ gearoenix::gl::ModelBuilder::~ModelBuilder() = default;
 
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::build(
     std::string&& name,
+    physics::TransformationComponent* parent_transform,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     core::job::EndCaller<>&& end_caller,
     const bool is_transformable)
 {
     return std::shared_ptr<render::model::Builder>(new ModelBuilder(
-        dynamic_cast<Engine&>(e), std::move(name), std::move(meshes), std::move(end_caller), is_transformable));
+        dynamic_cast<Engine&>(e), std::move(name), parent_transform, std::move(meshes), std::move(end_caller), is_transformable));
 }
 
 gearoenix::gl::ModelManager::ModelManager(Engine& e)
-    : render::model::Manager(e)
+    : Manager(e)
 {
 }
 

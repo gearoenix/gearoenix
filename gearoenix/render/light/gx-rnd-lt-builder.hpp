@@ -65,12 +65,14 @@ struct Builder {
     Builder(
         engine::Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const DirectionalInfo& info,
         core::job::EndCaller<>&& end_callback);
 
     Builder(
         engine::Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const ShadowCasterDirectionalInfo& info,
         core::job::EndCaller<>&& end_callback);
 

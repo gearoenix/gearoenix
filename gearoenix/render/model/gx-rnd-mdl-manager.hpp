@@ -4,6 +4,10 @@
 #include <memory>
 #include <string>
 
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -33,6 +37,7 @@ public:
 
     [[nodiscard]] virtual std::shared_ptr<Builder> build(
         std::string&& name,
+        physics::TransformationComponent* parent_transform,
         std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
         core::job::EndCaller<>&& c,
         bool is_transformable)

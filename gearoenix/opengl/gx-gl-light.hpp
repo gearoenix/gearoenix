@@ -36,6 +36,7 @@ private:
     LightBuilder(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const ShadowCasterDirectionalInfo& info,
         core::job::EndCaller<>&& end_callback);
 
@@ -43,11 +44,13 @@ public:
     LightBuilder(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const DirectionalInfo& info,
         core::job::EndCaller<>&& end_callback);
     static void construct(
         Engine& e,
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         const ShadowCasterDirectionalInfo& info,
         core::job::EndCallerShared<Builder>&& end_callback,
         core::job::EndCaller<>&& entity_end_callback);
@@ -60,9 +63,11 @@ struct LightManager final : render::light::Manager {
 private:
     [[nodiscard]] std::shared_ptr<render::light::Builder> build_directional(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         core::job::EndCaller<>&& end_callback) override;
     void build_shadow_caster_directional(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         std::uint32_t shadow_map_resolution,
         float camera_far,
         float camera_near,

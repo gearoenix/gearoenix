@@ -52,7 +52,7 @@ format_func() {
   fi
 }
 
-find ./games ./gearoenix ./examples ./tests -regex '.*\.\(cpp\|hpp\|mm\)' -print0 |
+find ./games ./gearoenix ./examples ./tests ./editor -regex '.*\.\(cpp\|hpp\|mm\)' -print0 |
   while IFS= read -r -d '' line; do
     format_func "$line"
   done

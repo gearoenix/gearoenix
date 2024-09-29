@@ -1,26 +1,27 @@
-#include "ui/gx-editor-ui-manager.hpp"
 #include "control/gx-editor-ctrl-manager.hpp"
+#include "ui/gx-editor-ui-manager.hpp"
 #include <gearoenix/core/gx-cr-application.hpp>
 
 namespace gearoenix::editor {
-    struct Application final : public core::Application {
-    private:
-        control::Manager control_manager;
-        ui::Manager ui_manager;
+struct Application final : core::Application {
+private:
+    control::Manager control_manager;
+    ui::Manager ui_manager;
 
-    public:
-        explicit Application(platform::Application& plt_app) noexcept
-        : core::Application(plt_app)
-        , control_manager(plt_app)
-        , ui_manager(plt_app, control_manager)
+public:
+    explicit Application(platform::Application& plt_app);
+    void update() override;
+};
+}
+
+gearoenix::editor::Application::Application(platform::Application& plt_app)
+    : core::Application(plt_app)
+    , control_manager(plt_app)
+    , ui_manager(plt_app, control_manager)
 {
 }
 
-        void update() noexcept final;
-    };
-}
-
-void gearoenix::editor::Application::update() noexcept
+void gearoenix::editor::Application::update()
 {
     ui_manager.update();
 }

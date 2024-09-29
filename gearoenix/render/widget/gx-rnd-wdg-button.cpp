@@ -1,5 +1,6 @@
 #include "gx-rnd-wdg-button.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
@@ -143,11 +144,13 @@ void gearoenix::render::widget::Button::construct(
     mat->set_albedo(std::shared_ptr(rest_texture));
     auto model_builder = parent->e.get_model_manager()->build(
         name + "-model",
+        parent ? parent->get_transform().get() : nullptr,
         { std::move(button_mesh) },
         core::job::EndCaller([] {}),
         true);
     const auto id = model_builder->get_id();
     auto but = std::make_shared<Button>(std::move(name), parent->e);
+    but->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(model_builder->get_transformation().get_component_self().lock());
     but->set_rest_texture(std::move(rest_texture));
     but->set_pressed_texture(std::move(pressed_texture));
     but->set_model_entity_id(id);

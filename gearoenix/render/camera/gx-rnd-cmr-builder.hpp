@@ -34,7 +34,9 @@ struct Builder {
 
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
-    Builder(engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback);
+    Builder(
+        engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback,
+        physics::TransformationComponent* parent_transform);
 
 public:
     Builder(Builder&&) = delete;

@@ -219,6 +219,8 @@ void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& chil
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)
 {
     add_child(std::move(child), 0.0);
+    transform->add_child(child->transform);
+    child->transform->set_parent(transform.get());
 }
 
 gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(

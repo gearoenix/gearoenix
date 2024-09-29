@@ -96,7 +96,7 @@ struct GameApp final : public GxCoreApp {
             }));
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
                 auto& camera_transform = camera_builder->get_transformation();
                 camera_transform.local_translate({ -19.0, -19.0, 5.0 });
@@ -109,7 +109,7 @@ struct GameApp final : public GxCoreApp {
             GxEndCaller([] {}));
 
         render_engine.get_reflection_manager()->build_baked(
-            "baked-reflection",
+            "baked-reflection", nullptr,
             GxPath::create_asset("exported.gx-reflection"),
             GxReflectionBuilderEndCaller([scene_builder](GxReflectionBuilderPtr&& baked_reflection_probe_builder) {
                 scene_builder->add(std::move(baked_reflection_probe_builder));
@@ -124,7 +124,7 @@ struct GameApp final : public GxCoreApp {
         const float metallic, const float roughness)
     {
         auto model_builder = render_engine.get_model_manager()->build(
-            "icosphere" + postfix,
+            "icosphere" + postfix, nullptr,
             { std::move(mesh) },
             GxEndCaller([] {}),
             true);

@@ -5,7 +5,6 @@
 #include "gx-phs-anm-animation.hpp"
 #include "gx-phs-anm-armature.hpp"
 #include "gx-phs-anm-bone.hpp"
-#include "gx-phs-anm-interpolation.hpp"
 
 void gearoenix::physics::animation::Manager::insert_bones(
     BoneInfo& bones_info,
@@ -34,7 +33,8 @@ void gearoenix::physics::animation::Manager::insert_bones(
 void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform)
 {
     auto& bone = bones[index];
-    bone.transform.update_without_inverse(parent_transform);
+    bone.transform.set_parent(&parent_transform);
+    bone.transform.update_without_inverse_child();
     if (bone.transform.get_changed()) {
         bone.m = math::Mat4x4<float>(bone.transform.get_global_matrix()) * bone.inverse_bind;
         bone.inv_m = bone.m.inverted().transposed();
@@ -56,7 +56,7 @@ void gearoenix::physics::animation::Manager::create_armature(
     core::ecs::EntityBuilder& builder,
     BoneInfo& bones_info)
 {
-    const std::lock_guard<std::mutex> _lg(this_lock);
+    const std::lock_guard _lg(this_lock);
 
     const auto root_index = bones.size();
 

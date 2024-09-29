@@ -3,25 +3,24 @@
 #include "gx-editor-ui-menu-bar.hpp"
 
 namespace gearoenix::platform {
-    struct Application;
+struct Application;
 }
 
 namespace gearoenix::editor::control {
-    struct Manager;
+struct Manager;
 }
 
 namespace gearoenix::editor::ui {
-    struct Manager final {
-    private:
-        platform::Application& platform_application;
-        editor::control::Manager& control_manager;
-        MenuBar menu_bar;
-    public:
-        explicit Manager(
-                platform::Application& platform_application,
-                editor::control::Manager& control_manager) noexcept;
-        void update() noexcept;
-    };
+struct Manager final {
+private:
+    platform::Application& platform_application;
+    control::Manager& control_manager;
+    MenuBar menu_bar;
+
+public:
+    Manager(platform::Application& platform_application, control::Manager& control_manager);
+    void update();
+};
 }
 
 #endif

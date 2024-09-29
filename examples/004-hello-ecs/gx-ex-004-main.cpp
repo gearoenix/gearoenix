@@ -230,7 +230,7 @@ struct GameApp final : GxCoreApp {
 
         for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
             auto model_builder = render_engine.get_model_manager()->build(
-                "triangle" + std::to_string(model_index),
+                "triangle" + std::to_string(model_index), nullptr,
                 { std::move(meshes[model_index]) },
                 GxEndCaller([] {}),
                 true);
@@ -244,7 +244,7 @@ struct GameApp final : GxCoreApp {
         }
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
                 camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
                 camera_controller = std::make_unique<GxJetCtrl>(
@@ -255,7 +255,7 @@ struct GameApp final : GxCoreApp {
             GxEndCaller([] {}));
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light",
+            "directional-light", nullptr,
             1024,
             10.0f,
             1.0f,

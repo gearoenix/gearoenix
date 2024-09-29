@@ -11,7 +11,6 @@
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
-#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
@@ -51,14 +50,14 @@ struct GameApp final : public gearoenix::core::Application {
             "scene", 0.0, GxEndCaller([] {}));
 
         auto model_builder = render_engine.get_model_manager()->build(
-            "triangle-model",
+            "triangle-model", nullptr,
             { std::move(mesh) },
             GxEndCaller([] {}),
             true);
         scene_builder->add(std::move(model_builder));
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
                 set_camera_builder(std::move(camera_builder), std::move(scene_builder));
             }),
@@ -102,7 +101,7 @@ struct GameApp final : public gearoenix::core::Application {
         scene_builder->add(std::move(camera_builder));
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light",
+            "directional-light", nullptr,
             1024,
             10.0f,
             1.0f,

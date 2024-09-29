@@ -82,18 +82,22 @@ void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::
 
 gearoenix::gl::Camera::~Camera() = default;
 
-gearoenix::gl::CameraBuilder::CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& end_caller)
-    : Builder(e, name, std::move(end_caller))
+gearoenix::gl::CameraBuilder::CameraBuilder(
+    Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller,
+    physics::TransformationComponent* const parent_transform)
+    : Builder(e, name, std::move(entity_end_caller), parent_transform)
     , eng(e)
 {
 }
 
 void gearoenix::gl::CameraBuilder::construct(
     Engine& e, const std::string& name,
-    core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
+    physics::TransformationComponent* parent_transform,
+    core::job::EndCallerShared<Builder>&& builder_end_caller,
     core::job::EndCaller<>&& entity_end_caller)
 {
-    builder_end_caller.set_return(std::make_shared<CameraBuilder>(e, name, std::move(entity_end_caller)));
+    builder_end_caller.set_return(std::make_shared<CameraBuilder>(
+        e, name, std::move(entity_end_caller), parent_transform));
     Camera::construct(
         e, name + "-gl-camera",
         core::job::EndCallerShared<Camera>([b = std::move(builder_end_caller)](std::shared_ptr<Camera>&& c) {
@@ -105,10 +109,11 @@ gearoenix::gl::CameraBuilder::~CameraBuilder() = default;
 
 void gearoenix::gl::CameraManager::build(
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
     core::job::EndCaller<>&& entity_end_caller)
 {
-    CameraBuilder::construct(dynamic_cast<Engine&>(e), name, std::move(builder_end_caller), std::move(entity_end_caller));
+    CameraBuilder::construct(dynamic_cast<Engine&>(e), name, parent_transform, std::move(builder_end_caller), std::move(entity_end_caller));
 }
 
 gearoenix::gl::CameraManager::CameraManager(Engine& e)

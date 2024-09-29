@@ -1,4 +1,5 @@
 #include "gx-rnd-wdg-modal.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
@@ -58,9 +59,12 @@ void gearoenix::render::widget::Modal::construct(
         values->mat->set_albedo(std::move(values->background_texture));
         values->return_value.background_model_builder = values->return_value.modal->e.get_model_manager()->build(
             values->return_value.modal->name + "-background-model",
+            parent ? parent->get_transform().get() : nullptr,
             { values->msh },
             core::job::EndCaller([] {}),
             true);
+        values->return_value.modal->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(
+            values->return_value.background_model_builder->get_transformation().get_component_self().lock());
         values->return_value.modal->set_model_entity_id(values->return_value.background_model_builder->get_id());
         values->return_value.modal->set_camera_entity_id(camera_id);
         if (nullptr != parent) {

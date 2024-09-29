@@ -1,7 +1,8 @@
 #include "gx-phs-anm-bone.hpp"
 
 gearoenix::physics::animation::BoneInfo::BoneInfo(std::string&& name)
-    : name(std::move(name))
+    : transform(nullptr)
+    , name(std::move(name))
 {
 }
 

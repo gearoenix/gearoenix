@@ -4,6 +4,10 @@
 #include <memory>
 #include <string>
 
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -19,10 +23,12 @@ struct Manager {
     virtual ~Manager();
     [[nodiscard]] virtual std::shared_ptr<Builder> build_directional(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         core::job::EndCaller<>&& end_callback)
         = 0;
     virtual void build_shadow_caster_directional(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         std::uint32_t shadow_map_resolution,
         float camera_far,
         float camera_near,

@@ -49,11 +49,13 @@ public:
 struct CameraBuilder final : render::camera::Builder {
     Engine& eng;
 
-    CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller);
+    CameraBuilder(Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller,
+        physics::TransformationComponent* parent_transform);
     static void construct(
         Engine& e,
         const std::string& name,
-        core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
+        physics::TransformationComponent* parent_transform,
+        core::job::EndCallerShared<Builder>&& builder_end_caller,
         core::job::EndCaller<>&& entity_end_caller);
     ~CameraBuilder() override;
 };
@@ -62,6 +64,7 @@ struct CameraManager final : render::camera::Manager {
 private:
     void build(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
         core::job::EndCaller<>&& entity_end_caller) override;
     void window_resized() override;

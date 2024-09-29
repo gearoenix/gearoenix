@@ -3,7 +3,12 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../math/gx-math-quaternion.hpp"
-#include <functional>
+#include <boost/container/flat_set.hpp>
+#include <memory>
+
+namespace gearoenix::core::ecs {
+struct World;
+}
 
 namespace gearoenix::physics {
 struct Transformation {
@@ -16,10 +21,12 @@ struct Transformation {
     GX_GET_CREF_PRV(math::Vec3<double>, y_axis);
     GX_GET_CREF_PRV(math::Vec3<double>, z_axis);
     GX_GET_CREF_PRV(math::Vec3<double>, scale);
+    GX_GET_CREF_PRV(boost::container::flat_set<std::shared_ptr<Transformation>>, children);
+    GX_GET_CPTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
 
 public:
-    Transformation();
+    explicit Transformation(const Transformation* parent);
     Transformation(Transformation&&) = default;
     Transformation& operator=(Transformation&&) = default;
     virtual ~Transformation() = default;
@@ -49,10 +56,9 @@ public:
     [[nodiscard]] math::Quat<double> get_local_orientation() const;
     void local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up);
     void local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up);
-    void local_update();
-    void update(const Transformation& parent);
-    void local_update_without_inverse();
-    void update_without_inverse(const Transformation& parent);
+    void update_without_inverse_root();
+    void update_inverse();
+    void update_without_inverse_child();
     void clear_change();
     void reset();
     void reset(const math::Vec3<double>& scale, const math::Quat<double>& rotation, const math::Vec3<double>& location);
@@ -62,6 +68,8 @@ public:
         const math::Vec3<double>& y_axis,
         const math::Vec3<double>& z_axis,
         const math::Vec3<double>& location);
+    void add_child(const std::shared_ptr<Transformation>& child);
+    void set_parent(const Transformation* parent);
     void show_debug_gui();
 };
 
@@ -70,9 +78,11 @@ private:
     [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 
 public:
-    explicit TransformationComponent(std::string&& name);
-    [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(std::string&& name);
+    explicit TransformationComponent(std::string&& name, const TransformationComponent* parent);
+    [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(
+        std::string&& name, TransformationComponent* parent);
     void show_debug_gui() override;
+    static void update(core::ecs::World* world);
 };
 }
 #endif

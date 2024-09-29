@@ -27,6 +27,9 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     }
     GX_GL_CHECK_D;
     ImGui_ImplOpenGL3_Init("#version 300 es");
+    glGetError();
+    GX_GL_CHECK_D;
+
     frames_count = GEAROENIX_GL_FRAMES_COUNT;
 
     sint max_texture_size = 0;

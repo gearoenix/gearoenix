@@ -15,6 +15,7 @@ gearoenix::render::reflection::Manager::~Manager() = default;
 
 void gearoenix::render::reflection::Manager::build_baked(
     const std::string& name,
+    physics::TransformationComponent* parent_transform,
     const platform::stream::Path& path,
     core::job::EndCallerShared<Builder>&& c,
     core::job::EndCaller<>&& entity_end_callback)
@@ -28,6 +29,7 @@ void gearoenix::render::reflection::Manager::build_baked(
         std::string name;
         core::job::EndCallerShared<Builder> c;
         core::job::EndCaller<> entity_end_callback;
+        physics::TransformationComponent* const parent_transform;
         math::Aabb3<double> include_box;
         std::shared_ptr<texture::TextureCube> irradiance;
         std::shared_ptr<texture::TextureCube> radiance;
@@ -37,11 +39,11 @@ void gearoenix::render::reflection::Manager::build_baked(
             GX_ASSERT(irradiance != nullptr);
             GX_ASSERT(radiance != nullptr);
 
-            c.set_return(manager->build_baked(name, std::move(irradiance), std::move(radiance), include_box, std::move(entity_end_callback)));
+            c.set_return(manager->build_baked(name, parent_transform, std::move(irradiance), std::move(radiance), include_box, std::move(entity_end_callback)));
         }
     };
 
-    auto values = std::make_shared<Values>(this, name, std::move(c), std::move(entity_end_callback));
+    auto values = std::make_shared<Values>(this, name, std::move(c), std::move(entity_end_callback), parent_transform);
     values->include_box.read(*stream);
 
     e.get_texture_manager()->read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) {

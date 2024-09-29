@@ -84,6 +84,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
     auto entity_callback = core::job::EndCaller([this, end = start_callback]() -> void {
         this->e.get_world()->get_component<Scene>(scene_id)->set_enabled(true);
+        (void)end;
     });
 
     auto scene_builder = e.get_scene_manager()->build(
@@ -92,7 +93,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
     {
         e.get_camera_manager()->build(
-            "gearoenix-splash-camera",
+            "gearoenix-splash-camera", nullptr,
             core::job::EndCallerShared<camera::Builder>([scene_builder](std::shared_ptr<camera::Builder>&& cb) {
                 cb->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
                 auto& camera = cb->get_camera();
@@ -135,7 +136,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
         {
             {
                 auto bg_model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-bg",
+                    "gearoenix-splash-bg", nullptr,
                     { std::move(bg_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
@@ -145,7 +146,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
             {
                 auto gear_model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-gear",
+                    "gearoenix-splash-gear", nullptr,
                     { std::shared_ptr(gear_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
@@ -157,7 +158,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
             {
                 auto glare_model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-glare",
+                    "gearoenix-splash-glare", nullptr,
                     { std::move(glare_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
@@ -169,7 +170,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
             {
                 auto wing_model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-left-wing",
+                    "gearoenix-splash-left-wing", nullptr,
                     { std::move(left_wing_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
@@ -182,7 +183,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
             {
                 auto wing_model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-right-wing",
+                    "gearoenix-splash-right-wing", nullptr,
                     { std::move(right_wing_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
@@ -197,7 +198,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                 math::Vec3<double> scale(splash->current_scale * gearoenix_text_base_scale);
                 scale.x *= text_width / text_height;
                 auto model_builder = e.get_model_manager()->build(
-                    "gearoenix-splash-text",
+                    "gearoenix-splash-text", nullptr,
                     { std::move(text_mesh) },
                     std::move(entity_callback),
                     true);

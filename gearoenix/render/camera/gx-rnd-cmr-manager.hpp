@@ -1,8 +1,11 @@
 #ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include <memory>
 #include <string>
+
+namespace gearoenix::physics {
+struct TransformationComponent;
+}
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -26,6 +29,7 @@ public:
 
     virtual void build(
         const std::string& name,
+        physics::TransformationComponent* parent_transform,
         core::job::EndCallerShared<Builder>&& builder_end_caller,
         core::job::EndCaller<>&& entity_end_caller)
         = 0;

@@ -80,9 +80,9 @@ void GameApp::update()
 
 void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
 {
-    if (const auto search = scene_builder->get_model_builders().find("Ch10"); scene_builder->get_model_builders().end() != search) {
+    if (const auto search = scene_builder->get_model_builders().find("Cesium_Man"); scene_builder->get_model_builders().end() != search) {
         auto* const player = search->second->get_entity_builder()->get_builder().get_component<GxAnimationPlayer>();
-        player->set_loop_range_time(1.0e-10, 0.6);
+        player->set_loop_range_time(1.0e-10, 1.98);
     }
 
     render_engine.get_skybox_manager()->build(
@@ -94,7 +94,7 @@ void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
         }));
 
     render_engine.get_reflection_manager()->build_baked(
-        "baked-reflection",
+        "baked-reflection", nullptr,
         GxPath::create_asset("exported.gx-reflection"),
         GxReflectionBuilderEndCaller([scene_builder](GxReflectionBuilderPtr&& baked_reflection_probe_builder) {
             scene_builder->add(std::move(baked_reflection_probe_builder));

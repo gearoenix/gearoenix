@@ -1,15 +1,19 @@
 #include "gx-rnd-rfl-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
 
 gearoenix::render::reflection::Builder::Builder(
-    engine::Engine& e,
-    std::string&& name,
+    engine::Engine& e, std::string&& name,
+    physics::TransformationComponent* parent_transform,
     core::job::EndCaller<>&& end_callback)
-    : entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
+    : transformation(physics::TransformationComponent::construct(name + "-transform", parent_transform))
+    , entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
 {
+    auto& builder = entity_builder->get_builder();
+    builder.add_component(transformation);
 }
 
 gearoenix::render::reflection::Builder::~Builder() = default;

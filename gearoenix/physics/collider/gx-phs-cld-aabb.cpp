@@ -6,14 +6,14 @@ const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physic
 }
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
-    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
+    : Component(create_this_type_index(this), std::move(name))
     , original_box(upper, lower)
     , updated_box(original_box)
 {
 }
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name)
-    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
+    : Component(create_this_type_index(this), std::move(name))
     , original_box(original_box)
     , updated_box(original_box)
 {
@@ -53,6 +53,6 @@ void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& tra
 
 const boost::container::flat_set<std::type_index>& gearoenix::physics::collider::Aabb3::get_all_the_hierarchy_types_except_component() const
 {
-    static const boost::container::flat_set<std::type_index> types { core::ecs::Component::create_this_type_index(this) };
+    static const boost::container::flat_set types { create_this_type_index(this) };
     return types;
 }

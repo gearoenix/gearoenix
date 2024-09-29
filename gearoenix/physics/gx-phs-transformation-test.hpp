@@ -12,7 +12,7 @@
 
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
-    gearoenix::physics::Transformation transform;
+    gearoenix::physics::Transformation transform(nullptr);
 
     auto glmm = glm::identity<glm::dmat4>();
 

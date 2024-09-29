@@ -3,8 +3,8 @@
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
-#include <utility>
 #include <algorithm>
+#include <utility>
 
 void gearoenix::physics::animation::ArmatureAnimationInfo::optimise()
 {
@@ -59,14 +59,15 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
             scale_end_iter,
             time,
             [](const double a, const auto& b) { return a < b.first; });
-        if (scale_search == scale_begin_iter)
+        if (scale_search == scale_begin_iter) {
             scale = get_key(scale_begin_iter->second);
-        else if (scale_search == scale_end_iter)
+        } else if (scale_search == scale_end_iter) {
             scale = get_key((scale_begin_iter + (static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.scale_samples_count) - 1))->second);
-        else if (scale_search->first == time)
+        } else if (scale_search->first == time) {
             scale = get_key(scale_search->second);
-        else
+        } else {
             scale = interpolate(*(scale_search - 1), *scale_search, time);
+        }
     }
 
     if (bone_channel.rotation_samples_count > 0) {
@@ -78,13 +79,13 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
             rotation_end_iter,
             time,
             [](const double a, const auto& b) { return a < b.first; });
-        if (rotation_search == rotation_begin_iter)
+        if (rotation_search == rotation_begin_iter) {
             rotation = get_key(rotation_begin_iter->second);
-        else if (rotation_search == rotation_end_iter)
+        } else if (rotation_search == rotation_end_iter) {
             rotation = get_key((rotation_begin_iter + (static_cast<Manager::TimeQuatMap::difference_type>(bone_channel.rotation_samples_count) - 1))->second);
-        else if (rotation_search->first == time)
+        } else if (rotation_search->first == time) {
             rotation = get_key(rotation_search->second);
-        else {
+        } else {
             rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
         }
     }
@@ -98,18 +99,19 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
             translation_end_iter,
             time,
             [](const double a, const auto& b) { return a < b.first; });
-        if (translation_search == translation_begin_iter)
+        if (translation_search == translation_begin_iter) {
             translation = get_key(translation_begin_iter->second);
-        else if (translation_search == translation_end_iter)
+        } else if (translation_search == translation_end_iter) {
             translation = get_key((translation_begin_iter + (static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.translation_samples_count) - 1))->second);
-        else if (translation_search->first == time)
+        } else if (translation_search->first == time) {
             translation = get_key(translation_search->second);
-        else
+        } else {
             translation = interpolate(*(translation_search - 1), *translation_search, time);
+        }
     }
-
-    if (transformed)
+    if (transformed) {
         bone.transform.reset(scale, rotation, translation);
+    }
 }
 
 gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(

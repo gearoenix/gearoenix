@@ -10,6 +10,7 @@
 gearoenix::render::model::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
+    physics::TransformationComponent* const parent_transform,
     const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
     core::job::EndCaller<>&& end_caller)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_caller)))
@@ -20,7 +21,7 @@ gearoenix::render::model::Builder::Builder(
         box.put(m->get_buffer()->get_box());
     }
     builder.add_component(physics::collider::Aabb3::construct(box, name + "-collider"));
-    builder.add_component(physics::TransformationComponent::construct(name + "-transformation"));
+    builder.add_component(physics::TransformationComponent::construct(name + "-transformation", parent_transform));
 }
 
 gearoenix::render::model::Builder::~Builder() = default;

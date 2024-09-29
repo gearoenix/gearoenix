@@ -199,11 +199,13 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         const auto name_ext = "-" + std::to_string(face.face);
         e.get_camera_manager()->build(
             std::string(name).append("-camera").append(name_ext),
+            builder->get_transformation().get(),
             core::job::EndCallerShared<camera::Builder>([builder, face_index, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<camera::Builder>&& camera_builder) {
                 auto cam = camera_builder->get_camera().get_camera_self().lock();
                 self->cameras[face_index].cmr = cam;
                 self->cameras[face_index].trn = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
                 builder->set_camera_builder(std::move(camera_builder), face_index);
+                (void)when_all_textures_are_ready;
             }),
             core::job::EndCaller([] {}));
     }

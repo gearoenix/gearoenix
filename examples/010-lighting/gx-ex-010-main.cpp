@@ -18,15 +18,10 @@
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/reflection/gx-rnd-rfl-builder.hpp>
-#include <gearoenix/render/reflection/gx-rnd-rfl-manager.hpp>
 #include <gearoenix/render/reflection/gx-rnd-rfl-runtime.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
-#include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
-#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
-#include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
-#include <gearoenix/render/texture/gx-rnd-txt-texture-cube.hpp>
 
 template <typename T>
 using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
@@ -96,7 +91,7 @@ struct GameApp final : public GxCoreApp {
             }));
 
         render_engine.get_camera_manager()->build(
-            "camera",
+            "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
                 camera_builder->get_transformation().local_look_at(
                     { -19.0, -19.0, 5.0 }, { -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
@@ -110,7 +105,7 @@ struct GameApp final : public GxCoreApp {
 
         for (int light_index = 0; light_index < 4; ++light_index) {
             render_engine.get_light_manager()->build_shadow_caster_directional(
-                "directional-light-" + std::to_string(light_index), 1024, 50.0f, 1.0f, 35.0f,
+                "directional-light-" + std::to_string(light_index), nullptr, 1024, 50.0f, 1.0f, 35.0f,
                 GxLightBuilderEndCaller([scene_builder, light_index](GxLightBuilderPtr&& light_builder) {
                     light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
                         { static_cast<double>(((light_index & 1) << 1) - 1) * 11.0,
@@ -132,7 +127,7 @@ struct GameApp final : public GxCoreApp {
         const float metallic, const float roughness)
     {
         auto model_builder = render_engine.get_model_manager()->build(
-            "icosphere" + postfix,
+            "icosphere" + postfix, nullptr,
             { std::move(mesh) },
             GxEndCaller([] {}),
             true);
@@ -163,7 +158,7 @@ struct GameApp final : public GxCoreApp {
     void plate_mesh_is_ready(GxMeshPtr&& mesh, const GxSceneBuilderPtr& scene_builder)
     {
         auto model_builder = render_engine.get_model_manager()->build(
-            "ground",
+            "ground", nullptr,
             { std::move(mesh) },
             GxEndCaller([] {}),
             true);

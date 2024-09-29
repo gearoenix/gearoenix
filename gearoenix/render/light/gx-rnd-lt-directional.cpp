@@ -56,6 +56,7 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
 
 void gearoenix::render::light::ShadowCasterDirectional::initialise(
     engine::Engine& e,
+    physics::TransformationComponent* const parent_transform,
     const std::uint32_t resolution,
     const float camera_far,
     const float camera_near,
@@ -65,7 +66,7 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise(
 {
     if (nullptr == shadow_camera) {
         e.get_camera_manager()->build(
-            name + "-shadow-camera",
+            name + "-shadow-camera", parent_transform,
             core::job::EndCallerShared<camera::Builder>([this, resolution, builder, c = get_component_self(), camera_aspect, camera_near, camera_far, e = std::move(end_callback)](std::shared_ptr<camera::Builder>&& camera_builder) mutable {
                 const auto self = c.lock();
                 if (nullptr == self) {
