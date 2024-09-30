@@ -25,5 +25,3 @@ These demos showcase Gearoenix running in WebAssembly, but keep in mind that web
 [Example 009 Baked Reflection Probes](https://gearoenix.com/engine/webassembly-samples/009-baked-reflection-probe/GearoenixExample009BakedReflectionProbe.html)
 
 [Example 010 Lighting](https://gearoenix.com/engine/webassembly-samples/010-lighting/GearoenixExample010Lighting.html)
-
-[Example 011 Animation](https://gearoenix.com/engine/webassembly-samples/011-animation/GearoenixExample011Animation.html)
