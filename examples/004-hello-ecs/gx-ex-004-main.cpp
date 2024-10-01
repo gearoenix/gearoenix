@@ -3,7 +3,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
-#include <gearoenix/platform/gx-plt-main-entry.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
@@ -49,8 +48,6 @@ using GxPltApp = gearoenix::platform::Application;
 using GxTransformComp = gearoenix::physics::TransformationComponent;
 
 using GxScene = gearoenix::render::scene::Scene;
-using GxSceneBuilder = gearoenix::render::scene::Builder;
-using GxSceneBuilderPtr = std::shared_ptr<GxSceneBuilder>;
 
 using GxCameraBuilder = gearoenix::render::camera::Builder;
 using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
@@ -79,7 +76,7 @@ struct Speed final : GxComp {
     Speed();
     [[nodiscard]] static std::shared_ptr<Speed> construct();
     void update(const Position& p);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 
 struct Position final : GxComp {
@@ -88,7 +85,7 @@ struct Position final : GxComp {
     Position();
     [[nodiscard]] static std::shared_ptr<Position> construct();
     void update(double delta_time, const Speed& speed);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 
 Speed::Speed()
@@ -143,9 +140,9 @@ void Speed::update(const Position& p)
     }
 }
 
-const boost::container::flat_set<std::type_index>& Speed::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& Speed::get_hierarchy_types() const
 {
-    const static boost::container::flat_set<std::type_index> types { create_this_type_index(this) };
+    const static auto types = generate_hierarchy_types(this);
     return types;
 }
 
@@ -172,9 +169,9 @@ void Position::update(const double delta_time, const Speed& speed)
     value.clamp(-position_limit, position_limit);
 }
 
-const boost::container::flat_set<std::type_index>& Position::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& Position::get_hierarchy_types() const
 {
-    const static boost::container::flat_set<std::type_index> types { create_this_type_index(this) };
+    const static auto types = generate_hierarchy_types(this);
     return types;
 }
 }
@@ -201,6 +198,7 @@ struct GameApp final : GxCoreApp {
                         1.0f
                     };
                     (*materials)[model_index] = std::move(m);
+                    (void)end;
                 }));
         }
     }
@@ -216,6 +214,7 @@ struct GameApp final : GxCoreApp {
                 std::move(materials[model_index]),
                 GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
                     (*meshes)[model_index] = std::move(mesh);
+                    (void)end;
                 }));
         }
     }

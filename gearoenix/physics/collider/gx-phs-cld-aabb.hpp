@@ -9,6 +9,8 @@ struct Aabb3 final : core::ecs::Component {
     GX_GET_CREF_PRV(math::Aabb3<double>, original_box);
     GX_GET_CREF_PRV(math::Aabb3<double>, updated_box);
 
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
+
 public:
     Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
     Aabb3(const math::Aabb3<double>& original_box, std::string&& name);
@@ -16,7 +18,6 @@ public:
     [[nodiscard]] static std::shared_ptr<Aabb3> construct(const math::Aabb3<double>& original_box, std::string&& name);
     ~Aabb3() override;
     void update(const math::Mat4x4<double>& transform);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 };
 }
 #endif

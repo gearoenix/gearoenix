@@ -8,9 +8,9 @@ namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Model, gearoenix::gl::Model::MAX_COUNT>::construct();
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::gl::Model::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Model::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_type_index<render::model::Model>(), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<render::model::Model>(this);
     return types;
 }
 

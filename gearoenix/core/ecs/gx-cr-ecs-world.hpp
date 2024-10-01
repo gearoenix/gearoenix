@@ -111,7 +111,7 @@ public:
     [[nodiscard]] ComponentType* get_component(const entity_id_t id) const
     {
         static_assert(std::is_base_of_v<Component, ComponentType>);
-        auto entity_search = entities.find(id);
+        const auto entity_search = entities.find(id);
         if (entities.end() == entity_search) {
             return nullptr;
         }
@@ -126,7 +126,7 @@ public:
     template <typename... ComponentTypes>
     [[nodiscard]] std::tuple<ComponentTypes*...> get_components(const entity_id_t id) const
     {
-        auto entity_search = entities.find(id);
+        const auto entity_search = entities.find(id);
         if (entities.end() == entity_search)
             return {
                 reinterpret_cast<ComponentTypes*>(std::size_t { 0 })...,

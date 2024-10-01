@@ -51,6 +51,8 @@ struct Scene final : core::ecs::Component {
 
     boost::container::flat_map<core::ecs::entity_id_t, std::uint64_t> cameras_flags;
 
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
+
 public:
     Scene(engine::Engine& e, double layer, std::string&& name);
     [[nodiscard]] static std::shared_ptr<Scene> construct(engine::Engine& e, double layer, std::string&& name);
@@ -63,7 +65,6 @@ public:
     void add_light(core::ecs::entity_id_t entity, light::Light& l);
     void add_empty(core::ecs::entity_id_t entity);
     void update(core::ecs::entity_id_t scene_entity_id);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
 };
 }
 #endif

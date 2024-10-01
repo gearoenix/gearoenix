@@ -20,7 +20,7 @@ struct Skybox final : render::skybox::Skybox {
     GX_GET_CREF_PRV(GlTexture, gl_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Mesh>, gl_mesh);
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     Skybox(

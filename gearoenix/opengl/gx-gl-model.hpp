@@ -14,7 +14,7 @@ struct Mesh;
 struct Model final : render::model::Model {
     GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     Model(

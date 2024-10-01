@@ -1,4 +1,4 @@
-<img src="https://github.com/Hossein-Noroozpour/gearoenix-static-files/raw/master/logo.png" width="100%" />
+<img src="https://github.com/Hossein-Noroozpour/gearoenix-static-files/raw/master/logo.png" width="100%"  alt=""/>
 
 # Gearoenix
 

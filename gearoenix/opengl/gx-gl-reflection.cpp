@@ -26,9 +26,9 @@ gearoenix::gl::BakedReflection::BakedReflection(
     GX_ASSERT_D(0 != gl_radiance_v);
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::gl::BakedReflection::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::BakedReflection::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_type_index<Baked>(), create_type_index<Probe>(), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<Baked, Probe>(this);
     return types;
 }
 
@@ -59,9 +59,9 @@ gearoenix::gl::RuntimeReflection::RuntimeReflection(
 {
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::gl::RuntimeReflection::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::RuntimeReflection::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_type_index<Runtime>(), create_type_index<Probe>(), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<Runtime, Probe>(this);
     return types;
 }
 

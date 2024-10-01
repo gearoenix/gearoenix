@@ -9,8 +9,8 @@ struct Armature final : core::ecs::Component {
 
     explicit Armature(std::string&& name);
     [[nodiscard]] static std::shared_ptr<Armature> construct(std::string&& name);
-    ~Armature() final;
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final;
+    ~Armature() override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 }
 #endif

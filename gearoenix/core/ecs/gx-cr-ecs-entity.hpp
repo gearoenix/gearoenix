@@ -7,8 +7,6 @@
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
 #include <atomic>
-#include <boost/container/flat_map.hpp>
-#include <string>
 
 namespace gearoenix::core::ecs {
 struct World;

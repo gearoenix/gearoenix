@@ -94,11 +94,11 @@ void gearoenix::core::ecs::EntityBuilder::add_component(std::shared_ptr<Componen
     if (const auto search = components.find(c.first); search != components.end()) {
         GX_LOG_F("Component '" << c.second->get_name() << "' already exists in entity '" << id);
     }
-    for (const auto& base_types = c.second->get_all_the_hierarchy_types_except_component(); const auto& t : base_types) {
-        if (const auto search = bases_to_leaves.find(t); search != bases_to_leaves.end()) {
+    for (const auto& base_types = c.second->get_hierarchy_types(); const auto& t : base_types) {
+        if (const auto search = bases_to_leaves.find(t.first); search != bases_to_leaves.end()) {
             GX_LOG_F("Component '" << c.second->get_name() << "' already exists in entity components hierarchy '" << id);
         }
-        bases_to_leaves.emplace(t, c.first);
+        bases_to_leaves.emplace(t.first, c.first);
     }
     components.emplace(std::move(c));
 }

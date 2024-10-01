@@ -31,7 +31,7 @@ struct Directional final : Light {
 
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     explicit Directional(std::string&& name);

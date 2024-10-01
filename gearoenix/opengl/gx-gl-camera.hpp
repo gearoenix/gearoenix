@@ -36,7 +36,7 @@ struct CameraTarget final {
 struct Camera final : render::camera::Camera {
     GX_GET_CREF_PRV(CameraTarget, gl_target);
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
 

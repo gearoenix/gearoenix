@@ -10,6 +10,12 @@ namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::scene::Scene, 16>::construct();
 }
 
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::scene::Scene::get_hierarchy_types() const
+{
+    static const auto types = generate_hierarchy_types(this);
+    return types;
+}
+
 gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, std::string&& name)
     : Component(create_this_type_index(this), std::move(name))
     , e(e)
@@ -109,10 +115,4 @@ void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_
     } else {
         recreate_bvh = false;
     }
-}
-
-const boost::container::flat_set<std::type_index>& gearoenix::render::scene::Scene::get_all_the_hierarchy_types_except_component() const
-{
-    static const boost::container::flat_set types { create_this_type_index(this) };
-    return types;
 }

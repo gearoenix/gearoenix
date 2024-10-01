@@ -27,7 +27,7 @@ public:
 };
 
 struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     BakedReflection(
@@ -61,7 +61,7 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     GX_GET_CREF_PRV(GlCubeTargetV, gl_irradiance_targets_v);
     GX_GET_CREF_PRV(GlMippedCubeTargetV, gl_radiance_targets_v);
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     RuntimeReflection(

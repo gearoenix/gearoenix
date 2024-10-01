@@ -27,7 +27,7 @@ struct Animation {
     virtual void animate(Manager& manager, double time) = 0;
 };
 
-struct ArmatureAnimation final : public Animation {
+struct ArmatureAnimation final : Animation {
     const std::size_t bones_channels_count = 0;
     const std::size_t bones_channels_first_index = 0;
     const std::size_t bones_channels_end_index = 0;
@@ -37,12 +37,12 @@ struct ArmatureAnimation final : public Animation {
         std::size_t bones_channels_count,
         std::size_t bones_channels_first_index,
         std::size_t bones_channels_end_index);
-    ~ArmatureAnimation() final;
-    void animate(Manager& manager, double time) final;
+    ~ArmatureAnimation() override;
+    void animate(Manager& manager, double time) override;
     void animate(Manager& manager, const BoneChannel& bone_channel, double time);
 };
 
-struct SpriteAnimation final : public Animation {
+struct SpriteAnimation final : Animation {
     const std::shared_ptr<render::material::Sprite> sprite;
     const double count;
     const std::size_t width;
@@ -54,8 +54,8 @@ struct SpriteAnimation final : public Animation {
         std::shared_ptr<render::material::Sprite> sprite,
         std::size_t width,
         std::size_t height);
-    ~SpriteAnimation() final;
-    void animate(Manager& manager, double time) final;
+    ~SpriteAnimation() override;
+    void animate(Manager& manager, double time) override;
 };
 
 struct AnimationPlayer final : core::ecs::Component {
@@ -71,14 +71,14 @@ struct AnimationPlayer final : core::ecs::Component {
 
 public:
     AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
-    ~AnimationPlayer() final;
+    ~AnimationPlayer() override;
     [[nodiscard]] static std::shared_ptr<AnimationPlayer> construct(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
     void update_time(double delta_time);
     void set_loop_start_time(double t);
     void set_loop_end_time(double t);
     void set_loop_range_time(double start, double end);
     void animate(Manager& manager);
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 }
 #endif

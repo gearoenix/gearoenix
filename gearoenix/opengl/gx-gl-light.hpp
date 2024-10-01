@@ -19,7 +19,7 @@ struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirection
     GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1));
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
 
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     explicit ShadowCasterDirectionalLight(std::string&& name);

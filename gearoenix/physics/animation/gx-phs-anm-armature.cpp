@@ -19,8 +19,8 @@ std::shared_ptr<gearoenix::physics::animation::Armature> gearoenix::physics::ani
 
 gearoenix::physics::animation::Armature::~Armature() = default;
 
-const boost::container::flat_set<std::type_index>& gearoenix::physics::animation::Armature::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::animation::Armature::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types(this);
     return types;
 }

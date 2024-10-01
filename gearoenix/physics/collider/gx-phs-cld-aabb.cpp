@@ -5,6 +5,12 @@ namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Aabb3, 8192>::construct();
 }
 
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::collider::Aabb3::get_hierarchy_types() const
+{
+    static const auto types = generate_hierarchy_types(this);
+    return types;
+}
+
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
     : Component(create_this_type_index(this), std::move(name))
     , original_box(upper, lower)
@@ -49,10 +55,4 @@ void gearoenix::physics::collider::Aabb3::update(const math::Mat4x4<double>& tra
         updated_box.put_without_update(tmp.xyz());
     }
     updated_box.update();
-}
-
-const boost::container::flat_set<std::type_index>& gearoenix::physics::collider::Aabb3::get_all_the_hierarchy_types_except_component() const
-{
-    static const boost::container::flat_set types { create_this_type_index(this) };
-    return types;
 }

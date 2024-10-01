@@ -151,7 +151,7 @@ void gearoenix::physics::Transformation::local_z_rotate(const double d)
     local_matrix.set_location(loc);
 }
 
-void gearoenix::physics::Transformation::set_local_scale(const gearoenix::math::Vec3<double>& s)
+void gearoenix::physics::Transformation::set_local_scale(const math::Vec3<double>& s)
 {
     changed = true;
     local_matrix.local_scale(s / scale);
@@ -264,7 +264,7 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     x_axis = up.cross(z_axis).normalised();
     y_axis = z_axis.cross(x_axis).normalised();
     local_matrix = math::Mat4x4<double>::look_at(l, -x_axis, y_axis, -z_axis).inverted();
-    scale = math::Vec3<double>(1.0);
+    scale = math::Vec3(1.0);
 }
 
 void gearoenix::physics::Transformation::update_without_inverse_root()
@@ -343,7 +343,7 @@ void gearoenix::physics::Transformation::set_parent(const Transformation* const 
     this->parent = parent;
 }
 
-void gearoenix::physics::Transformation::show_debug_gui()
+void gearoenix::physics::Transformation::show_debug_gui_base()
 {
     if (ImGui::TreeNode("Transformation")) {
         auto l = get_local_location();
@@ -408,11 +408,9 @@ void gearoenix::physics::Transformation::reset(
     changed = true;
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::physics::TransformationComponent::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::TransformationComponent::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types {
-        create_this_type_index(this),
-    };
+    static const auto types = generate_hierarchy_types(this);
     return types;
 }
 
@@ -436,7 +434,7 @@ std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics:
 
 void gearoenix::physics::TransformationComponent::show_debug_gui()
 {
-    Transformation::show_debug_gui();
+    show_debug_gui_base();
 }
 
 void gearoenix::physics::TransformationComponent::update(core::ecs::World* const world)

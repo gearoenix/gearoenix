@@ -2,7 +2,6 @@
 #define GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-sky-types.hpp"
 
 namespace gearoenix::render::mesh {

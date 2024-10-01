@@ -70,12 +70,12 @@ public:
         const math::Vec3<double>& location);
     void add_child(const std::shared_ptr<Transformation>& child);
     void set_parent(const Transformation* parent);
-    void show_debug_gui();
+    void show_debug_gui_base();
 };
 
 struct TransformationComponent final : core::ecs::Component, Transformation {
 private:
-    [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const override;
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     explicit TransformationComponent(std::string&& name, const TransformationComponent* parent);

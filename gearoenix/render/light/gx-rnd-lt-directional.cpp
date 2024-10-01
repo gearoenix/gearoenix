@@ -21,9 +21,9 @@ gearoenix::render::light::Directional::Directional(std::string&& name)
 {
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::render::light::Directional::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::light::Directional::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_type_index<Light>(), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<Light>(this);
     return types;
 }
 

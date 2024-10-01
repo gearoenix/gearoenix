@@ -2,9 +2,7 @@
 #define GEAROENIX_CORE_ECS_ARCHETYPE_HPP
 #include "../../platform/gx-plt-log.hpp"
 #include "../allocator/gx-cr-alc-same-size-block.hpp"
-#include "../gx-cr-build-configuration.hpp"
 #include "../gx-cr-range.hpp"
-#include "../macro/gx-cr-mcr-assert.hpp"
 #include "../sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-condition.hpp"
@@ -14,13 +12,8 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 
-#include <algorithm>
 #include <array>
-#include <functional>
-#include <map>
-#include <optional>
 #include <type_traits>
-#include <vector>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -90,13 +83,14 @@ private:
 
     void delete_entity(std::shared_ptr<Component>* cs);
 
-    /// If it fails to find the the component it will return -1
+    /// If it fails to find the component it will return -1
     template <typename T>
     [[nodiscard]] std::size_t get_component_index() const
     {
         const auto search = components_indices.find(Component::create_type_index<T>());
-        if (components_indices.end() == search)
+        if (components_indices.end() == search) {
             return static_cast<std::size_t>(-1);
+        }
         return search->second;
     }
 

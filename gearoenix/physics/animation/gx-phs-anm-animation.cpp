@@ -147,7 +147,7 @@ gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::shared_ptr<Animation> animation,
     std::string&& name,
     const double starting_time)
-    : core::ecs::Component(core::ecs::Component::create_this_type_index(this), std::move(name))
+    : Component(create_this_type_index(this), std::move(name))
     , time(starting_time)
     , animation(std::move(animation))
 {
@@ -199,8 +199,8 @@ void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager)
     animation->animate(manager, time);
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::physics::animation::AnimationPlayer::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::animation::AnimationPlayer::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types(this);
     return types;
 }

@@ -9,27 +9,27 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     using namespace gearoenix::core::job;
     using namespace gearoenix::core::sync;
 
-    struct Position final : public Component {
+    struct Position final : Component {
         double x;
         double y;
 
         Position(const double x, const double y)
-            : Component(Component::create_this_type_index(this), "position")
+            : Component(create_this_type_index(this), "position")
             , x(x)
             , y(y)
         {
         }
 
-        ~Position() final = default;
+        ~Position() override = default;
 
-        [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final
+        [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override
         {
-            static const boost::container::flat_set<std::type_index> types { Component::create_this_type_index(this) };
+            static const auto types = generate_hierarchy_types(this);
             return types;
         }
     };
 
-    struct Speed final : public Component {
+    struct Speed final : Component {
         double x;
         double y;
 
@@ -40,11 +40,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         {
         }
 
-        ~Speed() final = default;
+        ~Speed() override = default;
 
-        [[nodiscard]] const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const final
+        [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override
         {
-            static const boost::container::flat_set<std::type_index> types { Component::create_this_type_index(this) };
+            static const auto types = generate_hierarchy_types(this);
             return types;
         }
     };
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     const auto check_systems = [&]() {
         std::atomic<int> e1s = 0, e2s = 0, e3s = 0, e4s = 0, e5s = 0;
 
-        w.parallel_system<All<Position>>([&](const entity_id_t ent, Position* const p, const unsigned int) {
+        w.parallel_system<All<Position>>([&](const entity_id_t ent, const Position* const p, const unsigned int) {
             if (e1 == ent && 2.0 == p->x && 3.0 == p->y) {
                 ++e1s;
             } else if (e2 == ent && 6.0 == p->x && 7.0 == p->y) {
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e4s == 1 && e5s == 1));
         e4s = e5s = 0;
 
-        w.parallel_system<Speed>([&](const entity_id_t ent, Speed* const s, const unsigned int) {
+        w.parallel_system<Speed>([&](const entity_id_t ent, const Speed* const s, const unsigned int) {
             if (e1 == ent && 4.0 == s->x && 5.0 == s->y) {
                 ++e1s;
             } else if (e3 == ent && 10.0 == s->x && 11.0 == s->y) {
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
         e1s = e3s = e4s = 0;
 
-        w.parallel_system<All<Speed, Position>>([&](const entity_id_t ent, Speed* const s, Position* const p, const unsigned int) {
+        w.parallel_system<All<Speed, Position>>([&](const entity_id_t ent, const Speed* const s, const Position* const p, const unsigned int) {
             if (e1 == ent && 2 == std::lround(p->x) && 3 == std::lround(p->y) && 4 == std::lround(s->x) && 5 == std::lround(s->y)) {
                 ++e1s;
             } else if (e3 == ent && 8 == std::lround(p->x) && 9 == std::lround(p->y) && 10 == std::lround(s->x) && 11 == std::lround(s->y)) {
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST((e1s == 1 && e3s == 1));
         e1s = e3s = 0;
 
-        w.parallel_system<All<Not<Speed>, Position>>([&](const entity_id_t ent, Speed*, Position* const p, const unsigned int) {
+        w.parallel_system<All<Not<Speed>, Position>>([&](const entity_id_t ent, const Speed* const, const Position* const p, const unsigned int) {
             if (e2 == ent && 6.0 == p->x && 7.0 == p->y) {
                 ++e2s;
             } else {
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST(e2s == 1);
         e2s = 0;
 
-        w.parallel_system<All<Speed, Not<Position>>>([&](const entity_id_t ent, Speed* const s, Position*, const unsigned int) {
+        w.parallel_system<All<Speed, Not<Position>>>([&](const entity_id_t ent, const Speed* const s, Position*, const unsigned int) {
             if (e4 == ent && 12.0 == s->x && 13.0 == s->y) {
                 ++e4s;
             } else {
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         BOOST_TEST(e4s == 1);
         e4s = 0;
 
-        w.parallel_system<Any<All<Speed, Position>, Speed>>([&](const entity_id_t ent, Speed* const s, Position*, const unsigned int) {
+        w.parallel_system<Any<All<Speed, Position>, Speed>>([&](const entity_id_t ent, const Speed* const s, Position*, const unsigned int) {
             if (e1 == ent && 4.0 == s->x && 5.0 == s->y) {
                 ++e1s;
             } else if (e3 == ent && 10.0 == s->x && 11.0 == s->y) {
@@ -448,11 +448,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         w.delayed_create_entity(std::move(b));
     }
 
-    w.delayed_add_components(e1, EndCaller<>([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    w.delayed_add_components(e2, EndCaller<>([] {}), std::make_shared<Position>(6.0, 7.0), std::make_shared<Speed>(-1.0, -1.0));
-    w.delayed_add_components(e3, EndCaller<>([] {}), std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    w.delayed_add_components(e4, EndCaller<>([] {}), std::make_shared<Speed>(12.0, 13.0), std::make_shared<Position>(-1.0, -1.0));
-    w.delayed_add_components(e5, EndCaller<>([] {}), std::make_shared<Speed>(-1.0, -1.0), std::make_shared<Position>(-1.0, -1.0));
+    w.delayed_add_components(e1, EndCaller([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
+    w.delayed_add_components(e2, EndCaller([] {}), std::make_shared<Position>(6.0, 7.0), std::make_shared<Speed>(-1.0, -1.0));
+    w.delayed_add_components(e3, EndCaller([] {}), std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
+    w.delayed_add_components(e4, EndCaller([] {}), std::make_shared<Speed>(12.0, 13.0), std::make_shared<Position>(-1.0, -1.0));
+    w.delayed_add_components(e5, EndCaller([] {}), std::make_shared<Speed>(-1.0, -1.0), std::make_shared<Position>(-1.0, -1.0));
 
     w.delayed_remove_components<Speed>(e2, EndCaller<>([] {}));
     w.delayed_remove_components<Position>(e4, EndCaller<>([] {}));

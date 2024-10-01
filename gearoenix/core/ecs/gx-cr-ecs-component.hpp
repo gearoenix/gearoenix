@@ -3,7 +3,6 @@
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-condition.hpp"
 #include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -11,6 +10,8 @@
 
 namespace gearoenix::core::ecs {
 struct Component {
+    typedef boost::container::flat_map<std::type_index, std::string> HierarchyTypes;
+
     GX_GET_REFC_PRT(std::type_index, final_type_index);
     GX_GET_REFC_PRT(std::string, name);
     GX_GETSET_VAL_PRV(bool, enabled, true);
@@ -18,7 +19,7 @@ struct Component {
 
 public:
     Component(std::type_index final_type_index, std::string&& name);
-    [[nodiscard]] virtual const boost::container::flat_set<std::type_index>& get_all_the_hierarchy_types_except_component() const = 0;
+    [[nodiscard]] virtual const HierarchyTypes& get_hierarchy_types() const = 0;
     virtual void set_component_self(const std::shared_ptr<Component>&);
 
     virtual ~Component() = default;
@@ -76,6 +77,26 @@ public:
         using DT = std::remove_pointer_t<std::remove_reference_t<std::remove_const_t<T>>>;
         type_check<DT>();
         return std::type_index(typeid(not_t<DT>));
+    }
+
+    template <typename T>
+    static std::string create_this_type_name(const T* const)
+    {
+        using DT = std::remove_pointer_t<std::remove_reference_t<std::remove_const_t<T>>>;
+        type_check<DT>();
+        return typeid(not_t<DT>).name();
+    }
+
+    template <typename... Types, typename T>
+    [[nodiscard]] static HierarchyTypes generate_hierarchy_types(const T* const ptr)
+    {
+        static_assert((std::is_base_of_v<Types, T> && ...));
+        static_assert((!std::is_same_v<Types, T> && ...));
+        static_assert((!std::is_same_v<Types, Component> && ...));
+        return {
+            { create_this_type_index(ptr), create_this_type_name(ptr) },
+            { std::type_index(typeid(Types)), typeid(Types).name() }...,
+        };
     }
 };
 }

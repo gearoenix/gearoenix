@@ -1,14 +1,13 @@
 #include "gx-rnd-lt-point.hpp"
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../../core/job/gx-cr-job-end-caller.hpp"
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::light::Point, 16>::construct();
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::render::light::Point::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::light::Point::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { std::type_index(typeid(Light)), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<Light>(this);
     return types;
 }
 

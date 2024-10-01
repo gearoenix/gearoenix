@@ -10,13 +10,9 @@ namespace {
 const auto shadow_caster_directional_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::ShadowCasterDirectionalLight, gearoenix::render::light::ShadowCasterDirectional::MAX_COUNT>::construct();
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::gl::ShadowCasterDirectionalLight::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::ShadowCasterDirectionalLight::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types {
-        create_type_index<Light>(),
-        create_type_index<ShadowCasterDirectional>(),
-        create_this_type_index(this)
-    };
+    static const auto types = generate_hierarchy_types<Light, ShadowCasterDirectional>(this);
     return types;
 }
 

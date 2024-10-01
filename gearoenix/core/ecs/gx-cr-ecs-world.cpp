@@ -96,7 +96,7 @@ void gearoenix::core::ecs::World::remove_components_list(
     for (std::size_t ti = 0; ti < sz; ++ti) {
         const auto& t = ts[ti];
         for (auto iter = cs.begin(); cs.end() != iter;) {
-            if (iter->second->get_all_the_hierarchy_types_except_component().contains(t)) {
+            if (iter->second->get_hierarchy_types().contains(t)) {
                 iter = cs.erase(iter);
             } else {
                 ++iter;

@@ -16,15 +16,15 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     components_indices_t cis;
     std::size_t index = 0;
     for (const auto& c : cs) {
-        const auto& ts = c.second->get_all_the_hierarchy_types_except_component();
+        const auto& ts = c.second->get_hierarchy_types();
         for (const auto& t : ts) {
-            if (const auto search = cis.find(t); cis.end() != search) {
+            if (const auto search = cis.find(t.first); cis.end() != search) {
                 GX_LOG_F("There is a duplicate type in the entity components map.\n"
                          "No two component types can have overlapping component types in their hierarchy map.\n"
                          "Clashing component: "
                     << c.second->get_name());
             }
-            cis.emplace(t, index);
+            cis.emplace(t.first, index);
         }
         ++index;
     }

@@ -28,9 +28,9 @@ gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Textur
 }
 }
 
-const boost::container::flat_set<std::type_index>& gearoenix::gl::Skybox::get_all_the_hierarchy_types_except_component() const
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Skybox::get_hierarchy_types() const
 {
-    static const boost::container::flat_set types { create_type_index<render::skybox::Skybox>(), create_this_type_index(this) };
+    static const auto types = generate_hierarchy_types<render::skybox::Skybox>(this);
     return types;
 }
 
