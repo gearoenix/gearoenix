@@ -146,8 +146,9 @@ public:
     void parallel_system(F&& fun)
     {
         for (auto& archetype : archetypes) {
-            if (!archetype.second->satisfy<Condition>())
+            if (!archetype.second->satisfy<Condition>()) {
                 continue;
+            }
             archetype.second->parallel_system_conditioned<Condition>(fun);
         }
     }
@@ -158,8 +159,9 @@ public:
     void synchronised_system(F&& fun)
     {
         for (auto& archetype : archetypes) {
-            if (!archetype.second->satisfy<Condition>())
+            if (!archetype.second->satisfy<Condition>()) {
                 continue;
+            }
             archetype.second->synchronised_system_conditioned<Condition>(fun);
         }
     }
@@ -167,7 +169,7 @@ public:
     /// It will do all the delayed actions
     void update();
 
-    void show_debug_gui();
+    void show_debug_gui() const;
 
     [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, job::EndCaller<>&& entity_exists_in_world);
 };

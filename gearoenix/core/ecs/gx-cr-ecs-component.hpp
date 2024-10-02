@@ -3,6 +3,7 @@
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-condition.hpp"
 #include <boost/container/flat_map.hpp>
+#include <boost/core/demangle.hpp>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -16,6 +17,11 @@ struct Component {
     GX_GET_REFC_PRT(std::string, name);
     GX_GETSET_VAL_PRV(bool, enabled, true);
     GX_GET_CREF_PRV(std::weak_ptr<Component>, component_self);
+
+    static boost::container::flat_map<std::type_index, std::string> type_index_to_name;
+    static boost::container::flat_map<std::string, std::type_index> type_name_to_index;
+
+    static void register_type(std::type_index t, std::string name);
 
 public:
     Component(std::type_index final_type_index, std::string&& name);
@@ -84,7 +90,7 @@ public:
     {
         using DT = std::remove_pointer_t<std::remove_reference_t<std::remove_const_t<T>>>;
         type_check<DT>();
-        return typeid(not_t<DT>).name();
+        return boost::core::demangle(typeid(not_t<DT>).name());
     }
 
     template <typename... Types, typename T>
@@ -93,11 +99,17 @@ public:
         static_assert((std::is_base_of_v<Types, T> && ...));
         static_assert((!std::is_same_v<Types, T> && ...));
         static_assert((!std::is_same_v<Types, Component> && ...));
+        register_type(create_this_type_index(ptr), create_this_type_name(ptr));
+        (register_type(std::type_index(typeid(Types)), typeid(Types).name()), ...);
         return {
             { create_this_type_index(ptr), create_this_type_name(ptr) },
             { std::type_index(typeid(Types)), typeid(Types).name() }...,
         };
     }
+
+    static const boost::container::flat_map<std::type_index, std::string>& get_type_index_to_name() { return type_index_to_name; }
+
+    static const boost::container::flat_map<std::string, std::type_index>& get_type_name_to_index() { return type_name_to_index; }
 };
 }
 #endif

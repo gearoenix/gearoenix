@@ -62,6 +62,7 @@ private:
 
     const components_indices_t components_indices;
     const std::size_t entity_size;
+    const std::string name;
     allocator::SameSizeBlock alc;
     boost::container::flat_set<std::uint8_t*> entities;
 
@@ -74,6 +75,8 @@ private:
     [[nodiscard]] static std::size_t get_components_size(const EntityBuilder::components_t&);
 
     [[nodiscard]] static components_indices_t get_components_indices(const EntityBuilder::components_t&);
+
+    [[nodiscard]] static std::string create_name(const EntityBuilder::components_t&);
 
     explicit Archetype(const EntityBuilder::components_t&);
 
@@ -111,11 +114,12 @@ private:
     void move_out_entity(std::shared_ptr<Component>* cs, EntityBuilder::components_t& components);
 
     template <typename ComponentType, std::size_t I>
-    inline static ComponentType* get_component_ptr(const std::shared_ptr<Component>* cs, const std::size_t* const is)
+    static ComponentType* get_component_ptr(const std::shared_ptr<Component>* cs, const std::size_t* const is)
     {
         const std::size_t index = is[I];
-        if (static_cast<std::size_t>(-1) == index)
+        if (static_cast<std::size_t>(-1) == index) {
             return nullptr;
+        }
         Component* const rc = cs[index].get();
         if constexpr (std::is_final_v<ComponentType>) {
             return static_cast<ComponentType*>(rc);

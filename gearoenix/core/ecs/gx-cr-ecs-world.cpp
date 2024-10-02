@@ -134,8 +134,9 @@ gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(cons
     if (archetypes.end() == search) {
         bool is_ok = false;
         std::tie(search, is_ok) = archetypes.emplace(archetype_id, std::unique_ptr<Archetype>(new Archetype(cs)));
-        if (!is_ok)
+        if (!is_ok) {
             GX_LOG_F("Insertion in archetype map was not successful");
+        }
     }
     return search->second.get();
 }
@@ -194,17 +195,23 @@ void gearoenix::core::ecs::World::update()
     }
 }
 
-void gearoenix::core::ecs::World::show_debug_gui()
+void gearoenix::core::ecs::World::show_debug_gui() const
 {
     if (ImGui::TreeNode("ECS World")) {
         ImGui::Text("Number of Archetypes: %zu", archetypes.size());
         ImGui::Text("Number of Entities: %zu", entities.size());
         ImGui::Text("Number of Entity Names: %zu", name_to_entity_id.size());
-        if (ImGui::TreeNode("Entities")) {
-            for (const auto& name_id : name_to_entity_id) {
-                auto search = entities.find(name_id.second);
-                GX_ASSERT_D(entities.end() != search);
-                search->second.show_debug_gui();
+        if (ImGui::TreeNode("Archetypes")) {
+            for (const auto& a : archetypes) {
+                if (ImGui::TreeNode(a.second->name.c_str())) {
+                    for (const auto* const entity_ptr : a.second->entities) {
+                        const auto entity_id = *reinterpret_cast<const entity_id_t*>(entity_ptr);
+                        const auto search = entities.find(entity_id);
+                        GX_ASSERT_D(search != entities.end());
+                        search->second.show_debug_gui();
+                    }
+                    ImGui::TreePop();
+                }
             }
             ImGui::TreePop();
         }

@@ -31,9 +31,24 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     return cis;
 }
 
+std::string gearoenix::core::ecs::Archetype::create_name(const EntityBuilder::components_t& cs)
+{
+    std::string s = "[ ";
+    for (const auto& c : cs) {
+        const auto search = Component::get_type_index_to_name().find(c.first);
+        GX_ASSERT_D(search != Component::get_type_index_to_name().end());
+        s += search->second;
+        s += " , ";
+    }
+    s += "]";
+    s.shrink_to_fit();
+    return s;
+}
+
 gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs)
     : components_indices(get_components_indices(cs))
     , entity_size(header_size + get_components_size(cs))
+    , name(create_name(cs))
     , alc(entity_size, 2048)
 {
 }
