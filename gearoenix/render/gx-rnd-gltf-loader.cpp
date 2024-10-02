@@ -892,7 +892,8 @@ struct DataLoader final {
             const auto entity_builder = e.get_world()->create_shared_builder(
                 std::string(node.name),
                 core::job::EndCaller(entity_end_callback));
-            auto transform = physics::TransformationComponent::construct(node.name + "-transformation", parent_transform);
+            auto transform = physics::TransformationComponent::construct(
+                node.name + "-transformation", parent_transform, entity_builder->get_id());
             entity_builder->get_builder().add_component(transform);
             scene_builder->get_scene().add_empty(entity_builder->get_id());
             apply_transform(node, *transform);

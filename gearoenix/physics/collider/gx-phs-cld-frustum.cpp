@@ -11,8 +11,9 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::colli
     return types;
 }
 
-gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points)
-    : Component(create_this_type_index(this), std::move(name))
+gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points,
+    const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , frustum(points)
 {
     for (const auto& p : points) {
@@ -22,9 +23,10 @@ gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::ar
 }
 
 std::shared_ptr<gearoenix::physics::collider::Frustum> gearoenix::physics::collider::Frustum::construct(
-    std::string&& name, const std::array<math::Vec3<double>, 8>& points)
+    std::string&& name, const std::array<math::Vec3<double>, 8>& points,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = frustum_allocator->make_shared(std::move(name), points);
+    auto self = frustum_allocator->make_shared(std::move(name), points, entity_id);
     self->set_component_self(self);
     return self;
 }

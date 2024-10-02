@@ -12,10 +12,10 @@ struct Aabb3 final : core::ecs::Component {
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
-    Aabb3(const math::Aabb3<double>& original_box, std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Aabb3> construct(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Aabb3> construct(const math::Aabb3<double>& original_box, std::string&& name);
+    Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name, core::ecs::entity_id_t entity_id);
+    Aabb3(const math::Aabb3<double>& original_box, std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Aabb3> construct(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Aabb3> construct(const math::Aabb3<double>& original_box, std::string&& name, core::ecs::entity_id_t entity_id);
     ~Aabb3() override;
     void update(const math::Mat4x4<double>& transform);
 };

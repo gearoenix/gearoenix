@@ -8,8 +8,9 @@ gearoenix::render::reflection::Baked::Baked(
     std::shared_ptr<texture::TextureCube>&& irradiance,
     std::shared_ptr<texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box,
-    std::string&& name)
-    : Probe(e, final_component_type_index, std::move(irradiance), std::move(radiance), include_box, std::move(name))
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
+    : Probe(e, final_component_type_index, std::move(irradiance), std::move(radiance), include_box, std::move(name), entity_id)
 {
 }
 

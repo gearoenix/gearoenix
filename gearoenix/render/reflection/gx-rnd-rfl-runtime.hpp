@@ -78,7 +78,8 @@ struct Runtime : Probe {
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
     void set_runtime_reflection_self(
         const std::shared_ptr<Runtime>& runtime_self,
         const std::shared_ptr<Builder>& builder,

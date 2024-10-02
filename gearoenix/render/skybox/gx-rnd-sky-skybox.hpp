@@ -21,7 +21,8 @@ struct Skybox : core::ecs::Component {
         std::type_index final_component_type_index,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         Texture&& bound_texture,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
 
 public:
     ~Skybox() override;

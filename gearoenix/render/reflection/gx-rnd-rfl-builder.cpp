@@ -9,8 +9,8 @@ gearoenix::render::reflection::Builder::Builder(
     engine::Engine& e, std::string&& name,
     physics::TransformationComponent* parent_transform,
     core::job::EndCaller<>&& end_callback)
-    : transformation(physics::TransformationComponent::construct(name + "-transform", parent_transform))
-    , entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
+    : entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
+    , transformation(physics::TransformationComponent::construct(name + "-transform", parent_transform, entity_builder->get_id()))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(transformation);

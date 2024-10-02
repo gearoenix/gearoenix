@@ -12,8 +12,9 @@ gearoenix::gl::BakedReflection::BakedReflection(
     Engine& e,
     std::shared_ptr<TextureCube>&& irr,
     std::shared_ptr<TextureCube>&& rad,
-    const math::Aabb3<double>& include_box)
-    : Baked(e, create_this_type_index(this), std::move(irr), std::move(rad), include_box, std::move(name))
+    const math::Aabb3<double>& include_box,
+    const core::ecs::entity_id_t entity_id)
+    : Baked(e, create_this_type_index(this), std::move(irr), std::move(rad), include_box, std::move(name), entity_id)
 {
     gl_irradiance = std::dynamic_pointer_cast<TextureCube>(irradiance);
     gl_radiance = std::dynamic_pointer_cast<TextureCube>(radiance);
@@ -37,10 +38,11 @@ std::shared_ptr<gearoenix::gl::BakedReflection> gearoenix::gl::BakedReflection::
     Engine& e,
     std::shared_ptr<TextureCube>&& irr,
     std::shared_ptr<TextureCube>&& rad,
-    const math::Aabb3<double>& include_box)
+    const math::Aabb3<double>& include_box,
+    const core::ecs::entity_id_t entity_id)
 {
     static const auto allocator = core::allocator::SharedArray<BakedReflection, MAX_COUNT>::construct();
-    auto self = allocator->make_shared(std::move(name), e, std::move(irr), std::move(rad), include_box);
+    auto self = allocator->make_shared(std::move(name), e, std::move(irr), std::move(rad), include_box, entity_id);
     self->set_component_self(self);
     return self;
 }
@@ -52,8 +54,9 @@ gearoenix::gl::RuntimeReflection::RuntimeReflection(
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
-    std::string&& name)
-    : Runtime(e, create_this_type_index(this), receive_box, exclude_box, include_box, std::move(name))
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
+    : Runtime(e, create_this_type_index(this), receive_box, exclude_box, include_box, std::move(name), entity_id)
     , gl_environment_targets_v()
     , gl_irradiance_targets_v()
 {
@@ -75,10 +78,11 @@ void gearoenix::gl::RuntimeReflection::construct(
     const std::uint32_t environment_resolution,
     const std::uint32_t irradiance_resolution,
     const std::uint32_t radiance_resolution,
+    const core::ecs::entity_id_t entity_id,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
     static const auto allocator = core::allocator::SharedArray<RuntimeReflection, MAX_COUNT>::construct();
-    auto self = allocator->make_shared(e, receive_box, exclude_box, include_box, std::move(name));
+    auto self = allocator->make_shared(e, receive_box, exclude_box, include_box, std::move(name), entity_id);
     end_callback.set_return(std::shared_ptr(self));
     self->set_runtime_reflection_self(
         self, builder, environment_resolution, irradiance_resolution, radiance_resolution,
@@ -144,7 +148,8 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
         name + "-gl-reflection", e,
         std::dynamic_pointer_cast<TextureCube>(std::move(irradiance_texture)),
         std::dynamic_pointer_cast<TextureCube>(std::move(radiance_texture)),
-        include_box));
+        include_box,
+        builder.get_id()));
 }
 
 void gearoenix::gl::ReflectionBuilder::construct_runtime(
@@ -164,6 +169,7 @@ void gearoenix::gl::ReflectionBuilder::construct_runtime(
     RuntimeReflection::construct(
         e, builder, receive_box, exclude_box, include_box, std::string(name),
         environment_resolution, irradiance_resolution, radiance_resolution,
+        builder->get_id(),
         core::job::EndCallerShared<RuntimeReflection>([e = std::move(probe_end_callback), b = builder](std::shared_ptr<RuntimeReflection>&& t) mutable -> void {
             b->entity_builder->get_builder().add_component(std::move(t));
             e.set_return(std::move(b));

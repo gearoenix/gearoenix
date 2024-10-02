@@ -144,8 +144,9 @@ gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(cons
 gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const entity_id_t id)
 {
     const auto search = entities.find(id);
-    if (entities.end() == search)
+    if (entities.end() == search) {
         return nullptr;
+    }
     return &search->second;
 }
 

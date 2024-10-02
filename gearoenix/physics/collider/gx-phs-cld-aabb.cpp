@@ -11,15 +11,15 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::colli
     return types;
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
-    : Component(create_this_type_index(this), std::move(name))
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name, const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , original_box(upper, lower)
     , updated_box(original_box)
 {
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name)
-    : Component(create_this_type_index(this), std::move(name))
+gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name, const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , original_box(original_box)
     , updated_box(original_box)
 {
@@ -28,17 +28,19 @@ gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_b
 std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collider::Aabb3::construct(
     const math::Vec3<double>& upper,
     const math::Vec3<double>& lower,
-    std::string&& name)
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(upper, lower, std::move(name));
+    auto self = allocator->make_shared(upper, lower, std::move(name), entity_id);
     return self;
 }
 
 std::shared_ptr<gearoenix::physics::collider::Aabb3> gearoenix::physics::collider::Aabb3::construct(
     const math::Aabb3<double>& original_box,
-    std::string&& name)
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(original_box, std::move(name));
+    auto self = allocator->make_shared(original_box, std::move(name), entity_id);
     return self;
 }
 

@@ -37,12 +37,14 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Skybox::ge
 gearoenix::gl::Skybox::Skybox(
     render::skybox::Texture&& texture,
     std::shared_ptr<Mesh>&& mesh,
-    std::string&& name)
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
     : render::skybox::Skybox(
           create_this_type_index(this),
           std::shared_ptr<render::mesh::Mesh>(mesh),
           std::move(texture),
-          std::move(name))
+          std::move(name),
+          entity_id)
     , gl_texture(::convert(bound_texture))
     , gl_mesh(std::move(mesh))
 {
@@ -75,9 +77,10 @@ gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const
 std::shared_ptr<gearoenix::gl::Skybox> gearoenix::gl::Skybox::construct(
     render::skybox::Texture&& texture,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
-    std::string&& name)
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name));
+    auto self = allocator->make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name), entity_id);
     self->set_component_self(self);
     return self;
 }
@@ -93,7 +96,8 @@ gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
     entity_builder->get_builder().add_component(Skybox::construct(
         std::move(bound_texture),
         std::move(mesh),
-        entity_builder->get_builder().get_name() + "-gl-skybox"));
+        entity_builder->get_builder().get_name() + "-gl-skybox",
+        entity_builder->get_id()));
 }
 
 gearoenix::gl::SkyboxBuilder::~SkyboxBuilder() = default;

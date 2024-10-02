@@ -1,6 +1,5 @@
 #include "gx-cr-ecs-component.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
-#include <boost/core/demangle.hpp>
 
 boost::container::flat_map<std::type_index, std::string> gearoenix::core::ecs::Component::type_index_to_name;
 
@@ -20,9 +19,10 @@ void gearoenix::core::ecs::Component::register_type(std::type_index t, std::stri
     type_name_to_index.emplace(std::move(name), t);
 }
 
-gearoenix::core::ecs::Component::Component(const std::type_index final_type_index, std::string&& name)
+gearoenix::core::ecs::Component::Component(const std::type_index final_type_index, std::string&& name, const entity_id_t entity_id)
     : final_type_index(final_type_index)
     , name(std::move(name))
+    , entity_id(entity_id)
 {
 }
 

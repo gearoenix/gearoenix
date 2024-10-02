@@ -146,8 +146,9 @@ auto animation_player_allocator = gearoenix::core::allocator::SharedArray<gearoe
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::shared_ptr<Animation> animation,
     std::string&& name,
-    const double starting_time)
-    : Component(create_this_type_index(this), std::move(name))
+    const double starting_time,
+    const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , time(starting_time)
     , animation(std::move(animation))
 {
@@ -158,9 +159,10 @@ gearoenix::physics::animation::AnimationPlayer::~AnimationPlayer() = default;
 std::shared_ptr<gearoenix::physics::animation::AnimationPlayer> gearoenix::physics::animation::AnimationPlayer::construct(
     std::shared_ptr<Animation> animation,
     std::string&& name,
-    const double starting_time)
+    const double starting_time,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = animation_player_allocator->make_shared(std::move(animation), std::move(name), starting_time);
+    auto self = animation_player_allocator->make_shared(std::move(animation), std::move(name), starting_time, entity_id);
     self->set_component_self(self);
     return self;
 }

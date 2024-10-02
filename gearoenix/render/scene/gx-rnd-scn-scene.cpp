@@ -16,8 +16,9 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::scene:
     return types;
 }
 
-gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, std::string&& name)
-    : Component(create_this_type_index(this), std::move(name))
+gearoenix::render::scene::Scene::Scene(
+    engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , e(e)
     , ssao_settings(0.08f, 0.001f, 0.000f, 0.003f)
     , layer(layer)
@@ -26,9 +27,9 @@ gearoenix::render::scene::Scene::Scene(engine::Engine& e, const double layer, st
 }
 
 std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::render::scene::Scene::construct(
-    engine::Engine& e, const double layer, std::string&& name)
+    engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(e, layer, std::move(name));
+    auto self = allocator->make_shared(e, layer, std::move(name), entity_id);
     self->set_component_self(self);
     return self;
 }

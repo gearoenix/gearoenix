@@ -10,8 +10,8 @@ private:
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    explicit Point(std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Point> construct(std::string&& name);
+    Point(std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Point> construct(std::string&& name, core::ecs::entity_id_t entity_id);
     ~Point() override;
 };
 }

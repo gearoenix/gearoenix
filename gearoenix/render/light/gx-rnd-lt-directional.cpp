@@ -15,8 +15,9 @@ namespace {
 const auto directional_allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::light::Directional, gearoenix::render::light::Directional::MAX_COUNT>::construct();
 }
 
-gearoenix::render::light::Directional::Directional(std::string&& name)
-    : Light(create_this_type_index(this), std::move(name))
+gearoenix::render::light::Directional::Directional(std::string&& name,
+    const core::ecs::entity_id_t entity_id)
+    : Light(create_this_type_index(this), std::move(name), entity_id)
     , direction(0.0f, 0.0f, -1.0f)
 {
 }
@@ -27,9 +28,11 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::light:
     return types;
 }
 
-std::shared_ptr<gearoenix::render::light::Directional> gearoenix::render::light::Directional::construct(std::string&& name)
+std::shared_ptr<gearoenix::render::light::Directional> gearoenix::render::light::Directional::construct(
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = directional_allocator->make_shared(std::move(name));
+    auto self = directional_allocator->make_shared(std::move(name), entity_id);
     self->set_component_self(self);
     return self;
 }
@@ -37,8 +40,9 @@ std::shared_ptr<gearoenix::render::light::Directional> gearoenix::render::light:
 gearoenix::render::light::Directional::~Directional() = default;
 
 gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
-    const std::type_index final_type_index, std::string&& name)
-    : Light(final_type_index, std::move(name))
+    const std::type_index final_type_index, std::string&& name,
+    const core::ecs::entity_id_t entity_id)
+    : Light(final_type_index, std::move(name), entity_id)
 {
 }
 

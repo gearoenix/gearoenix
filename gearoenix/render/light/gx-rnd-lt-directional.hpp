@@ -34,8 +34,8 @@ struct Directional final : Light {
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    explicit Directional(std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Directional> construct(std::string&& name);
+    Directional(std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Directional> construct(std::string&& name, core::ecs::entity_id_t entity_id);
     ~Directional() override;
 };
 
@@ -49,7 +49,7 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<physics::TransformationComponent>, shadow_transform);
     GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, 0);
 
-    ShadowCasterDirectional(std::type_index final_type_index, std::string&& name);
+    ShadowCasterDirectional(std::type_index final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
 
 public:
     ~ShadowCasterDirectional() override;

@@ -5,14 +5,15 @@ namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::Armature, 16>::construct();
 }
 
-gearoenix::physics::animation::Armature::Armature(std::string&& name)
-    : Component(create_this_type_index(this), std::move(name))
+gearoenix::physics::animation::Armature::Armature(std::string&& name, const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
 {
 }
 
-std::shared_ptr<gearoenix::physics::animation::Armature> gearoenix::physics::animation::Armature::construct(std::string&& name)
+std::shared_ptr<gearoenix::physics::animation::Armature> gearoenix::physics::animation::Armature::construct(
+    std::string&& name, const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(std::move(name));
+    auto self = allocator->make_shared(std::move(name), entity_id);
     self->set_component_self(self);
     return self;
 }

@@ -16,15 +16,16 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::ShadowCast
     return types;
 }
 
-gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(std::string&& name)
-    : ShadowCasterDirectional(create_this_type_index(this), std::move(name))
+gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(
+    std::string&& name, const core::ecs::entity_id_t entity_id)
+    : ShadowCasterDirectional(create_this_type_index(this), std::move(name), entity_id)
 {
 }
 
 std::shared_ptr<gearoenix::gl::ShadowCasterDirectionalLight> gearoenix::gl::ShadowCasterDirectionalLight::construct(
-    std::string&& name)
+    std::string&& name, const core::ecs::entity_id_t entity_id)
 {
-    auto self = shadow_caster_directional_allocator->make_shared(std::move(name));
+    auto self = shadow_caster_directional_allocator->make_shared(std::move(name), entity_id);
     self->set_component_self(self);
     return self;
 }
@@ -57,7 +58,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
     , eng(e)
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(ShadowCasterDirectionalLight::construct(name + "-gl-directional-shadow-caster"));
+    b.add_component(ShadowCasterDirectionalLight::construct(name + "-gl-directional-shadow-caster", b.get_id()));
 }
 
 gearoenix::gl::LightBuilder::LightBuilder(

@@ -21,12 +21,14 @@ public:
         Engine& e,
         std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
         std::string&& name,
-        bool is_transformable);
+        bool is_transformable,
+        core::ecs::entity_id_t entity_id);
     [[nodiscard]] static std::shared_ptr<Model> construct(
         Engine& e,
         std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         std::string&& name,
-        bool is_transformable);
+        bool is_transformable,
+        core::ecs::entity_id_t entity_id);
     ~Model() override;
 };
 

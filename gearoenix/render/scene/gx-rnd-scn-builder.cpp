@@ -20,7 +20,7 @@ gearoenix::render::scene::Builder::Builder(
     , e(e)
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(Scene::construct(e, layer, name + "-scene"));
+    b.add_component(Scene::construct(e, layer, name + "-scene", b.get_id()));
 }
 
 gearoenix::render::scene::Builder::~Builder() = default;

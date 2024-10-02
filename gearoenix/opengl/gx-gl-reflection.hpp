@@ -35,13 +35,15 @@ public:
         Engine& e,
         std::shared_ptr<TextureCube>&& irr,
         std::shared_ptr<TextureCube>&& rad,
-        const math::Aabb3<double>& include_box);
+        const math::Aabb3<double>& include_box,
+        core::ecs::entity_id_t entity_id);
     [[nodiscard]] static std::shared_ptr<BakedReflection> construct(
         std::string&& name,
         Engine& e,
         std::shared_ptr<TextureCube>&& irr,
         std::shared_ptr<TextureCube>&& rad,
-        const math::Aabb3<double>& include_box);
+        const math::Aabb3<double>& include_box,
+        core::ecs::entity_id_t entity_id);
     ~BakedReflection() override;
 };
 
@@ -69,7 +71,8 @@ public:
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
     static void construct(
         Engine& e,
         const std::shared_ptr<render::reflection::Builder>& builder,
@@ -80,6 +83,7 @@ public:
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
+        core::ecs::entity_id_t entity_id,
         core::job::EndCallerShared<RuntimeReflection>&& end_callback);
     ~RuntimeReflection() override;
 };

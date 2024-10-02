@@ -76,7 +76,8 @@ protected:
         engine::Engine& e,
         std::type_index final_type,
         const std::string& name,
-        Target&& target);
+        Target&& target,
+        core::ecs::entity_id_t entity_id);
     void set_component_self(const std::shared_ptr<Component>&) override;
 
 public:
@@ -90,7 +91,7 @@ public:
     void set_view(const math::Mat4x4<float>& view);
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
     void disable_customised_target_aspect_ratio();
-    /// This will return customised_target_aspect_ratio value if it is has been set or the actual target aspect ratio
+    /// This returns customised_target_aspect_ratio value if it is set or the actual target aspect ratio
     [[nodiscard]] float get_target_aspect_ratio() const;
     void set_projection_data(ProjectionData);
     void update_projection();

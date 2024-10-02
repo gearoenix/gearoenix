@@ -22,8 +22,8 @@ struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirection
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    explicit ShadowCasterDirectionalLight(std::string&& name);
-    [[nodiscard]] static std::shared_ptr<ShadowCasterDirectionalLight> construct(std::string&& name);
+    explicit ShadowCasterDirectionalLight(std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<ShadowCasterDirectionalLight> construct(std::string&& name, core::ecs::entity_id_t entity_id);
     ~ShadowCasterDirectionalLight() override;
     void set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback) override;
     void set_shadow_map_target(std::shared_ptr<render::texture::Target>&& t) override;

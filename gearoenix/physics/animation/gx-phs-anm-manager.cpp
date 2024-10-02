@@ -60,7 +60,7 @@ void gearoenix::physics::animation::Manager::create_armature(
 
     const auto root_index = bones.size();
 
-    auto arm = Armature::construct(builder.get_name() + "-armature");
+    auto arm = Armature::construct(builder.get_name() + "-armature", builder.get_id());
     arm->root_bone_index = root_index;
     builder.add_component(std::move(arm));
 
@@ -82,7 +82,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     core::ecs::EntityBuilder& builder,
     ArmatureAnimationInfo& info)
 {
-    const std::lock_guard<std::mutex> _lg(this_lock);
+    const std::lock_guard _lg(this_lock);
     const std::size_t bones_channels_count = info.channels.size();
     const std::size_t bones_channels_first_index = bones_channels.size();
     for (auto& bone_channel : info.channels) {
@@ -124,7 +124,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     if (!info.name.empty()) {
         animations_map.emplace(info.name, anim);
     }
-    builder.add_component(AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player"));
+    builder.add_component(AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id()));
 }
 
 void gearoenix::physics::animation::Manager::create_sprite_player(
@@ -138,7 +138,7 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
     if (!name.empty()) {
         animations_map.emplace(std::move(name), anim);
     }
-    auto player = AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player");
+    auto player = AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
     player->set_loop_range_time(0.0, 0.999);
     builder.add_component(std::move(player));
 }

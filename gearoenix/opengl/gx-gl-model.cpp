@@ -18,12 +18,14 @@ gearoenix::gl::Model::Model(
     Engine&,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
     std::string&& name,
-    const bool is_transformable)
+    const bool is_transformable,
+    const core::ecs::entity_id_t entity_id)
     : render::model::Model(
           create_this_type_index(this),
           is_transformable,
           std::move(bound_meshes),
-          std::move(name))
+          std::move(name),
+          entity_id)
 {
     gl_meshes.reserve(meshes.size());
     for (const auto& mesh : meshes) {
@@ -35,9 +37,10 @@ std::shared_ptr<gearoenix::gl::Model> gearoenix::gl::Model::Model::construct(
     Engine& e,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     std::string&& name,
-    const bool is_transformable)
+    const bool is_transformable,
+    const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(e, std::move(meshes), std::move(name), is_transformable);
+    auto self = allocator->make_shared(e, std::move(meshes), std::move(name), is_transformable, entity_id);
     self->set_component_self(self);
     return self;
 }
@@ -55,7 +58,7 @@ gearoenix::gl::ModelBuilder::ModelBuilder(
     , e(e)
 {
     entity_builder->get_builder().add_component(Model::construct(
-        e, std::move(meshes), std::move(name), is_transformable));
+        e, std::move(meshes), std::move(name), is_transformable, entity_builder->get_id()));
 }
 
 gearoenix::gl::ModelBuilder::~ModelBuilder() = default;

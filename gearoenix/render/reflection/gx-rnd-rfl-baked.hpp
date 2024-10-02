@@ -21,7 +21,8 @@ protected:
         std::shared_ptr<texture::TextureCube>&& irradiance,
         std::shared_ptr<texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
 
 public:
     ~Baked() override;

@@ -70,9 +70,13 @@ struct AnimationPlayer final : core::ecs::Component {
     GX_GET_REFC_PRV(std::shared_ptr<Animation>, animation);
 
 public:
-    AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
+    AnimationPlayer(std::shared_ptr<Animation> animation, std::string&& name, double starting_time, core::ecs::entity_id_t entity_id);
     ~AnimationPlayer() override;
-    [[nodiscard]] static std::shared_ptr<AnimationPlayer> construct(std::shared_ptr<Animation> animation, std::string&& name, double starting_time = 0.0);
+    [[nodiscard]] static std::shared_ptr<AnimationPlayer> construct(
+        std::shared_ptr<Animation> animation,
+        std::string&& name,
+        double starting_time,
+        core::ecs::entity_id_t entity_id);
     void update_time(double delta_time);
     void set_loop_start_time(double t);
     void set_loop_end_time(double t);

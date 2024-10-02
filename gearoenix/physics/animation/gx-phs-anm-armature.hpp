@@ -7,8 +7,8 @@ struct Manager;
 struct Armature final : core::ecs::Component {
     std::size_t root_bone_index = static_cast<std::size_t>(-1);
 
-    explicit Armature(std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Armature> construct(std::string&& name);
+    Armature(std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Armature> construct(std::string&& name, core::ecs::entity_id_t entity_id);
     ~Armature() override;
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };

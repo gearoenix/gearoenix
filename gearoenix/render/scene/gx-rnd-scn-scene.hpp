@@ -54,8 +54,9 @@ struct Scene final : core::ecs::Component {
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    Scene(engine::Engine& e, double layer, std::string&& name);
-    [[nodiscard]] static std::shared_ptr<Scene> construct(engine::Engine& e, double layer, std::string&& name);
+    Scene(engine::Engine& e, double layer, std::string&& name, core::ecs::entity_id_t entity_id);
+    [[nodiscard]] static std::shared_ptr<Scene> construct(
+        engine::Engine& e, double layer, std::string&& name, core::ecs::entity_id_t entity_id);
     ~Scene() override;
     void add_model(core::ecs::entity_id_t entity, model::Model& m);
     void add_camera(core::ecs::entity_id_t entity, camera::Camera& c);

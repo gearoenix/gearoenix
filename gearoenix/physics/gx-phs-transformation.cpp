@@ -415,16 +415,16 @@ const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::Trans
 }
 
 gearoenix::physics::TransformationComponent::TransformationComponent(
-    std::string&& name, const TransformationComponent* const parent)
-    : Component(create_this_type_index(this), std::move(name))
+    std::string&& name, const TransformationComponent* const parent, const core::ecs::entity_id_t entity_id)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
     , Transformation(parent)
 {
 }
 
 std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(
-    std::string&& name, TransformationComponent* const parent)
+    std::string&& name, TransformationComponent* const parent, const core::ecs::entity_id_t entity_id)
 {
-    auto self = allocator->make_shared(std::move(name), parent);
+    auto self = allocator->make_shared(std::move(name), parent, entity_id);
     self->set_component_self(self);
     if (nullptr != parent) {
         parent->add_child(self);

@@ -20,8 +20,9 @@ gearoenix::render::reflection::Runtime::Runtime(
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
-    std::string&& name)
-    : Probe(e, final_component_type_index, include_box, std::move(name))
+    std::string&& name,
+    const core::ecs::entity_id_t entity_id)
+    : Probe(e, final_component_type_index, include_box, std::move(name), entity_id)
     , on_rendered([] {})
     , receive_box(receive_box)
     , exclude_box(exclude_box)

@@ -66,14 +66,14 @@ void gearoenix::gl::Camera::update_target(gearoenix::core::job::EndCaller<>&& en
     }));
 }
 
-gearoenix::gl::Camera::Camera(Engine& e, const std::string& name, render::camera::Target&& target)
-    : render::camera::Camera(e, create_this_type_index(this), name, std::move(target))
+gearoenix::gl::Camera::Camera(Engine& e, const std::string& name, render::camera::Target&& target, const core::ecs::entity_id_t entity_id)
+    : render::camera::Camera(e, create_this_type_index(this), name, std::move(target), entity_id)
 {
 }
 
-void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c)
+void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c, const core::ecs::entity_id_t entity_id)
 {
-    c.set_return(allocator->make_shared(e, name, render::camera::Target()));
+    c.set_return(allocator->make_shared(e, name, render::camera::Target(), entity_id));
     c.get_return()->set_component_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
@@ -98,11 +98,13 @@ void gearoenix::gl::CameraBuilder::construct(
 {
     builder_end_caller.set_return(std::make_shared<CameraBuilder>(
         e, name, std::move(entity_end_caller), parent_transform));
+    const auto entity_id = builder_end_caller.get_return()->get_id();
     Camera::construct(
         e, name + "-gl-camera",
         core::job::EndCallerShared<Camera>([b = std::move(builder_end_caller)](std::shared_ptr<Camera>&& c) {
             b.get_return()->get_entity_builder()->get_builder().add_component(std::move(c));
-        }));
+        }),
+        entity_id);
 }
 
 gearoenix::gl::CameraBuilder::~CameraBuilder() = default;

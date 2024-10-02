@@ -78,9 +78,9 @@ private:
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    explicit TransformationComponent(std::string&& name, const TransformationComponent* parent);
+    explicit TransformationComponent(std::string&& name, const TransformationComponent* parent, core::ecs::entity_id_t entity_id);
     [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(
-        std::string&& name, TransformationComponent* parent);
+        std::string&& name, TransformationComponent* parent, core::ecs::entity_id_t entity_id);
     void show_debug_gui() override;
     static void update(core::ecs::World* world);
 };

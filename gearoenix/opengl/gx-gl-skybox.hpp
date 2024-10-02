@@ -26,11 +26,13 @@ public:
     Skybox(
         render::skybox::Texture&& texture,
         std::shared_ptr<Mesh>&& mesh,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
     [[nodiscard]] static std::shared_ptr<Skybox> construct(
         render::skybox::Texture&& texture,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
     ~Skybox() override;
     [[nodiscard]] uint get_vertex_object() const;
     [[nodiscard]] uint get_index_buffer() const;

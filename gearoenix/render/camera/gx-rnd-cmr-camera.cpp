@@ -21,8 +21,9 @@ gearoenix::render::camera::Camera::Camera(
     engine::Engine& e,
     const std::type_index final_type,
     const std::string& name,
-    Target&& target)
-    : Component(final_type, std::string(name))
+    Target&& target,
+    const core::ecs::entity_id_t entity_id)
+    : Component(final_type, std::string(name), entity_id)
     , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))

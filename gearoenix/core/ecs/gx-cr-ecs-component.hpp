@@ -2,6 +2,7 @@
 #define GEAROENIX_CORE_ECS_COMPONENT_HPP
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-condition.hpp"
+#include "gx-cr-ecs-types.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/core/demangle.hpp>
 #include <memory>
@@ -17,6 +18,7 @@ struct Component {
     GX_GET_REFC_PRT(std::string, name);
     GX_GETSET_VAL_PRV(bool, enabled, true);
     GX_GET_CREF_PRV(std::weak_ptr<Component>, component_self);
+    GX_GET_VAL_PRT(entity_id_t, entity_id, 0);
 
     static boost::container::flat_map<std::type_index, std::string> type_index_to_name;
     static boost::container::flat_map<std::string, std::type_index> type_name_to_index;
@@ -24,7 +26,7 @@ struct Component {
     static void register_type(std::type_index t, std::string name);
 
 public:
-    Component(std::type_index final_type_index, std::string&& name);
+    Component(std::type_index final_type_index, std::string&& name, entity_id_t entity_id);
     [[nodiscard]] virtual const HierarchyTypes& get_hierarchy_types() const = 0;
     virtual void set_component_self(const std::shared_ptr<Component>&);
 

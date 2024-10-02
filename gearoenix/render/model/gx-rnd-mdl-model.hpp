@@ -20,7 +20,8 @@ struct Model : core::ecs::Component {
         std::type_index final_component_type,
         bool is_transformable,
         std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
-        std::string&& name);
+        std::string&& name,
+        core::ecs::entity_id_t entity_id);
 
 public:
     /// By having a value (even an empty one) we show that we want to have camera filtering enabled
