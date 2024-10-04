@@ -141,7 +141,7 @@ gearoenix::metal::TextureManager::~TextureManager()
     texture_descriptor.mipmapLevelCount = pixels.size() == 1 && info.has_mipmap ? render::texture::Texture::compute_mipmaps_count(info.width, info.height) : pixels.size();
     id<MTLTexture> texture = [e.get_heap_manager()->gpu newTextureWithDescriptor:texture_descriptor];
     auto result = std::make_shared<Texture2D>(e, texture, sampler, info, std::move(name));
-    core::job::EndCaller end([c, result] {});
+    core::job::EndCaller end([c, result] { });
     e.get_uploader()->upload(texture, texture_descriptor, std::move(pixels), std::move(end));
     return result;
 }

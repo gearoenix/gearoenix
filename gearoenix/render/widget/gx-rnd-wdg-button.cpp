@@ -146,7 +146,7 @@ void gearoenix::render::widget::Button::construct(
         name + "-model",
         parent ? parent->get_transform().get() : nullptr,
         { std::move(button_mesh) },
-        core::job::EndCaller([] {}),
+        core::job::EndCaller([] { }),
         true);
     const auto id = model_builder->get_id();
     auto but = std::make_shared<Button>(std::move(name), parent->e);

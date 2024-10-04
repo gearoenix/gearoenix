@@ -62,7 +62,7 @@ public:
     template <typename... ComponentsTypes>
     void add_components(const entity_id_t ei, std::shared_ptr<ComponentsTypes>&&... components)
     {
-        EntityBuilder b(ei, std::string(entities.find(ei)->second.name), job::EndCaller([] {}));
+        EntityBuilder b(ei, std::string(entities.find(ei)->second.name), job::EndCaller([] { }));
         b.add_components(std::move(components)...);
         add_components_map(ei, std::move(b.components));
     }

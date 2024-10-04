@@ -55,7 +55,7 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
     if (nullptr == world) {
         return;
     }
-    world->delayed_delete_entity(shadow_camera_entity_id, core::job::EndCaller([] {}));
+    world->delayed_delete_entity(shadow_camera_entity_id, core::job::EndCaller([] { }));
 }
 
 void gearoenix::render::light::ShadowCasterDirectional::initialise(
@@ -125,10 +125,10 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(
         texture::TextureInfo()
             .set_format(texture::TextureFormat::D32)
             .set_sampler_info(texture::SamplerInfo()
-                                  .set_min_filter(texture::Filter::Nearest)
-                                  .set_mag_filter(texture::Filter::Nearest)
-                                  .set_wrap_s(texture::Wrap::ClampToEdge)
-                                  .set_wrap_t(texture::Wrap::ClampToEdge))
+                    .set_min_filter(texture::Filter::Nearest)
+                    .set_mag_filter(texture::Filter::Nearest)
+                    .set_wrap_s(texture::Wrap::ClampToEdge)
+                    .set_wrap_t(texture::Wrap::ClampToEdge))
             .set_width(resolution)
             .set_height(resolution)
             .set_type(texture::Type::Texture2D)

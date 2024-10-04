@@ -55,7 +55,7 @@ std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::metal::MeshManager::bu
         vb, ib, std::move(occlusion_box),
         static_cast<NSUInteger>(sizeof(render::PbrVertex)),
         vsz, static_cast<NSUInteger>(indices.size()));
-    core::job::EndCaller end([c, m] {});
+    core::job::EndCaller end([c, m] { });
     auto* const u = eng.get_uploader();
     u->upload(vb, vertices, core::job::EndCaller(end));
     u->upload(ib, indices, std::move(end));

@@ -123,10 +123,10 @@ gearoenix::render::widget::Widget::Widget(
     : e(e)
     , name(std::move(n))
     , widget_type(widget_type)
-    , on_press([](const math::Vec3<double>&) -> void {})
-    , on_release([](const math::Vec3<double>&) -> void {})
-    , on_click([](const math::Vec3<double>&) -> void {})
-    , on_cancel([]() -> void {})
+    , on_press([](const math::Vec3<double>&) -> void { })
+    , on_release([](const math::Vec3<double>&) -> void { })
+    , on_click([](const math::Vec3<double>&) -> void { })
+    , on_cancel([]() -> void { })
 {
 }
 

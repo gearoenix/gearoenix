@@ -34,7 +34,7 @@ else
   exit 1
 fi
 
-expected_version=18
+expected_version=19
 
 if ((major_version < expected_version)); then
   echo "${text_red}Error clang-format major version is equal to or greater than ${expected_version}.${text_reset}"

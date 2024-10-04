@@ -63,7 +63,7 @@ void gearoenix::render::widget::Text::construct(
     auto model_builder = e.get_model_manager()->build(
         r->name + "-model-text", parent ? parent->get_transform().get() : nullptr,
         { std::move(msh) },
-        core::job::EndCaller([] {}),
+        core::job::EndCaller([] { }),
         true);
     r->set_model_entity_id(model_builder->get_id());
     r->set_camera_entity_id(camera_id);
@@ -77,7 +77,7 @@ void gearoenix::render::widget::Text::construct(
 
 gearoenix::render::widget::Text::~Text()
 {
-    e.get_world()->delayed_delete_entity(model_entity_id, core::job::EndCaller([] {}));
+    e.get_world()->delayed_delete_entity(model_entity_id, core::job::EndCaller([] { }));
 }
 
 gearoenix::math::Vec2<double> gearoenix::render::widget::Text::get_text_size() const

@@ -71,7 +71,7 @@ struct GameApp final : public GxCoreApp {
         : GxCoreApp(plt_app)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([] {}));
+            "scene", 0.0, GxEndCaller([] { }));
         scene_builder->get_scene().set_enabled(true);
 
         for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
@@ -126,7 +126,7 @@ struct GameApp final : public GxCoreApp {
         auto model_builder = render_engine.get_model_manager()->build(
             "icosphere" + postfix, nullptr,
             { std::move(mesh) },
-            GxEndCaller([] {}),
+            GxEndCaller([] { }),
             true);
         model_builder->get_transformation().local_translate(
             { static_cast<double>(metallic) * 30.0 - 15.0,

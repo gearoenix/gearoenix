@@ -89,7 +89,7 @@ struct Position final : GxComp {
 };
 
 Speed::Speed()
-    : GxComp(create_this_type_index(this), "speed")
+    : GxComp(create_this_type_index(this), "speed", 0)
     , value(
           speed_distribution(random_engine),
           speed_distribution(random_engine),
@@ -147,7 +147,7 @@ const gearoenix::core::ecs::Component::HierarchyTypes& Speed::get_hierarchy_type
 }
 
 Position::Position()
-    : GxComp(create_this_type_index(this), "position")
+    : GxComp(create_this_type_index(this), "position", 0)
     , value(
           space_distribution(random_engine),
           space_distribution(random_engine),
@@ -231,7 +231,7 @@ struct GameApp final : GxCoreApp {
             auto model_builder = render_engine.get_model_manager()->build(
                 "triangle" + std::to_string(model_index), nullptr,
                 { std::move(meshes[model_index]) },
-                GxEndCaller([] {}),
+                GxEndCaller([] { }),
                 true);
             auto speed = Speed::construct();
             auto position = Position::construct();

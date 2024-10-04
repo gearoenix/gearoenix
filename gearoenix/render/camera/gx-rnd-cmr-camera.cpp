@@ -55,7 +55,7 @@ void gearoenix::render::camera::Camera::set_component_self(const std::shared_ptr
                 if (nullptr == cam) {
                     return false;
                 }
-                cam->update_target(core::job::EndCaller([] {}));
+                cam->update_target(core::job::EndCaller([] { }));
                 return true;
             });
     }
@@ -144,7 +144,7 @@ void gearoenix::render::camera::Camera::update_projection()
     view_projection = projection * view;
 
     if (debug_enabled) {
-        create_debug_mesh(core::job::EndCaller([] {}));
+        create_debug_mesh(core::job::EndCaller([] { }));
     }
 }
 

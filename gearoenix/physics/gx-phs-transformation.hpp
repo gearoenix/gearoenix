@@ -69,7 +69,7 @@ public:
         const math::Vec3<double>& z_axis,
         const math::Vec3<double>& location);
     void add_child(const std::shared_ptr<Transformation>& child);
-    void set_parent(const Transformation* parent);
+    void set_parent(const Transformation*);
     void show_debug_gui_base();
 };
 

@@ -51,7 +51,7 @@ gearoenix::core::sync::KernelWorkers::~KernelWorkers()
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver)
 {
-    add_step([] {}, std::move(worker), [] {}, std::move(receiver));
+    add_step([] { }, std::move(worker), [] { }, std::move(receiver));
 }
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver)

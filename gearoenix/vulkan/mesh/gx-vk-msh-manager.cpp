@@ -113,7 +113,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     waiter_queue->submit(*cmd, *fence);
     waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
-        waiter->push([cmd = std::move(cmd)] {});
+        waiter->push([cmd = std::move(cmd)] { });
     });
 }
 

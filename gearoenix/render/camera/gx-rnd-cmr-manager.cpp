@@ -37,6 +37,6 @@ void gearoenix::render::camera::Manager::update()
 void gearoenix::render::camera::Manager::window_resized()
 {
     e.get_world()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) -> void {
-        c->update_target(core::job::EndCaller([] {}));
+        c->update_target(core::job::EndCaller([] { }));
     });
 }

@@ -17,7 +17,7 @@ struct GameApp final : public gearoenix::core::Application {
         : Application(plt_app)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, gearoenix::core::job::EndCaller([] {}));
+            "scene", 0.0, gearoenix::core::job::EndCaller([] { }));
         scene_builder->get_scene().set_enabled(true);
 
         render_engine.get_skybox_manager()->build(

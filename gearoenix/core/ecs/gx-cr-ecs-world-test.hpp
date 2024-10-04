@@ -13,8 +13,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         double x;
         double y;
 
-        Position(const double x, const double y)
-            : Component(create_this_type_index(this), "position")
+        Position(const double x, const double y, const entity_id_t entity_id)
+            : Component(create_this_type_index(this), "position", entity_id)
             , x(x)
             , y(y)
         {
@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         double x;
         double y;
 
-        Speed(const double x, const double y)
-            : Component(Component::create_this_type_index(this), "speed")
+        Speed(const double x, const double y, const entity_id_t entity_id)
+            : Component(Component::create_this_type_index(this), "speed", entity_id)
             , x(x)
             , y(y)
         {
@@ -202,35 +202,35 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     };
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Position>(2.0, 3.0, b.get_id()), std::make_shared<Speed>(4.0, 5.0, b.get_id()));
         e1 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Position>(6.0, 7.0));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Position>(6.0, 7.0, b.get_id()));
         e2 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Speed>(10.0, 11.0, b.get_id()), std::make_shared<Position>(8.0, 9., b.get_id()));
         e3 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Speed>(12.0, 13.0));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Speed>(12.0, 13.0, b.get_id()));
         e4 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.create_entity(std::move(b));
     }
@@ -238,77 +238,77 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     end_of_step();
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
         e1 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
         e2 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
         e3 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
         e4 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.create_entity(std::move(b));
     }
 
-    w.add_components(e1, std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    w.add_components(e2, std::make_shared<Position>(6.0, 7.0));
-    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0));
+    w.add_components(e1, std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
+    w.add_components(e2, std::make_shared<Position>(6.0, 7.0, e2));
+    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
+    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0, e4));
 
     end_of_step();
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
         e1 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
         e2 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
         e3 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
         e4 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.create_entity(std::move(b));
     }
 
-    w.add_components(e1, std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    w.add_components(e2, std::make_shared<Position>(6.0, 7.0), std::make_shared<Speed>(-1.0, -1.0));
-    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0), std::make_shared<Position>(-1.0, -1.0));
-    w.add_components(e5, std::make_shared<Speed>(-1.0, -1.0), std::make_shared<Position>(-1.0, -1.0));
+    w.add_components(e1, std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
+    w.add_components(e2, std::make_shared<Position>(6.0, 7.0, e2), std::make_shared<Speed>(-1.0, -1.0, e2));
+    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
+    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0, e4), std::make_shared<Position>(-1.0, -1.0, e4));
+    w.add_components(e5, std::make_shared<Speed>(-1.0, -1.0, e5), std::make_shared<Position>(-1.0, -1.0, e5));
 
     w.remove_components<Speed>(e2);
     w.remove_components<Position>(e4);
@@ -319,35 +319,35 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     // Delayed tests -------------------------------------------------------------
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Position>(2.0, 3.0, b.get_id()), std::make_shared<Speed>(4.0, 5.0, b.get_id()));
         e1 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Position>(6.0, 7.0));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Position>(6.0, 7.0, b.get_id()));
         e2 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Speed>(10.0, 11.0, b.get_id()), std::make_shared<Position>(8.0, 9.0, b.get_id()));
         e3 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
-        b.add_components(std::make_shared<Speed>(12.0, 13.0));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
+        b.add_components(std::make_shared<Speed>(12.0, 13.0, b.get_id()));
         e4 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
@@ -355,16 +355,16 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.update();
     end_of_step();
 
-    EntityBuilder b21("21", EndCaller<>([] {})),
-        b22("22", EndCaller<>([] {})),
-        b23("23", EndCaller<>([] {})),
-        b24("24", EndCaller<>([] {})),
-        b25("25", EndCaller<>([] {}));
+    EntityBuilder b21("21", EndCaller<>([] { })),
+        b22("22", EndCaller<>([] { })),
+        b23("23", EndCaller<>([] { })),
+        b24("24", EndCaller<>([] { })),
+        b25("25", EndCaller<>([] { }));
 
-    b21.add_components(std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    b22.add_component(std::make_shared<Position>(6.0, 7.0));
-    b23.add_components(std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    b24.add_components(std::make_shared<Speed>(12.0, 13.0));
+    b21.add_components(std::make_shared<Position>(2.0, 3.0, b21.get_id()), std::make_shared<Speed>(4.0, 5.0, b21.get_id()));
+    b22.add_component(std::make_shared<Position>(6.0, 7.0, b22.get_id()));
+    b23.add_components(std::make_shared<Speed>(10.0, 11.0, b23.get_id()), std::make_shared<Position>(8.0, 9.0, b23.get_id()));
+    b24.add_components(std::make_shared<Speed>(12.0, 13.0, b24.get_id()));
 
     e1 = b21.get_id();
     w.delayed_create_entity(std::move(b21));
@@ -381,82 +381,82 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     end_of_step();
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
         e1 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
         e2 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
         e3 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
         e4 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
-    w.delayed_add_components(e1, EndCaller<>([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    w.delayed_add_components(e2, EndCaller<>([] {}), std::make_shared<Position>(6.0, 7.0));
-    w.delayed_add_components(e3, EndCaller<>([] {}), std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    w.delayed_add_components(e4, EndCaller<>([] {}), std::make_shared<Speed>(12.0, 13.0));
+    w.delayed_add_components(e1, EndCaller<>([] { }), std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
+    w.delayed_add_components(e2, EndCaller<>([] { }), std::make_shared<Position>(6.0, 7.0, e2));
+    w.delayed_add_components(e3, EndCaller<>([] { }), std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
+    w.delayed_add_components(e4, EndCaller<>([] { }), std::make_shared<Speed>(12.0, 13.0, e4));
 
     w.update();
     end_of_step();
 
     {
-        auto b = EntityBuilder("1", EndCaller<>([] {}));
+        auto b = EntityBuilder("1", EndCaller<>([] { }));
         e1 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("2", EndCaller<>([] {}));
+        auto b = EntityBuilder("2", EndCaller<>([] { }));
         e2 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("3", EndCaller<>([] {}));
+        auto b = EntityBuilder("3", EndCaller<>([] { }));
         e3 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("4", EndCaller<>([] {}));
+        auto b = EntityBuilder("4", EndCaller<>([] { }));
         e4 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
-        auto b = EntityBuilder("5", EndCaller<>([] {}));
+        auto b = EntityBuilder("5", EndCaller<>([] { }));
         e5 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
-    w.delayed_add_components(e1, EndCaller([] {}), std::make_shared<Position>(2.0, 3.0), std::make_shared<Speed>(4.0, 5.0));
-    w.delayed_add_components(e2, EndCaller([] {}), std::make_shared<Position>(6.0, 7.0), std::make_shared<Speed>(-1.0, -1.0));
-    w.delayed_add_components(e3, EndCaller([] {}), std::make_shared<Speed>(10.0, 11.0), std::make_shared<Position>(8.0, 9.0));
-    w.delayed_add_components(e4, EndCaller([] {}), std::make_shared<Speed>(12.0, 13.0), std::make_shared<Position>(-1.0, -1.0));
-    w.delayed_add_components(e5, EndCaller([] {}), std::make_shared<Speed>(-1.0, -1.0), std::make_shared<Position>(-1.0, -1.0));
+    w.delayed_add_components(e1, EndCaller([] { }), std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
+    w.delayed_add_components(e2, EndCaller([] { }), std::make_shared<Position>(6.0, 7.0, e2), std::make_shared<Speed>(-1.0, -1.0, e2));
+    w.delayed_add_components(e3, EndCaller([] { }), std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
+    w.delayed_add_components(e4, EndCaller([] { }), std::make_shared<Speed>(12.0, 13.0, e4), std::make_shared<Position>(-1.0, -1.0, e4));
+    w.delayed_add_components(e5, EndCaller([] { }), std::make_shared<Speed>(-1.0, -1.0, e5), std::make_shared<Position>(-1.0, -1.0, e5));
 
-    w.delayed_remove_components<Speed>(e2, EndCaller<>([] {}));
-    w.delayed_remove_components<Position>(e4, EndCaller<>([] {}));
-    w.delayed_remove_components<Position, Speed>(e5, EndCaller<>([] {}));
+    w.delayed_remove_components<Speed>(e2, EndCaller<>([] { }));
+    w.delayed_remove_components<Position>(e4, EndCaller<>([] { }));
+    w.delayed_remove_components<Position, Speed>(e5, EndCaller<>([] { }));
 
     w.update();
     end_of_step();

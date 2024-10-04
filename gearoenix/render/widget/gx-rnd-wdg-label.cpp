@@ -89,7 +89,7 @@ void gearoenix::render::widget::Label::construct(
         name + "-model",
         parent ? parent->get_transform().get() : nullptr,
         { std::move(msh) },
-        core::job::EndCaller([] {}),
+        core::job::EndCaller([] { }),
         true);
     scene_builder->add(std::shared_ptr(model_builder));
     auto result = std::make_shared<Label>(std::move(name), e);

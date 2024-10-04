@@ -17,7 +17,7 @@ struct Layout : core::event::Listener {
     engine::Engine& e;
 
     explicit Layout(engine::Engine& e)
-        : e(e) {};
+        : e(e) { };
     ~Layout() override = default;
 };
 

@@ -80,7 +80,7 @@ struct GameApp final : public GxCoreApp {
         : Application(plt_app)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([] {}));
+            "scene", 0.0, GxEndCaller([] { }));
         scene_builder->get_scene().set_enabled(true);
 
         for (int metallic_i = 0; metallic_i < 10; ++metallic_i) {
@@ -133,12 +133,12 @@ struct GameApp final : public GxCoreApp {
 #if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
                     const std::shared_ptr<GxStream> rl(
                         new GxLocal(platform_application, "exported.gx-reflection", true));
-                    r->export_baked(rl, GxEndCaller([] {}));
+                    r->export_baked(rl, GxEndCaller([] { }));
 #endif
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT)
                     const std::shared_ptr<GxStream> tl(
                         new GxLocal(platform_application, "sky.gx-cube-texture", true));
-                    r->get_environment()->write(tl, GxEndCaller([] {}));
+                    r->get_environment()->write(tl, GxEndCaller([] { }));
 #endif
                 });
 #endif
@@ -167,7 +167,7 @@ struct GameApp final : public GxCoreApp {
         auto model_builder = render_engine.get_model_manager()->build(
             "icosphere" + postfix, nullptr,
             { std::move(mesh) },
-            GxEndCaller([] {}),
+            GxEndCaller([] { }),
             true);
         model_builder->get_transformation().local_translate(
             { static_cast<double>(metallic) * 30.0 - 15.0,

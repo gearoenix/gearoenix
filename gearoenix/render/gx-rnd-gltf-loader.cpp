@@ -144,10 +144,10 @@ struct DataLoader final {
         const auto txt_info = texture::TextureInfo()
                                   .set_format(texture::TextureFormat::Unknown)
                                   .set_sampler_info(texture::SamplerInfo()
-                                                        .set_min_filter(convert_filter(smp.minFilter))
-                                                        .set_mag_filter(convert_filter(smp.magFilter))
-                                                        .set_wrap_s(convert_wrap(smp.wrapS))
-                                                        .set_wrap_t(convert_wrap(smp.wrapT)))
+                                          .set_min_filter(convert_filter(smp.minFilter))
+                                          .set_mag_filter(convert_filter(smp.magFilter))
+                                          .set_wrap_s(convert_wrap(smp.wrapS))
+                                          .set_wrap_t(convert_wrap(smp.wrapT)))
                                   .set_width(0)
                                   .set_height(0)
                                   .set_depth(0)
@@ -964,7 +964,7 @@ struct DataLoader final {
         case physics::animation::Interpolation::Gltf2CubicSPLine: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
-                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
+                data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 const std::size_t in_ptr = curr_output_ptr;
                 const auto in = Value<double>(*reinterpret_cast<const Value<float>*>(in_ptr));
                 curr_output_ptr += sizeof(Value<float>);
@@ -987,7 +987,7 @@ struct DataLoader final {
         case physics::animation::Interpolation::Linear: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
-                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
+                data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
                     times[data_i],
                     physics::animation::KeyframeLinear<Value<double>> {
@@ -998,7 +998,7 @@ struct DataLoader final {
         case physics::animation::Interpolation::Step: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
             for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
-                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
+                data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
                     times[data_i],
                     physics::animation::KeyframeStep<Value<double>> {

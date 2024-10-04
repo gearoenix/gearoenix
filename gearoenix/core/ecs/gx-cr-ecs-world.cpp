@@ -17,7 +17,7 @@ void gearoenix::core::ecs::World::delayed_create_entity(EntityBuilder&& b)
 {
     const std::lock_guard _lg(delayed_actions_lock);
     delayed_actions.push_back(Action {
-        .callback = job::EndCaller([] {}),
+        .callback = job::EndCaller([] { }),
         .variant = Action::CreateEntity { .builder = std::move(b) },
     });
 }

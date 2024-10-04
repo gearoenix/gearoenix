@@ -40,16 +40,16 @@ void gearoenix::render::widget::Edit::init(const core::job::EndCaller<core::job:
     auto* const mdl_mgr = ast_mgr->get_model_manager();
     auto* const fnt_mgr = ast_mgr->get_font_manager();
 
-    core::job::EndCaller<mesh::Mesh> msh_end([c](const std::shared_ptr<mesh::Mesh>&) {});
+    core::job::EndCaller<mesh::Mesh> msh_end([c](const std::shared_ptr<mesh::Mesh>&) { });
     const auto plate_mesh = msh_mgr->create_plate(msh_end);
 
-    core::job::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) {});
+    core::job::EndCaller<font::Font> fend([c](const std::shared_ptr<font::Font>&) { });
     text_font = fnt_mgr->get_default_2d(fend);
 
     text_material->set_translucency(material::TranslucencyMode::Transparent);
     hint_text_material->set_translucency(material::TranslucencyMode::Transparent);
 
-    core::job::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) {});
+    core::job::EndCaller<model::Dynamic> mdl_end([c](const std::shared_ptr<model::Dynamic>&) { });
 
     text_model = mdl_mgr->create<model::Dynamic>("gx-edit-" + name + "-txt", mdl_end);
     text_model->add_mesh(std::make_shared<model::Mesh>(plate_mesh, text_material));

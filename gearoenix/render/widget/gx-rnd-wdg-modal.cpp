@@ -61,7 +61,7 @@ void gearoenix::render::widget::Modal::construct(
             values->return_value.modal->name + "-background-model",
             parent ? parent->get_transform().get() : nullptr,
             { values->msh },
-            core::job::EndCaller([] {}),
+            core::job::EndCaller([] { }),
             true);
         values->return_value.modal->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(
             values->return_value.background_model_builder->get_transformation().get_component_self().lock());

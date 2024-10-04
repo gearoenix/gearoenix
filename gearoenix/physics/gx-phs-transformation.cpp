@@ -338,9 +338,9 @@ void gearoenix::physics::Transformation::add_child(const std::shared_ptr<Transfo
     children.insert(child);
 }
 
-void gearoenix::physics::Transformation::set_parent(const Transformation* const parent)
+void gearoenix::physics::Transformation::set_parent(const Transformation* const p)
 {
-    this->parent = parent;
+    this->parent = p;
 }
 
 void gearoenix::physics::Transformation::show_debug_gui_base()

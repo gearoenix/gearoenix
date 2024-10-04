@@ -267,8 +267,8 @@ private:
         if (node.leaf) {
             const auto data_size = node.left;
             for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                 data_index < data_size;
-                 ++data_index, data_ptr += sizeof(Data)) {
+                data_index < data_size;
+                ++data_index, data_ptr += sizeof(Data)) {
                 function(*reinterpret_cast<Data*>(data_ptr));
             }
         } else {
@@ -291,8 +291,8 @@ private:
         if (node.leaf) {
             const auto data_size = node.left;
             for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                 data_index < data_size;
-                 ++data_index, data_ptr += sizeof(Data)) {
+                data_index < data_size;
+                ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
                 const auto is = cld.check_intersection_status(d.box);
                 if (math::IntersectionStatus::Out == is)
@@ -321,8 +321,8 @@ private:
         if (node.leaf) {
             const auto data_size = node.left;
             for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                 data_index < data_size;
-                 ++data_index, data_ptr += sizeof(Data)) {
+                data_index < data_size;
+                ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
                 const auto is = cld.check_intersection_status(d.box);
                 if (math::IntersectionStatus::Out == is)

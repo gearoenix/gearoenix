@@ -43,7 +43,7 @@ public:
     ~KernelWorkers();
     void add_step(
         std::function<void(const unsigned int)> worker,
-        std::function<void()> receiver = [] {});
+        std::function<void()> receiver = [] { });
     void add_step(
         std::function<void()> sender,
         std::function<void(const unsigned int)> worker,

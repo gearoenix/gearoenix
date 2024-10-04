@@ -47,12 +47,12 @@ struct GameApp final : public gearoenix::core::Application {
     void set_mesh(GxMeshPtr&& mesh)
     {
         auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([] {}));
+            "scene", 0.0, GxEndCaller([] { }));
 
         auto model_builder = render_engine.get_model_manager()->build(
             "triangle-model", nullptr,
             { std::move(mesh) },
-            GxEndCaller([] {}),
+            GxEndCaller([] { }),
             true);
         scene_builder->add(std::move(model_builder));
 
