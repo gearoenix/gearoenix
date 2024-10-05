@@ -160,9 +160,10 @@ void gearoenix::render::camera::Camera::set_far(const float f)
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::show_debug_gui()
+void gearoenix::render::camera::Camera::show_debug_gui(const core::ecs::World& w)
 {
     if (ImGui::TreeNode("Camera")) {
+        Component::show_debug_gui(w);
         bool input_changed = false;
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");

@@ -15,7 +15,7 @@ protected:
 
 public:
     ~Light() override;
-    void show_debug_gui() override;
+    void show_debug_gui(const core::ecs::World&) override;
 };
 }
 #endif

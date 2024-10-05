@@ -11,4 +11,6 @@
 #define GX_STR_8(a) GX_STR_7(a)
 #define GX_STR_9(a) GX_STR_8(a)
 #define GX_STRINGIFY(a) GX_STR_9(a)
+
+#define GX_STRINGIFY_VAR(a) ((void)a, GX_STRINGIFY(a))
 #endif

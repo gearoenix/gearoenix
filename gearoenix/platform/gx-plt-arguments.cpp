@@ -1,5 +1,6 @@
 #include "gx-plt-arguments.hpp"
 #include "../core/gx-cr-string.hpp"
+#include "gx-plt-log.hpp"
 
 std::string gearoenix::platform::Arguments::extract_process_directory(const std::string& s)
 {

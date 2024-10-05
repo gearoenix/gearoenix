@@ -46,6 +46,7 @@ private:
 
 public:
     World() = default;
+    World(const World&) = delete;
     //--------------------------------------Entity creation----------------------------------------------
     /// You must know your context (state of world), unless you want to end up having race
     void create_entity(EntityBuilder&&);

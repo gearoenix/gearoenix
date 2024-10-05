@@ -1,10 +1,12 @@
 #include "gx-phs-transformation.hpp"
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
+#include "../core/gx-cr-string.hpp"
 #include <imgui/imgui.h>
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192>::construct();
+const auto component_type_name = boost::core::demangle(typeid(gearoenix::physics::TransformationComponent).name());
 }
 
 gearoenix::physics::Transformation::Transformation(const Transformation* const parent)
@@ -432,9 +434,20 @@ std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics:
     return self;
 }
 
-void gearoenix::physics::TransformationComponent::show_debug_gui()
+void gearoenix::physics::TransformationComponent::show_debug_gui(const core::ecs::World& w)
 {
-    show_debug_gui_base();
+    const auto this_hex = core::String::ptr_to_hex_string(this);
+    static std::string tree_id;
+    tree_id.clear();
+    tree_id += component_type_name;
+    tree_id += " [";
+    tree_id += this_hex.data();
+    tree_id += "]";
+    if (ImGui::TreeNode(tree_id.c_str())) {
+        Component::show_debug_gui(w);
+        show_debug_gui_base();
+        ImGui::TreePop();
+    }
 }
 
 void gearoenix::physics::TransformationComponent::update(core::ecs::World* const world)

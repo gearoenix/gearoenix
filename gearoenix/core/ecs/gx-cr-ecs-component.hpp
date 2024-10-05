@@ -11,6 +11,7 @@
 #include <typeindex>
 
 namespace gearoenix::core::ecs {
+struct World;
 struct Component {
     typedef boost::container::flat_map<std::type_index, std::string> HierarchyTypes;
 
@@ -36,7 +37,7 @@ public:
     Component& operator=(Component&&) = delete;
     Component& operator=(const Component&) = delete;
 
-    virtual void show_debug_gui() { }
+    virtual void show_debug_gui(const World&);
 
     template <typename T>
     constexpr static void type_check()

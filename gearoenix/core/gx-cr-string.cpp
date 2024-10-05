@@ -1,9 +1,10 @@
 #include "gx-cr-string.hpp"
-
 #include <codecvt>
 #include <locale>
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+namespace {
+thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+}
 
 bool gearoenix::core::String::is_character(const platform::key::Id ki)
 {

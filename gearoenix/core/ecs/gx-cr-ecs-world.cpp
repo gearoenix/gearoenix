@@ -209,7 +209,7 @@ void gearoenix::core::ecs::World::show_debug_gui() const
                         const auto entity_id = *reinterpret_cast<const entity_id_t*>(entity_ptr);
                         const auto search = entities.find(entity_id);
                         GX_ASSERT_D(search != entities.end());
-                        search->second.show_debug_gui();
+                        search->second.show_debug_gui(*this);
                     }
                     ImGui::TreePop();
                 }

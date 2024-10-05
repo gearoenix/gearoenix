@@ -97,7 +97,7 @@ public:
     void update_projection();
     void set_near(float);
     void set_far(float);
-    void show_debug_gui() final;
+    void show_debug_gui(const core::ecs::World&) final;
     void enable_debug_mesh(core::job::EndCaller<>&& end);
     void disable_debug_mesh();
     [[nodiscard]] math::Ray3<double> generate_ray(const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const;

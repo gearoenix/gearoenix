@@ -81,7 +81,7 @@ public:
     explicit TransformationComponent(std::string&& name, const TransformationComponent* parent, core::ecs::entity_id_t entity_id);
     [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(
         std::string&& name, TransformationComponent* parent, core::ecs::entity_id_t entity_id);
-    void show_debug_gui() override;
+    void show_debug_gui(const core::ecs::World&) override;
     static void update(core::ecs::World* world);
 };
 }

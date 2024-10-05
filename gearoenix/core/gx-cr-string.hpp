@@ -2,8 +2,8 @@
 #define GEAROENIX_CORE_STRING_HPP
 
 #include "../platform/gx-plt-key.hpp"
-#include "event/gx-cr-ev-button.hpp"
 #include "gx-cr-language.hpp"
+#include <array>
 #include <optional>
 #include <string>
 
@@ -19,6 +19,27 @@ public:
     [[nodiscard]] static std::string to_string(const std::wstring& s);
     [[nodiscard]] static std::wstring to_wstring(const std::string& s);
     [[nodiscard]] static const wchar_t* to_wchar_ptr(const std::string& s);
+
+    template <typename T>
+    [[nodiscard]] static constexpr auto to_hex_string(const T val)
+    {
+        constexpr auto hex_map = "0123456789ABCDEF";
+        std::array<char, sizeof(T) * 2 + 3> hex_string;
+        hex_string[0] = '0';
+        hex_string[1] = 'X';
+        for (std::size_t i = 0; i < sizeof(T) * 2; ++i) {
+            hex_string[sizeof(T) * 2 + 1 - i] = hex_map[(val >> static_cast<T>(i << 2)) & static_cast<T>(0xF)];
+        }
+
+        hex_string[sizeof(T) * 2 + 2] = '\0';
+        return hex_string;
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr auto ptr_to_hex_string(const T* const ptr)
+    {
+        return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr));
+    }
 
 #ifdef GX_IN_IOS
     [[nodiscard]] static NSString* to_objc_string(const std::string& s);
