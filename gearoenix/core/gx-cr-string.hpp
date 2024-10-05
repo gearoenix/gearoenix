@@ -1,9 +1,9 @@
 #ifndef GEAROENIX_CORE_STRING_HPP
 #define GEAROENIX_CORE_STRING_HPP
-
 #include "../platform/gx-plt-key.hpp"
 #include "gx-cr-language.hpp"
 #include <array>
+#include <cstdint>
 #include <optional>
 #include <string>
 
