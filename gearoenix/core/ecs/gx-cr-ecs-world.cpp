@@ -1,4 +1,5 @@
 #include "gx-cr-ecs-world.hpp"
+#include "../gx-cr-string.hpp"
 #include <boost/mp11/algorithm.hpp>
 #include <imgui.h>
 
@@ -198,7 +199,7 @@ void gearoenix::core::ecs::World::update()
 
 void gearoenix::core::ecs::World::show_debug_gui() const
 {
-    if (ImGui::TreeNode("ECS World")) {
+    if (ImGui::TreeNode(String::ptr_name(this).c_str())) {
         ImGui::Text("Number of Archetypes: %zu", archetypes.size());
         ImGui::Text("Number of Entities: %zu", entities.size());
         ImGui::Text("Number of Entity Names: %zu", name_to_entity_id.size());

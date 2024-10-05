@@ -70,7 +70,7 @@ public:
         const math::Vec3<double>& location);
     void add_child(const std::shared_ptr<Transformation>& child);
     void set_parent(const Transformation*);
-    void show_debug_gui_base();
+    virtual void show_debug_gui_transform(const core::ecs::World&);
 };
 
 struct TransformationComponent final : core::ecs::Component, Transformation {
@@ -82,6 +82,7 @@ public:
     [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(
         std::string&& name, TransformationComponent* parent, core::ecs::entity_id_t entity_id);
     void show_debug_gui(const core::ecs::World&) override;
+    void show_debug_gui_transform(const core::ecs::World&) override;
     static void update(core::ecs::World* world);
 };
 }

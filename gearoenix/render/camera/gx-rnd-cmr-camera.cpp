@@ -1,4 +1,5 @@
 #include "gx-rnd-cmr-camera.hpp"
+#include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -162,7 +163,7 @@ void gearoenix::render::camera::Camera::set_far(const float f)
 
 void gearoenix::render::camera::Camera::show_debug_gui(const core::ecs::World& w)
 {
-    if (ImGui::TreeNode("Camera")) {
+    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         Component::show_debug_gui(w);
         bool input_changed = false;
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");

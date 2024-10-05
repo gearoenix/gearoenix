@@ -6,7 +6,6 @@
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192>::construct();
-const auto component_type_name = boost::core::demangle(typeid(gearoenix::physics::TransformationComponent).name());
 }
 
 gearoenix::physics::Transformation::Transformation(const Transformation* const parent)
@@ -345,9 +344,9 @@ void gearoenix::physics::Transformation::set_parent(const Transformation* const 
     this->parent = p;
 }
 
-void gearoenix::physics::Transformation::show_debug_gui_base()
+void gearoenix::physics::Transformation::show_debug_gui_transform(const core::ecs::World& w)
 {
-    if (ImGui::TreeNode("Transformation")) {
+    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         auto l = get_local_location();
         auto q = get_local_orientation();
         auto s = get_scale();
@@ -374,6 +373,14 @@ void gearoenix::physics::Transformation::show_debug_gui_base()
         if (input_changed) {
             reset(s, q, l);
         }
+
+        if (ImGui::TreeNode("Children")) {
+            for (const auto& child : children) {
+                child->show_debug_gui_transform(w);
+            }
+            ImGui::TreePop();
+        }
+
         ImGui::TreePop();
     }
 }
@@ -436,18 +443,16 @@ std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics:
 
 void gearoenix::physics::TransformationComponent::show_debug_gui(const core::ecs::World& w)
 {
-    const auto this_hex = core::String::ptr_to_hex_string(this);
-    static std::string tree_id;
-    tree_id.clear();
-    tree_id += component_type_name;
-    tree_id += " [";
-    tree_id += this_hex.data();
-    tree_id += "]";
-    if (ImGui::TreeNode(tree_id.c_str())) {
+    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         Component::show_debug_gui(w);
-        show_debug_gui_base();
+        Transformation::show_debug_gui_transform(w);
         ImGui::TreePop();
     }
+}
+
+void gearoenix::physics::TransformationComponent::show_debug_gui_transform(const core::ecs::World& w)
+{
+    show_debug_gui(w);
 }
 
 void gearoenix::physics::TransformationComponent::update(core::ecs::World* const world)

@@ -1,5 +1,6 @@
 #include "gx-rnd-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
@@ -127,11 +128,11 @@ void gearoenix::render::engine::Engine::window_resized()
 
 void gearoenix::render::engine::Engine::show_debug_gui()
 {
-    if (ImGui::Begin("Gearoenix Render Engine")) {
+    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         ImGui::Text("Type: %s", to_string(engine_type));
         ImGui::Text("Frames Count: %zu", frames_count);
         world->show_debug_gui();
         // TODO: I have to show all other things
+        ImGui::TreePop();
     }
-    ImGui::End();
 }

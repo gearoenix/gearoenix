@@ -3,6 +3,7 @@
 #include "../platform/gx-plt-key.hpp"
 #include "gx-cr-language.hpp"
 #include <array>
+#include <boost/core/demangle.hpp>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -39,6 +40,32 @@ public:
     [[nodiscard]] static constexpr auto ptr_to_hex_string(const T* const ptr)
     {
         return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr));
+    }
+
+    template <typename T>
+    [[nodiscard]] static auto type_name()
+    {
+        return boost::core::demangle(typeid(std::remove_cv_t<T>).name());
+    }
+
+    template <typename T>
+    [[nodiscard]] static auto type_name(const T* const)
+    {
+        return type_name<T>();
+    }
+
+    template <typename T>
+    [[nodiscard]] static const std::string& ptr_name(const T* const ptr)
+    {
+        static const auto tn = type_name(ptr);
+        const auto ph = ptr_to_hex_string(ptr);
+        thread_local std::string tpn;
+        tpn.clear();
+        tpn += tn;
+        tpn += " [";
+        tpn += ph.data();
+        tpn += "]";
+        return tpn;
     }
 
 #ifdef GX_IN_IOS

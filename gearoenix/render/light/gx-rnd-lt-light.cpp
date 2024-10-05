@@ -1,4 +1,5 @@
 #include "gx-rnd-lt-light.hpp"
+#include "../../core/gx-cr-string.hpp"
 #include <imgui/imgui.h>
 
 gearoenix::render::light::Light::Light(
@@ -13,7 +14,7 @@ gearoenix::render::light::Light::~Light() = default;
 
 void gearoenix::render::light::Light::show_debug_gui(const core::ecs::World& w)
 {
-    if (ImGui::TreeNode("Light")) {
+    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         Component::show_debug_gui(w);
         ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
         ImGui::TreePop();
