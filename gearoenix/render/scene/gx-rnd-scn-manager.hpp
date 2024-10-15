@@ -3,7 +3,6 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -20,7 +19,7 @@ public:
     ~Manager();
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
-    /// By layer you decide in what order scenes to be render on top of each other
+    /// By layer, you decide in what order scenes to be rendered on top of each other
     [[nodiscard]] std::shared_ptr<Builder> build(const std::string& name, double layer, core::job::EndCaller<>&& end_callback) const;
     void update() const;
 };

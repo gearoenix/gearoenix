@@ -1,6 +1,7 @@
 #include "gx-gl-skybox.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
+#include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"

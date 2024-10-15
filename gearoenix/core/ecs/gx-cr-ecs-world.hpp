@@ -141,6 +141,8 @@ public:
     [[nodiscard]] Archetype* get_archetype(const EntityBuilder::components_t& cs);
     [[nodiscard]] Entity* get_entity(entity_id_t);
     [[nodiscard]] const Entity* get_entity(entity_id_t) const;
+    [[nodiscard]] Entity* get_entity(const std::string&);
+    [[nodiscard]] const Entity* get_entity(const std::string&) const;
 
     /// Highly optimized way of system execution
     template <typename Condition, typename F>

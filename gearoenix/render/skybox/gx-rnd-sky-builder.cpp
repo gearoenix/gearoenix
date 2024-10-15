@@ -2,6 +2,7 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
+#include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Builder::Builder(
     engine::Engine& e,
@@ -12,3 +13,18 @@ gearoenix::render::skybox::Builder::Builder(
 }
 
 gearoenix::render::skybox::Builder::~Builder() = default;
+
+gearoenix::core::ecs::entity_id_t gearoenix::render::skybox::Builder::get_entity_id() const
+{
+    return entity_builder->get_id();
+}
+
+const gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Builder::get_skybox() const
+{
+    return entity_builder->get_builder().get_component<Skybox>();
+}
+
+gearoenix::render::skybox::Skybox* gearoenix::render::skybox::Builder::get_skybox()
+{
+    return entity_builder->get_builder().get_component<Skybox>();
+}

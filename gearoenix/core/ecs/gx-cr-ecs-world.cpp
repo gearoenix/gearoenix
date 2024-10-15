@@ -160,6 +160,24 @@ const gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(cons
     return &search->second;
 }
 
+gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const std::string& name)
+{
+    const auto search = name_to_entity_id.find(name);
+    if (name_to_entity_id.end() == search) {
+        return nullptr;
+    }
+    return get_entity(search->second);
+}
+
+const gearoenix::core::ecs::Entity* gearoenix::core::ecs::World::get_entity(const std::string& name) const
+{
+    const auto search = name_to_entity_id.find(name);
+    if (name_to_entity_id.end() == search) {
+        return nullptr;
+    }
+    return get_entity(search->second);
+}
+
 void gearoenix::core::ecs::World::update()
 {
     decltype(delayed_actions) actions;

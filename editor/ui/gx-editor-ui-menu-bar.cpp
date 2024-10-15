@@ -1,6 +1,7 @@
 #include "gx-editor-ui-menu-bar.hpp"
 #include "../control/gx-editor-ctrl-manager.hpp"
 #include "gx-editor-ui-manager.hpp"
+#include "gx-editor-ui-menu-entity.hpp"
 #include "gx-editor-ui-menu-window.hpp"
 #include "gx-editor-ui-window-overlay-progress-bar.hpp"
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
@@ -93,6 +94,7 @@ gearoenix::editor::ui::MenuBar::MenuBar(
     : platform_application(platform_application)
     , control_manager(control_manager)
     , manager(manager)
+    , entity_menu(new MenuEntity(manager))
     , window(new MenuWindow(manager))
 {
 }
@@ -104,12 +106,7 @@ void gearoenix::editor::ui::MenuBar::update()
     if (ImGui::BeginMainMenuBar()) {
         show_project();
         show_scene();
-        if (ImGui::BeginMenu("Object")) {
-            if (ImGui::MenuItem("New", "Alt+O,Alt+N", false, false)) { }
-            if (ImGui::MenuItem("Delete", "Alt+O,Alt+Del", false, false)) { }
-            if (ImGui::MenuItem("Settings", "Ctrl+Alt+O", false, false)) { }
-            ImGui::EndMenu();
-        }
+        entity_menu->update();
         if (ImGui::BeginMenu("Audio")) {
             if (ImGui::MenuItem("Settings", "Ctrl+Alt+A", false, false)) { }
             ImGui::EndMenu();

@@ -77,6 +77,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-selector.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-selector.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.cpp

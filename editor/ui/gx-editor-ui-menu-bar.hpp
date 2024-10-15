@@ -13,6 +13,7 @@ struct Manager;
 
 namespace gearoenix::editor::ui {
 struct Manager;
+struct MenuEntity;
 struct MenuWindow;
 struct MenuBar final {
 private:
@@ -20,6 +21,7 @@ private:
     control::Manager& control_manager;
     Manager& manager;
 
+    GX_GET_UPTR_PRV(MenuEntity, entity_menu);
     GX_GET_UPTR_PRV(MenuWindow, window);
 
     bool show_project_new_popup = false;

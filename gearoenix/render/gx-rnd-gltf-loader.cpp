@@ -1028,9 +1028,7 @@ struct DataLoader final {
         tinygltf::Material& mat = data.materials[index];
         material::Pbr& gx_mat = *gx_materials[index];
         GX_LOG_D("Loading material: " << mat.name);
-        if (mat.doubleSided) {
-            GX_UNIMPLEMENTED;
-        }
+        GX_COMPLAIN_D(!mat.doubleSided, "We don't support double sided object yet! In material: " << mat.name);
         const auto& albedo_factor = mat.pbrMetallicRoughness.baseColorFactor;
         GX_ASSERT(albedo_factor.size() == 4);
         gx_mat.get_alpha_cutoff_occlusion_strength_reserved_reserved().x = static_cast<float>(mat.alphaCutoff);

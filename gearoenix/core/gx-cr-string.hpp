@@ -7,14 +7,14 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <typeinfo>
 
 #ifdef GX_PLATFORM_IOS
 #import <Foundation/Foundation.h>
 #endif
 
 namespace gearoenix::core {
-struct String {
-public:
+struct String final {
     [[nodiscard]] static bool is_character(platform::key::Id);
     [[nodiscard]] static std::optional<wchar_t> to_character(platform::key::Id, bool shift_pressed = false, Language language = Language::English);
     [[nodiscard]] static std::string to_string(const std::wstring& s);

@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_CORE_ECS_ENTITY_HPP
 #define GEAROENIX_CORE_ECS_ENTITY_HPP
-#include "../../platform/gx-plt-log.hpp"
 #include "../job/gx-cr-job-end-caller.hpp"
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-component.hpp"
@@ -23,7 +22,7 @@ private:
 
     Archetype* archetype = nullptr;
     std::shared_ptr<Component>* components = nullptr;
-    std::string name;
+    GX_GET_CREF_PRV(std::string, name);
 
     Entity(Archetype* archetype, std::shared_ptr<Component>* components, std::string&& name);
 
