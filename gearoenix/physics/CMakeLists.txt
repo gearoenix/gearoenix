@@ -29,11 +29,12 @@ SET(GX_ENGINE_PHYSICS_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-mesh.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-mesh.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-sphere.hpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-constraint.cpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-constraint.hpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-manager.cpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-manager.hpp
-#        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-type.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-constraint.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-constraint.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-jet-controller.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-jet-controller.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-manager.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-manager.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-placer.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-placer.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-scaler.cpp

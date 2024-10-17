@@ -1,8 +1,10 @@
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
@@ -10,9 +12,7 @@
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 
-struct GameApp final : public gearoenix::core::Application {
-    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
-
+struct GameApp final : gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
     {
@@ -31,9 +31,12 @@ struct GameApp final : public gearoenix::core::Application {
         render_engine.get_camera_manager()->build(
             "camera", nullptr,
             gearoenix::core::job::EndCallerShared<gearoenix::render::camera::Builder>([this, scene_builder](auto&& camera_builder) {
-                camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
-                    render_engine,
-                    camera_builder->get_id());
+                auto trn = std::dynamic_pointer_cast<gearoenix::physics::Transformation>(camera_builder->get_transformation().get_component_self().lock());
+                (void)render_engine.get_physics_engine()->get_constraint_manager()->create_jet_controller(
+                    camera_builder->get_entity_builder()->get_builder().get_name() + "-controller",
+                    std::move(trn),
+                    camera_builder->get_id(),
+                    gearoenix::core::job::EndCaller([] { }));
                 scene_builder->add(std::move(camera_builder));
             }),
             gearoenix::core::job::EndCaller([] {}));
@@ -41,10 +44,9 @@ struct GameApp final : public gearoenix::core::Application {
         GX_LOG_D("Initialised");
     }
 
-    void update() noexcept final
+    void update() override
     {
         Application::update();
-        camera_controller->update();
     }
 };
 

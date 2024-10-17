@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_CAMERA_ARC_CONTROLLER_HPP
-#define GEAROENIX_RENDER_CAMERA_ARC_CONTROLLER_HPP
+#ifndef GEAROENIX_PHYSICS_CONSTRAINT_ARC_CONTROLLER_HPP
+#define GEAROENIX_PHYSICS_CONSTRAINT_ARC_CONTROLLER_HPP
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 #include <memory>

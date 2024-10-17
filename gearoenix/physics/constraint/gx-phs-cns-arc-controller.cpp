@@ -1,9 +1,9 @@
-#include "gx-rnd-cmr-arc-controller.hpp"
-#include "../../core/event/gx-cr-ev-engine.hpp"
-#include "../../core/sync/gx-cr-sync-update-manager.hpp"
-#include "../../platform/gx-plt-application.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
-#include "gx-rnd-cmr-camera.hpp"
+#include "gx-phs-cns-arc-controller.hpp"
+// #include "../../core/event/gx-cr-ev-engine.hpp"
+// #include "../../core/sync/gx-cr-sync-update-manager.hpp"
+// #include "../../platform/gx-plt-application.hpp"
+// #include "../engine/gx-rnd-eng-engine.hpp"
+// #include "gx-rnd-cmr-camera.hpp"
 
 // void gearoenix::render::camera::ArcController::update()
 //{

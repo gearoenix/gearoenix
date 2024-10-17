@@ -33,8 +33,8 @@ typedef gearoenix::render::light::Builder GxLightBuilder;
 typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
 typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndCaller;
 
-struct GameApp final : public gearoenix::core::Application {
-    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
+struct GameApp final : gearoenix::core::Application {
+    explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
     {
         render_engine.get_material_manager()->get_pbr(
@@ -122,7 +122,7 @@ struct GameApp final : public gearoenix::core::Application {
         scene_builder->get_scene().set_enabled(true);
     }
 
-    void update() noexcept final
+    void update()
     {
         Application::update();
     }

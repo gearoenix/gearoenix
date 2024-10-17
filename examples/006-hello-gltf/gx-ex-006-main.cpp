@@ -1,15 +1,17 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
-struct GameApp final : public gearoenix::core::Application {
-    std::unique_ptr<gearoenix::render::camera::JetController> camera_controller;
-    gearoenix::core::ecs::entity_id_t scene_id;
+struct GameApp final : gearoenix::core::Application {
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
 
     explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
@@ -20,21 +22,23 @@ struct GameApp final : public gearoenix::core::Application {
 
         gearoenix::render::gltf::load(
             render_engine,
-            gearoenix::platform::stream::Path::create_asset("1.glb"),
-            gearoenix::core::job::EndCaller<std::vector<std::shared_ptr<gearoenix::render::scene::Builder>>>([this, end_callback](auto&& ss) {
+            gearoenix::platform::stream::Path::create_asset("sample.glb"),
+            gearoenix::core::job::EndCaller<std::vector<std::shared_ptr<gearoenix::render::scene::Builder>>>([this, end_callback](auto&& ss) mutable {
                 auto scene_builder = std::move(ss[0]);
                 scene_id = scene_builder->get_id();
-                camera_controller = std::make_unique<gearoenix::render::camera::JetController>(
-                    render_engine,
-                    *scene_builder->get_scene().get_camera_entities().begin());
+                auto& cb = *scene_builder->get_camera_builders().begin()->second;
+                (void)render_engine.get_physics_engine()->get_constraint_manager()->create_jet_controller(
+                    cb.get_entity_builder()->get_builder().get_name() + "-controller",
+                    std::dynamic_pointer_cast<gearoenix::physics::Transformation>(cb.get_transformation().get_component_self().lock()),
+                    cb.get_id(),
+                    std::move(end_callback));
             }),
             end_callback);
     }
 
-    void update() final
+    void update() override
     {
         Application::update();
-        camera_controller->update();
     }
 };
 

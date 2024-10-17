@@ -62,18 +62,18 @@ public:
     template <typename... Args>
     [[nodiscard]] std::shared_ptr<T> make_shared(Args&&... args)
     {
-        auto* const ptr = [this]() {
-            const std::lock_guard<std::mutex> _lg(gx_core_shared_array_lock);
+        auto* const ptr = [this] {
+            const std::lock_guard _lg(gx_core_shared_array_lock);
 
             if (gx_core_shared_array_free_pointers.empty()) {
                 GX_LOG_F("Allocation failed, out of memory for type: " << typeid(T).name());
             }
-            auto* const ptr = gx_core_shared_array_free_pointers.back();
+            auto* const result = gx_core_shared_array_free_pointers.back();
             gx_core_shared_array_free_pointers.pop_back();
-            return ptr;
+            return result;
         }();
 #if GX_DEBUG_MODE
-        auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
+        const auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
         for (std::size_t i = 0; i < gx_core_shared_array_element_size; ++i) {
             GX_ASSERT(bs[i] == 0);
         }

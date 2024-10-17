@@ -1,10 +1,9 @@
 #include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/platform/gx-plt-log.hpp>
 #include <imgui.h>
 
-struct GameApp final : public gearoenix::core::Application {
+struct GameApp final : gearoenix::core::Application {
     explicit GameApp(gearoenix::platform::Application& plt_app) noexcept;
-    void update() noexcept final;
+    void update() override;
 };
 
 GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
@@ -12,7 +11,7 @@ GameApp::GameApp(gearoenix::platform::Application& plt_app) noexcept
 {
 }
 
-void GameApp::update() noexcept
+void GameApp::update()
 {
     static bool show_demo_window = true;
     static bool show_hello_window = true;

@@ -7,6 +7,10 @@ namespace gearoenix::physics::animation {
 struct Manager;
 }
 
+namespace gearoenix::physics::constraint {
+struct Manager;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -15,6 +19,7 @@ namespace gearoenix::physics {
 struct Engine final {
     GX_GET_RRF_PRV(render::engine::Engine, render_engine);
     GX_GET_UCPTR_PRV(animation::Manager, animation_manager);
+    GX_GET_UCPTR_PRV(constraint::Manager, constraint_manager);
 
 public:
     explicit Engine(render::engine::Engine& render_engine);

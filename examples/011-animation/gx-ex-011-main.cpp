@@ -1,8 +1,11 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/animation/gx-phs-anm-animation.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
@@ -20,6 +23,7 @@ using GxEndCaller = gearoenix::core::job::EndCaller<>;
 using GxComp = gearoenix::core::ecs::Component;
 using GxCoreApp = gearoenix::core::Application;
 using GxPltApp = gearoenix::platform::Application;
+using GxTransform = gearoenix::physics::Transformation;
 
 using GxScene = gearoenix::render::scene::Scene;
 using GxSceneBuilder = gearoenix::render::scene::Builder;
@@ -28,7 +32,6 @@ using GxSceneBuilderPtr = std::shared_ptr<GxSceneBuilder>;
 using GxCameraBuilder = gearoenix::render::camera::Builder;
 using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
 using GxCameraBuilderEndCaller = GxEndCallerShared<GxCameraBuilder>;
-using GxJetCtrl = gearoenix::render::camera::JetController;
 
 using GxLightBuilder = gearoenix::render::light::Builder;
 using GxLightBuilderPtr = std::shared_ptr<GxLightBuilder>;
@@ -51,8 +54,6 @@ using GxPath = gearoenix::platform::stream::Path;
 using GxAnimationPlayer = gearoenix::physics::animation::AnimationPlayer;
 
 struct GameApp final : GxCoreApp {
-    std::unique_ptr<GxJetCtrl> camera_controller;
-
     explicit GameApp(GxPltApp& plt_app);
     void update() override;
     void gltf_is_ready(const GxSceneBuilderPtr& scene_builder);
@@ -73,9 +74,6 @@ GameApp::GameApp(GxPltApp& plt_app)
 void GameApp::update()
 {
     GxCoreApp::update();
-    if (nullptr != camera_controller) {
-        camera_controller->update();
-    }
 }
 
 void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
@@ -101,11 +99,14 @@ void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
         }),
         GxEndCaller([] {}));
 
-    camera_controller = std::make_unique<GxJetCtrl>(
-        render_engine,
-        *scene_builder->get_scene().get_camera_entities().begin());
-
     scene_builder->get_scene().set_enabled(true);
+
+    auto& camera_builder = *scene_builder->get_camera_builders().begin()->second;
+    auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder.get_transformation().get_component_self().lock());
+    trn->local_look_at({ -19.0, -19.0, 5.0 }, { -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
+    const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
+    auto ctrl_name = camera_builder.get_entity_builder()->get_builder().get_name() + "-controller";
+    (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), camera_builder.get_id(), GxEndCaller([] { }));
 }
 
 GEAROENIX_START(GameApp)

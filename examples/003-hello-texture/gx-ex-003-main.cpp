@@ -1,10 +1,11 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
@@ -14,7 +15,6 @@
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
-#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
@@ -45,17 +45,16 @@ typedef std::shared_ptr<GxMesh> GxMeshPtr;
 typedef gearoenix::render::camera::Builder GxCameraBuilder;
 typedef gearoenix::core::job::EndCallerShared<GxCameraBuilder> GxCameraBuilderEndCaller;
 typedef std::shared_ptr<GxCameraBuilder> GxCameraBuilderPtr;
-typedef gearoenix::render::camera::JetController GxJetController;
+typedef gearoenix::physics::Transformation GxTransform;
 
 typedef gearoenix::render::light::Builder GxLightBuilder;
 typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndCaller;
 typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
 
-struct GameApp final : public gearoenix::core::Application {
-    std::unique_ptr<GxJetController> camera_controller;
-    gearoenix::core::ecs::entity_id_t scene_id;
+struct GameApp final : gearoenix::core::Application {
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app) noexcept
+    explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
     {
         render_engine.get_material_manager()->get_pbr(
@@ -136,11 +135,13 @@ struct GameApp final : public gearoenix::core::Application {
             }));
     }
 
-    void camera_is_ready(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder)
+    void camera_is_ready(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder) const
     {
-        camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-        camera_controller = std::make_unique<GxJetController>(render_engine, camera_builder->get_id());
-        camera_controller->set_movement_speed(5.0);
+        auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
+        trn->set_local_location({ 0.0f, 0.0f, 5.0f });
+        auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
+        const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
+        (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), camera_builder->get_id(), GxEndCaller([] { }));
         scene_builder->add(std::move(camera_builder));
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
@@ -172,7 +173,6 @@ struct GameApp final : public gearoenix::core::Application {
     void update() override
     {
         Application::update();
-        camera_controller->update();
     }
 };
 

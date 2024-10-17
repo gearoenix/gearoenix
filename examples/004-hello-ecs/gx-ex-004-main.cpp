@@ -2,9 +2,10 @@
 #include <gearoenix/core/allocator/gx-cr-alc-shared-array.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-jet-controller.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
@@ -31,9 +32,9 @@ constexpr std::size_t objects_count = 8000;
 
 std::random_device random_device {};
 std::default_random_engine random_engine { random_device() };
-std::uniform_real_distribution<double> space_distribution(-position_limit, position_limit);
-std::uniform_real_distribution<double> speed_distribution(-max_speed, max_speed);
-std::uniform_real_distribution<float> colour_distribution(0.5f, 1.0f);
+std::uniform_real_distribution space_distribution(-position_limit, position_limit);
+std::uniform_real_distribution speed_distribution(-max_speed, max_speed);
+std::uniform_real_distribution colour_distribution(0.5f, 1.0f);
 
 template <typename... Ts>
 using GxAll = gearoenix::core::ecs::All<Ts...>;
@@ -46,13 +47,13 @@ using GxComp = gearoenix::core::ecs::Component;
 using GxCoreApp = gearoenix::core::Application;
 using GxPltApp = gearoenix::platform::Application;
 using GxTransformComp = gearoenix::physics::TransformationComponent;
+using GxTransform = gearoenix::physics::Transformation;
 
 using GxScene = gearoenix::render::scene::Scene;
 
 using GxCameraBuilder = gearoenix::render::camera::Builder;
 using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
 using GxCameraBuilderEndCaller = GxEndCallerShared<GxCameraBuilder>;
-using GxJetCtrl = gearoenix::render::camera::JetController;
 
 using GxLightBuilder = gearoenix::render::light::Builder;
 using GxLightBuilderPtr = std::shared_ptr<GxLightBuilder>;
@@ -115,25 +116,25 @@ void Speed::update(const Position& p)
         gearoenix::math::Vec3<double> n;
         if (pos.x > position_limit) {
             if (p.value.x < 0.0) {
-                n = gearoenix::math::Vec3<double>(1.0, 0.0, 0.0);
+                n = gearoenix::math::Vec3(1.0, 0.0, 0.0);
             } else {
-                n = gearoenix::math::Vec3<double>(-1.0, 0.0, 0.0);
+                n = gearoenix::math::Vec3(-1.0, 0.0, 0.0);
             }
             value = n.reflect(value);
         }
         if (pos.y > position_limit) {
             if (p.value.y < 0.0) {
-                n = gearoenix::math::Vec3<double>(0.0, 1.0, 0.0);
+                n = gearoenix::math::Vec3(0.0, 1.0, 0.0);
             } else {
-                n = gearoenix::math::Vec3<double>(0.0, -1.0, 0.0);
+                n = gearoenix::math::Vec3(0.0, -1.0, 0.0);
             }
             value = n.reflect(value);
         }
         if (pos.z > position_limit) {
             if (p.value.z < 0.0) {
-                n = gearoenix::math::Vec3<double>(0.0, 0.0, 1.0);
+                n = gearoenix::math::Vec3(0.0, 0.0, 1.0);
             } else {
-                n = gearoenix::math::Vec3<double>(0.0, 0.0, -1.0);
+                n = gearoenix::math::Vec3(0.0, 0.0, -1.0);
             }
             value = n.reflect(value);
         }
@@ -177,10 +178,9 @@ const gearoenix::core::ecs::Component::HierarchyTypes& Position::get_hierarchy_t
 }
 
 struct GameApp final : GxCoreApp {
-    std::unique_ptr<GxJetCtrl> camera_controller;
-    gearoenix::core::ecs::entity_id_t scene_id;
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
 
-    explicit GameApp(GxPltApp& plt_app) noexcept
+    explicit GameApp(GxPltApp& plt_app)
         : GxCoreApp(plt_app)
     {
         const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
@@ -245,10 +245,11 @@ struct GameApp final : GxCoreApp {
         render_engine.get_camera_manager()->build(
             "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
-                camera_builder->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
-                camera_controller = std::make_unique<GxJetCtrl>(
-                    render_engine,
-                    camera_builder->get_id());
+                auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
+                trn->set_local_location({ 0.0f, 0.0f, 5.0f });
+                const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
+                auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
+                (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), camera_builder->get_id(), GxEndCaller([] { }));
                 scene_builder->add(std::move(camera_builder));
             }),
             GxEndCaller([] {}));
@@ -268,10 +269,9 @@ struct GameApp final : GxCoreApp {
             GxEndCaller([] {}));
     }
 
-    void update() noexcept override
+    void update() override
     {
         Application::update();
-        camera_controller->update();
         render_engine.get_world()->parallel_system<GxAll<Speed, Position, GxTransformComp>>(
             [&](auto, Speed* const speed, Position* const position, GxTransformComp* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);

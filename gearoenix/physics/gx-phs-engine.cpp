@@ -4,11 +4,13 @@
 #include "animation/gx-phs-anm-manager.hpp"
 #include "collider/gx-phs-cld-aabb.hpp"
 #include "collider/gx-phs-cld-frustum.hpp"
+#include "constraint/gx-phs-cns-manager.hpp"
 #include "gx-phs-transformation.hpp"
 
 gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     : render_engine(render_engine)
     , animation_manager(new animation::Manager(render_engine))
+    , constraint_manager(new constraint::Manager(render_engine))
 {
 }
 
@@ -17,6 +19,7 @@ gearoenix::physics::Engine::~Engine() = default;
 void gearoenix::physics::Engine::start_frame()
 {
     auto* const world = render_engine.get_world();
+    constraint_manager->update();
     TransformationComponent::update(world);
     world->parallel_system<core::ecs::All<TransformationComponent, collider::Aabb3>>(
         [&](const auto, const auto* const transform, auto* const cld, const auto) {
