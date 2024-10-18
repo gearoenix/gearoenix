@@ -46,6 +46,7 @@ private:
 
 public:
     World() = default;
+    World(World&&) = delete;
     World(const World&) = delete;
     //--------------------------------------Entity creation----------------------------------------------
     /// You must know your context (state of world), unless you want to end up having race

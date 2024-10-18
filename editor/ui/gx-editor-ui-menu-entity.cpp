@@ -1,15 +1,18 @@
 #include "gx-editor-ui-menu-entity.hpp"
 #include "gx-editor-ui-manager.hpp"
-#include "gx-editor-ui-utility.hpp"
 #include "gx-editor-ui-window-overlay-progress-bar.hpp"
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 #include <filesystem>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/gx-phs-engine.hpp>
+#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
+#include <gearoenix/render/imgui/gx-rnd-imgui-entity-selector.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-selector.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-builder.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-skybox.hpp>
@@ -21,6 +24,35 @@ namespace {
 {
     return std::filesystem::exists(path) && (path.ends_with(".hdr") || path.ends_with(".jpg") || path.ends_with(".png") || path.ends_with(".gx-cube-texture"));
 }
+}
+
+void gearoenix::editor::ui::MenuEntity::show_create_physics_constraint_jet_controller()
+{
+    if (!is_create_physics_constraint_jet_controller) {
+        return;
+    }
+
+    if (!ImGui::Begin("Create Physics>Constraint>JetController", &is_create_physics_constraint_jet_controller)) {
+        ImGui::End();
+        return;
+    }
+
+    auto& e = *manager.get_platform_application().get_base().get_render_engine();
+    auto& w = *e.get_world();
+    render::imgui::entity_name_text_input(w, create_physics_constraint_jet_controller_entity_name);
+
+    transformation_selector->show<physics::TransformationComponent>();
+
+    if (transformation_selector->selected() && !create_physics_constraint_jet_controller_entity_name.empty() && nullptr == w.get_entity(create_physics_constraint_jet_controller_entity_name) && ImGui::Button("Create")) {
+        (void)e.get_physics_engine()->get_constraint_manager()->create_jet_controller(
+            create_physics_constraint_jet_controller_entity_name + "",
+            std::dynamic_pointer_cast<physics::Transformation>(
+                w.get_component<physics::TransformationComponent>(transformation_selector->get_selection())->get_component_self().lock()),
+            transformation_selector->get_selection(),
+            core::job::EndCaller([] { }));
+    }
+
+    ImGui::End();
 }
 
 void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
@@ -38,16 +70,10 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 
     const auto is_valid_path = is_valid_skybox_path(create_skybox_path);
 
-    auto* const w = manager.get_platform_application().get_base().get_render_engine()->get_world();
+    auto& w = *manager.get_platform_application().get_base().get_render_engine()->get_world();
+    render::imgui::entity_name_text_input(w, create_skybox_entity_name);
     {
-        const auto _ = Utility::set_wrong_input_text(
-            w->get_entity(create_skybox_entity_name) == nullptr);
-        ImGui::InputTextWithHint("Entity Name", "Must be a unique name", &create_skybox_entity_name);
-        (void)_;
-    }
-    {
-        const auto _ = Utility::set_wrong_input_text(
-            create_skybox_path.empty() || is_valid_path);
+        const auto _ = render::imgui::set_wrong_input_text_style(create_skybox_path.empty() || is_valid_path);
         ImGui::InputTextWithHint("Skybox Image Path", "Path to .hdr,.png,.jpg or gx-cube-texture", &create_skybox_path);
         (void)_;
         ImGui::SameLine();
@@ -56,13 +82,13 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
         }
     }
 
-    scene_selector->show();
+    scene_selector->show<render::scene::Scene>();
 
     if (is_valid_path) {
         if (ImGui::Button("Create")) {
             const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Skybox [" + create_skybox_path + "]...");
             const auto scene_id = scene_selector->get_selection();
-            core::job::send_job_io1([this, scene_id, progress_bar_id, w] {
+            core::job::send_job_io1([this, scene_id, progress_bar_id, w = &w] {
                 manager.get_platform_application().get_base().get_render_engine()->get_skybox_manager()->build(
                     create_skybox_entity_name,
                     platform::stream::Path::create_absolute(create_skybox_path),
@@ -102,14 +128,28 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 
 void gearoenix::editor::ui::MenuEntity::show_create_menu()
 {
-    if (ImGui::MenuItem("Skybox", "Ctrl+N,Ctrl+S")) {
-        is_create_skybox_open = true;
+    if (ImGui::BeginMenu("Physics")) {
+        if (ImGui::BeginMenu("Constraints")) {
+            if (ImGui::MenuItem("Jet Controller")) {
+                is_create_physics_constraint_jet_controller = true;
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Render")) {
+        if (ImGui::MenuItem("Skybox", "Ctrl+N,Ctrl+S")) {
+            is_create_skybox_open = true;
+        }
+        ImGui::EndMenu();
     }
 }
 
 gearoenix::editor::ui::MenuEntity::MenuEntity(Manager& manager)
     : manager(manager)
-    , scene_selector(new render::scene::Selector(*manager.get_platform_application().get_base().get_render_engine()))
+    , transformation_selector(new render::imgui::EntitySelector(*manager.get_platform_application().get_base().get_render_engine()))
+    , scene_selector(new render::imgui::EntitySelector(*manager.get_platform_application().get_base().get_render_engine()))
 {
 }
 
@@ -128,4 +168,5 @@ void gearoenix::editor::ui::MenuEntity::update()
     }
 
     show_create_skybox_window();
+    show_create_physics_constraint_jet_controller();
 }
