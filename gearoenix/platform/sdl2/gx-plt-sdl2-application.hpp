@@ -32,7 +32,7 @@ private:
     void fetch_events();
 
 public:
-    Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
+    explicit Application(GX_MAIN_ENTRY_ARGS_DEF);
     ~Application();
     void run(core::Application* = nullptr);
     void loop();

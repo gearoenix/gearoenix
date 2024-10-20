@@ -25,6 +25,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-name-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-selector.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-input-uint.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-observer.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-style-wrong-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.cpp
@@ -133,6 +135,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-resolution.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-resolution.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.hpp

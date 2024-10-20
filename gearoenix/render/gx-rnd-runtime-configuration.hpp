@@ -1,19 +1,18 @@
 #ifndef GEAROENIX_RENDER_RUNTIME_CONFIGURATION_HPP
 #define GEAROENIX_RENDER_RUNTIME_CONFIGURATION_HPP
-
+#include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../core/gx-cr-observed.hpp"
-#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-build-configuration.hpp"
 #include "gx-rnd-resolution.hpp"
 #include <cstdint>
 
+namespace gearoenix::render::engine {
+struct Engine;
+}
+
 namespace gearoenix::render {
-struct RuntimeConfiguration {
-    GX_GETSET_VAL_PRV(bool, vulkan_render_backend_enabled, true);
-    GX_GETSET_VAL_PRV(bool, direct3dx_render_backend_enabled, true);
-    GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true);
-    GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true);
-    GX_GETSET_VAL_PRV(std::int8_t, shadow_cascades_count, GX_RENDER_MAX_SHADOW_CASCADES);
+struct RuntimeConfiguration final : core::ecs::Component {
+    GX_GETSET_VAL_PRV(std::uint8_t, shadow_cascades_count, GX_RENDER_MAX_SHADOW_CASCADES);
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_environment_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_ENVIRONMENT_RESOLUTION);
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_irradiance_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_IRRADIANCE_RESOLUTION);
     GX_GETSET_VAL_PRV(std::uint32_t, maximum_cpu_render_memory_size, 512 * 1024 * 1024);
@@ -25,10 +24,19 @@ struct RuntimeConfiguration {
     GX_GET_VAL_PRV(std::uint8_t, runtime_reflection_radiance_levels, 1);
     GX_GET_REF_PRV(core::Observed<Resolution>, runtime_resolution);
 
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
+    explicit RuntimeConfiguration(core::ecs::entity_id_t);
+
 public:
-    RuntimeConfiguration();
+    RuntimeConfiguration(const RuntimeConfiguration&) = delete;
+    RuntimeConfiguration(RuntimeConfiguration&&) = delete;
+    [[nodiscard]] static RuntimeConfiguration& get(core::ecs::World* w);
+    [[nodiscard]] static RuntimeConfiguration& get(engine::Engine* e);
+    [[nodiscard]] static RuntimeConfiguration& get(engine::Engine& e);
+    ~RuntimeConfiguration() override;
     void set_runtime_reflection_radiance_resolution(std::uint16_t value);
     [[nodiscard]] static std::uint8_t compute_radiance_mipmaps_count(std::uint16_t value);
+    void show_debug_gui(const core::ecs::World&) override;
 };
 }
 #endif

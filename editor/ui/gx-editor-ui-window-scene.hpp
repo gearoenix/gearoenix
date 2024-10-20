@@ -20,7 +20,7 @@ private:
     bool show_window = false;
 
 public:
-    WindowScene(platform::Application& platform_application, control::Manager& control_manager, Manager& manager);
+    explicit WindowScene(Manager& manager);
     void update();
     [[nodiscard]] bool* get_show_window_ptr();
 };

@@ -582,7 +582,7 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
 
 gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const
 {
-    switch (auto& resolution = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().get(); resolution.index()) {
+    switch (auto& resolution = RuntimeConfiguration::get(e).get_runtime_resolution().get(); resolution.index()) {
     case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
         const auto [width, height] = std::get<FixedResolution>(resolution);
         return { width, height };

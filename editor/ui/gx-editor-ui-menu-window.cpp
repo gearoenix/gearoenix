@@ -12,8 +12,8 @@ gearoenix::editor::ui::MenuWindow::MenuWindow(Manager& manager)
 void gearoenix::editor::ui::MenuWindow::update()
 {
     if (ImGui::BeginMenu("Window")) {
-        const auto is_fullscreen = manager.get_platform_application().get_base().get_configuration().get_fullscreen();
-        if (ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
+        if (const auto is_fullscreen = platform::RuntimeConfiguration::get(manager.get_platform_application()).get_fullscreen();
+            ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
             manager.get_platform_application().set_window_fullscreen(!is_fullscreen);
         }
         if (ImGui::Checkbox("Show Project Inspector", &show_engine_inspector)) {

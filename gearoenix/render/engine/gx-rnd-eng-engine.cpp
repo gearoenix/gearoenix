@@ -71,7 +71,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     platform::Application& platform_application)
 {
     std::unique_ptr<Engine> result;
-    const auto& configuration = platform_application.get_base().get_configuration().get_render_configuration();
+    const auto& configuration = platform::RuntimeConfiguration::get(&platform_application);
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
         result = std::make_unique<vulkan::engine::Engine>(platform_application);

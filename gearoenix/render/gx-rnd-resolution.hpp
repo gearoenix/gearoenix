@@ -14,16 +14,18 @@
 
 namespace gearoenix::render {
 struct FixedResolution final {
-    std::uint32_t width = GX_RENDER_HD_RESOLUTION_WIDTH;
-    std::uint32_t height = GX_RENDER_HD_RESOLUTION_HEIGHT;
+    std::uint32_t width = GX_RENDER_DEFAULT_RESOLUTION_WIDTH;
+    std::uint32_t height = GX_RENDER_DEFAULT_RESOLUTION_HEIGHT;
 };
 
 struct ScreenBasedResolution final {
-    std::uint32_t nom = 1;
-    std::uint32_t dom = 1;
+    std::uint32_t numerator = 1;
+    std::uint32_t denominator = 1;
 };
 
 typedef std::variant<FixedResolution, ScreenBasedResolution> Resolution;
+
+bool imgui_show(Resolution&);
 }
 
 #endif

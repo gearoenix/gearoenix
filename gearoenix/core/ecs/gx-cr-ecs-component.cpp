@@ -5,10 +5,6 @@
 #include "gx-cr-ecs-world.hpp"
 #include <imgui/imgui.h>
 
-namespace {
-const auto type_name = boost::core::demangle(typeid(gearoenix::core::ecs::Component).name());
-}
-
 boost::container::flat_map<std::type_index, std::string> gearoenix::core::ecs::Component::type_index_to_name;
 
 boost::container::flat_map<std::string, std::type_index> gearoenix::core::ecs::Component::type_name_to_index;
@@ -41,17 +37,45 @@ void gearoenix::core::ecs::Component::set_component_self(const std::shared_ptr<C
 
 void gearoenix::core::ecs::Component::show_debug_gui(const World& w)
 {
-    if (ImGui::TreeNode(String::ptr_name(this).c_str())) {
-        ImGui::Checkbox(GX_STRINGIFY_VAR(enabled), &enabled);
-        ImGui::Text("%s: %s", GX_STRINGIFY_VAR(name), name.c_str());
-        const auto type_search = type_index_to_name.find(final_type_index);
-        ImGui::Text("%s: %s", GX_STRINGIFY_VAR(final_type_index), type_search != type_index_to_name.end() ? type_search->second.c_str() : "Is Not Registered.");
-        const auto* const entity_ptr = w.get_entity(entity_id);
-        ImGui::Text("%s: %u", GX_STRINGIFY_VAR(entity_id), entity_id);
-        if (nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
-            entity_ptr->show_debug_gui(w);
-            ImGui::TreePop();
-        }
+    if (!ImGui::TreeNode(String::ptr_name(this).c_str())) {
+        return;
+    }
+
+    if (!ImGui::BeginTable("##gearoenix::core::ecs::Component", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
+        return;
+    }
+    ImGui::TableSetupColumn("##labels", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("##inputs", ImGuiTableColumnFlags_WidthStretch, 0.999f);
+
+    ImGui::TableNextColumn();
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Enabled:");
+    ImGui::TableNextColumn();
+    ImGui::Checkbox("##" GX_STRINGIFY(enabled), &enabled);
+    ImGui::TableNextColumn();
+
+    ImGui::Text("Name:");
+    ImGui::TableNextColumn();
+    ImGui::Text(name.c_str());
+    ImGui::TableNextColumn();
+
+    const auto type_search = type_index_to_name.find(final_type_index);
+    ImGui::Text("Final Type: ");
+    ImGui::TableNextColumn();
+    ImGui::Text(type_search != type_index_to_name.end() ? type_search->second.c_str() : "The type is not registered!");
+    ImGui::TableNextColumn();
+
+    ImGui::Text("Entity ID:");
+    ImGui::TableNextColumn();
+    ImGui::Text("%u", entity_id);
+
+    ImGui::EndTable();
+
+    if (const auto* const entity_ptr = w.get_entity(entity_id); nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
+        entity_ptr->show_debug_gui(w);
         ImGui::TreePop();
     }
+
+    ImGui::TreePop();
 }

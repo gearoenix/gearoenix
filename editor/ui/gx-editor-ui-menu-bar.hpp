@@ -7,31 +7,25 @@ namespace gearoenix::platform {
 struct Application;
 }
 
-namespace gearoenix::editor::control {
-struct Manager;
-}
-
 namespace gearoenix::editor::ui {
 struct Manager;
 struct MenuEntity;
+struct MenuProject;
 struct MenuWindow;
 struct MenuBar final {
 private:
-    platform::Application& platform_application;
-    control::Manager& control_manager;
     Manager& manager;
 
     GX_GET_UPTR_PRV(MenuEntity, entity_menu);
-    GX_GET_UPTR_PRV(MenuWindow, window);
+    GX_GET_UPTR_PRV(MenuProject, project_menu);
+    GX_GET_UPTR_PRV(MenuWindow, window_menu);
 
-    bool show_project_new_popup = false;
     bool show_scene_import_popup = false;
 
-    void show_project();
     void show_scene();
 
 public:
-    MenuBar(platform::Application& platform_application, control::Manager& control_manager, Manager& manager);
+    explicit MenuBar(Manager& manager);
     ~MenuBar();
     void update();
 };

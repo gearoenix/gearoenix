@@ -9,25 +9,30 @@
 constexpr double click_time_threshold = 0.3;
 constexpr double click_distance_threshold = 0.1;
 
-gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration)
-    : configuration(configuration)
-    , arguments(GX_MAIN_ENTRY_ARGS)
-    , event_engine(new core::event::Engine())
+void gearoenix::platform::BaseApplication::initialise_imgui()
 {
-    GX_LOG_D("This machine has " << std::thread::hardware_concurrency() << " number of thread cores.");
-    core::job::initialise();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     auto io_imgui = ImGui::GetIO();
     io_imgui.Fonts->AddFontDefault();
-    io_imgui.BackendPlatformName = configuration.get_application_name().c_str();
+    io_imgui.BackendPlatformName = RuntimeConfiguration::get(this).get_application_name().c_str();
     key::initialize_imgui_keymap();
+}
 
-    if (!configuration.get_fullscreen()) {
+gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
+    : arguments(GX_MAIN_ENTRY_ARGS)
+    , event_engine(new core::event::Engine())
+{
+    GX_LOG_D("This machine has " << std::thread::hardware_concurrency() << " number of thread cores.");
+    core::job::initialise();
+
+    initialise_imgui();
+
+    if (const auto& config = RuntimeConfiguration::get(this); !config.get_fullscreen()) {
         initialize_window_size(
-            static_cast<int>(configuration.get_window_width()),
-            static_cast<int>(configuration.get_window_height()));
+            static_cast<int>(config.get_window_width()),
+            static_cast<int>(config.get_window_height()));
     }
 }
 
@@ -60,7 +65,8 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
 
 void gearoenix::platform::BaseApplication::update_window()
 {
-    if (window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > configuration.get_window_resizing_event_interval_ms()) {
+    if (const auto& config = RuntimeConfiguration::get(this);
+        window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > config.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
         render_engine->window_resized();
         event_engine->broadcast(core::event::Data(core::event::Id::PlatformWindowSizeChange,

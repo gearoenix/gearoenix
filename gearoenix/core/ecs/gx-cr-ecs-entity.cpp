@@ -73,8 +73,9 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
     const std::type_index component_type) const
 {
     const auto search = bases_to_leaves.find(component_type);
-    if (bases_to_leaves.end() == search)
+    if (bases_to_leaves.end() == search) {
         return null_component;
+    }
     return get_component_final_type(search->second);
 }
 
@@ -82,10 +83,10 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
     const std::type_index component_type) const
 {
     const auto search = components.find(component_type);
-    if (components.end() == search)
+    if (components.end() == search) {
         return null_component;
+    }
     return search->second;
-    ;
 }
 
 void gearoenix::core::ecs::EntityBuilder::add_component(std::shared_ptr<Component>&& component)

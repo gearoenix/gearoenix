@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_IMGUI_ENTITY_NAME_TEXT_INPUT_HPP
-#define GEAROENIX_RENDER_IMGUI_ENTITY_NAME_TEXT_INPUT_HPP
+#ifndef GEAROENIX_RENDER_IMGUI_ENTITY_NAME_INPUT_TEXT_HPP
+#define GEAROENIX_RENDER_IMGUI_ENTITY_NAME_INPUT_TEXT_HPP
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "gx-rnd-imgui-style-wrong-input-text.hpp"

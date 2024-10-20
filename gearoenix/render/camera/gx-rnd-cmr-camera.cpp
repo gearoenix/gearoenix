@@ -43,16 +43,16 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera()
 {
-    e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().remove_observer(resolution_cfg_observer);
+    RuntimeConfiguration::get(e).get_runtime_resolution().remove_observer(resolution_cfg_observer);
 }
 
 void gearoenix::render::camera::Camera::set_component_self(const std::shared_ptr<Component>& c)
 {
     camera_self = std::dynamic_pointer_cast<Camera>(c);
     if (0 == resolution_cfg_observer) {
-        resolution_cfg_observer = e.get_platform_application().get_base().get_configuration().get_render_configuration().get_runtime_resolution().add_observer(
+        resolution_cfg_observer = RuntimeConfiguration::get(e).get_runtime_resolution().add_observer(
             [c = camera_self](const Resolution&) {
-                auto cam = c.lock();
+                const auto cam = c.lock();
                 if (nullptr == cam) {
                     return false;
                 }

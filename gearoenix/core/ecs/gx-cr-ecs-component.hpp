@@ -19,7 +19,7 @@ struct Component {
     GX_GET_REFC_PRT(std::string, name);
     GX_GETSET_VAL_PRV(bool, enabled, true);
     GX_GET_CREF_PRV(std::weak_ptr<Component>, component_self);
-    GX_GET_VAL_PRT(entity_id_t, entity_id, 0);
+    GX_GETSET_VAL_PRT(entity_id_t, entity_id, 0);
 
     static boost::container::flat_map<std::type_index, std::string> type_index_to_name;
     static boost::container::flat_map<std::string, std::type_index> type_name_to_index;

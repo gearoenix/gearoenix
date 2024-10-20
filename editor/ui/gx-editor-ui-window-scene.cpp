@@ -1,9 +1,6 @@
 #include "gx-editor-ui-window-scene.hpp"
 
-gearoenix::editor::ui::WindowScene::WindowScene(
-    platform::Application& platform_application,
-    control::Manager& control_manager,
-    Manager& manager)
+gearoenix::editor::ui::WindowScene::WindowScene(Manager& manager)
     : platform_application(platform_application)
     , control_manager(control_manager)
     , manager(manager)

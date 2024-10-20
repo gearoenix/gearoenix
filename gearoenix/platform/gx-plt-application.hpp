@@ -40,7 +40,6 @@ struct BaseApplication final {
 
     typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
 
-    GX_GET_REF_PRV(RuntimeConfiguration, configuration);
     GX_GET_CREF_PRV(Arguments, arguments);
     GX_GET_VAL_PRV(bool, running, true);
     GX_GET_CREF_PRV(math::Vec2<int>, screen_size);
@@ -63,8 +62,10 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);
     GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now());
 
+    void initialise_imgui();
+
 public:
-    BaseApplication(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& configuration);
+    explicit BaseApplication(GX_MAIN_ENTRY_ARGS_DEF);
     ~BaseApplication();
     void initialize_window_position(int x, int y);
     void initialize_window_size(int w, int h);

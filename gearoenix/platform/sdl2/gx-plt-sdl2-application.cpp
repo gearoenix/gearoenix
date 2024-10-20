@@ -26,11 +26,12 @@ void gearoenix::platform::Application::initialize_screen()
 {
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
-    base.screen_size = math::Vec2<int>(static_cast<int>(display_mode.w), static_cast<int>(display_mode.h));
-    if (base.configuration.get_fullscreen()) {
+    base.screen_size = math::Vec2(display_mode.w, display_mode.h);
+    const auto& config = RuntimeConfiguration::get(this);
+    if (config.get_fullscreen()) {
         base.initialize_window_size(base.screen_size.x, base.screen_size.y);
     }
-    if (base.configuration.get_lanscape()) {
+    if (config.get_landscape()) {
         SDL_SetHint(SDL_HINT_ORIENTATIONS, "Landscape");
     }
 }
@@ -39,7 +40,7 @@ void gearoenix::platform::Application::initialize_window()
 {
     std::uint32_t core_flags = SDL_WINDOW_SHOWN;
     core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-    if (base.configuration.get_fullscreen()) {
+    if (const auto& config = RuntimeConfiguration::get(this); config.get_fullscreen()) {
         core_flags |= SDL_WINDOW_FULLSCREEN;
         core_flags |= SDL_WINDOW_BORDERLESS;
         core_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -105,10 +106,11 @@ void gearoenix::platform::Application::initialize_mouse()
 
 bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
+    const auto& config = RuntimeConfiguration::get(this);
     window = SDL_CreateWindow(
-        base.configuration.get_application_name().c_str(),
+        config.get_application_name().c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        base.configuration.get_window_width(), base.configuration.get_window_height(),
+        config.get_window_width(), config.get_window_height(),
         flags);
     return window != nullptr;
 }
@@ -124,7 +126,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
         GX_LOG_D("OpenGL context with major: " << mj << " and minor: " << mn << " has been created.");
         return true;
     }
-    GX_LOG_D("OpenGL window creatin with major: " << mj << " and minor: " << mn << " has been failed.");
+    GX_LOG_D("OpenGL window creating with major: " << mj << " and minor: " << mn << " has been failed.");
     return false;
 }
 
@@ -214,8 +216,8 @@ void gearoenix::platform::Application::fetch_events()
     }
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config)
-    : base(GX_MAIN_ENTRY_ARGS, config)
+gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF)
+    : base(GX_MAIN_ENTRY_ARGS)
 {
     initialize_sdl();
     initialize_screen();
@@ -270,7 +272,7 @@ void gearoenix::platform::Application::set_caption(const std::string& s)
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
     SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-    base.configuration.set_fullscreen(b);
+    RuntimeConfiguration::get(this).set_fullscreen(b);
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
