@@ -47,7 +47,7 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<camera::Camera>, shadow_camera);
     GX_GET_CREF_PRV(std::shared_ptr<physics::collider::Frustum>, shadow_frustum);
     GX_GET_CREF_PRV(std::shared_ptr<physics::TransformationComponent>, shadow_transform);
-    GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, 0);
+    GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, core::ecs::INVALID_ENTITY_ID);
 
     ShadowCasterDirectional(std::type_index final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
 

@@ -10,3 +10,8 @@ gearoenix::render::texture::Texture2D::Texture2D(
 }
 
 gearoenix::render::texture::Texture2D::~Texture2D() = default;
+
+void* gearoenix::render::texture::Texture2D::get_imgui_ptr() const
+{
+    return nullptr;
+}

@@ -1,12 +1,10 @@
-#include "gx-editor-ui-menu-entity.hpp"
-#include "gx-editor-ui-manager.hpp"
-#include "gx-editor-ui-window-overlay-progress-bar.hpp"
+#include "gx-ed-ui-menu-entity.hpp"
+#include "gx-ed-ui-manager.hpp"
+#include "gx-ed-ui-window-overlay-progress-bar.hpp"
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 #include <filesystem>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
-#include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
@@ -24,35 +22,6 @@ namespace {
 {
     return std::filesystem::exists(path) && (path.ends_with(".hdr") || path.ends_with(".jpg") || path.ends_with(".png") || path.ends_with(".gx-cube-texture"));
 }
-}
-
-void gearoenix::editor::ui::MenuEntity::show_create_physics_constraint_jet_controller()
-{
-    if (!is_create_physics_constraint_jet_controller) {
-        return;
-    }
-
-    if (!ImGui::Begin("Create Physics>Constraint>JetController", &is_create_physics_constraint_jet_controller)) {
-        ImGui::End();
-        return;
-    }
-
-    auto& e = *manager.get_platform_application().get_base().get_render_engine();
-    auto& w = *e.get_world();
-    render::imgui::entity_name_text_input(w, create_physics_constraint_jet_controller_entity_name);
-
-    transformation_selector->show<physics::TransformationComponent>();
-
-    if (transformation_selector->selected() && !create_physics_constraint_jet_controller_entity_name.empty() && nullptr == w.get_entity(create_physics_constraint_jet_controller_entity_name) && ImGui::Button("Create")) {
-        (void)e.get_physics_engine()->get_constraint_manager()->create_jet_controller(
-            create_physics_constraint_jet_controller_entity_name + "",
-            std::dynamic_pointer_cast<physics::Transformation>(
-                w.get_component<physics::TransformationComponent>(transformation_selector->get_selection())->get_component_self().lock()),
-            transformation_selector->get_selection(),
-            core::job::EndCaller([] { }));
-    }
-
-    ImGui::End();
 }
 
 void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
@@ -130,9 +99,6 @@ void gearoenix::editor::ui::MenuEntity::show_create_menu()
 {
     if (ImGui::BeginMenu("Physics")) {
         if (ImGui::BeginMenu("Constraints")) {
-            if (ImGui::MenuItem("Jet Controller")) {
-                is_create_physics_constraint_jet_controller = true;
-            }
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
@@ -148,7 +114,6 @@ void gearoenix::editor::ui::MenuEntity::show_create_menu()
 
 gearoenix::editor::ui::MenuEntity::MenuEntity(Manager& manager)
     : manager(manager)
-    , transformation_selector(new render::imgui::EntitySelector(*manager.get_platform_application().get_base().get_render_engine()))
     , scene_selector(new render::imgui::EntitySelector(*manager.get_platform_application().get_base().get_render_engine()))
 {
 }
@@ -168,5 +133,4 @@ void gearoenix::editor::ui::MenuEntity::update()
     }
 
     show_create_skybox_window();
-    show_create_physics_constraint_jet_controller();
 }

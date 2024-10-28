@@ -4,10 +4,30 @@
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
+#include "stream/gx-plt-stm-stream.hpp"
 #include <imgui/imgui.h>
 
+namespace {
 constexpr double click_time_threshold = 0.3;
 constexpr double click_distance_threshold = 0.1;
+
+void initialise_default_font(gearoenix::platform::Application& app)
+{
+    const auto font = gearoenix::platform::stream::Stream::open(
+        gearoenix::platform::stream::Path::create_asset("default-font.ttf"), app);
+    if (nullptr == font) {
+        return;
+    }
+    const auto content_sz = font->size();
+    auto* const content = new char[content_sz];
+    const auto read_bytes = font->read(content, content_sz);
+    GX_ASSERT_D(content_sz == read_bytes);
+    auto& io = ImGui::GetIO();
+    auto* const fonts = io.Fonts;
+    io.FontDefault = fonts->AddFontFromMemoryTTF(content, static_cast<int>(read_bytes), 15);
+    fonts->Build();
+}
+}
 
 void gearoenix::platform::BaseApplication::initialise_imgui()
 {
@@ -247,6 +267,7 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
 
 void gearoenix::platform::BaseApplication::initialize_engine(Application& app)
 {
+    initialise_default_font(app);
     render_engine = render::engine::Engine::construct(app);
     audio_engine = std::make_unique<audio::Engine>(app);
 }

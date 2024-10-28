@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_MATH_QUATERNION_HPP
 #define GEAROENIX_MATH_QUATERNION_HPP
-#include "../core/gx-cr-types.hpp"
 #include "gx-math-matrix-4d.hpp"
 #include "gx-math-numeric.hpp"
 #include <ostream>
@@ -122,6 +121,51 @@ struct Quat final {
     {
         const auto a = (*this - o).abs();
         return a.x < tolerance && a.y < tolerance && a.z < tolerance && a.w < tolerance;
+    }
+
+    [[nodiscard]] Vec3<Element> to_euler() const
+    {
+        Vec3<Element> angles;
+
+        // roll (x-axis rotation)
+        const auto sin_r_cos_p = static_cast<Element>(2) * (w * x + y * z);
+        const auto cos_r_cos_p = static_cast<Element>(1) - static_cast<Element>(2) * (x * x + y * y);
+        angles.x = static_cast<Element>(std::atan2(sin_r_cos_p, cos_r_cos_p));
+
+        // pitch (y-axis rotation)
+        const auto sin_p = static_cast<Element>(std::sqrt(static_cast<Element>(1) + static_cast<Element>(2) * (w * y - x * z)));
+        const auto cos_p = static_cast<Element>(std::sqrt(static_cast<Element>(1) - static_cast<Element>(2) * (w * y - x * z)));
+        angles.y = static_cast<Element>(2) * std::atan2(sin_p, cos_p) - GX_PI / static_cast<Element>(2);
+
+        // yaw (z-axis rotation)
+        const auto sin_y_cos_p = static_cast<Element>(2) * (w * z + x * y);
+        const auto cos_y_cos_p = static_cast<Element>(1) - static_cast<Element>(2) * (y * y + z * z);
+        angles.z = static_cast<Element>(std::atan2(sin_y_cos_p, cos_y_cos_p));
+
+        return angles;
+    }
+
+    [[nodiscard]] static Quat from_euler(const Element roll, const Element pitch, const Element yaw)
+    {
+        const auto cr = static_cast<Element>(std::cos(roll * static_cast<Element>(0.5)));
+        const auto sr = static_cast<Element>(std::sin(roll * static_cast<Element>(0.5)));
+        const auto cp = static_cast<Element>(std::cos(pitch * static_cast<Element>(0.5)));
+        const auto sp = static_cast<Element>(std::sin(pitch * static_cast<Element>(0.5)));
+        const auto cy = static_cast<Element>(std::cos(yaw * static_cast<Element>(0.5)));
+        const auto sy = static_cast<Element>(std::sin(yaw * static_cast<Element>(0.5)));
+
+        Quat q;
+        q.w = cr * cp * cy + sr * sp * sy;
+        q.x = sr * cp * cy - cr * sp * sy;
+        q.y = cr * sp * cy + sr * cp * sy;
+        q.z = cr * cp * sy - sr * sp * cy;
+
+        return q;
+    }
+
+    [[nodiscard]] static Quat from_euler(Vec3<Element> angles)
+    {
+        return from_euler(angles.x, angles.y, angles.z);
     }
 };
 }

@@ -1,4 +1,4 @@
-#include "gx-editor-ui-window-scene.hpp"
+#include "gx-ed-ui-window-scene.hpp"
 
 gearoenix::editor::ui::WindowScene::WindowScene(Manager& manager)
     : platform_application(platform_application)

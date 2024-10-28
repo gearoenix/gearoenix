@@ -1,26 +1,20 @@
-#include "ui/gx-editor-ui-manager.hpp"
-#include <gearoenix/core/gx-cr-application.hpp>
+#include "gx-editor-main.hpp"
+#include "ui/gx-ed-ui-manager.hpp"
+#include "viewport/gx-ed-vp-viewport.hpp"
 
-namespace gearoenix::editor {
-struct Application final : core::Application {
-private:
-    ui::Manager ui_manager;
-
-public:
-    explicit Application(platform::Application& plt_app);
-    void update() override;
-};
+void gearoenix::editor::Application::update()
+{
+    ui_manager->update();
+    viewport->update();
 }
 
 gearoenix::editor::Application::Application(platform::Application& plt_app)
     : core::Application(plt_app)
-    , ui_manager(plt_app)
+    , ui_manager(new ui::Manager(plt_app))
+    , viewport(new viewport::Viewport(*this))
 {
 }
 
-void gearoenix::editor::Application::update()
-{
-    ui_manager.update();
-}
+gearoenix::editor::Application::~Application() = default;
 
 GEAROENIX_START(gearoenix::editor::Application)

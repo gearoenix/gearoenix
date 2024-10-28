@@ -5,7 +5,10 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-application.hpp"
 #include <SDL2/SDL.h>
-#include <vector>
+
+#ifdef main
+#undef main
+#endif
 
 namespace gearoenix::platform {
 struct Application final {

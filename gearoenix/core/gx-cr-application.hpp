@@ -26,10 +26,8 @@ struct Event;
 
 namespace gearoenix::core {
 struct Application {
-public:
-protected:
-    platform::Application& platform_application;
-    render::engine::Engine& render_engine;
+    GX_GET_RRF_PRT(platform::Application, platform_application);
+    GX_GET_RRF_PRT(render::engine::Engine, render_engine);
 
 public:
     explicit Application(platform::Application& platform_application);

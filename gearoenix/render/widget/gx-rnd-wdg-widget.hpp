@@ -36,8 +36,8 @@ struct Widget : core::event::Listener {
     GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_release);
     GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_click);
     GX_GET_CREF_PRT(std::function<void()>, on_cancel);
-    GX_GET_VAL_PRT(core::ecs::entity_id_t, model_entity_id, 0);
-    GX_GET_VAL_PRT(core::ecs::entity_id_t, camera_entity_id, 0);
+    GX_GET_VAL_PRT(core::ecs::entity_id_t, model_entity_id, core::ecs::INVALID_ENTITY_ID);
+    GX_GET_VAL_PRT(core::ecs::entity_id_t, camera_entity_id, core::ecs::INVALID_ENTITY_ID);
     GX_GET_VAL_PRT(bool, is_pressed, false); // For later, it can be better to include more states in here.
 
     [[nodiscard]] std::optional<math::Vec3<double>> get_hit_point(const math::Vec2<double>& normalised_point) const;

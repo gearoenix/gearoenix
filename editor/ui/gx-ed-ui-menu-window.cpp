@@ -1,5 +1,5 @@
-#include "gx-editor-ui-menu-window.hpp"
-#include "gx-editor-ui-manager.hpp"
+#include "gx-ed-ui-menu-window.hpp"
+#include "gx-ed-ui-manager.hpp"
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <imgui/imgui.h>

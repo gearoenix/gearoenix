@@ -1,7 +1,7 @@
-#include "gx-editor-ui-manager.hpp"
-#include "gx-editor-ui-menu-bar.hpp"
-#include "gx-editor-ui-window-overlay-progress-bar.hpp"
-#include "gx-editor-ui-window-scene.hpp"
+#include "gx-ed-ui-manager.hpp"
+#include "gx-ed-ui-menu-bar.hpp"
+#include "gx-ed-ui-window-overlay-progress-bar.hpp"
+#include "gx-ed-ui-window-scene.hpp"
 
 gearoenix::editor::ui::Manager::Manager(platform::Application& platform_application)
     : platform_application(platform_application)

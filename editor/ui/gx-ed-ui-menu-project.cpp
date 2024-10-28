@@ -1,11 +1,10 @@
-#include "gx-editor-ui-menu-project.hpp"
+#include "gx-ed-ui-menu-project.hpp"
+#include "gx-ed-ui-manager.hpp"
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
+#include <gearoenix/platform/sdl2/gx-plt-sdl2-application.hpp>
+#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-runtime-configuration.hpp>
 #include <imgui/imgui.h>
-
-#include "gearoenix/platform/sdl2/gx-plt-sdl2-application.hpp"
-#include "gearoenix/render/engine/gx-rnd-eng-engine.hpp"
-#include "gx-editor-ui-manager.hpp"
 
 void gearoenix::editor::ui::MenuProject::show_new_popup()
 {

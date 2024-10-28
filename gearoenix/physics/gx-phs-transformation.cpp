@@ -346,43 +346,92 @@ void gearoenix::physics::Transformation::set_parent(const Transformation* const 
 
 void gearoenix::physics::Transformation::show_debug_gui_transform(const core::ecs::World& w)
 {
-    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        auto l = get_local_location();
-        auto q = get_local_orientation();
-        auto s = get_scale();
-        bool input_changed = false;
-        if (ImGui::TreeNode("Position")) {
-            input_changed |= ImGui::InputDouble("x", &l.x, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("y", &l.y, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("z", &l.z, 0.01, 1.0, "%.3f");
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Quaternion")) {
-            input_changed |= ImGui::InputDouble("x", &q.x, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("y", &q.y, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("z", &q.z, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("z", &q.w, 0.01, 1.0, "%.3f");
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Scale")) {
-            input_changed |= ImGui::InputDouble("x", &s.x, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("y", &s.y, 0.01, 1.0, "%.3f");
-            input_changed |= ImGui::InputDouble("z", &s.z, 0.01, 1.0, "%.3f");
-            ImGui::TreePop();
-        }
-        if (input_changed) {
-            reset(s, q, l);
-        }
+    if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
+        return;
+    }
 
-        if (ImGui::TreeNode("Children")) {
-            for (const auto& child : children) {
-                child->show_debug_gui_transform(w);
-            }
-            ImGui::TreePop();
-        }
+    auto l = get_local_location();
+    auto r = get_local_orientation().to_euler() * 180.0 / GX_PI;
+    auto s = get_scale();
+    bool input_changed = false;
 
+    if (!ImGui::BeginTable("##gearoenix::physics::Transformation", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
+        return;
+    }
+    ImGui::TableSetupColumn("##labels", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("##inputs", ImGuiTableColumnFlags_WidthStretch, 0.999f);
+
+    ImGui::TableNextColumn();
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Position:");
+    ImGui::TableNextColumn();
+    ImGui::Text("X:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##position.x", &l.x, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Y:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##position.y", &l.y, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Z:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##position.z", &l.z, 0.01, 1.0, "%.3f");
+    ImGui::TableNextColumn();
+
+    ImGui::Text("Rotation:  ");
+    ImGui::TableNextColumn();
+    ImGui::Text("X:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##rotation.x", &r.x, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Y:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##rotation.y", &r.y, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Z:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##rotation.z", &r.z, 0.01, 1.0, "%.3f");
+    ImGui::TableNextColumn();
+
+    ImGui::Text("Scale:");
+    ImGui::TableNextColumn();
+    ImGui::Text("X:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##scale.x", &s.x, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Y:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##scale.y", &s.y, 0.01, 1.0, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("Z:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    input_changed |= ImGui::InputDouble("##scale.z", &s.z, 0.01, 1.0, "%.3f");
+    ImGui::TableNextColumn();
+
+    ImGui::EndTable();
+
+    if (input_changed) {
+        reset(s, math::Quat<double>::from_euler(r * GX_PI / 180.0), l);
+    }
+
+    if (ImGui::TreeNode("Children")) {
+        for (const auto& child : children) {
+            child->show_debug_gui_transform(w);
+        }
         ImGui::TreePop();
     }
+
+    ImGui::TreePop();
 }
 
 void gearoenix::physics::Transformation::reset(

@@ -28,7 +28,7 @@ public:
     /// Now if it is empty it will be filtered by all cameras
     std::optional<boost::container::flat_set<core::ecs::entity_id_t>> cameras;
     std::uint64_t cameras_flags = static_cast<std::uint64_t>(-1);
-    core::ecs::entity_id_t scene_id = 0;
+    core::ecs::entity_id_t scene_id = core::ecs::INVALID_ENTITY_ID;
 
     ~Model() override;
 };

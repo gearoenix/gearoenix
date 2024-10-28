@@ -1,4 +1,4 @@
-#include "gx-editor-ui-window-overlay-progress-bar.hpp"
+#include "gx-ed-ui-window-overlay-progress-bar.hpp"
 #include <imgui/imgui.h>
 #include <utility>
 

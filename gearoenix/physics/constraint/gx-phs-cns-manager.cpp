@@ -14,12 +14,11 @@ gearoenix::physics::constraint::Manager::~Manager() = default;
 std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::physics::constraint::Manager::create_jet_controller(
     std::string&& name,
     std::shared_ptr<Transformation>&& transform,
-    const core::ecs::entity_id_t entity_id,
     core::job::EndCaller<>&& entity_exists_in_world) const
 {
     auto cmp_name = name + "-jet-controller";
     auto eb = e.get_world()->create_shared_builder(std::move(name), std::move(entity_exists_in_world));
-    eb->get_builder().add_component(JetController::construct(e, std::move(transform), std::move(cmp_name), entity_id));
+    eb->get_builder().add_component(JetController::construct(e, std::move(transform), std::move(cmp_name), eb->get_id()));
     return eb;
 }
 

@@ -34,7 +34,7 @@ struct Camera final {
     math::Vec4<sizei> viewport_clip;
     math::Mat4x4<float> vp;
     math::Vec3<float> pos;
-    core::ecs::entity_id_t out_reference = 0;
+    core::ecs::entity_id_t out_reference = core::ecs::INVALID_ENTITY_ID;
     float skybox_scale = 1.0;
     float exposure_value = 1.0f;
     render::camera::ColourTuning colour_tuning;

@@ -7,7 +7,7 @@
 namespace gearoenix::render::light {
 struct Light : core::ecs::Component {
     math::Vec3<float> colour = { 1.0f, 1.0f, 1.0f };
-    core::ecs::entity_id_t scene_id = 0;
+    core::ecs::entity_id_t scene_id = core::ecs::INVALID_ENTITY_ID;
     bool is_shadow_caster = false;
 
 protected:

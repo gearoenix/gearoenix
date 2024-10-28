@@ -215,6 +215,11 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         (void)c; });
 }
 
+void* gearoenix::gl::Texture2D::get_imgui_ptr() const
+{
+    return reinterpret_cast<void*>(static_cast<std::uintptr_t>(object));
+}
+
 gearoenix::gl::Texture2D::Texture2D(
     Engine& e,
     const render::texture::TextureInfo& info,

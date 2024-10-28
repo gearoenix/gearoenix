@@ -54,8 +54,8 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_CREF_PRT(Target, target);
     GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, 0); // It can be light or reflection probe or any other owner entity
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, 0);
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, core::ecs::INVALID_ENTITY_ID); // It can be light or reflection probe or any other owner entity
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::INVALID_ENTITY_ID);
     GX_GETSET_VAL_PRT(std::uint64_t, flag, 1);
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);

@@ -26,6 +26,7 @@ struct Texture2D final : render::texture::Texture2D {
     GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const override;
+    void* get_imgui_ptr() const override;
 
 public:
     Texture2D(

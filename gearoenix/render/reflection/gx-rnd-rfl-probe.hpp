@@ -18,7 +18,7 @@ struct Probe : core::ecs::Component {
     GX_GET_CREF_PRT(math::Aabb3<double>, include_box);
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, irradiance);
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, radiance);
-    GX_GET_VAL_PRT(core::ecs::entity_id_t, scene_id, 0);
+    GX_GET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::INVALID_ENTITY_ID);
     GX_GET_RRF_PRT(engine::Engine, e);
 
 protected:

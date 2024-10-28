@@ -1,9 +1,9 @@
-#include "gx-editor-ui-menu-bar.hpp"
-#include "gx-editor-ui-manager.hpp"
-#include "gx-editor-ui-menu-entity.hpp"
-#include "gx-editor-ui-menu-project.hpp"
-#include "gx-editor-ui-menu-window.hpp"
-#include "gx-editor-ui-window-overlay-progress-bar.hpp"
+#include "gx-ed-ui-menu-bar.hpp"
+#include "gx-ed-ui-manager.hpp"
+#include "gx-ed-ui-menu-entity.hpp"
+#include "gx-ed-ui-menu-project.hpp"
+#include "gx-ed-ui-menu-window.hpp"
+#include "gx-ed-ui-window-overlay-progress-bar.hpp"
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
