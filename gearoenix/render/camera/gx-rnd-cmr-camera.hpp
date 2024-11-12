@@ -70,6 +70,7 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(Exposure, exposure);
     GX_GET_VAL_PRT(std::size_t, resolution_cfg_observer, 0);
     GX_GET_CREF_PRV(std::weak_ptr<Camera>, camera_self);
+    GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, transform);
 
 protected:
     Camera(
@@ -77,6 +78,7 @@ protected:
         std::type_index final_type,
         const std::string& name,
         Target&& target,
+        std::shared_ptr<physics::Transformation>&& transform,
         core::ecs::entity_id_t entity_id);
     void set_component_self(const std::shared_ptr<Component>&) override;
 
@@ -94,13 +96,15 @@ public:
     /// This returns customised_target_aspect_ratio value if it is set or the actual target aspect ratio
     [[nodiscard]] float get_target_aspect_ratio() const;
     void set_projection_data(ProjectionData);
+    [[nodiscard]] bool is_perspective() const;
+    [[nodiscard]] bool is_orthographic() const;
     void update_projection();
     void set_near(float);
     void set_far(float);
     void show_debug_gui(const core::ecs::World&) final;
     void enable_debug_mesh(core::job::EndCaller<>&& end);
     void disable_debug_mesh();
-    [[nodiscard]] math::Ray3<double> generate_ray(const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const;
+    [[nodiscard]] math::Ray3<double> generate_ray(const math::Vec2<double>& normalised_point) const;
     virtual void set_customised_target(std::shared_ptr<texture::Target>&&);
     virtual void create_debug_mesh(core::job::EndCaller<>&& end);
     virtual void disable_bloom();

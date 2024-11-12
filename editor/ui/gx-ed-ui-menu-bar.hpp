@@ -11,6 +11,7 @@ namespace gearoenix::editor::ui {
 struct Manager;
 struct MenuEntity;
 struct MenuProject;
+struct MenuScene;
 struct MenuWindow;
 struct MenuBar final {
 private:
@@ -18,11 +19,10 @@ private:
 
     GX_GET_UPTR_PRV(MenuEntity, entity_menu);
     GX_GET_UPTR_PRV(MenuProject, project_menu);
+    GX_GET_UPTR_PRV(MenuScene, scene_menu);
     GX_GET_UPTR_PRV(MenuWindow, window_menu);
 
     bool show_scene_import_popup = false;
-
-    void show_scene();
 
 public:
     explicit MenuBar(Manager& manager);

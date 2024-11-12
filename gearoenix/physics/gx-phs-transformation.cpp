@@ -17,6 +17,13 @@ gearoenix::physics::Transformation::Transformation(const Transformation* const p
 {
 }
 
+void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<double>& lm)
+{
+    changed = true;
+    local_matrix = lm;
+    lm.get_axes(x_axis, y_axis, z_axis);
+}
+
 gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_global_location() const
 {
     return global_matrix.get_location();
@@ -249,11 +256,9 @@ gearoenix::math::Quat<double> gearoenix::physics::Transformation::get_local_orie
 void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up)
 {
     changed = true;
-    z_axis = (location - target).normalised();
-    x_axis = up.cross(z_axis).normalised();
-    y_axis = z_axis.cross(x_axis).normalised();
-    local_matrix = math::Mat4x4<double>::look_at(location, -x_axis, y_axis, -z_axis).inverted();
-    scale = math::Vec3<double>(1.0);
+    local_matrix = math::Mat4x4<double>::look_at(location, target, up).inverted();
+    local_matrix.get_axes(x_axis, y_axis, z_axis);
+    scale = math::Vec3(1.0);
 }
 
 void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up)
@@ -261,11 +266,7 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     changed = true;
     math::Vec3<double> l;
     get_local_location(l);
-    z_axis = (l - target).normalised();
-    x_axis = up.cross(z_axis).normalised();
-    y_axis = z_axis.cross(x_axis).normalised();
-    local_matrix = math::Mat4x4<double>::look_at(l, -x_axis, y_axis, -z_axis).inverted();
-    scale = math::Vec3(1.0);
+    local_look_at(l, target, up);
 }
 
 void gearoenix::physics::Transformation::update_without_inverse_root()

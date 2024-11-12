@@ -23,6 +23,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-font.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/font/gx-rnd-fnt-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gizmo/gx-rnd-gzm-manager.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gizmo/gx-rnd-gzm-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-name-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-selector.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-input-uint.hpp

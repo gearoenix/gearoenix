@@ -11,6 +11,10 @@ namespace gearoenix::render::camera {
 struct Camera;
 }
 
+namespace gearoenix::render::engine {
+struct Engine;
+}
+
 namespace gearoenix::editor {
 struct Application;
 }
@@ -18,6 +22,7 @@ struct Application;
 namespace gearoenix::editor::viewport {
 struct Camera final {
     Application& app;
+    render::engine::Engine& e;
 
     GX_GET_CREF_PRT(std::shared_ptr<render::camera::Camera>, camera);
     GX_GET_CREF_PRT(std::shared_ptr<physics::TransformationComponent>, transformation);

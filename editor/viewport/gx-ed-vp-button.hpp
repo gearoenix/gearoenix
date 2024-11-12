@@ -37,9 +37,9 @@ struct Button {
     GX_GET_VAL_PRT(float, text_font_size, 20.0f);
     GX_GET_VAL_PRT(float, rounding, 10.0f);
     GX_GET_VAL_PRT(ImU32, text_colour, IM_COL32(200, 200, 200, 255));
-    GX_GET_VAL_PRT(ImU32, background_colour, IM_COL32(80, 80, 80, 128));
+    GX_GET_VAL_PRT(ImU32, background_colour, IM_COL32(80, 80, 80, 200));
     GX_GET_VAL_PRT(ImU32, toggled_background_colour, background_colour);
-    GX_GET_VAL_PRT(ImU32, border_colour, IM_COL32(128, 128, 128, 128));
+    GX_GET_VAL_PRT(ImU32, border_colour, IM_COL32(128, 128, 128, 200));
 
     void show();
     void compute_values();

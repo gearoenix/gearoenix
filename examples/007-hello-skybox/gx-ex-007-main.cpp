@@ -35,7 +35,6 @@ struct GameApp final : gearoenix::core::Application {
                 (void)render_engine.get_physics_engine()->get_constraint_manager()->create_jet_controller(
                     camera_builder->get_entity_builder()->get_builder().get_name() + "-controller",
                     std::move(trn),
-                    camera_builder->get_id(),
                     gearoenix::core::job::EndCaller([] { }));
                 scene_builder->add(std::move(camera_builder));
             }),

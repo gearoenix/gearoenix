@@ -34,6 +34,11 @@ const gearoenix::physics::TransformationComponent& gearoenix::render::camera::Bu
     return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
 }
 
+std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::render::camera::Builder::get_transformation_shared_ptr() const
+{
+    return std::dynamic_pointer_cast<physics::TransformationComponent>(get_transformation().get_component_self().lock());
+}
+
 gearoenix::physics::collider::Frustum& gearoenix::render::camera::Builder::get_frustum()
 {
     return *entity_builder->get_builder().get_component<physics::collider::Frustum>();

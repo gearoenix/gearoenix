@@ -2,6 +2,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
+#include "../physics/gx-phs-transformation.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
@@ -66,14 +67,21 @@ void gearoenix::gl::Camera::update_target(gearoenix::core::job::EndCaller<>&& en
     }));
 }
 
-gearoenix::gl::Camera::Camera(Engine& e, const std::string& name, render::camera::Target&& target, const core::ecs::entity_id_t entity_id)
-    : render::camera::Camera(e, create_this_type_index(this), name, std::move(target), entity_id)
+gearoenix::gl::Camera::Camera(
+    Engine& e,
+    const std::string& name,
+    render::camera::Target&& target,
+    std::shared_ptr<physics::Transformation>&& transform,
+    const core::ecs::entity_id_t entity_id)
+    : render::camera::Camera(e, create_this_type_index(this), name, std::move(target), std::move(transform), entity_id)
 {
 }
 
-void gearoenix::gl::Camera::construct(Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c, const core::ecs::entity_id_t entity_id)
+void gearoenix::gl::Camera::construct(
+    Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
+    std::shared_ptr<physics::Transformation>&& transform, const core::ecs::entity_id_t entity_id)
 {
-    c.set_return(allocator->make_shared(e, name, render::camera::Target(), entity_id));
+    c.set_return(allocator->make_shared(e, name, render::camera::Target(), std::move(transform), entity_id));
     c.get_return()->set_component_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
@@ -99,11 +107,13 @@ void gearoenix::gl::CameraBuilder::construct(
     builder_end_caller.set_return(std::make_shared<CameraBuilder>(
         e, name, std::move(entity_end_caller), parent_transform));
     const auto entity_id = builder_end_caller.get_return()->get_id();
+    auto transform = builder_end_caller.get_return()->get_transformation_shared_ptr();
     Camera::construct(
         e, name + "-gl-camera",
         core::job::EndCallerShared<Camera>([b = std::move(builder_end_caller)](std::shared_ptr<Camera>&& c) {
             b.get_return()->get_entity_builder()->get_builder().add_component(std::move(c));
         }),
+        std::move(transform),
         entity_id);
 }
 

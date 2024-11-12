@@ -23,6 +23,7 @@ gearoenix::render::camera::Camera::Camera(
     const std::type_index final_type,
     const std::string& name,
     Target&& target,
+    std::shared_ptr<physics::Transformation>&& transform,
     const core::ecs::entity_id_t entity_id)
     : Component(final_type, std::string(name), entity_id)
     , e(e)
@@ -35,6 +36,7 @@ gearoenix::render::camera::Camera::Camera(
         urd(re),
         urd(re),
     }
+    , transform(std::move(transform))
 {
     if (this->target.is_customised()) {
         exposure.disable();
@@ -131,6 +133,16 @@ void gearoenix::render::camera::Camera::set_projection_data(const ProjectionData
     update_projection();
 }
 
+bool gearoenix::render::camera::Camera::is_perspective() const
+{
+    return boost::mp11::mp_find<ProjectionData, PerspectiveProjectionData>::value == projection_data.index();
+}
+
+bool gearoenix::render::camera::Camera::is_orthographic() const
+{
+    return boost::mp11::mp_find<ProjectionData, OrthographicProjectionData>::value == projection_data.index();
+}
+
 void gearoenix::render::camera::Camera::update_projection()
 {
     const auto target_aspect_ratio = get_target_aspect_ratio();
@@ -204,8 +216,7 @@ void gearoenix::render::camera::Camera::disable_debug_mesh()
     debug_enabled = false;
 }
 
-gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(
-    const physics::Transformation& transform, const math::Vec2<double>& normalised_point) const
+gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(const math::Vec2<double>& normalised_point) const
 {
     const auto [scale, is_perspective] = [&] {
         if (const auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
@@ -217,9 +228,9 @@ gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(
         GX_UNEXPECTED;
     }();
     const auto near_plane_point = normalised_point * scale;
-    const auto direction = (transform.get_x_axis() * near_plane_point.x) + (transform.get_y_axis() * near_plane_point.y) + (transform.get_z_axis() * static_cast<double>(-near));
-    const auto origin = transform.get_local_location() + direction;
-    return { origin, is_perspective ? direction.normalised() : -transform.get_z_axis() };
+    const auto direction = (transform->get_x_axis() * near_plane_point.x) + (transform->get_y_axis() * near_plane_point.y) + (transform->get_z_axis() * static_cast<double>(-near));
+    const auto origin = transform->get_local_location() + direction;
+    return { origin, is_perspective ? direction.normalised() : -transform->get_z_axis() };
 }
 
 void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<texture::Target>&& t)

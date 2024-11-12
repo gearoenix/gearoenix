@@ -9,16 +9,19 @@
 #include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 gearoenix::editor::viewport::Camera::Camera(Application& app)
     : app(app)
+    , e(app.get_render_engine())
 {
     app.get_render_engine().get_camera_manager()->build(
         "Geareonix/Editor/Viewport/Camera", nullptr,
         core::job::EndCallerShared<render::camera::Builder>([this](auto&& camera_builder) {
             camera = camera_builder->get_camera().get_camera_self().lock();
             transformation = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
+            transformation->local_look_at({ 10, 10, 10 }, { 0, 0, 0 }, { 0, 0, 1 });
             (void)this->app.get_render_engine().get_physics_engine()->get_constraint_manager()->create_jet_controller(
                 "Geareonix/Editor/Viewport/Camera/JetController",
                 transformation,
@@ -31,13 +34,30 @@ gearoenix::editor::viewport::Camera::~Camera() = default;
 
 void gearoenix::editor::viewport::Camera::update()
 {
-    if (core::ecs::INVALID_ENTITY_ID == camera->get_scene_id()) {
-        app.get_render_engine().get_world()->synchronised_system<render::scene::Scene>([this](const auto id, auto* const scene) {
-            if (!scene->get_enabled()) {
-                return;
-            }
-            camera->set_scene_id(id);
-            scene->add_camera(camera->get_entity_id(), *camera);
-        });
+    auto& w = *e.get_world();
+    if (camera) {
+        if (core::ecs::INVALID_ENTITY_ID == camera->get_scene_id()) {
+            w.synchronised_system<render::scene::Scene>([this](const auto scene_id, auto* const scene) {
+                if (!scene->get_enabled()) {
+                    return;
+                }
+                camera->set_scene_id(scene_id);
+                scene->add_camera(camera->get_entity_id(), *camera);
+
+                e.get_world()->synchronised_system<render::camera::Camera>([this, scene_id](const auto camera_id, auto* const c) {
+                    if (camera_id == camera->get_entity_id()) {
+                        return;
+                    }
+
+                    if (render::camera::Camera::Usage::Main != c->get_usage()) {
+                        return;
+                    }
+
+                    c->set_enabled(false);
+                });
+            });
+        }
+        e.get_gizmo_manager()->set_viewport_camera(camera.get());
+        e.get_gizmo_manager()->show_view();
     }
 }

@@ -22,17 +22,21 @@ constexpr std::array default_event_ids {
 std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const
 {
     const auto* const world = e.get_world();
-    if (0 == model_entity_id)
+    if (0 == model_entity_id) {
         return std::nullopt;
+    }
     const auto* const collider = world->get_component<physics::collider::Aabb3>(model_entity_id);
-    if (nullptr == collider)
+    if (nullptr == collider) {
         return std::nullopt;
-    if (0 == camera_entity_id)
+    }
+    if (0 == camera_entity_id) {
         return std::nullopt;
+    }
     const auto [camera_transform, camera] = world->get_components<physics::TransformationComponent, camera::Camera>(camera_entity_id);
-    if (nullptr == camera_transform || nullptr == camera)
+    if (nullptr == camera_transform || nullptr == camera) {
         return std::nullopt;
-    const auto ray = camera->generate_ray(*camera_transform, normalised_point);
+    }
+    const auto ray = camera->generate_ray(normalised_point);
     if (auto dis = collider->get_updated_box().hit(ray, std::numeric_limits<double>::max()); dis.has_value()) {
         return ray.get_point(dis.value());
     }
@@ -43,8 +47,9 @@ void gearoenix::render::widget::Widget::handle_click_gesture(const core::event::
 {
     const auto& click = std::get<core::event::gesture::Click>(event_data.get_data());
     const auto hit = get_hit_point(click.get_point().get_current_position());
-    if (!hit.has_value())
+    if (!hit.has_value()) {
         return;
+    }
     on_click(hit.value());
 }
 

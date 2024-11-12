@@ -5,6 +5,7 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
+#include "../gizmo/gx-rnd-gzm-manager.hpp"
 #include "../light/gx-rnd-lt-manager.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -41,6 +42,7 @@ gearoenix::render::engine::Engine::Engine(
     , physics_engine(new physics::Engine(*this))
     , scene_manager(new scene::Manager(*this))
     , font_manager(new font::Manager(*this))
+    , gizmo_manager(new gizmo::Manager(*this))
     , world(new core::ecs::World())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {

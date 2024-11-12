@@ -290,9 +290,9 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                e.get_world()->synchronised_system<core::ecs::Any<gl::BakedReflection, gl::RuntimeReflection>>(
-                    [&](const core::ecs::entity_id_t reflection_id, gl::BakedReflection* const baked, gl::RuntimeReflection* const runtime) {
-                        gl::ReflectionProbe* gl_probe = nullptr;
+                e.get_world()->synchronised_system<core::ecs::Any<BakedReflection, RuntimeReflection>>(
+                    [&](const core::ecs::entity_id_t reflection_id, BakedReflection* const baked, RuntimeReflection* const runtime) {
+                        ReflectionProbe* gl_probe = nullptr;
                         render::reflection::Probe* render_probe = nullptr;
                         if (nullptr == runtime) {
                             if (!baked->get_enabled()) {
@@ -659,13 +659,13 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
     push_debug_group("render-reflection-probes");
     e.get_world()->synchronised_system<RuntimeReflection>(
         [&](const core::ecs::entity_id_t, const RuntimeReflection* const r) {
-            constexpr std::array<std::array<math::Vec3<float>, 3>, 6> face_uv_axis {
-                std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
-                std::array<math::Vec3<float>, 3> { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
-                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
-                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
-                std::array<math::Vec3<float>, 3> { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
-                std::array<math::Vec3<float>, 3> { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
+            constexpr std::array face_uv_axis {
+                std::array { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
+                std::array { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
+                std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
+                std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
+                std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
+                std::array { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
             };
             switch (r->get_state()) {
             case render::reflection::Runtime::State::EnvironmentCubeMipMap:

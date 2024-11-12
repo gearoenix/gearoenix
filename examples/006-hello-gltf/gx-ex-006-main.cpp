@@ -30,7 +30,6 @@ struct GameApp final : gearoenix::core::Application {
                 (void)render_engine.get_physics_engine()->get_constraint_manager()->create_jet_controller(
                     cb.get_entity_builder()->get_builder().get_name() + "-controller",
                     std::dynamic_pointer_cast<gearoenix::physics::Transformation>(cb.get_transformation().get_component_self().lock()),
-                    cb.get_id(),
                     std::move(end_callback));
             }),
             end_callback);

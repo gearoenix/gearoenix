@@ -249,7 +249,7 @@ struct GameApp final : GxCoreApp {
                 trn->set_local_location({ 0.0f, 0.0f, 5.0f });
                 const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
                 auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
-                (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), camera_builder->get_id(), GxEndCaller([] { }));
+                (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
                 scene_builder->add(std::move(camera_builder));
             }),
             GxEndCaller([] {}));

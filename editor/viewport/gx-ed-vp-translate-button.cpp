@@ -17,7 +17,7 @@ gearoenix::editor::viewport::TranslateButton::TranslateButton(Application& app, 
     toggled_text = "";
     start_point = { previous.get_end_point().x + spacing, top_margin };
     size = { height, height };
-    toggled_background_colour = IM_COL32(90, 90, 200, 128);
+    toggled_background_colour = IM_COL32(90, 90, 200, 200);
     compute_values();
 
     core::job::send_job_io1([this] {

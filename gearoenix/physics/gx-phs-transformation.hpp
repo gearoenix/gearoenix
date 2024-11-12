@@ -30,6 +30,7 @@ public:
     Transformation(Transformation&&) = default;
     Transformation& operator=(Transformation&&) = default;
     virtual ~Transformation() = default;
+    void set_local_matrix(const math::Mat4x4<double>&);
     [[nodiscard]] math::Vec3<double> get_global_location() const;
     void get_global_location(math::Vec3<double>& l) const;
     [[nodiscard]] math::Vec3<double> get_local_location() const;

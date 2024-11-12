@@ -47,6 +47,7 @@ public:
 
     [[nodiscard]] physics::TransformationComponent& get_transformation();
     [[nodiscard]] const physics::TransformationComponent& get_transformation() const;
+    [[nodiscard]] std::shared_ptr<physics::TransformationComponent> get_transformation_shared_ptr() const;
     [[nodiscard]] physics::collider::Frustum& get_frustum();
     [[nodiscard]] const physics::collider::Frustum& get_frustum() const;
     [[nodiscard]] Camera& get_camera();

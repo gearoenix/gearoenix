@@ -51,8 +51,8 @@ void gearoenix::editor::viewport::Button::show()
     }
 
     ImGui::End();
-    ImGui::PopStyleColor();
     ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
 }
 
 void gearoenix::editor::viewport::Button::compute_values()

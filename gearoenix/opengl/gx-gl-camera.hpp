@@ -41,8 +41,12 @@ struct Camera final : render::camera::Camera {
     void update_target(core::job::EndCaller<>&& end) override;
 
 public:
-    Camera(Engine& e, const std::string& name, render::camera::Target&& target, core::ecs::entity_id_t entity_id);
-    static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c, core::ecs::entity_id_t entity_id);
+    Camera(
+        Engine& e, const std::string& name, render::camera::Target&& target,
+        std::shared_ptr<physics::Transformation>&& transform, core::ecs::entity_id_t entity_id);
+    static void construct(
+        Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
+        std::shared_ptr<physics::Transformation>&& transform, core::ecs::entity_id_t entity_id);
     ~Camera() override;
 };
 

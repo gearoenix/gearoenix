@@ -9,11 +9,15 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <random>
 
 BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
 {
     using GxMat4 = gearoenix::math::Mat4x4<float>;
     using GxVec3 = gearoenix::math::Vec3<float>;
+
+    std::default_random_engine re;
+    std::uniform_real_distribution<float> dis(-1.0, 1.0);
 
     glm::mat4 glmm;
     GxMat4 gxm;
@@ -48,11 +52,16 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
     gxm.inverse();
 
     compare("hard-coded-inverse-1", __LINE__);
+    for (int i = 0; i < 1000; ++i) {
+        const auto px = dis(re), py = dis(re), pz = dis(re);
+        const auto tx = dis(re), ty = dis(re), tz = dis(re);
+        const auto ux = dis(re), uy = dis(re), uz = dis(re);
 
-    glmm = glm::lookAt(glm::vec3(32.0, 11.0, -89.0), glm::vec3(-4.0, -5.0, -7.0), glm::vec3(0.0, 0.0, 1.0));
-    gxm = GxMat4::look_at(GxVec3(32.0, 11.0, -89.0), GxVec3(-4.0, -5.0, -7.0), GxVec3(0.0, 0.0, 1.0));
+        glmm = glm::lookAt(glm::vec3(px, py, pz), { tx, ty, tz }, { ux, uy, uz });
+        gxm = GxMat4::look_at({ px, py, pz }, { tx, ty, tz }, { ux, uy, uz });
 
-    compare("hard-coded-look-at-1", __LINE__);
+        compare("hard-coded-look-at-1", __LINE__);
+    }
 }
 #endif
 #endif
