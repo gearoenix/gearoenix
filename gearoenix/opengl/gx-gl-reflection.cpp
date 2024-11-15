@@ -127,7 +127,7 @@ gearoenix::gl::RuntimeReflection::~RuntimeReflection() = default;
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     core::job::EndCaller<>&& end_callback)
     : Builder(e, std::string(name), parent_transform, std::move(end_callback))
 {
@@ -136,7 +136,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const math::Aabb3<double>& include_box,
     std::shared_ptr<render::texture::TextureCube>&& irradiance_texture,
     std::shared_ptr<render::texture::TextureCube>&& radiance_texture,
@@ -155,7 +155,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
 void gearoenix::gl::ReflectionBuilder::construct_runtime(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
@@ -180,7 +180,7 @@ gearoenix::gl::ReflectionBuilder::~ReflectionBuilder() = default;
 
 std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::ReflectionManager::build_baked(
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     std::shared_ptr<render::texture::TextureCube>&& irradiance,
     std::shared_ptr<render::texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box,
@@ -198,7 +198,7 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::gl::Reflectio
 
 void gearoenix::gl::ReflectionManager::build_runtime(
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,

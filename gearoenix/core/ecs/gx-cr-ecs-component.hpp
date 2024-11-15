@@ -10,6 +10,10 @@
 #include <type_traits>
 #include <typeindex>
 
+namespace gearoenix::render::engine {
+struct Engine;
+}
+
 namespace gearoenix::core::ecs {
 struct World;
 struct Component {
@@ -37,7 +41,7 @@ public:
     Component& operator=(Component&&) = delete;
     Component& operator=(const Component&) = delete;
 
-    virtual void show_debug_gui(const World&);
+    virtual void show_debug_gui(const render::engine::Engine&);
 
     template <typename T>
     constexpr static void type_check()

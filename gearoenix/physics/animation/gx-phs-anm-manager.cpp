@@ -33,16 +33,16 @@ void gearoenix::physics::animation::Manager::insert_bones(
 void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, const Transformation& parent_transform)
 {
     auto& bone = bones[index];
-    bone.transform.set_parent(&parent_transform);
-    bone.transform.update_without_inverse_child();
-    if (bone.transform.get_changed()) {
-        bone.m = math::Mat4x4<float>(bone.transform.get_global_matrix()) * bone.inverse_bind;
+    bone.transform->set_parent(&parent_transform);
+    bone.transform->update_without_inverse_child();
+    if (bone.transform->get_changed()) {
+        bone.m = math::Mat4x4<float>(bone.transform->get_global_matrix()) * bone.inverse_bind;
         bone.inv_m = bone.m.inverted().transposed();
     }
     for (auto i = bone.first_child_index; i < bone.end_child_index; ++i) {
-        update_bone(i, bone.transform);
+        update_bone(i, *bone.transform);
     }
-    bone.transform.clear_change();
+    bone.transform->clear_change();
 }
 
 gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e)
@@ -145,8 +145,8 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
 
 void gearoenix::physics::animation::Manager::update()
 {
-    e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, TransformationComponent>>(
-        [this](auto, AnimationPlayer* const player, Armature* const armature, const TransformationComponent* const model_transform, auto) {
+    e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, Transformation>>(
+        [this](auto, AnimationPlayer* const player, Armature* const armature, const Transformation* const model_transform, auto) {
             if (nullptr != player) {
                 player->update_time(e.get_delta_time());
                 player->animate(*this);

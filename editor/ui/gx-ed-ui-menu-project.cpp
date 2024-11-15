@@ -39,15 +39,16 @@ void gearoenix::editor::ui::MenuProject::show_settings()
         return;
     }
 
-    auto* const w = manager.get_platform_application().get_base().get_render_engine()->get_world();
+    auto& e = *manager.get_platform_application().get_base().get_render_engine();
+    auto* const w = e.get_world();
 
     if (ImGui::TreeNode("Platform Settings")) {
-        platform::RuntimeConfiguration::get(manager.get_platform_application()).show_debug_gui(*w);
+        platform::RuntimeConfiguration::get(manager.get_platform_application()).show_debug_gui(e);
         ImGui::TreePop();
     }
 
     if (ImGui::TreeNode("Render Settings")) {
-        render::RuntimeConfiguration::get(w).show_debug_gui(*w);
+        render::RuntimeConfiguration::get(w).show_debug_gui(e);
         ImGui::TreePop();
     }
 

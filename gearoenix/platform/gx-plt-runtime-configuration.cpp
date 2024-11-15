@@ -89,13 +89,13 @@ gearoenix::platform::RuntimeConfiguration& gearoenix::platform::RuntimeConfigura
 
 gearoenix::platform::RuntimeConfiguration::~RuntimeConfiguration() = default;
 
-void gearoenix::platform::RuntimeConfiguration::show_debug_gui(const core::ecs::World& w)
+void gearoenix::platform::RuntimeConfiguration::show_debug_gui(const render::engine::Engine& e)
 {
     if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         return;
     }
 
-    Component::show_debug_gui(w);
+    Component::show_debug_gui(e);
 
     if (!ImGui::BeginTable("", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
         return;

@@ -600,7 +600,7 @@ struct DataLoader final {
             GX_ASSERT_D(name_to_joint_index.end() != search);
             bone_info.inverse_bind = inv_bind_mats[search->second];
         }
-        apply_transform(bone_node_index, bone_info.transform);
+        apply_transform(bone_node_index, *bone_info.transform);
         bone_info.children.reserve(bone_node.children.size());
         for (auto child : bone_node.children) {
             bone_info.children.push_back(load_bone_info(child, bone_node.name, name_to_joint_index, inv_bind_mats));
@@ -670,7 +670,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_camera(
         const std::size_t node_index,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder) const
@@ -714,7 +714,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_mesh(
         const tinygltf::Node& node,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& entity_end_callback,
         scene::Builder& scene_builder)
     {
@@ -750,7 +750,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_light(
         const std::size_t node_index,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& light_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)
@@ -853,7 +853,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_armature(
         const int node_index,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)
@@ -879,8 +879,8 @@ struct DataLoader final {
         return node.rotation.empty() && node.scale.empty() && node.translation.empty();
     }
 
-    [[nodiscard]] physics::TransformationComponent* create_empty_entity_transform(
-        physics::TransformationComponent* const parent_transform,
+    [[nodiscard]] physics::Transformation* create_empty_entity_transform(
+        physics::Transformation* const parent_transform,
         const tinygltf::Node& node,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder) const
@@ -892,8 +892,8 @@ struct DataLoader final {
             const auto entity_builder = e.get_world()->create_shared_builder(
                 std::string(node.name),
                 core::job::EndCaller(entity_end_callback));
-            auto transform = physics::TransformationComponent::construct(
-                node.name + "-transformation", parent_transform, entity_builder->get_id());
+            const auto transform = physics::Transformation::construct(
+                node.name + "-transformation", parent_transform, entity_builder->get_id(), &e);
             entity_builder->get_builder().add_component(transform);
             scene_builder->get_scene().add_empty(entity_builder->get_id());
             apply_transform(node, *transform);
@@ -903,7 +903,7 @@ struct DataLoader final {
 
     [[nodiscard]] bool process_node_empty(
         const int node_index,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)
@@ -921,7 +921,7 @@ struct DataLoader final {
 
     void process_node(
         const int node_index,
-        physics::TransformationComponent* const parent_transform,
+        physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
         const std::shared_ptr<scene::Builder>& scene_builder)

@@ -12,7 +12,7 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::render::camera {
@@ -33,12 +33,12 @@ struct Builder {
     typedef std::array<std::shared_ptr<camera::Builder>, 6> CameraBuilders;
 
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
-    GX_GET_REFC_PRT(std::shared_ptr<physics::TransformationComponent>, transformation);
+    GX_GET_REFC_PRT(std::shared_ptr<physics::Transformation>, transformation);
     GX_GET_CREF_PRT(CameraBuilders, faces_camera_builders);
 
     Builder(
         engine::Engine& e, std::string&& name,
-        physics::TransformationComponent* parent_transform,
+        physics::Transformation* parent_transform,
         core::job::EndCaller<>&& end_callback);
 
 public:

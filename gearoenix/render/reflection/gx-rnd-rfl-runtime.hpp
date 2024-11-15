@@ -10,7 +10,7 @@
 #include <memory>
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::platform::stream {
@@ -42,7 +42,7 @@ struct Runtime : Probe {
 
     struct CameraData final {
         std::shared_ptr<camera::Camera> cmr;
-        std::shared_ptr<physics::TransformationComponent> trn;
+        std::shared_ptr<physics::Transformation> trn;
     };
 
     typedef std::array<CameraData, 6> CubeCamera;

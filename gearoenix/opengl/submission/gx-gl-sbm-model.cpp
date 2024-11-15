@@ -18,7 +18,7 @@ gearoenix::gl::submission::Model::Model() = default;
 gearoenix::gl::submission::Model::Model(
     Engine& e,
     gl::Model* const model,
-    physics::TransformationComponent* const model_transform,
+    physics::Transformation* const model_transform,
     Scene& scene,
     physics::animation::Armature* const armature)
     : m(model_transform->get_global_matrix())
@@ -101,7 +101,7 @@ gearoenix::gl::submission::BvhNodeModel::BvhNodeModel() = default;
 gearoenix::gl::submission::BvhNodeModel::BvhNodeModel(
     Engine& e,
     gl::Model* const gl_model,
-    physics::TransformationComponent* const model_transform,
+    physics::Transformation* const model_transform,
     Scene& scene,
     physics::animation::Armature* const armature)
     : cameras_flags(gl_model->cameras_flags)
@@ -110,7 +110,7 @@ gearoenix::gl::submission::BvhNodeModel::BvhNodeModel(
 }
 
 gearoenix::gl::submission::DynamicModel::DynamicModel(
-    gl::Engine& e, gl::Model* gl_model, physics::TransformationComponent* model_transform, Scene& scene,
+    gl::Engine& e, gl::Model* gl_model, physics::Transformation* model_transform, Scene& scene,
     physics::animation::Armature* armature, physics::collider::Aabb3* collider)
     : base(e, gl_model, model_transform, scene, armature)
     , box(collider->get_updated_box())
@@ -119,7 +119,7 @@ gearoenix::gl::submission::DynamicModel::DynamicModel(
 
 gearoenix::gl::submission::DebugModel::DebugModel(
     gl::Camera* const camera,
-    physics::TransformationComponent* const transform)
+    physics::Transformation* const transform)
     : m(math::Mat4x4<float>(transform->get_global_matrix()))
     , colour(camera->get_debug_colour())
 {

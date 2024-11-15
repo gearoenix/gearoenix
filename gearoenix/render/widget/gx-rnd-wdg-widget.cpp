@@ -32,7 +32,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
     if (0 == camera_entity_id) {
         return std::nullopt;
     }
-    const auto [camera_transform, camera] = world->get_components<physics::TransformationComponent, camera::Camera>(camera_entity_id);
+    const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
     if (nullptr == camera_transform || nullptr == camera) {
         return std::nullopt;
     }

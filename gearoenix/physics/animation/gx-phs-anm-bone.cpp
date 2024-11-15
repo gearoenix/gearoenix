@@ -7,7 +7,7 @@ gearoenix::physics::animation::BoneInfo::BoneInfo(std::string&& name)
 }
 
 gearoenix::physics::animation::Bone::Bone(
-    Transformation&& transform,
+    std::shared_ptr<Transformation>&& transform,
     math::Mat4x4<float>&& inverse_bind,
     std::string&& name,
     const std::size_t parent_index,

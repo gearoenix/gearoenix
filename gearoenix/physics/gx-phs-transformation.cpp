@@ -2,19 +2,42 @@
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/gx-cr-string.hpp"
+#include "../render/engine/gx-rnd-eng-engine.hpp"
+#include "../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include <imgui/imgui.h>
 
 namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::TransformationComponent, 8192>::construct();
+const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::Transformation, 8192>::construct();
 }
 
-gearoenix::physics::Transformation::Transformation(const Transformation* const parent)
-    : x_axis(1.0, 0.0, 0.0)
+const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::Transformation::get_hierarchy_types() const
+{
+    static const auto types = generate_hierarchy_types(this);
+    return types;
+}
+
+gearoenix::physics::Transformation::Transformation(
+    std::string&& name,
+    const Transformation* const parent,
+    const core::ecs::entity_id_t entity_id,
+    render::engine::Engine* const e)
+    : Component(create_this_type_index(this), std::move(name), entity_id)
+    , Drawer(e)
+    , x_axis(1.0, 0.0, 0.0)
     , y_axis(0.0, 1.0, 0.0)
     , z_axis(0.0, 0.0, 1.0)
     , scale(1.0)
     , parent(parent)
 {
+}
+
+gearoenix::physics::Transformation::~Transformation()
+{
+    for (auto& c : children) {
+        if (this == c->parent) {
+            c->parent = nullptr;
+        }
+    }
 }
 
 void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<double>& lm)
@@ -332,6 +355,38 @@ void gearoenix::physics::Transformation::reset(
     changed = true;
 }
 
+void gearoenix::physics::Transformation::reset(
+    const math::Vec3<double>& s,
+    const math::Vec3<double>& x,
+    const math::Vec3<double>& y,
+    const math::Vec3<double>& z,
+    const math::Vec3<double>& l)
+{
+    x_axis = x;
+    y_axis = y;
+    z_axis = z;
+    local_matrix.data[0][0] = x.x;
+    local_matrix.data[0][1] = x.y;
+    local_matrix.data[0][2] = x.z;
+    local_matrix.data[0][3] = 0.0;
+    local_matrix.data[1][0] = y.x;
+    local_matrix.data[1][1] = y.y;
+    local_matrix.data[1][2] = y.z;
+    local_matrix.data[1][3] = 0.0;
+    local_matrix.data[2][0] = z.x;
+    local_matrix.data[2][1] = z.y;
+    local_matrix.data[2][2] = z.z;
+    local_matrix.data[2][3] = 0.0;
+    local_matrix.data[3][0] = 0.0;
+    local_matrix.data[3][1] = 0.0;
+    local_matrix.data[3][2] = 0.0;
+    local_matrix.data[3][3] = 1.0;
+    scale = s;
+    local_matrix.local_scale(s);
+    local_matrix.set_location(l);
+    changed = true;
+}
+
 void gearoenix::physics::Transformation::add_child(const std::shared_ptr<Transformation>& child)
 {
     if (nullptr == child) {
@@ -345,11 +400,15 @@ void gearoenix::physics::Transformation::set_parent(const Transformation* const 
     this->parent = p;
 }
 
-void gearoenix::physics::Transformation::show_debug_gui_transform(const core::ecs::World& w)
+void gearoenix::physics::Transformation::show_debug_gui(const render::engine::Engine& e)
 {
     if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         return;
     }
+
+    Component::show_debug_gui(e);
+
+    is_gizmo_visible = true; // maybe later I make it true based on the object selection
 
     auto l = get_local_location();
     auto r = get_local_orientation().to_euler() * 180.0 / GX_PI;
@@ -427,7 +486,7 @@ void gearoenix::physics::Transformation::show_debug_gui_transform(const core::ec
 
     if (ImGui::TreeNode("Children")) {
         for (const auto& child : children) {
-            child->show_debug_gui_transform(w);
+            child->show_debug_gui(e);
         }
         ImGui::TreePop();
     }
@@ -435,55 +494,21 @@ void gearoenix::physics::Transformation::show_debug_gui_transform(const core::ec
     ImGui::TreePop();
 }
 
-void gearoenix::physics::Transformation::reset(
-    const math::Vec3<double>& s,
-    const math::Vec3<double>& x,
-    const math::Vec3<double>& y,
-    const math::Vec3<double>& z,
-    const math::Vec3<double>& l)
+void gearoenix::physics::Transformation::draw_gizmo()
 {
-    x_axis = x;
-    y_axis = y;
-    z_axis = z;
-    local_matrix.data[0][0] = x.x;
-    local_matrix.data[0][1] = x.y;
-    local_matrix.data[0][2] = x.z;
-    local_matrix.data[0][3] = 0.0;
-    local_matrix.data[1][0] = y.x;
-    local_matrix.data[1][1] = y.y;
-    local_matrix.data[1][2] = y.z;
-    local_matrix.data[1][3] = 0.0;
-    local_matrix.data[2][0] = z.x;
-    local_matrix.data[2][1] = z.y;
-    local_matrix.data[2][2] = z.z;
-    local_matrix.data[2][3] = 0.0;
-    local_matrix.data[3][0] = 0.0;
-    local_matrix.data[3][1] = 0.0;
-    local_matrix.data[3][2] = 0.0;
-    local_matrix.data[3][3] = 1.0;
-    scale = s;
-    local_matrix.local_scale(s);
-    local_matrix.set_location(l);
-    changed = true;
+    if (gizmo_manager->show_transform(local_matrix)) {
+        set_local_matrix(local_matrix);
+    }
+    is_gizmo_visible = false;
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::TransformationComponent::get_hierarchy_types() const
+std::shared_ptr<gearoenix::physics::Transformation> gearoenix::physics::Transformation::construct(
+    std::string&& name,
+    Transformation* const parent,
+    const core::ecs::entity_id_t entity_id,
+    render::engine::Engine* const e)
 {
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
-
-gearoenix::physics::TransformationComponent::TransformationComponent(
-    std::string&& name, const TransformationComponent* const parent, const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
-    , Transformation(parent)
-{
-}
-
-std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics::TransformationComponent::construct(
-    std::string&& name, TransformationComponent* const parent, const core::ecs::entity_id_t entity_id)
-{
-    auto self = allocator->make_shared(std::move(name), parent, entity_id);
+    auto self = allocator->make_shared(std::move(name), parent, entity_id, e);
     self->set_component_self(self);
     if (nullptr != parent) {
         parent->add_child(self);
@@ -491,26 +516,12 @@ std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::physics:
     return self;
 }
 
-void gearoenix::physics::TransformationComponent::show_debug_gui(const core::ecs::World& w)
+void gearoenix::physics::Transformation::update(core::ecs::World* const world)
 {
-    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        Component::show_debug_gui(w);
-        Transformation::show_debug_gui_transform(w);
-        ImGui::TreePop();
-    }
-}
-
-void gearoenix::physics::TransformationComponent::show_debug_gui_transform(const core::ecs::World& w)
-{
-    show_debug_gui(w);
-}
-
-void gearoenix::physics::TransformationComponent::update(core::ecs::World* const world)
-{
-    world->parallel_system<core::ecs::All<TransformationComponent>>([&](const auto, TransformationComponent* const transform, const auto) {
+    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_without_inverse_root();
     });
-    world->parallel_system<core::ecs::All<TransformationComponent>>([&](const auto, TransformationComponent* const transform, const auto) {
+    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_inverse();
     });
 }

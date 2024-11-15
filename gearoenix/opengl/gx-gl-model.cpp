@@ -50,7 +50,7 @@ gearoenix::gl::Model::~Model() = default;
 gearoenix::gl::ModelBuilder::ModelBuilder(
     Engine& e,
     std::string&& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     core::job::EndCaller<>&& end_caller,
     const bool is_transformable)
@@ -65,7 +65,7 @@ gearoenix::gl::ModelBuilder::~ModelBuilder() = default;
 
 std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::build(
     std::string&& name,
-    physics::TransformationComponent* parent_transform,
+    physics::Transformation* parent_transform,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     core::job::EndCaller<>&& end_caller,
     const bool is_transformable)

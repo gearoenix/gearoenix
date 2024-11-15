@@ -4,7 +4,7 @@
 #include <string>
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::render::engine {
@@ -29,7 +29,7 @@ public:
 
     virtual void build(
         const std::string& name,
-        physics::TransformationComponent* parent_transform,
+        physics::Transformation* parent_transform,
         core::job::EndCallerShared<Builder>&& builder_end_caller,
         core::job::EndCaller<>&& entity_end_caller)
         = 0;

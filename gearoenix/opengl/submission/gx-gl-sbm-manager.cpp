@@ -226,8 +226,8 @@ void gearoenix::gl::submission::Manager::fill_scenes()
             scene_pool_ref.meshes.clear();
             scene_pool_ref.debug_mesh_data.clear();
             scene_pool_ref.name = &scene->get_name();
-            e.get_world()->synchronised_system<core::ecs::All<gl::Camera, physics::TransformationComponent>>(
-                [&](const core::ecs::entity_id_t camera_id, gl::Camera* const camera, physics::TransformationComponent* const transform) {
+            e.get_world()->synchronised_system<core::ecs::All<gl::Camera, physics::Transformation>>(
+                [&](const core::ecs::entity_id_t camera_id, gl::Camera* const camera, physics::Transformation* const transform) {
                     if (!camera->get_enabled()) {
                         return;
                     }
@@ -360,12 +360,12 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
         return;
     }
     bvh.reset();
-    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::TransformationComponent>>(
+    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
         [&](
             const core::ecs::entity_id_t,
             const auto* const collider,
             gl::Model* const model,
-            physics::TransformationComponent* const model_transform) {
+            physics::Transformation* const model_transform) {
             if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
@@ -376,12 +376,12 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
 
 void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
-    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::TransformationComponent>, physics::animation::Armature>>(
+    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>, physics::animation::Armature>>(
         [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             gl::Model* const model,
-            physics::TransformationComponent* const model_transform,
+            physics::Transformation* const model_transform,
             physics::animation::Armature* const armature) {
             if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
@@ -478,12 +478,12 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
 
 void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    e.get_world()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::TransformationComponent>>(
+    e.get_world()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::Transformation>>(
         [&, this](
             const core::ecs::entity_id_t camera_id,
             const gl::Camera* const camera,
             const physics::collider::Frustum* const frustum,
-            const physics::TransformationComponent* const transform,
+            const physics::Transformation* const transform,
             const unsigned int /*kernel_index*/) -> void {
             if (!camera->get_enabled() || scene_id != camera->get_scene_id()) {
                 return;

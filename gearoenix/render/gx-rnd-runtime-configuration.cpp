@@ -5,7 +5,6 @@
 #include "engine/gx-rnd-eng-engine.hpp"
 #include "imgui/gx-rnd-imgui-input-uint.hpp"
 #include "imgui/gx-rnd-imgui-observer.hpp"
-#include <imgui/misc/cpp/imgui_stdlib.h>
 
 namespace {
 constexpr auto entity_name = "gearoenix-render-runtime-configuration";
@@ -80,13 +79,13 @@ std::uint8_t gearoenix::render::RuntimeConfiguration::compute_radiance_mipmaps_c
     return static_cast<std::uint8_t>(math::Numeric::floor_log2(value) - 3);
 }
 
-void gearoenix::render::RuntimeConfiguration::show_debug_gui(const core::ecs::World& world)
+void gearoenix::render::RuntimeConfiguration::show_debug_gui(const engine::Engine& e)
 {
     if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         return;
     }
 
-    Component::show_debug_gui(world);
+    Component::show_debug_gui(e);
 
     if (!ImGui::BeginTable("", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
         return;

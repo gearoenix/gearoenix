@@ -10,7 +10,7 @@
 gearoenix::render::model::Builder::Builder(
     engine::Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
     core::job::EndCaller<>&& end_caller)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_caller)))
@@ -21,14 +21,14 @@ gearoenix::render::model::Builder::Builder(
         box.put(m->get_buffer()->get_box());
     }
     builder.add_component(physics::collider::Aabb3::construct(box, name + "-collider", builder.get_id()));
-    builder.add_component(physics::TransformationComponent::construct(name + "-transformation", parent_transform, builder.get_id()));
+    builder.add_component(physics::Transformation::construct(name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 
 gearoenix::render::model::Builder::~Builder() = default;
 
-gearoenix::physics::TransformationComponent& gearoenix::render::model::Builder::get_transformation() const
+gearoenix::physics::Transformation& gearoenix::render::model::Builder::get_transformation() const
 {
-    return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
+    return *entity_builder->get_builder().get_component<physics::Transformation>();
 }
 
 gearoenix::render::model::Model& gearoenix::render::model::Builder::get_model() const

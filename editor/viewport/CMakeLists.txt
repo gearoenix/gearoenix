@@ -12,6 +12,8 @@ SET(GX_EDITOR_VIEWPORT_SRC
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-rotate-button.hpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-scale-button.cpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-scale-button.hpp
+        ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-transform-mode-button.cpp
+        ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-transform-mode-button.hpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-translate-button.cpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-translate-button.hpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-viewport.cpp

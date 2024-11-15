@@ -41,7 +41,7 @@ private:
     ModelBuilder(
         Engine& e,
         std::string&& name,
-        physics::TransformationComponent* parent_transform,
+        physics::Transformation* parent_transform,
         std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         core::job::EndCaller<>&& end_caller,
         bool is_transformable);
@@ -54,7 +54,7 @@ struct ModelManager final : render::model::Manager {
 private:
     [[nodiscard]] std::shared_ptr<render::model::Builder> build(
         std::string&& name,
-        physics::TransformationComponent* parent_transform,
+        physics::Transformation* parent_transform,
         std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         core::job::EndCaller<>&& end_caller,
         bool is_transformable) override;

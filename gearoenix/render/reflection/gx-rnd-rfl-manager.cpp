@@ -15,7 +15,7 @@ gearoenix::render::reflection::Manager::~Manager() = default;
 
 void gearoenix::render::reflection::Manager::build_baked(
     const std::string& name,
-    physics::TransformationComponent* parent_transform,
+    physics::Transformation* parent_transform,
     const platform::stream::Path& path,
     core::job::EndCallerShared<Builder>&& c,
     core::job::EndCaller<>&& entity_end_callback)
@@ -29,7 +29,7 @@ void gearoenix::render::reflection::Manager::build_baked(
         std::string name;
         core::job::EndCallerShared<Builder> c;
         core::job::EndCaller<> entity_end_callback;
-        physics::TransformationComponent* const parent_transform;
+        physics::Transformation* const parent_transform;
         math::Aabb3<double> include_box;
         std::shared_ptr<texture::TextureCube> irradiance;
         std::shared_ptr<texture::TextureCube> radiance;

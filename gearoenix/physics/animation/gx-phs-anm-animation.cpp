@@ -44,9 +44,9 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
 {
     Bone& bone = manager.get_bones()[bone_channel.target_bone_index];
 
-    auto scale = bone.transform.get_scale();
-    auto rotation = bone.transform.get_local_orientation();
-    auto translation = bone.transform.get_local_location();
+    auto scale = bone.transform->get_scale();
+    auto rotation = bone.transform->get_local_orientation();
+    auto translation = bone.transform->get_local_location();
 
     bool transformed = false;
 
@@ -110,7 +110,7 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
         }
     }
     if (transformed) {
-        bone.transform.reset(scale, rotation, translation);
+        bone.transform->reset(scale, rotation, translation);
     }
 }
 

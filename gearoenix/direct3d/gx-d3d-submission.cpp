@@ -135,13 +135,13 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
         auto& bvh = bvh_pool[scene_data.bvh_pool_index];
         bvh.reset();
-        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::TransformationComponent>(
+        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
             [&](
                 const core::ecs::entity_id_t,
                 physics::collider::Aabb3& collider,
                 render::model::Model& render_model,
                 Model& model,
-                physics::TransformationComponent& model_transform) {
+                physics::Transformation& model_transform) {
                 if (!render_model.enabled)
                     return;
                 if (render_model.scene_id != scene_id)
@@ -163,12 +163,12 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                     } });
             });
         bvh.create_nodes();
-        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::TransformationComponent, Camera>(
+        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>(
             [&](
                 const core::ecs::entity_id_t camera_id,
                 render::camera::Camera& camera,
                 physics::collider::Frustum& frustum,
-                physics::TransformationComponent& transform,
+                physics::Transformation& transform,
                 Camera& d3d_camera,
                 const unsigned int) {
                 if (!camera.get_is_enabled())

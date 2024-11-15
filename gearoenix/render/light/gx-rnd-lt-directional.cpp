@@ -60,7 +60,7 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
 
 void gearoenix::render::light::ShadowCasterDirectional::initialise(
     engine::Engine& e,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const std::uint32_t resolution,
     const float camera_far,
     const float camera_near,
@@ -77,7 +77,7 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise(
                     return;
                 }
 
-                shadow_transform = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
+                shadow_transform = std::dynamic_pointer_cast<physics::Transformation>(camera_builder->get_transformation().get_component_self().lock());
                 shadow_frustum = std::dynamic_pointer_cast<physics::collider::Frustum>(camera_builder->get_frustum().get_component_self().lock());
 
                 shadow_camera_entity_id = camera_builder->get_id();

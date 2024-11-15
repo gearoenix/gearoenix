@@ -1,4 +1,5 @@
 #include "gx-cr-ecs-component.hpp"
+#include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-cr-string.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../macro/gx-cr-mcr-stringifier.hpp"
@@ -35,7 +36,7 @@ void gearoenix::core::ecs::Component::set_component_self(const std::shared_ptr<C
     component_self = c;
 }
 
-void gearoenix::core::ecs::Component::show_debug_gui(const World& w)
+void gearoenix::core::ecs::Component::show_debug_gui(const render::engine::Engine& e)
 {
     if (!ImGui::TreeNode(String::ptr_name(this).c_str())) {
         return;
@@ -72,8 +73,8 @@ void gearoenix::core::ecs::Component::show_debug_gui(const World& w)
 
     ImGui::EndTable();
 
-    if (const auto* const entity_ptr = w.get_entity(entity_id); nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
-        entity_ptr->show_debug_gui(w);
+    if (const auto* const entity_ptr = e.get_world()->get_entity(entity_id); nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
+        entity_ptr->show_debug_gui(e);
         ImGui::TreePop();
     }
 

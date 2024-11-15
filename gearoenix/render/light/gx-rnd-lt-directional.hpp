@@ -4,7 +4,7 @@
 #include "gx-rnd-lt-light.hpp"
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::physics::collider {
@@ -46,7 +46,7 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
     GX_GET_CREF_PRV(std::shared_ptr<camera::Camera>, shadow_camera);
     GX_GET_CREF_PRV(std::shared_ptr<physics::collider::Frustum>, shadow_frustum);
-    GX_GET_CREF_PRV(std::shared_ptr<physics::TransformationComponent>, shadow_transform);
+    GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, shadow_transform);
     GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, core::ecs::INVALID_ENTITY_ID);
 
     ShadowCasterDirectional(std::type_index final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
@@ -55,7 +55,7 @@ public:
     ~ShadowCasterDirectional() override;
     virtual void initialise(
         engine::Engine&,
-        physics::TransformationComponent* parent_transform,
+        physics::Transformation* parent_transform,
         std::uint32_t resolution,
         float camera_far,
         float camera_near,

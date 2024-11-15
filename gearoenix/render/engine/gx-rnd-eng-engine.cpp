@@ -130,11 +130,12 @@ void gearoenix::render::engine::Engine::window_resized()
 
 void gearoenix::render::engine::Engine::show_debug_gui()
 {
-    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        ImGui::Text("Type: %s", to_string(engine_type));
-        ImGui::Text("Frames Count: %zu", frames_count);
-        world->show_debug_gui();
-        // TODO: I have to show all other things
-        ImGui::TreePop();
+    if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
+        return;
     }
+    ImGui::Text("Type: %s", to_string(engine_type));
+    ImGui::Text("Frames Count: %zu", frames_count);
+    world->show_debug_gui(*this);
+    // TODO: I have to show all other things
+    ImGui::TreePop();
 }

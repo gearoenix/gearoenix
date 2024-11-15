@@ -20,11 +20,11 @@ gearoenix::editor::viewport::Camera::Camera(Application& app)
         "Geareonix/Editor/Viewport/Camera", nullptr,
         core::job::EndCallerShared<render::camera::Builder>([this](auto&& camera_builder) {
             camera = camera_builder->get_camera().get_camera_self().lock();
-            transformation = std::dynamic_pointer_cast<physics::TransformationComponent>(camera_builder->get_transformation().get_component_self().lock());
+            transformation = std::dynamic_pointer_cast<physics::Transformation>(camera_builder->get_transformation().get_component_self().lock());
             transformation->local_look_at({ 10, 10, 10 }, { 0, 0, 0 }, { 0, 0, 1 });
             (void)this->app.get_render_engine().get_physics_engine()->get_constraint_manager()->create_jet_controller(
                 "Geareonix/Editor/Viewport/Camera/JetController",
-                transformation,
+                std::shared_ptr(transformation),
                 core::job::EndCaller([] { }));
         }),
         core::job::EndCaller([] {}));

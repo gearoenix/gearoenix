@@ -32,7 +32,7 @@ public:
     Entity& operator=(Entity&&) = default;
     Entity& operator=(const Entity&) = delete;
     ~Entity();
-    void show_debug_gui(const World& w) const;
+    void show_debug_gui(const render::engine::Engine&) const;
 };
 
 struct EntityBuilder final {

@@ -82,7 +82,7 @@ gearoenix::render::widget::Text::~Text()
 
 gearoenix::math::Vec2<double> gearoenix::render::widget::Text::get_text_size() const
 {
-    auto* const trn = e.get_world()->get_component<physics::TransformationComponent>(model_entity_id);
+    auto* const trn = e.get_world()->get_component<physics::Transformation>(model_entity_id);
     GX_ASSERT_D(nullptr != trn);
     return trn->get_scale().xy() * 2.0; // TODO not sure about 2 multiplication
 }
@@ -97,5 +97,5 @@ void gearoenix::render::widget::Text::update_text(const core::job::EndCaller<>& 
             self->text_material->set_albedo(std::move(t));
             (void)c;
         }));
-    e.get_world()->get_component<physics::TransformationComponent>(model_entity_id)->local_x_scale(width / img_dim.x);
+    e.get_world()->get_component<physics::Transformation>(model_entity_id)->local_x_scale(width / img_dim.x);
 }

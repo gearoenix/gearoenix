@@ -12,11 +12,12 @@ gearoenix::render::light::Light::Light(
 
 gearoenix::render::light::Light::~Light() = default;
 
-void gearoenix::render::light::Light::show_debug_gui(const core::ecs::World& w)
+void gearoenix::render::light::Light::show_debug_gui(const engine::Engine& e)
 {
-    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        Component::show_debug_gui(w);
-        ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
-        ImGui::TreePop();
+    if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
+        return;
     }
+    Component::show_debug_gui(e);
+    ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
+    ImGui::TreePop();
 }

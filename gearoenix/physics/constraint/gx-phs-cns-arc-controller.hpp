@@ -25,7 +25,7 @@ namespace gearoenix::render::camera {
 //     GX_GET_VAL_PRV(double, distance, (max_distance + min_distance) * 0.5)
 //     GX_GET_REFC_PRV(std::shared_ptr<Camera>, controlled_camera)
 //  private:
-//     TransformationComponent* const trn;
+//     Transformation* const trn;
 //     engine::Engine* const render_engine;
 //     const core::Id function_id;
 //     double rotate_x = 0.0;

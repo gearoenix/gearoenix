@@ -3,7 +3,9 @@
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include "../gx-phs-transformation.hpp"
+#include <imgui/imgui.h>
 
 namespace {
 const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::constraint::JetController, 64>::construct();
@@ -128,18 +130,27 @@ gearoenix::physics::constraint::JetController::~JetController()
 
 void gearoenix::physics::constraint::JetController::update()
 {
+
+    if (e.get_gizmo_manager()->is_processing_inputs()) {
+        clear_transforms();
+        return;
+    }
+
+    if (const auto& io = ImGui::GetIO();
+        (io.WantCaptureMouse || io.WantCaptureKeyboard) && (ImGui::IsAnyItemActive() || ImGui::IsAnyItemFocused())) {
+        clear_transforms();
+        return;
+    }
+
     const auto delta_time = e.get_delta_time();
     if (0.0 != rotate_x) {
         transformation->local_x_rotate(rotate_x);
-        rotate_x = 0.0;
     }
     if (0.0 != rotate_z) {
         transformation->local_rotate(rotate_z, math::Z3D<double>);
-        rotate_z = 0.0;
     }
     if (0.0 != move_forward_accumulated) {
         transformation->local_z_translate(move_forward_accumulated);
-        move_forward_accumulated = 0.0;
     }
     const auto delta_movement = movement_speed * delta_time;
     const auto delta_rotation = rotation_speed * delta_time;
@@ -161,4 +172,12 @@ void gearoenix::physics::constraint::JetController::update()
     if (rotate_left) {
         transformation->local_rotate(delta_rotation, math::Z3D<double>);
     }
+    clear_transforms();
+}
+
+void gearoenix::physics::constraint::JetController::clear_transforms()
+{
+    rotate_x = 0.0;
+    rotate_z = 0.0;
+    move_forward_accumulated = 0.0;
 }

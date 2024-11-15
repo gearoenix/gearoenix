@@ -12,7 +12,7 @@
 
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
-    gearoenix::physics::Transformation transform(nullptr);
+    gearoenix::physics::Transformation transform("transform", nullptr, 0, nullptr);
 
     auto glmm = glm::identity<glm::dmat4>();
 
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
         auto gxq = transform.get_local_orientation();
         auto glmq = glm::quat_cast(glmm);
 
-        if (!gxq.safe_equal(gearoenix::math::Quat<double>(glmq.x, glmq.y, glmq.z, glmq.w))) {
+        if (!gxq.safe_equal(gearoenix::math::Quat(glmq.x, glmq.y, glmq.z, glmq.w))) {
             GX_TEST_FLOAT_NEAR(gxq.w, glmq.w);
             GX_TEST_FLOAT_NEAR(gxq.x, glmq.x);
             GX_TEST_FLOAT_NEAR(gxq.y, glmq.y);

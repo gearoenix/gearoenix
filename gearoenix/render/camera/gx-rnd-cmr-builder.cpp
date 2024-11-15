@@ -9,7 +9,7 @@
 
 gearoenix::render::camera::Builder::Builder(
     engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback,
-    physics::TransformationComponent* const parent_transform)
+    physics::Transformation* const parent_transform)
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
@@ -18,25 +18,25 @@ gearoenix::render::camera::Builder::Builder(
         physics::collider::Frustum::default_points,
         builder.get_id());
     builder.add_component(std::move(frustum));
-    builder.add_component(physics::TransformationComponent::construct(
-        name + "-transformation", parent_transform, builder.get_id()));
+    builder.add_component(physics::Transformation::construct(
+        name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 
 gearoenix::render::camera::Builder::~Builder() = default;
 
-gearoenix::physics::TransformationComponent& gearoenix::render::camera::Builder::get_transformation()
+gearoenix::physics::Transformation& gearoenix::render::camera::Builder::get_transformation()
 {
-    return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
+    return *entity_builder->get_builder().get_component<physics::Transformation>();
 }
 
-const gearoenix::physics::TransformationComponent& gearoenix::render::camera::Builder::get_transformation() const
+const gearoenix::physics::Transformation& gearoenix::render::camera::Builder::get_transformation() const
 {
-    return *entity_builder->get_builder().get_component<physics::TransformationComponent>();
+    return *entity_builder->get_builder().get_component<physics::Transformation>();
 }
 
-std::shared_ptr<gearoenix::physics::TransformationComponent> gearoenix::render::camera::Builder::get_transformation_shared_ptr() const
+std::shared_ptr<gearoenix::physics::Transformation> gearoenix::render::camera::Builder::get_transformation_shared_ptr() const
 {
-    return std::dynamic_pointer_cast<physics::TransformationComponent>(get_transformation().get_component_self().lock());
+    return std::dynamic_pointer_cast<physics::Transformation>(get_transformation().get_component_self().lock());
 }
 
 gearoenix::physics::collider::Frustum& gearoenix::render::camera::Builder::get_frustum()

@@ -15,11 +15,11 @@ gearoenix::render::camera::Manager::Manager(engine::Engine& e)
 void gearoenix::render::camera::Manager::update()
 {
     auto* const world = e.get_world();
-    world->parallel_system<core::ecs::All<Camera, physics::TransformationComponent, physics::collider::Frustum>>(
+    world->parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>(
         [](
             const core::ecs::entity_id_t /*entity-id*/,
             Camera* const cam,
-            const physics::TransformationComponent* const transform,
+            const physics::Transformation* const transform,
             physics::collider::Frustum* const collider,
             const unsigned int /*kernel_index*/) {
             cam->set_view(math::Mat4x4<float>(transform->get_inverted_global_matrix()));

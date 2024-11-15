@@ -36,7 +36,7 @@ public:
     ~RuntimeConfiguration() override;
     void set_runtime_reflection_radiance_resolution(std::uint16_t value);
     [[nodiscard]] static std::uint8_t compute_radiance_mipmaps_count(std::uint16_t value);
-    void show_debug_gui(const core::ecs::World&) override;
+    void show_debug_gui(const engine::Engine&) override;
 };
 }
 #endif

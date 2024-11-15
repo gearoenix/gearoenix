@@ -90,8 +90,8 @@ void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_
         cam->set_flag(flag);
         flag <<= 1; });
     std::atomic refresh_bvh = false;
-    world->parallel_system<core::ecs::All<model::Model, physics::TransformationComponent>>(
-        [&](const core::ecs::entity_id_t, model::Model* const mdl, const physics::TransformationComponent* const trn, const auto /*kernel_index*/) {
+    world->parallel_system<core::ecs::All<model::Model, physics::Transformation>>(
+        [&](const core::ecs::entity_id_t, model::Model* const mdl, const physics::Transformation* const trn, const auto /*kernel_index*/) {
             if (!mdl->get_enabled() || mdl->scene_id != scene_entity_id)
                 return;
             if (mdl->cameras.has_value()) {

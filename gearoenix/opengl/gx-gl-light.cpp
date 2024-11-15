@@ -51,7 +51,7 @@ void gearoenix::gl::ShadowCasterDirectionalLight::set_shadow_map_target(std::sha
 gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const ShadowCasterDirectionalInfo& info,
     core::job::EndCaller<>&& end_callback)
     : Builder(e, name, parent_transform, info, std::move(end_callback))
@@ -64,7 +64,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
 gearoenix::gl::LightBuilder::LightBuilder(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const DirectionalInfo& info,
     core::job::EndCaller<>&& end_callback)
     : Builder(e, name, parent_transform, info, std::move(end_callback))
@@ -75,7 +75,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
 void gearoenix::gl::LightBuilder::construct(
     Engine& e,
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const ShadowCasterDirectionalInfo& info,
     core::job::EndCallerShared<Builder>&& end_callback,
     core::job::EndCaller<>&& entity_end_callback)
@@ -91,7 +91,7 @@ gearoenix::gl::LightBuilder::~LightBuilder() = default;
 
 std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::build_directional(
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     core::job::EndCaller<>&& end_callback)
 {
     return std::make_shared<LightBuilder>(
@@ -100,7 +100,7 @@ std::shared_ptr<gearoenix::render::light::Builder> gearoenix::gl::LightManager::
 
 void gearoenix::gl::LightManager::build_shadow_caster_directional(
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     const std::uint32_t shadow_map_resolution,
     const float camera_far,
     const float camera_near,

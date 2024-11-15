@@ -173,7 +173,7 @@ public:
     /// It will do all the delayed actions
     void update();
 
-    void show_debug_gui() const;
+    void show_debug_gui(const render::engine::Engine&) const;
 
     [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, job::EndCaller<>&& entity_exists_in_world);
 };

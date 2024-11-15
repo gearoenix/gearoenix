@@ -215,7 +215,7 @@ void gearoenix::core::ecs::World::update()
     }
 }
 
-void gearoenix::core::ecs::World::show_debug_gui() const
+void gearoenix::core::ecs::World::show_debug_gui(const render::engine::Engine& e) const
 {
     if (ImGui::TreeNode(String::ptr_name(this).c_str())) {
         ImGui::Text("Number of Archetypes: %zu", archetypes.size());
@@ -228,7 +228,7 @@ void gearoenix::core::ecs::World::show_debug_gui() const
                         const auto entity_id = *reinterpret_cast<const entity_id_t*>(entity_ptr);
                         const auto search = entities.find(entity_id);
                         GX_ASSERT_D(search != entities.end());
-                        search->second.show_debug_gui(*this);
+                        search->second.show_debug_gui(e);
                     }
                     ImGui::TreePop();
                 }

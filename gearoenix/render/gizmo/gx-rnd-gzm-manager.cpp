@@ -3,6 +3,8 @@
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include <imgui/imgui.h>
 
+#include <ImGuizmo/ImGuizmo.h>
+
 gearoenix::render::gizmo::Manager::Manager(engine::Engine& e)
     : e(e)
 {
@@ -87,4 +89,53 @@ void gearoenix::render::gizmo::Manager::show_view()
 void gearoenix::render::gizmo::Manager::set_viewport_camera(camera::Camera* const c)
 {
     current_camera = c;
+    if (nullptr == current_camera) {
+        return;
+    }
+    current_view_matrix = c->get_view();
+    current_projection_matrix = c->get_projection();
+
+    ImGuizmo::SetOrthographic(c->is_orthographic());
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(0, 0, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+
+    for (auto* const d : drawers) {
+        if (!d->is_gizmo_visible) {
+            continue;
+        }
+        ImGuizmo::PushID(d);
+        d->draw_gizmo();
+        ImGuizmo::PopID();
+    }
+}
+
+bool gearoenix::render::gizmo::Manager::show_transform(math::Mat4x4<double>& inout) const
+{
+    math::Mat4x4<float> m(inout);
+    if (!ImGuizmo::Manipulate(
+            &current_view_matrix.data[0][0],
+            &current_projection_matrix.data[0][0],
+            ImGuizmo::OPERATION::TRANSLATE,
+            ImGuizmo::MODE::LOCAL,
+            &m.data[0][0])) {
+        return false;
+    }
+    inout = math::Mat4x4<double>(m);
+    return true;
+}
+
+bool gearoenix::render::gizmo::Manager::is_processing_inputs() const
+{
+    return ImGuizmo::IsUsingAny();
+}
+
+void gearoenix::render::gizmo::Manager::register_drawer(Drawer* const d)
+{
+    drawers.emplace(d);
+}
+
+void gearoenix::render::gizmo::Manager::remove_drawer(Drawer* const d)
+{
+    drawers.erase(d);
 }

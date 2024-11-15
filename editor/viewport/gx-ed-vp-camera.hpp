@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::render::camera {
@@ -25,7 +25,7 @@ struct Camera final {
     render::engine::Engine& e;
 
     GX_GET_CREF_PRT(std::shared_ptr<render::camera::Camera>, camera);
-    GX_GET_CREF_PRT(std::shared_ptr<physics::TransformationComponent>, transformation);
+    GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transformation);
 
 public:
     explicit Camera(Application& app);

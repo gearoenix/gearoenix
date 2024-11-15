@@ -11,7 +11,7 @@ struct EntitySharedBuilder;
 }
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::physics::collider {
@@ -36,7 +36,7 @@ struct Builder {
 
     Builder(
         engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback,
-        physics::TransformationComponent* parent_transform);
+        physics::Transformation* parent_transform);
 
 public:
     Builder(Builder&&) = delete;
@@ -45,9 +45,9 @@ public:
     Builder& operator=(const Builder&) = delete;
     virtual ~Builder();
 
-    [[nodiscard]] physics::TransformationComponent& get_transformation();
-    [[nodiscard]] const physics::TransformationComponent& get_transformation() const;
-    [[nodiscard]] std::shared_ptr<physics::TransformationComponent> get_transformation_shared_ptr() const;
+    [[nodiscard]] physics::Transformation& get_transformation();
+    [[nodiscard]] const physics::Transformation& get_transformation() const;
+    [[nodiscard]] std::shared_ptr<physics::Transformation> get_transformation_shared_ptr() const;
     [[nodiscard]] physics::collider::Frustum& get_frustum();
     [[nodiscard]] const physics::collider::Frustum& get_frustum() const;
     [[nodiscard]] Camera& get_camera();

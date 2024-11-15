@@ -93,7 +93,7 @@ void gearoenix::render::widget::Label::construct(
         true);
     scene_builder->add(std::shared_ptr(model_builder));
     auto result = std::make_shared<Label>(std::move(name), e);
-    result->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(model_builder->get_transformation().get_component_self().lock());
+    result->transform = std::dynamic_pointer_cast<physics::Transformation>(model_builder->get_transformation().get_component_self().lock());
     result->set_model_entity_id(model_builder->get_id());
     result->set_camera_entity_id(camera_id);
     if (nullptr != parent) {

@@ -12,7 +12,7 @@ namespace gearoenix::physics::animation {
 struct Manager;
 
 struct BoneInfo final {
-    Transformation transform;
+    std::shared_ptr<Transformation> transform;
     math::Mat4x4<float> inverse_bind;
     std::string parent_name;
     std::vector<BoneInfo> children;
@@ -22,7 +22,7 @@ struct BoneInfo final {
 };
 
 struct Bone final {
-    Transformation transform;
+    std::shared_ptr<Transformation> transform;
     math::Mat4x4<float> inverse_bind; // TODO: this should remove if we make bones as entity
     math::Mat4x4<float> m; // TODO: this should remove if we make bones as entity
     math::Mat4x4<float> inv_m; // TODO: this should remove if we make bones as entity
@@ -33,7 +33,7 @@ struct Bone final {
     std::size_t end_child_index = static_cast<std::size_t>(-1);
 
     Bone(
-        Transformation&& transform,
+        std::shared_ptr<Transformation>&& transform,
         math::Mat4x4<float>&& inverse_bind,
         std::string&& name,
         std::size_t parent_index,

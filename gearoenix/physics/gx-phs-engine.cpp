@@ -20,8 +20,8 @@ void gearoenix::physics::Engine::start_frame()
 {
     auto* const world = render_engine.get_world();
     constraint_manager->update();
-    TransformationComponent::update(world);
-    world->parallel_system<core::ecs::All<TransformationComponent, collider::Aabb3>>(
+    Transformation::update(world);
+    world->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>(
         [&](const auto, const auto* const transform, auto* const cld, const auto) {
             if (transform->get_changed()) {
                 cld->update(transform->get_global_matrix());
@@ -33,7 +33,7 @@ void gearoenix::physics::Engine::start_frame()
 void gearoenix::physics::Engine::end_frame()
 {
     auto* const world = render_engine.get_world();
-    world->parallel_system<TransformationComponent>([&](const auto, auto* const transform, const auto) {
+    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->clear_change();
     });
 }

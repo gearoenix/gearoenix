@@ -8,7 +8,7 @@
 #include <array>
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::physics::animation {
@@ -53,7 +53,7 @@ struct Model final {
 
     Model();
     Model(
-        Engine& e, gl::Model* model, physics::TransformationComponent* model_transform, Scene& scene,
+        Engine& e, gl::Model* model, physics::Transformation* model_transform, Scene& scene,
         physics::animation::Armature* armature);
     [[nodiscard]] bool has_transparent_material(const Scene& scene) const;
     [[nodiscard]] bool needs_mvp(const Scene& scene) const;
@@ -68,7 +68,7 @@ struct BvhNodeModel final {
 
     BvhNodeModel();
     BvhNodeModel(
-        Engine& e, gl::Model* gl_model, physics::TransformationComponent* model_transform, Scene& scene,
+        Engine& e, gl::Model* gl_model, physics::Transformation* model_transform, Scene& scene,
         physics::animation::Armature* armature);
 };
 
@@ -77,7 +77,7 @@ struct DynamicModel final {
     math::Aabb3<double> box;
 
     DynamicModel(
-        Engine& e, gl::Model* gl_model, physics::TransformationComponent* model_transform, Scene& scene,
+        Engine& e, gl::Model* gl_model, physics::Transformation* model_transform, Scene& scene,
         physics::animation::Armature* armature, physics::collider::Aabb3* collider);
 };
 
@@ -87,7 +87,7 @@ struct DebugModel final {
     uint vertex_object = 0;
     sizei indices_count = 0;
 
-    DebugModel(gl::Camera* camera, physics::TransformationComponent* transform);
+    DebugModel(gl::Camera* camera, physics::Transformation* transform);
 };
 }
 #endif

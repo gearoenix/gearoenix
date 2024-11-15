@@ -3,6 +3,7 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../math/gx-math-quaternion.hpp"
+#include "../render/gizmo/gx-rnd-gzm-drawer.hpp"
 #include <boost/container/flat_set.hpp>
 #include <memory>
 
@@ -11,7 +12,7 @@ struct World;
 }
 
 namespace gearoenix::physics {
-struct Transformation {
+struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
     /// This is useful for caching the calculation
@@ -25,11 +26,11 @@ struct Transformation {
     GX_GET_CPTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
 
+    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
+
 public:
-    explicit Transformation(const Transformation* parent);
-    Transformation(Transformation&&) = default;
-    Transformation& operator=(Transformation&&) = default;
-    virtual ~Transformation() = default;
+    Transformation(std::string&& name, const Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
+    ~Transformation() override;
     void set_local_matrix(const math::Mat4x4<double>&);
     [[nodiscard]] math::Vec3<double> get_global_location() const;
     void get_global_location(math::Vec3<double>& l) const;
@@ -71,19 +72,10 @@ public:
         const math::Vec3<double>& location);
     void add_child(const std::shared_ptr<Transformation>& child);
     void set_parent(const Transformation*);
-    virtual void show_debug_gui_transform(const core::ecs::World&);
-};
-
-struct TransformationComponent final : core::ecs::Component, Transformation {
-private:
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
-
-public:
-    explicit TransformationComponent(std::string&& name, const TransformationComponent* parent, core::ecs::entity_id_t entity_id);
-    [[nodiscard]] static std::shared_ptr<TransformationComponent> construct(
-        std::string&& name, TransformationComponent* parent, core::ecs::entity_id_t entity_id);
-    void show_debug_gui(const core::ecs::World&) override;
-    void show_debug_gui_transform(const core::ecs::World&) override;
+    void show_debug_gui(const render::engine::Engine&) override;
+    void draw_gizmo() override;
+    [[nodiscard]] static std::shared_ptr<Transformation> construct(
+        std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
     static void update(core::ecs::World* world);
 };
 }

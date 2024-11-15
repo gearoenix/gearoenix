@@ -29,7 +29,7 @@ std::atomic<gearoenix::core::ecs::entity_id_t> gearoenix::core::ecs::Entity::las
 
 gearoenix::core::ecs::Entity::~Entity() = default;
 
-void gearoenix::core::ecs::Entity::show_debug_gui(const World& w) const
+void gearoenix::core::ecs::Entity::show_debug_gui(const render::engine::Engine& e) const
 {
     static boost::container::flat_set<std::size_t> indices;
     if (ImGui::TreeNode(name.c_str())) {
@@ -38,7 +38,7 @@ void gearoenix::core::ecs::Entity::show_debug_gui(const World& w) const
             indices.emplace(ci.second);
         }
         for (const auto i : indices) {
-            components[i]->show_debug_gui(w);
+            components[i]->show_debug_gui(e);
         }
         ImGui::TreePop();
     }

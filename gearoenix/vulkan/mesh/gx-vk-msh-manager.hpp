@@ -10,7 +10,7 @@ struct WorkWaiter;
 }
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::vulkan::buffer {

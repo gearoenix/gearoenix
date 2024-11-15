@@ -33,7 +33,7 @@ using GxEndCaller = gearoenix::core::job::EndCaller<>;
 using GxComp = gearoenix::core::ecs::Component;
 using GxCoreApp = gearoenix::core::Application;
 using GxPltApp = gearoenix::platform::Application;
-using GxTransformComp = gearoenix::physics::TransformationComponent;
+using GxTransformComp = gearoenix::physics::Transformation;
 using GxTransform = gearoenix::physics::Transformation;
 
 using GxScene = gearoenix::render::scene::Scene;

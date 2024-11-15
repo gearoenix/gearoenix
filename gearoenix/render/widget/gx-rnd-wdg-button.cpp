@@ -150,7 +150,7 @@ void gearoenix::render::widget::Button::construct(
         true);
     const auto id = model_builder->get_id();
     auto but = std::make_shared<Button>(std::move(name), parent->e);
-    but->transform = std::dynamic_pointer_cast<physics::TransformationComponent>(model_builder->get_transformation().get_component_self().lock());
+    but->transform = std::dynamic_pointer_cast<physics::Transformation>(model_builder->get_transformation().get_component_self().lock());
     but->set_rest_texture(std::move(rest_texture));
     but->set_pressed_texture(std::move(pressed_texture));
     but->set_model_entity_id(id);

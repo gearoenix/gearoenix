@@ -92,7 +92,7 @@ gearoenix::gl::Camera::~Camera() = default;
 
 gearoenix::gl::CameraBuilder::CameraBuilder(
     Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller,
-    physics::TransformationComponent* const parent_transform)
+    physics::Transformation* const parent_transform)
     : Builder(e, name, std::move(entity_end_caller), parent_transform)
     , eng(e)
 {
@@ -100,7 +100,7 @@ gearoenix::gl::CameraBuilder::CameraBuilder(
 
 void gearoenix::gl::CameraBuilder::construct(
     Engine& e, const std::string& name,
-    physics::TransformationComponent* parent_transform,
+    physics::Transformation* parent_transform,
     core::job::EndCallerShared<Builder>&& builder_end_caller,
     core::job::EndCaller<>&& entity_end_caller)
 {
@@ -121,7 +121,7 @@ gearoenix::gl::CameraBuilder::~CameraBuilder() = default;
 
 void gearoenix::gl::CameraManager::build(
     const std::string& name,
-    physics::TransformationComponent* const parent_transform,
+    physics::Transformation* const parent_transform,
     core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
     core::job::EndCaller<>&& entity_end_caller)
 {

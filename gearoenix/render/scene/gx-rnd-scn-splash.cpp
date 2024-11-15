@@ -332,19 +332,19 @@ std::shared_ptr<gearoenix::render::scene::Splash> gearoenix::render::scene::Spla
 
 void gearoenix::render::scene::Splash::update()
 {
-    auto* const gear_tran = e.get_world()->get_component<physics::TransformationComponent>(gear_id);
+    auto* const gear_tran = e.get_world()->get_component<physics::Transformation>(gear_id);
     if (gear_tran == nullptr)
         return;
-    auto* const glare_tran = e.get_world()->get_component<physics::TransformationComponent>(glare_id);
+    auto* const glare_tran = e.get_world()->get_component<physics::Transformation>(glare_id);
     if (glare_tran == nullptr)
         return;
-    auto* const left_wing_tran = e.get_world()->get_component<physics::TransformationComponent>(left_wing_id);
+    auto* const left_wing_tran = e.get_world()->get_component<physics::Transformation>(left_wing_id);
     if (left_wing_tran == nullptr)
         return;
-    auto* const right_wing_tran = e.get_world()->get_component<physics::TransformationComponent>(right_wing_id);
+    auto* const right_wing_tran = e.get_world()->get_component<physics::Transformation>(right_wing_id);
     if (right_wing_tran == nullptr)
         return;
-    auto* const gearoenix_tran = e.get_world()->get_component<physics::TransformationComponent>(gearoenix_text);
+    auto* const gearoenix_tran = e.get_world()->get_component<physics::Transformation>(gearoenix_text);
     if (gearoenix_tran == nullptr)
         return;
     auto* const gearoenix_model = e.get_world()->get_component<model::Model>(gearoenix_text);

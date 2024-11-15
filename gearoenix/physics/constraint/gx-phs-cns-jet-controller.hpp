@@ -46,6 +46,7 @@ public:
         core::ecs::entity_id_t entity_id);
     ~JetController() override;
     void update() override;
+    void clear_transforms();
 };
 }
 #endif

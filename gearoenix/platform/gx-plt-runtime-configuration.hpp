@@ -41,7 +41,7 @@ public:
     [[nodiscard]] static RuntimeConfiguration& get(Application& a);
     [[nodiscard]] static RuntimeConfiguration& get(BaseApplication* b);
     ~RuntimeConfiguration() override;
-    void show_debug_gui(const core::ecs::World& w) override;
+    void show_debug_gui(const render::engine::Engine&) override;
 };
 }
 #endif

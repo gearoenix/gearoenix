@@ -7,7 +7,7 @@
 #include "gx-gl-sbm-model.hpp"
 
 namespace gearoenix::physics {
-struct TransformationComponent;
+struct Transformation;
 }
 
 namespace gearoenix::render::camera {
