@@ -6,10 +6,6 @@
 #include "../gx-plt-application.hpp"
 #include <SDL2/SDL.h>
 
-#ifdef main
-#undef main
-#endif
-
 namespace gearoenix::platform {
 struct Application final {
     GX_GET_VAL_PRV(SDL_Window*, window, nullptr);

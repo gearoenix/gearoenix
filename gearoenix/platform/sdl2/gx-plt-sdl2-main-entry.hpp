@@ -11,7 +11,7 @@
 #define GX_MAIN_ENTRY_ARGS argc, argv
 
 #define GX_MAIN_ENTRY(expr)                                      \
-    extern SDLMAIN_DECLSPEC int main(GX_MAIN_ENTRY_ARGS_DEF) \
+    extern "C" int main(GX_MAIN_ENTRY_ARGS_DEF) \
     {                                                            \
         expr;                                                    \
         return 0;                                                \
