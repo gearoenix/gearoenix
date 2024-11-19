@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_MATH_NUMERIC_HPP
 #define GEAROENIX_MATH_NUMERIC_HPP
-
 #include "../core/gx-cr-types.hpp"
 #include <cmath>
 #include <limits>

@@ -13,6 +13,7 @@
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
     gearoenix::physics::Transformation transform("transform", nullptr, 0, nullptr);
+    constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
 
     auto glmm = glm::identity<glm::dmat4>();
 
@@ -22,13 +23,14 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 
     for (int j = 0; j < 10; ++j) {
         for (int i = 0; i < 10; ++i) {
-            const auto x = dis(re) > 0.0 ? std::abs(dis(re)) + math::Numeric::epsilon<double> : -std::abs(dis(re)) - math::Numeric::epsilon<double>;
+            const auto random = dis(re);
+            const auto x = std::copysign(std::abs(dis(re)) + gx_epsilon, random);
             const auto y = dis(re);
             const auto z = dis(re);
             const auto d = dis(re);
 
             transform.local_inner_rotate(d, gearoenix::math::Vec3(x, y, z).normalised());
-            glmm = glm::rotate(glmm, d, glm::normalize(glm::dvec3(x, y, z)));
+            glmm = glm::rotate(glm::identity<glm::dmat4>(), d, glm::normalize(glm::dvec3(x, y, z))) * glmm;
         }
 
         auto gxq = transform.get_rotation().get_quat();

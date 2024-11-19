@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_MATH_VECTOR_3D_HPP
 #define GEAROENIX_MATH_VECTOR_3D_HPP
-
 #include "gx-math-vector-2d.hpp"
 
 namespace gearoenix::math {

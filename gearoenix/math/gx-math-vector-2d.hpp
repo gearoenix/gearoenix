@@ -1,6 +1,5 @@
 #ifndef GEAROENIX_MATH_VECTOR_2D_HPP
 #define GEAROENIX_MATH_VECTOR_2D_HPP
-
 #include "../platform/gx-plt-log.hpp"
 #include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-math-numeric.hpp"
@@ -16,7 +15,13 @@ struct Vec2 final {
     Element x = static_cast<Element>(0);
     Element y = static_cast<Element>(0);
 
-    constexpr explicit Vec2(const Element e = static_cast<Element>(0))
+    constexpr explicit Vec2()
+        : x(static_cast<Element>(0))
+        , y(static_cast<Element>(0))
+    {
+    }
+
+    constexpr explicit Vec2(const Element e)
         : x(e)
         , y(e)
     {
@@ -40,61 +45,56 @@ struct Vec2 final {
 
     [[nodiscard]] constexpr Vec2 operator+(const Vec2& o) const
     {
-        return Vec2(x + o.x, y + o.y);
+        return { x + o.x, y + o.y };
     }
 
     [[nodiscard]] constexpr Vec2 operator-(const Vec2& o) const
     {
-        return Vec2(x - o.x, y - o.y);
+        return { x - o.x, y - o.y };
     }
 
     [[nodiscard]] constexpr Vec2 operator*(const Vec2& o) const
     {
-        return Vec2(x * o.x, y * o.y);
+        return { x * o.x, y * o.y };
     }
 
     [[nodiscard]] constexpr Vec2 operator/(const Vec2& o) const
     {
-        return Vec2(x / o.x, y / o.y);
+        return { x / o.x, y / o.y };
     }
 
     [[nodiscard]] constexpr Vec2 operator+(const Element e) const
     {
-        return Vec2(x + e, y + e);
+        return { x + e, y + e };
     }
 
     [[nodiscard]] constexpr Vec2 operator-(const Element e) const
     {
-        return Vec2(x - e, y - e);
+        return { x - e, y - e };
     }
 
     [[nodiscard]] constexpr Vec2 operator*(const Element e) const
     {
-        return Vec2(x * e, y * e);
+        return { x * e, y * e };
     }
 
     [[nodiscard]] constexpr Vec2 operator/(const Element e) const
     {
         if constexpr (std::is_floating_point_v<Element>) {
             const auto m = static_cast<Element>(1) / e;
-            return Vec2(x * m, y * m);
+            return { x * m, y * m };
         } else {
-            return Vec2(x / e, y / e);
+            return { x / e, y / e };
         }
     }
 
     [[nodiscard]] constexpr Vec2 operator-() const
     {
         Numeric::check_signable<Element>();
-        return Vec2(-x, -y);
+        return { -x, -y };
     }
 
-    constexpr Vec2& operator=(const Vec2& o)
-    {
-        x = o.x;
-        y = o.y;
-        return *this;
-    }
+    constexpr Vec2& operator=(const Vec2& o) = default;
 
     constexpr void operator+=(const Vec2& o)
     {
@@ -151,31 +151,15 @@ struct Vec2 final {
     }
 
     template <typename T>
-    [[nodiscard]] typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type
-    operator[](const T i) const
+    [[nodiscard]] constexpr Element operator[](const T i) const
     {
-        switch (i) {
-        case static_cast<T>(0):
-            return x;
-        case static_cast<T>(1):
-            return y;
-        default:
-            GX_LOG_F("Out of bound index: " << i);
-        }
+        return data()[i];
     }
 
     template <typename T>
-    [[nodiscard]] typename std::enable_if<std::numeric_limits<T>::is_integer, Element>::type&
-    operator[](const T i)
+    [[nodiscard]] constexpr Element& operator[](const T i)
     {
-        switch (i) {
-        case static_cast<T>(0):
-            return x;
-        case static_cast<T>(1):
-            return y;
-        default:
-            GX_LOG_F("Out of bound index: " << i);
-        }
+        return data()[i];
     }
 
     /// Y is the most valuable part then X
@@ -250,22 +234,22 @@ struct Vec2 final {
 
     [[nodiscard]] constexpr Vec2 maximum(const Vec2& o) const
     {
-        return Vec2(x > o.x ? x : o.x, y > o.y ? y : o.y);
+        return { x > o.x ? x : o.x, y > o.y ? y : o.y };
     }
 
     [[nodiscard]] constexpr Vec2 safe_maximum(const Vec2& o) const
     {
-        return Vec2(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y));
+        return { Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y) };
     }
 
     [[nodiscard]] constexpr Vec2 minimum(const Vec2& o) const
     {
-        return Vec2(x < o.x ? x : o.x, y < o.y ? y : o.y);
+        return { x < o.x ? x : o.x, y < o.y ? y : o.y };
     }
 
     [[nodiscard]] constexpr Vec2 safe_minimum(const Vec2& o) const
     {
-        return Vec2(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y));
+        return { Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y) };
     }
 
     [[nodiscard]] constexpr Element length() const
@@ -298,6 +282,11 @@ struct Vec2 final {
         return &x;
     }
 
+    [[nodiscard]] constexpr Element* data()
+    {
+        return &x;
+    }
+
     constexpr void normalize()
     {
         *this /= length();
@@ -305,8 +294,8 @@ struct Vec2 final {
 
     void read(platform::stream::Stream& f)
     {
-        x = static_cast<Element>(f.read<float>());
-        y = static_cast<Element>(f.read<float>());
+        x = f.read<Element>();
+        y = f.read<Element>();
     }
 
     [[nodiscard]] static constexpr std::optional<Vec2> intersect(
@@ -317,7 +306,7 @@ struct Vec2 final {
 
     [[nodiscard]] static constexpr Vec2 hammersley(const std::uint32_t i, const std::uint32_t n)
     {
-        return Vec2(static_cast<Element>(i) / static_cast<Element>(n), Numeric::radical_inverse_vdc(i));
+        return { static_cast<Element>(i) / static_cast<Element>(n), Numeric::radical_inverse_vdc(i) };
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec2& v)
@@ -341,20 +330,23 @@ constexpr std::optional<gearoenix::math::Vec2<Element>> gearoenix::math::Vec2<El
     const auto min1 = s11.minimum(s12);
     const auto max2 = s21.maximum(s22);
     const auto min2 = s21.minimum(s22);
-    if (min1.x > max2.x || min2.x > max1.x || min1.y > max2.y || min2.y > max1.y)
+    if (min1.x > max2.x || min2.x > max1.x || min1.y > max2.y || min2.y > max1.y) {
         return std::nullopt;
+    }
     // s11 + s0 * v0 == s21 + s1 * v1
     // s21 - s11 = s0 * v0 - s1 * v1
     // d = | v0 v1 | * s
     const auto v0 = s12 - s11;
     const auto v1 = s22 - s21;
     Mat2x2 m(v0.x, -v1.x, v0.y, -v1.y);
-    if (!m.invert())
+    if (!m.invert()) {
         return std::nullopt;
+    }
     const auto d = s21 - s11;
     const auto s = m * d;
-    if (s.x < static_cast<Element>(0) || s.x > static_cast<Element>(1) || s.y < static_cast<Element>(0) || s.y > static_cast<Element>(1))
+    if (s.x < static_cast<Element>(0) || s.x > static_cast<Element>(1) || s.y < static_cast<Element>(0) || s.y > static_cast<Element>(1)) {
         return std::nullopt;
+    }
     return v0 * s.x + s11;
 }
 

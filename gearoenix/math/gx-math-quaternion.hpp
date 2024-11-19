@@ -85,9 +85,15 @@ struct Quat final {
         const Element zw = z * w;
 
         return {
-            Vec3(static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz), static_cast<Element>(2) * (xy + zw), static_cast<Element>(2) * (xz - yw)).normalised(),
-            Vec3(static_cast<Element>(2) * (xy - zw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz), static_cast<Element>(2) * (yz + xw)).normalised(),
-            Vec3(static_cast<Element>(2) * (xz + yw), static_cast<Element>(2) * (yz - xw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy)).normalised()
+            { static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz),
+                static_cast<Element>(2) * (xy + zw),
+                static_cast<Element>(2) * (xz - yw) },
+            { static_cast<Element>(2) * (xy - zw),
+                static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz),
+                static_cast<Element>(2) * (yz + xw) },
+            { static_cast<Element>(2) * (xz + yw),
+                static_cast<Element>(2) * (yz - xw),
+                static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy) }
         };
     }
 
