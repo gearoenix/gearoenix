@@ -27,7 +27,7 @@ struct Mat2x2 {
     {
     }
 
-    constexpr bool invert(const Element zero_tolerance = static_cast<Element>(0.0001))
+    constexpr bool invert(const Element zero_tolerance = Numeric::epsilon<Element>)
     {
         static_assert(std::numeric_limits<Element>::is_signed,
             "This functionality is only available for signed element types.");

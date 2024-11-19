@@ -2,6 +2,7 @@
 #define GEAROENIX_MATH_QUATERNION_HPP
 #include "gx-math-matrix-4d.hpp"
 #include "gx-math-numeric.hpp"
+#include <algorithm>
 #include <ostream>
 
 namespace gearoenix::math {
@@ -9,11 +10,19 @@ template <typename Element>
 struct Quat final {
     Element x, y, z, w;
 
-    constexpr explicit Quat(const Element e = static_cast<Element>(0))
+    constexpr Quat()
+        : x(static_cast<Element>(0))
+        , y(static_cast<Element>(0))
+        , z(static_cast<Element>(0))
+        , w(static_cast<Element>(1))
+    {
+    }
+
+    constexpr explicit Quat(const Element e)
         : x(e)
         , y(e)
         , z(e)
-        , w(e)
+        , w(static_cast<Element>(1))
     {
     }
 
@@ -21,6 +30,14 @@ struct Quat final {
         : x(x)
         , y(y)
         , z(z)
+        , w(w)
+    {
+    }
+
+    constexpr Quat(const Vec3<Element>& xyz, const Element w)
+        : x(xyz.x)
+        , y(xyz.y)
+        , z(xyz.z)
         , w(w)
     {
     }
@@ -50,7 +67,12 @@ struct Quat final {
         return q;
     }
 
-    constexpr Mat4x4<Element> to_mat() const
+    constexpr Mat4x4<Element> to_m4x4() const
+    {
+        return Mat4x4(to_m3x3());
+    }
+
+    constexpr Mat3x3<Element> to_m3x3() const
     {
         const Element xx = x * x;
         const Element xy = x * y;
@@ -61,17 +83,12 @@ struct Quat final {
         const Element yw = y * w;
         const Element zz = z * z;
         const Element zw = z * w;
-        Mat4x4<Element> m;
-        m.data[0][0] = static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz);
-        m.data[0][1] = static_cast<Element>(2) * (xy + zw);
-        m.data[0][2] = static_cast<Element>(2) * (xz - yw);
-        m.data[1][0] = static_cast<Element>(2) * (xy - zw);
-        m.data[1][1] = static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz);
-        m.data[1][2] = static_cast<Element>(2) * (yz + xw);
-        m.data[2][0] = static_cast<Element>(2) * (xz + yw);
-        m.data[2][1] = static_cast<Element>(2) * (yz - xw);
-        m.data[2][2] = static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy);
-        return m;
+
+        return {
+            Vec3(static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz), static_cast<Element>(2) * (xy + zw), static_cast<Element>(2) * (xz - yw)).normalised(),
+            Vec3(static_cast<Element>(2) * (xy - zw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz), static_cast<Element>(2) * (yz + xw)).normalised(),
+            Vec3(static_cast<Element>(2) * (xz + yw), static_cast<Element>(2) * (yz - xw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy)).normalised()
+        };
     }
 
     [[nodiscard]] constexpr bool safe_equal(const Quat& o) const
@@ -81,29 +98,65 @@ struct Quat final {
         return Numeric::equal(nt.x, no.x) && Numeric::equal(nt.y, no.y) && Numeric::equal(nt.z, no.z) && Numeric::equal(nt.w, no.w);
     }
 
+    [[nodiscard]] constexpr Quat conjugate() const
+    {
+        return { -x, -y, -z, w };
+    }
+
+    [[nodiscard]] constexpr Vec3<Element> rotate(const Vec3<Element>& v) const
+    {
+        const auto q = (*this * v) * conjugate();
+        return { q.x, q.y, q.z };
+    }
+
     [[nodiscard]] constexpr Quat operator*(const Element v) const
     {
-        return Quat(x * v, y * v, z * v, w * v);
+        return { x * v, y * v, z * v, w * v };
+    }
+
+    [[nodiscard]] constexpr Quat operator*(const Quat& o) const
+    {
+        return {
+            w * o.x + x * o.w + y * o.z - z * o.y,
+            w * o.y + y * o.w + z * o.x - x * o.z,
+            w * o.z + z * o.w + x * o.y - y * o.x,
+            w * o.w - x * o.x - y * o.y - z * o.z
+        };
+    }
+
+    constexpr void operator*=(const Quat& o)
+    {
+        *this = *this * o;
+    }
+
+    [[nodiscard]] constexpr Quat operator*(const Vec3<Element>& o) const
+    {
+        return {
+            w * o.x + y * o.z - z * o.y,
+            w * o.y + z * o.x - x * o.z,
+            w * o.z + x * o.y - y * o.x,
+            -x * o.x - y * o.y - z * o.z
+        };
     }
 
     [[nodiscard]] constexpr Quat operator+(const Quat& o) const
     {
-        return Quat(x + o.x, y + o.y, z + o.z, w + o.w);
+        return { x + o.x, y + o.y, z + o.z, w + o.w };
     }
 
     [[nodiscard]] constexpr Quat operator-(const Quat& o) const
     {
-        return Quat(x - o.x, y - o.y, z - o.z, w - o.w);
+        return { x - o.x, y - o.y, z - o.z, w - o.w };
     }
 
     [[nodiscard]] constexpr Quat operator-(const Element v) const
     {
-        return Quat(x - v, y - v, z - v, w - v);
+        return { x - v, y - v, z - v, w - v };
     }
 
     [[nodiscard]] constexpr Quat abs() const
     {
-        return Quat(std::abs(x), std::abs(y), std::abs(z), std::abs(w));
+        return { std::abs(x), std::abs(y), std::abs(z), std::abs(w) };
     }
 
     [[nodiscard]] constexpr Element dot(const Quat& o) const
@@ -117,7 +170,7 @@ struct Quat final {
         return os;
     }
 
-    [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance) const
+    [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance = Numeric::epsilon<Element>) const
     {
         const auto a = (*this - o).abs();
         return a.x < tolerance && a.y < tolerance && a.z < tolerance && a.w < tolerance;
@@ -127,45 +180,118 @@ struct Quat final {
     {
         Vec3<Element> angles;
 
-        // roll (x-axis rotation)
-        const auto sin_r_cos_p = static_cast<Element>(2) * (w * x + y * z);
-        const auto cos_r_cos_p = static_cast<Element>(1) - static_cast<Element>(2) * (x * x + y * y);
-        angles.x = static_cast<Element>(std::atan2(sin_r_cos_p, cos_r_cos_p));
+        const auto pitch_atan_xy = Vec2<Element>(
+            static_cast<Element>(2) * (w * x + y * z),
+            w * w - x * x - y * y + z * z);
+        if (pitch_atan_xy.equal(static_cast<Element>(0))) {
+            angles.x = static_cast<Element>(2) * std::atan2(x, w);
+        } else {
+            angles.x = static_cast<Element>(std::atan2(pitch_atan_xy.x, pitch_atan_xy.y));
+        }
 
-        // pitch (y-axis rotation)
-        const auto sin_p = static_cast<Element>(std::sqrt(static_cast<Element>(1) + static_cast<Element>(2) * (w * y - x * z)));
-        const auto cos_p = static_cast<Element>(std::sqrt(static_cast<Element>(1) - static_cast<Element>(2) * (w * y - x * z)));
-        angles.y = static_cast<Element>(2) * std::atan2(sin_p, cos_p) - GX_PI / static_cast<Element>(2);
+        const auto sin_p = std::clamp(static_cast<Element>(2) * (w * y - x * z), static_cast<Element>(-1), static_cast<Element>(1));
+        angles.y = std::asin(sin_p);
 
-        // yaw (z-axis rotation)
-        const auto sin_y_cos_p = static_cast<Element>(2) * (w * z + x * y);
-        const auto cos_y_cos_p = static_cast<Element>(1) - static_cast<Element>(2) * (y * y + z * z);
-        angles.z = static_cast<Element>(std::atan2(sin_y_cos_p, cos_y_cos_p));
+        const auto roll_atan_xy = Vec2<Element>(
+            static_cast<Element>(2) * (w * z + x * y),
+            w * w + x * x - y * y - z * z);
+        if (roll_atan_xy.equal(static_cast<Element>(0))) {
+            angles.z = static_cast<Element>(0);
+        } else {
+            angles.z = static_cast<Element>(std::atan2(roll_atan_xy.x, roll_atan_xy.y));
+        }
 
         return angles;
     }
 
-    [[nodiscard]] static Quat from_euler(const Element roll, const Element pitch, const Element yaw)
+    [[nodiscard]] Vec3<Element> to_euler_degree() const
     {
-        const auto cr = static_cast<Element>(std::cos(roll * static_cast<Element>(0.5)));
-        const auto sr = static_cast<Element>(std::sin(roll * static_cast<Element>(0.5)));
-        const auto cp = static_cast<Element>(std::cos(pitch * static_cast<Element>(0.5)));
-        const auto sp = static_cast<Element>(std::sin(pitch * static_cast<Element>(0.5)));
-        const auto cy = static_cast<Element>(std::cos(yaw * static_cast<Element>(0.5)));
-        const auto sy = static_cast<Element>(std::sin(yaw * static_cast<Element>(0.5)));
-
-        Quat q;
-        q.w = cr * cp * cy + sr * sp * sy;
-        q.x = sr * cp * cy - cr * sp * sy;
-        q.y = cr * sp * cy + sr * cp * sy;
-        q.z = cr * cp * sy - sr * sp * cy;
-
-        return q;
+        return to_euler() * (180.0 / GX_PI);
     }
 
-    [[nodiscard]] static Quat from_euler(Vec3<Element> angles)
+    [[nodiscard]] constexpr static Quat from_euler(const Element x, const Element y, const Element z)
+    {
+        const auto cr = static_cast<Element>(std::cos(x * static_cast<Element>(0.5)));
+        const auto sr = static_cast<Element>(std::sin(x * static_cast<Element>(0.5)));
+        const auto cp = static_cast<Element>(std::cos(y * static_cast<Element>(0.5)));
+        const auto sp = static_cast<Element>(std::sin(y * static_cast<Element>(0.5)));
+        const auto cy = static_cast<Element>(std::cos(z * static_cast<Element>(0.5)));
+        const auto sy = static_cast<Element>(std::sin(z * static_cast<Element>(0.5)));
+
+        return {
+            sr * cp * cy - cr * sp * sy,
+            cr * sp * cy + sr * cp * sy,
+            cr * cp * sy - sr * sp * cy,
+            cr * cp * cy + sr * sp * sy
+        };
+    }
+
+    [[nodiscard]] constexpr static Quat from_euler(Vec3<Element> angles)
     {
         return from_euler(angles.x, angles.y, angles.z);
+    }
+
+    [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles)
+    {
+        return from_euler(angles * static_cast<Element>(GX_PI / 180.0));
+    }
+
+    [[nodiscard]] constexpr static Quat from(const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
+    {
+        const auto trace0 = x.x - y.y - z.z;
+        const auto trace1 = y.y - x.x - z.z;
+        const auto trace2 = z.z - x.x - y.y;
+        const auto trace3 = x.x + y.y + z.z;
+
+        int biggest_index = 3;
+        auto biggest = trace3;
+        if (trace0 > biggest) {
+            biggest = trace0;
+            biggest_index = 0;
+        }
+        if (trace1 > biggest) {
+            biggest = trace1;
+            biggest_index = 1;
+        }
+        if (trace2 > biggest) {
+            biggest = trace2;
+            biggest_index = 2;
+        }
+
+        biggest = sqrt(biggest + static_cast<Element>(1)) * static_cast<Element>(0.5);
+        const auto mlt = static_cast<Element>(0.25) / biggest;
+
+        switch (biggest_index) {
+        case 0:
+            return { biggest, (x.y + y.x) * mlt, (z.x + x.z) * mlt, (y.z - z.y) * mlt };
+        case 1:
+            return { (x.y + y.x) * mlt, biggest, (y.z + z.y) * mlt, (z.x - x.z) * mlt };
+        case 2:
+            return { (z.x + x.z) * mlt, (y.z + z.y) * mlt, biggest, (x.y - y.x) * mlt };
+        case 3:
+            return { (y.z - z.y) * mlt, (z.x - x.z) * mlt, (x.y - y.x) * mlt, biggest };
+        default:
+            return { 0, 0, 0, 0 };
+        }
+    }
+
+    [[nodiscard]] constexpr static Quat from(const Mat4x4<Element>& m)
+    {
+        Vec3<Element> x, y, z;
+        m.get_axes(x, y, z);
+
+        return from(x, y, z);
+    }
+
+    [[nodiscard]] constexpr static Quat from(const Mat3x3<Element>& m)
+    {
+        return from(m[0], m[1], m[2]);
+    }
+
+    [[nodiscard]] constexpr static Quat angle_axis(const Element rad, const Vec3<Element>& axis)
+    {
+        const auto ha = static_cast<Element>(0.5) * rad;
+        return { axis * std::sin(ha), std::cos(ha) };
     }
 };
 }

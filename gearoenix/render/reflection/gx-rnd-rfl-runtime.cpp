@@ -107,10 +107,10 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             cam->set_parent_entity_id(builder->get_id());
             cam->set_enabled(false);
             const auto& transform = self->cameras[face_index].trn;
-            transform->local_x_rotate(face.x_rotate);
-            transform->local_y_rotate(face.y_rotate);
-            transform->local_z_rotate(face.z_rotate);
-            transform->set_local_location(self->receive_box.get_center());
+            transform->local_inner_x_rotate(face.x_rotate);
+            transform->local_inner_y_rotate(face.y_rotate);
+            transform->local_inner_z_rotate(face.z_rotate);
+            transform->set_local_position(self->receive_box.get_center());
             self->e.get_texture_manager()->create_target(
                 self->name + "-irradiance-target" + name_ext,
                 std::vector {
@@ -220,7 +220,7 @@ void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<doubl
     exclude_box.set_center(p);
     include_box.set_center(p);
     for (const auto& camera_data : cameras) {
-        camera_data.trn->set_local_location(p);
+        camera_data.trn->set_local_position(p);
     }
 }
 

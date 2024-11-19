@@ -10,7 +10,7 @@ static bool keyframe_is_interpolated(
     const std::pair<double, T>& ke)
 {
     const auto i = interpolate(ks, ke, km.first);
-    return i.equal(get_key(km.second), 0.001);
+    return i.equal(get_key(km.second), math::Numeric::epsilon<double>);
 }
 
 template <typename T>

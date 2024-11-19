@@ -49,9 +49,9 @@ gearoenix::render::scene::Splash::Splash(
     engine::Engine& e,
     const core::job::EndCaller<>& end_callback)
     : e(e)
-    , end_callback(end_callback)
-    , current_scale(calculate_scale() * whole_scale_start)
     , wings_current_angle(wing_angle_start)
+    , current_scale(calculate_scale() * whole_scale_start)
+    , end_callback(end_callback)
 {
 }
 
@@ -95,7 +95,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
         e.get_camera_manager()->build(
             "gearoenix-splash-camera", nullptr,
             core::job::EndCallerShared<camera::Builder>([scene_builder](std::shared_ptr<camera::Builder>&& cb) {
-                cb->get_transformation().set_local_location({ 0.0f, 0.0f, 5.0f });
+                cb->get_transformation().set_local_position({ 0.0, 0.0, 5.0 });
                 auto& camera = cb->get_camera();
                 camera.set_projection_data(camera::OrthographicProjectionData { .scale = 1.0 });
                 camera.disable_bloom();
@@ -140,7 +140,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     { std::move(bg_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
-                bg_model_builder->get_transformation().local_scale(100.0);
+                bg_model_builder->get_transformation().local_inner_scale(100.0);
                 scene_builder->add(std::move(bg_model_builder));
             }
 
@@ -150,7 +150,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     { std::shared_ptr(gear_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
-                gear_model_builder->get_transformation().local_scale(splash->current_scale * gear_base_scale);
+                gear_model_builder->get_transformation().local_inner_scale(splash->current_scale * gear_base_scale);
                 gear_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.3f });
                 splash->gear_id = gear_model_builder->get_entity_builder()->get_builder().get_id();
                 scene_builder->add(std::move(gear_model_builder));
@@ -162,7 +162,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     { std::move(glare_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
-                glare_model_builder->get_transformation().local_scale(splash->current_scale * glare_base_scale);
+                glare_model_builder->get_transformation().local_inner_scale(splash->current_scale * glare_base_scale);
                 glare_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.2f });
                 splash->glare_id = glare_model_builder->get_entity_builder()->get_builder().get_id();
                 scene_builder->add(std::move(glare_model_builder));
@@ -174,9 +174,9 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     { std::move(left_wing_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
-                wing_model_builder->get_transformation().local_scale(splash->current_scale * wings_base_scale);
+                wing_model_builder->get_transformation().local_inner_scale(splash->current_scale * wings_base_scale);
                 wing_model_builder->get_transformation().local_translate({ 0.0, 0.0, 0.1 });
-                wing_model_builder->get_transformation().local_z_rotate(-wing_angle_start);
+                wing_model_builder->get_transformation().local_inner_z_rotate(-wing_angle_start);
                 splash->left_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
                 scene_builder->add(std::move(wing_model_builder));
             }
@@ -187,9 +187,9 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     { std::move(right_wing_mesh) },
                     core::job::EndCaller(entity_callback),
                     true);
-                wing_model_builder->get_transformation().local_scale(splash->current_scale * wings_base_scale);
+                wing_model_builder->get_transformation().local_inner_scale(splash->current_scale * wings_base_scale);
                 wing_model_builder->get_transformation().local_translate({ 0.0f, 0.0f, 0.1f });
-                wing_model_builder->get_transformation().local_z_rotate(wing_angle_start);
+                wing_model_builder->get_transformation().local_inner_z_rotate(wing_angle_start);
                 splash->right_wing_id = wing_model_builder->get_entity_builder()->get_builder().get_id();
                 scene_builder->add(std::move(wing_model_builder));
             }
@@ -203,7 +203,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                     std::move(entity_callback),
                     true);
                 auto& trn = model_builder->get_transformation();
-                trn.local_scale(scale);
+                trn.local_inner_scale(scale);
                 trn.local_translate({ 0.0f, -0.25f, 0.5f });
                 splash->gearoenix_text = model_builder->get_id();
                 scene_builder->add(std::move(model_builder));
@@ -297,7 +297,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
                         }));
             }));
 
-    values->text_height = e.get_platform_application().get_base().get_screen_size().y * 0.0001;
+    values->text_height = e.get_platform_application().get_base().get_screen_size().y * math::Numeric::epsilon<double>;
 
     e.get_material_manager()->get_unlit(
         "gearoenix-splash-text",
@@ -374,27 +374,27 @@ void gearoenix::render::scene::Splash::update()
         }
     }
 
-    gear_tran->local_z_rotate(delta_time);
-    glare_tran->local_z_rotate(-delta_time);
+    gear_tran->local_inner_z_rotate(delta_time);
+    glare_tran->local_inner_z_rotate(-delta_time);
 
     const auto new_scale = calculate_scale() * (whole_scale_start + whole_scale_animation * scale_animation_time_current);
     const auto scale = new_scale / current_scale;
     current_scale = new_scale;
 
-    gear_tran->local_scale(scale);
-    glare_tran->local_scale(scale);
-    left_wing_tran->local_scale(scale);
-    right_wing_tran->local_scale(scale);
-    gearoenix_tran->local_scale(scale);
+    gear_tran->local_inner_scale(scale);
+    glare_tran->local_inner_scale(scale);
+    left_wing_tran->local_inner_scale(scale);
+    right_wing_tran->local_inner_scale(scale);
+    gearoenix_tran->local_inner_scale(scale);
 
     const auto new_wing_angle = wing_angle_start + scale_animation_time_current * wing_rotate_dis;
     const auto new_wing_rot = new_wing_angle - wings_current_angle;
-    left_wing_tran->local_z_rotate(-new_wing_rot);
-    right_wing_tran->local_z_rotate(new_wing_rot);
+    left_wing_tran->local_inner_z_rotate(-new_wing_rot);
+    right_wing_tran->local_inner_z_rotate(new_wing_rot);
     wings_current_angle = new_wing_angle;
 }
 
 void gearoenix::render::scene::Splash::hide()
 {
-    e.get_world()->get_component<scene::Scene>(scene_id)->set_enabled(false);
+    e.get_world()->get_component<Scene>(scene_id)->set_enabled(false);
 }

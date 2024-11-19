@@ -97,5 +97,5 @@ void gearoenix::render::widget::Text::update_text(const core::job::EndCaller<>& 
             self->text_material->set_albedo(std::move(t));
             (void)c;
         }));
-    e.get_world()->get_component<physics::Transformation>(model_entity_id)->local_x_scale(width / img_dim.x);
+    e.get_world()->get_component<physics::Transformation>(model_entity_id)->local_inner_x_scale(width / img_dim.x);
 }

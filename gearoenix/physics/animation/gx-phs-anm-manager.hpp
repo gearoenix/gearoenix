@@ -37,7 +37,7 @@ private:
     std::map<std::string, std::shared_ptr<Animation>> animations_map;
 
     void insert_bones(BoneInfo& bones_info, std::size_t current_index);
-    void update_bone(std::size_t index, const Transformation& parent);
+    void update_bone(std::size_t index, Transformation* parent);
 
 public:
     explicit Manager(render::engine::Engine& e);

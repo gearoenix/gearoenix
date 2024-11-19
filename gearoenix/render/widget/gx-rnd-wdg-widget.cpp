@@ -29,7 +29,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
     if (nullptr == collider) {
         return std::nullopt;
     }
-    if (0 == camera_entity_id) {
+    if (core::ecs::INVALID_ENTITY_ID == camera_entity_id) {
         return std::nullopt;
     }
     const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
@@ -224,8 +224,7 @@ void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& chil
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)
 {
     add_child(std::move(child), 0.0);
-    transform->add_child(child->transform);
-    child->transform->set_parent(transform.get());
+    transform->add_child(child->transform.get());
 }
 
 gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(

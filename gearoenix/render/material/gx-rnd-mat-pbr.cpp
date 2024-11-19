@@ -8,7 +8,7 @@ gearoenix::render::material::Pbr::Pbr(engine::Engine& e, const std::string& name
     , albedo_factor(1.0f)
     , emission_roughness_factor(1.0f)
     , normal_metallic_factor(1.0f)
-    , alpha_cutoff_occlusion_strength_reserved_reserved(0.001f, 1.0f, 0.0f, 0.0f)
+    , alpha_cutoff_occlusion_strength_reserved_reserved(math::Numeric::epsilon<float>, 1.0f, 0.0f, 0.0f)
 {
 }
 

@@ -33,7 +33,7 @@ void gearoenix::render::widget::Edit::init(const core::job::EndCaller<core::job:
         event_engine->add_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
     });
 
-    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, 0.001), math::Vec3(-1.0, -1.0, -0.001)));
+    set_collider(std::make_unique<physics::collider::Aabb>(math::Vec3(1.0, 1.0, math::Numeric::epsilon), math::Vec3(-1.0, -1.0, -math::Numeric::epsilon)));
 
     auto* const ast_mgr = e->get_platform_application()->get_asset_manager();
     auto* const msh_mgr = ast_mgr->get_mesh_manager();

@@ -149,7 +149,7 @@ void gearoenix::render::calculate_tangents(PbrVertices& vertices, const std::vec
         const auto uv2 = tex2 - tex0;
 
         const auto dom_r = uv1.x * uv2.y - uv1.y * uv2.x;
-        const auto r = 1.0f / (dom_r > 0.00001f || dom_r < -0.00001f ? dom_r : 0.000001f);
+        const auto r = 1.0f / (dom_r > math::Numeric::epsilon<float> || dom_r < -math::Numeric::epsilon<float> ? dom_r : math::Numeric::epsilon<float>);
 
         const math::Vec3 tangent(
             ((edge1.x * uv2.y) - (edge2.x * uv1.y)) * r,

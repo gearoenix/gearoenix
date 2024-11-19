@@ -10,11 +10,11 @@
 
 #define GX_MAIN_ENTRY_ARGS argc, argv
 
-#define GX_MAIN_ENTRY(expr)                                      \
+#define GX_MAIN_ENTRY(expr)                     \
     extern "C" int main(GX_MAIN_ENTRY_ARGS_DEF) \
-    {                                                            \
-        expr;                                                    \
-        return 0;                                                \
+    {                                           \
+        expr;                                   \
+        return 0;                               \
     }
 
 #endif

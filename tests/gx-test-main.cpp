@@ -19,6 +19,7 @@
 
 #include "gearoenix/core/allocator/gx-cr-alc-range-test.hpp"
 #include <gearoenix/core/ecs/gx-cr-ecs-world-test.hpp>
+#include <gearoenix/math/gx-math-matrix-3d-test.hpp>
 #include <gearoenix/math/gx-math-matrix-4d-test.hpp>
 #include <gearoenix/math/gx-math-quaternion-test.hpp>
 #include <gearoenix/physics/accelerator/gx-phs-acc-bvh-test.hpp>

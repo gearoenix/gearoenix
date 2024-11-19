@@ -1,30 +1,27 @@
 #ifndef GEAROENIX_MATH_MATRIX_4D_HPP
 #define GEAROENIX_MATH_MATRIX_4D_HPP
+#include "gx-math-matrix-3d.hpp"
 #include "gx-math-vector-4d.hpp"
 
 namespace gearoenix::math {
 /// It is a column major matrix
 template <typename Element>
 struct Mat4x4 final {
-    Element data[4][4];
+    std::array<Vec4<Element>, 4> columns;
 
     constexpr Mat4x4()
-        : data {
-            { static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) }
-        }
+        : columns { { { static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0), static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1), static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) } } }
     {
     }
 
     constexpr explicit Mat4x4(const Element diameter)
-        : data {
-            { diameter, static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
-            { static_cast<Element>(0), diameter, static_cast<Element>(0), static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(0), diameter, static_cast<Element>(0) },
-            { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) }
-        }
+        : columns { { { diameter, static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0) },
+              { static_cast<Element>(0), diameter, static_cast<Element>(0), static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(0), diameter, static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) } } }
     {
     }
 
@@ -33,48 +30,51 @@ struct Mat4x4 final {
         const Element e4, const Element e5, const Element e6, const Element e7,
         const Element e8, const Element e9, const Element e10, const Element e11,
         const Element e12, const Element e13, const Element e14, const Element e15)
-        : data {
-            { e0, e1, e2, e3 },
-            { e4, e5, e6, e7 },
-            { e8, e9, e10, e11 },
-            { e12, e13, e14, e15 },
-        }
+        : columns { {
+              { e0, e1, e2, e3 },
+              { e4, e5, e6, e7 },
+              { e8, e9, e10, e11 },
+              { e12, e13, e14, e15 },
+          } }
     {
     }
 
-    explicit Mat4x4(platform::stream::Stream* const f)
+    explicit Mat4x4(platform::stream::Stream& f)
     {
         read(f);
     }
 
-    constexpr Mat4x4(const Mat4x4& m)
-        : data {
-            { m.data[0][0], m.data[0][1], m.data[0][2], m.data[0][3] },
-            { m.data[1][0], m.data[1][1], m.data[1][2], m.data[1][3] },
-            { m.data[2][0], m.data[2][1], m.data[2][2], m.data[2][3] },
-            { m.data[3][0], m.data[3][1], m.data[3][2], m.data[3][3] },
-        }
+    constexpr explicit Mat4x4(const Mat3x3<Element>& m)
+        : columns { {
+              { m[0], static_cast<Element>(0) },
+              { m[1], static_cast<Element>(0) },
+              { m[2], static_cast<Element>(0) },
+              { static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(0), static_cast<Element>(1) },
+          } }
     {
     }
 
+    constexpr Mat4x4(const Mat4x4& m) = default;
+
     template <typename T>
     constexpr explicit Mat4x4(const Mat4x4<T>& m)
-        : data {
-            { static_cast<Element>(m.data[0][0]), static_cast<Element>(m.data[0][1]), static_cast<Element>(m.data[0][2]), static_cast<Element>(m.data[0][3]) },
-            { static_cast<Element>(m.data[1][0]), static_cast<Element>(m.data[1][1]), static_cast<Element>(m.data[1][2]), static_cast<Element>(m.data[1][3]) },
-            { static_cast<Element>(m.data[2][0]), static_cast<Element>(m.data[2][1]), static_cast<Element>(m.data[2][2]), static_cast<Element>(m.data[2][3]) },
-            { static_cast<Element>(m.data[3][0]), static_cast<Element>(m.data[3][1]), static_cast<Element>(m.data[3][2]), static_cast<Element>(m.data[3][3]) },
-        }
+        : columns { {
+              { static_cast<Element>(m[0][0]), static_cast<Element>(m[0][1]), static_cast<Element>(m[0][2]), static_cast<Element>(m[0][3]) },
+              { static_cast<Element>(m[1][0]), static_cast<Element>(m[1][1]), static_cast<Element>(m[1][2]), static_cast<Element>(m[1][3]) },
+              { static_cast<Element>(m[2][0]), static_cast<Element>(m[2][1]), static_cast<Element>(m[2][2]), static_cast<Element>(m[2][3]) },
+              { static_cast<Element>(m[3][0]), static_cast<Element>(m[3][1]), static_cast<Element>(m[3][2]), static_cast<Element>(m[3][3]) },
+          } }
     {
     }
 
     [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const
     {
-        return Vec4<Element>(
-            data[0][0] * v.x + data[1][0] * v.y + data[2][0] * v.z + data[3][0] * v.w,
-            data[0][1] * v.x + data[1][1] * v.y + data[2][1] * v.z + data[3][1] * v.w,
-            data[0][2] * v.x + data[1][2] * v.y + data[2][2] * v.z + data[3][2] * v.w,
-            data[0][3] * v.x + data[1][3] * v.y + data[2][3] * v.z + data[3][3] * v.w);
+        return {
+            columns[0][0] * v.x + columns[1][0] * v.y + columns[2][0] * v.z + columns[3][0] * v.w,
+            columns[0][1] * v.x + columns[1][1] * v.y + columns[2][1] * v.z + columns[3][1] * v.w,
+            columns[0][2] * v.x + columns[1][2] * v.y + columns[2][2] * v.z + columns[3][2] * v.w,
+            columns[0][3] * v.x + columns[1][3] * v.y + columns[2][3] * v.z + columns[3][3] * v.w
+        };
     }
 
     [[nodiscard]] constexpr Mat4x4 operator*(const Mat4x4& m) const
@@ -82,7 +82,7 @@ struct Mat4x4 final {
         Mat4x4 r;
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                r.data[i][j] = m.data[i][0] * data[0][j] + m.data[i][1] * data[1][j] + m.data[i][2] * data[2][j] + m.data[i][3] * data[3][j];
+                r[i][j] = m[i][0] * columns[0][j] + m[i][1] * columns[1][j] + m[i][2] * columns[2][j] + m[i][3] * columns[3][j];
             }
         }
         return r;
@@ -92,7 +92,7 @@ struct Mat4x4 final {
     {
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                data[i][j] = m.data[i][j];
+                columns[i][j] = m[i][j];
             }
         }
         return *this;
@@ -108,7 +108,7 @@ struct Mat4x4 final {
     {
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                if (data[i][j] != m.data[i][j]) {
+                if (columns[i][j] != m[i][j]) {
                     return false;
                 }
             }
@@ -117,60 +117,48 @@ struct Mat4x4 final {
     }
 
     template <typename T>
-    constexpr Element operator[](const T i) const
+    constexpr const Vec4<Element>& operator[](const T i) const
     {
-        return data[i >> 2][i & 3];
+        return columns[i];
     }
 
     template <typename T>
-    constexpr Element& operator[](const T i)
+    constexpr Vec4<Element>& operator[](const T i)
     {
-        return data[i >> 2][i & 3];
+        return columns[i];
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_scale(const Element s)
     {
         local_scale(s, s, s);
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_x_scale(const Element s)
     {
-        data[0][0] *= s;
-        data[0][1] *= s;
-        data[0][2] *= s;
-        data[0][3] *= s;
+        columns[0] *= s;
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_y_scale(const Element s)
     {
-        data[1][0] *= s;
-        data[1][1] *= s;
-        data[1][2] *= s;
-        data[1][3] *= s;
+        columns[1] *= s;
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_z_scale(const Element s)
     {
-        data[2][0] *= s;
-        data[2][1] *= s;
-        data[2][2] *= s;
-        data[2][3] *= s;
+        columns[2] *= s;
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_w_scale(const Element s)
     {
-        data[3][0] *= s;
-        data[3][1] *= s;
-        data[3][2] *= s;
-        data[3][3] *= s;
+        columns[3] *= s;
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_scale(const Element a, const Element b, const Element c)
     {
         local_x_scale(a);
@@ -178,68 +166,68 @@ struct Mat4x4 final {
         local_z_scale(c);
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void local_scale(const Element a, const Element b, const Element c, const Element d)
     {
         local_scale(a, b, c);
         local_w_scale(d);
     }
 
-    /// It does not change location
+    /// It does not change position
     constexpr void local_scale(const Vec3<Element>& s)
     {
         local_scale(s.x, s.y, s.z);
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void local_scale(const Vec4<Element>& s)
     {
         local_scale(s.x, s.y, s.z, s.w);
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void global_scale(const Element s)
     {
         global_scale(s, s, s);
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void global_scale(const Element a, const Element b, const Element c)
     {
-        data[0][0] *= a;
-        data[1][0] *= a;
-        data[2][0] *= a;
-        data[3][0] *= a;
+        columns[0][0] *= a;
+        columns[1][0] *= a;
+        columns[2][0] *= a;
+        columns[3][0] *= a;
 
-        data[0][1] *= b;
-        data[1][1] *= b;
-        data[2][1] *= b;
-        data[3][1] *= b;
+        columns[0][1] *= b;
+        columns[1][1] *= b;
+        columns[2][1] *= b;
+        columns[3][1] *= b;
 
-        data[0][2] *= c;
-        data[1][2] *= c;
-        data[2][2] *= c;
-        data[3][2] *= c;
+        columns[0][2] *= c;
+        columns[1][2] *= c;
+        columns[2][2] *= c;
+        columns[3][2] *= c;
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void global_scale(const Element a, const Element b, const Element c, const Element d)
     {
         global_scale(a, b, c);
 
-        data[0][3] *= d;
-        data[1][3] *= d;
-        data[2][3] *= d;
-        data[3][3] *= d;
+        columns[0][3] *= d;
+        columns[1][3] *= d;
+        columns[2][3] *= d;
+        columns[3][3] *= d;
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void global_scale(const Vec3<Element>& s)
     {
         global_scale(s.x, s.y, s.z);
     }
 
-    /// It changes location
+    /// It changes position
     constexpr void global_scale(const Vec4<Element>& s)
     {
         global_scale(s.x, s.y, s.z, s.w);
@@ -247,60 +235,49 @@ struct Mat4x4 final {
 
     constexpr void translate(const Vec3<Element>& v)
     {
-        data[3][0] += v.x;
-        data[3][1] += v.y;
-        data[3][2] += v.z;
+        columns[3].x += v.x;
+        columns[3].y += v.y;
+        columns[3].z += v.z;
     }
 
-    constexpr void set_location(const Vec3<Element>& location = Vec3<Element>(0))
+    constexpr void set_position(const Vec3<Element>& position = Vec3<Element>(0))
     {
-        data[3][0] = location.x;
-        data[3][1] = location.y;
-        data[3][2] = location.z;
+        columns[3].x = position.x;
+        columns[3].y = position.y;
+        columns[3].z = position.z;
     }
 
-    constexpr void get_location(Vec3<Element>& location) const
+    constexpr void get_position(Vec3<Element>& position) const
     {
-        location.x = data[3][0];
-        location.y = data[3][1];
-        location.z = data[3][2];
+        position = columns[3].xyz();
     }
 
     constexpr void get_axes(Vec3<Element>& x, Vec3<Element>& y, Vec3<Element>& z) const
     {
-        x.x = data[0][0];
-        x.y = data[0][1];
-        x.z = data[0][2];
-
-        y.x = data[1][0];
-        y.y = data[1][1];
-        y.z = data[1][2];
-
-        z.x = data[2][0];
-        z.y = data[2][1];
-        z.z = data[2][2];
+        x = columns[0].xyz();
+        y = columns[1].xyz();
+        z = columns[2].xyz();
     }
 
     constexpr void set_axes(const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
     {
-        data[0][0] = x.x;
-        data[0][1] = x.y;
-        data[0][2] = x.z;
-
-        data[1][0] = y.x;
-        data[1][1] = y.y;
-        data[1][2] = y.z;
-
-        data[2][0] = z.x;
-        data[2][1] = z.y;
-        data[2][2] = z.z;
+        columns[0] = { x, columns[0].w };
+        columns[1] = { y, columns[1].w };
+        columns[2] = { z, columns[2].w };
     }
 
-    [[nodiscard]] constexpr Vec3<Element> get_location() const
+    [[nodiscard]] constexpr Vec3<Element> get_position() const
     {
         Vec3<Element> v;
-        get_location(v);
+        get_position(v);
         return v;
+    }
+
+    constexpr void set_m3x3(const Mat3x3<Element>& m)
+    {
+        columns[0] = { m[0], columns[0].w };
+        columns[1] = { m[1], columns[1].w };
+        columns[2] = { m[2], columns[2].w };
     }
 
     constexpr void inverse()
@@ -312,46 +289,46 @@ struct Mat4x4 final {
     {
         for (auto i = 0; i < 4; ++i) {
             for (auto j = i + 1; j < 4; ++j) {
-                std::swap(data[i][j], data[j][i]);
+                std::swap(columns[i][j], columns[j][i]);
             }
         }
     }
 
-    void read(platform::stream::Stream* const f)
+    void read(platform::stream::Stream& f)
     {
-        for (auto& r : data)
-            for (auto& c : r)
-                c = static_cast<Element>(f->read<float>());
+        for (auto& c : columns) {
+            c.read(f);
+        }
     }
 
     [[nodiscard]] constexpr Element determinant() const
     {
-        return (+data[0][0] * (+data[1][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) + data[3][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]))
-            - data[1][0] * (+data[0][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]))
-            + data[2][0] * (+data[0][1] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) - data[1][1] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][1] * (data[0][2] * data[1][3] - data[0][3] * data[1][2]))
-            - data[3][0] * (+data[0][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]) - data[1][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]) + data[2][1] * (data[0][2] * data[1][3] - data[0][3] * data[1][2])));
+        return (+columns[0][0] * (+columns[1][1] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][1] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) + columns[3][1] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]))
+            - columns[1][0] * (+columns[0][1] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][1] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][1] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]))
+            + columns[2][0] * (+columns[0][1] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) - columns[1][1] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][1] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2]))
+            - columns[3][0] * (+columns[0][1] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]) - columns[1][1] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]) + columns[2][1] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2])));
     }
 
     [[nodiscard]] constexpr Mat4x4 inverted() const
     {
         const auto id = static_cast<Element>(1) / determinant();
         Mat4x4 result;
-        result.data[0][0] = id * (+data[1][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) + data[3][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]));
-        result.data[0][1] = id * -(+data[0][1] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][1] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]));
-        result.data[0][2] = id * (+data[0][1] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) - data[1][1] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][1] * (data[0][2] * data[1][3] - data[0][3] * data[1][2]));
-        result.data[0][3] = id * -(+data[0][1] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]) - data[1][1] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]) + data[2][1] * (data[0][2] * data[1][3] - data[0][3] * data[1][2]));
-        result.data[1][0] = id * -(+data[1][0] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][0] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) + data[3][0] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]));
-        result.data[1][1] = id * (+data[0][0] * (data[2][2] * data[3][3] - data[2][3] * data[3][2]) - data[2][0] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][0] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]));
-        result.data[1][2] = id * -(+data[0][0] * (data[1][2] * data[3][3] - data[1][3] * data[3][2]) - data[1][0] * (data[0][2] * data[3][3] - data[0][3] * data[3][2]) + data[3][0] * (data[0][2] * data[1][3] - data[0][3] * data[1][2]));
-        result.data[1][3] = id * (+data[0][0] * (data[1][2] * data[2][3] - data[1][3] * data[2][2]) - data[1][0] * (data[0][2] * data[2][3] - data[0][3] * data[2][2]) + data[2][0] * (data[0][2] * data[1][3] - data[0][3] * data[1][2]));
-        result.data[2][0] = id * (+data[1][0] * (data[2][1] * data[3][3] - data[2][3] * data[3][1]) - data[2][0] * (data[1][1] * data[3][3] - data[1][3] * data[3][1]) + data[3][0] * (data[1][1] * data[2][3] - data[1][3] * data[2][1]));
-        result.data[2][1] = id * -(+data[0][0] * (data[2][1] * data[3][3] - data[2][3] * data[3][1]) - data[2][0] * (data[0][1] * data[3][3] - data[0][3] * data[3][1]) + data[3][0] * (data[0][1] * data[2][3] - data[0][3] * data[2][1]));
-        result.data[2][2] = id * (+data[0][0] * (data[1][1] * data[3][3] - data[1][3] * data[3][1]) - data[1][0] * (data[0][1] * data[3][3] - data[0][3] * data[3][1]) + data[3][0] * (data[0][1] * data[1][3] - data[0][3] * data[1][1]));
-        result.data[2][3] = id * -(+data[0][0] * (data[1][1] * data[2][3] - data[1][3] * data[2][1]) - data[1][0] * (data[0][1] * data[2][3] - data[0][3] * data[2][1]) + data[2][0] * (data[0][1] * data[1][3] - data[0][3] * data[1][1]));
-        result.data[3][0] = id * -(+data[1][0] * (data[2][1] * data[3][2] - data[2][2] * data[3][1]) - data[2][0] * (data[1][1] * data[3][2] - data[1][2] * data[3][1]) + data[3][0] * (data[1][1] * data[2][2] - data[1][2] * data[2][1]));
-        result.data[3][1] = id * (+data[0][0] * (data[2][1] * data[3][2] - data[2][2] * data[3][1]) - data[2][0] * (data[0][1] * data[3][2] - data[0][2] * data[3][1]) + data[3][0] * (data[0][1] * data[2][2] - data[0][2] * data[2][1]));
-        result.data[3][2] = id * -(+data[0][0] * (data[1][1] * data[3][2] - data[1][2] * data[3][1]) - data[1][0] * (data[0][1] * data[3][2] - data[0][2] * data[3][1]) + data[3][0] * (data[0][1] * data[1][2] - data[0][2] * data[1][1]));
-        result.data[3][3] = id * (+data[0][0] * (data[1][1] * data[2][2] - data[1][2] * data[2][1]) - data[1][0] * (data[0][1] * data[2][2] - data[0][2] * data[2][1]) + data[2][0] * (data[0][1] * data[1][2] - data[0][2] * data[1][1]));
+        result.columns[0][0] = id * (+columns[1][1] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][1] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) + columns[3][1] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]));
+        result.columns[0][1] = id * -(+columns[0][1] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][1] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][1] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]));
+        result.columns[0][2] = id * (+columns[0][1] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) - columns[1][1] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][1] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2]));
+        result.columns[0][3] = id * -(+columns[0][1] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]) - columns[1][1] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]) + columns[2][1] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2]));
+        result.columns[1][0] = id * -(+columns[1][0] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][0] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) + columns[3][0] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]));
+        result.columns[1][1] = id * (+columns[0][0] * (columns[2][2] * columns[3][3] - columns[2][3] * columns[3][2]) - columns[2][0] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][0] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]));
+        result.columns[1][2] = id * -(+columns[0][0] * (columns[1][2] * columns[3][3] - columns[1][3] * columns[3][2]) - columns[1][0] * (columns[0][2] * columns[3][3] - columns[0][3] * columns[3][2]) + columns[3][0] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2]));
+        result.columns[1][3] = id * (+columns[0][0] * (columns[1][2] * columns[2][3] - columns[1][3] * columns[2][2]) - columns[1][0] * (columns[0][2] * columns[2][3] - columns[0][3] * columns[2][2]) + columns[2][0] * (columns[0][2] * columns[1][3] - columns[0][3] * columns[1][2]));
+        result.columns[2][0] = id * (+columns[1][0] * (columns[2][1] * columns[3][3] - columns[2][3] * columns[3][1]) - columns[2][0] * (columns[1][1] * columns[3][3] - columns[1][3] * columns[3][1]) + columns[3][0] * (columns[1][1] * columns[2][3] - columns[1][3] * columns[2][1]));
+        result.columns[2][1] = id * -(+columns[0][0] * (columns[2][1] * columns[3][3] - columns[2][3] * columns[3][1]) - columns[2][0] * (columns[0][1] * columns[3][3] - columns[0][3] * columns[3][1]) + columns[3][0] * (columns[0][1] * columns[2][3] - columns[0][3] * columns[2][1]));
+        result.columns[2][2] = id * (+columns[0][0] * (columns[1][1] * columns[3][3] - columns[1][3] * columns[3][1]) - columns[1][0] * (columns[0][1] * columns[3][3] - columns[0][3] * columns[3][1]) + columns[3][0] * (columns[0][1] * columns[1][3] - columns[0][3] * columns[1][1]));
+        result.columns[2][3] = id * -(+columns[0][0] * (columns[1][1] * columns[2][3] - columns[1][3] * columns[2][1]) - columns[1][0] * (columns[0][1] * columns[2][3] - columns[0][3] * columns[2][1]) + columns[2][0] * (columns[0][1] * columns[1][3] - columns[0][3] * columns[1][1]));
+        result.columns[3][0] = id * -(+columns[1][0] * (columns[2][1] * columns[3][2] - columns[2][2] * columns[3][1]) - columns[2][0] * (columns[1][1] * columns[3][2] - columns[1][2] * columns[3][1]) + columns[3][0] * (columns[1][1] * columns[2][2] - columns[1][2] * columns[2][1]));
+        result.columns[3][1] = id * (+columns[0][0] * (columns[2][1] * columns[3][2] - columns[2][2] * columns[3][1]) - columns[2][0] * (columns[0][1] * columns[3][2] - columns[0][2] * columns[3][1]) + columns[3][0] * (columns[0][1] * columns[2][2] - columns[0][2] * columns[2][1]));
+        result.columns[3][2] = id * -(+columns[0][0] * (columns[1][1] * columns[3][2] - columns[1][2] * columns[3][1]) - columns[1][0] * (columns[0][1] * columns[3][2] - columns[0][2] * columns[3][1]) + columns[3][0] * (columns[0][1] * columns[1][2] - columns[0][2] * columns[1][1]));
+        result.columns[3][3] = id * (+columns[0][0] * (columns[1][1] * columns[2][2] - columns[1][2] * columns[2][1]) - columns[1][0] * (columns[0][1] * columns[2][2] - columns[0][2] * columns[2][1]) + columns[2][0] * (columns[0][1] * columns[1][2] - columns[0][2] * columns[1][1]));
         return result;
     }
 
@@ -360,7 +337,7 @@ struct Mat4x4 final {
         Mat4x4 r;
         for (auto i = 0; i < 4; ++i) {
             for (auto j = 0; j < 4; ++j) {
-                r.data[i][j] = data[j][i];
+                r[i][j] = columns[j][i];
             }
         }
         return r;
@@ -373,6 +350,15 @@ struct Mat4x4 final {
         return v4.xyz() / v4.w;
     }
 
+    [[nodiscard]] constexpr Mat3x3<Element> to_m3x3() const
+    {
+        Mat3x3<Element> r;
+        r[0] = columns[0].xyz();
+        r[1] = columns[1].xyz();
+        r[2] = columns[2].xyz();
+        return r;
+    }
+
     [[nodiscard]] constexpr static Mat4x4 look_at(const Vec3<Element>& position, const Vec3<Element>& target, const Vec3<Element>& up)
     {
         const auto z = (position - target).normalised();
@@ -381,26 +367,40 @@ struct Mat4x4 final {
 
         Mat4x4 m;
 
-        m.data[0][0] = x.x;
-        m.data[1][0] = x.y;
-        m.data[2][0] = x.z;
+        m[0][0] = x.x;
+        m[1][0] = x.y;
+        m[2][0] = x.z;
 
-        m.data[0][1] = y.x;
-        m.data[1][1] = y.y;
-        m.data[2][1] = y.z;
+        m[0][1] = y.x;
+        m[1][1] = y.y;
+        m[2][1] = y.z;
 
-        m.data[0][2] = z.x;
-        m.data[1][2] = z.y;
-        m.data[2][2] = z.z;
+        m[0][2] = z.x;
+        m[1][2] = z.y;
+        m[2][2] = z.z;
 
-        m.data[3][0] = -x.dot(position);
-        m.data[3][1] = -y.dot(position);
-        m.data[3][2] = -z.dot(position);
+        m[3][0] = -x.dot(position);
+        m[3][1] = -y.dot(position);
+        m[3][2] = -z.dot(position);
 
-        m.data[0][3] = static_cast<Element>(0);
-        m.data[1][3] = static_cast<Element>(0);
-        m.data[2][3] = static_cast<Element>(0);
-        m.data[3][3] = static_cast<Element>(1);
+        m[0][3] = static_cast<Element>(0);
+        m[1][3] = static_cast<Element>(0);
+        m[2][3] = static_cast<Element>(0);
+        m[3][3] = static_cast<Element>(1);
+
+        return m;
+    }
+
+    [[nodiscard]] constexpr static Mat4x4 look_at_inverted(const Vec3<Element>& position, const Vec3<Element>& target, const Vec3<Element>& up)
+    {
+        const auto z = (position - target).normalised();
+        const auto x = up.cross(z).normalised();
+        const auto y = z.cross(x);
+
+        Mat4x4 m;
+
+        m.set_axes(x, y, z);
+        m.set_position(position);
 
         return m;
     }
@@ -423,44 +423,44 @@ struct Mat4x4 final {
         const Element wy_sin = w[1] * sinus;
         const Element wz_sin = w[2] * sinus;
         Mat4x4 m;
-        m.data[0][0] = cosine + (wx2 * one_minus_cos);
-        m.data[0][1] = wz_sin + wxy_one_min_cos;
-        m.data[0][2] = wxz_one_min_cos - wy_sin;
-        m.data[0][3] = static_cast<Element>(0);
-        m.data[1][0] = wxy_one_min_cos - wz_sin;
-        m.data[1][1] = cosine + (wy2 * one_minus_cos);
-        m.data[1][2] = wx_sin + wyz_one_min_cos;
-        m.data[1][3] = static_cast<Element>(0);
-        m.data[2][0] = wy_sin + wxz_one_min_cos;
-        m.data[2][1] = wyz_one_min_cos - wx_sin;
-        m.data[2][2] = cosine + (wz2 * one_minus_cos);
-        m.data[2][3] = static_cast<Element>(0);
-        m.data[3][0] = static_cast<Element>(0);
-        m.data[3][1] = static_cast<Element>(0);
-        m.data[3][2] = static_cast<Element>(0);
-        m.data[3][3] = static_cast<Element>(1);
+        m[0][0] = cosine + (wx2 * one_minus_cos);
+        m[0][1] = wz_sin + wxy_one_min_cos;
+        m[0][2] = wxz_one_min_cos - wy_sin;
+        m[0][3] = static_cast<Element>(0);
+        m[1][0] = wxy_one_min_cos - wz_sin;
+        m[1][1] = cosine + (wy2 * one_minus_cos);
+        m[1][2] = wx_sin + wyz_one_min_cos;
+        m[1][3] = static_cast<Element>(0);
+        m[2][0] = wy_sin + wxz_one_min_cos;
+        m[2][1] = wyz_one_min_cos - wx_sin;
+        m[2][2] = cosine + (wz2 * one_minus_cos);
+        m[2][3] = static_cast<Element>(0);
+        m[3][0] = static_cast<Element>(0);
+        m[3][1] = static_cast<Element>(0);
+        m[3][2] = static_cast<Element>(0);
+        m[3][3] = static_cast<Element>(1);
         return m;
     }
 
     [[nodiscard]] constexpr static Mat4x4 translator(const Vec3<Element>& v)
     {
         Mat4x4 r;
-        r.data[0][0] = static_cast<Element>(1);
-        r.data[0][1] = static_cast<Element>(0);
-        r.data[0][2] = static_cast<Element>(0);
-        r.data[0][3] = static_cast<Element>(0);
-        r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = static_cast<Element>(1);
-        r.data[1][2] = static_cast<Element>(0);
-        r.data[1][3] = static_cast<Element>(0);
-        r.data[2][0] = static_cast<Element>(0);
-        r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = static_cast<Element>(1);
-        r.data[2][3] = static_cast<Element>(0);
-        r.data[3][0] = v.x;
-        r.data[3][1] = v.y;
-        r.data[3][2] = v.z;
-        r.data[3][3] = static_cast<Element>(1);
+        r[0][0] = static_cast<Element>(1);
+        r[0][1] = static_cast<Element>(0);
+        r[0][2] = static_cast<Element>(0);
+        r[0][3] = static_cast<Element>(0);
+        r[1][0] = static_cast<Element>(0);
+        r[1][1] = static_cast<Element>(1);
+        r[1][2] = static_cast<Element>(0);
+        r[1][3] = static_cast<Element>(0);
+        r[2][0] = static_cast<Element>(0);
+        r[2][1] = static_cast<Element>(0);
+        r[2][2] = static_cast<Element>(1);
+        r[2][3] = static_cast<Element>(0);
+        r[3][0] = v.x;
+        r[3][1] = v.y;
+        r[3][2] = v.z;
+        r[3][3] = static_cast<Element>(1);
         return r;
     }
 
@@ -471,22 +471,22 @@ struct Mat4x4 final {
         const Element proj_far)
     {
         Mat4x4 r;
-        r.data[0][0] = static_cast<Element>(2) / proj_width;
-        r.data[0][1] = static_cast<Element>(0);
-        r.data[0][2] = static_cast<Element>(0);
-        r.data[0][3] = static_cast<Element>(0);
-        r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = static_cast<Element>(2) / proj_height;
-        r.data[1][2] = static_cast<Element>(0);
-        r.data[1][3] = static_cast<Element>(0);
-        r.data[2][0] = static_cast<Element>(0);
-        r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = static_cast<Element>(2) / (proj_near - proj_far);
-        r.data[2][3] = static_cast<Element>(0);
-        r.data[3][0] = static_cast<Element>(0);
-        r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = (proj_far + proj_near) / (proj_near - proj_far);
-        r.data[3][3] = static_cast<Element>(1);
+        r[0][0] = static_cast<Element>(2) / proj_width;
+        r[0][1] = static_cast<Element>(0);
+        r[0][2] = static_cast<Element>(0);
+        r[0][3] = static_cast<Element>(0);
+        r[1][0] = static_cast<Element>(0);
+        r[1][1] = static_cast<Element>(2) / proj_height;
+        r[1][2] = static_cast<Element>(0);
+        r[1][3] = static_cast<Element>(0);
+        r[2][0] = static_cast<Element>(0);
+        r[2][1] = static_cast<Element>(0);
+        r[2][2] = static_cast<Element>(2) / (proj_near - proj_far);
+        r[2][3] = static_cast<Element>(0);
+        r[3][0] = static_cast<Element>(0);
+        r[3][1] = static_cast<Element>(0);
+        r[3][2] = (proj_far + proj_near) / (proj_near - proj_far);
+        r[3][3] = static_cast<Element>(1);
         return r;
     }
 
@@ -497,24 +497,28 @@ struct Mat4x4 final {
         const Element proj_far)
     {
         Mat4x4 r;
-        r.data[0][0] = (static_cast<Element>(2) * proj_near) / proj_width;
-        r.data[0][1] = static_cast<Element>(0);
-        r.data[0][2] = static_cast<Element>(0);
-        r.data[0][3] = static_cast<Element>(0);
-        r.data[1][0] = static_cast<Element>(0);
-        r.data[1][1] = (static_cast<Element>(2) * proj_near) / proj_height;
-        r.data[1][2] = static_cast<Element>(0);
-        r.data[1][3] = static_cast<Element>(0);
-        r.data[2][0] = static_cast<Element>(0);
-        r.data[2][1] = static_cast<Element>(0);
-        r.data[2][2] = (proj_far + proj_near) / (proj_near - proj_far);
-        r.data[2][3] = static_cast<Element>(-1);
-        r.data[3][0] = static_cast<Element>(0);
-        r.data[3][1] = static_cast<Element>(0);
-        r.data[3][2] = (static_cast<Element>(2) * proj_far * proj_near) / (proj_near - proj_far);
-        r.data[3][3] = static_cast<Element>(0);
+        r[0][0] = (static_cast<Element>(2) * proj_near) / proj_width;
+        r[0][1] = static_cast<Element>(0);
+        r[0][2] = static_cast<Element>(0);
+        r[0][3] = static_cast<Element>(0);
+        r[1][0] = static_cast<Element>(0);
+        r[1][1] = (static_cast<Element>(2) * proj_near) / proj_height;
+        r[1][2] = static_cast<Element>(0);
+        r[1][3] = static_cast<Element>(0);
+        r[2][0] = static_cast<Element>(0);
+        r[2][1] = static_cast<Element>(0);
+        r[2][2] = (proj_far + proj_near) / (proj_near - proj_far);
+        r[2][3] = static_cast<Element>(-1);
+        r[3][0] = static_cast<Element>(0);
+        r[3][1] = static_cast<Element>(0);
+        r[3][2] = (static_cast<Element>(2) * proj_far * proj_near) / (proj_near - proj_far);
+        r[3][3] = static_cast<Element>(0);
         return r;
     }
+
+    [[nodiscard]] constexpr const Element* data() const { return reinterpret_cast<const Element*>(this); }
+
+    [[nodiscard]] constexpr Element* data() { return reinterpret_cast<Element*>(this); }
 };
 }
 #endif

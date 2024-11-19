@@ -23,6 +23,8 @@ private:
     math::Mat4x4<float> current_view_matrix;
     math::Mat4x4<float> current_projection_matrix;
     boost::container::flat_set<Drawer*> drawers;
+    std::uint64_t operation_handles = 0;
+    std::uint64_t transform_mode = 0;
 
 public:
     explicit Manager(engine::Engine& e);
@@ -33,6 +35,14 @@ public:
     [[nodiscard]] bool is_processing_inputs() const;
     void register_drawer(Drawer*);
     void remove_drawer(Drawer*);
+    void enable_translation_handle();
+    void disable_translation_handle();
+    void enable_rotation_handle();
+    void disable_rotation_handle();
+    void enable_scale_handle();
+    void disable_scale_handle();
+    void enable_local_transform_mode();
+    void disable_local_transform_mode();
 };
 }
 #endif

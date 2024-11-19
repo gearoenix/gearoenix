@@ -2,6 +2,7 @@
 #include "../gx-editor-main.hpp"
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 #include <imgui/imgui.h>
@@ -38,4 +39,11 @@ gearoenix::editor::viewport::TranslateButton::~TranslateButton() = default;
 void gearoenix::editor::viewport::TranslateButton::update()
 {
     show();
+    if (clicked_in_this_frame) {
+        if (toggled) {
+            app.get_render_engine().get_gizmo_manager()->enable_translation_handle();
+        } else {
+            app.get_render_engine().get_gizmo_manager()->disable_translation_handle();
+        }
+    }
 }

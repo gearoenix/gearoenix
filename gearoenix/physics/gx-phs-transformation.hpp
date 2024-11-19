@@ -1,11 +1,13 @@
 #ifndef GEAROENIX_PHYSICS_TRANSFORMATION_HPP
 #define GEAROENIX_PHYSICS_TRANSFORMATION_HPP
 #include "../core/ecs/gx-cr-ecs-component.hpp"
+#include "../math/gx-math-matrix-3d.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../math/gx-math-quaternion.hpp"
 #include "../render/gizmo/gx-rnd-gzm-drawer.hpp"
 #include <boost/container/flat_set.hpp>
 #include <memory>
+#include <optional>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -13,65 +15,97 @@ struct World;
 
 namespace gearoenix::physics {
 struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
+    struct Rotation final {
+        friend struct Transformation;
+
+        GX_GET_CREF_PRV(math::Quat<double>, quat);
+
+        /// This property is for UI purposes only. (it can have other applications as well)
+        /// After receiving its initial value, tt is updated each frame afterward.
+        /// This can negatively impact performance, so use it judiciously.
+        /// To avoid unnecessary updates, do not provide an initial value unless strictly required.
+        /// For this reason, it is not exposed as a public API.
+        /// The value is in degree scale.
+        GX_GET_CREF_PRV(std::optional<math::Vec3<double>>, euler_in_degree);
+
+    public:
+        constexpr Rotation& operator=(const math::Quat<double>& q)
+        {
+            quat = q.normalised();
+            if (euler_in_degree.has_value()) {
+                euler_in_degree = q.to_euler_degree();
+            }
+            return *this;
+        }
+
+        explicit constexpr operator const math::Quat<double>&() const
+        {
+            return quat;
+        }
+    };
+
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
-    /// This is useful for caching the calculation
-    /// It gets updated in each loop so be careful and check the `changed` variable
     GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
-    GX_GET_CREF_PRV(math::Vec3<double>, x_axis);
-    GX_GET_CREF_PRV(math::Vec3<double>, y_axis);
-    GX_GET_CREF_PRV(math::Vec3<double>, z_axis);
+    GX_GET_CREF_PRV(math::Mat3x3<double>, rotation_matrix);
+
+    GX_GET_CREF_PRV(Rotation, rotation);
     GX_GET_CREF_PRV(math::Vec3<double>, scale);
-    GX_GET_CREF_PRV(boost::container::flat_set<std::shared_ptr<Transformation>>, children);
-    GX_GET_CPTR_PRV(Transformation, parent);
+
+    GX_GET_CREF_PRV(boost::container::flat_set<Transformation*>, children);
+    GX_GET_PTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
 
     [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
-    Transformation(std::string&& name, const Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
+    Transformation(std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
     ~Transformation() override;
     void set_local_matrix(const math::Mat4x4<double>&);
-    [[nodiscard]] math::Vec3<double> get_global_location() const;
-    void get_global_location(math::Vec3<double>& l) const;
-    [[nodiscard]] math::Vec3<double> get_local_location() const;
-    void get_local_location(math::Vec3<double>& l) const;
-    void set_local_location(const math::Vec3<double>& l);
-    void local_translate(const math::Vec3<double>& t);
-    void local_x_translate(double v);
-    void local_y_translate(double v);
-    void local_z_translate(double v);
-    void local_outer_rotate(double d, const math::Vec3<double>& axis, const math::Vec3<double>& location);
-    void local_outer_rotate(double d, const math::Vec3<double>& axis);
-    void local_rotate(double d, const math::Vec3<double>& axis);
-    void local_rotate(const math::Quat<double>& q);
-    void local_x_rotate(double d);
-    void local_y_rotate(double d);
-    void local_z_rotate(double d);
-    void set_local_scale(const math::Vec3<double>& s);
-    void local_scale(double s);
-    void local_scale(const math::Vec3<double>& s);
-    void local_x_scale(double s);
-    void local_y_scale(double s);
-    void local_z_scale(double s);
-    void set_local_orientation(const math::Quat<double>& q);
-    [[nodiscard]] math::Quat<double> get_local_orientation() const;
-    void local_look_at(const math::Vec3<double>& location, const math::Vec3<double>& target, const math::Vec3<double>& up);
+    [[nodiscard]] math::Vec3<double> get_global_position() const;
+    void get_global_position(math::Vec3<double>&) const;
+    void set_local_position(const math::Vec3<double>&);
+    [[nodiscard]] math::Vec3<double> get_local_position() const;
+    void get_local_position(math::Vec3<double>&) const;
+    void local_translate(const math::Vec3<double>&);
+    void local_x_translate(double);
+    void local_y_translate(double);
+    void local_z_translate(double);
+    void local_outer_rotate(double rad, const math::Vec3<double>& axis, const math::Vec3<double>& position);
+    void local_outer_rotate(double rad, const math::Vec3<double>& axis);
+    void local_inner_rotate(double rad, const math::Vec3<double>& axis);
+    void local_inner_rotate(const math::Quat<double>& q);
+    void local_inner_x_rotate(double rad);
+    void local_inner_y_rotate(double rad);
+    void local_inner_z_rotate(double rad);
+    void set_local_inner_scale(const math::Vec3<double>& s);
+    void local_inner_scale(double s);
+    void local_inner_scale(const math::Vec3<double>& s);
+    void local_inner_x_scale(double s);
+    void local_inner_y_scale(double s);
+    void local_inner_z_scale(double s);
+    void set_rotation(const math::Quat<double>&);
+    void set_rotation(const Rotation&);
+    [[nodiscard]] const math::Vec3<double>& get_x_axis() const;
+    [[nodiscard]] const math::Vec3<double>& get_y_axis() const;
+    [[nodiscard]] const math::Vec3<double>& get_z_axis() const;
+    void local_look_at(const math::Vec3<double>& pos, const math::Vec3<double>& target, const math::Vec3<double>& up);
     void local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up);
     void update_without_inverse_root();
     void update_inverse();
     void update_without_inverse_child();
     void clear_change();
     void reset();
-    void reset(const math::Vec3<double>& scale, const math::Quat<double>& rotation, const math::Vec3<double>& location);
+    void reset(const math::Vec3<double>& s, const Rotation& r, const math::Vec3<double>& p);
+    void reset(const math::Vec3<double>& s, const math::Quat<double>& r, const math::Vec3<double>& p);
     void reset(
-        const math::Vec3<double>& scale,
-        const math::Vec3<double>& x_axis,
-        const math::Vec3<double>& y_axis,
-        const math::Vec3<double>& z_axis,
-        const math::Vec3<double>& location);
-    void add_child(const std::shared_ptr<Transformation>& child);
-    void set_parent(const Transformation*);
+        const math::Vec3<double>& s,
+        const math::Vec3<double>& x,
+        const math::Vec3<double>& y,
+        const math::Vec3<double>& z,
+        const math::Vec3<double>& p);
+    void add_child(Transformation* child);
+    void set_parent(Transformation*);
     void show_debug_gui(const render::engine::Engine&) override;
     void draw_gizmo() override;
     [[nodiscard]] static std::shared_ptr<Transformation> construct(

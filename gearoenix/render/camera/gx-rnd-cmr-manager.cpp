@@ -25,7 +25,7 @@ void gearoenix::render::camera::Manager::update()
             cam->set_view(math::Mat4x4<float>(transform->get_inverted_global_matrix()));
             std::array<math::Vec3<double>, 8> points;
             cam->generate_frustum_points(
-                transform->get_global_location(),
+                transform->get_global_position(),
                 transform->get_x_axis(),
                 transform->get_y_axis(),
                 transform->get_z_axis(),

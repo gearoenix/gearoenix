@@ -41,8 +41,9 @@ template <typename Value, typename T>
         if (dot < -0.999)
             dot = -0.999; // Preventing NaN in acos
         const auto arc_cosine = std::acos(std::abs(dot));
-        if (arc_cosine < 0.001)
+        if (arc_cosine < math::Numeric::epsilon<double>) {
             return (sk * (1.0 - t)) + (ek * t); // Preventing NaN in slerp
+        }
         const auto arc_cosine_t = arc_cosine * t;
         const auto e_sin = dot > 0.0 ? std::sin(arc_cosine_t) : -std::sin(arc_cosine_t);
         const auto dom = 1.0 / std::sin(arc_cosine);

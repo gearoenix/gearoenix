@@ -236,8 +236,8 @@ struct GameApp final : GxCoreApp {
             auto speed = Speed::construct();
             auto position = Position::construct();
             auto& model_transformation = model_builder->get_transformation();
-            model_transformation.set_local_location(position->value);
-            model_transformation.local_scale(cube_size);
+            model_transformation.set_local_position(position->value);
+            model_transformation.local_inner_scale(cube_size);
             model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
             scene_builder->add(std::move(model_builder));
         }
@@ -246,7 +246,7 @@ struct GameApp final : GxCoreApp {
             "camera", nullptr,
             GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
                 auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
-                trn->set_local_location({ 0.0f, 0.0f, 5.0f });
+                trn->set_local_position({ 0.0f, 0.0f, 5.0f });
                 const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
                 auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
                 (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
@@ -276,7 +276,7 @@ struct GameApp final : GxCoreApp {
             [&](auto, Speed* const speed, Position* const position, GxTransformComp* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);
                 speed->update(*position);
-                trn->set_local_location(position->value);
+                trn->set_local_position(position->value);
             });
     }
 };

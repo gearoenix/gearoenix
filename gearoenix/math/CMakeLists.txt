@@ -6,6 +6,7 @@ SET(GX_ENGINE_MATH_SRC
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-imgui.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-intersection-status.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-matrix-2d.hpp
+        ${GX_ENGINE_MATH_SRC_DIR}/gx-math-matrix-3d.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-matrix-4d.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-numeric.hpp
         ${GX_ENGINE_MATH_SRC_DIR}/gx-math-plane.hpp

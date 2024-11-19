@@ -20,7 +20,7 @@ gearoenix::render::scene::Scene::Scene(
     engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
     : Component(create_this_type_index(this), std::move(name), entity_id)
     , e(e)
-    , ssao_settings(0.08f, 0.001f, 0.000f, 0.003f)
+    , ssao_settings(0.08f, math::Numeric::epsilon<float>, 0.000f, 0.003f)
     , layer(layer)
 {
     set_enabled(false);

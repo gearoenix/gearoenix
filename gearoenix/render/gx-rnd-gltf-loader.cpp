@@ -411,7 +411,7 @@ struct DataLoader final {
                     is.y = bone_index_map[is.y];
                     is.z = bone_index_map[is.z];
                     is.w = bone_index_map[is.w];
-                    return math::Vec4<float>(is) + 0.001f;
+                    return math::Vec4<float>(is) + math::Numeric::epsilon<float>;
                 };
                 switch (bin_a.componentType) {
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
@@ -576,13 +576,13 @@ struct DataLoader final {
         const std::vector<double>& translation = node.translation;
         GX_ASSERT_D(translation.empty() || translation.size() == 3);
         if (scale.size() == 3) {
-            transform.local_scale({ scale[0], scale[1], scale[2] });
+            transform.local_inner_scale({ scale[0], scale[1], scale[2] });
         }
         if (rotation.size() == 4) {
-            transform.local_rotate(math::Quat<double>(rotation[0], rotation[1], rotation[2], rotation[3]));
+            transform.local_inner_rotate(math::Quat<double>(rotation[0], rotation[1], rotation[2], rotation[3]));
         }
         if (translation.size() == 3) {
-            transform.set_local_location(math::Vec3<double>(translation[0], translation[1], translation[2]));
+            transform.set_local_position(math::Vec3<double>(translation[0], translation[1], translation[2]));
         }
     }
 

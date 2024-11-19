@@ -4,10 +4,13 @@
 #include "../core/gx-cr-types.hpp"
 #include <cmath>
 #include <limits>
+#include <random>
 
 namespace gearoenix::math {
 struct Numeric {
-public:
+    template <typename T>
+    constexpr static T epsilon = static_cast<T>(0.0001);
+
     template <typename T>
     constexpr static void check_signable()
     {
@@ -81,9 +84,10 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T clamp(const T v, const T mx, const T mn)
+    [[nodiscard]] constexpr static T clamp(const T v, const T mn, const T mx)
     {
-        return maximum(minimum(v, mx), mn);
+        return v < mn ? mn : v > mx ? mx
+                                    : v;
     }
 
     /// On failure it returns static_cast<T>(-1).
@@ -106,7 +110,7 @@ public:
         bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
         bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
         bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-        return float(bits) * 2.3283064365386963e-10f; // / 0x100000000 // TODO
+        return float(bits) * 2.3283064365386963e-10f;
     }
 
     template <typename T>
@@ -124,9 +128,44 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = static_cast<T>(0.0001))
+    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = epsilon<T>)
     {
-        return a == b || std::abs(a) + std::abs(b) < tolerance || std::abs(a - b) / (std::abs(a) + std::abs(b)) < tolerance;
+        if (a == b) {
+            return true;
+        }
+        const auto d = std::abs(a - b);
+        return d < tolerance || (d / (std::abs(a) + std::abs(b)) < tolerance);
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr T positive_mod(const T a, const T b)
+    {
+        const auto r = std::remainder(a, b);
+        return std::signbit(r) ? r + std::abs(b) : r;
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr T normalise_radian(const T r)
+    {
+        return positive_mod(r, static_cast<T>(GX_PI * 2.0));
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr T normalise_degree(const T r)
+    {
+        return positive_mod(r, static_cast<T>(360.0));
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr T to_degree(const T r)
+    {
+        return r * static_cast<T>(180.0 / GX_PI);
+    }
+
+    template <typename T>
+    [[nodiscard]] static constexpr T to_radian(const T r)
+    {
+        return r * static_cast<T>(GX_PI / 180.0);
     }
 };
 }

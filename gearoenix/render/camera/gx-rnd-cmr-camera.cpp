@@ -227,9 +227,9 @@ gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(co
         }
         GX_UNEXPECTED;
     }();
-    const auto near_plane_point = normalised_point * scale;
-    const auto direction = (transform->get_x_axis() * near_plane_point.x) + (transform->get_y_axis() * near_plane_point.y) + (transform->get_z_axis() * static_cast<double>(-near));
-    const auto origin = transform->get_local_location() + direction;
+    const auto near_plane_point = math::Vec3(normalised_point * scale, static_cast<double>(-near));
+    const auto direction = transform->get_rotation_matrix() * near_plane_point;
+    const auto origin = transform->get_local_position() + direction;
     return { origin, is_perspective ? direction.normalised() : -transform->get_z_axis() };
 }
 

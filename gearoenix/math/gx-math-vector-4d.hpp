@@ -15,8 +15,7 @@ struct Vec4 final {
     {
     }
 
-    constexpr explicit Vec4(const Vec2<Element>& v, const Element z = static_cast<Element>(0),
-        const Element w = static_cast<Element>(0))
+    constexpr Vec4(const Vec2<Element>& v, const Element z, const Element w)
         : x(v.x)
         , y(v.y)
         , z(z)
@@ -24,7 +23,7 @@ struct Vec4 final {
     {
     }
 
-    constexpr explicit Vec4(const Vec3<Element>& v, const Element w = static_cast<Element>(0))
+    constexpr Vec4(const Vec3<Element>& v, const Element w)
         : x(v.x)
         , y(v.y)
         , z(v.z)
@@ -48,7 +47,7 @@ struct Vec4 final {
     {
     }
 
-    constexpr Vec4(const Vec4<Element>& o) = default;
+    constexpr Vec4(const Vec4& o) = default;
 
     template <typename T>
     constexpr explicit Vec4(const Vec4<T>& o)
@@ -61,7 +60,7 @@ struct Vec4 final {
     }
 
     template <typename T>
-    constexpr explicit Vec4(const Vec2<T>& v1, const Vec2<T>& v2)
+    constexpr Vec4(const Vec2<T>& v1, const Vec2<T>& v2)
         : x(static_cast<Element>(v1.x))
         , y(static_cast<Element>(v1.y))
         , z(static_cast<Element>(v2.x))
@@ -93,88 +92,66 @@ struct Vec4 final {
     }
 
     template <typename T>
-    [[nodiscard]] Element operator[](const T i) const
+    [[nodiscard]] constexpr Element operator[](const T i) const
     {
         static_assert(std::numeric_limits<T>::is_integer, "Only integer type is acceptable for indexing.");
-        switch (i) {
-        case static_cast<T>(0):
-            return x;
-        case static_cast<T>(1):
-            return y;
-        case static_cast<T>(2):
-            return z;
-        case static_cast<T>(3):
-            return w;
-        default:
-            GX_LOG_F("Out of bound index: " << i);
-        }
+        return reinterpret_cast<const Element*>(this)[i];
     }
 
     template <typename T>
-    [[nodiscard]] Element& operator[](const T i)
+    [[nodiscard]] constexpr Element& operator[](const T i)
     {
         static_assert(std::numeric_limits<T>::is_integer, "Only integer type is acceptable for indexing.");
-        switch (i) {
-        case static_cast<T>(0):
-            return x;
-        case static_cast<T>(1):
-            return y;
-        case static_cast<T>(2):
-            return z;
-        case static_cast<T>(3):
-            return w;
-        default:
-            GX_LOG_F("Out of bound index: " << i);
-        }
+        return reinterpret_cast<Element*>(this)[i];
     }
 
-    [[nodiscard]] constexpr bool operator<(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr bool operator<(const Vec4& o) const
     {
         return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x < o.x)))));
     }
 
-    [[nodiscard]] constexpr bool operator<=(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr bool operator<=(const Vec4& o) const
     {
         return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x <= o.x)))));
     }
 
-    [[nodiscard]] constexpr bool operator>(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr bool operator>(const Vec4& o) const
     {
         return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x > o.x)))));
     }
 
-    [[nodiscard]] constexpr bool operator>=(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr bool operator>=(const Vec4& o) const
     {
         return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x >= o.x)))));
     }
 
-    [[nodiscard]] constexpr bool operator==(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr bool operator==(const Vec4& o) const
     {
         return w == o.w && z == o.z && y == o.y && x == o.x;
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator+(const Element o) const
+    [[nodiscard]] constexpr Vec4 operator+(const Element o) const
     {
-        return Vec4<Element>(x + o, y + o, z + o, w + o);
+        return { x + o, y + o, z + o, w + o };
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator*(const Element o) const
+    [[nodiscard]] constexpr Vec4 operator*(const Element o) const
     {
-        return Vec4<Element>(x * o, y * o, z * o, w * o);
+        return { x * o, y * o, z * o, w * o };
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr Vec4 operator*(const Vec4& o) const
     {
-        return Vec4<Element>(x * o.x, y * o.y, z * o.z, w * o.w);
+        return { x * o.x, y * o.y, z * o.z, w * o.w };
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator/(const Element o) const
+    [[nodiscard]] constexpr Vec4 operator/(const Element o) const
     {
         if constexpr (std::is_floating_point_v<Element>) {
             const auto m = static_cast<Element>(1) / o;
             return *this * m;
         } else {
-            return Vec4<Element>(x / o, y / o, z / o, w / o);
+            return { x / o, y / o, z / o, w / o };
         }
     }
 
@@ -199,9 +176,9 @@ struct Vec4 final {
         }
     }
 
-    [[nodiscard]] constexpr Vec4<Element> operator-(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr Vec4 operator-(const Vec4& o) const
     {
-        return Vec4<Element>(x - o.x, y - o.y, z - o.z, w - o.w);
+        return { x - o.x, y - o.y, z - o.z, w - o.w };
     }
 
     [[nodiscard]] constexpr Element length() const
@@ -214,17 +191,17 @@ struct Vec4 final {
         return dot(*this);
     }
 
-    [[nodiscard]] constexpr Element dot(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr Element dot(const Vec4& o) const
     {
         return x * o.x + y * o.y + z * o.z + w * o.w;
     }
 
-    [[nodiscard]] constexpr Vec4<Element> cross(const Vec4<Element>& o) const
+    [[nodiscard]] constexpr Vec4 cross(const Vec4& o) const
     {
-        return Vec4<Element>((y * o.z) - (z * o.y), (z * o.x) - (x * o.z), (x * o.y) - (y * o.x), w * o.w);
+        return { (y * o.z) - (z * o.y), (z * o.x) - (x * o.z), (x * o.y) - (y * o.x), w * o.w };
     }
 
-    [[nodiscard]] constexpr Vec4<Element> normalized() const
+    [[nodiscard]] constexpr Vec4 normalized() const
     {
         return *this / length();
     }
@@ -242,12 +219,17 @@ struct Vec4 final {
         w = static_cast<Element>(f.read<float>());
     }
 
-    [[nodiscard]] const Element* data() const
+    [[nodiscard]] constexpr const Element* data() const
     {
         return reinterpret_cast<const Element*>(this);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Vec4<Element>& v)
+    [[nodiscard]] constexpr Element* data()
+    {
+        return reinterpret_cast<Element*>(this);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec4& v)
     {
         os << R"("Vec4": { "x": ")" << v.x << R"(", "y": ")" << v.y << R"(", "z": ")" << v.z << R"(", "w": ")" << v.w << R"(" })";
         return os;

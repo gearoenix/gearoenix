@@ -9,7 +9,7 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::T
     const auto wds = distance.to_world(e);
     const auto& wsz = e.get_platform_application().get_base().get_window_size();
     const auto war = static_cast<double>(wsz.x) / static_cast<double>(wsz.y);
-    auto l = trn.get_local_location();
+    auto l = trn.get_local_position();
     switch (side) {
     case Side::Top:
         l.y = std::max(1.0 / war, 1.0) * 0.5 - wds;
@@ -24,7 +24,7 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::T
         l.x = wds - std::max(war, 1.0) * 0.5;
         break;
     }
-    trn.set_local_location(l);
+    trn.set_local_position(l);
 }
 
 gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWindowBasedPlacer::on_event(const core::event::Data& event_data)

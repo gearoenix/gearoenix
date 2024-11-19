@@ -1,14 +1,12 @@
 #include "gx-ed-vp-transform-mode-button.hpp"
 #include "../gx-editor-main.hpp"
-#include "gx-ed-vp-viewport.hpp"
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 #include <imgui/imgui.h>
-
-#include "gx-ed-vp-camera.hpp"
 
 gearoenix::editor::viewport::TransformModeButton::TransformModeButton(Application& app, const Button& previous)
     : app(app)
@@ -45,4 +43,11 @@ gearoenix::editor::viewport::TransformModeButton::~TransformModeButton() = defau
 void gearoenix::editor::viewport::TransformModeButton::update()
 {
     show();
+    if (clicked_in_this_frame) {
+        if (toggled) {
+            app.get_render_engine().get_gizmo_manager()->enable_local_transform_mode();
+        } else {
+            app.get_render_engine().get_gizmo_manager()->disable_local_transform_mode();
+        }
+    }
 }

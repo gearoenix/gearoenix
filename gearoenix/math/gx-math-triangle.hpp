@@ -26,7 +26,7 @@ public:
     {
         const auto pvec = r.get_normalized_direction().cross(edge[1]);
         const auto det = edge[0].dot(pvec);
-        if (static_cast<Element>(-0.001) < det && det < static_cast<Element>(0.001)) {
+        if (-Numeric::epsilon<Element> < det && det < Numeric::epsilon<Element>) {
             return false;
         }
         const auto inv_det = 1.0f / det;

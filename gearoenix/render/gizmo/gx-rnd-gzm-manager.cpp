@@ -8,6 +8,8 @@
 gearoenix::render::gizmo::Manager::Manager(engine::Engine& e)
     : e(e)
 {
+    enable_translation_handle();
+    disable_local_transform_mode();
 }
 
 gearoenix::render::gizmo::Manager::~Manager() = default;
@@ -38,7 +40,7 @@ void gearoenix::render::gizmo::Manager::show_view()
 
     const auto z_dis_origin = (current_camera->get_near() + current_camera->get_far()) * -0.5f;
 
-    axes[0] = math::Vec3<float>(trn.get_local_location() + (trn.get_z_axis() * z_dis_origin));
+    axes[0] = math::Vec3<float>(trn.get_local_position() + trn.get_z_axis() * z_dis_origin);
     axes[1] = axes[0] + math::X3D<float>;
     axes[2] = axes[0] - math::X3D<float>;
     axes[3] = axes[0] + math::Y3D<float>;
@@ -114,11 +116,11 @@ bool gearoenix::render::gizmo::Manager::show_transform(math::Mat4x4<double>& ino
 {
     math::Mat4x4<float> m(inout);
     if (!ImGuizmo::Manipulate(
-            &current_view_matrix.data[0][0],
-            &current_projection_matrix.data[0][0],
-            ImGuizmo::OPERATION::TRANSLATE,
-            ImGuizmo::MODE::LOCAL,
-            &m.data[0][0])) {
+            current_view_matrix.data(),
+            current_projection_matrix.data(),
+            static_cast<ImGuizmo::OPERATION>(operation_handles),
+            static_cast<ImGuizmo::MODE>(transform_mode),
+            m.data())) {
         return false;
     }
     inout = math::Mat4x4<double>(m);
@@ -138,4 +140,44 @@ void gearoenix::render::gizmo::Manager::register_drawer(Drawer* const d)
 void gearoenix::render::gizmo::Manager::remove_drawer(Drawer* const d)
 {
     drawers.erase(d);
+}
+
+void gearoenix::render::gizmo::Manager::enable_translation_handle()
+{
+    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE);
+}
+
+void gearoenix::render::gizmo::Manager::disable_translation_handle()
+{
+    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE);
+}
+
+void gearoenix::render::gizmo::Manager::enable_rotation_handle()
+{
+    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE);
+}
+
+void gearoenix::render::gizmo::Manager::disable_rotation_handle()
+{
+    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE);
+}
+
+void gearoenix::render::gizmo::Manager::enable_scale_handle()
+{
+    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE);
+}
+
+void gearoenix::render::gizmo::Manager::disable_scale_handle()
+{
+    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE);
+}
+
+void gearoenix::render::gizmo::Manager::enable_local_transform_mode()
+{
+    transform_mode = ImGuizmo::MODE::LOCAL;
+}
+
+void gearoenix::render::gizmo::Manager::disable_local_transform_mode()
+{
+    transform_mode = ImGuizmo::MODE::WORLD;
 }

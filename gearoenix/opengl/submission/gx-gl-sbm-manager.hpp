@@ -79,7 +79,7 @@ private:
 
     math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
     float back_buffer_aspect_ratio = 999.0f;
-    math::Vec2<float> back_buffer_uv_move { 0.001f };
+    math::Vec2<float> back_buffer_uv_move { math::Numeric::epsilon<float> };
     math::Vec4<sizei> back_buffer_viewport_clip { static_cast<sizei>(-1) };
 
     uint screen_vertex_object = 0;

@@ -488,7 +488,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             if (!camera->get_enabled() || scene_id != camera->get_scene_id()) {
                 return;
             }
-            const auto camera_location = transform->get_global_location();
+            const auto camera_location = transform->get_global_position();
             auto camera_pool_index = static_cast<std::size_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
@@ -1069,7 +1069,7 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Came
         set_framebuffer(camera.framebuffers[0][mip_index]);
         set_viewport_clip(camera.viewport_clip / (1 << mip_index));
         bloom_upsampler_shader->bind(current_shader);
-        const math::Vec2<float> scatter_src_mip_index(b.scatter_clamp_max_threshold_threshold_knee.x, static_cast<float>(mip_index) + 0.0001f);
+        const math::Vec2<float> scatter_src_mip_index(b.scatter_clamp_max_threshold_threshold_knee.x, static_cast<float>(mip_index) + math::Numeric::epsilon<float>);
         bloom_upsampler_shader->set_scatter_src_mip_index_data(scatter_src_mip_index.data());
         glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(bloom_upsampler_shader->get_source_texture_index()));
         glBindTexture(GL_TEXTURE_2D, camera.colour_attachments[1]);

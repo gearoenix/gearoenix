@@ -161,8 +161,9 @@ struct GameApp final : GxCoreApp {
             { std::move(mesh) },
             GxEndCaller([] { }),
             true);
-        model_builder->get_transformation().local_scale(30.0);
-        model_builder->get_transformation().local_translate({ 0.0, 0.0, -5.0 });
+        auto& trn = model_builder->get_transformation();
+        trn.local_inner_scale(30.0);
+        trn.local_translate({ 0.0, 0.0, -5.0 });
         scene_builder->add(std::move(model_builder));
     }
 

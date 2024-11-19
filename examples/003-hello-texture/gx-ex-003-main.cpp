@@ -138,7 +138,7 @@ struct GameApp final : gearoenix::core::Application {
     void camera_is_ready(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder) const
     {
         auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
-        trn->set_local_location({ 0.0f, 0.0f, 5.0f });
+        trn->set_local_position({ 0.0f, 0.0f, 5.0f });
         auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
         const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
         (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
