@@ -74,12 +74,21 @@ void gearoenix::platform::BaseApplication::initialize_window_size(const int w, c
 
 void gearoenix::platform::BaseApplication::update_window_size(const int w, const int h)
 {
+    const auto new_size = decltype(window_size) {w, h};
+    if (window_size == new_size)
+    {
+        return;
+    }
+
     window_resizing = true;
-    window_size.x = w;
-    window_size.y = h;
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize.x = static_cast<decltype(io.DisplaySize.x)>(window_size.x);
-    io.DisplaySize.y = static_cast<decltype(io.DisplaySize.y)>(window_size.y);
+    window_size = new_size;
+
+    auto& io = ImGui::GetIO();
+    io.DisplaySize = {
+        static_cast<decltype(io.DisplaySize.x)>(window_size.x),
+        static_cast<decltype(io.DisplaySize.y)>(window_size.y),
+    };
+
     last_time_window_resized = std::chrono::high_resolution_clock::now();
 }
 

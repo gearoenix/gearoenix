@@ -10,8 +10,15 @@
 
 #define GX_MAIN_ENTRY_ARGS argc, argv
 
+#if GX_PLATFORM_WEBASSEMBLY
+#define GX_SDL_MAIN int main
+#else
+#define GX_SDL_MAIN extern "C" SDLMAIN_DECLSPEC int main
+#endif
+
+
 #define GX_MAIN_ENTRY(expr)                     \
-    extern "C" int main(GX_MAIN_ENTRY_ARGS_DEF) \
+    GX_SDL_MAIN (GX_MAIN_ENTRY_ARGS_DEF) \
     {                                           \
         expr;                                   \
         return 0;                               \

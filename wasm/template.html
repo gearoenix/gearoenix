@@ -1,0 +1,184 @@
+<!doctypehtml>
+<html lang=en-us>
+<head>
+    <meta charset=utf-8>
+    <meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+    <title>Gearoenix Application</title>
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        #gearoenix-progress-container {
+            position: absolute;
+            width: 80%;
+            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: rgb(120, 120, 120);
+            z-index: 10;
+        }
+
+        #gearoenix-progress-bar {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+        }
+
+        #gearoenix-progress-bar-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0);
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            color: rgb(150, 150, 150);
+        }
+
+        #gearoenix-progress-inner-bar {
+            height: 30px;
+            width: 0;
+            background: repeating-linear-gradient(45deg,
+            rgba(30, 30, 30, 255),
+            rgba(30, 30, 30, 255) 8px,
+            rgba(120, 0, 0, 255) 10px,
+            rgba(120, 0, 0, 255) 18px,
+            rgba(30, 30, 30, 255) 20px);
+            background-size: 28px 30px;
+            line-height: 30px;
+            color: white;
+            text-align: center;
+            border-radius: 25px;
+            position: relative;
+            animation: move-stripes 2s linear infinite;
+        }
+
+        @keyframes move-stripes {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 28px 0;
+            }
+        }
+
+        #gearoenix-progress-image {
+            height: 200px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div id="gearoenix-progress-container">
+    <img id="gearoenix-progress-image" src="/build/logo.png" alt="Gearoenix Logo">
+    <div style="margin: 10px"> Gearoenix App is Loading ...</div>
+    <div id="gearoenix-progress-bar">
+        <div id="gearoenix-progress-inner-bar"></div>
+        <div id="gearoenix-progress-bar-text"></div>
+    </div>
+</div>
+
+<canvas id="canvas" tabindex=-1></canvas>
+
+<script>
+    const gearoenixWasmCanvas = document.getElementById("canvas");
+    gearoenixWasmCanvas.addEventListener("webglcontextlost", e => {
+        alert("WebGL context lost. You will need to reload the page.");
+        e.preventDefault();
+    }, false);
+    gearoenixWasmCanvas.addEventListener("contextmenu", e => e.preventDefault());
+    const gearoenixProgressBarText = document.getElementById("gearoenix-progress-bar-text");
+    const gearoenixProgressInnerBar = document.getElementById("gearoenix-progress-inner-bar");
+    window.Module = {
+        print: (...t) => {
+            console.log(t.join("\n"));
+        },
+        canvas: gearoenixWasmCanvas,
+        totalDependencies: 0,
+        setStatus: e => {
+            this.lastText ??= "";
+            this.dataProgress ??= false;
+            this.depProgress ??= false;
+            if (e === this.lastText) {
+                return;
+            }
+            if (Number.isInteger(e)) {
+                if(!this.dataProgress) { return; }
+                const dependenciesProgress = parseInt(e);
+                this.depProgress = Module.totalDependencies !== dependenciesProgress;
+                gearoenixProgressInnerBar.style.width = "100%";
+                gearoenixProgressBarText.textContent = this.depProgress ?
+                    "Processing Dependencies: (" + dependenciesProgress + " / " + Module.totalDependencies + ")":
+                    "Reading Dependencies: " + dependenciesProgress;
+                return;
+            }
+            const t = e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+            if (!t) {
+                if (this.dataProgress && this.depProgress) {
+                    Module.setStatus = _ => {};
+                    setTimeout(() => {
+                        document.getElementById("gearoenix-progress-container").remove();
+                        function resizeCanvas() {
+                            Module.canvas.width = window.innerWidth;
+                            Module.canvas.height = window.innerHeight;
+                        }
+                        window.addEventListener('resize', resizeCanvas);
+                        window.addEventListener('orientationchange', resizeCanvas);
+                        resizeCanvas();
+                    }, 2000);
+                    return;
+                }
+                gearoenixProgressInnerBar.style.width = "0";
+                gearoenixProgressBarText.textContent = "0%";
+                return;
+            }
+
+            this.lastText = e;
+
+            const percentage = (100 * parseFloat(t[2]) / parseFloat(t[4])).toFixed(2);
+            gearoenixProgressInnerBar.style.width = percentage + "%";
+            gearoenixProgressBarText.textContent = percentage + "%";
+            this.dataProgress = true;
+        },
+        monitorRunDependencies: e => {
+            if(!Number.isInteger(e)) { return; }
+            Module.totalDependencies = Math.max(Module.totalDependencies, e);
+            Module.setStatus(e);
+        }
+    };
+    Module.setStatus("Downloading...");
+    window.onerror = e => {
+        console.error(e);
+    };
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

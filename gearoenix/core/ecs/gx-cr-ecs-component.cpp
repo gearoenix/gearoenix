@@ -58,13 +58,13 @@ void gearoenix::core::ecs::Component::show_debug_gui(const render::engine::Engin
 
     ImGui::Text("Name:");
     ImGui::TableNextColumn();
-    ImGui::Text(name.c_str());
+    ImGui::Text("%s", name.c_str());
     ImGui::TableNextColumn();
 
     const auto type_search = type_index_to_name.find(final_type_index);
     ImGui::Text("Final Type: ");
     ImGui::TableNextColumn();
-    ImGui::Text(type_search != type_index_to_name.end() ? type_search->second.c_str() : "The type is not registered!");
+    ImGui::Text("%s", type_search != type_index_to_name.end() ? type_search->second.c_str() : "The type is not registered!");
     ImGui::TableNextColumn();
 
     ImGui::Text("Entity ID:");

@@ -10,7 +10,18 @@
 #include <emscripten.h>
 #endif
 
-static bool sdl_initialized = false;
+namespace
+{
+    bool sdl_initialized = false;
+
+#if GX_PLATFORM_WEBASSEMBLY
+    static void gearoenix_platform_application_loop(void* const arg)
+    {
+        reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
+    }
+#endif
+}
+
 
 void gearoenix::platform::Application::initialize_sdl()
 {
@@ -24,6 +35,7 @@ void gearoenix::platform::Application::initialize_sdl()
 
 void gearoenix::platform::Application::initialize_screen()
 {
+    SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1");
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     base.screen_size = math::Vec2(display_mode.w, display_mode.h);
@@ -39,7 +51,9 @@ void gearoenix::platform::Application::initialize_screen()
 void gearoenix::platform::Application::initialize_window()
 {
     std::uint32_t core_flags = SDL_WINDOW_SHOWN;
+#if !GX_PLATFORM_WEBASSEMBLY
     core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
     if (const auto& config = RuntimeConfiguration::get(this); config.get_fullscreen()) {
         core_flags |= SDL_WINDOW_FULLSCREEN;
         core_flags |= SDL_WINDOW_BORDERLESS;
@@ -71,8 +85,7 @@ void gearoenix::platform::Application::initialize_window()
 #endif
         SDL_GL_SetSwapInterval(1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        //        if (create_gl_window(3, 2, flags))
-        //            return;
+        // if (create_gl_window(3, 2, flags)) return;
         if (create_gl_window(3, 1, flags))
             return;
         if (create_gl_window(3, 0, flags))
@@ -202,15 +215,16 @@ void gearoenix::platform::Application::fetch_events()
         case SDL_WINDOWEVENT:
             switch (e.window.event) {
             case SDL_WINDOWEVENT_RESIZED:
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
                 base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
                 break;
             default:
-                GX_LOG_E("Unhandled windows event: " << static_cast<int>(e.window.event));
+                GX_LOG_D("Unhandled windows event: " << static_cast<int>(e.window.event));
                 break;
             }
             break;
         default:
-            GX_LOG_E("Unhandled event " << e.type);
+            GX_LOG_D("Unhandled event " << e.type);
             break;
         }
     }
@@ -237,13 +251,6 @@ gearoenix::platform::Application::~Application()
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
-
-#ifdef GX_PLATFORM_WEBASSEMBLY
-static void gearoenix_platform_application_loop(void* const arg)
-{
-    reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
-}
-#endif
 
 void gearoenix::platform::Application::run(core::Application* core_app)
 {

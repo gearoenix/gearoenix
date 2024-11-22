@@ -1,6 +1,15 @@
 #!/usr/bin/python3
 
 import http.server
+import os
+import urllib.request
+
+logo_file_path = "build/logo.png"
+logo_url = "https://github.com/Hossein-Noroozpour/gearoenix-static-files/raw/master/logo.png"
+
+if not os.path.exists(logo_file_path):
+    os.makedirs(os.path.dirname(logo_file_path), exist_ok=True)
+    urllib.request.urlretrieve(logo_url, logo_file_path)
 
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
