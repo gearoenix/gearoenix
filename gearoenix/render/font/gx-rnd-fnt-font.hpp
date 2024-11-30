@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_FONT_FONT_HPP
-#define GEAROENIX_RENDER_FONT_FONT_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include <memory>
@@ -57,4 +56,3 @@ public:
         core::job::EndCallerShared<texture::Texture2D>&& end) const;
 };
 }
-#endif

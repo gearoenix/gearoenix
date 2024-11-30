@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_LIGHT_MANAGER_HPP
-#define GEAROENIX_RENDER_LIGHT_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <memory>
 #include <string>
@@ -52,4 +51,3 @@ struct Manager {
     //    const core::job::EndCaller& end_callback) ;
 };
 }
-#endif

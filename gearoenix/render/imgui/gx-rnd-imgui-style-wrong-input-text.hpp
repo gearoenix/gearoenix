@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_IMGUI_STYLE_WRONG_INPUT_TEXT_HPP
-#define GEAROENIX_RENDER_IMGUI_STYLE_WRONG_INPUT_TEXT_HPP
+#pragma once
 #include <imgui/imgui.h>
 
 namespace gearoenix::render::imgui {
@@ -38,5 +37,3 @@ public:
     return WrongInputTextStyle { false };
 }
 }
-
-#endif

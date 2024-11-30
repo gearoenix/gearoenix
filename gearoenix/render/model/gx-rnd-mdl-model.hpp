@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MODEL_MODEL_HPP
-#define GEAROENIX_RENDER_MODEL_MODEL_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include <boost/container/flat_set.hpp>
@@ -36,4 +35,3 @@ public:
     ~Model() override;
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_CAMERA_PROJECTION_HPP
-#define GEAROENIX_RENDER_CAMERA_PROJECTION_HPP
+#pragma once
 #include <variant>
 
 namespace gearoenix::render::camera {
@@ -13,5 +12,3 @@ struct OrthographicProjectionData {
 
 typedef std::variant<PerspectiveProjectionData, OrthographicProjectionData> ProjectionData;
 }
-
-#endif

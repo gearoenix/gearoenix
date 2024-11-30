@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_GIZMO_DRAWER_HPP
-#define GEAROENIX_RENDER_GIZMO_DRAWER_HPP
+#pragma once
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -16,4 +15,3 @@ struct Drawer {
     virtual void draw_gizmo() = 0;
 };
 }
-#endif

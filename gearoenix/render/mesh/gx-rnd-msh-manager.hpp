@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MESH_MANAGER_HPP
-#define GEAROENIX_RENDER_MESH_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-vertex.hpp"
@@ -76,5 +75,3 @@ public:
     [[nodiscard]] bool remove_if_exist(const std::string& name);
 };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MATERIAL_MANAGER_HPP
-#define GEAROENIX_RENDER_MATERIAL_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <map>
 #include <string>
@@ -31,5 +30,3 @@ public:
     void get_sprite(const std::string& name, core::job::EndCallerShared<Sprite>&& c);
 };
 }
-
-#endif

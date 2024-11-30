@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_CAMERA_COLOUR_TUNING_HPP
-#define GEAROENIX_RENDER_CAMERA_COLOUR_TUNING_HPP
+#pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include <variant>
 
@@ -16,5 +15,3 @@ struct RawColour final { };
 
 typedef std::variant<GammaCorrection, Multiply, RawColour> ColourTuning;
 }
-
-#endif

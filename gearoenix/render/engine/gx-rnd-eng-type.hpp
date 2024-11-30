@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_ENGINE_TYPE_HPP
-#define GEAROENIX_RENDER_ENGINE_TYPE_HPP
+#pragma once
+#include <cstdint>
 #include <ostream>
 
 namespace gearoenix::render::engine {
@@ -14,4 +14,3 @@ enum struct Type : std::uint8_t {
 
 std::ostream& operator<<(std::ostream& os, Type t);
 }
-#endif

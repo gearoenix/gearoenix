@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_IMGUI_OBSERVER_HPP
-#define GEAROENIX_RENDER_IMGUI_OBSERVER_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include <imgui/imgui.h>
 
@@ -12,5 +11,3 @@
         }                                    \
         return false;                        \
     }()
-
-#endif

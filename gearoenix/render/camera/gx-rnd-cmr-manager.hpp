@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_CAMERA_MANAGER_HPP
-#define GEAROENIX_RENDER_CAMERA_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <string>
 
@@ -38,4 +37,3 @@ public:
     virtual void window_resized();
 };
 }
-#endif

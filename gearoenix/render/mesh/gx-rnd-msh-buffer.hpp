@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MESH_BUFFER_HPP
-#define GEAROENIX_RENDER_MESH_BUFFER_HPP
+#pragma once
 #include "../../math/gx-math-aabb.hpp"
 
 namespace gearoenix::render::material {
@@ -23,5 +22,3 @@ public:
     Buffer& operator=(const Buffer&) = delete;
 };
 }
-
-#endif

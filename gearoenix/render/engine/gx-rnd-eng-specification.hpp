@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_ENGINE_SPECIFICATION_HPP
-#define GEAROENIX_RENDER_ENGINE_SPECIFICATION_HPP
+#pragma once
 namespace gearoenix::render::engine {
 struct Specification final {
     unsigned int texture_maximum_aspect = 0;
@@ -9,4 +8,3 @@ struct Specification final {
     bool is_float_texture_supported = true;
 };
 }
-#endif

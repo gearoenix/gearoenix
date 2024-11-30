@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_IMGUI_ENTITY_NAME_INPUT_TEXT_HPP
-#define GEAROENIX_RENDER_IMGUI_ENTITY_NAME_INPUT_TEXT_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "gx-rnd-imgui-style-wrong-input-text.hpp"
@@ -12,5 +11,3 @@ inline bool entity_name_text_input(core::ecs::World& world, std::string& name)
     return ImGui::InputTextWithHint("Entity Name", "Must be a unique name", &name);
 }
 }
-
-#endif

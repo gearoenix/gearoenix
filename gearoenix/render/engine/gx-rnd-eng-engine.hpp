@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_ENGINE_ENGINE_HPP
-#define GEAROENIX_RENDER_ENGINE_ENGINE_HPP
+#pragma once
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
@@ -106,4 +105,3 @@ public:
     virtual void show_debug_gui();
 };
 }
-#endif

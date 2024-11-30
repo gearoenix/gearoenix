@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_GIZMO_MANAGER_HPP
-#define GEAROENIX_RENDER_GIZMO_MANAGER_HPP
+#pragma once
 #include "../../math/gx-math-matrix-4d.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -45,4 +44,3 @@ public:
     void disable_local_transform_mode();
 };
 }
-#endif

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"

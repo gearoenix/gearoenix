@@ -1,12 +1,10 @@
-#ifndef GEAROENIX_RENDER_CAMERA_EXPOSURE_HPP
-#define GEAROENIX_RENDER_CAMERA_EXPOSURE_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 
 namespace gearoenix::render::camera {
 struct Exposure final {
     GX_GET_VAL_PRV(bool, enabled, true);
 
-private:
     float aperture = 4.0f;
     float shutter_speed = aperture * aperture / 120.0f;
     float sensitivity = 1.0f;
@@ -28,5 +26,3 @@ public:
     void show_debug_gui();
 };
 }
-
-#endif

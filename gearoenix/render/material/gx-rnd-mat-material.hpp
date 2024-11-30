@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MATERIAL_HPP
-#define GEAROENIX_RENDER_MATERIAL_HPP
+#pragma once
 #include "../../math/gx-math-vector-4d.hpp"
 #include "gx-rnd-mat-id.hpp"
 #include "gx-rnd-mat-transparency.hpp"
@@ -34,4 +33,3 @@ public:
     virtual void set_albedo(std::shared_ptr<texture::Texture2D>&&);
 };
 }
-#endif

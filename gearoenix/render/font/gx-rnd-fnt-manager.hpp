@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_FONT_MANAGER_HPP
-#define GEAROENIX_RENDER_FONT_MANAGER_HPP
+#pragma once
 #include <boost/container/flat_map.hpp>
 #include <memory>
 #include <string>
@@ -22,4 +21,3 @@ public:
     [[nodiscard]] std::shared_ptr<Font> get(const std::string& name);
 };
 }
-#endif

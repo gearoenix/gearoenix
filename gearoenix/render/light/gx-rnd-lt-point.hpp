@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_LIGHT_POINT_HPP
-#define GEAROENIX_RENDER_LIGHT_POINT_HPP
+#pragma once
 #include "gx-rnd-lt-light.hpp"
 
 namespace gearoenix::render::light {
@@ -15,4 +14,3 @@ struct Point final : Light {
     ~Point() override;
 };
 }
-#endif

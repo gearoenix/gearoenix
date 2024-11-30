@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MATERIAL_SPRITE_HPP
-#define GEAROENIX_RENDER_MATERIAL_SPRITE_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-mat-material.hpp"
 
@@ -20,4 +19,3 @@ public:
     void set_albedo(std::shared_ptr<texture::Texture2D>&& t) override;
 };
 }
-#endif

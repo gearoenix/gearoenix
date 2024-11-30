@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MODEL_MANAGER_HPP
-#define GEAROENIX_RENDER_MODEL_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <memory>
 #include <string>
@@ -44,4 +43,3 @@ public:
         = 0;
 };
 }
-#endif

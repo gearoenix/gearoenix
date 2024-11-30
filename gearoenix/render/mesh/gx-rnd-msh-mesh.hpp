@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MESH_MESH_HPP
-#define GEAROENIX_RENDER_MESH_MESH_HPP
+#pragma once
 #include "../../math/gx-math-aabb.hpp"
 
 namespace gearoenix::render::material {
@@ -27,5 +26,3 @@ public:
     virtual void set_material(std::shared_ptr<material::Material>&& material);
 };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MATERIAL_PBR_HPP
-#define GEAROENIX_RENDER_MATERIAL_PBR_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-mat-material.hpp"
 
@@ -31,5 +30,3 @@ public:
     virtual void set_brdflut(std::shared_ptr<texture::Texture2D>&&);
 };
 }
-
-#endif

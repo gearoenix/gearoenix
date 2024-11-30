@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_IMGUI_ENTITY_SELECTOR_HPP
-#define GEAROENIX_RENDER_IMGUI_ENTITY_SELECTOR_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -55,5 +54,3 @@ public:
     }
 };
 }
-
-#endif

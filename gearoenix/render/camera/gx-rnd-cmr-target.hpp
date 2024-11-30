@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_CAMERA_TARGET_HPP
-#define GEAROENIX_RENDER_CAMERA_TARGET_HPP
+#pragma once
 #include "../../math/gx-math-vector-2d.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include <memory>
@@ -36,5 +35,3 @@ public:
     [[nodiscard]] const Customised& get_customised() const;
 };
 }
-
-#endif
