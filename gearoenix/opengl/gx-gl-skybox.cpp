@@ -8,10 +8,8 @@
 #include <boost/mp11/algorithm.hpp>
 
 namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Skybox, gearoenix::gl::Skybox::MAX_COUNT>::construct();
-
 template <typename T>
-constexpr size_t index_of_texture = boost::mp11::mp_find<gearoenix::render::skybox::Texture, std::shared_ptr<T>>::value;
+constexpr std::uint32_t index_of_texture = boost::mp11::mp_find<gearoenix::render::skybox::Texture, std::shared_ptr<T>>::value;
 
 constexpr auto index_of_texture_2d = index_of_texture<gearoenix::render::texture::Texture2D>;
 constexpr auto index_of_texture_cube = index_of_texture<gearoenix::render::texture::TextureCube>;
@@ -27,12 +25,6 @@ gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Textur
         GX_UNEXPECTED;
     }
 }
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Skybox::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<render::skybox::Skybox>(this);
-    return types;
 }
 
 gearoenix::gl::Skybox::Skybox(
@@ -75,17 +67,6 @@ gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const
     }
 }
 
-std::shared_ptr<gearoenix::gl::Skybox> gearoenix::gl::Skybox::construct(
-    render::skybox::Texture&& texture,
-    std::shared_ptr<render::mesh::Mesh>&& mesh,
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-{
-    auto self = allocator->make_shared(std::move(texture), std::dynamic_pointer_cast<Mesh>(std::move(mesh)), std::move(name), entity_id);
-    self->set_component_self(self);
-    return self;
-}
-
 gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
     Engine& e,
     std::string&& name,
@@ -94,9 +75,9 @@ gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
     core::job::EndCaller<>&& entity_end_callback)
     : Builder(e, std::move(name), std::move(entity_end_callback))
 {
-    entity_builder->get_builder().add_component(Skybox::construct(
+    entity_builder->get_builder().add_component(Skybox::construct<Skybox>(
         std::move(bound_texture),
-        std::move(mesh),
+        std::static_pointer_cast<Mesh>(std::move(mesh)),
         entity_builder->get_builder().get_name() + "-gl-skybox",
         entity_builder->get_id()));
 }
@@ -107,6 +88,7 @@ gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e)
     : Manager(e)
     , eng(e)
 {
+    core::ecs::Component::register_type<Skybox>();
 }
 
 gearoenix::gl::SkyboxManager::~SkyboxManager() = default;

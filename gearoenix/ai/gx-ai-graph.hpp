@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_AI_GRAPH_HPP
-#define GEAROENIX_AI_GRAPH_HPP
-
+#pragma once
 #include <map>
 #include <memory>
 #include <ostream>
@@ -102,5 +100,3 @@ struct Graph {
     }
 };
 }
-
-#endif

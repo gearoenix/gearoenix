@@ -5,7 +5,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType qt, const std::size_t ii)
+std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType qt, const std::uint64_t ii)
 {
     std::lock_guard<std::mutex> _lg(indices_lock);
     auto q_search = indices.find(qt);
@@ -46,7 +46,7 @@ gearoenix::vulkan::query::Pool::~Pool()
 void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size(
     command::Buffer& cmd,
     VkAccelerationStructureKHR accel,
-    const std::size_t issue_id)
+    const std::uint64_t issue_id)
 {
     constexpr static const auto query_type = VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR;
     const auto qi = register_request(query_type, issue_id);
@@ -54,7 +54,7 @@ void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size
     vkCmdWriteAccelerationStructuresPropertiesKHR(cmd.get_vulkan_data(), 1, &accel, query_type, vulkan_data, qi);
 }
 
-VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::size_t id)
+VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::uint64_t id)
 {
     VkDeviceSize result = 0;
     GX_VK_CHK(vkGetQueryPoolResults(

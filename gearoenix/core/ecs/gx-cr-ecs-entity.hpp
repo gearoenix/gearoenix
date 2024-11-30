@@ -1,11 +1,11 @@
-#ifndef GEAROENIX_CORE_ECS_ENTITY_HPP
-#define GEAROENIX_CORE_ECS_ENTITY_HPP
+#pragma once
 #include "../job/gx-cr-job-end-caller.hpp"
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <algorithm>
 #include <atomic>
+#include <memory>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -39,15 +39,13 @@ struct EntityBuilder final {
     friend struct World;
     friend struct EntitySharedBuilder;
 
-    /// Only final types are used in the key
-    typedef boost::container::flat_map<std::type_index, std::shared_ptr<Component>> components_t;
-    typedef boost::container::flat_map<std::type_index, std::type_index> bases_to_leaves_t;
+    typedef boost::container::flat_map<Component::TypeIndex, std::shared_ptr<Component>> components_t;
 
     GX_GET_CVAL_PRV(entity_id_t, id);
     GX_GETSET_CREF_PRV(std::string, name);
-
-    components_t components;
-    bases_to_leaves_t bases_to_leaves;
+    GX_GET_CREF_PRV(Component::TypeIndexSet, final_types);
+    GX_GET_CREF_PRV(Component::TypeIndexSet, all_types);
+    components_t all_types_to_components;
     job::EndCaller<> end_caller;
 
     EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<>&& end_caller);
@@ -68,18 +66,19 @@ public:
         ((add_component(std::move(cs))), ...);
     }
 
-    [[nodiscard]] const std::shared_ptr<Component>& get_component(std::type_index component_type) const;
-    [[nodiscard]] const std::shared_ptr<Component>& get_component_final_type(std::type_index component_type) const;
+    [[nodiscard]] const std::shared_ptr<Component>& get_component(Component::TypeIndex component_type) const;
 
     template <typename ComponentType>
-    ComponentType* get_component() const
+    [[nodiscard]] ComponentType* get_component() const
+    {
+        return static_cast<ComponentType*>(get_component(ComponentType::TYPE_INDEX).get());
+    }
+
+    template <typename ComponentType>
+    [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr() const
     {
         static_assert(std::is_base_of_v<Component, ComponentType>);
-        if constexpr (std::is_final_v<ComponentType>) {
-            return static_cast<ComponentType*>(get_component_final_type(std::type_index(typeid(ComponentType))).get());
-        } else {
-            return dynamic_cast<ComponentType*>(get_component(std::type_index(typeid(ComponentType))).get());
-        }
+        return std::static_pointer_cast<ComponentType>(get_component(ComponentType::TYPE_INDEX));
     }
 };
 
@@ -96,5 +95,3 @@ public:
     [[nodiscard]] entity_id_t get_id() const { return builder.get_id(); }
 };
 }
-
-#endif

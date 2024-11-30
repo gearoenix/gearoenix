@@ -74,8 +74,8 @@ struct GameApp final : GxCoreApp {
             "scene", 0.0, GxEndCaller([] { }));
         scene_builder->get_scene().set_enabled(true);
 
-        for (std::size_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
-            for (std::size_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
+        for (std::uint32_t metallic_i = 0; metallic_i < 10; ++metallic_i) {
+            for (std::uint32_t roughness_i = 0; roughness_i < 10; ++roughness_i) {
                 const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
                 const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "metallic: " + std::to_string(metallic) + ", roughness: " + std::to_string(roughness);

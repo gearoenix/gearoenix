@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_TEXT_HPP
-#define GEAROENIX_RENDER_WIDGET_TEXT_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
@@ -70,4 +69,3 @@ public:
     void update_text(const core::job::EndCaller<>& c) const;
 };
 }
-#endif

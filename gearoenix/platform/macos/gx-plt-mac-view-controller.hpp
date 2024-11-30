@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_MACOS_VIEW_CONTROLLER_HPP
-#define GEAROENIX_PLATFORM_MACOS_VIEW_CONTROLLER_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_MACOS
 #import <Cocoa/Cocoa.h>
@@ -15,5 +14,4 @@ struct Application;
 @property (assign, nonnull) gearoenix::platform::Application* os_app;
 @end
 
-#endif
 #endif

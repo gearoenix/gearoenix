@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_RENDER_CAMERA_CAMERA_HPP
-#define GEAROENIX_RENDER_CAMERA_CAMERA_HPP
+#pragma once
+
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
@@ -39,7 +39,10 @@ struct Camera : core::ecs::Component {
     friend struct Builder;
     friend struct Manager;
 
-    static constexpr std::size_t MAX_COUNT = 16;
+    constexpr static TypeIndex TYPE_INDEX = 18;
+    constexpr static std::uint32_t MAX_COUNT = 16;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
 
     enum struct Usage : std::uint8_t {
         ReflectionProbe = 5,
@@ -68,19 +71,20 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh);
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
     GX_GET_CREF_PRT(Exposure, exposure);
-    GX_GET_VAL_PRT(std::size_t, resolution_cfg_observer, 0);
+    GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
     GX_GET_CREF_PRV(std::weak_ptr<Camera>, camera_self);
     GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, transform);
 
 protected:
     Camera(
         engine::Engine& e,
-        std::type_index final_type,
+        TypeIndex final_type,
         const std::string& name,
         Target&& target,
         std::shared_ptr<physics::Transformation>&& transform,
         core::ecs::entity_id_t entity_id);
-    void set_component_self(const std::shared_ptr<Component>&) override;
+
+    void set_camera_self(const std::shared_ptr<Camera>& camera_self);
 
 public:
     ~Camera() override;
@@ -113,4 +117,3 @@ public:
     virtual void update_target(core::job::EndCaller<>&& end);
 };
 }
-#endif

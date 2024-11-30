@@ -3,10 +3,11 @@
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-engine.hpp"
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -39,10 +40,10 @@ void main() {\n\
     gl_Position = vp * pos;\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -89,6 +90,7 @@ void main() {\n\
     frag_out_emission_roughness = vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, mtr.y);\n\
 \n\
 }\n";
+}
 
 gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e)
     : Shader(e)

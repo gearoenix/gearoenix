@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ANIMATION_CHANNEL_HPP
-#define GEAROENIX_PHYSICS_ANIMATION_CHANNEL_HPP
+#pragma once
 #include "gx-phs-anm-keyframe.hpp"
 #include <string>
 
@@ -16,16 +15,15 @@ struct BoneChannelBuilder final {
 };
 
 struct BoneChannel final {
-    std::size_t target_bone_index = static_cast<std::size_t>(-1);
-    std::size_t scale_samples_count = static_cast<std::size_t>(-1);
-    std::size_t scale_samples_first_keyframe_index = static_cast<std::size_t>(-1);
-    std::size_t scale_samples_end_keyframe_index = static_cast<std::size_t>(-1);
-    std::size_t rotation_samples_count = static_cast<std::size_t>(-1);
-    std::size_t rotation_samples_first_keyframe_index = static_cast<std::size_t>(-1);
-    std::size_t rotation_samples_end_keyframe_index = static_cast<std::size_t>(-1);
-    std::size_t translation_samples_count = static_cast<std::size_t>(-1);
-    std::size_t translation_samples_first_keyframe_index = static_cast<std::size_t>(-1);
-    std::size_t translation_samples_end_keyframe_index = static_cast<std::size_t>(-1);
+    std::uint32_t target_bone_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t scale_samples_count = static_cast<std::uint32_t>(-1);
+    std::uint32_t scale_samples_first_keyframe_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t scale_samples_end_keyframe_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t rotation_samples_count = static_cast<std::uint32_t>(-1);
+    std::uint32_t rotation_samples_first_keyframe_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t rotation_samples_end_keyframe_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t translation_samples_count = static_cast<std::uint32_t>(-1);
+    std::uint32_t translation_samples_first_keyframe_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t translation_samples_end_keyframe_index = static_cast<std::uint32_t>(-1);
 };
 }
-#endif

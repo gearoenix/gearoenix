@@ -1,7 +1,8 @@
 #include "gx-gl-shd-multiply.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
 precision highp float;\n\
@@ -15,7 +16,7 @@ void main() {\n\
     out_uv = position* 0.5 + 0.5;\n\
 }";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
 precision highp float;\n\
@@ -32,6 +33,7 @@ void main() {\n\
     frag_colour = textureLod(source_texture, out_uv, value_mip_index.w);\n\
     frag_colour.xyz *= value_mip_index.xyz;\n\
 }";
+}
 
 gearoenix::gl::shader::Multiply::Multiply(Engine& e)
     : Shader(e)

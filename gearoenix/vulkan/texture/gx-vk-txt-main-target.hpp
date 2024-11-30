@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_TEXTURE_MAIN_TARGET_HPP
-#define GEAROENIX_VULKAN_TEXTURE_MAIN_TARGET_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/texture/gx-rnd-txt-target.hpp"
@@ -60,5 +59,4 @@ public:
     void present();
 };
 }
-#endif
 #endif

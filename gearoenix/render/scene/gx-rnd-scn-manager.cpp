@@ -7,6 +7,7 @@
 gearoenix::render::scene::Manager::Manager(engine::Engine& e)
     : e(e)
 {
+    core::ecs::Component::register_type<Scene>();
 }
 
 gearoenix::render::scene::Manager::~Manager() = default;

@@ -1,8 +1,7 @@
-#ifndef GEAROENIX_MATH_NUMERIC_HPP
-#define GEAROENIX_MATH_NUMERIC_HPP
-#include "../core/gx-cr-types.hpp"
+#pragma once
 #include <cmath>
 #include <limits>
+#include <numbers>
 #include <random>
 
 namespace gearoenix::math {
@@ -24,6 +23,14 @@ struct Numeric {
         static_assert(
             !std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed,
             "This functionality only works when both of the type have signedness compatibility.");
+    }
+
+    template <typename T>
+    [[nodiscard]] constexpr static T log2i(const T v)
+    {
+        T i = static_cast<T>(1);
+        for (; v > static_cast<T>(1) << i; ++i) { }
+        return i;
     }
 
     // It will raise given number to the nearest bigger or equal value that is in power of 2
@@ -102,7 +109,7 @@ struct Numeric {
         return static_cast<T>(-1);
     }
 
-    [[nodiscard]] static constexpr float radical_inverse_vdc(std::uint32_t bits)
+    [[nodiscard]] constexpr static float radical_inverse_vdc(std::uint32_t bits)
     {
         bits = (bits << 16u) | (bits >> 16u);
         bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -113,21 +120,21 @@ struct Numeric {
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T geometry_schlick_ggx(const T n_dot_v, const T roughness)
+    [[nodiscard]] constexpr static T geometry_schlick_ggx(const T n_dot_v, const T roughness)
     {
         const auto k = (roughness * roughness) * static_cast<T>(0.5);
         return n_dot_v / (n_dot_v * (1.0f - k) + k);
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T align(const T value, const T alignment)
+    [[nodiscard]] constexpr static T align(const T value, const T alignment)
     {
         const T r = value % alignment;
         return r != 0 ? value + (alignment - r) : value;
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr bool equal(const T a, const T b, const T tolerance = epsilon<T>)
+    [[nodiscard]] constexpr static bool equal(const T a, const T b, const T tolerance = epsilon<T>)
     {
         if (a == b) {
             return true;
@@ -137,35 +144,34 @@ struct Numeric {
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T positive_mod(const T a, const T b)
+    [[nodiscard]] constexpr static T positive_mod(const T a, const T b)
     {
         const auto r = std::remainder(a, b);
         return std::signbit(r) ? r + std::abs(b) : r;
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T normalise_radian(const T r)
+    [[nodiscard]] constexpr static T normalise_radian(const T r)
     {
-        return positive_mod(r, static_cast<T>(GX_PI * 2.0));
+        return positive_mod(r, static_cast<T>(std::numbers::pi * 2.0));
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T normalise_degree(const T r)
+    [[nodiscard]] constexpr static T normalise_degree(const T r)
     {
         return positive_mod(r, static_cast<T>(360.0));
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T to_degree(const T r)
+    [[nodiscard]] constexpr static T to_degree(const T r)
     {
-        return r * static_cast<T>(180.0 / GX_PI);
+        return r * static_cast<T>(180.0 / std::numbers::pi);
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr T to_radian(const T r)
+    [[nodiscard]] constexpr static T to_radian(const T r)
     {
-        return r * static_cast<T>(GX_PI / 180.0);
+        return r * static_cast<T>(std::numbers::pi / 180.0);
     }
 };
 }
-#endif

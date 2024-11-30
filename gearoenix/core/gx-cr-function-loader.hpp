@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_FUNCTION_LOADER_HPP
-#define GEAROENIX_CORE_FUNCTION_LOADER_HPP
+#pragma once
 #include <functional>
 #include <mutex>
 #include <vector>
@@ -15,7 +14,6 @@ public:
     ~FunctionLoader();
     void load(std::function<void()>&& fun);
     void unload();
-    [[nodiscard]] std::size_t get_loaded_count() const;
+    [[nodiscard]] std::uint64_t get_loaded_count() const;
 };
 }
-#endif

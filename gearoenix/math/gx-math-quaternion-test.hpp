@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_QUATERNION_TEST_HPP
-#define GEAROENIX_MATH_QUATERNION_TEST_HPP
+#pragma once
 #include "gx-math-quaternion.hpp"
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -191,5 +190,3 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         }
     }
 }
-
-#endif

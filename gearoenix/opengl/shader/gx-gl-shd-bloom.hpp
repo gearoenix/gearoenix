@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SHADER_BLOOM_HPP
-#define GEAROENIX_GL_SHADER_BLOOM_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <array>
@@ -48,5 +47,4 @@ public:
     void bind(uint& current_shader) const final;
 };
 }
-#endif
 #endif

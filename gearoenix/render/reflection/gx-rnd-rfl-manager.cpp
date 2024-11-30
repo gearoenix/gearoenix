@@ -3,12 +3,16 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
+#include "gx-rnd-rfl-baked.hpp"
 #include "gx-rnd-rfl-builder.hpp"
 #include "gx-rnd-rfl-runtime.hpp"
 
 gearoenix::render::reflection::Manager::Manager(engine::Engine& e)
     : e(e)
 {
+    core::ecs::Component::register_type<Probe>();
+    core::ecs::Component::register_type<Runtime>();
+    core::ecs::Component::register_type<Baked>();
 }
 
 gearoenix::render::reflection::Manager::~Manager() = default;

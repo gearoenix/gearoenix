@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_KERNEL_WORKERS_HPP
-#define GEAROENIX_CORE_SYNC_KERNEL_WORKERS_HPP
+#pragma once
 #include "../gx-cr-build-configuration.hpp"
 #include <functional>
 #include <memory>
@@ -53,4 +52,3 @@ public:
     [[nodiscard]] unsigned int get_threads_count() const;
 };
 }
-#endif

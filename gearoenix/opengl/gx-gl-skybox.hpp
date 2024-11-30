@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SKYBOX_HPP
-#define GEAROENIX_GL_SKYBOX_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
@@ -17,20 +16,17 @@ struct Mesh;
 struct Skybox final : render::skybox::Skybox {
     typedef std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> GlTexture;
 
+    constexpr static TypeIndex TYPE_INDEX = 27;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
+
     GX_GET_CREF_PRV(GlTexture, gl_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Mesh>, gl_mesh);
-
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     Skybox(
         render::skybox::Texture&& texture,
         std::shared_ptr<Mesh>&& mesh,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
-    [[nodiscard]] static std::shared_ptr<Skybox> construct(
-        render::skybox::Texture&& texture,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
         std::string&& name,
         core::ecs::entity_id_t entity_id);
     ~Skybox() override;
@@ -62,5 +58,4 @@ struct SkyboxManager final : render::skybox::Manager {
 };
 }
 
-#endif
 #endif

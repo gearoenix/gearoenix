@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_ECS_CONDITION_HPP
-#define GEAROENIX_CORE_ECS_CONDITION_HPP
+#pragma once
 #include <tuple>
 #include <type_traits>
 
@@ -12,13 +11,13 @@ struct Not final {
 template <typename T>
 struct IsNot final {
     typedef T type;
-    static constexpr bool value = false;
+    constexpr static bool value = false;
 };
 
 template <typename T>
 struct IsNot<Not<T>> final {
     typedef T type;
-    static constexpr bool value = true;
+    constexpr static bool value = true;
 };
 
 template <typename T>
@@ -33,68 +32,68 @@ struct CountNot final {
 
 template <typename T, typename... Args>
 struct CountNot<T, Args...> final {
-    static constexpr int value = (is_not_v<T> ? 1 : 0) + CountNot<Args...>::value;
+    constexpr static int value = (is_not_v<T> ? 1 : 0) + CountNot<Args...>::value;
 };
 
 template <>
 struct CountNot<> final {
-    static constexpr int value = 0;
+    constexpr static int value = 0;
 };
 
 template <typename... Args>
 struct All final {
-    static constexpr std::size_t count = sizeof...(Args);
-    template <std::size_t N>
+    constexpr static std::uint32_t count = sizeof...(Args);
+    template <std::uint32_t N>
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
 };
 
 template <typename T>
 struct IsAll final {
     typedef T type;
-    static constexpr bool value = false;
+    constexpr static bool value = false;
 };
 
 template <typename... Args>
 struct IsAll<All<Args...>> final {
-    template <std::size_t N>
+    template <std::uint32_t N>
     using type = typename All<Args...>::template type<N>;
-    static constexpr bool value = true;
+    constexpr static bool value = true;
     using tuple = std::tuple<Args...>;
-    static constexpr std::size_t count = sizeof...(Args);
+    constexpr static std::uint32_t count = sizeof...(Args);
 };
 
 template <typename T>
 inline constexpr bool is_all_v = IsAll<T>::value;
 
-template <typename T, std::size_t N>
+template <typename T, std::uint32_t N>
 using all_t = typename IsAll<T>::template type<N>;
 
 template <typename... Args>
 struct Any final {
-    static constexpr std::size_t count = sizeof...(Args);
-    template <std::size_t N>
+    constexpr static std::uint32_t count = sizeof...(Args);
+    template <std::uint32_t N>
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
 };
 
 template <typename T>
 struct IsAny final {
     typedef T type;
-    static constexpr bool value = false;
+    constexpr static bool value = false;
 };
 
 template <typename... Args>
 struct IsAny<Any<Args...>> final {
-    template <std::size_t N>
+    template <std::uint32_t N>
     using type = typename Any<Args...>::template type<N>;
-    static constexpr bool value = true;
+    constexpr static bool value = true;
     using tuple = std::tuple<Args...>;
-    static constexpr std::size_t count = sizeof...(Args);
+    constexpr static std::uint32_t count = sizeof...(Args);
 };
 
 template <typename T>
 inline constexpr bool is_any_v = IsAny<T>::value;
 
-template <typename T, std::size_t N>
+template <typename T, std::uint32_t N>
 using any_t = typename IsAny<T>::template type<N>;
 
 template <typename>
@@ -154,5 +153,3 @@ struct ConditionTypesPack final {
 };
 static_assert(std::is_same_v<std::tuple<int, char, float>, ConditionTypesPack<All<int, char, float>>::types>, "Internal error!");
 }
-
-#endif

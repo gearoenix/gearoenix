@@ -78,7 +78,7 @@ void gearoenix::vulkan::device::Physical::initialize_extensions()
     GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr));
     if (ext_count <= 0)
         return;
-    std::vector<VkExtensionProperties> extensions(static_cast<std::size_t>(ext_count));
+    std::vector<VkExtensionProperties> extensions(static_cast<std::uint64_t>(ext_count));
     GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, extensions.data()));
     for (auto& ext : extensions) {
         supported_extensions.emplace(ext.extensionName);
@@ -184,7 +184,7 @@ gearoenix::vulkan::device::Physical::Physical(const Surface& surf)
     initialize_properties();
     std::uint32_t count = 0;
     vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, nullptr);
-    surface_formats.resize(static_cast<std::size_t>(count));
+    surface_formats.resize(static_cast<std::uint64_t>(count));
     vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, surface.get_vulkan_data(), &count, surface_formats.data());
     VkFormatProperties format_props;
     for (auto format : acceptable_depth_formats) {
@@ -228,9 +228,9 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
     GX_LOG_F("Could not find the requested memory type.");
 }
 
-std::size_t gearoenix::vulkan::device::Physical::align_size(const std::size_t size) const
+std::uint64_t gearoenix::vulkan::device::Physical::align_size(const std::uint64_t size) const
 {
-    return math::Numeric::align(size, static_cast<std::size_t>(max_memory_alignment));
+    return math::Numeric::align(size, static_cast<std::uint64_t>(max_memory_alignment));
 }
 
 VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
@@ -244,7 +244,7 @@ std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available
 {
     std::uint32_t gpu_count = 0;
     GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr));
-    std::vector<VkPhysicalDevice> gpus(static_cast<std::size_t>(gpu_count));
+    std::vector<VkPhysicalDevice> gpus(static_cast<std::uint64_t>(gpu_count));
     GX_LOG_D(gpu_count << " GPU(s) are available.");
     GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, gpus.data()));
     return gpus;

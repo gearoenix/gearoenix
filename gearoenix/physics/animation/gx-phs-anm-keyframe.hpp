@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ANIMATION_KEYFRAME_HPP
-#define GEAROENIX_PHYSICS_ANIMATION_KEYFRAME_HPP
+#pragma once
 #include "../../math/gx-math-quaternion.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include <variant>
@@ -38,5 +37,3 @@ template <typename Value>
     return std::get<KeyframeGltf2Bezier<Value>>(keyframe).key;
 }
 }
-
-#endif

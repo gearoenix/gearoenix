@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ENGINE_HPP
-#define GEAROENIX_PHYSICS_ENGINE_HPP
+#pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <memory>
 
@@ -30,4 +29,3 @@ public:
     void end_frame();
 };
 }
-#endif

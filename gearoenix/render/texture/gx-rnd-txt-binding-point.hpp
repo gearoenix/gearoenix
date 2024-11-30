@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_BINDING_POINT_HPP
-#define GEAROENIX_RENDER_TEXTURE_BINDING_POINT_HPP
-#include "../../core/gx-cr-types.hpp"
+#pragma once
+#include <cstdint>
 
 namespace gearoenix::render::texture {
-enum struct BindingPoint : core::TypeId {
+enum struct BindingPoint : std::uint8_t {
     Unknown = 0,
     Albedo = 1,
     Normal = 2,
@@ -12,4 +11,3 @@ enum struct BindingPoint : core::TypeId {
     Occlusion = 5,
 };
 }
-#endif

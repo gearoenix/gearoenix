@@ -43,12 +43,12 @@ public:
     Buffer& operator=(Buffer&&) = delete;
     Buffer& operator=(const Buffer&) = delete;
     [[nodiscard]] static std::shared_ptr<Buffer> construct(
-        const std::string&, std::size_t size, memory::Place place, memory::Manager& memory_manager);
+        const std::string&, std::uint64_t size, memory::Place place, memory::Manager& memory_manager);
     ~Buffer();
-    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::size_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::uint64_t size);
     // void push_memory_barrier(command::Buffer& command) const ;
     //[[nodiscard]] static std::uint32_t get_memory_type_bits(device::Logical& device, bool in_gpu) ;
-    void write(const void* data, std::size_t size);
+    void write(const void* data, std::uint64_t size);
     [[nodiscard]] VkDeviceAddress get_device_address() const;
 };
 }

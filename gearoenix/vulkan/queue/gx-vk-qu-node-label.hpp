@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_QUEUE_NODE_LABEL_HPP
-#define GEAROENIX_VULKAN_QUEUE_NODE_LABEL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 
@@ -10,6 +9,4 @@ enum struct NodeLabel : unsigned int {
     End,
 };
 }
-
-#endif
 #endif

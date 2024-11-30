@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_UPLOADER_HPP
-#define GEAROENIX_METAL_UPLOADER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/sync/gx-cr-job-end-caller.hpp"
@@ -16,7 +15,7 @@ private:
     core::sync::WorkWaiter uploader;
     const id<MTLCommandQueue> queue;
 
-    void upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::job::EndCaller&& c);
+    void upload(id<MTLBuffer> destination, const void* data, const std::uint32_t size, core::job::EndCaller&& c);
 
 public:
     Uploader(Engine& e);
@@ -36,5 +35,4 @@ public:
 };
 }
 
-#endif
 #endif

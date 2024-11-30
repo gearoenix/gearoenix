@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_FRUSTUM_HPP
-#define GEAROENIX_MATH_FRUSTUM_HPP
+#pragma once
 #include "gx-math-aabb.hpp"
 #include "gx-math-plane.hpp"
 #include <array>
@@ -65,4 +64,3 @@ struct Frustum final {
     }
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SHADER_MANAGER_HPP
-#define GEAROENIX_GL_SHADER_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <boost/container/flat_map.hpp>
@@ -41,5 +40,4 @@ public:
 };
 }
 
-#endif
 #endif

@@ -22,8 +22,8 @@ struct AttachmentCube final {
 };
 
 struct Attachment final {
-    static constexpr std::size_t ATTACHMENT_2D_VARIANT_INDEX = 0;
-    static constexpr std::size_t ATTACHMENT_CUBE_VARIANT_INDEX = 1;
+    constexpr static std::uint32_t ATTACHMENT_2D_VARIANT_INDEX = 0;
+    constexpr static std::uint32_t ATTACHMENT_CUBE_VARIANT_INDEX = 1;
 
     std::uint8_t mipmap_level = 0;
     std::variant<Attachment2D, AttachmentCube> var;

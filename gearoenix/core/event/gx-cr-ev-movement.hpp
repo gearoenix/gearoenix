@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_MOVEMENT_HPP
-#define GEAROENIX_CORE_EVENT_MOVEMENT_HPP
+#pragma once
 #include "gx-cr-ev-point.hpp"
 #include <chrono>
 
@@ -42,4 +41,3 @@ public:
     }
 };
 }
-#endif

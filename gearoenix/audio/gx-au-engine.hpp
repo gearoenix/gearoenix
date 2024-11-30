@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_AUDIO_ENGINE_HPP
-#define GEAROENIX_AUDIO_ENGINE_HPP
+#pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../core/sync/gx-cr-sync-semaphore.hpp"
 #include "../platform/gx-plt-build-configuration.hpp"
@@ -28,4 +27,3 @@ public:
     void update();
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_CAMERA_HPP
-#define GEAROENIX_METAL_CAMERA_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/ecs/gx-cr-ecs-component.hpp"
@@ -37,5 +36,4 @@ public:
 };
 }
 
-#endif
 #endif

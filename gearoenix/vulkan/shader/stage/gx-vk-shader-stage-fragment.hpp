@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SHADER_STAGE_FRAGMENT_HPP
-#define GEAROENIX_VULKAN_SHADER_STAGE_FRAGMENT_HPP
+#pragma once
 #include "../../../core/gx-cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 #include "gx-vk-shader-stage.hpp"
@@ -16,5 +15,4 @@ namespace render {
     }
 }
 }
-#endif
 #endif

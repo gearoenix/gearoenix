@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_ANIMATION_HPP
-#define GEAROENIX_GL_SUBMISSION_ANIMATION_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../math/gx-math-matrix-4d.hpp"
@@ -11,5 +10,4 @@ struct Bone final {
 };
 }
 
-#endif
 #endif

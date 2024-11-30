@@ -456,7 +456,7 @@ void gearoenix::render::widget::Edit::insert(
     if ((static_cast<int>(character) > 31 && static_cast<int>(character) < 127) || (static_cast<int>(character) > 1631 && static_cast<int>(character) < 1642)) {
         if (left_to_right) {
             if (temporary_right > 0) {
-                for (std::size_t i = 0; i < temporary_right; ++i) {
+                for (std::uint64_t i = 0; i < temporary_right; ++i) {
                     left_text.push_back(right_text.back());
                     right_text.pop_back();
                 }
@@ -472,7 +472,7 @@ void gearoenix::render::widget::Edit::insert(
             ++temporary_right;
         } else {
             if (temporary_left > 0) {
-                for (std::size_t i = 0; i < temporary_left; ++i) {
+                for (std::uint64_t i = 0; i < temporary_left; ++i) {
                     right_text.push_back(left_text.back());
                     left_text.pop_back();
                 }

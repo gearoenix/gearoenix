@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_CONSTRAINT_JET_CONTROLLER_HPP
-#define GEAROENIX_PHYSICS_CONSTRAINT_JET_CONTROLLER_HPP
+#pragma once
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "gx-phs-cns-constraint.hpp"
 
@@ -13,6 +12,11 @@ struct Engine;
 
 namespace gearoenix::physics::constraint {
 struct JetController final : core::event::Listener, Constraint {
+    constexpr static std::uint32_t MAX_COUNT = 8;
+    constexpr static TypeIndex TYPE_INDEX = 7;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
+
     GX_GETSET_VAL_PRV(double, movement_speed, 10.0);
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
 
@@ -30,16 +34,9 @@ struct JetController final : core::event::Listener, Constraint {
     bool rotate = false;
 
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     JetController(
-        render::engine::Engine& e,
-        std::shared_ptr<Transformation>&&,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
-
-    [[nodiscard]] static std::shared_ptr<JetController> construct(
         render::engine::Engine& e,
         std::shared_ptr<Transformation>&&,
         std::string&& name,
@@ -49,4 +46,3 @@ public:
     void clear_transforms();
 };
 }
-#endif

@@ -28,7 +28,7 @@ namespace {
 constexpr double position_limit = 2.0;
 constexpr double cube_size = 0.05;
 constexpr double max_speed = cube_size * 2.5;
-constexpr std::size_t objects_count = 8000;
+constexpr std::uint32_t objects_count = 8000;
 
 std::random_device random_device {};
 std::default_random_engine random_engine { random_device() };
@@ -67,26 +67,29 @@ using GxPbr = gearoenix::render::material::Pbr;
 using GxPbrPtr = std::shared_ptr<GxPbr>;
 using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
 
-template <typename T>
-using GxAllocator = gearoenix::core::allocator::SharedArray<T, objects_count>;
-
 struct Position;
 struct Speed final : GxComp {
+    constexpr static std::uint32_t MAX_COUNT = objects_count;
+    constexpr static TypeIndex TYPE_INDEX = 100;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     gearoenix::math::Vec3<double> value;
 
     Speed();
-    [[nodiscard]] static std::shared_ptr<Speed> construct();
     void update(const Position& p);
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 
 struct Position final : GxComp {
+    constexpr static std::uint32_t MAX_COUNT = objects_count;
+    constexpr static TypeIndex TYPE_INDEX = 101;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     gearoenix::math::Vec3<double> value;
 
     Position();
-    [[nodiscard]] static std::shared_ptr<Position> construct();
     void update(double delta_time, const Speed& speed);
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 };
 
 Speed::Speed()
@@ -99,14 +102,6 @@ Speed::Speed()
     value.x += value.x > 0 ? max_speed : -max_speed;
     value.y += value.y > 0 ? max_speed : -max_speed;
     value.z += value.z > 0 ? max_speed : -max_speed;
-}
-
-std::shared_ptr<Speed> Speed::construct()
-{
-    static auto allocator = GxAllocator<Speed>::construct();
-    auto result = allocator->make_shared();
-    result->set_component_self(result);
-    return result;
 }
 
 void Speed::update(const Position& p)
@@ -141,12 +136,6 @@ void Speed::update(const Position& p)
     }
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& Speed::get_hierarchy_types() const
-{
-    const static auto types = generate_hierarchy_types(this);
-    return types;
-}
-
 Position::Position()
     : GxComp(create_this_type_index(this), "position", 0)
     , value(
@@ -156,24 +145,10 @@ Position::Position()
 {
 }
 
-std::shared_ptr<Position> Position::construct()
-{
-    static auto allocator = GxAllocator<Position>::construct();
-    auto result = allocator->make_shared();
-    result->set_component_self(result);
-    return result;
-}
-
 void Position::update(const double delta_time, const Speed& speed)
 {
     value += speed.value * delta_time;
     value.clamp(-position_limit, position_limit);
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& Position::get_hierarchy_types() const
-{
-    const static auto types = generate_hierarchy_types(this);
-    return types;
 }
 }
 
@@ -183,11 +158,14 @@ struct GameApp final : GxCoreApp {
     explicit GameApp(GxPltApp& plt_app)
         : GxCoreApp(plt_app)
     {
+        GxComp::register_type<Position>();
+        GxComp::register_type<Speed>();
+
         const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
 
         const GxEndCaller end([this, materials] { materials_ready(*materials); });
 
-        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+        for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
             render_engine.get_material_manager()->get_pbr(
                 "material-" + std::to_string(model_index),
                 GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
@@ -209,7 +187,7 @@ struct GameApp final : GxCoreApp {
 
         const GxEndCaller end([this, meshes] { meshes_ready(*meshes); });
 
-        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+        for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
             render_engine.get_mesh_manager()->build_cube(
                 std::move(materials[model_index]),
                 GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
@@ -227,14 +205,14 @@ struct GameApp final : GxCoreApp {
             }));
         scene_id = scene_builder->get_id();
 
-        for (std::size_t model_index = 0; model_index < objects_count; ++model_index) {
+        for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
             auto model_builder = render_engine.get_model_manager()->build(
                 "triangle" + std::to_string(model_index), nullptr,
                 { std::move(meshes[model_index]) },
                 GxEndCaller([] { }),
                 true);
-            auto speed = Speed::construct();
-            auto position = Position::construct();
+            auto speed = Speed::construct<Speed>();
+            auto position = Position::construct<Position>();
             auto& model_transformation = model_builder->get_transformation();
             model_transformation.set_local_position(position->value);
             model_transformation.local_inner_scale(cube_size);

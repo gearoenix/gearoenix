@@ -1,19 +1,17 @@
-#ifndef GEAROENIX_GL_SHADER_IRRADIANCE_HPP
-#define GEAROENIX_GL_SHADER_IRRADIANCE_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl::shader {
-struct Irradiance final : public Shader {
+struct Irradiance final : Shader {
     GX_GL_UNIFORM_MATRIX(m, 3, 1);
     GX_GL_UNIFORM_TEXTURE(environment);
 
 public:
     explicit Irradiance(Engine& e);
-    ~Irradiance() final;
-    void bind(uint& current_shader) const final;
+    ~Irradiance() override;
+    void bind(uint& current_shader) const override;
 };
 }
 
-#endif
 #endif

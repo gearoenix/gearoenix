@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_MAIN_ENTRY_HPP
-#define GEAROENIX_PLATFORM_MAIN_ENTRY_HPP
+#pragma once
 #include "gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLATFORM_INTERFACE_WIN32
@@ -22,7 +21,5 @@
         expr;                        \
         return 0;                    \
     }
-
-#endif
 
 #endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_MARKER_HPP
-#define GEAROENIX_VULKAN_MARKER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-loader.hpp"
@@ -34,6 +33,5 @@ void mark(const std::string& name, T o, const device::Logical& dev)
 
 #else
 #define GX_VK_MARK(name, obj, logical_device)
-#endif
 #endif
 #endif

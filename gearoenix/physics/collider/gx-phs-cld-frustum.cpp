@@ -1,15 +1,4 @@
 #include "gx-phs-cld-frustum.hpp"
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
-
-namespace {
-const auto frustum_allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::collider::Frustum, 16>::construct();
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::collider::Frustum::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
 
 gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points,
     const core::ecs::entity_id_t entity_id)
@@ -22,20 +11,11 @@ gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::ar
     surrounding_box.update();
 }
 
-std::shared_ptr<gearoenix::physics::collider::Frustum> gearoenix::physics::collider::Frustum::construct(
-    std::string&& name, const std::array<math::Vec3<double>, 8>& points,
-    const core::ecs::entity_id_t entity_id)
-{
-    auto self = frustum_allocator->make_shared(std::move(name), points, entity_id);
-    self->set_component_self(self);
-    return self;
-}
-
 void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<double>, 8>& points)
 {
     frustum = math::Frustum(points);
     surrounding_box.reset(points[0]);
-    for (std::size_t i = 1; i < points.size(); ++i) {
+    for (std::uint32_t i = 1; i < points.size(); ++i) {
         surrounding_box.put_without_update(points[i]);
     }
     surrounding_box.update();

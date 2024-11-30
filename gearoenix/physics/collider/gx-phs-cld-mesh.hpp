@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_COLLIDER_MESH_HPP
-#define GEAROENIX_PHYSICS_COLLIDER_MESH_HPP
-#include "../../core/gx-cr-types.hpp"
+#pragma once
 #include "../../math/gx-math-aabb.hpp"
 #include "../../math/gx-math-triangle.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
@@ -29,4 +27,3 @@ public:
     }
 };
 }
-#endif

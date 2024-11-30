@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_MODEL_HPP
-#define GEAROENIX_GL_MODEL_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
@@ -12,20 +11,16 @@ struct Engine;
 struct Mesh;
 
 struct Model final : render::model::Model {
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
+    constexpr static TypeIndex TYPE_INDEX = 9;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
 
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
 
 public:
     Model(
         Engine& e,
         std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
-        std::string&& name,
-        bool is_transformable,
-        core::ecs::entity_id_t entity_id);
-    [[nodiscard]] static std::shared_ptr<Model> construct(
-        Engine& e,
-        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
         std::string&& name,
         bool is_transformable,
         core::ecs::entity_id_t entity_id);
@@ -65,5 +60,4 @@ public:
 };
 }
 
-#endif
 #endif

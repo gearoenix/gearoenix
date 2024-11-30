@@ -1,9 +1,6 @@
-#ifndef GEAROENIX_PLATFORM_LIBRARY_HPP
-#define GEAROENIX_PLATFORM_LIBRARY_HPP
-
+#pragma once
 #include "gx-plt-build-configuration.hpp"
-
-#ifndef GX_PLT_WEB
+#ifndef GX_PLATFORM_WEBASSEMBLY
 #define GX_SHARED_LINKAGE_SUPPORTED
 
 namespace gearoenix::platform {
@@ -27,6 +24,4 @@ FunctionPtr gearoenix::platform::Library::load(const char* function_name)
 {
     return reinterpret_cast<FunctionPtr>(raw_load(function_name));
 }
-
-#endif
 #endif

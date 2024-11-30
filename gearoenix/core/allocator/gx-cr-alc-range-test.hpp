@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_ALLOCATOR_RANGE_TEST_HPP
-#define GEAROENIX_CORE_ALLOCATOR_RANGE_TEST_HPP
+#pragma once
 #include "gx-cr-alc-range.hpp"
 
 BOOST_AUTO_TEST_CASE(gearoenix_core_allocator_range)
@@ -49,5 +48,3 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_allocator_range)
     a5 = a2->allocate(100);
     BOOST_TEST(nullptr == a5);
 }
-
-#endif

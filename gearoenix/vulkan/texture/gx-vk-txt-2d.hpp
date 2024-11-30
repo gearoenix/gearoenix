@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_TEXTURE_2D_HPP
-#define GEAROENIX_VULKAN_TEXTURE_2D_HPP
+#pragma once
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/sync/gx-cr-job-end-caller.hpp"
@@ -25,8 +24,8 @@ public:
         engine::Engine* e,
         const std::vector<std::vector<std::uint8_t>>& data,
         const render::texture::TextureInfo& info,
-        std::size_t img_width,
-        std::size_t img_height,
+        std::uint64_t img_width,
+        std::uint64_t img_height,
         const core::job::EndCaller<core::job::EndCallerIgnore>& call);
     ~Texture2D() final;
     void write_gx3d(
@@ -35,5 +34,4 @@ public:
     [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format);
 };
 }
-#endif
 #endif

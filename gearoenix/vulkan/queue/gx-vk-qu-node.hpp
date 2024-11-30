@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_QUEUE_NODE_HPP
-#define GEAROENIX_VULKAN_QUEUE_NODE_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -47,6 +46,4 @@ public:
     static void connect(Node& provider, Node& consumer, engine::Engine& e);
 };
 }
-
-#endif
 #endif

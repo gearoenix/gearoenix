@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_LOADER_HPP
-#define GEAROENIX_GL_LOADER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
@@ -193,5 +192,4 @@ void unload_library();
 void GX_GL_APIENTRY_TYPE debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);
 #endif
 }
-#endif
 #endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_LABEL_HPP
-#define GEAROENIX_RENDER_WIDGET_LABEL_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-wdg-widget.hpp"
 
@@ -65,4 +64,3 @@ struct Label final : Widget {
         core::job::EndCaller<ConstructorReturn>&& end_callback);
 };
 }
-#endif

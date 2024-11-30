@@ -9,7 +9,7 @@ struct Material;
 namespace gearoenix::render::mesh {
 struct Buffer;
 struct Mesh {
-    static constexpr std::size_t MAX_COUNT = 8192;
+    constexpr static std::uint32_t MAX_COUNT = 8192;
 
     GX_GET_CREF_PRT(std::shared_ptr<Buffer>, buffer);
     GX_GET_CREF_PRT(std::shared_ptr<material::Material>, bound_material);

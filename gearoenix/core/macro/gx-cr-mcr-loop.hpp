@@ -1,5 +1,5 @@
-#ifndef GEAROENIX_CORE_MACROS_LOOP_HPP
-#define GEAROENIX_CORE_MACROS_LOOP_HPP
+#pragma once
+
 #define GX_LOOP_WI1(a) a(0)
 #define GX_LOOP_WI2(a) \
     GX_LOOP_WI1(a)     \
@@ -249,5 +249,3 @@
 #define GX_LOOP_WI_L2(n, a) GX_LOOP_WI_L1(n, a)
 #define GX_LOOP_WI_L3(n, a) GX_LOOP_WI_L2(n, a)
 #define GX_LOOP_WI_L4(n, a) GX_LOOP_WI_L3(n, a)
-
-#endif

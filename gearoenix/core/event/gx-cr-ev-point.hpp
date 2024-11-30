@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_POINT_HPP
-#define GEAROENIX_CORE_EVENT_POINT_HPP
+#pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include <chrono>
 
@@ -73,4 +72,3 @@ public:
     }
 };
 }
-#endif

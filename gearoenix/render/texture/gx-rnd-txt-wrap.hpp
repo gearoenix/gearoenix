@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_WRAP_HPP
-#define GEAROENIX_RENDER_TEXTURE_WRAP_HPP
-#include "../../core/gx-cr-types.hpp"
+#pragma once
+#include <cstdint>
 #include <string>
 
 namespace gearoenix::render::texture {
-enum struct Wrap : core::TypeId {
+enum struct Wrap : std::uint8_t {
     ClampToEdge = 1,
     Mirror = 2,
     Repeat = 3,
@@ -14,4 +13,3 @@ enum struct Wrap : core::TypeId {
 namespace std {
 [[nodiscard]] std::string to_string(gearoenix::render::texture::Wrap w);
 }
-#endif

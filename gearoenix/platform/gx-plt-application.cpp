@@ -27,6 +27,12 @@ void initialise_default_font(gearoenix::platform::Application& app)
     io.FontDefault = fonts->AddFontFromMemoryTTF(content, static_cast<int>(read_bytes), 15);
     fonts->Build();
 }
+
+void register_types()
+{
+    gearoenix::core::ecs::Component::register_type<gearoenix::platform::RuntimeConfiguration>();
+    gearoenix::core::ecs::Component::register_type<gearoenix::render::RuntimeConfiguration>();
+}
 }
 
 void gearoenix::platform::BaseApplication::initialise_imgui()
@@ -44,6 +50,8 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
     : arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
 {
+    register_types();
+
     GX_LOG_D("This machine has " << std::thread::hardware_concurrency() << " number of thread cores.");
     core::job::initialise();
 
@@ -74,9 +82,8 @@ void gearoenix::platform::BaseApplication::initialize_window_size(const int w, c
 
 void gearoenix::platform::BaseApplication::update_window_size(const int w, const int h)
 {
-    const auto new_size = decltype(window_size) {w, h};
-    if (window_size == new_size)
-    {
+    const auto new_size = decltype(window_size) { w, h };
+    if (window_size == new_size) {
         return;
     }
 

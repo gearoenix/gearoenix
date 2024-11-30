@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_PLANE_HPP
-#define GEAROENIX_MATH_PLANE_HPP
+#pragma once
 #include "gx-math-intersection-status.hpp"
 #include "gx-math-vector-4d.hpp"
 
@@ -34,4 +33,3 @@ struct Plane {
     }
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_MATRIX_4D_HPP
-#define GEAROENIX_MATH_MATRIX_4D_HPP
+#pragma once
 #include "gx-math-matrix-3d.hpp"
 #include "gx-math-vector-4d.hpp"
 
@@ -521,4 +520,3 @@ struct Mat4x4 final {
     [[nodiscard]] constexpr Element* data() { return reinterpret_cast<Element*>(this); }
 };
 }
-#endif

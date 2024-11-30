@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
-#define GEAROENIX_GL_SHADER_FORWARD_PBR_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <array>
@@ -47,9 +46,9 @@ private:
 public:
     ForwardPbr(
         Engine& e,
-        std::size_t directional_lights_count,
-        std::size_t shadow_casters_directional_lights_count,
-        std::size_t bones_count);
+        std::uint32_t directional_lights_count,
+        std::uint32_t shadow_casters_directional_lights_count,
+        std::uint32_t bones_count);
     ForwardPbr(ForwardPbr&&) noexcept;
     ~ForwardPbr() final;
     void bind(uint& current_shader) const final;
@@ -81,7 +80,7 @@ private:
     }
 
 public:
-    [[nodiscard]] ForwardPbr& get(const std::size_t bones_count, const std::size_t shadow_casters_directional_lights_count, const std::size_t directional_lights_count)
+    [[nodiscard]] ForwardPbr& get(const std::uint32_t bones_count, const std::uint32_t shadow_casters_directional_lights_count, const std::uint32_t directional_lights_count)
     {
         auto& s = combinations[bones_count][shadow_casters_directional_lights_count][directional_lights_count];
         if (s.has_value()) {
@@ -93,5 +92,4 @@ public:
 };
 }
 
-#endif
 #endif

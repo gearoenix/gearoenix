@@ -24,7 +24,7 @@ std::unique_ptr<gearoenix::vulkan::descriptor::BindingsData>& gearoenix::vulkan:
 
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::Manager::create_set(
     const std::vector<VkDescriptorSetLayoutBinding>& bindings,
-    const std::optional<std::size_t> kernel_index)
+    const std::optional<std::uint64_t> kernel_index)
 {
     auto& bd = get_bindings_data(bindings);
     if (nullptr == bd) {

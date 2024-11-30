@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_KEY_HPP
-#define GEAROENIX_PLATFORM_KEY_HPP
+#pragma once
 
 namespace gearoenix::platform::key {
 enum struct Id {
@@ -144,5 +143,3 @@ enum struct Action {
 void initialize_imgui_keymap();
 [[nodiscard]] int convert_mouse_to_imgui(Id);
 }
-
-#endif

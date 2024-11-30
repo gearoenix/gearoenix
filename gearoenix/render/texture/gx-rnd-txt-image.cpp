@@ -27,13 +27,13 @@ void gearoenix::render::texture::Image::decode(
     std::vector<unsigned char> img;
     file->read(img);
     std::uint32_t img_channels = 0;
-    decode(img.data(), img.size(), 4, encoded_data, img_width, img_height, img_channels);
+    decode(img.data(), static_cast<std::uint32_t>(img.size()), 4, encoded_data, img_width, img_height, img_channels);
 }
 
 void gearoenix::render::texture::Image::decode(
     const unsigned char* const formatted_data,
-    const std::size_t formatted_size,
-    const std::optional<std::size_t> requested_channels,
+    const std::uint32_t formatted_size,
+    const std::optional<std::uint32_t> requested_channels,
     std::vector<unsigned char>& decoded_data,
     std::uint32_t& img_width,
     std::uint32_t& img_height,
@@ -57,8 +57,8 @@ void gearoenix::render::texture::Image::decode(
 
 void gearoenix::render::texture::Image::decode(
     const unsigned char* const formatted_data,
-    const std::size_t formatted_size,
-    const std::optional<std::size_t> requested_channels,
+    const std::uint32_t formatted_size,
+    const std::optional<std::uint32_t> requested_channels,
     std::vector<float>& decoded_data,
     std::uint32_t& img_width,
     std::uint32_t& img_height,
@@ -70,9 +70,9 @@ void gearoenix::render::texture::Image::decode(
     if (dd == nullptr) {
         GX_LOG_F("Image decoder error.");
     }
-    img_width = static_cast<std::size_t>(iw);
-    img_height = static_cast<std::size_t>(ih);
-    img_channels = static_cast<std::size_t>(chs);
+    img_width = static_cast<std::uint32_t>(iw);
+    img_height = static_cast<std::uint32_t>(ih);
+    img_channels = static_cast<std::uint32_t>(chs);
     decoded_data.resize(img_width * img_height * (requested_channels.has_value() ? requested_channels.value() : img_channels));
     std::memcpy(&(decoded_data[0]), dd, decoded_data.size() * sizeof(float));
     stbi_image_free(dd);

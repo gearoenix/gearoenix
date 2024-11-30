@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_APPLICATION_HPP
-#define GEAROENIX_PLATFORM_APPLICATION_HPP
+#pragma once
 #include "../core/event/gx-cr-ev-point.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../math/gx-math-vector-2d.hpp"
@@ -106,5 +105,4 @@ private:
 #include "sdl2/gx-plt-sdl2-application.hpp"
 #else
 #error "Unspecified platform application interface."
-#endif
 #endif

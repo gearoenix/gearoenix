@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
-#define GEAROENIX_VULKAN_SYNC_SEMAPHORE_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -32,5 +31,4 @@ public:
     [[nodiscard]] static std::vector<std::shared_ptr<Semaphore>> create_frame_based(const engine::Engine& e);
 };
 }
-#endif
 #endif

@@ -9,7 +9,10 @@ struct Mesh;
 
 namespace gearoenix::render::skybox {
 struct Skybox : core::ecs::Component {
-    static constexpr std::size_t MAX_COUNT = 16;
+    constexpr static TypeIndex TYPE_INDEX = 16;
+    constexpr static std::uint32_t MAX_COUNT = 16;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
     GX_GET_CREF_PRT(Texture, bound_texture);
@@ -17,7 +20,7 @@ struct Skybox : core::ecs::Component {
     GX_GETSET_VAL_PRT(double, layer, 0.0);
 
     Skybox(
-        std::type_index final_component_type_index,
+        TypeIndex final_component_type_index,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         Texture&& bound_texture,
         std::string&& name,

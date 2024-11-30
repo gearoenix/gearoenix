@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_TRANSFORM_MODE_BUTTON_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_TRANSFORM_MODE_BUTTON_HPP
+#pragma once
 #include "gx-ed-vp-button.hpp"
 
 namespace gearoenix::render::texture {
@@ -20,5 +19,3 @@ struct TransformModeButton final : Button {
     void update() override;
 };
 }
-
-#endif

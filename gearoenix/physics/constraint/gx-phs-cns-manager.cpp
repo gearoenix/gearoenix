@@ -7,6 +7,8 @@
 gearoenix::physics::constraint::Manager::Manager(render::engine::Engine& e)
     : e(e)
 {
+    core::ecs::Component::register_type<Constraint>();
+    core::ecs::Component::register_type<JetController>();
 }
 
 gearoenix::physics::constraint::Manager::~Manager() = default;
@@ -18,7 +20,7 @@ std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::physics::c
 {
     auto cmp_name = name + "-jet-controller";
     auto eb = e.get_world()->create_shared_builder(std::move(name), std::move(entity_exists_in_world));
-    eb->get_builder().add_component(JetController::construct(e, std::move(transform), std::move(cmp_name), eb->get_id()));
+    eb->get_builder().add_component(core::ecs::Component::construct<JetController>(e, std::move(transform), std::move(cmp_name), eb->get_id()));
     return eb;
 }
 

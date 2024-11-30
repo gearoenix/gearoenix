@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_EDIT_HPP
-#define GEAROENIX_RENDER_WIDGET_EDIT_HPP
-
+#pragma once
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "gx-rnd-wdg-alignment.hpp"
@@ -68,8 +66,8 @@ struct Edit final : public Widget, public core::event::Listener {
     GX_GET_VAL_PRV(double, cursor_pos_in_text, 0.0f)
     GX_GET_VAL_PRV(double, starting_text_cut, 0.0f)
     GX_GET_VAL_PRV(double, ending_text_cut, 0.0f)
-    GX_GET_VAL_PRV(std::size_t, temporary_left, 0)
-    GX_GET_VAL_PRV(std::size_t, temporary_right, 0)
+    GX_GET_VAL_PRV(std::uint64_t, temporary_left, 0)
+    GX_GET_VAL_PRV(std::uint64_t, temporary_right, 0)
     GX_GET_CREF_PRV(std::weak_ptr<Edit>, edit_self)
 private:
     GX_CREATE_GUARD(text)
@@ -137,4 +135,3 @@ public:
     void clear();
 };
 }
-#endif

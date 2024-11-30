@@ -1,15 +1,10 @@
 #include "gx-gl-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-transformation.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
-
-namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Camera, gearoenix::render::camera::Camera::MAX_COUNT>::construct();
-}
 
 gearoenix::gl::CameraTarget::~CameraTarget() = default;
 
@@ -20,8 +15,8 @@ gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render:
         CameraTarget result { .target = Default {} };
         auto& gd = std::get<DEFAULT_VAR_INDEX>(result.target);
         gd.main = std::dynamic_pointer_cast<Target>(d.main);
-        for (std::size_t ti = 0; ti < d.targets.size(); ++ti) {
-            for (std::size_t mi = 0; mi < d.targets[ti].size(); ++mi) {
+        for (std::uint32_t ti = 0; ti < d.targets.size(); ++ti) {
+            for (std::uint32_t mi = 0; mi < d.targets[ti].size(); ++mi) {
                 gd.targets[ti][mi] = std::dynamic_pointer_cast<Target>(d.targets[ti][mi]);
             }
         }
@@ -46,19 +41,13 @@ const gearoenix::gl::CameraTarget::Default& gearoenix::gl::CameraTarget::get_def
     return std::get<DEFAULT_VAR_INDEX>(target);
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Camera::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<render::camera::Camera>(this);
-    return types;
-}
-
 void gearoenix::gl::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
 {
     gl_target.target = CameraTarget::Customised { .target = std::dynamic_pointer_cast<Target>(t) };
     render::camera::Camera::set_customised_target(std::move(t));
 }
 
-void gearoenix::gl::Camera::update_target(gearoenix::core::job::EndCaller<>&& end)
+void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
 {
     render::camera::Camera::update_target(core::job::EndCaller([this, self = get_camera_self().lock(), end = std::move(end)] {
         (void)end;
@@ -81,8 +70,8 @@ void gearoenix::gl::Camera::construct(
     Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
     std::shared_ptr<physics::Transformation>&& transform, const core::ecs::entity_id_t entity_id)
 {
-    c.set_return(allocator->make_shared(e, name, render::camera::Target(), std::move(transform), entity_id));
-    c.get_return()->set_component_self(c.get_return());
+    c.set_return(Component::construct<Camera>(e, name, render::camera::Target(), std::move(transform), entity_id));
+    c.get_return()->set_camera_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
     }));
@@ -131,6 +120,7 @@ void gearoenix::gl::CameraManager::build(
 gearoenix::gl::CameraManager::CameraManager(Engine& e)
     : Manager(e)
 {
+    core::ecs::Component::register_type<Camera>();
 }
 
 void gearoenix::gl::CameraManager::window_resized()

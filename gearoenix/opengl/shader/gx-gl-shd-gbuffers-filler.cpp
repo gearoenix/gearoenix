@@ -3,10 +3,11 @@
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-engine.hpp"
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -42,10 +43,10 @@ void main() {\n\
     gl_Position = vp * pos;\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -98,6 +99,7 @@ void main() {\n\
 \n\
     frag_out_radiance = textureLod(radiance, normalize(reflect(out_eye, frag_out_normal_ao.xyz)), mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n\
 }\n";
+}
 
 gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e)
     : Shader(e)
@@ -127,8 +129,9 @@ gearoenix::gl::shader::GBuffersFiller::~GBuffersFiller() = default;
 
 void gearoenix::gl::shader::GBuffersFiller::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);

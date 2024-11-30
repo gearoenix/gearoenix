@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_HEAP_HPP
-#define GEAROENIX_METAL_HEAP_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import <Metal/MTLHeap.h>
@@ -14,5 +13,4 @@ struct HeapManager final {
 };
 }
 
-#endif
 #endif

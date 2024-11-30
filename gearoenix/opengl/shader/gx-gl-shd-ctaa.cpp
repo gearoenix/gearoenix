@@ -2,7 +2,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <boost/mp11/algorithm.hpp>
 
-static constexpr const char* const vertex_shader_src = "\
+constexpr static const char* const vertex_shader_src = "\
 #version 300 es\n\
 \n\
 precision highp float;\n\
@@ -16,7 +16,7 @@ void main() {\n\
     out_uv = position * 0.5 + 0.5;\n\
 }\n";
 
-gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::size_t colour_tuning_index)
+gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::uint32_t colour_tuning_index)
     : Shader(e)
 {
     const bool is_gamma_correction_index = colour_tuning_index == boost::mp11::mp_find<render::camera::ColourTuning, render::camera::GammaCorrection>::value;
@@ -26,7 +26,7 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine
     std::stringstream fs;
     fs << "#version 300 es\n";
     fs << "\n";
-    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "#define gx_pi 3.141592653589793238\n";
     fs << "\n";
     fs << "precision highp float;\n";
     fs << "precision highp sampler2D;\n";

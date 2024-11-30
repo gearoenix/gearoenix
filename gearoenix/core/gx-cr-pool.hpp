@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_POOL_HPP
-#define GEAROENIX_CORE_POOL_HPP
+#pragma once
 #include "../platform/gx-plt-log.hpp"
 #include "gx-cr-build-configuration.hpp"
 #include <functional>
@@ -10,7 +9,7 @@ template <typename T>
 struct Pool final {
 private:
     std::vector<T> objects;
-    std::size_t size = 0;
+    std::uintptr_t size = 0;
 
 public:
     struct iterator final {
@@ -20,7 +19,7 @@ public:
         using reference = typename std::vector<T>::iterator::reference;
         using iterator_category = typename std::vector<T>::iterator::iterator_category;
 
-        constexpr iterator(const std::size_t index, Pool* const pool)
+        constexpr iterator(const std::uintptr_t index, Pool* const pool)
             : index(index)
             , pool(pool)
         {
@@ -56,7 +55,7 @@ public:
         }
 
     private:
-        std::size_t index = 0;
+        std::uintptr_t index = 0;
         Pool* const pool = nullptr;
     };
 
@@ -67,7 +66,7 @@ public:
         using reference = typename std::vector<T>::const_iterator::reference;
         using iterator_category = typename std::vector<T>::const_iterator::iterator_category;
 
-        constexpr const_iterator(const std::size_t index, const Pool* const pool)
+        constexpr const_iterator(const std::uintptr_t index, const Pool* const pool)
             : index(index)
             , pool(pool)
         {
@@ -103,15 +102,16 @@ public:
         }
 
     private:
-        std::size_t index = 0;
+        std::uintptr_t index = 0;
         const Pool* const pool = nullptr;
     };
 
     template <typename F>
-    [[nodiscard]] constexpr std::size_t emplace(const F&& func)
+    [[nodiscard]] constexpr std::uintptr_t emplace(const F&& func)
     {
-        for (std::size_t i = objects.size(); i <= size; ++i)
+        for (auto i = objects.size(); i <= size; ++i) {
             objects.emplace_back(func());
+        }
         return size++;
     }
 
@@ -120,7 +120,7 @@ public:
         size = 0;
     }
 
-    [[nodiscard]] constexpr std::size_t get_size()
+    [[nodiscard]] constexpr std::uint32_t get_size()
     {
         return size;
     }
@@ -148,14 +148,13 @@ public:
     template <typename I>
     [[nodiscard]] constexpr const T& operator[](const I index) const
     {
-        return objects[static_cast<std::size_t>(index)];
+        return objects[static_cast<std::uint32_t>(index)];
     }
 
     template <typename I>
     [[nodiscard]] constexpr T& operator[](const I index)
     {
-        return objects[static_cast<std::size_t>(index)];
+        return objects[static_cast<std::uint32_t>(index)];
     }
 };
 }
-#endif

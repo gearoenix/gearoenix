@@ -56,12 +56,12 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const uns
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver)
 {
-    const size_t kernels_count = threads.size();
+    const auto kernels_count = threads.size();
     std::vector<std::shared_ptr<Semaphore>> waits;
     std::vector<std::shared_ptr<Semaphore>> worker_signals;
     waits.reserve(kernels_count);
     worker_signals.reserve(kernels_count);
-    for (size_t ki = 0; ki < kernels_count; ++ki) {
+    for (auto ki = decltype(kernels_count) { 0 }; ki < kernels_count; ++ki) {
         waits.push_back(std::make_shared<Semaphore>());
         worker_signals.push_back(std::make_shared<Semaphore>());
     }

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_ALLOCATOR_STATIC_BLOCK_HPP
-#define GEAROENIX_CORE_ALLOCATOR_STATIC_BLOCK_HPP
+#pragma once
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <array>
 #include <cstring>
@@ -9,11 +8,11 @@
 #include <utility>
 
 namespace gearoenix::core::allocator {
-template <std::size_t Size>
+template <std::intptr_t Size>
 struct StaticBlock final {
     template <typename T>
     struct std_deleter {
-        StaticBlock<Size>& ref;
+        StaticBlock& ref;
 
         void operator()(T const* p)
         {
@@ -24,9 +23,9 @@ struct StaticBlock final {
 private:
     std::mutex this_lock;
     std::array<std::uint8_t, Size> memory;
-    std::set<std::pair<std::size_t /*start-offset*/, std::size_t /*size*/>> start_map { { 0, Size } };
-    std::set<std::pair<std::size_t /*size*/, std::size_t /*start-offset*/>> size_map { { Size, 0 } };
-    std::set<std::pair<std::size_t /*end-offset*/, std::size_t /*size*/>> end_map { { Size, Size } };
+    std::set<std::pair<std::intptr_t /*start-offset*/, std::intptr_t /*size*/>> start_map { { 0, Size } };
+    std::set<std::pair<std::intptr_t /*size*/, std::intptr_t /*start-offset*/>> size_map { { Size, 0 } };
+    std::set<std::pair<std::intptr_t /*end-offset*/, std::intptr_t /*size*/>> end_map { { Size, Size } };
 
 public:
 #ifdef GX_DEBUG_MODE
@@ -46,7 +45,7 @@ public:
     template <typename T, typename... Args>
     [[nodiscard]] T* alloc(Args&&... args)
     {
-        std::lock_guard<std::mutex> _lg(this_lock);
+        std::lock_guard _lg(this_lock);
         auto search = size_map.lower_bound({ sizeof(T), 0 });
         GX_ASSERT_D(size_map.end() != search);
         const auto old_size = search->first;
@@ -78,17 +77,17 @@ public:
     void free(T* const t)
     {
         t->~T();
-        auto start = reinterpret_cast<std::size_t>(t) - reinterpret_cast<std::size_t>(memory.data());
-        auto end = start + sizeof(T);
+        auto start = reinterpret_cast<std::intptr_t>(t) - reinterpret_cast<std::intptr_t>(memory.data());
+        auto end = static_cast<std::intptr_t>(start + sizeof(T));
         std::memset(&memory[start], 0, sizeof(T));
-        std::lock_guard<std::mutex> _lg(this_lock);
-        if (auto search = end_map.lower_bound({ start, 0 }); end_map.end() != search && search->first == start) {
+        std::lock_guard _lg(this_lock);
+        if (const auto search = end_map.lower_bound({ start, 0 }); end_map.end() != search && search->first == start) {
             start -= search->second;
             start_map.erase({ start, search->second });
             size_map.erase({ search->second, start });
             end_map.erase(search);
         }
-        if (auto search = start_map.lower_bound({ end, 0 }); start_map.end() != search && search->first == end) {
+        if (const auto search = start_map.lower_bound({ end, 0 }); start_map.end() != search && search->first == end) {
             end += search->second;
             size_map.erase({ search->second, search->first });
             end_map.erase({ end, search->second });
@@ -101,5 +100,3 @@ public:
     }
 };
 }
-
-#endif

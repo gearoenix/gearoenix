@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_SHADER_COMMON_HPP
-#define GEAROENIX_METAL_SHADER_COMMON_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #include <simd/simd.h>
@@ -41,5 +40,4 @@ struct CameraUniform {
 
 }
 
-#endif
 #endif

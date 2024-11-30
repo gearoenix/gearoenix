@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_ENGINE_HPP
-#define GEAROENIX_METAL_ENGINE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -31,5 +30,4 @@ struct Engine final : public render::engine::Engine {
 };
 }
 
-#endif
 #endif

@@ -30,12 +30,12 @@ void gearoenix::physics::body::Car::update_axles()
 void gearoenix::physics::body::Car::update_engine()
 {
     velocity_attitude = velocity.length();
-    // wheels_angular_velocity = velocity_attitude / (2.0 * GX_PI * tire_radius);
+    // wheels_angular_velocity = velocity_attitude / (2.0 * std::numbers::pi * tire_radius);
     // engine_angular_velocity = wheels_angular_velocity * gear_ratios[current_gear] * final_drive_ratio;
     engine_angular_velocity_rpm = engine_angular_velocity * 60.0;
     // check for transmission change base on engine_angular_velocity_rpm
     //
-    std::size_t torque_index = 0;
+    std::uint32_t torque_index = 0;
 #ifdef GX_DEBUG_MODE
     if (engine_angular_velocity_rpm > torque_rpm_diagram_points.back().first || engine_angular_velocity_rpm < 0.0) {
         GXLOGF("Unexpected engine_angular_velocity_rpm (" << engine_angular_velocity_rpm << ") value.")

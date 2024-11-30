@@ -3,10 +3,24 @@
 #include <boost/mp11/algorithm.hpp>
 #include <imgui.h>
 
+namespace {
+gearoenix::core::ecs::Archetype::id_t create_archetype_id(const gearoenix::core::ecs::EntityBuilder::components_t& cs)
+{
+    gearoenix::core::ecs::Archetype::id_t id;
+    for (const auto& c : cs) {
+        id.add(c.first);
+        for (const auto& info = gearoenix::core::ecs::Component::get_type_info(c.first); const auto pt : info.get_all_parents()) {
+            id.add(pt);
+        }
+    }
+    return id;
+}
+}
+
 void gearoenix::core::ecs::World::create_entity(EntityBuilder&& b)
 {
-    auto* const a = get_archetype(b.components);
-    auto* const cs = a->allocate_entity(b.id, b.components);
+    auto* const a = get_archetype(b.all_types);
+    auto* const cs = a->allocate_entity(b.id, b.all_types_to_components);
     entities.emplace(b.id, Entity(a, cs, std::string(b.name)));
     if (name_to_entity_id.contains(b.name)) {
         GX_LOG_F("Entity with name `" << b.name << "' is already in the world.");
@@ -59,7 +73,7 @@ void gearoenix::core::ecs::World::add_components_map(const entity_id_t id, Entit
     const auto old_archetype = entity->archetype;
     const auto old_components = entity->components;
     old_archetype->move_out_entity(old_components, c);
-    const auto new_archetype = get_archetype(c);
+    const auto new_archetype = get_archetype(create_archetype_id(c));
     entity->archetype = new_archetype;
     entity->components = new_archetype->allocate_entity(id, c);
 }
@@ -78,7 +92,7 @@ void gearoenix::core::ecs::World::delayed_add_components_map(
 }
 
 void gearoenix::core::ecs::World::remove_components_list(
-    const entity_id_t id, const std::type_index* const ts, const std::size_t sz)
+    const entity_id_t id, const Component::TypeIndex* const ts, const std::uint64_t sz)
 {
     if (0 == sz) {
         GX_LOG_E("At least one component must be selected to remove. Entity: " << id);
@@ -94,24 +108,22 @@ void gearoenix::core::ecs::World::remove_components_list(
     EntityBuilder::components_t cs;
     cs.reserve(old_archetype->components_indices.size());
     old_archetype->move_out_entity(old_components, cs);
-    for (std::size_t ti = 0; ti < sz; ++ti) {
-        const auto& t = ts[ti];
-        for (auto iter = cs.begin(); cs.end() != iter;) {
-            if (iter->second->get_hierarchy_types().contains(t)) {
-                iter = cs.erase(iter);
-            } else {
-                ++iter;
-            }
+    for (auto ti = decltype(sz) { 0 }; ti < sz; ++ti) {
+        const auto t = ts[ti];
+        cs.erase(t);
+        const auto& t_info = Component::get_type_info(t);
+        for (const auto pt : t_info.get_all_parents()) {
+            cs.erase(pt);
         }
     }
-    auto* const new_archetype = get_archetype(cs);
+    auto* const new_archetype = get_archetype(create_archetype_id(cs));
     entity->archetype = new_archetype;
     entity->components = new_archetype->allocate_entity(id, cs);
 }
 
 void gearoenix::core::ecs::World::delayed_remove_components_list(
     const entity_id_t ei,
-    std::vector<std::type_index>&& cs,
+    std::vector<Component::TypeIndex>&& cs,
     job::EndCaller<>&& callback)
 {
     const std::lock_guard _lg(delayed_actions_lock);
@@ -124,17 +136,12 @@ void gearoenix::core::ecs::World::delayed_remove_components_list(
     });
 }
 
-gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(const EntityBuilder::components_t& cs)
+gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(const Archetype::id_t& id)
 {
-    thread_local Archetype::id_t archetype_id;
-    archetype_id.clear();
-    for (const auto& c : cs) {
-        archetype_id.emplace(c.first);
-    }
-    auto search = archetypes.find(archetype_id);
+    auto search = archetypes.find(id);
     if (archetypes.end() == search) {
         bool is_ok = false;
-        std::tie(search, is_ok) = archetypes.emplace(archetype_id, std::unique_ptr<Archetype>(new Archetype(cs)));
+        std::tie(search, is_ok) = archetypes.emplace(id, std::unique_ptr<Archetype>(new Archetype(id)));
         if (!is_ok) {
             GX_LOG_F("Insertion in archetype map was not successful");
         }
@@ -186,10 +193,10 @@ void gearoenix::core::ecs::World::update()
         std::swap(actions, delayed_actions);
     }
 
-    constexpr std::size_t create_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::CreateEntity>::value;
-    constexpr std::size_t delete_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::DeleteEntity>::value;
-    constexpr std::size_t add_components_index = boost::mp11::mp_find<decltype(Action::variant), Action::AddComponents>::value;
-    constexpr std::size_t delete_components_index = boost::mp11::mp_find<decltype(Action::variant), Action::DeleteComponents>::value;
+    constexpr std::uint32_t create_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::CreateEntity>::value;
+    constexpr std::uint32_t delete_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::DeleteEntity>::value;
+    constexpr std::uint32_t add_components_index = boost::mp11::mp_find<decltype(Action::variant), Action::AddComponents>::value;
+    constexpr std::uint32_t delete_components_index = boost::mp11::mp_find<decltype(Action::variant), Action::DeleteComponents>::value;
 
     for (auto& action : actions) {
         switch (action.variant.index()) {

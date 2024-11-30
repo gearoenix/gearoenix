@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_REFLECTION_MANAGER_HPP
-#define GEAROENIX_VULKAN_REFLECTION_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-manager.hpp"
@@ -24,9 +23,9 @@ private:
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::size_t environment_resolution,
-        std::size_t irradiance_resolution,
-        std::size_t radiance_resolution,
+        std::uint64_t_t environment_resolution,
+        std::uint64_t irradiance_resolution,
+        std::uint64_t radiance_resolution,
         const core::job::EndCaller& end_callback) final;
     void update() final;
 
@@ -35,6 +34,4 @@ public:
     ~Manager() final;
 };
 }
-
-#endif
 #endif

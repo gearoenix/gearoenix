@@ -29,7 +29,7 @@ public:
     Manager& operator=(Manager&&) = delete;
     explicit Manager(const engine::Engine& e);
     ~Manager();
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size, std::uint32_t type_bits, Place place);
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::uint64_t size, std::uint32_t type_bits, Place place);
 };
 }
 #endif

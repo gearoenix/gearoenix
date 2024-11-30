@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_CONSTANTS_HPP
-#define GEAROENIX_GL_CONSTANTS_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
@@ -463,5 +462,4 @@
 #define GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_WEIGHTS 4
 #define GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES 5
 
-#endif
 #endif

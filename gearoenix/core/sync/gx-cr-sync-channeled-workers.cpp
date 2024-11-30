@@ -21,7 +21,7 @@ void gearoenix::core::sync::ChanneledWorkers::Thread::kernel()
     running = true;
 }
 
-gearoenix::core::sync::ChanneledWorkers::Thread::Thread(const std::size_t i)
+gearoenix::core::sync::ChanneledWorkers::Thread::Thread(const std::uint32_t i)
     : thread_index(i)
     , thread([this] { kernel(); })
 {
@@ -37,20 +37,21 @@ gearoenix::core::sync::ChanneledWorkers::Thread::~Thread()
 
 gearoenix::core::sync::ChanneledWorkers::ChanneledWorkers()
 {
-    std::size_t count = std::thread::hardware_concurrency();
+    std::uint32_t count = std::thread::hardware_concurrency();
     threads.reserve(count);
-    for (std::size_t i = 0; i < count; ++i)
+    for (std::uint32_t i = 0; i < count; ++i) {
         threads.emplace_back(new Thread(i));
+    }
 }
 
 gearoenix::core::sync::ChanneledWorkers::~ChanneledWorkers() = default;
 
-void gearoenix::core::sync::ChanneledWorkers::perform(const std::function<void(std::size_t)>& job)
+void gearoenix::core::sync::ChanneledWorkers::perform(const std::function<void(std::uint32_t)>& job)
 {
-    std::size_t min = std::numeric_limits<std::size_t>::max();
-    std::size_t i = 0;
+    std::uint32_t min = std::numeric_limits<std::uint32_t>::max();
+    std::uint32_t i = 0;
     for (const auto& t : threads) {
-        std::size_t p = t->pending.size();
+        std::uint32_t p = t->pending.size();
         p += t->underprocess.size();
         p -= t->underprocess_index;
         if (p < min) {

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_SIZE_HPP
-#define GEAROENIX_RENDER_WIDGET_SIZE_HPP
+#pragma once
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -34,5 +33,3 @@ public:
     [[nodiscard]] double to_world(const engine::Engine& e) const;
 };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_AI_DIJKSTRA_HPP
-#define GEAROENIX_AI_DIJKSTRA_HPP
+#pragma once
 #include "gx-ai-graph.hpp"
 #include <map>
 #include <tuple>
@@ -19,5 +18,3 @@ public:
     Graph<int, int> best_graph(int start) const;
 };
 }
-
-#endif

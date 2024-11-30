@@ -4,8 +4,8 @@
 #include <cstring>
 
 gearoenix::core::allocator::SameSizeBlock::SameSizeBlock(
-    const std::size_t object_size,
-    const std::size_t objects_count_in_each_block)
+    const std::int64_t object_size,
+    const std::int64_t objects_count_in_each_block)
     : object_size(object_size)
     , objects_count_in_each_block(objects_count_in_each_block)
     , block_bytes_count(object_size * objects_count_in_each_block)
@@ -30,7 +30,7 @@ unsigned char* gearoenix::core::allocator::SameSizeBlock::alloc()
 #ifdef GX_DEBUG_MODE
         std::memset(new_block.data(), 0, block_bytes_count);
 #endif
-        for (std::size_t i = 0, ptr = 0; i < objects_count_in_each_block; ++i, ptr += object_size)
+        for (std::int64_t i = 0, ptr = 0; i < objects_count_in_each_block; ++i, ptr += object_size)
             free_pointers.push(&new_block[ptr]);
     }
     auto result = free_pointers.top();

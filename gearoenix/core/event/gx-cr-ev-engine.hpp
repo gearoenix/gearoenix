@@ -1,7 +1,5 @@
-#ifndef GEAROENIX_CORE_EVENT_ENGINE_HPP
-#define GEAROENIX_CORE_EVENT_ENGINE_HPP
+#pragma once
 #include "gx-cr-ev-event.hpp"
-#include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <tuple>
 
@@ -26,4 +24,3 @@ public:
     void broadcast(const Data& event_data);
 };
 }
-#endif

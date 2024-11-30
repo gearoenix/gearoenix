@@ -1,12 +1,12 @@
 #include "gx-gl-shd-irradiance.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-engine.hpp"
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -24,10 +24,10 @@ void main() {\n\
     gl_Position = vec4(position, 0.0, 1.0);\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -48,19 +48,20 @@ void main() {\n\
     up = normalize(cross(nrm, right));\n\
     float sample_delta = 0.005;\n\
     float phi_samples_count = 0.001f;\n\
-    for(float phi = 0.0; phi < 2.0 * GX_PI; phi += sample_delta, ++phi_samples_count) {\n\
+    for(float phi = 0.0; phi < 2.0 * gx_pi; phi += sample_delta, ++phi_samples_count) {\n\
         float theta_samples_count = 0.001f;\n\
         vec3 irradiance_temp = vec3(0.0);\n\
-        for(float theta = 0.0; theta < 0.5 * GX_PI; theta += sample_delta, ++theta_samples_count) {\n\
+        for(float theta = 0.0; theta < 0.5 * gx_pi; theta += sample_delta, ++theta_samples_count) {\n\
             vec3 tangent_sample = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));\n\
             vec3 sample_vec = tangent_sample.x * right + tangent_sample.y * up + tangent_sample.z * nrm;\n\
             irradiance_temp += texture(environment, normalize(sample_vec)).rgb * cos(theta) * sin(theta);\n\
         }\n\
         irradiance += irradiance_temp / theta_samples_count;\n\
     }\n\
-    irradiance *= GX_PI / phi_samples_count;\n\
+    irradiance *= gx_pi / phi_samples_count;\n\
     frag_out = vec4(irradiance, 1.0);\n\
 }\n";
+}
 
 gearoenix::gl::shader::Irradiance::Irradiance(Engine& e)
     : Shader(e)

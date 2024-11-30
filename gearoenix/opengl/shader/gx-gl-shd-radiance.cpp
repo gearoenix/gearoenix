@@ -3,10 +3,11 @@
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-engine.hpp"
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -24,10 +25,10 @@ void main() {\n\
     gl_Position = vec4(position, 0.0, 1.0);\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -48,7 +49,7 @@ float distribution_ggx(float NdotH2) {\n\
 \n\
     float nom   = roughness_p_4;\n\
     float denom = (NdotH2 * (roughness_p_4 - 1.0) + 1.0);\n\
-    denom = GX_PI * denom * denom;\n\
+    denom = gx_pi * denom * denom;\n\
     return nom / denom;\n\
 }\n\
 \n\
@@ -66,7 +67,7 @@ vec2 hammersley(uint i, uint N) {\n\
 }\n\
 \n\
 vec3 importance_sample_ggx(vec2 xi, vec3 n) {\n\
-    float phi = 2.0 * GX_PI * xi.x;\n\
+    float phi = 2.0 * gx_pi * xi.x;\n\
     float cos_theta = sqrt((1.0 - xi.y) / (1.0 + (roughness_p_4 - 1.0) * xi.y));\n\
     float sin_theta = sqrt(1.0 - cos_theta * cos_theta);\n\
     vec3 h;\n\
@@ -105,6 +106,7 @@ void main() {\n\
     prefiltered_colour = prefiltered_colour / total_weight;\n\
     frag_out = vec4(prefiltered_colour, 1.0);\n\
 }\n";
+}
 
 gearoenix::gl::shader::Radiance::Radiance(Engine& e)
     : Shader(e)

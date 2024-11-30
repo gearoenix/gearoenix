@@ -68,20 +68,20 @@ gearoenix::vulkan::buffer::Manager::Manager(
 
 gearoenix::vulkan::buffer::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::size_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::uint64_t size)
 {
     return gpu_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::size_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::uint64_t size)
 {
     return upload_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::uint64_t size)
 {
     std::vector<std::shared_ptr<Buffer>> cpus(each_frame_upload_source.size());
-    for (std::size_t fi = 0; fi < each_frame_upload_source.size(); ++fi)
+    for (std::uint64_t fi = 0; fi < each_frame_upload_source.size(); ++fi)
         cpus[fi] = each_frame_upload_source[fi]->allocate(size);
     auto gpu = each_frame_upload_destination->allocate(size);
     return std::make_shared<Uniform>(e, std::move(cpus), std::move(gpu));
@@ -90,7 +90,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::M
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
     const std::string& name,
     const void* const data,
-    const std::size_t size,
+    const std::uint64_t size,
     const core::job::EndCaller& end)
 {
     auto cpu = upload_root_buffer->allocate(size);

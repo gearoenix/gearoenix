@@ -10,10 +10,10 @@ gearoenix::physics::animation::Bone::Bone(
     std::shared_ptr<Transformation>&& transform,
     math::Mat4x4<float>&& inverse_bind,
     std::string&& name,
-    const std::size_t parent_index,
-    const std::size_t children_count,
-    const std::size_t first_child_index,
-    const std::size_t last_child_index)
+    const std::uint32_t parent_index,
+    const std::uint32_t children_count,
+    const std::uint32_t first_child_index,
+    const std::uint32_t last_child_index)
     : transform(std::move(transform))
     , inverse_bind(inverse_bind)
     , name(std::move(name))

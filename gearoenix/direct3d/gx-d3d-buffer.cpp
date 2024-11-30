@@ -35,7 +35,7 @@ gearoenix::d3d::CpuBuffer::CpuBuffer(CpuBuffer&& o)
     o.pointer = nullptr;
 }
 
-void gearoenix::d3d::CpuBuffer::copy(const void* data, std::size_t size)
+void gearoenix::d3d::CpuBuffer::copy(const void* data, std::uint32_t size)
 {
     std::memcpy(pointer, data, size);
 }

@@ -16,8 +16,8 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(
     engine::Engine* const e,
     const std::vector<std::vector<std::uint8_t>>& data,
     const render::texture::TextureInfo& info,
-    const std::size_t img_width,
-    const std::size_t img_height,
+    const std::uint64_t img_width,
+    const std::uint64_t img_height,
     const core::job::EndCaller<core::job::EndCallerIgnore>& call)
     : render::texture::Texture2D(id, std::move(name), info.format, info.sampler_info, e)
     , view(new image::View(std::make_shared<image::Image>(

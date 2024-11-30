@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_CAMERA_HPP
-#define GEAROENIX_GL_CAMERA_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/camera/gx-rnd-cmr-builder.hpp"
@@ -22,8 +21,8 @@ struct CameraTarget final {
         std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
     };
 
-    static constexpr std::size_t CUSTOMISED_VAR_INDEX = 0;
-    static constexpr std::size_t DEFAULT_VAR_INDEX = 1;
+    constexpr static std::uint32_t CUSTOMISED_VAR_INDEX = 0;
+    constexpr static std::uint32_t DEFAULT_VAR_INDEX = 1;
 
     std::variant<Customised, Default> target = Default {};
 
@@ -34,9 +33,12 @@ struct CameraTarget final {
 };
 
 struct Camera final : render::camera::Camera {
+    constexpr static TypeIndex TYPE_INDEX = 17;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
+
     GX_GET_CREF_PRV(CameraTarget, gl_target);
 
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
 
@@ -82,5 +84,4 @@ public:
 };
 }
 
-#endif
 #endif

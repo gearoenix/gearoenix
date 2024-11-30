@@ -23,7 +23,7 @@ gearoenix::vulkan::buffer::Buffer::Buffer(
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
     const std::string& name,
-    const std::size_t size,
+    const std::uint64_t size,
     const memory::Place place,
     memory::Manager& memory_manager)
 {
@@ -76,7 +76,7 @@ gearoenix::vulkan::buffer::Buffer::~Buffer()
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::size_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::uint64_t_t size)
 {
     const auto aligned_size = allocated_memory->get_e().get_logical_device().get_physical_device().align_size(size);
     auto alc = allocator->allocate(aligned_size);
@@ -90,7 +90,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     return result;
 }
 
-void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::size_t size)
+void gearoenix::vulkan::buffer::Buffer::write(const void* data, const std::uint64_t size)
 {
     GX_CHECK_NOT_EQUAL_D(nullptr, allocated_memory->get_data());
     std::memcpy(allocated_memory->get_data(), data, size);

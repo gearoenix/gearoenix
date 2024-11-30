@@ -76,13 +76,13 @@ struct DataLoader final {
     {
         GX_ASSERT_D(gx_texture_2ds.empty());
         gx_texture_2ds.resize(data.textures.size());
-        for (std::size_t index = 0; index < data.textures.size(); ++index) {
+        for (std::uint64_t index = 0; index < data.textures.size(); ++index) {
             load_texture_2d(index, core::job::EndCaller(end_callback));
         }
     }
 
     void load_texture_2d(
-        const std::size_t index,
+        const std::uint64_t index,
         core::job::EndCaller<>&& end_callback)
     {
         const tinygltf::Texture& txt = data.textures[index];
@@ -103,7 +103,7 @@ struct DataLoader final {
         const tinygltf::BufferView& img_bv = data.bufferViews[img.bufferView];
         const tinygltf::Buffer& img_b = data.buffers[img_bv.buffer];
         const void* const img_ptr = &img_b.data[img_bv.byteOffset];
-        const auto img_sz = static_cast<std::size_t>(img_bv.byteLength);
+        const auto img_sz = static_cast<std::uint32_t>(img_bv.byteLength);
         const tinygltf::Sampler& smp = data.samplers[txt.sampler];
         GX_LOG_D("Loading sampler: " << smp.name);
         bool needs_mipmap = false;
@@ -204,7 +204,7 @@ struct DataLoader final {
     {
         GX_ASSERT_D(gx_meshes.empty());
         gx_meshes.resize(data.meshes.size());
-        std::size_t index = 0;
+        std::uint64_t index = 0;
         for (const tinygltf::Node& n : data.nodes) {
             if (!is_mesh(n)) {
                 continue;
@@ -218,21 +218,21 @@ struct DataLoader final {
     }
 
     void load_mesh(
-        const std::size_t mesh_index,
+        const std::uint64_t mesh_index,
         const core::job::EndCaller<>& end_callback,
         const std::vector<int>& bone_index_map)
     {
         const tinygltf::Mesh& msh = data.meshes[mesh_index];
         GX_LOG_D("Loading mesh: " << msh.name);
         gx_meshes[mesh_index].meshes.resize(msh.primitives.size());
-        for (std::size_t primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
+        for (std::uint64_t primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
             load_mesh(mesh_index, primitive_index, end_callback, bone_index_map);
         }
     }
 
     void load_mesh(
-        const std::size_t mesh_index,
-        const std::size_t primitive_index,
+        const std::uint64_t mesh_index,
+        const std::uint64_t primitive_index,
         const core::job::EndCaller<>& end_callback,
         const std::vector<int>& bone_index_map) const
     {
@@ -242,37 +242,37 @@ struct DataLoader final {
         const auto& acs = data.accessors;
         const auto& bvs = data.bufferViews;
         const auto& bfs = data.buffers;
-        auto pos_ai = static_cast<std::size_t>(-1);
-        auto nrm_ai = static_cast<std::size_t>(-1);
-        auto tng_ai = static_cast<std::size_t>(-1);
-        auto txc_ai = static_cast<std::size_t>(-1);
-        auto bwt_ai = static_cast<std::size_t>(-1);
-        auto bin_ai = static_cast<std::size_t>(-1);
+        auto pos_ai = static_cast<std::uint64_t>(-1);
+        auto nrm_ai = static_cast<std::uint64_t>(-1);
+        auto tng_ai = static_cast<std::uint64_t>(-1);
+        auto txc_ai = static_cast<std::uint64_t>(-1);
+        auto bwt_ai = static_cast<std::uint64_t>(-1);
+        auto bin_ai = static_cast<std::uint64_t>(-1);
         const auto& attrs = primitive.attributes;
         const bool is_animated = !bone_index_map.empty();
         for (const auto& att : attrs) {
             if ("POSITION" == att.first) {
-                pos_ai = static_cast<std::size_t>(att.second);
+                pos_ai = static_cast<std::uint64_t>(att.second);
             } else if ("NORMAL" == att.first) {
-                nrm_ai = static_cast<std::size_t>(att.second);
+                nrm_ai = static_cast<std::uint64_t>(att.second);
             } else if ("TANGENT" == att.first) {
-                tng_ai = static_cast<std::size_t>(att.second);
+                tng_ai = static_cast<std::uint64_t>(att.second);
             } else if ("TEXCOORD_0" == att.first) {
-                txc_ai = static_cast<std::size_t>(att.second);
+                txc_ai = static_cast<std::uint64_t>(att.second);
             } else if (is_animated && "WEIGHTS_0" == att.first) {
-                bwt_ai = static_cast<std::size_t>(att.second);
+                bwt_ai = static_cast<std::uint64_t>(att.second);
             } else if (is_animated && "JOINTS_0" == att.first) {
-                bin_ai = static_cast<std::size_t>(att.second);
+                bin_ai = static_cast<std::uint64_t>(att.second);
             } else {
                 GX_UNEXPECTED;
             }
         }
-        GX_ASSERT(pos_ai != static_cast<std::size_t>(-1));
-        GX_ASSERT(nrm_ai != static_cast<std::size_t>(-1));
-        const auto has_tangent = tng_ai != static_cast<std::size_t>(-1);
-        GX_ASSERT(txc_ai != static_cast<std::size_t>(-1));
-        GX_ASSERT(!is_animated || bwt_ai != static_cast<std::size_t>(-1));
-        GX_ASSERT(!is_animated || bin_ai != static_cast<std::size_t>(-1));
+        GX_ASSERT(pos_ai != static_cast<std::uint64_t>(-1));
+        GX_ASSERT(nrm_ai != static_cast<std::uint64_t>(-1));
+        const auto has_tangent = tng_ai != static_cast<std::uint64_t>(-1);
+        GX_ASSERT(txc_ai != static_cast<std::uint64_t>(-1));
+        GX_ASSERT(!is_animated || bwt_ai != static_cast<std::uint64_t>(-1));
+        GX_ASSERT(!is_animated || bin_ai != static_cast<std::uint64_t>(-1));
 
         GX_ASSERT(-1 != primitive.indices);
         GX_ASSERT(-1 != primitive.material);
@@ -334,8 +334,8 @@ struct DataLoader final {
 
         {
             const auto* const pos_b = &bfs[pos_bv.buffer].data[pos_bv.byteOffset];
-            const std::size_t pos_bi_inc = pos_bv.byteStride > 0 ? pos_bv.byteStride : sizeof(math::Vec3<float>);
-            std::size_t bi = 0;
+            const std::uint64_t pos_bi_inc = pos_bv.byteStride > 0 ? pos_bv.byteStride : sizeof(math::Vec3<float>);
+            std::uint64_t bi = 0;
             for (auto& vertex : vertices) {
                 vertex.position = *reinterpret_cast<const math::Vec3<float>*>(&pos_b[bi]);
                 bi += pos_bi_inc;
@@ -344,8 +344,8 @@ struct DataLoader final {
 
         {
             const auto* const nrm_b = &bfs[nrm_bv.buffer].data[nrm_bv.byteOffset];
-            const std::size_t nrm_bi_inc = nrm_bv.byteStride > 0 ? nrm_bv.byteStride : sizeof(math::Vec3<float>);
-            std::size_t bi = 0;
+            const std::uint64_t nrm_bi_inc = nrm_bv.byteStride > 0 ? nrm_bv.byteStride : sizeof(math::Vec3<float>);
+            std::uint64_t bi = 0;
             for (auto& vertex : vertices) {
                 vertex.normal = *reinterpret_cast<const math::Vec3<float>*>(&nrm_b[bi]);
                 bi += nrm_bi_inc;
@@ -355,8 +355,8 @@ struct DataLoader final {
         if (has_tangent) {
             const auto* const tng_b = &bfs[tng_bv->buffer].data[tng_bv->byteOffset];
             GX_ASSERT_D(tng_bv->byteStride <= 0 || tng_bv->byteStride >= sizeof(math::Vec4<float>));
-            const std::size_t tng_bi_inc = tng_bv->byteStride > 0 ? tng_bv->byteStride : sizeof(math::Vec4<float>);
-            std::size_t bi = 0;
+            const std::uint64_t tng_bi_inc = tng_bv->byteStride > 0 ? tng_bv->byteStride : sizeof(math::Vec4<float>);
+            std::uint64_t bi = 0;
             for (auto& vertex : vertices) {
                 vertex.tangent = *reinterpret_cast<const math::Vec4<float>*>(&tng_b[bi]);
                 bi += tng_bi_inc;
@@ -365,8 +365,8 @@ struct DataLoader final {
 
         {
             const auto* const txc_b = &bfs[txc_bv.buffer].data[txc_bv.byteOffset];
-            const std::size_t txc_bi_inc = txc_bv.byteStride > 0 ? txc_bv.byteStride : sizeof(math::Vec2<float>);
-            std::size_t bi = 0;
+            const std::uint64_t txc_bi_inc = txc_bv.byteStride > 0 ? txc_bv.byteStride : sizeof(math::Vec2<float>);
+            std::uint64_t bi = 0;
             for (auto& vertex : vertices) {
                 vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&txc_b[bi]);
                 vertex.uv.y = 1.0f - vertex.uv.y;
@@ -377,8 +377,8 @@ struct DataLoader final {
         if (is_animated) {
             {
                 const auto* const bwt_b = &bfs[bwt_bv.buffer].data[bwt_bv.byteOffset];
-                const std::size_t bwt_bi_inc = bwt_bv.byteStride > 0 ? bwt_bv.byteStride : sizeof(math::Vec4<float>);
-                std::size_t bi = 0;
+                const std::uint64_t bwt_bi_inc = bwt_bv.byteStride > 0 ? bwt_bv.byteStride : sizeof(math::Vec4<float>);
+                std::uint64_t bi = 0;
                 for (auto& vertex : animated_vertices) {
                     vertex.bone_weights = *reinterpret_cast<const math::Vec4<float>*>(&bwt_b[bi]);
                     bi += bwt_bi_inc;
@@ -387,7 +387,7 @@ struct DataLoader final {
 
             {
                 const auto* const bin_b = &bfs[bin_bv.buffer].data[bin_bv.byteOffset];
-                const auto bin_bi_inc = [&]() -> std::size_t {
+                const auto bin_bi_inc = [&]() -> std::uint64_t {
                     if (bin_bv.byteStride > 0)
                         return bin_bv.byteStride;
                     switch (bin_a.componentType) {
@@ -404,7 +404,7 @@ struct DataLoader final {
                         GX_UNEXPECTED;
                     }
                 }();
-                std::size_t bi = 0;
+                std::uint64_t bi = 0;
                 const auto convert_indices = [&]<typename T>() {
                     auto is = math::Vec4<int>(*reinterpret_cast<const math::Vec4<T>*>(&bin_b[bi]));
                     is.x = bone_index_map[is.x];
@@ -457,7 +457,7 @@ struct DataLoader final {
         }
 
         const auto* const ids_b = &bfs[ids_bv.buffer].data[ids_bv.byteOffset];
-        const std::size_t ids_bi_inc = [&]() {
+        const std::uint64_t ids_bi_inc = [&]() {
             if (ids_bv.byteStride > 0)
                 return ids_bv.byteStride;
             switch (ids_a.componentType) {
@@ -474,7 +474,7 @@ struct DataLoader final {
                 GX_UNEXPECTED;
             }
         }();
-        std::size_t bi = 0;
+        std::uint64_t bi = 0;
         switch (ids_a.componentType) {
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
         case TINYGLTF_COMPONENT_TYPE_INT:
@@ -505,7 +505,7 @@ struct DataLoader final {
             calculate_tangents(vertices, indices);
         }
 
-        for (std::size_t vi = 0; vi < animated_vertices.size(); ++vi) {
+        for (std::uint64_t vi = 0; vi < animated_vertices.size(); ++vi) {
             animated_vertices[vi].base = vertices[vi];
         }
 
@@ -562,7 +562,7 @@ struct DataLoader final {
         return false;
     }
 
-    void apply_transform(const std::size_t node_index, physics::Transformation& transform) const
+    void apply_transform(const std::uint64_t node_index, physics::Transformation& transform) const
     {
         apply_transform(data.nodes[node_index], transform);
     }
@@ -669,7 +669,7 @@ struct DataLoader final {
     }
 
     [[nodiscard]] bool process_node_camera(
-        const std::size_t node_index,
+        const std::uint64_t node_index,
         physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& gpu_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
@@ -749,7 +749,7 @@ struct DataLoader final {
     }
 
     [[nodiscard]] bool process_node_light(
-        const std::size_t node_index,
+        const std::uint64_t node_index,
         physics::Transformation* const parent_transform,
         const core::job::EndCaller<>& light_end_callback,
         const core::job::EndCaller<>& entity_end_callback,
@@ -892,7 +892,7 @@ struct DataLoader final {
             const auto entity_builder = e.get_world()->create_shared_builder(
                 std::string(node.name),
                 core::job::EndCaller(entity_end_callback));
-            const auto transform = physics::Transformation::construct(
+            const auto transform = core::ecs::Component::construct<physics::Transformation>(
                 node.name + "-transformation", parent_transform, entity_builder->get_id(), &e);
             entity_builder->get_builder().add_component(transform);
             scene_builder->get_scene().add_empty(entity_builder->get_id());
@@ -953,7 +953,7 @@ struct DataLoader final {
         const tinygltf::Accessor& output,
         const tinygltf::BufferView& output_bv,
         const physics::animation::Interpolation interpolation,
-        const std::size_t output_b_ptr,
+        const std::uint64_t output_b_ptr,
         const std::vector<float>& times)
     {
         keyframes.reserve(input.count);
@@ -963,15 +963,15 @@ struct DataLoader final {
         switch (interpolation) {
         case physics::animation::Interpolation::Gltf2CubicSPLine: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bytes_count);
-            for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
+            for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr;
                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
-                const std::size_t in_ptr = curr_output_ptr;
+                const std::uint64_t in_ptr = curr_output_ptr;
                 const auto in = Value<double>(*reinterpret_cast<const Value<float>*>(in_ptr));
                 curr_output_ptr += sizeof(Value<float>);
-                const std::size_t key_ptr = curr_output_ptr;
+                const std::uint64_t key_ptr = curr_output_ptr;
                 const auto key = Value<double>(*reinterpret_cast<const Value<float>*>(key_ptr));
                 curr_output_ptr += sizeof(Value<float>);
-                const std::size_t out_ptr = curr_output_ptr;
+                const std::uint64_t out_ptr = curr_output_ptr;
                 const auto out = Value<double>(*reinterpret_cast<const Value<float>*>(out_ptr));
                 keyframes.emplace_back(
                     times[data_i],
@@ -986,7 +986,7 @@ struct DataLoader final {
         }
         case physics::animation::Interpolation::Linear: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
-            for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
+            for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr;
                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
                     times[data_i],
@@ -997,7 +997,7 @@ struct DataLoader final {
         }
         case physics::animation::Interpolation::Step: {
             GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
-            for (std::size_t data_i = 0, curr_output_ptr = output_b_ptr;
+            for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr;
                 data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
                 keyframes.emplace_back(
                     times[data_i],
@@ -1023,7 +1023,7 @@ struct DataLoader final {
         GX_LOG_F("Unexpected interpolation " << interpolation);
     }
 
-    void initialise_material(const std::size_t index)
+    void initialise_material(const std::uint64_t index)
     {
         tinygltf::Material& mat = data.materials[index];
         material::Pbr& gx_mat = *gx_materials[index];
@@ -1061,7 +1061,7 @@ struct DataLoader final {
         gx_mat.get_normal_metallic_factor().w = static_cast<float>(mat.pbrMetallicRoughness.metallicFactor);
     }
 
-    void load_material(const std::size_t index, core::job::EndCaller<>&& end_callback)
+    void load_material(const std::uint64_t index, core::job::EndCaller<>&& end_callback)
     {
         gx_materials.resize(data.materials.size());
         e.get_material_manager()->get_pbr(
@@ -1075,7 +1075,7 @@ struct DataLoader final {
 
     void load_materials(const core::job::EndCaller<>& end_callback)
     {
-        for (std::size_t material_id = 0; material_id < data.materials.size(); ++material_id) {
+        for (std::uint64_t material_id = 0; material_id < data.materials.size(); ++material_id) {
             load_material(material_id, core::job::EndCaller(end_callback));
         }
     }
@@ -1106,7 +1106,7 @@ struct DataLoader final {
                 GX_ASSERT_D(0 == output_bv.byteStride);
                 std::memcpy(times.data(), &data.buffers[input_bv.buffer].data[input_bv.byteOffset], input_byte_length);
                 const std::vector<std::uint8_t>& output_b = data.buffers[output_bv.buffer].data;
-                const auto output_b_ptr = reinterpret_cast<std::size_t>(&output_b[output_bv.byteOffset]);
+                const auto output_b_ptr = reinterpret_cast<std::uint64_t>(&output_b[output_bv.byteOffset]);
                 if ("translation" == chn.target_path) {
                     GX_ASSERT(output.type == TINYGLTF_TYPE_VEC3);
                     read_output(bone_channels.translation_samples, input, output, output_bv, interpolation, output_b_ptr, times);
@@ -1132,7 +1132,7 @@ struct DataLoader final {
 
         const core::job::EndCaller<> meshes_ready([this, s = weak_self.lock(), scenes_end_callback, entity_end_callback] {
             const core::job::EndCaller<> gpu_end_callback([s = scenes_end_callback] { (void)s; });
-            for (std::size_t index = 0; index < data.scenes.size(); ++index) {
+            for (std::uint64_t index = 0; index < data.scenes.size(); ++index) {
                 const tinygltf::Scene& scn = data.scenes[index];
                 GX_LOG_D("Loading scene: " << scn.name);
                 auto scene_builder = e.get_scene_manager()->build(scn.name, 0.0, core::job::EndCaller(entity_end_callback));

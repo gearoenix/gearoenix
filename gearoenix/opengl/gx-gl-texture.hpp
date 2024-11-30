@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_TEXTURE_HPP
-#define GEAROENIX_GL_TEXTURE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/texture/gx-rnd-txt-manager.hpp"
@@ -79,5 +78,4 @@ private:
 };
 }
 
-#endif
 #endif

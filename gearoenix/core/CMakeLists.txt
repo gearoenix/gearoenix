@@ -78,7 +78,7 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-range.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-types.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-type-index-set.hpp
         PARENT_SCOPE)
 
 SET(GX_ENGINE_CORE_TEST_SRC

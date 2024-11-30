@@ -10,6 +10,7 @@
 gearoenix::render::camera::Manager::Manager(engine::Engine& e)
     : e(e)
 {
+    core::ecs::Component::register_type<Camera>();
 }
 
 void gearoenix::render::camera::Manager::update()

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_TARGET_HPP
-#define GEAROENIX_GL_TARGET_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/job/gx-cr-job-end-caller.hpp"
@@ -17,8 +16,8 @@ struct Engine;
 
 struct Target final : render::texture::Target {
     struct GlAttachment final {
-        static constexpr std::size_t VARIANT_2D_INDEX = 0;
-        static constexpr std::size_t VARIANT_CUBE_INDEX = 1;
+        constexpr static std::uint32_t VARIANT_2D_INDEX = 0;
+        constexpr static std::uint32_t VARIANT_CUBE_INDEX = 1;
 
         std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
         uint texture_object = static_cast<uint>(-1);
@@ -44,5 +43,4 @@ public:
 };
 }
 
-#endif
 #endif

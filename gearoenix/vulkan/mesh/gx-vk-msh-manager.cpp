@@ -20,15 +20,15 @@
 #include "gx-vk-msh-mesh.hpp"
 #include <memory>
 
-constexpr static const std::size_t default_init_mesh_descriptor_count = 200;
-constexpr static const std::size_t default_init_material_descriptor_count = 100;
-constexpr static const std::size_t default_init_2d_texture_descriptor_count = 500;
-constexpr static const std::size_t default_init_cube_texture_descriptor_count = 10;
+constexpr static const std::uint64_t default_init_mesh_descriptor_count = 200;
+constexpr static const std::uint64_t default_init_material_descriptor_count = 100;
+constexpr static const std::uint64_t default_init_2d_texture_descriptor_count = 500;
+constexpr static const std::uint64_t default_init_cube_texture_descriptor_count = 10;
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     std::string&& name,
-    const std::size_t vertices_count,
-    const std::size_t indices_count,
+    const std::uint64_t vertices_count,
+    const std::uint64_t indices_count,
     core::job::EndCaller&& c,
     std::shared_ptr<Mesh>&& result)
 {
@@ -74,7 +74,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
-    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.accelerationStructureSize)));
+    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(bsz_info.accelerationStructureSize)));
     GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff);
 
     VkAccelerationStructureCreateInfoKHR asc_info;
@@ -90,7 +90,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
 
     bge_info.dstAccelerationStructure = result->vulkan_data;
 
-    auto scratch_buf = vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(bsz_info.buildScratchSize));
+    auto scratch_buf = vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(bsz_info.buildScratchSize));
     GX_CHECK_NOT_EQUAL_D(nullptr, scratch_buf);
     const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
@@ -136,7 +136,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 
     const auto compact_size = query_pool->get_acceleration_structure_compacted_size();
 
-    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::size_t>(compact_size)));
+    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(compact_size)));
     GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff);
 
     VkAccelerationStructureCreateInfoKHR asc_info;

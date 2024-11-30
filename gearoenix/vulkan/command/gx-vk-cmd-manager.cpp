@@ -9,7 +9,7 @@ gearoenix::vulkan::command::Manager::Manager(const engine::Engine& e)
 
 gearoenix::vulkan::command::Manager::~Manager() = default;
 
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type t, const std::optional<std::size_t> thread_index)
+gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type t, const std::optional<std::uint64_t> thread_index)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     Pool* pool;

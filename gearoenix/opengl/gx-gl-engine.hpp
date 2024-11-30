@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_ENGINE_HPP
-#define GEAROENIX_GL_ENGINE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/engine/gx-rnd-eng-engine.hpp"
@@ -29,5 +28,4 @@ public:
 };
 }
 
-#endif
 #endif

@@ -1,14 +1,17 @@
-#ifndef GEAROENIX_CORE_ECS_COMPONENT_HPP
-#define GEAROENIX_CORE_ECS_COMPONENT_HPP
+#pragma once
+#include "../allocator/gx-cr-alc-shared-array.hpp"
+#include "../gx-cr-type-index-set.hpp"
 #include "../macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-types.hpp"
+#include <any>
+#include <array>
 #include <boost/container/flat_map.hpp>
 #include <boost/core/demangle.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
-#include <typeindex>
 
 namespace gearoenix::render::engine {
 struct Engine;
@@ -17,24 +20,50 @@ struct Engine;
 namespace gearoenix::core::ecs {
 struct World;
 struct Component {
-    typedef boost::container::flat_map<std::type_index, std::string> HierarchyTypes;
+    typedef TypeIndexSet<2 /*increase this based on your project needs*/> TypeIndexSet;
+    typedef TypeIndexSet::element_t TypeIndex;
 
-    GX_GET_REFC_PRT(std::type_index, final_type_index);
+    struct TypeInfo final {
+        GX_GET_CREF_PRV(std::string, name);
+        GX_GET_CREF_PRV(std::any, allocator);
+        GX_GET_CREF_PRV(TypeIndexSet, all_parents);
+        GX_GET_CREF_PRV(TypeIndexSet, immediate_parents);
+        GX_GET_VAL_PRV(bool, is_final, false);
+
+    public:
+        TypeInfo() = default;
+
+        TypeInfo(
+            std::string&& name,
+            std::any&& allocator,
+            const TypeIndexSet& all_parents,
+            const TypeIndexSet& immediate_parents,
+            const bool is_final)
+            : name(std::move(name))
+            , allocator(std::move(allocator))
+            , all_parents(all_parents)
+            , immediate_parents(immediate_parents)
+            , is_final(is_final)
+        {
+        }
+    };
+
+    typedef std::array<TypeInfo, TypeIndexSet::bits_count> TypesInfos;
+
+    GX_GET_REFC_PRT(TypeIndex, final_type_index);
     GX_GET_REFC_PRT(std::string, name);
-    GX_GETSET_VAL_PRV(bool, enabled, true);
-    GX_GET_CREF_PRV(std::weak_ptr<Component>, component_self);
+    GX_GETSET_VAL_PRT(bool, enabled, true);
+    GX_GET_CREF_PRT(std::weak_ptr<Component>, component_self);
     GX_GETSET_VAL_PRT(entity_id_t, entity_id, INVALID_ENTITY_ID);
 
-    static boost::container::flat_map<std::type_index, std::string> type_index_to_name;
-    static boost::container::flat_map<std::string, std::type_index> type_name_to_index;
+private:
+    static TypesInfos types_infos;
+    static boost::container::flat_map<std::string, TypeIndex> type_name_to_index;
 
-    static void register_type(std::type_index t, std::string name);
+    static void register_type(TypeIndex t, TypeInfo&&);
 
 public:
-    Component(std::type_index final_type_index, std::string&& name, entity_id_t entity_id);
-    [[nodiscard]] virtual const HierarchyTypes& get_hierarchy_types() const = 0;
-    virtual void set_component_self(const std::shared_ptr<Component>&);
-
+    Component(TypeIndex final_type_index, std::string&& name, entity_id_t entity_id);
     virtual ~Component() = default;
     Component(Component&&) = delete;
     Component(const Component&) = delete;
@@ -42,6 +71,9 @@ public:
     Component& operator=(const Component&) = delete;
 
     virtual void show_debug_gui(const render::engine::Engine&);
+
+    template <typename T>
+    using clean_t = not_t<std::remove_pointer_t<std::remove_cvref_t<T>>>;
 
     template <typename T>
     constexpr static void type_check()
@@ -65,7 +97,7 @@ public:
         ((type_check<T>()), ...);
     }
 
-    template <typename Tuple, std::size_t... I>
+    template <typename Tuple, std::uint32_t... I>
     constexpr static void tuple_types_check(std::index_sequence<I...> const&)
     {
         ((type_check<std::tuple_element_t<I, Tuple>>()), ...);
@@ -79,44 +111,59 @@ public:
     }
 
     template <typename T>
-    static std::type_index create_type_index()
+    constexpr static TypeIndex create_type_index()
     {
-        return std::type_index(typeid(not_t<T>));
+        return clean_t<T>::TYPE_INDEX;
     }
 
     template <typename T>
-    static std::type_index create_this_type_index(const T* const)
+    constexpr static TypeIndex create_this_type_index(const T* const)
     {
-        using DT = std::remove_pointer_t<std::remove_reference_t<std::remove_const_t<T>>>;
+        using DT = clean_t<T>;
         type_check<DT>();
-        return std::type_index(typeid(not_t<DT>));
+        return create_type_index<DT>();
     }
 
     template <typename T>
     static std::string create_this_type_name(const T* const)
     {
-        using DT = std::remove_pointer_t<std::remove_reference_t<std::remove_const_t<T>>>;
+        using DT = clean_t<T>;
         type_check<DT>();
-        return boost::core::demangle(typeid(not_t<DT>).name());
+        return boost::core::demangle(typeid(DT).name());
     }
 
-    template <typename... Types, typename T>
-    [[nodiscard]] static HierarchyTypes generate_hierarchy_types(const T* const ptr)
+    template <typename T, typename ComponentDerivedType = T /*specify it for those types that don't have any root in component*/>
+    static void register_type()
     {
-        static_assert((std::is_base_of_v<Types, T> && ...));
-        static_assert((!std::is_same_v<Types, T> && ...));
-        static_assert((!std::is_same_v<Types, Component> && ...));
-        register_type(create_this_type_index(ptr), create_this_type_name(ptr));
-        (register_type(std::type_index(typeid(Types)), typeid(Types).name()), ...);
-        return {
-            { create_this_type_index(ptr), create_this_type_name(ptr) },
-            { std::type_index(typeid(Types)), typeid(Types).name() }...,
-        };
+        static_assert(std::is_base_of_v<Component, ComponentDerivedType>);
+        static_assert(std::is_base_of_v<T, ComponentDerivedType>);
+        static_assert(!std::is_same_v<T, Component>);
+        static_assert(create_type_index<T>() < TypeIndexSet::bits_count);
+        register_type(
+            create_type_index<T>(),
+            { boost::core::demangle(typeid(clean_t<T>).name()),
+                std::conditional_t<std::is_final_v<T>, allocator::SharedArray<T, T::MAX_COUNT>, allocator::SharedArray<char, 0>>::construct(),
+                T::ALL_PARENT_TYPE_INDICES,
+                T::IMMEDIATE_PARENT_TYPE_INDICES,
+                std::is_final_v<T> });
     }
 
-    static const boost::container::flat_map<std::type_index, std::string>& get_type_index_to_name() { return type_index_to_name; }
+    static const TypesInfos& get_types_infos() { return types_infos; }
+    static const TypeInfo& get_type_info(const TypeIndex ti) { return types_infos[ti]; }
+    template <typename T>
+    static const TypeInfo& get_type_info() { return types_infos[create_type_index<T>()]; }
 
-    static const boost::container::flat_map<std::string, std::type_index>& get_type_name_to_index() { return type_name_to_index; }
+    static const boost::container::flat_map<std::string, TypeIndex>& get_type_name_to_index() { return type_name_to_index; }
+    static std::optional<TypeIndex> get_type_index(const std::string& type_name);
+
+    template <typename T, typename... Args>
+    [[nodiscard]] static std::shared_ptr<T> construct(Args&&... args)
+    {
+        static_assert(std::is_base_of_v<Component, T>);
+        static_assert(std::is_final_v<T>);
+        auto ptr = std::any_cast<const std::shared_ptr<allocator::SharedArray<T, T::MAX_COUNT>>&>(get_type_info<T>().get_allocator())->make_shared(std::forward<Args>(args)...);
+        static_cast<Component*>(ptr.get())->component_self = ptr;
+        return ptr;
+    }
 };
 }
-#endif

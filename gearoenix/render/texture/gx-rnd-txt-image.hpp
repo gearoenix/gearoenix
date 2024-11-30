@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_IMAGE_HPP
-#define GEAROENIX_RENDER_TEXTURE_IMAGE_HPP
+#pragma once
 #include <cstdint>
 #include <optional>
 #include <vector>
@@ -24,16 +23,16 @@ public:
         std::uint32_t& img_height);
     static void decode(
         const unsigned char* formatted_data,
-        std::size_t formatted_size,
-        std::optional<std::size_t> requested_channels,
+        std::uint32_t formatted_size,
+        std::optional<std::uint32_t> requested_channels,
         std::vector<unsigned char>& decoded_data,
         std::uint32_t& img_width,
         std::uint32_t& img_height,
         std::uint32_t& img_channels);
     static void decode(
         const unsigned char* formatted_data,
-        std::size_t formatted_size,
-        std::optional<std::size_t> requested_channels,
+        std::uint32_t formatted_size,
+        std::optional<std::uint32_t> requested_channels,
         std::vector<float>& decoded_data,
         std::uint32_t& img_width,
         std::uint32_t& img_height,
@@ -52,4 +51,3 @@ public:
         std::uint32_t components_count);
 };
 }
-#endif

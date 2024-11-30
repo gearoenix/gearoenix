@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_MATRIX_2D_HPP
-#define GEAROENIX_MATH_MATRIX_2D_HPP
+#pragma once
 #include "gx-math-vector-2d.hpp"
 
 namespace gearoenix::math {
@@ -51,4 +50,3 @@ struct Mat2x2 {
     }
 };
 }
-#endif

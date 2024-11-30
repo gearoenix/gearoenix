@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SAMPLER_MANAGER_HPP
-#define GEAROENIX_VULKAN_SAMPLER_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -25,5 +24,4 @@ public:
     [[nodiscard]] const std::shared_ptr<Sampler>& get(const render::texture::SamplerInfo& info);
 };
 }
-#endif
 #endif

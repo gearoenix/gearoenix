@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_MESH_HPP
-#define GEAROENIX_GL_SUBMISSION_MESH_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../math/gx-math-aabb.hpp"
@@ -29,5 +28,4 @@ struct Mesh final {
     explicit Mesh(const gl::Mesh& m);
 };
 }
-#endif
 #endif

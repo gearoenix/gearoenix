@@ -1,7 +1,5 @@
-#ifndef GEAROENIX_CORE_SYNC_CHANNEL_HPP
-#define GEAROENIX_CORE_SYNC_CHANNEL_HPP
+#pragma once
 #include "../gx-cr-build-configuration.hpp"
-#include "../gx-cr-static.hpp"
 #include "gx-cr-sync-semaphore.hpp"
 #include <queue>
 
@@ -19,7 +17,7 @@ public:
     Channel(const Channel&) = delete;
     void operator=(const Channel&) = delete;
 
-    [[nodiscard]] std::size_t get_pending() const
+    [[nodiscard]] std::uint32_t get_pending() const
     {
         return data.size();
     }
@@ -41,4 +39,3 @@ public:
     }
 };
 }
-#endif

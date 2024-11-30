@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_MESH_HPP
-#define GEAROENIX_METAL_MESH_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../render/mesh/gx-rnd-msh-manager.hpp"
@@ -32,5 +31,4 @@ struct MeshManager final : render::mesh::Manager {
 };
 }
 
-#endif
 #endif

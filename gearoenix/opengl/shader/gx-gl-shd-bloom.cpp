@@ -1,18 +1,21 @@
 #include "gx-gl-shd-bloom.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-static constexpr const char* const vertex_shader_src = "#version 300 es\n"
-                                                       "\n"
-                                                       "precision highp float;\n"
-                                                       "\n"
-                                                       "layout(location = 0) in vec2 position;\n"
-                                                       "\n"
-                                                       "out vec2 out_uv;\n"
-                                                       "\n"
-                                                       "void main() {\n"
-                                                       "    gl_Position = vec4(position, 0.0, 1.0);\n"
-                                                       "    out_uv = position * 0.5 + 0.5;\n"
-                                                       "}";
+namespace {
+constexpr auto vertex_shader_src = "\
+#version 300 es\n\
+\n\
+precision highp float;\n\
+\n\
+layout(location = 0) in vec2 position;\n\
+\n\
+out vec2 out_uv;\n\
+\n\
+void main() {\n\
+    gl_Position = vec4(position, 0.0, 1.0);\n\
+    out_uv = position * 0.5 + 0.5;\n\
+}";
+}
 
 gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e)
     : Shader(e)
@@ -92,7 +95,7 @@ gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e)
     std::stringstream fs;
     fs << "#version 300 es\n";
     fs << "\n";
-    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "#define gx_pi 3.141592653589793238\n";
     fs << "\n";
     fs << "precision highp float;\n";
     fs << "precision highp int;\n";
@@ -145,7 +148,7 @@ gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e)
     std::stringstream fs;
     fs << "#version 300 es\n";
     fs << "\n";
-    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "#define gx_pi 3.141592653589793238\n";
     fs << "\n";
     fs << "precision highp float;\n";
     fs << "precision highp int;\n";
@@ -194,7 +197,7 @@ gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e)
     std::stringstream fs;
     fs << "#version 300 es\n";
     fs << "\n";
-    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "#define gx_pi 3.141592653589793238\n";
     fs << "\n";
     fs << "precision highp float;\n";
     fs << "precision highp int;\n";

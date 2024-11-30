@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_INFO_HPP
-#define GEAROENIX_RENDER_TEXTURE_INFO_HPP
+#pragma once
 #include "gx-rnd-txt-format.hpp"
 #include "gx-rnd-txt-sampler.hpp"
 #include "gx-rnd-txt-type.hpp"
@@ -11,7 +10,7 @@ struct Stream;
 
 namespace gearoenix::render::texture {
 struct TextureInfo final {
-    GX_GET_VAL_PRV(std::size_t, hash, 0);
+    GX_GET_VAL_PRV(std::uint64_t, hash, 0);
     GX_GET_VAL_PRV(TextureFormat, format, TextureFormat::Unknown);
     GX_GET_CREF_PRV(SamplerInfo, sampler_info);
     GX_GET_VAL_PRV(std::uint32_t, width, 0);
@@ -44,12 +43,10 @@ public:
 };
 
 struct TextureInfoHasher final {
-    [[nodiscard]] inline std::size_t operator()(const TextureInfo& i) const { return i.get_hash(); }
+    [[nodiscard]] std::uint64_t operator()(const TextureInfo& i) const { return i.get_hash(); }
 };
 }
 
 namespace std {
 [[nodiscard]] std::string to_string(const gearoenix::render::texture::TextureInfo& info);
 }
-
-#endif

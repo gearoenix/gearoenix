@@ -1,7 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_BODY_BODY_HPP
-#define GEAROENIX_PHYSICS_BODY_BODY_HPP
-#include "../../core/asset/gx-cr-asset.hpp"
-#include "../../core/gx-cr-static.hpp"
+#pragma once
 #include "gx-phs-bd-type.hpp"
 #include <memory>
 
@@ -19,4 +16,3 @@ public:
     ~Body() override;
 };
 }
-#endif

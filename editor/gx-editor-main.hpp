@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_MAIN_HPP
-#define GEAROENIX_EDITOR_MAIN_HPP
+#pragma once
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <memory>
 
@@ -23,5 +22,3 @@ public:
     ~Application() override;
 };
 }
-
-#endif

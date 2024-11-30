@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_WIN32_APPLICATION_HPP
-#define GEAROENIX_PLATFORM_WIN32_APPLICATION_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "../gx-plt-application.hpp"
@@ -27,5 +26,4 @@ public:
     void run(core::Application* = nullptr);
 };
 }
-#endif
 #endif

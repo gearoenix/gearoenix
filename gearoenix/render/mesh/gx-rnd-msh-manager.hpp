@@ -45,7 +45,7 @@ protected:
 public:
     virtual ~Manager();
 
-    void build_icosphere(std::size_t subdivisions, std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
+    void build_icosphere(std::uint64_t subdivisions, std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
     void build_plate(std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
     void build_cube(std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
     void build_inward_cube(std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);

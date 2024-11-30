@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_SDL2_MAIN_ENTRY_HPP
-#define GEAROENIX_PLATFORM_SDL2_MAIN_ENTRY_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include <SDL2/SDL_main.h>
@@ -16,13 +15,11 @@
 #define GX_SDL_MAIN extern "C" SDLMAIN_DECLSPEC int main
 #endif
 
-
-#define GX_MAIN_ENTRY(expr)                     \
-    GX_SDL_MAIN (GX_MAIN_ENTRY_ARGS_DEF) \
-    {                                           \
-        expr;                                   \
-        return 0;                               \
+#define GX_MAIN_ENTRY(expr)             \
+    GX_SDL_MAIN(GX_MAIN_ENTRY_ARGS_DEF) \
+    {                                   \
+        expr;                           \
+        return 0;                       \
     }
 
-#endif
 #endif

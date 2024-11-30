@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_SAMPLE_HPP
-#define GEAROENIX_RENDER_TEXTURE_SAMPLE_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-txt-filter.hpp"
 #include "gx-rnd-txt-wrap.hpp"
@@ -12,7 +11,7 @@ struct Stream;
 
 namespace gearoenix::render::texture {
 struct SamplerInfo final {
-    GX_GET_VAL_PRV(std::size_t, hash, 0);
+    GX_GET_VAL_PRV(std::uint64_t, hash, 0);
     GX_GET_VAL_PRV(Filter, min_filter, Filter::LinearMipmapLinear);
     GX_GET_VAL_PRV(Filter, mag_filter, Filter::Linear);
     GX_GET_VAL_PRV(Wrap, wrap_s, Wrap::Repeat);
@@ -45,11 +44,10 @@ public:
 };
 
 struct SamplerInfoHasher final {
-    [[nodiscard]] inline std::size_t operator()(const SamplerInfo& sampler) const { return sampler.get_hash(); }
+    [[nodiscard]] inline std::uint64_t operator()(const SamplerInfo& sampler) const { return sampler.get_hash(); }
 };
 }
 
 namespace std {
 [[nodiscard]] std::string to_string(const gearoenix::render::texture::SamplerInfo& s);
 }
-#endif

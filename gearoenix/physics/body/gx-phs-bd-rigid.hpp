@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_BODY_RIGID_HPP
-#define GEAROENIX_PHYSICS_BODY_RIGID_HPP
+#pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-phs-bd-body.hpp"
 
@@ -36,4 +35,3 @@ public:
     void apply_time(double delta_time);
 };
 }
-#endif

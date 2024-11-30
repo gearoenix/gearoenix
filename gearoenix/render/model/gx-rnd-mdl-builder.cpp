@@ -20,8 +20,8 @@ gearoenix::render::model::Builder::Builder(
     for (const auto& m : bound_meshes) {
         box.put(m->get_buffer()->get_box());
     }
-    builder.add_component(physics::collider::Aabb3::construct(box, name + "-collider", builder.get_id()));
-    builder.add_component(physics::Transformation::construct(name + "-transformation", parent_transform, builder.get_id(), &e));
+    builder.add_component(core::ecs::Component::construct<physics::collider::Aabb3>(box, name + "-collider", builder.get_id()));
+    builder.add_component(core::ecs::Component::construct<physics::Transformation>(name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 
 gearoenix::render::model::Builder::~Builder() = default;

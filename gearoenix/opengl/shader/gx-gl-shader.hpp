@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SHADER_HPP
-#define GEAROENIX_GL_SHADER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -101,8 +100,8 @@ protected:
 public:
     explicit Shader(Engine& e);
     Shader(const Shader&) = delete;
-    Shader(Shader&&);
-    Shader& operator=(Shader&&);
+    Shader(Shader&&) noexcept;
+    Shader& operator=(Shader&&) noexcept;
     virtual ~Shader();
     /// returns GX_SHADER_UNIFORM_FAILED when uniform not found.
     [[nodiscard]] sint get_uniform_location(const std::string& name) const;
@@ -114,5 +113,4 @@ struct ShaderCombination {
 };
 }
 
-#endif
 #endif

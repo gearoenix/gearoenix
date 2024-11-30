@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_STOP_POINT_HPP
-#define GEAROENIX_CORE_SYNC_STOP_POINT_HPP
+#pragma once
 #include "../gx-cr-build-configuration.hpp"
 #include <memory>
 #include <mutex>
@@ -18,4 +17,3 @@ public:
     void all_reach();
 };
 }
-#endif

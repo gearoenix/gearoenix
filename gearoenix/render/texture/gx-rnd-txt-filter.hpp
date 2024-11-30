@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_FILTER_HPP
-#define GEAROENIX_RENDER_TEXTURE_FILTER_HPP
-#include "../../core/gx-cr-types.hpp"
+#pragma once
+#include <cstdint>
 #include <string>
 
 namespace gearoenix::render::texture {
-enum struct Filter : core::TypeId {
+enum struct Filter : std::uint8_t {
     Cubic = 1,
     CubicMipmapCubic = 2,
     CubicMipmapLinear = 3,
@@ -23,4 +22,3 @@ enum struct Filter : core::TypeId {
 namespace std {
 [[nodiscard]] std::string to_string(gearoenix::render::texture::Filter f);
 }
-#endif

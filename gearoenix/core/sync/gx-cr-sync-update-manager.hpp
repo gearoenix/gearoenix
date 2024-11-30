@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_UPDATE_MANAGER_HPP
-#define GEAROENIX_CORE_SYNC_UPDATE_MANAGER_HPP
+#pragma once
 #include "gx-cr-sync-influence-manager.hpp"
 
 namespace gearoenix::core::sync {
@@ -19,4 +18,3 @@ public:
     void remove(Id id);
 };
 }
-#endif

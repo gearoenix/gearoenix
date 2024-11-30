@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_SDL2_APPLICATION_HPP
-#define GEAROENIX_PLATFORM_SDL2_APPLICATION_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
 #include "../../render/gx-rnd-build-configuration.hpp"
@@ -43,5 +42,4 @@ public:
 #endif
 };
 }
-#endif
 #endif

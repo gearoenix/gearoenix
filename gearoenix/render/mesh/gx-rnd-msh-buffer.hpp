@@ -8,7 +8,7 @@ struct Material;
 
 namespace gearoenix::render::mesh {
 struct Buffer {
-    static constexpr std::size_t MAX_COUNT = 8192;
+    constexpr static std::uint32_t MAX_COUNT = 8192;
 
     GX_GET_REFC_PRT(math::Aabb3<double>, box);
 

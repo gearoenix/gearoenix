@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_QUATERNION_HPP
-#define GEAROENIX_MATH_QUATERNION_HPP
+#pragma once
 #include "gx-math-matrix-4d.hpp"
 #include "gx-math-numeric.hpp"
 #include <algorithm>
@@ -212,7 +211,7 @@ struct Quat final {
 
     [[nodiscard]] Vec3<Element> to_euler_degree() const
     {
-        return to_euler() * (180.0 / GX_PI);
+        return to_euler() * (180.0 / std::numbers::pi);
     }
 
     [[nodiscard]] constexpr static Quat from_euler(const Element x, const Element y, const Element z)
@@ -239,7 +238,7 @@ struct Quat final {
 
     [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles)
     {
-        return from_euler(angles * static_cast<Element>(GX_PI / 180.0));
+        return from_euler(angles * static_cast<Element>(std::numbers::pi / 180.0));
     }
 
     [[nodiscard]] constexpr static Quat from(const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
@@ -301,4 +300,3 @@ struct Quat final {
     }
 };
 }
-#endif

@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_ID_HPP
-#define GEAROENIX_CORE_EVENT_ID_HPP
-
+#pragma once
 #ifdef None
 #undef None
 #endif
@@ -30,4 +28,3 @@ enum struct Id : int {
     None,
 };
 }
-#endif

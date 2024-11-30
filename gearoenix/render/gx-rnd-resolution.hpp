@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_RESOLUTION_HPP
-#define GEAROENIX_RENDER_RESOLUTION_HPP
+#pragma once
 #include <cstdint>
 #include <variant>
 
@@ -27,5 +26,3 @@ typedef std::variant<FixedResolution, ScreenBasedResolution> Resolution;
 
 bool imgui_show(Resolution&);
 }
-
-#endif

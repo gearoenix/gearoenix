@@ -1,12 +1,10 @@
-#ifndef GEAROENIX_PHYSICS_TRANSFORMATION_HPP
-#define GEAROENIX_PHYSICS_TRANSFORMATION_HPP
+#pragma once
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../math/gx-math-matrix-3d.hpp"
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../math/gx-math-quaternion.hpp"
 #include "../render/gizmo/gx-rnd-gzm-drawer.hpp"
 #include <boost/container/flat_set.hpp>
-#include <memory>
 #include <optional>
 
 namespace gearoenix::core::ecs {
@@ -21,7 +19,7 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
         GX_GET_CREF_PRV(math::Quat<double>, quat);
 
         /// This property is for UI purposes only. (it can have other applications as well)
-        /// After receiving its initial value, tt is updated each frame afterward.
+        /// After receiving its initial value, it is updated each frame afterward.
         /// This can negatively impact performance, so use it judiciously.
         /// To avoid unnecessary updates, do not provide an initial value unless strictly required.
         /// For this reason, it is not exposed as a public API.
@@ -44,6 +42,11 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
         }
     };
 
+    constexpr static std::uint32_t MAX_COUNT = 8192;
+    constexpr static TypeIndex TYPE_INDEX = 23;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
@@ -55,8 +58,6 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     GX_GET_CREF_PRV(boost::container::flat_set<Transformation*>, children);
     GX_GET_PTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
-
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
 public:
     Transformation(std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
@@ -108,9 +109,6 @@ public:
     void set_parent(Transformation*);
     void show_debug_gui(const render::engine::Engine&) override;
     void draw_gizmo() override;
-    [[nodiscard]] static std::shared_ptr<Transformation> construct(
-        std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
     static void update(core::ecs::World* world);
 };
 }
-#endif

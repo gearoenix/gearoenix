@@ -1,10 +1,11 @@
 #include "gx-gl-shd-deferred-pbr-transparent.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -20,10 +21,10 @@ void main() {\n\
     out_uv = position* 0.5 + 0.5;\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -65,6 +66,7 @@ void main() {\n\
     frag_colour = vec4(vec3(ssao_value), 1.0) +\n\
         (alb_mtl + pos_dpt + ems_rgh) * 0.00001;\n\
 }\n";
+}
 
 gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent(Engine& e)
     : Shader(e)

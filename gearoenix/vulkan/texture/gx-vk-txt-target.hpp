@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_TEXTURE_TARGET_HPP
-#define GEAROENIX_VULKAN_TEXTURE_TARGET_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/sync/gx-cr-job-end-caller.hpp"
@@ -41,5 +40,4 @@ public:
     [[nodiscard]] Target* clone() const final;
 };
 }
-#endif
 #endif

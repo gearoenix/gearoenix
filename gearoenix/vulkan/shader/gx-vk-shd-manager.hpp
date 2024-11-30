@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SHADER_MANAGER_HPP
-#define GEAROENIX_VULKAN_SHADER_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include <map>
@@ -27,6 +26,4 @@ public:
     [[nodiscard]] std::shared_ptr<Module> get(const std::string& shader_name);
 };
 }
-
-#endif
 #endif

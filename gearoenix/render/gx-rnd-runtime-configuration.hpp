@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_RUNTIME_CONFIGURATION_HPP
-#define GEAROENIX_RENDER_RUNTIME_CONFIGURATION_HPP
+#pragma once
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../core/gx-cr-observed.hpp"
 #include "gx-rnd-build-configuration.hpp"
@@ -12,6 +11,11 @@ struct Engine;
 
 namespace gearoenix::render {
 struct RuntimeConfiguration final : core::ecs::Component {
+    constexpr static std::uint32_t MAX_COUNT = 1;
+    constexpr static TypeIndex TYPE_INDEX = 25;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     GX_GETSET_VAL_PRV(std::uint8_t, shadow_cascades_count, GX_RENDER_MAX_SHADOW_CASCADES);
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_environment_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_ENVIRONMENT_RESOLUTION);
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_irradiance_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_IRRADIANCE_RESOLUTION);
@@ -24,10 +28,8 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GET_VAL_PRV(std::uint8_t, runtime_reflection_radiance_levels, 1);
     GX_GET_REF_PRV(core::Observed<Resolution>, runtime_resolution);
 
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
-    explicit RuntimeConfiguration(core::ecs::entity_id_t);
-
 public:
+    explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;
     RuntimeConfiguration(RuntimeConfiguration&&) = delete;
     [[nodiscard]] static RuntimeConfiguration& get(core::ecs::World* w);
@@ -39,4 +41,3 @@ public:
     void show_debug_gui(const engine::Engine&) override;
 };
 }
-#endif

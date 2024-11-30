@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_TEXTURE_HPP
-#define GEAROENIX_RENDER_TEXTURE_TEXTURE_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
@@ -42,31 +41,29 @@ struct Texture {
 public:
     virtual ~Texture();
     virtual void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const;
-    [[nodiscard]] std::size_t get_mipmaps_count() const;
+    [[nodiscard]] std::uint64_t get_mipmaps_count() const;
 
     [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(
         const float* data,
-        std::size_t in_components_count,
-        std::size_t pixels_count,
-        std::size_t out_components_count);
+        std::uint64_t in_components_count,
+        std::uint64_t pixels_count,
+        std::uint64_t out_components_count);
 
     [[nodiscard]] static std::vector<std::vector<std::uint8_t>> convert_float_pixels(
         const std::vector<std::vector<std::uint8_t>>& data,
-        std::size_t in_components_count,
-        std::size_t out_components_count);
+        std::uint64_t in_components_count,
+        std::uint64_t out_components_count);
 
     [[nodiscard]] static std::vector<std::vector<std::vector<std::uint8_t>>> convert_float_pixels(
         const std::vector<std::vector<std::vector<std::uint8_t>>>& data,
-        std::size_t in_components_count,
-        std::size_t out_components_count);
+        std::uint64_t in_components_count,
+        std::uint64_t out_components_count);
 
-    [[nodiscard]] static std::size_t compute_mipmaps_count(
-        std::size_t img_width,
-        std::size_t img_height);
+    [[nodiscard]] static std::uint64_t compute_mipmaps_count(
+        std::uint64_t img_width,
+        std::uint64_t img_height);
 
-    [[nodiscard]] static std::size_t compute_mipmaps_count(
+    [[nodiscard]] static std::uint64_t compute_mipmaps_count(
         const TextureInfo& info);
 };
 }
-
-#endif

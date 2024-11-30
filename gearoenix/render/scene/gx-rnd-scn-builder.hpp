@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SCENE_BUILDER_HPP
-#define GEAROENIX_RENDER_SCENE_BUILDER_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -71,5 +70,3 @@ public:
     [[nodiscard]] core::ecs::entity_id_t get_id() const;
 };
 }
-
-#endif

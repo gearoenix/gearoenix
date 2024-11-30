@@ -11,7 +11,7 @@ gearoenix::render::mesh::Manager::Manager(engine::Engine& e)
 gearoenix::render::mesh::Manager::~Manager() = default;
 
 void gearoenix::render::mesh::Manager::build_icosphere(
-    const std::size_t subdivisions,
+    const std::uint64_t subdivisions,
     std::shared_ptr<material::Material>&& material,
     core::job::EndCallerShared<Mesh>&& end_callback)
 {
@@ -112,11 +112,11 @@ void gearoenix::render::mesh::Manager::build_icosphere(
     };
     boost::container::flat_map<std::pair<std::uint32_t, std::uint32_t>, std::uint32_t> cached_vertices;
 
-    for (std::size_t subdivision_index = 1; subdivision_index < subdivisions; ++subdivision_index) {
-        const std::size_t last_index_index = indices.size();
+    for (std::uint64_t subdivision_index = 1; subdivision_index < subdivisions; ++subdivision_index) {
+        const std::uint64_t last_index_index = indices.size();
         std::vector<std::uint32_t> new_indices;
         new_indices.reserve(indices.size() << 2);
-        for (std::size_t index_index = 0; index_index < last_index_index;) {
+        for (std::uint64_t index_index = 0; index_index < last_index_index;) {
             const auto insert = [&](const std::uint32_t i1, const std::uint32_t i2) {
                 if (const auto search = cached_vertices.find(std::make_pair(i1, i2)); cached_vertices.end() != search) {
                     return search->second;

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_CONSTRAINT_MANAGER_HPP
-#define GEAROENIX_PHYSICS_CONSTRAINT_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <memory>
@@ -36,4 +35,3 @@ public:
     void update();
 };
 }
-#endif

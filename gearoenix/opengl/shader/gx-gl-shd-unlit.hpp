@@ -1,12 +1,11 @@
-#ifndef GEAROENIX_GL_SHADER_UNLIT_HPP
-#define GEAROENIX_GL_SHADER_UNLIT_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <array>
 #include <optional>
 
 namespace gearoenix::gl::shader {
-struct Unlit final : public Shader {
+struct Unlit final : Shader {
     GX_GL_UNIFORM_MATRIX(mvp, 4, 1);
     GX_GL_UNIFORM_VECTOR(albedo_factor, 4, 1);
     GX_GL_UNIFORM_VECTOR(uv_transform, 4, 1);
@@ -15,11 +14,11 @@ struct Unlit final : public Shader {
 
 public:
     Unlit(Engine& e, bool has_uv_transform, bool has_alpha_cutoff, bool has_albedo_factor, bool has_albedo);
-    ~Unlit() final;
-    void bind(uint& current_shader) const final;
+    ~Unlit() override;
+    void bind(uint& current_shader) const override;
 };
 
-struct UnlitCombination final : public ShaderCombination {
+struct UnlitCombination final : ShaderCombination {
     friend struct Manager;
     Engine& e;
 
@@ -40,17 +39,17 @@ public: /// TODO: support bone-count too
     [[nodiscard]] Unlit& get(const bool uv_transform, const bool alpha_cutoff, const bool albedo_factor, const bool albedo)
     {
         auto& s = combinations
-            [static_cast<std::size_t>(uv_transform)]
-            [static_cast<std::size_t>(alpha_cutoff)]
-            [static_cast<std::size_t>(albedo_factor)]
-            [static_cast<std::size_t>(albedo)];
-        if (s.has_value())
+            [static_cast<std::uint32_t>(uv_transform)]
+            [static_cast<std::uint32_t>(alpha_cutoff)]
+            [static_cast<std::uint32_t>(albedo_factor)]
+            [static_cast<std::uint32_t>(albedo)];
+        if (s.has_value()) {
             return s.value();
+        }
         s.emplace(e, uv_transform, alpha_cutoff, albedo_factor, albedo);
         return s.value();
     }
 };
 }
 
-#endif
 #endif

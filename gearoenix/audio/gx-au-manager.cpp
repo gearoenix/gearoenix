@@ -16,24 +16,24 @@ gearoenix::audio::Manager::Manager(Engine& engine)
 {
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name)
+std::uint64_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name)
 {
     return create_audio(platform::stream::Path::create_asset(asset_path), name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name)
+std::uint64_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name)
 {
     auto stream = platform::stream::Stream::open(asset_path, engine.get_platform_application());
     return create_audio(*stream, name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& asset_stream, const std::string& name)
+std::uint64_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& asset_stream, const std::string& name)
 {
     const auto data = asset_stream.get_file_content();
     return create_audio_ogg(data, name);
 }
 
-std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name)
+std::uint64_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name)
 {
 
 #if !GX_PLATFORM_WEBASSEMBLY
@@ -47,17 +47,17 @@ std::size_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::u
         FMOD_CREATESAMPLE | FMOD_OPENMEMORY | FMOD_LOOP_NORMAL,
         &info,
         &sound);
-    std::lock_guard<std::mutex> _ignore_lg(this_lock);
+    std::lock_guard _ignore_lg(this_lock);
     const auto audio_index = audios.size();
     audios.push_back(Audio { sound, name });
     audio_name_map.emplace(name, audio_index);
-    return audio_index;
+    return static_cast<std::uint64_t>(audio_index);
 #else
     return 0;
 #endif
 }
 
-std::size_t gearoenix::audio::Manager::create_player(const std::string& name, const std::size_t audio_index, const bool is_loop)
+std::uint64_t gearoenix::audio::Manager::create_player(const std::string& name, const std::uint64_t audio_index, const bool is_loop)
 {
 #if !GX_PLATFORM_WEBASSEMBLY
     FMOD::Channel* channel = nullptr;
@@ -65,7 +65,7 @@ std::size_t gearoenix::audio::Manager::create_player(const std::string& name, co
     if (is_loop) {
         GX_AUDIO_FMOD_RESULT_CHECK(channel->setLoopCount(-1));
     }
-    std::lock_guard<std::mutex> _ignore_lg(this_lock);
+    std::lock_guard _ignore_lg(this_lock);
     const auto player_index = players.size();
     players.push_back(Player { name, audio_index, channel, is_loop });
     return player_index;

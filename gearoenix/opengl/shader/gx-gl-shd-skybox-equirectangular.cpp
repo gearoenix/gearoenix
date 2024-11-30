@@ -1,10 +1,11 @@
 #include "gx-gl-shd-skybox-equirectangular.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -23,13 +24,13 @@ void main() {\n\
     gl_Position = vp * vec4((position * camera_position_box_scale.w) + camera_position_box_scale.xyz, 1.0);\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
 #extension GL_OES_texture_float: enable\n\
 #extension GL_OES_texture_float_linear: enable\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -48,6 +49,7 @@ void main() {\n\
     vec3 v = normalize(out_uv);\n\
     frag_colour = texture(albedo, (vec2(atan(v.y, v.x), asin(v.z)) * inv_atan) + 0.5);\n\
 }\n";
+}
 
 gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e)
     : Shader(e)

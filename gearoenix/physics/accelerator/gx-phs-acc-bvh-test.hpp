@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ACCELERATOR_BVH_TEST_HPP
-#define GEAROENIX_PHYSICS_ACCELERATOR_BVH_TEST_HPP
+#pragma once
 #include "../../math/gx-math-frustum.hpp"
 #include "gx-phs-acc-bvh.hpp"
 
@@ -59,5 +58,3 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh)
     });
     BOOST_TEST(count == 7 * 7);
 }
-
-#endif

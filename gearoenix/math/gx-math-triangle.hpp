@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_TRIANGLE_HPP
-#define GEAROENIX_MATH_TRIANGLE_HPP
+#pragma once
 #include "gx-math-vector-3d.hpp"
 
 namespace gearoenix::math {
@@ -59,4 +58,3 @@ public:
     }
 };
 }
-#endif

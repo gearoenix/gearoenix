@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_FRAMEBUFFER_HPP
-#define GEAROENIX_VULKAN_FRAMEBUFFER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -28,5 +27,4 @@ public:
     Framebuffer& operator=(Framebuffer&&) = delete;
 };
 }
-#endif
 #endif

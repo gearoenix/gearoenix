@@ -136,7 +136,7 @@ void gearoenix::gl::material::Pbr::forward_render(
         shader.set_shadow_caster_directional_light_direction_data(model.shadow_caster_directional_lights_direction.data());
         shader.set_shadow_caster_directional_light_colour_data(model.shadow_caster_directional_lights_colour.data());
 
-        for (std::size_t ti = 0; ti < model.shadow_caster_directional_lights_count; ++ti) {
+        for (std::uint32_t ti = 0; ti < model.shadow_caster_directional_lights_count; ++ti) {
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_shadow_caster_directional_light_shadow_map_indices()[ti]));
             glBindTexture(GL_TEXTURE_2D, model.shadow_caster_directional_lights_shadow_map_texture[ti]);
         }

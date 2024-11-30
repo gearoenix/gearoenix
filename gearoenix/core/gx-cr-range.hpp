@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_CORE_RANGE_HPP
-#define GEAROENIX_CORE_RANGE_HPP
-
+#pragma once
 #include <cstddef>
 #include <iterator>
 #include <utility>
@@ -11,14 +9,14 @@ struct PtrRange final {
 private:
     T* const ptr;
     T* const end_ptr;
-    const std::size_t count, jump;
+    const std::uint32_t count, jump;
 
 public:
     struct Iterator final {
     private:
         T* ptr = nullptr;
         T* end_ptr = nullptr;
-        std::size_t jump = 0;
+        std::uint32_t jump = 0;
 
     public:
         typedef std::ptrdiff_t difference_type;
@@ -28,7 +26,7 @@ public:
         typedef std::forward_iterator_tag iterator_category;
 
         constexpr Iterator() = default;
-        constexpr Iterator(T* ptr, std::size_t jump, T* end_ptr);
+        constexpr Iterator(T* ptr, std::uint32_t jump, T* end_ptr);
         ~Iterator() = default;
         constexpr Iterator(const Iterator&);
         constexpr Iterator& operator=(const Iterator&);
@@ -46,7 +44,7 @@ public:
         [[nodiscard]] constexpr O* cast();
     };
 
-    constexpr PtrRange(T* ptr, std::size_t count, std::size_t jump);
+    constexpr PtrRange(T* ptr, std::uint32_t count, std::uint32_t jump);
 
     [[nodiscard]] constexpr Iterator begin();
     [[nodiscard]] constexpr Iterator end();
@@ -54,7 +52,7 @@ public:
 }
 
 template <typename T>
-constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(T* const ptr, const std::size_t jump, T* const end_ptr)
+constexpr gearoenix::core::PtrRange<T>::Iterator::Iterator(T* const ptr, const std::uint32_t jump, T* const end_ptr)
     : ptr(ptr)
     , jump(jump)
     , end_ptr(end_ptr)
@@ -143,7 +141,7 @@ constexpr O* gearoenix::core::PtrRange<T>::Iterator::cast()
 }
 
 template <typename T>
-constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::size_t count, const std::size_t jump)
+constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::uint32_t count, const std::uint32_t jump)
     : ptr(ptr)
     , count(count)
     , jump(jump)
@@ -162,5 +160,3 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRa
 {
     return Iterator(end_ptr, jump, end_ptr);
 }
-
-#endif

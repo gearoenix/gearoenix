@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_MACOS_APP_DELEGATE_HPP
-#define GEAROENIX_PLATFORM_MACOS_APP_DELEGATE_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_MACOS
 #include "../gx-plt-runtime-configuration.hpp"
@@ -17,5 +16,4 @@ struct Application;
 @property (readonly, nonnull) GearoenixPlatformViewController* view_controller;
 @end
 
-#endif
 #endif

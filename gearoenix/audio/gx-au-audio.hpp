@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_AUDIO_AUDIO_HPP
-#define GEAROENIX_AUDIO_AUDIO_HPP
+#pragma once
 #include <string>
 
 namespace FMOD {
@@ -12,4 +11,3 @@ struct Audio final {
     const std::string name;
 };
 }
-#endif

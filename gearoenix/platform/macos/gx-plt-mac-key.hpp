@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_MACOS_KEY_HPP
-#define GEAROENIX_PLATFORM_MACOS_KEY_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_MACOS
 #import "../gx-plt-key.hpp"
@@ -10,5 +9,4 @@ namespace gearoenix::platform {
 
 }
 
-#endif
 #endif

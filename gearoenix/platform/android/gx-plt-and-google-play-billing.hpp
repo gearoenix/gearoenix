@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_ANDROID_GOOGLE_PLAY_BILLING_HPP
-#define GEAROENIX_PLATFORM_ANDROID_GOOGLE_PLAY_BILLING_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include <jni.h>
@@ -18,5 +17,4 @@ public:
 };
 }
 
-#endif
 #endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_UI_MENU_ENTITY_HPP
-#define GEAROENIX_EDITOR_UI_MENU_ENTITY_HPP
+#pragma once
 #include <memory>
 #include <string>
 
@@ -28,5 +27,3 @@ public:
     void update();
 };
 }
-
-#endif

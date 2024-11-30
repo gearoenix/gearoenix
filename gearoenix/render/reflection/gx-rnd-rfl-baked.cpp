@@ -4,7 +4,7 @@
 
 gearoenix::render::reflection::Baked::Baked(
     engine::Engine& e,
-    const std::type_index final_component_type_index,
+    const TypeIndex final_component_type_index,
     std::shared_ptr<texture::TextureCube>&& irradiance,
     std::shared_ptr<texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box,

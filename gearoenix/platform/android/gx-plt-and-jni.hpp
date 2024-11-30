@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_ANDROID_JNI_HPP
-#define GEAROENIX_PLATFORM_ANDROID_JNI_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include <jni.h>
@@ -15,5 +14,4 @@ struct JniUtility final {
 };
 }
 
-#endif
 #endif

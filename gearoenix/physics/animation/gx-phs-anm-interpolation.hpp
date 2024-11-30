@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ANIMATION_INTERPOLATION_HPP
-#define GEAROENIX_PHYSICS_ANIMATION_INTERPOLATION_HPP
+#pragma once
 #include "gx-phs-anm-keyframe.hpp"
 
 namespace gearoenix::physics::animation {
@@ -53,5 +52,3 @@ template <typename Value, typename T>
     }
 }
 }
-
-#endif

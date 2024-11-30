@@ -1,15 +1,13 @@
-#ifndef GEAROENIX_MATH_BEZIER_CURVE_HPP
-#define GEAROENIX_MATH_BEZIER_CURVE_HPP
+#pragma once
 #include "gx-math-vector-2d.hpp"
 #include <vector>
 
 namespace gearoenix::math {
-struct CubicBezierCurve2D {
-public:
+struct CubicBezierCurve2D final {
     struct Point {
-        math::Vec2<double> position;
-        math::Vec2<double> in;
-        math::Vec2<double> out;
+        Vec2<double> position;
+        Vec2<double> in;
+        Vec2<double> out;
     };
 
 private:
@@ -25,4 +23,3 @@ public:
     void render(std::uint32_t* pixels, int img_width, int img_height, std::uint32_t color = 0XFFFFFFFF);
 };
 }
-#endif

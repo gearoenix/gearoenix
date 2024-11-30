@@ -85,8 +85,8 @@ gearoenix::vulkan::device::Logical::Logical(const Physical& p)
     queue_index_set.insert(physical_device.get_transfer_queue_node_index());
     queue_index_set.insert(physical_device.get_compute_queue_node_index());
     queue_index_set.insert(physical_device.get_present_queue_node_index());
-    std::vector<VkDeviceQueueCreateInfo> queue_create_infos(static_cast<std::size_t>(queue_index_set.size()));
-    std::size_t queue_create_infos_index = 0;
+    std::vector<VkDeviceQueueCreateInfo> queue_create_infos(static_cast<std::uint64_t>(queue_index_set.size()));
+    std::uint64_t queue_create_infos_index = 0;
     for (auto q : queue_index_set) {
         if (q == UINT32_MAX)
             continue;

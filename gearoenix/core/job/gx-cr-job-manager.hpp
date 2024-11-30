@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_JOB_MANAGER_HPP
-#define GEAROENIX_CORE_JOB_MANAGER_HPP
+#pragma once
 #include <functional>
 #include <optional>
 #include <thread>
@@ -27,4 +26,3 @@ void execute_current_thread_jobs();
 
 void terminate();
 }
-#endif

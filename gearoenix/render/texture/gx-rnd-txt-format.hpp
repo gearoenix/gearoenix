@@ -1,11 +1,9 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_FORMAT_HPP
-#define GEAROENIX_RENDER_TEXTURE_FORMAT_HPP
-#include "../../core/gx-cr-types.hpp"
-#include <cstdlib>
+#pragma once
+#include <cstdint>
 #include <string>
 
 namespace gearoenix::render::texture {
-enum struct TextureFormat : core::TypeId {
+enum struct TextureFormat : std::uint8_t {
     RgbaFloat16 = 1,
     RgbFloat16 = 2,
     RgFloat16 = 3,
@@ -30,7 +28,7 @@ enum struct TextureFormat : core::TypeId {
     Unknown = 255,
 };
 
-[[nodiscard]] constexpr std::size_t format_component_bits_count(const TextureFormat f)
+[[nodiscard]] constexpr std::uint32_t format_component_bits_count(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::RgbaFloat16:
@@ -54,7 +52,7 @@ enum struct TextureFormat : core::TypeId {
     case TextureFormat::RgbaUint8:
         return 8;
     default:
-        return static_cast<std::size_t>(-1);
+        return static_cast<std::uint32_t>(-1);
     }
 }
 
@@ -122,7 +120,7 @@ enum struct TextureFormat : core::TypeId {
     }
 }
 
-[[nodiscard]] constexpr std::size_t format_pixel_size(const TextureFormat f)
+[[nodiscard]] constexpr std::uint32_t format_pixel_size(const TextureFormat f)
 {
     switch (f) {
     case TextureFormat::Float16:
@@ -150,7 +148,7 @@ enum struct TextureFormat : core::TypeId {
     case TextureFormat::RgbaFloat32:
         return 16;
     default:
-        return static_cast<std::size_t>(-1);
+        return static_cast<std::uint32_t>(-1);
     }
 }
 }
@@ -158,4 +156,3 @@ enum struct TextureFormat : core::TypeId {
 namespace std {
 [[nodiscard]] std::string to_string(gearoenix::render::texture::TextureFormat f);
 }
-#endif

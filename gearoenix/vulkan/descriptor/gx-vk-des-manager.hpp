@@ -37,7 +37,7 @@ public:
         const std::vector<VkDescriptorSetLayoutBinding>& bindings);
     [[nodiscard]] std::shared_ptr<Set> create_set(
         const std::vector<VkDescriptorSetLayoutBinding>& bindings,
-        std::optional<std::size_t> kernel_index = std::nullopt);
+        std::optional<std::uint64_t> kernel_index = std::nullopt);
 };
 }
 

@@ -34,7 +34,7 @@ const void* gearoenix::render::get_data(const Vertices& vertices)
     }
 }
 
-std::size_t gearoenix::render::get_element_size(const Vertices& vertices)
+std::uint64_t gearoenix::render::get_element_size(const Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -170,7 +170,7 @@ void gearoenix::render::calculate_tangents(PbrVertices& vertices, const std::vec
         tan_b[i2] += bitangent;
     }
 
-    for (size_t i = 0; i < vertices_count; ++i) {
+    for (std::uint32_t i = 0; i < vertices_count; ++i) {
         const auto n = vertices[i].normal;
         const auto t0 = tan_a[i];
         const auto t1 = tan_b[i];
@@ -184,7 +184,7 @@ void gearoenix::render::calculate_tangents(PbrVertices& vertices, const std::vec
     }
 }
 
-std::size_t gearoenix::core::count(const render::Vertices& vertices)
+std::uint64_t gearoenix::core::count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:
@@ -196,7 +196,7 @@ std::size_t gearoenix::core::count(const render::Vertices& vertices)
     }
 }
 
-std::size_t gearoenix::core::bytes_count(const render::Vertices& vertices)
+std::uint64_t gearoenix::core::bytes_count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
     case 0:

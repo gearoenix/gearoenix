@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_BUFFER_HPP
-#define GEAROENIX_METAL_BUFFER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "shaders/gx-mtl-shd-common.hpp"
@@ -53,9 +52,8 @@ struct BufferManager final {
     ~BufferManager();
     BufferManager(const BufferManager&) = delete;
     [[nodiscard]] UniformBuffer create_uniform(NSUInteger size);
-    void update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number);
+    void update(id<MTLBlitCommandEncoder> blit, std::uint32_t frame_number);
 };
 }
 
-#endif
 #endif

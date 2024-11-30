@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_PROJECTION_BUTTON_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_PROJECTION_BUTTON_HPP
+#pragma once
 #include "gx-ed-vp-button.hpp"
 #include <gearoenix/render/camera/gx-rnd-cmr-projection.hpp>
 
@@ -21,5 +20,3 @@ struct ProjectionButton final : Button {
     void update() override;
 };
 }
-
-#endif

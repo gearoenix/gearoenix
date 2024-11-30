@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SHADER_FINAL_HPP
-#define GEAROENIX_GL_SHADER_FINAL_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
@@ -14,5 +13,4 @@ public:
 };
 }
 
-#endif
 #endif

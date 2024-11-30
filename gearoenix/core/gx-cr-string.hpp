@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_STRING_HPP
-#define GEAROENIX_CORE_STRING_HPP
+#pragma once
 #include "../platform/gx-plt-key.hpp"
 #include "gx-cr-language.hpp"
 #include <array>
@@ -22,13 +21,13 @@ struct String final {
     [[nodiscard]] static const wchar_t* to_wchar_ptr(const std::string& s);
 
     template <typename T>
-    [[nodiscard]] static constexpr auto to_hex_string(const T val)
+    [[nodiscard]] constexpr static auto to_hex_string(const T val)
     {
         constexpr auto hex_map = "0123456789ABCDEF";
         std::array<char, sizeof(T) * 2 + 3> hex_string;
         hex_string[0] = '0';
         hex_string[1] = 'X';
-        for (std::size_t i = 0; i < sizeof(T) * 2; ++i) {
+        for (std::uint32_t i = 0; i < sizeof(T) * 2; ++i) {
             hex_string[sizeof(T) * 2 + 1 - i] = hex_map[(val >> static_cast<T>(i << 2)) & static_cast<T>(0xF)];
         }
 
@@ -37,7 +36,7 @@ struct String final {
     }
 
     template <typename T>
-    [[nodiscard]] static constexpr auto ptr_to_hex_string(const T* const ptr)
+    [[nodiscard]] constexpr static auto ptr_to_hex_string(const T* const ptr)
     {
         return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr));
     }
@@ -77,4 +76,3 @@ struct String final {
 #endif
 };
 }
-#endif

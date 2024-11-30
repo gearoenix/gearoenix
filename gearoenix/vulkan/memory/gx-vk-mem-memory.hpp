@@ -41,10 +41,10 @@ public:
     Memory(const Memory&) = delete;
     Memory& operator=(Memory&&) = delete;
     Memory& operator=(const Memory&) = delete;
-    [[nodiscard]] static std::size_t align(const engine::Engine&, std::size_t);
+    [[nodiscard]] static std::uint64_t align(const engine::Engine&, std::uint64_t);
     [[nodiscard]] static std::shared_ptr<Memory> construct(const engine::Engine&, Place, std::uint32_t type_index);
     ~Memory();
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::size_t size);
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::uint64_t size);
 };
 }
 #endif

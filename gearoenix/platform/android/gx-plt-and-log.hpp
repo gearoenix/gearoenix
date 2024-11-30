@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_ANDROID_LOG_HPP
-#define GEAROENIX_PLATFORM_ANDROID_LOG_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_ANDROID
 #include <android/log.h>
@@ -53,5 +52,4 @@
     }                                                                                                  \
     static_assert(true, "")
 
-#endif
 #endif

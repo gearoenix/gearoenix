@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_VECTOR_2D_HPP
-#define GEAROENIX_MATH_VECTOR_2D_HPP
+#pragma once
 #include "../platform/gx-plt-log.hpp"
 #include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-math-numeric.hpp"
@@ -298,13 +297,13 @@ struct Vec2 final {
         y = f.read<Element>();
     }
 
-    [[nodiscard]] static constexpr std::optional<Vec2> intersect(
+    [[nodiscard]] constexpr static std::optional<Vec2> intersect(
         const Vec2& s11,
         const Vec2& s12,
         const Vec2& s21,
         const Vec2& s22);
 
-    [[nodiscard]] static constexpr Vec2 hammersley(const std::uint32_t i, const std::uint32_t n)
+    [[nodiscard]] constexpr static Vec2 hammersley(const std::uint32_t i, const std::uint32_t n)
     {
         return { static_cast<Element>(i) / static_cast<Element>(n), Numeric::radical_inverse_vdc(i) };
     }
@@ -349,5 +348,3 @@ constexpr std::optional<gearoenix::math::Vec2<Element>> gearoenix::math::Vec2<El
     }
     return v0 * s.x + s11;
 }
-
-#endif

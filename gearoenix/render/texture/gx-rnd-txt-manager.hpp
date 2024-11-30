@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
-#define GEAROENIX_RENDER_TEXTURE_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "../gx-rnd-build-configuration.hpp"
@@ -78,13 +77,13 @@ public:
     void create_2d_from_formatted(
         std::string&& name,
         const void* data,
-        std::size_t size,
+        std::uint32_t size,
         const TextureInfo& info,
         core::job::EndCallerShared<Texture2D>&& c);
     void create_2df_from_formatted(
         std::string&& name,
         const void* data,
-        std::size_t size,
+        std::uint32_t size,
         const TextureInfo& info,
         core::job::EndCallerShared<Texture2D>&& c);
     void create_2d_from_file(
@@ -101,13 +100,13 @@ public:
         std::string&& name,
         std::vector<Attachment>&& attachments,
         core::job::EndCallerShared<Target>&& c);
-    [[nodiscard]] static constexpr float geometry_smith(
+    [[nodiscard]] constexpr static float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,
         const math::Vec3<float>& l,
         float roughness);
     [[nodiscard]] static math::Vec2<float> integrate_brdf(float n_dot_v, float roughness);
-    [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(std::size_t resolution = 256);
+    [[nodiscard]] static std::vector<math::Vec4<std::uint8_t>> create_brdflut_pixels(std::uint32_t resolution = 256);
     [[nodiscard]] math::Vec2<std::uint32_t> get_default_camera_render_target_dimensions() const;
     void create_default_camera_render_target(
         const std::string& camera_name,
@@ -129,5 +128,3 @@ constexpr float gearoenix::render::texture::Manager::geometry_smith(
     const auto ggx1 = math::Numeric::geometry_schlick_ggx(n_dot_l, roughness);
     return ggx1 * ggx2;
 }
-
-#endif

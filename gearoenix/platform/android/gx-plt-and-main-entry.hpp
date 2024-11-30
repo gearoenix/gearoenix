@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_ANDROID_MAIN_ENTRY_HPP
-#define GEAROENIX_PLATFORM_ANDROID_MAIN_ENTRY_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include <android_native_app_glue.h>
@@ -14,5 +13,4 @@
         expr;                                 \
     }
 
-#endif
 #endif

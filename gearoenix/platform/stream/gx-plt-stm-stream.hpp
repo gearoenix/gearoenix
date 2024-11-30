@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_SYSTEM_STREAM_STREAM_HPP
-#define GEAROENIX_SYSTEM_STREAM_STREAM_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <memory>
@@ -18,16 +17,16 @@ struct Stream {
 
 protected:
     Stream() = default;
-    void built_in_type_read(void* data, std::size_t length);
+    void built_in_type_read(void* data, std::uint64_t length);
 
 public:
     virtual ~Stream() = default;
     [[nodiscard]] static std::shared_ptr<Stream> open(const Path& path, Application& app);
-    [[nodiscard]] virtual std::size_t read(void* data, std::size_t length) = 0;
-    [[nodiscard]] virtual std::size_t write(const void* data, std::size_t length) = 0;
-    virtual void seek(std::size_t offset) = 0;
-    [[nodiscard]] virtual std::size_t tell() = 0;
-    [[nodiscard]] virtual std::size_t size() = 0;
+    [[nodiscard]] virtual std::uint64_t read(void* data, std::uint64_t length) = 0;
+    [[nodiscard]] virtual std::uint64_t write(const void* data, std::uint64_t length) = 0;
+    virtual void seek(std::uint64_t offset) = 0;
+    [[nodiscard]] virtual std::uint64_t tell() = 0;
+    [[nodiscard]] virtual std::uint64_t size() = 0;
     virtual void flush() = 0;
 
     void read(std::string& s);
@@ -36,7 +35,7 @@ public:
     void read(std::vector<T>& data)
     {
         const auto c = read<std::uint32_t>();
-        data.resize(static_cast<std::size_t>(c));
+        data.resize(static_cast<std::uint64_t>(c));
         if constexpr (sizeof(T) == 1) {
             GX_ASSERT(data.size() == read(data.data(), data.size()));
         } else {
@@ -68,7 +67,7 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] std::size_t write(const T& d)
+    [[nodiscard]] std::uint64_t write(const T& d)
     {
         return write(&d, sizeof(T));
     }
@@ -87,4 +86,3 @@ public:
     [[nodiscard]] std::vector<std::uint8_t> get_file_content();
 };
 }
-#endif

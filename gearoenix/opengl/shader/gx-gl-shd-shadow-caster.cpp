@@ -3,7 +3,7 @@
 #include "../gx-gl-engine.hpp"
 #include <sstream>
 
-gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::size_t bones_count)
+gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::uint32_t bones_count)
     : Shader(e)
     , mvp_count(static_cast<sizei>(bones_count + 1))
 {

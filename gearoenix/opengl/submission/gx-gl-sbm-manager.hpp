@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_MANAGER_HPP
-#define GEAROENIX_GL_SUBMISSION_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/gx-cr-pool.hpp"
@@ -87,11 +86,11 @@ private:
     boost::container::flat_map<core::ecs::entity_id_t, physics::accelerator::Bvh<BvhNodeModel>> scenes_bvhs;
     core::Pool<Camera> camera_pool;
     core::Pool<Scene> scene_pool;
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
     math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
-    std::size_t resolution_cfg_listener_id = 0;
+    std::uint32_t resolution_cfg_listener_id = 0;
 
     void initialise_back_buffer_sizes();
     void back_buffer_size_changed();
@@ -131,5 +130,4 @@ public:
 };
 }
 
-#endif
 #endif

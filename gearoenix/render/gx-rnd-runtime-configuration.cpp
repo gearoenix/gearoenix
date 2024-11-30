@@ -11,12 +11,6 @@ constexpr auto entity_name = "gearoenix-render-runtime-configuration";
 std::shared_ptr<gearoenix::render::RuntimeConfiguration> default_value = nullptr;
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::RuntimeConfiguration::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
-
 gearoenix::render::RuntimeConfiguration::RuntimeConfiguration(const core::ecs::entity_id_t id)
     : Component(create_this_type_index(this), entity_name, id)
     , runtime_resolution(FixedResolution {})
@@ -28,7 +22,7 @@ gearoenix::render::RuntimeConfiguration& gearoenix::render::RuntimeConfiguration
 {
     if (nullptr == w) {
         if (nullptr == default_value) {
-            default_value = std::shared_ptr<RuntimeConfiguration>(new RuntimeConfiguration(core::ecs::INVALID_ENTITY_ID));
+            default_value = construct<RuntimeConfiguration>(core::ecs::INVALID_ENTITY_ID);
         }
         return *default_value;
     }

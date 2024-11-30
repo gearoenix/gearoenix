@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_VECTOR_4D_HPP
-#define GEAROENIX_MATH_VECTOR_4D_HPP
+#pragma once
 #include "gx-math-vector-3d.hpp"
 
 namespace gearoenix::math {
@@ -236,4 +235,3 @@ struct Vec4 final {
     }
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_SYSTEM_STREAM_ASSET_HPP
-#define GEAROENIX_SYSTEM_STREAM_ASSET_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #include "gx-plt-stm-stream.hpp"
 #include <memory>
@@ -40,13 +39,11 @@ public:
     ~Asset() override;
     /// It will return null if file does not exist
     [[nodiscard]] static Asset* construct(const platform::Application& platform_application, const std::string& name);
-    [[nodiscard]] std::size_t read(void* data, std::size_t length) override;
-    [[nodiscard]] std::size_t write(const void* data, std::size_t length) override;
-    [[nodiscard]] std::size_t tell() override;
-    [[nodiscard]] std::size_t size() override;
+    [[nodiscard]] std::uint64_t read(void* data, std::uint64_t length) override;
+    [[nodiscard]] std::uint64_t write(const void* data, std::uint64_t length) override;
+    [[nodiscard]] std::uint64_t tell() override;
+    [[nodiscard]] std::uint64_t size() override;
     void flush() override;
-    void seek(std::size_t offset) override;
+    void seek(std::uint64_t offset) override;
 };
 }
-
-#endif

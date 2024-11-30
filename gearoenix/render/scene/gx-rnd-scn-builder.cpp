@@ -16,11 +16,11 @@
 
 gearoenix::render::scene::Builder::Builder(
     engine::Engine& e, const std::string& name, const double layer, core::job::EndCaller<>&& end_callback)
-    : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
-    , e(e)
+    : e(e)
+    , entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(Scene::construct(e, layer, name + "-scene", b.get_id()));
+    b.add_component(core::ecs::Component::construct<Scene>(e, layer, name + "-scene", b.get_id()));
 }
 
 gearoenix::render::scene::Builder::~Builder() = default;

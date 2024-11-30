@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_MATRIX_4D_TEST_HPP
-#define GEAROENIX_MATH_MATRIX_4D_TEST_HPP
+#pragma once
 #include "../platform/gx-plt-build-configuration.hpp"
 #ifndef GX_PLATFORM_ANDROID
 #include "gx-math-matrix-4d.hpp"
@@ -67,5 +66,4 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
         BOOST_TEST(compare(), "hard-coded-look-at-2-" << i);
     }
 }
-#endif
 #endif

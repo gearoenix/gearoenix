@@ -8,29 +8,29 @@
 
 void gearoenix::physics::animation::Manager::insert_bones(
     BoneInfo& bones_info,
-    const std::size_t current_index)
+    const std::uint32_t current_index)
 {
-    bones[current_index].first_child_index = bones.size();
+    bones[current_index].first_child_index = static_cast<std::uint32_t>(bones.size());
     for (auto& child_bone : bones_info.children) {
-        bones_indices[child_bone.name] = bones.size();
+        bones_indices[child_bone.name] = static_cast<std::uint32_t>(bones.size());
         bones.emplace_back(
             std::move(child_bone.transform),
             std::move(child_bone.inverse_bind),
             std::move(child_bone.name),
             current_index,
-            child_bone.children.size(),
-            static_cast<std::size_t>(-1),
-            static_cast<std::size_t>(-1));
+            static_cast<std::uint32_t>(child_bone.children.size()),
+            static_cast<std::uint32_t>(-1),
+            static_cast<std::uint32_t>(-1));
     }
-    bones[current_index].end_child_index = bones.size();
-    std::size_t child_index = bones[current_index].first_child_index;
+    bones[current_index].end_child_index = static_cast<std::uint32_t>(bones.size());
+    auto child_index = bones[current_index].first_child_index;
     for (auto& child_bone : bones_info.children) {
         insert_bones(child_bone, child_index);
         ++child_index;
     }
 }
 
-void gearoenix::physics::animation::Manager::update_bone(const std::size_t index, Transformation* const parent)
+void gearoenix::physics::animation::Manager::update_bone(const std::uint32_t index, Transformation* const parent)
 {
     auto& bone = bones[index];
     bone.transform->set_parent(parent); // TODO this should change
@@ -48,6 +48,8 @@ void gearoenix::physics::animation::Manager::update_bone(const std::size_t index
 gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e)
     : e(e)
 {
+    core::ecs::Component::register_type<AnimationPlayer>();
+    core::ecs::Component::register_type<Armature>();
 }
 
 gearoenix::physics::animation::Manager::~Manager() = default;
@@ -58,9 +60,9 @@ void gearoenix::physics::animation::Manager::create_armature(
 {
     const std::lock_guard _lg(this_lock);
 
-    const auto root_index = bones.size();
+    const auto root_index = static_cast<std::uint32_t>(bones.size());
 
-    auto arm = Armature::construct(builder.get_name() + "-armature", builder.get_id());
+    auto arm = core::ecs::Component::construct<Armature>(builder.get_name() + "-armature", builder.get_id());
     arm->root_bone_index = root_index;
     builder.add_component(std::move(arm));
 
@@ -70,10 +72,10 @@ void gearoenix::physics::animation::Manager::create_armature(
         std::move(bones_info.transform),
         std::move(bones_info.inverse_bind),
         std::move(bones_info.name),
-        static_cast<std::size_t>(-1),
-        bones_info.children.size(),
-        static_cast<std::size_t>(-1),
-        static_cast<std::size_t>(-1));
+        static_cast<std::uint32_t>(-1),
+        static_cast<std::uint32_t>(bones_info.children.size()),
+        static_cast<std::uint32_t>(-1),
+        static_cast<std::uint32_t>(-1));
 
     insert_bones(bones_info, root_index);
 }
@@ -83,62 +85,62 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     ArmatureAnimationInfo& info)
 {
     const std::lock_guard _lg(this_lock);
-    const std::size_t bones_channels_count = info.channels.size();
-    const std::size_t bones_channels_first_index = bones_channels.size();
+    const auto bones_channels_count = static_cast<std::uint32_t>(info.channels.size());
+    const auto bones_channels_first_index = static_cast<std::uint32_t>(bones_channels.size());
     for (auto& bone_channel : info.channels) {
         BoneChannel bch;
         auto bone_search = bones_indices.find(bone_channel.target_bone);
         GX_ASSERT(bones_indices.end() != bone_search);
         bch.target_bone_index = bone_search->second;
-        bch.scale_samples_count = bone_channel.scale_samples.size();
-        bch.scale_samples_first_keyframe_index = scale_keyframes.size();
-        double last_time = -0.1e-10;
+        bch.scale_samples_count = static_cast<std::uint32_t>(bone_channel.scale_samples.size());
+        bch.scale_samples_first_keyframe_index = static_cast<std::uint32_t>(scale_keyframes.size());
+        auto last_time = -0.1e-10;
         for (auto& k : bone_channel.scale_samples) {
             GX_ASSERT(last_time < k.first);
             last_time = k.first;
             scale_keyframes.push_back(k);
         }
-        bch.scale_samples_end_keyframe_index = scale_keyframes.size();
-        bch.rotation_samples_count = bone_channel.rotation_samples.size();
-        bch.rotation_samples_first_keyframe_index = rotation_keyframes.size();
+        bch.scale_samples_end_keyframe_index = static_cast<std::uint32_t>(scale_keyframes.size());
+        bch.rotation_samples_count = static_cast<std::uint32_t>(bone_channel.rotation_samples.size());
+        bch.rotation_samples_first_keyframe_index = static_cast<std::uint32_t>(rotation_keyframes.size());
         last_time = -0.1e-10;
         for (auto& k : bone_channel.rotation_samples) {
             GX_ASSERT(last_time < k.first);
             last_time = k.first;
             rotation_keyframes.push_back(k);
         }
-        bch.rotation_samples_end_keyframe_index = rotation_keyframes.size();
-        bch.translation_samples_count = bone_channel.translation_samples.size();
-        bch.translation_samples_first_keyframe_index = translation_keyframes.size();
+        bch.rotation_samples_end_keyframe_index = static_cast<std::uint32_t>(rotation_keyframes.size());
+        bch.translation_samples_count = static_cast<std::uint32_t>(bone_channel.translation_samples.size());
+        bch.translation_samples_first_keyframe_index = static_cast<std::uint32_t>(translation_keyframes.size());
         last_time = -0.1e-10;
         for (auto& k : bone_channel.translation_samples) {
             GX_ASSERT(last_time < k.first);
             last_time = k.first;
             translation_keyframes.push_back(k);
         }
-        bch.translation_samples_end_keyframe_index = translation_keyframes.size();
+        bch.translation_samples_end_keyframe_index = static_cast<std::uint32_t>(translation_keyframes.size());
         bones_channels.push_back(bch);
     }
-    const std::size_t bones_channels_end_index = bones_channels.size();
+    const auto bones_channels_end_index = static_cast<std::uint32_t>(bones_channels.size());
     auto anim = animation_allocator.make_shared<ArmatureAnimation>(info.name, bones_channels_count, bones_channels_first_index, bones_channels_end_index);
     if (!info.name.empty()) {
         animations_map.emplace(info.name, anim);
     }
-    builder.add_component(AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id()));
+    builder.add_component(core::ecs::Component::construct<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id()));
 }
 
 void gearoenix::physics::animation::Manager::create_sprite_player(
     core::ecs::EntityBuilder& builder,
     std::string name,
     std::shared_ptr<render::material::Sprite> sprite,
-    const std::size_t width,
-    const std::size_t height)
+    const std::uint32_t width,
+    const std::uint32_t height)
 {
     auto anim = animation_allocator.make_shared<SpriteAnimation>(name, std::move(sprite), width, height);
     if (!name.empty()) {
         animations_map.emplace(std::move(name), anim);
     }
-    auto player = AnimationPlayer::construct(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
+    auto player = core::ecs::Component::construct<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
     player->set_loop_range_time(0.0, 0.999);
     builder.add_component(std::move(player));
 }
@@ -146,7 +148,7 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
 void gearoenix::physics::animation::Manager::update()
 {
     e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, Transformation>>(
-        [this](auto, AnimationPlayer* const player, Armature* const armature, Transformation* const model_transform, auto) {
+        [this](auto, AnimationPlayer* const player, const Armature* const armature, Transformation* const model_transform, auto) {
             if (nullptr != player) {
                 player->update_time(e.get_delta_time());
                 player->animate(*this);

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_JOB_END_CALLER_HPP
-#define GEAROENIX_CORE_JOB_END_CALLER_HPP
+#pragma once
 #include "../gx-cr-build-configuration.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "gx-cr-job-manager.hpp"
@@ -120,4 +119,3 @@ template <typename T>
 using EndCallerShared = EndCaller<std::shared_ptr<T>>;
 
 }
-#endif

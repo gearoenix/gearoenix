@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_IMGUI_HPP
-#define GEAROENIX_VULKAN_IMGUI_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include <memory>
@@ -36,6 +35,4 @@ public:
     void update();
 };
 }
-
-#endif
 #endif

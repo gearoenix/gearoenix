@@ -18,9 +18,9 @@ std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::vulkan::refle
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
-    const std::size_t environment_resolution,
-    const std::size_t irradiance_resolution,
-    const std::size_t radiance_resolution,
+    const std::uint64_t environment_resolution,
+    const std::uint64_t irradiance_resolution,
+    const std::uint64_t radiance_resolution,
     const core::job::EndCaller& end_callback)
 {
     GX_UNIMPLEMENTED;

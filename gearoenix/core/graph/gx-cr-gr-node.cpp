@@ -5,11 +5,11 @@ gearoenix::core::graph::Node::Node(std::string n, const std::vector<std::string>
     : asset::Asset(asset::Manager::create_id(), asset::Type::Node, std::move(n))
 {
     input_links_providers_links.resize(input_links.size());
-    for (std::size_t i = 0; i < input_links.size(); ++i) {
+    for (std::uint32_t i = 0; i < input_links.size(); ++i) {
         input_links_string_index[input_links[i]] = static_cast<unsigned int>(i);
     }
     output_links_consumers_links.resize(output_links.size());
-    for (std::size_t i = 0; i < output_links.size(); ++i) {
+    for (std::uint32_t i = 0; i < output_links.size(); ++i) {
         output_links_string_index[output_links[i]] = static_cast<unsigned int>(i);
     }
 }
@@ -26,7 +26,7 @@ void gearoenix::core::graph::Node::clear_provider(unsigned int input_link_index)
     input_links_providers_links[input_link_index] = std::make_pair(nullptr, 0);
 }
 
-void gearoenix::core::graph::Node::set_providers_count(const std::size_t count)
+void gearoenix::core::graph::Node::set_providers_count(const std::uint32_t count)
 {
     input_links_providers_links.resize(count);
 }

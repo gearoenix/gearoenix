@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_GL_SHADER_GBUFFERS_FILLER_HPP
-#define GEAROENIX_GL_SHADER_GBUFFERS_FILLER_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl::shader {
-struct GBuffersFiller final : public Shader {
+struct GBuffersFiller final : Shader {
     GX_GL_UNIFORM_MATRIX(m, 4, 1);
     GX_GL_UNIFORM_MATRIX(inv_m, 4, 1);
     GX_GL_UNIFORM_MATRIX(vp, 4, 1);
@@ -23,10 +22,9 @@ struct GBuffersFiller final : public Shader {
 
 public:
     explicit GBuffersFiller(Engine& e);
-    ~GBuffersFiller() final;
-    void bind(uint& current_shader) const final;
+    ~GBuffersFiller() override;
+    void bind(uint& current_shader) const override;
 };
 }
 
-#endif
 #endif

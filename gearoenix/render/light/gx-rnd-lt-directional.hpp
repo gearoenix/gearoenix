@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_LIGHT_DIRECTIONAL_HPP
-#define GEAROENIX_RENDER_LIGHT_DIRECTIONAL_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-lt-light.hpp"
 
@@ -27,20 +26,23 @@ struct Texture2D;
 namespace gearoenix::render::light {
 struct Builder;
 struct Directional final : Light {
-    static constexpr std::size_t MAX_COUNT = 16;
+    constexpr static std::uint32_t MAX_COUNT = 16;
+    constexpr static TypeIndex TYPE_INDEX = 13;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
 
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
-
 public:
     Directional(std::string&& name, core::ecs::entity_id_t entity_id);
-    [[nodiscard]] static std::shared_ptr<Directional> construct(std::string&& name, core::ecs::entity_id_t entity_id);
     ~Directional() override;
 };
 
 struct ShadowCasterDirectional : Light {
-    static constexpr std::size_t MAX_COUNT = 16;
+    constexpr static std::uint32_t MAX_COUNT = 16;
+    constexpr static TypeIndex TYPE_INDEX = 11;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
 
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, shadow_map);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
@@ -49,7 +51,7 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, shadow_transform);
     GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, core::ecs::INVALID_ENTITY_ID);
 
-    ShadowCasterDirectional(std::type_index final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
+    ShadowCasterDirectional(TypeIndex final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
 
 public:
     ~ShadowCasterDirectional() override;
@@ -68,5 +70,3 @@ public:
     virtual void set_shadow_map_target(std::shared_ptr<texture::Target>&&);
 };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_PLOTTER_HPP
-#define GEAROENIX_MATH_PLOTTER_HPP
+#pragma once
 #include "gx-math-vector-2d.hpp"
 #include <cstdint>
 #include <tuple>
@@ -32,4 +31,3 @@ public:
     void draw_line(const Vec2<double>& start, const Vec2<double>& end, const Brush& b = Brush());
 };
 }
-#endif

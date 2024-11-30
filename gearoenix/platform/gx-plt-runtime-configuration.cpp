@@ -17,12 +17,6 @@ constexpr auto entity_name = "gearoenix-platform-runtime-configuration";
 std::shared_ptr<gearoenix::platform::RuntimeConfiguration> default_value = nullptr;
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::platform::RuntimeConfiguration::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
-
 gearoenix::platform::RuntimeConfiguration::RuntimeConfiguration(const core::ecs::entity_id_t id)
     : Component(create_this_type_index(this), entity_name, id)
     , application_name(GX_APPLICATION_NAME)

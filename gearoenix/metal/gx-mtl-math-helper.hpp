@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_MATH_HELPER_HPP
-#define GEAROENIX_METAL_MATH_HELPER_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../math/gx-math-matrix-4d.hpp"
@@ -49,5 +48,4 @@ inline vector_float4 simd_make_float4(const float x, const float y, const float 
 }
 }
 
-#endif
 #endif

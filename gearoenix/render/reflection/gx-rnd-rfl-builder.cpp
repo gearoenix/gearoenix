@@ -10,7 +10,7 @@ gearoenix::render::reflection::Builder::Builder(
     physics::Transformation* parent_transform,
     core::job::EndCaller<>&& end_callback)
     : entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
-    , transformation(physics::Transformation::construct(name + "-transform", parent_transform, entity_builder->get_id(), &e))
+    , transformation(core::ecs::Component::construct<physics::Transformation>(name + "-transform", parent_transform, entity_builder->get_id(), &e))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(transformation);
@@ -32,7 +32,7 @@ gearoenix::render::reflection::Runtime& gearoenix::render::reflection::Builder::
     return *c;
 }
 
-void gearoenix::render::reflection::Builder::set_camera_builder(std::shared_ptr<camera::Builder>&& builder, const std::size_t face_index)
+void gearoenix::render::reflection::Builder::set_camera_builder(std::shared_ptr<camera::Builder>&& builder, const std::uint64_t face_index)
 {
     faces_camera_builders[face_index] = std::move(builder);
 }

@@ -55,7 +55,7 @@ double gearoenix::render::camera::Target::get_aspect_ratio() const
     }
 }
 
-gearoenix::math::Vec2<size_t> gearoenix::render::camera::Target::get_dimension() const
+gearoenix::math::Vec2<std::uint32_t> gearoenix::render::camera::Target::get_dimension() const
 {
     switch (target.index()) {
     case CUSTOMISED_VAR_INDEX: {

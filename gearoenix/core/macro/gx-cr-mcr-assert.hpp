@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_MACRO_ASSERT_HPP
-#define GEAROENIX_CORE_MACRO_ASSERT_HPP
+#pragma once
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-cr-build-configuration.hpp"
 #include "gx-cr-mcr-stringifier.hpp"
@@ -46,6 +45,4 @@
 #define GX_COMPLAIN_D(x, msg) static_assert(true, "")
 #define GX_CHECK_NOT_EQUAL_D(x, y) static_assert(true, "")
 #define GX_CHECK_EQUAL_D(x, y) static_assert(true, "")
-#endif
-
 #endif

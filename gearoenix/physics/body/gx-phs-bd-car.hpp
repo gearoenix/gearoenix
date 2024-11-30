@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_BODY_CAR_HPP
-#define GEAROENIX_PHYSICS_BODY_CAR_HPP
+#pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-phs-bd-body.hpp"
 #include <array>
@@ -56,7 +55,7 @@ public:
     /// Player input
     GX_GETSET_VAL_PRV(double, steering_angle, 0.0)
     /// Player input or it can be set by automatic transmission system
-    GX_GETSET_VAL_PRV(std::size_t, current_gear, 0)
+    GX_GETSET_VAL_PRV(std::uint32_t, current_gear, 0)
     /// Car settings (tunable)
     GX_GETSET_VAL_PRV(double, steering_angle_max, 0.6)
     /// Car settings (tunable)
@@ -110,4 +109,3 @@ public:
     ~Car() override;
 };
 }
-#endif

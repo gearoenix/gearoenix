@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_UI_WINDOW_OVERLAY_PROGRESS_BAR_HPP
-#define GEAROENIX_EDITOR_UI_WINDOW_OVERLAY_PROGRESS_BAR_HPP
+#pragma once
 #include <atomic>
 #include <boost/container/flat_map.hpp>
 #include <functional>
@@ -43,5 +42,3 @@ public:
     void update() const;
 };
 }
-
-#endif

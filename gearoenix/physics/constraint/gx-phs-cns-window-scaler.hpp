@@ -1,9 +1,5 @@
-#ifndef GEAROENIX_PHYSICS_CONSTRAINT_WINDOW_SCALER_HPP
-#define GEAROENIX_PHYSICS_CONSTRAINT_WINDOW_SCALER_HPP
-
+#pragma once
 #include "../../core/event/gx-cr-ev-listener.hpp"
-#include "../../core/gx-cr-types.hpp"
-#include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-phs-cns-constraint.hpp"
 #include <map>
@@ -38,4 +34,3 @@ public:
     void set_current_size(double s);
 };
 }
-#endif

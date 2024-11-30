@@ -24,9 +24,9 @@ struct Pool final {
 private:
     std::mutex indices_lock;
     std::uint32_t latest_id = 0;
-    std::map<VkQueryType, std::map<std::size_t /*id*/, std::uint32_t>> indices;
+    std::map<VkQueryType, std::map<std::uint64_t /*id*/, std::uint32_t>> indices;
 
-    [[nodiscard]] std::uint32_t register_request(VkQueryType, std::size_t id);
+    [[nodiscard]] std::uint32_t register_request(VkQueryType, std::uint64_t id);
 
 public:
     Pool(const device::Logical& logical_device, VkQueryType, std::uint32_t = 1);
@@ -35,8 +35,8 @@ public:
     Pool(const Pool&) = delete;
     Pool& operator=(Pool&&) = delete;
     Pool& operator=(const Pool&) = delete;
-    void issue_acceleration_structure_compacted_size(command::Buffer&, VkAccelerationStructureKHR, std::size_t id = 0);
-    [[nodiscard]] VkDeviceSize get_acceleration_structure_compacted_size(std::size_t id = 0);
+    void issue_acceleration_structure_compacted_size(command::Buffer&, VkAccelerationStructureKHR, std::uint64_t id = 0);
+    [[nodiscard]] VkDeviceSize get_acceleration_structure_compacted_size(std::uint64_t id = 0);
 };
 }
 

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_MACROS_UNUSED_HPP
-#define GEAROENIX_CORE_MACROS_UNUSED_HPP
+#pragma once
 
 #define GX_FORCE_KEEP_UNUSED(x)                     \
     {                                               \
@@ -8,5 +7,3 @@
         (void)x;                                    \
     }                                               \
     static_assert(true, "")
-
-#endif

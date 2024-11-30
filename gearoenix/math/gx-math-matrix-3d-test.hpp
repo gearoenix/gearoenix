@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_MATRIX_3D_TEST_HPP
-#define GEAROENIX_MATH_MATRIX_3D_TEST_HPP
+#pragma once
 #include "../platform/gx-plt-build-configuration.hpp"
 #ifndef GX_PLATFORM_ANDROID
 #include "gx-math-matrix-3d.hpp"
@@ -59,5 +58,4 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_3d)
         BOOST_TEST(GxN::equal(glm::determinant(glmm), gxm.determinant()));
     }
 }
-#endif
 #endif

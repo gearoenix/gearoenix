@@ -49,7 +49,7 @@ public:
     Builder& operator=(const Builder&) = delete;
     [[nodiscard]] const Runtime& get_runtime() const;
     [[nodiscard]] Runtime& get_runtime();
-    void set_camera_builder(std::shared_ptr<camera::Builder>&& builder, std::size_t face_index);
+    void set_camera_builder(std::shared_ptr<camera::Builder>&& builder, std::uint64_t face_index);
     [[nodiscard]] core::ecs::entity_id_t get_id() const;
 };
 }

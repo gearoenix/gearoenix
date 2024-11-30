@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ACCELERATOR_BVH_HPP
-#define GEAROENIX_PHYSICS_ACCELERATOR_BVH_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../../math/gx-math-ray.hpp"
@@ -14,9 +13,9 @@
 namespace gearoenix::physics::accelerator {
 template <typename UserData>
 struct Bvh final {
-    constexpr static const std::size_t local_data_size = 5;
-    constexpr static const std::size_t bins_count = 32;
-    constexpr static const std::size_t walls_count = bins_count - 1;
+    constexpr static std::uintptr_t local_data_size = 5;
+    constexpr static std::uintptr_t bins_count = 32;
+    constexpr static std::uintptr_t walls_count = bins_count - 1;
 
     static_assert(bins_count > 4 && bins_count % 2 == 0, "Bins count is unexpected.");
     static_assert(std::is_trivially_destructible_v<UserData>, "Only trivially destructible data is accepted.");
@@ -35,14 +34,14 @@ private:
     struct Leaf final {
         const bool leaf = true;
         math::Aabb3<double> volume;
-        std::size_t data_count = static_cast<std::size_t>(-1); // there is an array of data after this
+        std::uintptr_t data_count = static_cast<std::uintptr_t>(-1); // there is an array of data after this
     };
 
     struct Node final {
         const bool leaf = false;
         math::Aabb3<double> volume;
-        std::size_t left = static_cast<std::size_t>(-1);
-        std::size_t right = static_cast<std::size_t>(-1);
+        std::uintptr_t left = static_cast<std::uintptr_t>(-1);
+        std::uintptr_t right = static_cast<std::uintptr_t>(-1);
     };
 
     std::vector<std::uint8_t> nodes;
@@ -61,8 +60,8 @@ private:
     }
 
     void create_node(
-        const std::size_t data_starting_index,
-        const std::size_t data_ending_index,
+        const std::uintptr_t data_starting_index,
+        const std::uintptr_t data_ending_index,
         const math::Aabb3<double>& center_volume,
         const math::Aabb3<double>& volume)
     {
@@ -78,8 +77,8 @@ private:
         }
         /// Sorting dimensions
         const auto& dimensions = center_volume.get_diameter();
-        std::array<std::pair<std::size_t, double>, 3> dimensions_indices;
-        for (std::size_t dimension_index = 0; dimension_index < 3; ++dimension_index) {
+        std::array<std::pair<std::uintptr_t, double>, 3> dimensions_indices;
+        for (std::uintptr_t dimension_index = 0; dimension_index < 3; ++dimension_index) {
             dimensions_indices[dimension_index] = std::make_pair(dimension_index, dimensions[dimension_index]);
         }
         if (dimensions_indices[0].second < dimensions_indices[1].second) {
@@ -108,7 +107,7 @@ private:
             for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index) {
                 const auto& d = data[data_index];
                 bool not_found = true;
-                for (std::size_t wall_index = 0; wall_index < walls_count; ++wall_index) {
+                for (std::uintptr_t wall_index = 0; wall_index < walls_count; ++wall_index) {
                     if (d.box.get_center()[dimension_index.first] < splits[wall_index]) {
                         auto& bin = bins[wall_index];
                         bin.data.push_back(d);
@@ -129,7 +128,8 @@ private:
                 if (b.data.size() == data_size) {
                     overlapped = true;
                     break;
-                } else if (!b.data.empty()) {
+                }
+                if (!b.data.empty()) {
                     break;
                 }
             }
@@ -137,12 +137,12 @@ private:
                 continue;
             }
             auto best_wall_cost = std::numeric_limits<double>::max();
-            auto best_wall_index = static_cast<std::size_t>(-1);
+            auto best_wall_index = static_cast<std::uintptr_t>(-1);
             math::Aabb3<double> best_wall_left_box;
             math::Aabb3<double> best_wall_right_box;
             math::Aabb3<double> left_box;
-            std::size_t left_count = 0;
-            for (std::size_t wall_index = 0; wall_index < walls_count; ++wall_index) {
+            std::uintptr_t left_count = 0;
+            for (std::uintptr_t wall_index = 0; wall_index < walls_count; ++wall_index) {
                 const auto& left_bin = bins[wall_index];
                 left_count += left_bin.data.size();
                 if (0 >= left_count)
@@ -171,9 +171,9 @@ private:
 
             ++best_wall_index;
 
-            const std::size_t left_data_starting_index = data.size();
+            const std::uintptr_t left_data_starting_index = data.size();
             math::Aabb3<double> left_center_volume;
-            for (std::size_t wall_index = 0; wall_index < best_wall_index; ++wall_index) {
+            for (std::uintptr_t wall_index = 0; wall_index < best_wall_index; ++wall_index) {
                 const auto& bin = bins[wall_index];
                 left_center_volume.put_without_update(bin.volume.get_center());
                 for (auto& d : bin.data) {
@@ -181,9 +181,9 @@ private:
                 }
             }
             left_center_volume.update();
-            const std::size_t left_data_ending_index = data.size();
+            const std::uintptr_t left_data_ending_index = data.size();
 
-            const std::size_t right_data_starting_index = data.size();
+            const std::uintptr_t right_data_starting_index = data.size();
             math::Aabb3<double> right_center_volume;
             for (auto wall_index = best_wall_index; wall_index < bins_count; ++wall_index) {
                 const auto& bin = bins[wall_index];
@@ -193,7 +193,7 @@ private:
                 }
             }
             right_center_volume.update();
-            const std::size_t right_data_ending_index = data.size();
+            const std::uintptr_t right_data_ending_index = data.size();
 
             const auto current_node_index = nodes.size();
             auto& current_node = allocate<Node>();
@@ -227,7 +227,7 @@ private:
     }
 
     [[nodiscard]] std::optional<std::pair<double, const Data*>> hit(
-        const std::size_t ptr,
+        const std::uintptr_t ptr,
         const math::Ray3<double>& ray,
         const double minimum_distance) const
     {
@@ -240,7 +240,7 @@ private:
             const auto min_dis = minimum_distance;
             const Data* min_data = nullptr;
             for (
-                std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
+                std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                 data_index < data_size;
                 ++data_index, data_ptr += sizeof(Data)) {
                 const auto* const d = reinterpret_cast<const Data*>(data_ptr);
@@ -254,31 +254,31 @@ private:
                 return std::nullopt;
             return std::make_pair(min_dis, min_data);
         }
-        hit_result = hit(reinterpret_cast<std::size_t>(&nodes[node.left]), ray, minimum_distance);
+        hit_result = hit(reinterpret_cast<std::uintptr_t>(&nodes[node.left]), ray, minimum_distance);
         const auto min_dis = hit_result.has_value() ? hit_result->first : minimum_distance;
-        const auto right_hit_result = hit(reinterpret_cast<std::size_t>(&nodes[node.right]), ray, min_dis);
+        const auto right_hit_result = hit(reinterpret_cast<std::uintptr_t>(&nodes[node.right]), ray, min_dis);
         return right_hit_result.has_value() ? right_hit_result : hit_result;
     }
 
     template <typename Function>
-    void call_on_all(const std::size_t ptr, Function&& function)
+    void call_on_all(const std::uintptr_t ptr, Function&& function)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                 data_index < data_size;
                 ++data_index, data_ptr += sizeof(Data)) {
                 function(*reinterpret_cast<Data*>(data_ptr));
             }
         } else {
-            call_on_all(reinterpret_cast<std::size_t>(&nodes[node.left]), function);
-            call_on_all(reinterpret_cast<std::size_t>(&nodes[node.right]), function);
+            call_on_all(reinterpret_cast<std::uintptr_t>(&nodes[node.left]), function);
+            call_on_all(reinterpret_cast<std::uintptr_t>(&nodes[node.right]), function);
         }
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection)
+    void call_on_intersecting(const std::uintptr_t ptr, const Collider& cld, Function&& on_intersection)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
@@ -290,7 +290,7 @@ private:
         }
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                 data_index < data_size;
                 ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
@@ -300,13 +300,13 @@ private:
                 on_intersection(d);
             }
         } else {
-            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.left]), cld, on_intersection);
-            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.right]), cld, on_intersection);
+            call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[node.left]), cld, on_intersection);
+            call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[node.right]), cld, on_intersection);
         }
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
-    void call_on_intersecting(const std::size_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
+    void call_on_intersecting(const std::uintptr_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
@@ -320,7 +320,7 @@ private:
         }
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::size_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
                 data_index < data_size;
                 ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
@@ -331,8 +331,8 @@ private:
                     on_intersection(d);
             }
         } else {
-            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.left]), cld, on_intersection);
-            call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[node.right]), cld, on_intersection);
+            call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[node.left]), cld, on_intersection);
+            call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[node.right]), cld, on_intersection);
         }
     }
 
@@ -365,7 +365,7 @@ public:
     {
         if (nodes.empty())
             return std::nullopt;
-        return hit(reinterpret_cast<std::size_t>(&nodes[0]), ray, minimum_distance);
+        return hit(reinterpret_cast<std::uintptr_t>(&nodes[0]), ray, minimum_distance);
     }
 
     template <typename Collider, typename Function>
@@ -373,7 +373,7 @@ public:
     {
         if (nodes.empty())
             return;
-        call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[0]), cld, on_intersection);
+        call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[0]), cld, on_intersection);
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
@@ -381,7 +381,7 @@ public:
     {
         if (nodes.empty())
             return;
-        call_on_intersecting(reinterpret_cast<std::size_t>(&nodes[0]), cld, on_intersection, not_intersection);
+        call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[0]), cld, on_intersection, not_intersection);
     }
 
     template <typename Function>
@@ -389,8 +389,7 @@ public:
     {
         if (nodes.empty())
             return;
-        call_on_all(reinterpret_cast<std::size_t>(&nodes[0]), function);
+        call_on_all(reinterpret_cast<std::uintptr_t>(&nodes[0]), function);
     }
 };
 }
-#endif

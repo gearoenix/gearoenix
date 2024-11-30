@@ -71,11 +71,11 @@ struct Engine {
     GX_GET_RRF_PRT(platform::Application, platform_application);
     GX_GET_UPTR_PRT(physics::Engine, physics_engine);
     GX_GET_CREF_PRT(Specification, specification);
-    GX_GET_VAL_PRT(std::size_t, frames_count, 2);
-    GX_GET_VAL_PRT(std::size_t, frame_number, 0);
-    GX_GET_VAL_PRT(std::size_t, next_frame_number, 1);
-    GX_GET_VAL_PRT(std::size_t, previous_frame_number, 1);
-    GX_GET_VAL_PRT(std::size_t, frame_number_from_start, static_cast<decltype(frame_number)>(-1));
+    GX_GET_VAL_PRT(std::uint64_t, frames_count, 2);
+    GX_GET_VAL_PRT(std::uint64_t, frame_number, 0);
+    GX_GET_VAL_PRT(std::uint64_t, next_frame_number, 1);
+    GX_GET_VAL_PRT(std::uint64_t, previous_frame_number, 1);
+    GX_GET_VAL_PRT(std::uint64_t, frame_number_from_start, static_cast<decltype(frame_number)>(-1));
     GX_GET_VAL_PRT(double, delta_time, 0.0f);
     GX_GET_UPTR_PRT(scene::Manager, scene_manager);
     GX_GET_UPTR_PRT(mesh::Manager, mesh_manager);

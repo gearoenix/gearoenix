@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_TRANSLATE_BUTTON_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_TRANSLATE_BUTTON_HPP
+#pragma once
 #include "gx-ed-vp-button.hpp"
 
 namespace gearoenix::render::texture {
@@ -20,5 +19,3 @@ struct TranslateButton final : Button {
     void update() override;
 };
 }
-
-#endif

@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_GL_SHADER_FORWARD_PBR_TRANSPARENT_HPP
-#define GEAROENIX_GL_SHADER_FORWARD_PBR_TRANSPARENT_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl::shader {
-struct ForwardPbrTransparent final : public Shader {
+struct ForwardPbrTransparent final : Shader {
     GX_GL_UNIFORM_MATRIX(m, 4, 1);
     GX_GL_UNIFORM_MATRIX(inv_m, 4, 1);
     GX_GL_UNIFORM_MATRIX(vp, 4, 1);
@@ -22,10 +21,9 @@ struct ForwardPbrTransparent final : public Shader {
 
 public:
     explicit ForwardPbrTransparent(Engine& e);
-    ~ForwardPbrTransparent() final;
-    void bind(uint& current_shader) const final;
+    ~ForwardPbrTransparent() override;
+    void bind(uint& current_shader) const override;
 };
 }
 
-#endif
 #endif

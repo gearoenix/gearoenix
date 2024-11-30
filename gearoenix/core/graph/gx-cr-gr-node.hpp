@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_CORE_GR_NODE_HPP
-#define GEAROENIX_CORE_GR_NODE_HPP
-#include "../asset/gx-cr-asset.hpp"
+#pragma once
 #include <map>
 #include <set>
 #include <string>
@@ -19,7 +17,7 @@ public:
     ~Node() override;
     virtual void set_provider(unsigned int input_link_index, Node* o, unsigned int provider_output_link_index);
     virtual void clear_provider(unsigned int input_link_index);
-    virtual void set_providers_count(std::size_t count);
+    virtual void set_providers_count(std::uint32_t count);
     virtual void remove_provider(unsigned int input_link_index);
     virtual void set_consumer(unsigned int output_link_index, Node* o, unsigned int consumer_input_link_index);
     virtual void remove_consumer(unsigned int output_link_index, Id node_id, unsigned int consumer_input_link_index);
@@ -30,4 +28,3 @@ public:
     static void connect(Node* p, unsigned int po, Node* c, unsigned int ci);
 };
 }
-#endif

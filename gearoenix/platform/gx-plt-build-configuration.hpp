@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_BUILD_CONFIGURATION_HPP
-#define GEAROENIX_PLATFORM_BUILD_CONFIGURATION_HPP
+#pragma once
 
 #ifdef ANDROID
 
@@ -48,6 +47,4 @@
 
 #else
 #error "Not implemetned yet."
-#endif
-
 #endif

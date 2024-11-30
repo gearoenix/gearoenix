@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_SHADER_RESOURCES_HPP
-#define GEAROENIX_VULKAN_SHADER_RESOURCES_HPP
+#pragma once
 #include "../../core/gx-cr-build-configuration.hpp"
 #ifdef USE_VULKAN
 namespace gearoenix {
@@ -33,5 +32,4 @@ namespace render {
     }
 }
 }
-#endif
 #endif

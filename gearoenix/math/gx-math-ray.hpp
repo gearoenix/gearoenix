@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_RAY_HPP
-#define GEAROENIX_MATH_RAY_HPP
+#pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-vector-3d.hpp"
 #include <utility>
@@ -24,4 +23,3 @@ public:
     }
 };
 }
-#endif

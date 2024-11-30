@@ -105,8 +105,8 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     if (info.has_mipmap) {
         if (pixels.size() == 1) {
             desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
-                static_cast<std::size_t>(info.width),
-                static_cast<std::size_t>(info.height)));
+                static_cast<std::uint32_t>(info.width),
+                static_cast<std::uint32_t>(info.height)));
             needs_mipmap_generator = true;
         } else {
             desc.MipLevels = static_cast<UINT16>(pixels.size());
@@ -239,7 +239,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
         });
     });
 
-    for (std::size_t mipmap_index = 0; mipmap_index < pixels.size(); ++mipmap_index) {
+    for (std::uint32_t mipmap_index = 0; mipmap_index < pixels.size(); ++mipmap_index) {
         uploader->upload(
             std::move(pixels[mipmap_index]),
             std::shared_ptr<Texture2D>(t),

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_CUBE_HPP
-#define GEAROENIX_RENDER_TEXTURE_CUBE_HPP
+#pragma once
 #include "gx-rnd-txt-texture.hpp"
 
 namespace gearoenix::render::texture {
@@ -14,4 +13,3 @@ public:
     ~TextureCube() override;
 };
 }
-#endif

@@ -1,43 +1,44 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include <cstring>
 
-std::size_t gearoenix::core::ecs::Archetype::get_components_size(const EntityBuilder::components_t& cs)
+std::uint32_t gearoenix::core::ecs::Archetype::create_components_size(const id_t& id)
 {
-    std::size_t s = 0;
-    for (const auto& c : cs) {
-        s += sizeof(c.second);
+    std::uint32_t s = 0;
+    for (const auto ti : id) {
+        if (Component::get_type_info(ti).get_is_final()) {
+            s += static_cast<std::uint32_t>(sizeof(std::shared_ptr<Component>));
+        }
     }
     return s;
 }
 
-gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Archetype::get_components_indices(
-    const EntityBuilder::components_t& cs)
+gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Archetype::create_components_indices(const id_t& id)
 {
     components_indices_t cis;
-    std::size_t index = 0;
-    for (const auto& c : cs) {
-        const auto& ts = c.second->get_hierarchy_types();
-        for (const auto& t : ts) {
-            if (const auto search = cis.find(t.first); cis.end() != search) {
-                GX_LOG_F("There is a duplicate type in the entity components map.\n"
-                         "No two component types can have overlapping component types in their hierarchy map.\n"
-                         "Clashing component: "
-                    << c.second->get_name());
-            }
-            cis.emplace(t.first, index);
+    std::uint32_t index = 0;
+    for (const auto ti : id) {
+        const auto& info = Component::get_type_info(ti);
+        if (!info.get_is_final()) {
+            continue;
+        }
+        cis.emplace(ti, index);
+        for (const auto& pts = info.get_all_parents(); const auto pt : pts) {
+            cis.emplace(pt, index);
         }
         ++index;
     }
     return cis;
 }
 
-std::string gearoenix::core::ecs::Archetype::create_name(const EntityBuilder::components_t& cs)
+std::string gearoenix::core::ecs::Archetype::create_name(const id_t& id)
 {
     std::string s = "[ ";
-    for (const auto& c : cs) {
-        const auto search = Component::get_type_index_to_name().find(c.first);
-        GX_ASSERT_D(search != Component::get_type_index_to_name().end());
-        s += search->second;
+    for (const auto ti : id) {
+        const auto& info = Component::get_type_info(ti);
+        if (!info.get_is_final()) {
+            continue;
+        }
+        s += info.get_name();
         s += " , ";
     }
     s += "]";
@@ -45,28 +46,29 @@ std::string gearoenix::core::ecs::Archetype::create_name(const EntityBuilder::co
     return s;
 }
 
-gearoenix::core::ecs::Archetype::Archetype(const EntityBuilder::components_t& cs)
-    : components_indices(get_components_indices(cs))
-    , entity_size(header_size + get_components_size(cs))
-    , name(create_name(cs))
+gearoenix::core::ecs::Archetype::Archetype(const id_t& id)
+    : id(id)
+    , components_indices(create_components_indices(id))
+    , entity_size(header_size + create_components_size(id))
+    , name(create_name(id))
     , alc(entity_size, 2048)
 {
 }
 
-std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t id)
+std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(const entity_id_t eid)
 {
     unsigned char* const entity = alc.alloc();
     entities.emplace(entity);
     std::memset(entity, 0, entity_size); // we need it because of the std::shared_ptr moves
-    *reinterpret_cast<entity_id_t*>(entity) = id;
+    *reinterpret_cast<entity_id_t*>(entity) = eid;
     return reinterpret_cast<std::shared_ptr<Component>*>(&entity[header_size]);
 }
 
 std::shared_ptr<gearoenix::core::ecs::Component>* gearoenix::core::ecs::Archetype::allocate_entity(
-    const entity_id_t ei,
+    const entity_id_t eid,
     const EntityBuilder::components_t& cs)
 {
-    auto* const ptr = allocate_entity(ei);
+    auto* const ptr = allocate_entity(eid);
     for (const auto& c : cs) {
         auto search = components_indices.find(c.first);
         GX_ASSERT_D(components_indices.end() != search);

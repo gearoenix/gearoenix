@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_GIZMO_BUTTONS_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_GIZMO_BUTTONS_HPP
+#pragma once
 #include <memory>
 
 namespace gearoenix::render::texture {
@@ -29,5 +28,3 @@ struct GizmoButtons final {
     void update();
 };
 }
-
-#endif

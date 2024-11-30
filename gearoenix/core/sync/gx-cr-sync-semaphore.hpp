@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
-#define GEAROENIX_CORE_SYNC_SEMAPHORE_HPP
+#pragma once
 #include <condition_variable>
 #include <mutex>
 
@@ -28,4 +27,3 @@ public:
     }
 };
 }
-#endif

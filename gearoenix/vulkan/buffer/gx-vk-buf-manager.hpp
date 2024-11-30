@@ -55,13 +55,13 @@ public:
     Manager& operator=(const Manager&) = delete;
     Manager(memory::Manager& memory_manager, engine::Engine& e);
     ~Manager();
-    [[nodiscard]] std::shared_ptr<Buffer> create_static(std::size_t size);
-    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::size_t size);
-    [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::size_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> create_static(std::uint64_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::uint64_t size);
+    [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::uint64_t size);
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,
         const void* data,
-        std::size_t size,
+        std::uint64_t size,
         const core::job::EndCaller& end = GX_DEFAULT_IGNORED_END_CALLER);
 
     template <typename T>

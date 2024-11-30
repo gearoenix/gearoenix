@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_MACROS_PROFILER_HPP
-#define GEAROENIX_CORE_MACROS_PROFILER_HPP
+#pragma once
 #include "../../platform/gx-plt-log.hpp"
 #include <chrono>
 
@@ -16,5 +15,3 @@
 #define GX_PROFILE_END_S(tag)                                                                                                  \
     thread_local static std::chrono::time_point<std::chrono::high_resolution_clock> _gearoenix_core_macro_profile_begin_##tag; \
     GX_PROFILE_END(tag)
-
-#endif

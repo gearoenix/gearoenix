@@ -57,7 +57,7 @@ gearoenix::vulkan::texture::Target::Target(
                 auto t = std::make_shared<Texture2D>(
                     txt_id, std::string("target-") + std::to_string(target_id) + "-2d-" + std::to_string(txt_id),
                     e, std::vector<std::vector<std::uint8_t>> {}, info.texture_info,
-                    static_cast<std::size_t>(info.img_width), static_cast<std::size_t>(info.img_height), call);
+                    static_cast<std::uint64_t>(info.img_width), static_cast<std::uint64_t>(info.img_height), call);
                 txt = t;
                 var = render::texture::Attachment2D {
                     .txt = std::move(t),
@@ -69,7 +69,7 @@ gearoenix::vulkan::texture::Target::Target(
                 auto t = std::make_shared<TextureCube>(
                     txt_id, std::string("target-") + std::to_string(target_id) + "-cube-" + std::to_string(txt_id),
                     e, std::vector<std::vector<std::vector<std::uint8_t>>> {},
-                    info.texture_info, static_cast<std::size_t>(info.img_width), call);
+                    info.texture_info, static_cast<std::uint64_t>(info.img_width), call);
                 txt = t;
                 var = render::texture::AttachmentCube {
                     .txt = std::move(t),

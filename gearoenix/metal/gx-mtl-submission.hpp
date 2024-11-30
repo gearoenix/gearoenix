@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_SUBMISSION_HPP
-#define GEAROENIX_METAL_SUBMISSION_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/ecs/gx-cr-ecs-entity.hpp"
@@ -36,8 +35,8 @@ struct SubmissionManager final {
     };
 
     struct SceneData final {
-        std::size_t bvh_pool_index = 0;
-        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::size_t /*camera-pool-index*/> cameras;
+        std::uint32_t bvh_pool_index = 0;
+        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::uint32_t /*camera-pool-index*/> cameras;
     };
 
 private:
@@ -45,11 +44,11 @@ private:
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::size_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
 
     dispatch_semaphore_t present_semaphore;
 
-    [[nodiscard]] bool fill_g_buffers(const std::size_t camera_pool_index);
+    [[nodiscard]] bool fill_g_buffers(const std::uint32_t camera_pool_index);
 
 public:
     SubmissionManager(Engine& e);
@@ -58,5 +57,4 @@ public:
 };
 }
 
-#endif
 #endif

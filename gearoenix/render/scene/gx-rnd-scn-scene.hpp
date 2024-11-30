@@ -1,8 +1,6 @@
-#ifndef GEAROENIX_RENDER_SCENE_SCENE_HPP
-#define GEAROENIX_RENDER_SCENE_SCENE_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -34,6 +32,11 @@ struct Skybox;
 
 namespace gearoenix::render::scene {
 struct Scene final : core::ecs::Component {
+    constexpr static std::uint32_t MAX_COUNT = 16;
+    constexpr static TypeIndex TYPE_INDEX = 24;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     GX_GET_RRF_PRV(engine::Engine, e);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, model_entities);
@@ -51,12 +54,8 @@ struct Scene final : core::ecs::Component {
 
     boost::container::flat_map<core::ecs::entity_id_t, std::uint64_t> cameras_flags;
 
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
-
 public:
     Scene(engine::Engine& e, double layer, std::string&& name, core::ecs::entity_id_t entity_id);
-    [[nodiscard]] static std::shared_ptr<Scene> construct(
-        engine::Engine& e, double layer, std::string&& name, core::ecs::entity_id_t entity_id);
     ~Scene() override;
     void add_model(core::ecs::entity_id_t entity, model::Model& m);
     void add_camera(core::ecs::entity_id_t entity, camera::Camera& c);
@@ -68,4 +67,3 @@ public:
     void update(core::ecs::entity_id_t scene_entity_id);
 };
 }
-#endif

@@ -12,7 +12,7 @@ std::vector<VkDescriptorPoolSize> gearoenix::vulkan::descriptor::BindingsData::c
         szs[b.descriptorType] += b.descriptorCount;
     }
     std::vector<VkDescriptorPoolSize> result(szs.size());
-    std::size_t i = 0;
+    std::uint64_t i = 0;
     for (const auto& [t, c] : szs) {
         auto& r = result[i];
         r.descriptorCount = c;
@@ -32,9 +32,9 @@ gearoenix::vulkan::descriptor::BindingsData::BindingsData(
 }
 
 std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::BindingsData::create_set(
-    const std::optional<std::size_t> kernel_index)
+    const std::optional<std::uint64_t> kernel_index)
 {
-    std::variant<std::size_t, std::thread::id> ti;
+    std::variant<std::uint64_t, std::thread::id> ti;
     if (kernel_index.has_value())
         ti = *kernel_index;
     else

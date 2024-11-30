@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
-#define GEAROENIX_CORE_SYNC_PARALLEL_FOR_HPP
+#pragma once
 #include "../gx-cr-build-configuration.hpp"
 #include <functional>
 #include <thread>
@@ -73,4 +72,3 @@ public:
     }
 };
 }
-#endif

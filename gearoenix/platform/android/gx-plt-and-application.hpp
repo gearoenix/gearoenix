@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_ANDROID_APPLICATION_HPP
-#define GEAROENIX_PLATFORM_ANDROID_APPLICATION_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../../render/gx-rnd-build-configuration.hpp"
@@ -44,5 +43,4 @@ public:
 };
 }
 
-#endif
 #endif

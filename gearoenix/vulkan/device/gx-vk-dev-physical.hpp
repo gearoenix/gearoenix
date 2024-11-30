@@ -60,7 +60,7 @@ public:
     Physical& operator=(const Physical&) = delete;
     Physical& operator=(Physical&&) = delete;
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const;
-    [[nodiscard]] std::size_t align_size(std::size_t size) const;
+    [[nodiscard]] std::uint64_t align_size(std::uint64_t size) const;
 
     /// It's going to fetch a new information about the surface every time.
     ///

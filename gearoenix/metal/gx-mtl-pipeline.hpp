@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_PIPELINE_HPP
-#define GEAROENIX_METAL_PIPELINE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -22,5 +21,4 @@ struct PipelineManager final {
 };
 }
 
-#endif
 #endif

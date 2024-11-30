@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_MATRIX_3D_HPP
-#define GEAROENIX_MATH_MATRIX_3D_HPP
+#pragma once
 #include "gx-math-vector-3d.hpp"
 #include <array>
 
@@ -297,4 +296,3 @@ struct Mat3x3 final {
     }
 };
 }
-#endif

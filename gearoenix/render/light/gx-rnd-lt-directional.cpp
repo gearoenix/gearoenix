@@ -1,6 +1,4 @@
 #include "gx-rnd-lt-directional.hpp"
-
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
@@ -11,10 +9,6 @@
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-lt-builder.hpp"
 
-namespace {
-const auto directional_allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::light::Directional, gearoenix::render::light::Directional::MAX_COUNT>::construct();
-}
-
 gearoenix::render::light::Directional::Directional(std::string&& name,
     const core::ecs::entity_id_t entity_id)
     : Light(create_this_type_index(this), std::move(name), entity_id)
@@ -22,26 +16,10 @@ gearoenix::render::light::Directional::Directional(std::string&& name,
 {
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::light::Directional::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<Light>(this);
-    return types;
-}
-
-std::shared_ptr<gearoenix::render::light::Directional> gearoenix::render::light::Directional::construct(
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-{
-    auto self = directional_allocator->make_shared(std::move(name), entity_id);
-    self->set_component_self(self);
-    return self;
-}
-
 gearoenix::render::light::Directional::~Directional() = default;
 
 gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
-    const std::type_index final_type_index, std::string&& name,
-    const core::ecs::entity_id_t entity_id)
+    const TypeIndex final_type_index, std::string&& name, const core::ecs::entity_id_t entity_id)
     : Light(final_type_index, std::move(name), entity_id)
 {
 }

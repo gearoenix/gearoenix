@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_CHECK_HPP
-#define GEAROENIX_VULKAN_CHECK_HPP
+#pragma once
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
@@ -20,5 +19,4 @@ const char* result_to_string(VkResult res);
     }                                                                    \
     static_assert(true, "")
 
-#endif
 #endif

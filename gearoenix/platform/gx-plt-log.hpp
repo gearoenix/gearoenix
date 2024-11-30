@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_LOG_HPP
-#define GEAROENIX_PLATFORM_LOG_HPP
+#pragma once
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/macro/gx-cr-mcr-concatenate.hpp"
 #include "gx-plt-build-configuration.hpp"
@@ -9,10 +8,10 @@
 #include <mutex>
 #include <sstream>
 
-// You can uses it for enabling log print in the std out
+// You can use it for enabling log print in the std out
 // #define GX_PLATFORM_LOG_STD_OUT_ENABLED
 
-// You can uses it for appending to the log file
+// You can use it for appending to the log file
 // #define GX_PLATFORM_LOG_APPEND_FILE
 
 namespace gearoenix::platform {
@@ -93,5 +92,3 @@ struct Log {
 #define GX_TODO GX_LOG_E("TODO")
 #define GX_UNEXPECTED GX_LOG_F("Unexpected")
 #define GX_UNIMPLEMENTED GX_LOG_F("Unimplemented")
-
-#endif

@@ -80,7 +80,7 @@ void gearoenix::render::font::Font::compute_text_widths(
         widths.push_back(total_width);
     }
     const auto end_index = text.size() - 1;
-    for (std::size_t i = 0; i < end_index;) {
+    for (std::uint64_t i = 0; i < end_index;) {
         const auto pre_c = static_cast<int>(static_cast<unsigned char>(text[i]));
         const auto cur_c = static_cast<int>(static_cast<unsigned char>(text[++i]));
         total_width += static_cast<double>(stbtt_GetCodepointKernAdvance(stb_font.get(), pre_c, cur_c)) * txt_scale;
@@ -133,11 +133,11 @@ void gearoenix::render::font::Font::bake(
         max_texture_size, 16U);
     const auto w_scale = (static_cast<double>(img_width_pixels) * img_height) / (img_width * static_cast<double>(fnt_height));
     const auto width_to_pixel = static_cast<double>(img_width_pixels) / img_width;
-    std::size_t index = 0;
+    std::uint64_t index = 0;
     while (txt_widths[index] < img_start_skip)
         ++index;
     const auto base_line = static_cast<double>(ascent) * h_scale;
-    std::vector<unsigned char> rnd_data(static_cast<std::size_t>(img_width_pixels) * static_cast<std::size_t>(img_height_pixels));
+    std::vector<unsigned char> rnd_data(static_cast<std::uint64_t>(img_width_pixels) * static_cast<std::uint64_t>(img_height_pixels));
     const auto x_pos_start = (txt_widths[index] - img_start_skip) * width_to_pixel;
     const auto txt_end_index = text.size() - 1;
     const auto txt_end_width = img_start_skip + img_width;
@@ -173,8 +173,8 @@ void gearoenix::render::font::Font::bake(
 
     const auto pixels_bytes_count = rnd_data.size() * 4;
     std::vector<std::uint8_t> img_pixels(pixels_bytes_count);
-    for (std::size_t i = 0, ti = 0, img_index = 0; i < static_cast<std::size_t>(img_height_pixels); ++i) {
-        for (std::size_t j = 0; j < static_cast<std::size_t>(img_width_pixels); ++j, ++ti, ++img_index) {
+    for (std::uint64_t i = 0, ti = 0, img_index = 0; i < static_cast<std::uint64_t>(img_height_pixels); ++i) {
+        for (std::uint64_t j = 0; j < static_cast<std::uint64_t>(img_width_pixels); ++j, ++ti, ++img_index) {
             const auto c = static_cast<unsigned int>(rnd_data[ti]);
             img_pixels[img_index] = color_bytes[0];
             img_pixels[++img_index] = color_bytes[1];

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_BILLING_BUILD_CONFIGURATION_HPP
-#define GEAROENIX_PLATFORM_BILLING_BUILD_CONFIGURATION_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 
 #ifdef GX_PLATFORM_ANDROID
@@ -34,7 +33,5 @@
 #else
 
 #error "Unknown platform"
-
-#endif
 
 #endif

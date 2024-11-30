@@ -1,10 +1,11 @@
 #include "gx-gl-shd-deferred-pbr.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-static constexpr const char* const vertex_shader_src = "\
+namespace {
+constexpr auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -20,10 +21,10 @@ void main() {\n\
     out_uv = position* 0.5 + 0.5;\n\
 }\n";
 
-static constexpr const char* const fragment_shader_src = "\
+constexpr auto fragment_shader_src = "\
 #version 300 es\n\
 \n\
-#define GX_PI 3.141592653589793238\n\
+#define gx_pi 3.141592653589793238\n\
 \n\
 precision highp float;\n\
 precision highp int;\n\
@@ -91,6 +92,7 @@ void main() {\n\
     ambient *= ssao_value;\n\
     frag_colour = vec4(ambient + ems_rgh.xyz, 1.0);\n\
 }\n";
+}
 
 gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e)
     : Shader(e)

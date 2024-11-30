@@ -86,13 +86,13 @@ void gearoenix::render::texture::Manager::read_gx3d(
         auto mip_w = txt_info.get_width();
         auto mip_h = txt_info.get_height();
         std::vector<std::uint8_t> data;
-        for (std::size_t mip_index = 0; mip_index < mips_count; ++mip_index, mip_w >>= 1, mip_h >>= 1) {
+        for (std::uint32_t mip_index = 0; mip_index < mips_count; ++mip_index, mip_w >>= 1, mip_h >>= 1) {
             auto& mip_pixels = pixels[mip_index];
             stream.read(data);
             if (is_float) {
                 std::vector<float> float_pixels;
                 std::uint32_t decode_w = 0, decode_h = 0, ignored = 0;
-                Image::decode(data.data(), data.size(), comps_count, float_pixels, decode_w, decode_h, ignored);
+                Image::decode(data.data(), static_cast<std::uint32_t>(data.size()), comps_count, float_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
                 if (e.get_specification().is_float_texture_supported) {
@@ -101,8 +101,8 @@ void gearoenix::render::texture::Manager::read_gx3d(
                 } else {
                     GX_LOG_D("Loading float texture in a an unsupported engine, inefficient load of texture.");
                     mip_pixels.resize((float_pixels.size() * 4) / comps_count); // 4 is because we use RgbaUint8
-                    for (std::size_t pixel_index = 0, float_index = 0; pixel_index < mip_pixels.size();) {
-                        std::size_t comp_index = 0;
+                    for (std::uint32_t pixel_index = 0, float_index = 0; pixel_index < mip_pixels.size();) {
+                        std::uint32_t comp_index = 0;
                         for (; comp_index < comps_count; ++comp_index, ++pixel_index, ++float_index) {
                             const float f = float_pixels[float_index];
                             mip_pixels[pixel_index] = f >= 1.0f ? 225 : f <= 0.0f ? 0
@@ -118,7 +118,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
                 }
             } else {
                 std::uint32_t decode_w = 0, decode_h = 0, ignored = 0;
-                Image::decode(data.data(), data.size(), comps_count, mip_pixels, decode_w, decode_h, ignored);
+                Image::decode(data.data(), static_cast<std::uint32_t>(data.size()), comps_count, mip_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
             }
@@ -223,7 +223,7 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
             return;
         }
     }
-    constexpr std::size_t resolution = 256;
+    constexpr std::uint32_t resolution = 256;
     auto texture_info = TextureInfo()
                             .set_format(TextureFormat::RgbaUint8)
                             .set_sampler_info(SamplerInfo()
@@ -322,7 +322,7 @@ void gearoenix::render::texture::Manager::create_2d_from_pixels(
 void gearoenix::render::texture::Manager::create_2d_from_formatted(
     std::string&& name,
     const void* const data,
-    const std::size_t size,
+    const std::uint32_t size,
     const TextureInfo& info,
     core::job::EndCallerShared<Texture2D>&& c)
 {
@@ -359,7 +359,7 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
 void gearoenix::render::texture::Manager::create_2df_from_formatted(
     std::string&& name,
     const void* const data,
-    std::size_t size,
+    std::uint32_t size,
     const TextureInfo& info,
     core::job::EndCallerShared<Texture2D>&& c)
 {
@@ -425,10 +425,10 @@ void gearoenix::render::texture::Manager::create_2d_from_file(
     GX_ASSERT(nullptr != stream);
     const auto data = stream->get_file_content();
     if (path.get_raw_data().ends_with(".hdr")) {
-        create_2df_from_formatted(std::string(path.get_raw_data()), data.data(), data.size(), info, std::move(c));
+        create_2df_from_formatted(std::string(path.get_raw_data()), data.data(), static_cast<std::uint32_t>(data.size()), info, std::move(c));
         return;
     }
-    return create_2d_from_formatted(std::string(path.get_raw_data()), data.data(), data.size(), info, std::move(c));
+    return create_2d_from_formatted(std::string(path.get_raw_data()), data.data(), static_cast<std::uint32_t>(data.size()), info, std::move(c));
 }
 
 void gearoenix::render::texture::Manager::create_cube_from_colour(
@@ -559,11 +559,11 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
     return { a, b };
 }
 
-std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::size_t resolution)
+std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Manager::create_brdflut_pixels(const std::uint32_t resolution)
 {
     std::vector<math::Vec4<std::uint8_t>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / static_cast<float>(resolution);
-    core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::size_t index, auto) {
+    core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::uint32_t index, auto) {
         const auto roughness_index = (resolution - 1) - index / resolution;
         auto p = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,
@@ -656,9 +656,9 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
                     target_gatherer->targets.main = std::move(t);
                 }));
 
-            for (std::size_t target_index = 0; target_index < target_gatherer->targets.targets.size(); ++target_index) {
+            for (std::uint32_t target_index = 0; target_index < target_gatherer->targets.targets.size(); ++target_index) {
                 const auto target_target_name = target_name + "-index:" + std::to_string(target_index) + "-mip:";
-                for (std::size_t mip_index = 0; mip_index < target_gatherer->targets.targets[0].size(); ++mip_index) {
+                for (std::uint32_t mip_index = 0; mip_index < target_gatherer->targets.targets[0].size(); ++mip_index) {
                     manager->create_target(
                         target_target_name + std::to_string(mip_index),
                         std::vector {

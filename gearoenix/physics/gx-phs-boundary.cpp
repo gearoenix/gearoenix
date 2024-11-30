@@ -9,9 +9,3 @@ gearoenix::physics::Boundary::Boundary(
     , box(upper, lower)
 {
 }
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::Boundary::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}

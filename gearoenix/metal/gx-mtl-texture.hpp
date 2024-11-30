@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_METAL_TEXTURE_HPP
-#define GEAROENIX_METAL_TEXTURE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_METAL_ENABLED
 #import "../render/texture/gx-rnd-txt-manager.hpp"
@@ -40,5 +39,4 @@ struct TextureManager final : public render::texture::Manager {
 };
 }
 
-#endif
 #endif

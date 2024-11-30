@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_OBSERVED_HPP
-#define GEAROENIX_CORE_OBSERVED_HPP
+#pragma once
 #include <boost/container/flat_map.hpp>
 #include <functional>
 
@@ -8,8 +7,8 @@ template <typename T>
 struct Observed final {
 private:
     T value;
-    std::size_t last_id = 0;
-    boost::container::flat_map<std::size_t, std::function<bool(const T&)>> listeners;
+    std::uint32_t last_id = 0;
+    boost::container::flat_map<std::uint32_t, std::function<bool(const T&)>> listeners;
 
     void notify()
     {
@@ -37,14 +36,14 @@ public:
     }
 
     // true means, keep the observer alive
-    [[nodiscard]] std::size_t add_observer(std::function<bool(const T&)>&& f)
+    [[nodiscard]] std::uint32_t add_observer(std::function<bool(const T&)>&& f)
     {
         const auto id = ++last_id;
         listeners.emplace(id, std::move(f));
         return id;
     }
 
-    void remove_observer(const std::size_t id)
+    void remove_observer(const std::uint32_t id)
     {
         if (id == 0)
             return;
@@ -66,5 +65,3 @@ public:
     [[nodiscard]] const T& get() const { return value; }
 };
 }
-
-#endif

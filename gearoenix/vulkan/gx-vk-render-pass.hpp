@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_RENDER_PASS_HPP
-#define GEAROENIX_VULKAN_RENDER_PASS_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -18,5 +17,4 @@ public:
     ~RenderPass();
 };
 }
-#endif
 #endif

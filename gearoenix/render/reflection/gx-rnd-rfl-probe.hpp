@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_RENDER_REFLECTION_PROBE_HPP
-#define GEAROENIX_RENDER_REFLECTION_PROBE_HPP
+#pragma once
+
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-aabb.hpp"
 
 namespace gearoenix::render::engine {
@@ -14,7 +13,12 @@ struct TextureCube;
 
 namespace gearoenix::render::reflection {
 struct Probe : core::ecs::Component {
-    GX_GET_VAL_PRT(std::size_t, radiance_mips_count, 0);
+    constexpr static std::uint32_t MAX_COUNT = 0;
+    constexpr static TypeIndex TYPE_INDEX = 28;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
+    GX_GET_VAL_PRT(std::uint64_t, radiance_mips_count, 0);
     GX_GET_CREF_PRT(math::Aabb3<double>, include_box);
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, irradiance);
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, radiance);
@@ -24,7 +28,7 @@ struct Probe : core::ecs::Component {
 protected:
     Probe(
         engine::Engine& e,
-        std::type_index final_component_type_index,
+        TypeIndex final_component_type_index,
         std::shared_ptr<texture::TextureCube>&& irradiance,
         std::shared_ptr<texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box,
@@ -32,7 +36,7 @@ protected:
         core::ecs::entity_id_t entity_id);
     Probe(
         engine::Engine& e,
-        std::type_index final_component_type_index,
+        TypeIndex final_component_type_index,
         const math::Aabb3<double>& include_box,
         std::string&& name,
         core::ecs::entity_id_t entity_id);
@@ -44,4 +48,3 @@ public:
     virtual void set_radiance(std::shared_ptr<texture::TextureCube>&&);
 };
 }
-#endif

@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_SYSTEM_STREAM_MEMORY_HPP
-#define GEAROENIX_SYSTEM_STREAM_MEMORY_HPP
-
+#pragma once
 #include <string>
 #include <variant>
 
@@ -61,5 +59,3 @@ struct Path final {
     [[nodiscard]] const std::string& get_raw_data() const;
 };
 }
-
-#endif

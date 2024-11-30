@@ -1,6 +1,4 @@
-#ifndef GEAROENIX_RENDER_BUILD_CONFIGURATION_HPP
-#define GEAROENIX_RENDER_BUILD_CONFIGURATION_HPP
-
+#pragma once
 #include "../core/macro/gx-cr-mcr-stringifier.hpp"
 
 #define GX_RENDER_MAX_DIRECTIONAL_LIGHTS 8
@@ -45,6 +43,4 @@
 #define GX_RENDER_OPENGL_ENABLED
 #else
 #error "Unexpected/unimplemented platform."
-#endif
-
 #endif

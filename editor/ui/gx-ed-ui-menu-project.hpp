@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_UI_MENU_PROJECT_HPP
-#define GEAROENIX_EDITOR_UI_MENU_PROJECT_HPP
+#pragma once
 
 namespace gearoenix::editor::ui {
 struct Manager;
@@ -18,4 +17,3 @@ public:
     void update();
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_QUEUE_HPP
-#define GEAROENIX_VULKAN_QUEUE_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -40,16 +39,14 @@ public:
     ~Queue();
     void submit(command::Buffer&, sync::Fence& fence);
     void submit(
-        std::size_t wait_semaphores_count,
+        std::uint64_t wait_semaphores_count,
         const VkSemaphore* wait_semaphores,
         const VkPipelineStageFlags* wait_stages,
-        std::size_t commands_count,
+        std::uint64_t commands_count,
         const VkCommandBuffer* commands,
-        std::size_t signal_semaphores_count,
+        std::uint64_t signal_semaphores_count,
         const VkSemaphore* signal_semaphores,
         VkFence fence = nullptr);
 };
 }
-
-#endif
 #endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_TARGET_HPP
-#define GEAROENIX_RENDER_TEXTURE_TARGET_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../math/gx-math-vector-2d.hpp"
 #include "gx-rnd-txt-attachment.hpp"
@@ -17,8 +16,7 @@ struct Target {
 
 public:
     virtual ~Target();
-    [[nodiscard]] math::Vec2<std::size_t> get_dimension() const;
+    [[nodiscard]] math::Vec2<std::uint32_t> get_dimension() const;
     [[nodiscard]] float get_aspect_ratio() const;
 };
 }
-#endif

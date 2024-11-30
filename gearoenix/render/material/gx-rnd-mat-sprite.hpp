@@ -5,7 +5,7 @@
 
 namespace gearoenix::render::material {
 struct Sprite : Material {
-    static constexpr std::size_t MAX_COUNT = 64;
+    constexpr static std::uint32_t MAX_COUNT = 64;
 
     GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
     GX_GET_REF_PRT(math::Vec4<float>, uv_transform);

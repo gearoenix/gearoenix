@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_BUTTON_HPP
-#define GEAROENIX_RENDER_WIDGET_BUTTON_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-wdg-widget.hpp"
 
@@ -92,4 +91,3 @@ public:
     void set_pressed_texture(std::shared_ptr<texture::Texture2D>&& pressed_texture);
 };
 }
-#endif

@@ -1,53 +1,55 @@
-#ifndef GEAROENIX_CORE_ECS_WORLD_TEST_HPP
-#define GEAROENIX_CORE_ECS_WORLD_TEST_HPP
+#pragma once
 #include "gx-cr-ecs-world.hpp"
 #include <cmath>
 
+namespace gearoenix_core_ecs_world_test {
+struct Position final : gearoenix::core::ecs::Component {
+    constexpr static std::uint32_t MAX_COUNT = 100;
+    constexpr static TypeIndex TYPE_INDEX = 100;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    double x;
+    double y;
+
+    Position(const double x, const double y, const gearoenix::core::ecs::entity_id_t entity_id)
+        : Component(create_this_type_index(this), "position", entity_id)
+        , x(x)
+        , y(y)
+    {
+    }
+
+    ~Position() override = default;
+};
+
+struct Speed final : gearoenix::core::ecs::Component {
+    constexpr static std::uint32_t MAX_COUNT = 100;
+    constexpr static TypeIndex TYPE_INDEX = 101;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
+    double x;
+    double y;
+
+    Speed(const double x, const double y, const gearoenix::core::ecs::entity_id_t entity_id)
+        : Component(create_this_type_index(this), "speed", entity_id)
+        , x(x)
+        , y(y)
+    {
+    }
+
+    ~Speed() override = default;
+};
+}
+
 BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 {
+    using namespace gearoenix_core_ecs_world_test;
     using namespace gearoenix::core::ecs;
     using namespace gearoenix::core::job;
     using namespace gearoenix::core::sync;
 
-    struct Position final : Component {
-        double x;
-        double y;
-
-        Position(const double x, const double y, const entity_id_t entity_id)
-            : Component(create_this_type_index(this), "position", entity_id)
-            , x(x)
-            , y(y)
-        {
-        }
-
-        ~Position() override = default;
-
-        [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override
-        {
-            static const auto types = generate_hierarchy_types(this);
-            return types;
-        }
-    };
-
-    struct Speed final : Component {
-        double x;
-        double y;
-
-        Speed(const double x, const double y, const entity_id_t entity_id)
-            : Component(Component::create_this_type_index(this), "speed", entity_id)
-            , x(x)
-            , y(y)
-        {
-        }
-
-        ~Speed() override = default;
-
-        [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override
-        {
-            static const auto types = generate_hierarchy_types(this);
-            return types;
-        }
-    };
+    Component::register_type<Position>();
+    Component::register_type<Speed>();
 
     static entity_id_t e1, e2, e3, e4, e5;
     static World w;
@@ -203,28 +205,28 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     {
         auto b = EntityBuilder("1", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Position>(2.0, 3.0, b.get_id()), std::make_shared<Speed>(4.0, 5.0, b.get_id()));
+        b.add_components(Component::construct<Position>(2.0, 3.0, b.get_id()), Component::construct<Speed>(4.0, 5.0, b.get_id()));
         e1 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("2", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Position>(6.0, 7.0, b.get_id()));
+        b.add_components(Component::construct<Position>(6.0, 7.0, b.get_id()));
         e2 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("3", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Speed>(10.0, 11.0, b.get_id()), std::make_shared<Position>(8.0, 9., b.get_id()));
+        b.add_components(Component::construct<Speed>(10.0, 11.0, b.get_id()), Component::construct<Position>(8.0, 9., b.get_id()));
         e3 = b.get_id();
         w.create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("4", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Speed>(12.0, 13.0, b.get_id()));
+        b.add_components(Component::construct<Speed>(12.0, 13.0, b.get_id()));
         e4 = b.get_id();
         w.create_entity(std::move(b));
     }
@@ -267,10 +269,10 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         w.create_entity(std::move(b));
     }
 
-    w.add_components(e1, std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
-    w.add_components(e2, std::make_shared<Position>(6.0, 7.0, e2));
-    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
-    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0, e4));
+    w.add_components(e1, Component::construct<Position>(2.0, 3.0, e1), Component::construct<Speed>(4.0, 5.0, e1));
+    w.add_components(e2, Component::construct<Position>(6.0, 7.0, e2));
+    w.add_components(e3, Component::construct<Speed>(10.0, 11.0, e3), Component::construct<Position>(8.0, 9.0, e3));
+    w.add_components(e4, Component::construct<Speed>(12.0, 13.0, e4));
 
     end_of_step();
 
@@ -304,11 +306,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         w.create_entity(std::move(b));
     }
 
-    w.add_components(e1, std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
-    w.add_components(e2, std::make_shared<Position>(6.0, 7.0, e2), std::make_shared<Speed>(-1.0, -1.0, e2));
-    w.add_components(e3, std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
-    w.add_components(e4, std::make_shared<Speed>(12.0, 13.0, e4), std::make_shared<Position>(-1.0, -1.0, e4));
-    w.add_components(e5, std::make_shared<Speed>(-1.0, -1.0, e5), std::make_shared<Position>(-1.0, -1.0, e5));
+    w.add_components(e1, Component::construct<Position>(2.0, 3.0, e1), Component::construct<Speed>(4.0, 5.0, e1));
+    w.add_components(e2, Component::construct<Position>(6.0, 7.0, e2), Component::construct<Speed>(-1.0, -1.0, e2));
+    w.add_components(e3, Component::construct<Speed>(10.0, 11.0, e3), Component::construct<Position>(8.0, 9.0, e3));
+    w.add_components(e4, Component::construct<Speed>(12.0, 13.0, e4), Component::construct<Position>(-1.0, -1.0, e4));
+    w.add_components(e5, Component::construct<Speed>(-1.0, -1.0, e5), Component::construct<Position>(-1.0, -1.0, e5));
 
     w.remove_components<Speed>(e2);
     w.remove_components<Position>(e4);
@@ -320,28 +322,28 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     {
         auto b = EntityBuilder("1", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Position>(2.0, 3.0, b.get_id()), std::make_shared<Speed>(4.0, 5.0, b.get_id()));
+        b.add_components(Component::construct<Position>(2.0, 3.0, b.get_id()), Component::construct<Speed>(4.0, 5.0, b.get_id()));
         e1 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("2", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Position>(6.0, 7.0, b.get_id()));
+        b.add_components(Component::construct<Position>(6.0, 7.0, b.get_id()));
         e2 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("3", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Speed>(10.0, 11.0, b.get_id()), std::make_shared<Position>(8.0, 9.0, b.get_id()));
+        b.add_components(Component::construct<Speed>(10.0, 11.0, b.get_id()), Component::construct<Position>(8.0, 9.0, b.get_id()));
         e3 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
 
     {
         auto b = EntityBuilder("4", EndCaller<>([] { }));
-        b.add_components(std::make_shared<Speed>(12.0, 13.0, b.get_id()));
+        b.add_components(Component::construct<Speed>(12.0, 13.0, b.get_id()));
         e4 = b.get_id();
         w.delayed_create_entity(std::move(b));
     }
@@ -361,10 +363,10 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         b24("24", EndCaller<>([] { })),
         b25("25", EndCaller<>([] { }));
 
-    b21.add_components(std::make_shared<Position>(2.0, 3.0, b21.get_id()), std::make_shared<Speed>(4.0, 5.0, b21.get_id()));
-    b22.add_component(std::make_shared<Position>(6.0, 7.0, b22.get_id()));
-    b23.add_components(std::make_shared<Speed>(10.0, 11.0, b23.get_id()), std::make_shared<Position>(8.0, 9.0, b23.get_id()));
-    b24.add_components(std::make_shared<Speed>(12.0, 13.0, b24.get_id()));
+    b21.add_components(Component::construct<Position>(2.0, 3.0, b21.get_id()), Component::construct<Speed>(4.0, 5.0, b21.get_id()));
+    b22.add_component(Component::construct<Position>(6.0, 7.0, b22.get_id()));
+    b23.add_components(Component::construct<Speed>(10.0, 11.0, b23.get_id()), Component::construct<Position>(8.0, 9.0, b23.get_id()));
+    b24.add_components(Component::construct<Speed>(12.0, 13.0, b24.get_id()));
 
     e1 = b21.get_id();
     w.delayed_create_entity(std::move(b21));
@@ -410,10 +412,10 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         w.delayed_create_entity(std::move(b));
     }
 
-    w.delayed_add_components(e1, EndCaller<>([] { }), std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
-    w.delayed_add_components(e2, EndCaller<>([] { }), std::make_shared<Position>(6.0, 7.0, e2));
-    w.delayed_add_components(e3, EndCaller<>([] { }), std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
-    w.delayed_add_components(e4, EndCaller<>([] { }), std::make_shared<Speed>(12.0, 13.0, e4));
+    w.delayed_add_components(e1, EndCaller<>([] { }), Component::construct<Position>(2.0, 3.0, e1), Component::construct<Speed>(4.0, 5.0, e1));
+    w.delayed_add_components(e2, EndCaller<>([] { }), Component::construct<Position>(6.0, 7.0, e2));
+    w.delayed_add_components(e3, EndCaller<>([] { }), Component::construct<Speed>(10.0, 11.0, e3), Component::construct<Position>(8.0, 9.0, e3));
+    w.delayed_add_components(e4, EndCaller<>([] { }), Component::construct<Speed>(12.0, 13.0, e4));
 
     w.update();
     end_of_step();
@@ -448,11 +450,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
         w.delayed_create_entity(std::move(b));
     }
 
-    w.delayed_add_components(e1, EndCaller([] { }), std::make_shared<Position>(2.0, 3.0, e1), std::make_shared<Speed>(4.0, 5.0, e1));
-    w.delayed_add_components(e2, EndCaller([] { }), std::make_shared<Position>(6.0, 7.0, e2), std::make_shared<Speed>(-1.0, -1.0, e2));
-    w.delayed_add_components(e3, EndCaller([] { }), std::make_shared<Speed>(10.0, 11.0, e3), std::make_shared<Position>(8.0, 9.0, e3));
-    w.delayed_add_components(e4, EndCaller([] { }), std::make_shared<Speed>(12.0, 13.0, e4), std::make_shared<Position>(-1.0, -1.0, e4));
-    w.delayed_add_components(e5, EndCaller([] { }), std::make_shared<Speed>(-1.0, -1.0, e5), std::make_shared<Position>(-1.0, -1.0, e5));
+    w.delayed_add_components(e1, EndCaller([] { }), Component::construct<Position>(2.0, 3.0, e1), Component::construct<Speed>(4.0, 5.0, e1));
+    w.delayed_add_components(e2, EndCaller([] { }), Component::construct<Position>(6.0, 7.0, e2), Component::construct<Speed>(-1.0, -1.0, e2));
+    w.delayed_add_components(e3, EndCaller([] { }), Component::construct<Speed>(10.0, 11.0, e3), Component::construct<Position>(8.0, 9.0, e3));
+    w.delayed_add_components(e4, EndCaller([] { }), Component::construct<Speed>(12.0, 13.0, e4), Component::construct<Position>(-1.0, -1.0, e4));
+    w.delayed_add_components(e5, EndCaller([] { }), Component::construct<Speed>(-1.0, -1.0, e5), Component::construct<Position>(-1.0, -1.0, e5));
 
     w.delayed_remove_components<Speed>(e2, EndCaller<>([] { }));
     w.delayed_remove_components<Position>(e4, EndCaller<>([] { }));
@@ -461,5 +463,3 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     w.update();
     end_of_step();
 }
-
-#endif

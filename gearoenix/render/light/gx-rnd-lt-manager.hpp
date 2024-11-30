@@ -41,14 +41,14 @@ struct Manager {
     //    const core::job::EndCaller& end_callback) ;
     //[[nodiscard]] virtual std::shared_ptr<Builder> build_shadow_caster_point(
     //    const std::string& name,
-    //    std::size_t shadow_map_resolution,
+    //    std::uint64_t shadow_map_resolution,
     //    const core::job::EndCaller& end_callback) ;
     //[[nodiscard]] virtual std::shared_ptr<Builder> build_spot(
     //    const std::string& name,
     //    const core::job::EndCaller& end_callback) ;
     //[[nodiscard]] virtual std::shared_ptr<Builder> build_shadow_caster_spot(
     //    const std::string& name,
-    //    std::size_t shadow_map_resolution,
+    //    std::uint64_t shadow_map_resolution,
     //    const core::job::EndCaller& end_callback) ;
 };
 }

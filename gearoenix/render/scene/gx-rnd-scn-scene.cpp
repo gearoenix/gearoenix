@@ -1,20 +1,9 @@
 #include "gx-rnd-scn-scene.hpp"
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
-
-namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::render::scene::Scene, 16>::construct();
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::render::scene::Scene::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
 
 gearoenix::render::scene::Scene::Scene(
     engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
@@ -24,14 +13,6 @@ gearoenix::render::scene::Scene::Scene(
     , layer(layer)
 {
     set_enabled(false);
-}
-
-std::shared_ptr<gearoenix::render::scene::Scene> gearoenix::render::scene::Scene::construct(
-    engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
-{
-    auto self = allocator->make_shared(e, layer, std::move(name), entity_id);
-    self->set_component_self(self);
-    return self;
 }
 
 gearoenix::render::scene::Scene::~Scene() = default;

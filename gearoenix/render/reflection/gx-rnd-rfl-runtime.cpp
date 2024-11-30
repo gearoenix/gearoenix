@@ -1,5 +1,4 @@
 #include "gx-rnd-rfl-runtime.hpp"
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
@@ -16,7 +15,7 @@
 
 gearoenix::render::reflection::Runtime::Runtime(
     engine::Engine& e,
-    const std::type_index final_component_type_index,
+    const TypeIndex final_component_type_index,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
@@ -40,8 +39,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     core::job::EndCaller<>&& end_callback)
 {
     weak_runtime_self = runtime_self;
-    set_component_self(runtime_self);
-    const auto radiance_mipmap_levels = static_cast<std::size_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
+    const auto radiance_mipmap_levels = static_cast<std::uint32_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
     const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
     const auto fars = math::Vec3<float>(receive_box.get_diameter() * 0.5);
     struct FaceInfo {
@@ -53,12 +51,12 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         float far;
     };
     const std::array<FaceInfo, 6> faces { {
-        { texture::FACES[0], GX_PI * 0.0, GX_PI * 1.5, GX_PI * 1.0, nears.x, fars.x },
-        { texture::FACES[1], GX_PI * 0.0, GX_PI * 0.5, GX_PI * 1.0, nears.x, fars.x },
-        { texture::FACES[2], GX_PI * 0.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
-        { texture::FACES[3], GX_PI * 1.5, GX_PI * 0.0, GX_PI * 0.0, nears.y, fars.y },
-        { texture::FACES[4], GX_PI * 1.0, GX_PI * 0.0, GX_PI * 0.0, nears.z, fars.z },
-        { texture::FACES[5], GX_PI * 0.0, GX_PI * 0.0, GX_PI * 1.0, nears.z, fars.z },
+        { texture::FACES[0], std::numbers::pi * 0.0, std::numbers::pi * 1.5, std::numbers::pi * 1.0, nears.x, fars.x },
+        { texture::FACES[1], std::numbers::pi * 0.0, std::numbers::pi * 0.5, std::numbers::pi * 1.0, nears.x, fars.x },
+        { texture::FACES[2], std::numbers::pi * 0.5, std::numbers::pi * 0.0, std::numbers::pi * 0.0, nears.y, fars.y },
+        { texture::FACES[3], std::numbers::pi * 1.5, std::numbers::pi * 0.0, std::numbers::pi * 0.0, nears.y, fars.y },
+        { texture::FACES[4], std::numbers::pi * 1.0, std::numbers::pi * 0.0, std::numbers::pi * 0.0, nears.z, fars.z },
+        { texture::FACES[5], std::numbers::pi * 0.0, std::numbers::pi * 0.0, std::numbers::pi * 1.0, nears.z, fars.z },
     } };
     const auto roughness_move = 1.0 / static_cast<double>(radiance_mipmap_levels - 1);
     double current_roughness = 0.0;
@@ -80,7 +78,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
                                               .set_has_mipmap(true);
 
     const core::job::EndCaller when_all_textures_are_ready([self = runtime_self, faces, main_end_callback = std::move(end_callback), builder]() -> void {
-        for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+        for (std::uint64_t face_index = 0; face_index < 6; ++face_index) {
             const auto& face = faces[face_index];
             const auto name_ext = "-" + std::to_string(face.face);
             const auto& cam = self->cameras[face_index].cmr;
@@ -102,7 +100,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
                 }));
             cam->set_near(face.near);
             cam->set_far(face.far);
-            cam->set_projection_data(camera::PerspectiveProjectionData { .field_of_view_y = static_cast<float>(GX_PI * 0.5) });
+            cam->set_projection_data(camera::PerspectiveProjectionData { .field_of_view_y = static_cast<float>(std::numbers::pi * 0.5) });
             cam->set_usage(camera::Camera::Usage::ReflectionProbe);
             cam->set_parent_entity_id(builder->get_id());
             cam->set_enabled(false);
@@ -123,7 +121,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
                     self->irradiance_targets[face_index] = std::move(t);
                 }));
             self->radiance_targets[face_index].resize(self->roughnesses.size());
-            for (std::size_t mip_index = 0; mip_index < self->roughnesses.size(); ++mip_index) {
+            for (std::uint64_t mip_index = 0; mip_index < self->roughnesses.size(); ++mip_index) {
                 self->e.get_texture_manager()->create_target(
                     self->name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
                     std::vector {
@@ -159,8 +157,8 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     radiance_texture_info.set_width(radiance_resolution);
     radiance_texture_info.set_height(radiance_resolution);
     std::vector<std::vector<std::vector<std::uint8_t>>> radiance_pixels(6);
-    constexpr auto pixel_size = static_cast<std::size_t>(4) * static_cast<std::size_t>(4);
-    const std::size_t base_mipmap_radiance_size = pixel_size * radiance_resolution * radiance_resolution;
+    constexpr auto pixel_size = static_cast<std::uint64_t>(4) * static_cast<std::uint64_t>(4);
+    const std::uint64_t base_mipmap_radiance_size = pixel_size * radiance_resolution * radiance_resolution;
     for (auto& fp : radiance_pixels) {
         fp.resize(roughnesses.size());
         auto psz = base_mipmap_radiance_size;
@@ -195,7 +193,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             self->environment_depth = std::move(t);
             (void)when_all_textures_are_ready;
         }));
-    for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+    for (std::uint64_t face_index = 0; face_index < 6; ++face_index) {
         const auto& face = faces[face_index];
         const auto name_ext = "-" + std::to_string(face.face);
         e.get_camera_manager()->build(

@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_GL_SHADER_DEFERRED_PBR_TRANSPARENT_HPP
-#define GEAROENIX_GL_SHADER_DEFERRED_PBR_TRANSPARENT_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl::shader {
-struct DeferredPbrTransparent final : public Shader {
+struct DeferredPbrTransparent final : Shader {
     GX_GL_UNIFORM_VECTOR(screen_uv_move_reserved, 4, 1);
     GX_GL_UNIFORM_TEXTURE(albedo_metallic);
     GX_GL_UNIFORM_TEXTURE(position_depth);
@@ -14,10 +13,9 @@ struct DeferredPbrTransparent final : public Shader {
 
 public:
     explicit DeferredPbrTransparent(Engine& e);
-    ~DeferredPbrTransparent() final;
-    void bind(uint& current_shader) const final;
+    ~DeferredPbrTransparent() override;
+    void bind(uint& current_shader) const override;
 };
 }
 
-#endif
 #endif

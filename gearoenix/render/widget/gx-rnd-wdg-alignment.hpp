@@ -1,6 +1,6 @@
-#ifndef GEAROENIX_RENDER_WIDGET_ALIGNMENT_HPP
-#define GEAROENIX_RENDER_WIDGET_ALIGNMENT_HPP
+#pragma once
 #include <cstdint>
+
 namespace gearoenix::render::widget {
 enum struct Alignment : std::uint8_t {
     Center = 1,
@@ -8,4 +8,3 @@ enum struct Alignment : std::uint8_t {
     End = 3,
 };
 }
-#endif

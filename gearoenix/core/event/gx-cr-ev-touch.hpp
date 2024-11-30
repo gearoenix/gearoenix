@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_TOUCH_HPP
-#define GEAROENIX_CORE_EVENT_TOUCH_HPP
+#pragma once
 #include "../../platform/gx-plt-touch.hpp"
 #include "gx-cr-ev-point.hpp"
 #include <chrono>
@@ -29,4 +28,3 @@ public:
 };
 
 }
-#endif

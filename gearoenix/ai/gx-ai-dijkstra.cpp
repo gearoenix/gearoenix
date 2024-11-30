@@ -24,9 +24,9 @@ gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int sta
     seen_vertices.resize(graph.size(), SeenInfo {});
     seen_vertices[start].weight = 0;
     int idx = start;
-    for (std::size_t i = 0; i < graph.size(); ++i) {
+    for (std::uint32_t i = 0; i < graph.size(); ++i) {
         int min_w = std::numeric_limits<int>::max();
-        for (std::size_t j = 0; j < graph.size(); ++j) {
+        for (std::uint32_t j = 0; j < graph.size(); ++j) {
             const auto& v = seen_vertices[j];
             if (v.not_best && v.weight < min_w) {
                 min_w = v.weight;

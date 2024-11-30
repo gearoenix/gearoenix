@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
-#define GEAROENIX_RENDER_TEXTURE_TEXTURE_2D_HPP
+#pragma once
 #include "gx-rnd-txt-texture.hpp"
 
 namespace gearoenix::render::texture {
@@ -15,4 +14,3 @@ public:
     [[nodiscard]] virtual void* get_imgui_ptr() const;
 };
 }
-#endif

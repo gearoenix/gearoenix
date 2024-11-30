@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_WORK_WAITER_HPP
-#define GEAROENIX_CORE_SYNC_WORK_WAITER_HPP
+#pragma once
 #include "../gx-cr-function-loader.hpp"
 #include "gx-cr-sync-semaphore.hpp"
 #include <functional>
@@ -31,5 +30,3 @@ public:
     void push(std::function<void()>&& f);
 };
 }
-
-#endif

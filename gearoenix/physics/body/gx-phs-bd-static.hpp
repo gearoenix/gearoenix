@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_BODY_STATIC_HPP
-#define GEAROENIX_PHYSICS_BODY_STATIC_HPP
+#pragma once
 #include "gx-phs-bd-body.hpp"
 
 namespace gearoenix::physics::body {
@@ -13,4 +12,3 @@ public:
     virtual ~Static();
 };
 }
-#endif

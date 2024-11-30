@@ -100,7 +100,7 @@ gearoenix::metal::UniformBuffer gearoenix::metal::BufferManager::create_uniform(
     return UniformBuffer(uniforms_gpu_range->allocate(size), std::move(cpu_ranges), std::move(data));
 }
 
-void gearoenix::metal::BufferManager::update(id<MTLBlitCommandEncoder> blit, std::size_t frame_number)
+void gearoenix::metal::BufferManager::update(id<MTLBlitCommandEncoder> blit, std::uint32_t frame_number)
 {
     [blit
            copyFromBuffer:uniforms_cpu

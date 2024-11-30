@@ -3,13 +3,13 @@
 #include "gx-plt-stm-local.hpp"
 #include "gx-plt-stm-path.hpp"
 
-void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const std::size_t length)
+void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const std::uint64_t length)
 {
     (void)read(data, length);
     if (endian_compatibility)
         return;
     auto* const c_data = static_cast<std::uint8_t*>(data);
-    for (std::size_t i = 0, j = length - 1; i < j; ++i, --j) {
+    for (std::uint64_t i = 0, j = length - 1; i < j; ++i, --j) {
         const std::uint8_t tmp = c_data[i];
         c_data[i] = c_data[j];
         c_data[j] = tmp;

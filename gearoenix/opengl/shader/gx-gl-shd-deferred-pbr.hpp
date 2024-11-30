@@ -1,10 +1,9 @@
-#ifndef GEAROENIX_GL_SHADER_DEFERRED_PBR_HPP
-#define GEAROENIX_GL_SHADER_DEFERRED_PBR_HPP
+#pragma once
 #include "gx-gl-shader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace gearoenix::gl::shader {
-struct DeferredPbr final : public Shader {
+struct DeferredPbr final : Shader {
     GX_GL_UNIFORM_VECTOR(screen_uv_move_reserved, 4, 1);
     GX_GL_UNIFORM_VECTOR(camera_position, 3, 1);
     GX_GL_UNIFORM_TEXTURE(albedo_metallic);
@@ -18,10 +17,9 @@ struct DeferredPbr final : public Shader {
 
 public:
     explicit DeferredPbr(Engine& e);
-    ~DeferredPbr() final;
-    void bind(uint& current_shader) const final;
+    ~DeferredPbr() override;
+    void bind(uint& current_shader) const override;
 };
 }
 
-#endif
 #endif

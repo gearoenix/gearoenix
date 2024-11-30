@@ -67,7 +67,7 @@ void gearoenix::gl::Buffer::construct(
             glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES);
         }
         const auto stride = static_cast<sizei>(render::get_element_size(vs));
-        std::size_t pointer = 0;
+        std::uintptr_t pointer = 0;
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(pointer));
         pointer += 3 * sizeof(float);
         glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(pointer));

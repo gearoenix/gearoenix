@@ -43,7 +43,7 @@ void gearoenix::metal::ModelBuilder::set_material(const render::material::Pbr& m
         e,
         std::dynamic_pointer_cast<Mesh>(b.get_component<render::model::Model>()->bound_mesh),
         sizeof(ModelUniform), *b.get_name());
-    for (std::size_t frame_index = 0; frame_index < GEAROENIX_METAL_FRAMES_COUNT; ++frame_index) {
+    for (std::uint32_t frame_index = 0; frame_index < GEAROENIX_METAL_FRAMES_COUNT; ++frame_index) {
         auto& u = *reinterpret_cast<ModelUniform*>(m.uniform.data[frame_index]);
         u.colour_factor = simd_make_float4(mat.get_albedo_factor());
         u.emission_factor__alpha_cutoff = simd_make_float4(mat.get_emission_factor(), mat.get_alpha_cutoff());

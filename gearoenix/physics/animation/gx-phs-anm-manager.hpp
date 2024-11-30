@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
-#define GEAROENIX_PHYSICS_ANIMATION_MANAGER_HPP
+#pragma once
 #include "../../core/allocator/gx-cr-alc-static-block.hpp"
 #include "gx-phs-anm-animation.hpp"
 #include "gx-phs-anm-armature.hpp"
@@ -32,12 +31,12 @@ struct Manager final {
 
 private:
     std::mutex this_lock;
-    std::map<std::string, std::size_t> bones_indices;
+    std::map<std::string, std::uint32_t> bones_indices;
     core::allocator::StaticBlock<1048 * 1024> animation_allocator;
     std::map<std::string, std::shared_ptr<Animation>> animations_map;
 
-    void insert_bones(BoneInfo& bones_info, std::size_t current_index);
-    void update_bone(std::size_t index, Transformation* parent);
+    void insert_bones(BoneInfo& bones_info, std::uint32_t current_index);
+    void update_bone(std::uint32_t index, Transformation* parent);
 
 public:
     explicit Manager(render::engine::Engine& e);
@@ -52,17 +51,17 @@ public:
         core::ecs::EntityBuilder& builder,
         std::string name,
         std::shared_ptr<render::material::Sprite> sprite,
-        std::size_t width,
-        std::size_t height);
+        std::uint32_t width,
+        std::uint32_t height);
     void update();
 
     template <typename Function>
-    void loop_over_bones(Function&& function, const std::size_t bone_index)
+    void loop_over_bones(Function&& function, const std::uint32_t bone_index)
     {
         const Bone& bone = bones[bone_index];
-        for (std::size_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
+        for (std::uint32_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
             function(bones[child_index]);
-        for (std::size_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
+        for (std::uint32_t child_index = bone.first_child_index; child_index < bone.end_child_index; ++child_index)
             loop_over_bones(function, child_index);
     }
 
@@ -74,4 +73,3 @@ public:
     }
 };
 }
-#endif

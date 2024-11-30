@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_MACRO_GETTER_SETTER_HPP
-#define GEAROENIX_CORE_MACRO_GETTER_SETTER_HPP
+#pragma once
 
 #define GX_GET_CREF(v, c, t, x)            \
 public:                                    \
@@ -191,4 +190,3 @@ public:                        \
 #define GX_GET_CRRF_PRV(t, x) GX_GET_CRRF(private, const, t, x)
 #define GX_GET_RRF_PRT(t, x) GX_GET_RRF(protected, t, x)
 #define GX_GET_RRF_PRV(t, x) GX_GET_RRF(private, t, x)
-#endif

@@ -16,8 +16,8 @@ struct Target final {
     };
 
 private:
-    static constexpr std::size_t CUSTOMISED_VAR_INDEX = 0;
-    static constexpr std::size_t DEFAULT_VAR_INDEX = 1;
+    constexpr static std::uint32_t CUSTOMISED_VAR_INDEX = 0;
+    constexpr static std::uint32_t DEFAULT_VAR_INDEX = 1;
 
     std::variant<Customised, texture::DefaultCameraTargets> target = texture::DefaultCameraTargets {};
 
@@ -31,7 +31,7 @@ public:
     [[nodiscard]] bool is_default() const;
     void set_customised(std::shared_ptr<texture::Target>&& customised_target);
     [[nodiscard]] double get_aspect_ratio() const;
-    [[nodiscard]] math::Vec2<std::size_t> get_dimension() const;
+    [[nodiscard]] math::Vec2<std::uint32_t> get_dimension() const;
     [[nodiscard]] const texture::DefaultCameraTargets& get_default() const;
     [[nodiscard]] const Customised& get_customised() const;
 };

@@ -10,10 +10,10 @@ void gearoenix::core::sync::UpdateManager::update_kernel(const unsigned int kern
 {
     GX_START_MULTITHREADED_TASKS
     const unsigned int kernels_count = workers->get_threads_count();
-    std::size_t current_index = 0;
+    std::uint32_t current_index = 0;
     const auto& end_indices = influence_manager.get_influencers_indices();
     const auto& functions = influence_manager.get_influencers();
-    for (const std::size_t end_index : end_indices) {
+    for (const std::uint32_t end_index : end_indices) {
         GX_DO_MULTITHREADED_TASK(for (; current_index < end_index; ++current_index) {
             functions[current_index]();
         })

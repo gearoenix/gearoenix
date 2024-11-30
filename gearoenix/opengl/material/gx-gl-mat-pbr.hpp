@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_MATERIAL_PBR_HPP
-#define GEAROENIX_GL_MATERIAL_PBR_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../render/material/gx-rnd-mat-pbr.hpp"
@@ -39,5 +38,4 @@ public:
 };
 }
 
-#endif
 #endif

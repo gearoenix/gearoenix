@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_CAMERA_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_CAMERA_HPP
+#pragma once
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
 #include <memory>
 
@@ -33,5 +32,3 @@ public:
     void update();
 };
 }
-
-#endif

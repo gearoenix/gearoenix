@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_ENVIRONMENT_HPP
-#define GEAROENIX_GL_SUBMISSION_ENVIRONMENT_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../math/gx-math-aabb.hpp"
@@ -21,5 +20,4 @@ struct Reflection final {
 };
 }
 
-#endif
 #endif

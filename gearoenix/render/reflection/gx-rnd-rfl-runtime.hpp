@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_REFLECTION_RUNTIME_HPP
-#define GEAROENIX_RENDER_REFLECTION_RUNTIME_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../gx-rnd-build-configuration.hpp"
 #include "gx-rnd-rfl-probe.hpp"
@@ -50,7 +49,8 @@ struct Runtime : Probe {
     typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MipedCubeTarget;
     typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MipedRoughness;
 
-    static constexpr std::size_t MAX_COUNT = 8;
+    constexpr static std::uint32_t MAX_COUNT = 8;
+    constexpr static TypeIndex TYPE_INDEX = 22;
 
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, environment);
     GX_GET_CREF_PRT(CubeCamera, cameras);
@@ -59,11 +59,11 @@ struct Runtime : Probe {
     GX_GET_CREF_PRT(MipedCubeTarget, radiance_targets);
     GX_GET_CREF_PRT(MipedRoughness, roughnesses);
     GX_GET_VAL_PRT(State, state, State::Uninitialized);
-    GX_GET_VAL_PRT(std::size_t, state_environment_face, 0);
-    GX_GET_VAL_PRT(std::size_t, state_irradiance_face, 0);
-    GX_GET_VAL_PRT(std::size_t, state_radiance_face, 0);
-    GX_GET_VAL_PRT(std::size_t, state_radiance_level, 0);
-    GX_GET_VAL_PRT(std::size_t, state_resting_frame, 0);
+    GX_GET_VAL_PRT(std::uint32_t, state_environment_face, 0);
+    GX_GET_VAL_PRT(std::uint32_t, state_irradiance_face, 0);
+    GX_GET_VAL_PRT(std::uint32_t, state_radiance_face, 0);
+    GX_GET_VAL_PRT(std::uint32_t, state_radiance_level, 0);
+    GX_GET_VAL_PRT(std::uint32_t, state_resting_frame, 0);
     GX_GETSET_VAL_PRT(std::uint64_t, resting_frames_count, std::numeric_limits<std::uint64_t>::max());
     GX_GET_CREF_PRT(std::function<void()>, on_rendered);
     GX_GETSET_VAL_PRT(bool, pending_to_start, false);
@@ -74,7 +74,7 @@ struct Runtime : Probe {
 
     Runtime(
         engine::Engine& e,
-        std::type_index final_component_type_index,
+        TypeIndex final_component_type_index,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
@@ -97,4 +97,3 @@ public:
     void export_baked(const std::shared_ptr<platform::stream::Stream>& s, core::job::EndCaller<>&& end_callback) const;
 };
 }
-#endif

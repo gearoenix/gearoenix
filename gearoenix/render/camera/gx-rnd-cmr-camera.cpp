@@ -20,7 +20,7 @@ thread_local std::default_random_engine re(rd());
 
 gearoenix::render::camera::Camera::Camera(
     engine::Engine& e,
-    const std::type_index final_type,
+    const TypeIndex final_type,
     const std::string& name,
     Target&& target,
     std::shared_ptr<physics::Transformation>&& transform,
@@ -48,9 +48,9 @@ gearoenix::render::camera::Camera::~Camera()
     RuntimeConfiguration::get(e).get_runtime_resolution().remove_observer(resolution_cfg_observer);
 }
 
-void gearoenix::render::camera::Camera::set_component_self(const std::shared_ptr<Component>& c)
+void gearoenix::render::camera::Camera::set_camera_self(const std::shared_ptr<Camera>& c)
 {
-    camera_self = std::dynamic_pointer_cast<Camera>(c);
+    camera_self = c;
     if (0 == resolution_cfg_observer) {
         resolution_cfg_observer = RuntimeConfiguration::get(e).get_runtime_resolution().add_observer(
             [c = camera_self](const Resolution&) {
@@ -62,7 +62,6 @@ void gearoenix::render::camera::Camera::set_component_self(const std::shared_ptr
                 return true;
             });
     }
-    Component::set_component_self(c);
 }
 
 void gearoenix::render::camera::Camera::generate_frustum_points(
@@ -248,7 +247,7 @@ void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>
             if (nullptr == self) {
                 return;
             }
-            std::string mesh_name = name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::size_t>(this));
+            std::string mesh_name = name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::uint64_t>(this));
             (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
             std::array<math::Vec3<double>, 8> points;
             generate_frustum_points(
@@ -258,7 +257,7 @@ void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>
                 math::Z3D<double>,
                 points);
             std::vector<PbrVertex> vertices(points.size());
-            for (std::size_t i = 0; i < points.size(); ++i) {
+            for (std::uint64_t i = 0; i < points.size(); ++i) {
                 vertices[i].position = math::Vec3<float>(points[i]);
             }
             std::vector<std::uint32_t> indices {

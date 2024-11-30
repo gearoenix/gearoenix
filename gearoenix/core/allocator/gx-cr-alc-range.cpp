@@ -3,7 +3,7 @@
 #include <algorithm>
 
 gearoenix::core::allocator::Range::Range(
-    const std::size_t size, const std::size_t offset, std::shared_ptr<Range> parent)
+    const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
     : size(size)
     , offset(offset)
     , parent(std::move(parent))
@@ -13,7 +13,7 @@ gearoenix::core::allocator::Range::Range(
 
 void gearoenix::core::allocator::Range::deallocate(const Range* const child)
 {
-    std::lock_guard<std::mutex> _lg(this_lock);
+    std::lock_guard _lg(this_lock);
     auto* const child_previous = child->previous;
     auto* const child_next = child->next;
     const auto new_range = std::make_pair(child_previous, child_next);
@@ -40,7 +40,7 @@ void gearoenix::core::allocator::Range::deallocate(const Range* const child)
     ranges.emplace(new_key, new_range);
 }
 
-std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::size_t size)
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::int64_t size)
 {
     GX_CHECK_NOT_EQUAL_D(size, 0);
     std::shared_ptr<Range> result(new Range(size, 0));
@@ -54,12 +54,12 @@ gearoenix::core::allocator::Range::~Range()
         parent->deallocate(this);
 }
 
-std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::size_t sz)
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
     auto search = std::upper_bound(
         ranges.begin(), ranges.end(), sz,
-        [](const std::size_t a, const decltype(ranges)::value_type& b) {
+        [](const std::int64_t a, const decltype(ranges)::value_type& b) {
             return a <= b.first.first;
         });
     if (ranges.end() == search) {

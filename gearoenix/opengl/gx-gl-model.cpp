@@ -4,16 +4,6 @@
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 
-namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Model, gearoenix::gl::Model::MAX_COUNT>::construct();
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::Model::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<render::model::Model>(this);
-    return types;
-}
-
 gearoenix::gl::Model::Model(
     Engine&,
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
@@ -33,18 +23,6 @@ gearoenix::gl::Model::Model(
     }
 }
 
-std::shared_ptr<gearoenix::gl::Model> gearoenix::gl::Model::Model::construct(
-    Engine& e,
-    std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
-    std::string&& name,
-    const bool is_transformable,
-    const core::ecs::entity_id_t entity_id)
-{
-    auto self = allocator->make_shared(e, std::move(meshes), std::move(name), is_transformable, entity_id);
-    self->set_component_self(self);
-    return self;
-}
-
 gearoenix::gl::Model::~Model() = default;
 
 gearoenix::gl::ModelBuilder::ModelBuilder(
@@ -57,7 +35,7 @@ gearoenix::gl::ModelBuilder::ModelBuilder(
     : Builder(e, name, parent_transform, meshes, std::move(end_caller))
     , e(e)
 {
-    entity_builder->get_builder().add_component(Model::construct(
+    entity_builder->get_builder().add_component(Model::construct<Model>(
         e, std::move(meshes), std::move(name), is_transformable, entity_builder->get_id()));
 }
 
@@ -77,6 +55,7 @@ std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::
 gearoenix::gl::ModelManager::ModelManager(Engine& e)
     : Manager(e)
 {
+    Model::register_type<Model>();
 }
 
 gearoenix::gl::ModelManager::~ModelManager() = default;

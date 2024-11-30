@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_WIN32_KEY_HPP
-#define GEAROENIX_PLATFORM_WIN32_KEY_HPP
+#pragma once
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_WIN32
 #include "../gx-plt-key.hpp"
@@ -9,5 +8,4 @@ namespace gearoenix::platform {
 [[nodiscard]] key::Id convert_to_keyboard_key(WPARAM, LPARAM);
 }
 
-#endif
 #endif

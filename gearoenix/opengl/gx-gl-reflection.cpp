@@ -1,6 +1,6 @@
 #include "gx-gl-reflection.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
+#include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
@@ -27,26 +27,6 @@ gearoenix::gl::BakedReflection::BakedReflection(
     GX_ASSERT_D(0 != gl_radiance_v);
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::BakedReflection::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<Baked, Probe>(this);
-    return types;
-}
-
-std::shared_ptr<gearoenix::gl::BakedReflection> gearoenix::gl::BakedReflection::construct(
-    std::string&& name,
-    Engine& e,
-    std::shared_ptr<TextureCube>&& irr,
-    std::shared_ptr<TextureCube>&& rad,
-    const math::Aabb3<double>& include_box,
-    const core::ecs::entity_id_t entity_id)
-{
-    static const auto allocator = core::allocator::SharedArray<BakedReflection, MAX_COUNT>::construct();
-    auto self = allocator->make_shared(std::move(name), e, std::move(irr), std::move(rad), include_box, entity_id);
-    self->set_component_self(self);
-    return self;
-}
-
 gearoenix::gl::BakedReflection::~BakedReflection() = default;
 
 gearoenix::gl::RuntimeReflection::RuntimeReflection(
@@ -62,12 +42,6 @@ gearoenix::gl::RuntimeReflection::RuntimeReflection(
 {
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::gl::RuntimeReflection::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<Runtime, Probe>(this);
-    return types;
-}
-
 void gearoenix::gl::RuntimeReflection::construct(
     Engine& e,
     const std::shared_ptr<render::reflection::Builder>& builder,
@@ -81,8 +55,7 @@ void gearoenix::gl::RuntimeReflection::construct(
     const core::ecs::entity_id_t entity_id,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
-    static const auto allocator = core::allocator::SharedArray<RuntimeReflection, MAX_COUNT>::construct();
-    auto self = allocator->make_shared(e, receive_box, exclude_box, include_box, std::move(name), entity_id);
+    auto self = Component::construct<RuntimeReflection>(e, receive_box, exclude_box, include_box, std::move(name), entity_id);
     end_callback.set_return(std::shared_ptr(self));
     self->set_runtime_reflection_self(
         self, builder, environment_resolution, irradiance_resolution, radiance_resolution,
@@ -101,7 +74,7 @@ void gearoenix::gl::RuntimeReflection::construct(
             GX_ASSERT_D(nullptr != self->gl_radiance);
             self->gl_radiance_v = self->gl_radiance->get_object();
             GX_ASSERT_D(0 != self->gl_radiance_v);
-            for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+            for (std::uint32_t face_index = 0; face_index < 6; ++face_index) {
                 self->gl_environment_targets[face_index] = std::dynamic_pointer_cast<Target>(self->environment_targets[face_index]);
                 GX_ASSERT_D(nullptr != self->gl_environment_targets[face_index]);
                 self->gl_environment_targets_v[face_index] = self->gl_environment_targets[face_index]->get_framebuffer();
@@ -112,7 +85,7 @@ void gearoenix::gl::RuntimeReflection::construct(
                 GX_ASSERT_D(0 != self->gl_irradiance_targets_v[face_index]);
                 self->gl_radiance_targets[face_index].resize(self->roughnesses.size());
                 self->gl_radiance_targets_v[face_index].resize(self->roughnesses.size());
-                for (std::size_t mip_level = 0; mip_level < self->gl_radiance_targets[face_index].size(); ++mip_level) {
+                for (std::uint32_t mip_level = 0; mip_level < self->gl_radiance_targets[face_index].size(); ++mip_level) {
                     self->gl_radiance_targets[face_index][mip_level] = std::dynamic_pointer_cast<Target>(self->radiance_targets[face_index][mip_level]);
                     GX_ASSERT_D(nullptr != self->gl_radiance_targets[face_index][mip_level]);
                     self->gl_radiance_targets_v[face_index][mip_level] = self->gl_radiance_targets[face_index][mip_level]->get_framebuffer();
@@ -144,7 +117,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     : Builder(e, std::string(name), parent_transform, std::move(end_callback))
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(BakedReflection::construct(
+    builder.add_component(core::ecs::Component::construct<BakedReflection>(
         name + "-gl-reflection", e,
         std::dynamic_pointer_cast<TextureCube>(std::move(irradiance_texture)),
         std::dynamic_pointer_cast<TextureCube>(std::move(radiance_texture)),
@@ -228,6 +201,9 @@ gearoenix::gl::ReflectionManager::ReflectionManager(Engine& e)
     : Manager(e)
     , eng(e)
 {
+    core::ecs::Component::register_type<ReflectionProbe, RuntimeReflection>();
+    core::ecs::Component::register_type<BakedReflection>();
+    core::ecs::Component::register_type<RuntimeReflection>();
 }
 
 gearoenix::gl::ReflectionManager::~ReflectionManager() = default;

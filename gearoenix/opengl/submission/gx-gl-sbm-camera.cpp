@@ -51,7 +51,7 @@ void gearoenix::gl::submission::Camera::clear(
 
     const bool has_customised_target = gl_cam.get_target().is_customised();
 
-    const math::Vec2<std::size_t> target_dimension = gl_cam.get_target().get_dimension();
+    const math::Vec2<std::uint32_t> target_dimension = gl_cam.get_target().get_dimension();
 
     depth_attachment = static_cast<uint>(-1);
     colour_attachments[0] = static_cast<uint>(-1);
@@ -78,8 +78,8 @@ void gearoenix::gl::submission::Camera::clear(
         {
             colour_attachments[1] = def.targets[1][0]->get_gl_attachments()[0].texture_object;
         }
-        for (std::size_t ti = 0; ti < framebuffers.size(); ++ti) {
-            for (std::size_t mi = 0; mi < framebuffers[ti].size(); ++mi) {
+        for (std::uint32_t ti = 0; ti < framebuffers.size(); ++ti) {
+            for (std::uint32_t mi = 0; mi < framebuffers[ti].size(); ++mi) {
                 const auto& target = *def.targets[ti][mi];
                 framebuffers[ti][mi] = target.get_framebuffer();
             }

@@ -9,7 +9,7 @@ gearoenix::render::texture::Target::Target(std::vector<Attachment>&& attachments
 
 gearoenix::render::texture::Target::~Target() = default;
 
-gearoenix::math::Vec2<std::size_t> gearoenix::render::texture::Target::get_dimension() const
+gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Target::get_dimension() const
 {
     GX_ASSERT_D(!attachments.empty());
     const auto& t = attachments[0].var;

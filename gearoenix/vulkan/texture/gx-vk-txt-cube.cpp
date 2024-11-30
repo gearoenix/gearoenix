@@ -16,7 +16,7 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(
     engine::Engine* const eng,
     std::vector<std::vector<std::vector<std::uint8_t>>> data,
     const render::texture::TextureInfo& info,
-    const std::size_t aspect,
+    const std::uint64_t aspect,
     const core::job::EndCaller<core::job::EndCallerIgnore>& call)
     : render::texture::TextureCube(id, std::move(name), info.format, info.sampler_info, eng)
     , view(new image::View(std::make_shared<image::Image>(
@@ -31,7 +31,7 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(
     auto buff = eng->get_vulkan_buffer_manager()->create_upload_buffer(sz);
     std::vector<std::uint8_t> gathered_data;
     gathered_data.reserve(sz);
-    for (std::size_t face_index = 0, ptr = reinterpret_cast<std::size_t>(buff->get_allocated_memory()->get_data()); face_index < 6; ++face_index, ptr += sz_per_face) {
+    for (std::uint64_t face_index = 0, ptr = reinterpret_cast<std::uint64_t>(buff->get_allocated_memory()->get_data()); face_index < 6; ++face_index, ptr += sz_per_face) {
         gathered_data.clear();
         for (const auto& d : data[face_index]) {
             gathered_data.insert(gathered_data.end(), d.begin(), d.end());

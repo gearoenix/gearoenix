@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_INTERSECTION_STATUS_HPP
-#define GEAROENIX_MATH_INTERSECTION_STATUS_HPP
+#pragma once
 #include "../platform/gx-plt-log.hpp"
 #include <ostream>
 
@@ -45,4 +44,3 @@ inline std::ostream& operator<<(std::ostream& os, const gearoenix::math::Interse
     }
     return os;
 }
-#endif

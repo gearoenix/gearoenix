@@ -1,7 +1,4 @@
-#ifndef GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_HPP
-#define GEAROENIX_CORE_SYNC_INFLUENCE_MANAGER_HPP
-
-#include "../gx-cr-types.hpp"
+#pragma once
 #include <functional>
 #include <map>
 #include <optional>
@@ -12,7 +9,7 @@
 namespace gearoenix::core::sync {
 struct InfluenceManager {
     GX_GET_CREF_PRV(std::vector<std::function<void()>>, influencers);
-    GX_GET_CREF_PRV(std::vector<std::size_t>, influencers_indices);
+    GX_GET_CREF_PRV(std::vector<std::uint32_t>, influencers_indices);
 
 private:
     std::map<Id, std::tuple<std::vector<Id>, double, std::function<void()>>> added_functions;
@@ -26,4 +23,3 @@ public:
     void update();
 };
 }
-#endif

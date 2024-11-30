@@ -28,10 +28,10 @@
 
 gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device)
 {
-    const std::size_t threads_count = std::thread::hardware_concurrency();
+    const std::uint32_t threads_count = std::thread::hardware_concurrency();
     threads_g_buffer_filler_commands.reserve(threads_count);
     threads_g_buffer_filler_command_lists_raw.reserve(threads_count);
-    for (std::size_t thread_index = 0; thread_index < threads_count; ++thread_index) {
+    for (std::uint32_t thread_index = 0; thread_index < threads_count; ++thread_index) {
         threads_g_buffer_filler_commands.emplace_back(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
         threads_g_buffer_filler_command_lists_raw.push_back(threads_g_buffer_filler_commands[thread_index].get_list());
     }
@@ -46,7 +46,7 @@ gearoenix::d3d::SubmissionManager::CameraData::CameraData(Device& device)
 {
 }
 
-bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::size_t camera_pool_index)
+bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::uint32_t camera_pool_index)
 {
     auto& camera = camera_pool[camera_pool_index];
     auto& frame = camera.frames[e.get_frame_number()];

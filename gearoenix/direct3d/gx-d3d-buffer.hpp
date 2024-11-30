@@ -15,7 +15,7 @@ struct CpuBuffer final {
     CpuBuffer(ID3D12Device* device, UINT buffer_size, LPCWSTR resource_name);
     ~CpuBuffer();
     CpuBuffer(CpuBuffer&&);
-    void copy(const void* data, std::size_t size);
+    void copy(const void* data, std::uint32_t size);
 };
 
 struct GpuBuffer final {

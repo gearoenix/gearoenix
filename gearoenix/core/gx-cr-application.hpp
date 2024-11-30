@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_APPLICATION_HPP
-#define GEAROENIX_CORE_APPLICATION_HPP
+#pragma once
 #include "../platform/gx-plt-application.hpp"
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
@@ -35,4 +34,3 @@ public:
     virtual void update();
 };
 }
-#endif

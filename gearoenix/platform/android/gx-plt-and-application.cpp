@@ -93,7 +93,7 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
     case AINPUT_EVENT_TYPE_MOTION: {
         const auto action = AMotionEvent_getAction(e);
         const auto flags = action & AMOTION_EVENT_ACTION_MASK;
-        const auto pointer_index = static_cast<size_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
+        const auto pointer_index = static_cast<std::uint32_t>((action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
         const auto pointer_id = AMotionEvent_getPointerId(e, pointer_index);
         switch (flags) {
         case AMOTION_EVENT_ACTION_DOWN:

@@ -81,8 +81,8 @@ private:
 
     void create_accel_after_vertices_ready(
         std::string&& name,
-        std::size_t vertices_count,
-        std::size_t indices_count,
+        std::uint64_t vertices_count,
+        std::uint64_t indices_count,
         core::job::EndCaller&& c,
         std::shared_ptr<Mesh>&& result);
 

@@ -50,7 +50,7 @@ public:
     void bind(const DescriptorSet& set);
     void bind_vertices(buffer::Buffer& buf);
     void bind_indices(buffer::Buffer& buf);
-    void draw_indices(std::size_t count);
+    void draw_indices(std::uint64_t count);
     void build_acceleration_structure(
         const VkAccelerationStructureBuildGeometryInfoKHR&,
         const VkAccelerationStructureBuildRangeInfoKHR* const* const);

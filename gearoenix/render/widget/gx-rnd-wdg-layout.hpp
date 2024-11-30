@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_LAYOUT_HPP
-#define GEAROENIX_RENDER_WIDGET_LAYOUT_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "gx-rnd-wdg-size.hpp"
@@ -46,4 +45,3 @@ struct LayoutWindowBasedPlacer final : Layout {
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 };
 }
-#endif

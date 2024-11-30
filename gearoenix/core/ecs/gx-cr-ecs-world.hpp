@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_ECS_WORLD_HPP
-#define GEAROENIX_CORE_ECS_WORLD_HPP
+#pragma once
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include <boost/container/flat_map.hpp>
@@ -35,7 +34,7 @@ private:
 
         struct DeleteComponents final {
             entity_id_t id;
-            std::vector<std::type_index> component_types;
+            std::vector<Component::TypeIndex> component_types;
         };
 
         job::EndCaller<> callback;
@@ -66,7 +65,7 @@ public:
     {
         EntityBuilder b(ei, std::string(entities.find(ei)->second.name), job::EndCaller([] { }));
         b.add_components(std::move(components)...);
-        add_components_map(ei, std::move(b.components));
+        add_components_map(ei, std::move(b.all_types_to_components));
     }
 
     void delayed_add_components_map(entity_id_t, EntityBuilder::components_t&&, job::EndCaller<>&& callback);
@@ -76,20 +75,20 @@ public:
     {
         EntityBuilder b(ei, std::string(entities.find(ei)->second.name), job::EndCaller(callback));
         b.add_components(std::move(components)...);
-        delayed_add_components_map(ei, std::move(b.components), std::move(callback));
+        delayed_add_components_map(ei, std::move(b.all_types_to_components), std::move(callback));
     }
     //--------------------------------------Component deletion-------------------------------------------
     template <typename... ComponentsTypes>
     void remove_components(const entity_id_t ei)
     {
         Component::types_check<ComponentsTypes...>();
-        const std::array<std::type_index, sizeof...(ComponentsTypes)> ts = {
+        const std::array<Component::TypeIndex, sizeof...(ComponentsTypes)> ts = {
             Component::create_type_index<ComponentsTypes>()...,
         };
         remove_components_list(ei, ts.data(), ts.size());
     }
 
-    void remove_components_list(entity_id_t, const std::type_index*, std::size_t);
+    void remove_components_list(entity_id_t, const Component::TypeIndex*, std::uint64_t);
 
     template <typename... ComponentsTypes>
     void delayed_remove_components(const entity_id_t ei, job::EndCaller<>&& callback)
@@ -103,25 +102,39 @@ public:
             std::move(callback));
     }
 
-    void delayed_remove_components_list(entity_id_t, std::vector<std::type_index>&&, job::EndCaller<>&& callback);
+    void delayed_remove_components_list(entity_id_t, std::vector<Component::TypeIndex>&&, job::EndCaller<>&& callback);
 
-    /// It is better to not use it very much.
+    /// It is better to not use it too often.
     /// It is recommended to design your code in a way that batches all of your uses and
     /// use the system callers instead of one-by-one use of this function.
     /// Returns nullptr if entity or component does not exist.
     template <typename ComponentType>
     [[nodiscard]] ComponentType* get_component(const entity_id_t id) const
     {
-        static_assert(std::is_base_of_v<Component, ComponentType>);
-        const auto entity_search = entities.find(id);
-        if (entities.end() == entity_search) {
+        const auto search = entities.find(id);
+        if (entities.end() == search) {
             return nullptr;
         }
-        const auto& e = entity_search->second;
+        const auto& e = search->second;
         return e.archetype->get_component<ComponentType>(e.components);
     }
 
-    /// It is better to not use it very much.
+    /// It is better to not use it too often.
+    /// It is recommended to design your code in a way that batches all of your uses and
+    /// use the system callers instead of one-by-one use of this function.
+    /// Returns nullptr if entity or component does not exist.
+    template <typename ComponentType>
+    [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr(const entity_id_t id) const
+    {
+        const auto search = entities.find(id);
+        if (entities.end() == search) {
+            return nullptr;
+        }
+        const auto& e = search->second;
+        return e.archetype->get_component_shared_ptr<ComponentType>(e.components);
+    }
+
+    /// It is better to not use it too often.
     /// It is recommended to design your code in a way that batches all of your uses and
     /// use the system callers instead of one-by-one use of this function.
     /// Returns nullptr if entity or component does not exist.
@@ -131,7 +144,7 @@ public:
         const auto entity_search = entities.find(id);
         if (entities.end() == entity_search)
             return {
-                reinterpret_cast<ComponentTypes*>(std::size_t { 0 })...,
+                reinterpret_cast<ComponentTypes*>(std::uintptr_t { 0 })...,
             };
         const auto& e = entity_search->second;
         return {
@@ -139,7 +152,7 @@ public:
         };
     }
 
-    [[nodiscard]] Archetype* get_archetype(const EntityBuilder::components_t& cs);
+    [[nodiscard]] Archetype* get_archetype(const Archetype::id_t&);
     [[nodiscard]] Entity* get_entity(entity_id_t);
     [[nodiscard]] const Entity* get_entity(entity_id_t) const;
     [[nodiscard]] Entity* get_entity(const std::string&);
@@ -178,5 +191,3 @@ public:
     [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, job::EndCaller<>&& entity_exists_in_world);
 };
 }
-
-#endif

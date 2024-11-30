@@ -10,9 +10,11 @@ std::string gearoenix::platform::Arguments::extract_process_directory(const std:
 #else
 #define GX_DIR_SEP '/'
 #endif
-    for (std::size_t i = s.size() - 1; i > 0; --i)
-        if (s[i] == GX_DIR_SEP)
+    for (auto i = s.size() - 1; i > 0; --i) {
+        if (s[i] == GX_DIR_SEP) {
             return s.substr(0, i + 1);
+        }
+    }
     return std::string("");
 #else
     (void)s;
@@ -52,7 +54,7 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF)
         tokens[ti] = std::string(argv[ai]);
     }
 
-    for (std::size_t ti = 0; ti < tokens.size();) {
+    for (std::uint32_t ti = 0; ti < tokens.size();) {
         const auto& token = tokens[ti];
         if (!is_key(token)) {
             GX_LOG_F("Unexpected token '" << token << "'.");
@@ -101,8 +103,9 @@ bool gearoenix::platform::Arguments::get_value(const std::string& key, std::stri
 bool gearoenix::platform::Arguments::get_value(const std::string& key, int& value, bool necessary) const
 {
     std::string v;
-    if (!get_value(key, v, necessary))
+    if (!get_value(key, v, necessary)) {
         return false;
+    }
     value = std::stoi(v);
     return true;
 }

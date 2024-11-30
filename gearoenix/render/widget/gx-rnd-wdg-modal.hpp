@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_MODAL_HPP
-#define GEAROENIX_RENDER_WIDGET_MODAL_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-wdg-widget.hpp"
 #include <optional>
@@ -48,4 +47,3 @@ public:
     ~Modal() override;
 };
 }
-#endif

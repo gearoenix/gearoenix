@@ -10,14 +10,17 @@ struct Mesh;
 
 namespace gearoenix::render::model {
 struct Model : core::ecs::Component {
-    static constexpr std::size_t MAX_COUNT = 8192;
+    constexpr static TypeIndex TYPE_INDEX = 8;
+    constexpr static std::uint32_t MAX_COUNT = 8192;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_VAL_PRT(bool, is_transformable, false);
     GX_GET_CREF_PRT(std::vector<std::shared_ptr<mesh::Mesh>>, meshes);
 
     /// \note A model can be static while it has transform component.
     Model(
-        std::type_index final_component_type,
+        TypeIndex final_component_type,
         bool is_transformable,
         std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
         std::string&& name,

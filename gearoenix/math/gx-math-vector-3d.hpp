@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_VECTOR_3D_HPP
-#define GEAROENIX_MATH_VECTOR_3D_HPP
+#pragma once
 #include "gx-math-vector-2d.hpp"
 
 namespace gearoenix::math {
@@ -423,7 +422,7 @@ struct Vec3 final {
         return x || y || z;
     }
 
-    [[nodiscard]] static constexpr Vec3 importance_sample_ggx(
+    [[nodiscard]] constexpr static Vec3 importance_sample_ggx(
         const Vec2<Element>& xi, const Vec3& n, const Element roughness,
         const Element tolerance = Numeric::epsilon<Element>)
     {
@@ -431,7 +430,7 @@ struct Vec3 final {
         const auto two = static_cast<Element>(2);
         const auto roughness_p_2 = roughness * roughness;
         const auto roughness_p_4 = roughness_p_2 * roughness_p_2;
-        const auto phi = two * static_cast<Element>(GX_PI) * xi.x;
+        const auto phi = two * static_cast<Element>(std::numbers::pi) * xi.x;
         const auto cos_phi = static_cast<Element>(std::cos(phi));
         const auto cos_phi_p_2 = cos_phi * cos_phi;
         const auto sin_phi_p_2 = one - cos_phi_p_2;
@@ -492,4 +491,3 @@ constexpr Vec3<Element> Z3D(
     static_cast<Element>(0),
     static_cast<Element>(1));
 }
-#endif

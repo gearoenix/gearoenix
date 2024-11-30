@@ -6,34 +6,41 @@
 #include "gx-cr-ecs-world.hpp"
 #include <imgui/imgui.h>
 
-boost::container::flat_map<std::type_index, std::string> gearoenix::core::ecs::Component::type_index_to_name;
+gearoenix::core::ecs::Component::TypesInfos gearoenix::core::ecs::Component::types_infos {};
 
-boost::container::flat_map<std::string, std::type_index> gearoenix::core::ecs::Component::type_name_to_index;
+boost::container::flat_map<std::string, gearoenix::core::ecs::Component::TypeIndex> gearoenix::core::ecs::Component::type_name_to_index;
 
-void gearoenix::core::ecs::Component::register_type(std::type_index t, std::string name)
+void gearoenix::core::ecs::Component::register_type(TypeIndex t, TypeInfo&& info)
 {
-#if GX_DEBUG_MODE
-    if (const auto search = type_index_to_name.find(t); type_index_to_name.end() != search) {
-        GX_ASSERT_D(search->second == name);
+    GX_ASSERT_D(types_infos.size() > t);
+
+    auto& ti = types_infos[t];
+    if (ti.get_name() != info.get_name()) {
+        GX_ASSERT_D(ti.get_name().empty());
+        GX_ASSERT_D(type_name_to_index.find(info.get_name()) == type_name_to_index.end());
+
+        type_name_to_index.emplace(info.get_name(), t);
     }
-    if (const auto search = type_name_to_index.find(name); type_name_to_index.end() != search) {
-        GX_ASSERT_D(search->second == t);
-    }
-#endif
-    type_index_to_name.emplace(t, name);
-    type_name_to_index.emplace(std::move(name), t);
+
+    ti = std::move(info);
 }
 
-gearoenix::core::ecs::Component::Component(const std::type_index final_type_index, std::string&& name, const entity_id_t entity_id)
+gearoenix::core::ecs::Component::Component(const TypeIndex final_type_index, std::string&& name, const entity_id_t entity_id)
     : final_type_index(final_type_index)
     , name(std::move(name))
     , entity_id(entity_id)
 {
-}
-
-void gearoenix::core::ecs::Component::set_component_self(const std::shared_ptr<Component>& c)
-{
-    component_self = c;
+    GX_ASSERT_D(final_type_index < types_infos.size());
+    GX_ASSERT_D(!types_infos[final_type_index].get_name().empty());
+    GX_ASSERT_D(type_name_to_index.find(types_infos[final_type_index].get_name()) != type_name_to_index.end());
+    GX_ASSERT_D(type_name_to_index[types_infos[final_type_index].get_name()] == final_type_index);
+#if GX_DEBUG_MODE
+    for (const auto pt : types_infos[final_type_index].get_all_parents()) {
+        GX_ASSERT_D(!types_infos[pt].get_name().empty());
+        GX_ASSERT_D(type_name_to_index.find(types_infos[pt].get_name()) != type_name_to_index.end());
+        GX_ASSERT_D(type_name_to_index[types_infos[pt].get_name()] == pt);
+    }
+#endif
 }
 
 void gearoenix::core::ecs::Component::show_debug_gui(const render::engine::Engine& e)
@@ -61,10 +68,10 @@ void gearoenix::core::ecs::Component::show_debug_gui(const render::engine::Engin
     ImGui::Text("%s", name.c_str());
     ImGui::TableNextColumn();
 
-    const auto type_search = type_index_to_name.find(final_type_index);
+    const auto& type_info = types_infos[final_type_index];
     ImGui::Text("Final Type: ");
     ImGui::TableNextColumn();
-    ImGui::Text("%s", type_search != type_index_to_name.end() ? type_search->second.c_str() : "The type is not registered!");
+    ImGui::Text("%s", type_info.get_name().c_str());
     ImGui::TableNextColumn();
 
     ImGui::Text("Entity ID:");
@@ -79,4 +86,10 @@ void gearoenix::core::ecs::Component::show_debug_gui(const render::engine::Engin
     }
 
     ImGui::TreePop();
+}
+
+std::optional<gearoenix::core::ecs::Component::TypeIndex> gearoenix::core::ecs::Component::get_type_index(const std::string& type_name)
+{
+    const auto search = type_name_to_index.find(type_name);
+    return search == type_name_to_index.end() ? std::nullopt : std::make_optional(search->second);
 }

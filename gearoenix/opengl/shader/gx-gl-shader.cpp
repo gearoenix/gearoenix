@@ -3,7 +3,6 @@
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../gx-gl-check.hpp"
 #include "../gx-gl-engine.hpp"
-#include <vector>
 
 void gearoenix::gl::shader::Shader::run()
 {
@@ -19,7 +18,7 @@ void gearoenix::gl::shader::Shader::link() const
     sint max_length = 0;
     glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
     std::string info_log;
-    info_log.resize(static_cast<std::size_t>(max_length));
+    info_log.resize(static_cast<std::uint32_t>(max_length));
     glGetProgramInfoLog(shader_program, static_cast<sizei>(max_length), nullptr, &(info_log[0]));
     if (is_success == 0) {
         info_log[max_length - 1] = '\n';
@@ -39,7 +38,7 @@ void gearoenix::gl::shader::Shader::validate() const
     sint max_length = 0;
     glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &max_length);
     std::string info_log;
-    info_log.resize(static_cast<std::size_t>(max_length));
+    info_log.resize(static_cast<std::uint32_t>(max_length));
     glGetProgramInfoLog(shader_program, static_cast<sizei>(max_length), nullptr, &(info_log[0]));
     if (!is_success) {
         info_log[max_length - 1] = '\n';
@@ -66,7 +65,7 @@ gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const s
     sint sts_size;
     glGetShaderiv(shader_obj, GL_INFO_LOG_LENGTH, &sts_size);
     std::string info_log;
-    info_log.resize(static_cast<std::size_t>(sts_size));
+    info_log.resize(static_cast<std::uint32_t>(sts_size));
     glGetShaderInfoLog(shader_obj, static_cast<sizei>(sts_size), nullptr, &(info_log[0]));
     if (!success) {
         info_log[sts_size - 1] = '\n';
@@ -99,7 +98,7 @@ gearoenix::gl::shader::Shader::Shader(Engine& e)
     }
 }
 
-gearoenix::gl::shader::Shader::Shader(Shader&& o)
+gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
     : shader_program(o.shader_program)
     , e(o.e)
     , vertex_object(o.vertex_object)
@@ -110,7 +109,7 @@ gearoenix::gl::shader::Shader::Shader(Shader&& o)
     o.fragment_object = static_cast<uint>(-1);
 }
 
-gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&& o)
+gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&& o) noexcept
 {
     shader_program = o.shader_program;
     vertex_object = o.vertex_object;

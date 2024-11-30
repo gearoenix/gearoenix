@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_CAMERA_HPP
-#define GEAROENIX_GL_SUBMISSION_CAMERA_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
@@ -43,7 +42,7 @@ struct Camera final {
     std::vector<std::vector<std::pair<double, Model>>> threads_opaque_models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_translucent_models_data;
     std::vector<math::Mat4x4<float>> mvps;
-    std::vector<std::vector<std::pair<std::size_t, math::Mat4x4<float>>>> threads_mvps;
+    std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
     std::vector<DebugModel> debug_meshes;
     std::vector<std::vector<DebugModel>> debug_meshes_threads;
 
@@ -54,5 +53,4 @@ struct Camera final {
 };
 }
 
-#endif
 #endif

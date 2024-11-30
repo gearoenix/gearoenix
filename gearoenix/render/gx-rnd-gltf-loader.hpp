@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_GLTF_LOADER_HPP
-#define GEAROENIX_RENDER_GLTF_LOADER_HPP
+#pragma once
 #include "../core/job/gx-cr-job-end-caller.hpp"
 #include <memory>
 #include <vector>
@@ -23,5 +22,3 @@ void load(
     const core::job::EndCaller<std::vector<std::shared_ptr<scene::Builder>>>& scenes_end_callback,
     const core::job::EndCaller<>& entity_end_callback);
 }
-
-#endif

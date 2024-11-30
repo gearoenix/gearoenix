@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_VULKAN_INSTANCE_HPP
-#define GEAROENIX_VULKAN_INSTANCE_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
@@ -35,5 +34,4 @@ public:
     Instance& operator=(Instance&&) = delete;
 };
 }
-#endif
 #endif

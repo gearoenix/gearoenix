@@ -21,7 +21,7 @@ struct Manager final {
 
 private:
     std::mutex this_lock;
-    std::map<std::size_t, Pool> indexed_pools;
+    std::map<std::uint64_t, Pool> indexed_pools;
     std::map<std::thread::id, Pool> threads_pools;
 
 public:
@@ -31,7 +31,7 @@ public:
     ~Manager();
     Manager& operator=(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
-    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::size_t> thread_index = std::nullopt);
+    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::uint64_t> thread_index = std::nullopt);
     [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based();
 };
 }

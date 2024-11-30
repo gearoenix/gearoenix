@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_RUNTIME_CONFIGURATION_HPP
-#define GEAROENIX_PLATFORM_RUNTIME_CONFIGURATION_HPP
+#pragma once
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 
 namespace gearoenix::core::ecs {
@@ -14,6 +13,11 @@ namespace gearoenix::platform {
 struct Application;
 struct BaseApplication;
 struct RuntimeConfiguration final : core::ecs::Component {
+    constexpr static std::uint32_t MAX_COUNT = 1;
+    constexpr static TypeIndex TYPE_INDEX = 26;
+    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
+    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+
     GX_GETSET_CREF_PRV(std::string, application_name);
     GX_GETSET_VAL_PRV(bool, fullscreen, false);
     GX_GETSET_VAL_PRV(bool, landscape, true);
@@ -27,8 +31,6 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GETSET_VAL_PRV(bool, direct3dx_render_backend_enabled, true);
     GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true);
     GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true);
-
-    [[nodiscard]] const HierarchyTypes& get_hierarchy_types() const override;
 
     explicit RuntimeConfiguration(core::ecs::entity_id_t);
 
@@ -44,4 +46,3 @@ public:
     void show_debug_gui(const render::engine::Engine&) override;
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_CHECK_HPP
-#define GEAROENIX_GL_CHECK_HPP
+#pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
@@ -15,5 +14,4 @@ namespace gearoenix::gl {
 [[nodiscard]] bool check_for_error();
 }
 
-#endif
 #endif

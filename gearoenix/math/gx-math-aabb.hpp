@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_MATH_AABB_HPP
-#define GEAROENIX_MATH_AABB_HPP
+#pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-intersection-status.hpp"
 #include "gx-math-vector-3d.hpp"
@@ -249,4 +248,3 @@ public:
     }
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_VIEWPORT_BUTTON_HPP
-#define GEAROENIX_EDITOR_VIEWPORT_BUTTON_HPP
+#pragma once
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
 #include <imgui/imgui.h>
 #include <memory>
@@ -50,5 +49,3 @@ public:
     virtual void update() = 0;
 };
 }
-
-#endif

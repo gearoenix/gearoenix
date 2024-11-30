@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PLATFORM_BILLING_HPP
-#define GEAROENIX_PLATFORM_BILLING_HPP
+#pragma once
 #include "gx-plt-bll-build-configuration.hpp"
 #include <functional>
 #include <string>
@@ -26,5 +25,3 @@ public:
     static void query_purchases_info();
 };
 }
-
-#endif

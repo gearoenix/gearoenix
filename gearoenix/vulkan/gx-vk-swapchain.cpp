@@ -112,7 +112,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, nullptr));
     std::vector<VkImage> images(count);
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
-    image_views.reserve(static_cast<std::size_t>(count));
+    image_views.reserve(static_cast<std::uint64_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
         image_views.emplace_back(image::Image(
             &logical_device, info.imageExtent.width, info.imageExtent.height, 1, 1, 1,

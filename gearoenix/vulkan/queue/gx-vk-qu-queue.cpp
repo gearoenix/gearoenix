@@ -47,12 +47,12 @@ void gearoenix::vulkan::queue::Queue::submit(command::Buffer& cmd, sync::Fence& 
 }
 
 void gearoenix::vulkan::queue::Queue::submit(
-    const std::size_t wait_semaphores_count,
+    const std::uint64_t wait_semaphores_count,
     const VkSemaphore* const wait_semaphores,
     const VkPipelineStageFlags* const wait_stages,
-    const std::size_t commands_count,
+    const std::uint64_t commands_count,
     const VkCommandBuffer* const commands,
-    const std::size_t signal_semaphores_count,
+    const std::uint64_t signal_semaphores_count,
     const VkSemaphore* const signal_semaphores,
     VkFence fence)
 {

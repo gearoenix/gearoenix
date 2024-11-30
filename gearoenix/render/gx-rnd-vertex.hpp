@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_VERTEX_HPP
-#define GEAROENIX_RENDER_VERTEX_HPP
+#pragma once
 #include "../math/gx-math-vector-4d.hpp"
 #include <variant>
 #include <vector>
@@ -46,11 +45,11 @@ typedef std::vector<PbrVertexAnimated> PbrAnimatedVertices;
 
 typedef std::variant<PbrVertices, PbrAnimatedVertices> Vertices;
 
-constexpr std::size_t PBR_VERTEX_VARIANT_TYPE_INDEX = 0;
-constexpr std::size_t PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX = 1;
+constexpr std::uint64_t PBR_VERTEX_VARIANT_TYPE_INDEX = 0;
+constexpr std::uint64_t PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX = 1;
 
 [[nodiscard]] const void* get_data(const Vertices& vertices);
-[[nodiscard]] std::size_t get_element_size(const Vertices& vertices);
+[[nodiscard]] std::uint64_t get_element_size(const Vertices& vertices);
 [[nodiscard]] bool has_bone_weights(const Vertices& vertices);
 [[nodiscard]] bool has_bone_indices(const Vertices& vertices);
 [[nodiscard]] math::Vec3<float>& get_position(Vertices& vertices, std::uint32_t index);
@@ -61,8 +60,6 @@ void calculate_tangents(PbrVertices& vertices, const std::vector<std::uint32_t>&
 }
 
 namespace gearoenix::core {
-[[nodiscard]] std::size_t count(const render::Vertices& vertices);
-[[nodiscard]] std::size_t bytes_count(const render::Vertices& vertices);
+[[nodiscard]] std::uint64_t count(const render::Vertices& vertices);
+[[nodiscard]] std::uint64_t bytes_count(const render::Vertices& vertices);
 }
-
-#endif

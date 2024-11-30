@@ -11,7 +11,7 @@ namespace gearoenix::vulkan {
 #ifdef GX_VULKAN_INSTANCE_DEBUG
 static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-    uint64_t object, size_t location, int32_t messageCode,
+    uint64_t object, std::uinptr_t location, int32_t messageCode,
     const char* pLayerPrefix, const char* pMessage, void* pUserData)
 {
     std::stringstream msg;
@@ -196,7 +196,7 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
     instance_extensions_set.insert(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     std::uint32_t layers_count = 0;
     vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
-    std::vector<VkLayerProperties> properties(static_cast<std::size_t>(layers_count));
+    std::vector<VkLayerProperties> properties(static_cast<std::uint64_t>(layers_count));
     std::set<std::string> available_layers;
     vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
     for (const auto& prop : properties) {

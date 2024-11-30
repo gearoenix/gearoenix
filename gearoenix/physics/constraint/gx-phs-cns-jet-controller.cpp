@@ -1,15 +1,10 @@
 #include "gx-phs-cns-jet-controller.hpp"
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include "../gx-phs-transformation.hpp"
 #include <imgui/imgui.h>
-
-namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::constraint::JetController, 64>::construct();
-}
 
 gearoenix::core::event::Listener::Response gearoenix::physics::constraint::JetController::on_event(const core::event::Data& d)
 {
@@ -87,12 +82,6 @@ gearoenix::core::event::Listener::Response gearoenix::physics::constraint::JetCo
     return Response::Continue;
 }
 
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::constraint::JetController::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types<Constraint>(this);
-    return types;
-}
-
 gearoenix::physics::constraint::JetController::JetController(
     render::engine::Engine& e,
     std::shared_ptr<Transformation>&& trn,
@@ -108,14 +97,6 @@ gearoenix::physics::constraint::JetController::JetController(
     event_engine->add_listener(core::event::Id::ButtonKeyboard, this);
     event_engine->add_listener(core::event::Id::ButtonMouse, this);
     event_engine->add_listener(core::event::Id::MovementMouse, this);
-}
-
-std::shared_ptr<gearoenix::physics::constraint::JetController> gearoenix::physics::constraint::JetController::construct(
-    render::engine::Engine& e, std::shared_ptr<Transformation>&& trn, std::string&& name, const core::ecs::entity_id_t entity_id)
-{
-    auto self = allocator->make_shared(e, std::move(trn), std::move(name), entity_id);
-    self->set_component_self(self);
-    return self;
 }
 
 gearoenix::physics::constraint::JetController::~JetController()

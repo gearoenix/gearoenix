@@ -7,10 +7,10 @@ gearoenix::platform::stream::Memory::Memory() = default;
 
 gearoenix::platform::stream::Memory::~Memory() = default;
 
-std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t length)
+std::uint64_t gearoenix::platform::stream::Memory::read(void* d, std::uint64_t length)
 {
-    const std::size_t sz = length + index;
-    const std::size_t result = sz > mem_data.size() ? mem_data.size() - index : length;
+    const std::uint64_t sz = length + index;
+    const std::uint64_t result = sz > mem_data.size() ? mem_data.size() - index : length;
 #ifdef GX_DEBUG_MODE
     if (0 == result)
         GX_UNEXPECTED;
@@ -20,24 +20,24 @@ std::size_t gearoenix::platform::stream::Memory::read(void* d, std::size_t lengt
     return result;
 }
 
-std::size_t gearoenix::platform::stream::Memory::write(const void* d, std::size_t length)
+std::uint64_t gearoenix::platform::stream::Memory::write(const void* d, std::uint64_t length)
 {
-    const std::size_t sz = length + index;
+    const std::uint64_t sz = length + index;
     if (sz <= mem_data.size()) {
         std::memcpy(&(mem_data[index]), d, length);
         return length;
     }
-    const std::size_t li = ((std::size_t)mem_data.size()) - index;
+    const std::uint64_t li = ((std::uint64_t)mem_data.size()) - index;
     if (li != 0)
         std::memcpy(&(mem_data[index]), d, li);
     const char* cd = (const char*)d;
-    for (std::size_t i = li; i < length; ++i)
+    for (std::uint64_t i = li; i < length; ++i)
         mem_data.push_back(cd[i]);
     index = sz;
     return length;
 }
 
-void gearoenix::platform::stream::Memory::seek(std::size_t offset)
+void gearoenix::platform::stream::Memory::seek(std::uint64_t offset)
 {
 #ifdef GX_DEBUG_MODE
     if (offset > mem_data.size())
@@ -46,12 +46,12 @@ void gearoenix::platform::stream::Memory::seek(std::size_t offset)
     index = offset;
 }
 
-std::size_t gearoenix::platform::stream::Memory::tell()
+std::uint64_t gearoenix::platform::stream::Memory::tell()
 {
     return index;
 }
 
-std::size_t gearoenix::platform::stream::Memory::size()
+std::uint64_t gearoenix::platform::stream::Memory::size()
 {
     return mem_data.size();
 }

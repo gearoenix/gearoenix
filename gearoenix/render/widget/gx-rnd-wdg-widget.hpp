@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_WIDGET_WIDGET_HPP
-#define GEAROENIX_RENDER_WIDGET_WIDGET_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -68,4 +67,3 @@ public:
     Response on_event(const core::event::Data& event_data) override;
 };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_PHYSICS_TRANSFORMATION_TEST_HPP
-#define GEAROENIX_PHYSICS_TRANSFORMATION_TEST_HPP
+#pragma once
 #include "gx-phs-transformation.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -12,6 +11,8 @@
 
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
+    gearoenix::core::ecs::Component::register_type<gearoenix::physics::Transformation>();
+
     gearoenix::physics::Transformation transform("transform", nullptr, 0, nullptr);
     constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
 
@@ -44,4 +45,3 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
         }
     }
 }
-#endif

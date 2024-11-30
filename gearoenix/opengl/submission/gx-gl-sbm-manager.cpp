@@ -489,7 +489,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                 return;
             }
             const auto camera_location = transform->get_global_position();
-            auto camera_pool_index = static_cast<std::size_t>(-1);
+            auto camera_pool_index = static_cast<std::uint32_t>(-1);
             uint self_irradiance = static_cast<uint>(-1);
             uint self_radiance = static_cast<uint>(-1);
             switch (camera->get_usage()) {
@@ -594,11 +594,11 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
                         camera_data.threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
                     }
                 });
-            auto current_model_index = static_cast<std::size_t>(-1);
+            auto current_model_index = static_cast<std::uint32_t>(-1);
             for (auto& ms : camera_data.threads_mvps) {
                 for (auto& im : ms) {
                     if (current_model_index != im.first) {
-                        camera_data.models_data[im.first].second.first_mvp_index = camera_data.mvps.size();
+                        camera_data.models_data[im.first].second.first_mvp_index = static_cast<std::uint32_t>(camera_data.mvps.size());
                         current_model_index = im.first;
                     }
                     camera_data.mvps.push_back(im.second);
@@ -706,7 +706,7 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
                 const float roughness_p_4 = roughness * roughness * roughness * roughness;
                 radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
                 const auto resolution = static_cast<float>(r->get_environment()->get_info().get_width());
-                const float sa_texel = (static_cast<float>(GX_PI) / 1.5f) / (resolution * resolution);
+                const float sa_texel = (static_cast<float>(std::numbers::pi) / 1.5f) / (resolution * resolution);
                 radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
                 glBindVertexArray(screen_vertex_object);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -1048,7 +1048,7 @@ void gearoenix::gl::submission::Manager::render_bloom(const Scene& s, const Came
 
     GX_GL_CHECK_D;
 
-    for (std::size_t layer_index = 0; layer_index < camera.framebuffers[0].size() - 1; ++layer_index) {
+    for (std::uint32_t layer_index = 0; layer_index < camera.framebuffers[0].size() - 1; ++layer_index) {
         const auto copy_index = (camera.framebuffers[0].size() - 1) - layer_index;
         const auto mip_index = copy_index - 1;
 

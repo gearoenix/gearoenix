@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_UI_MANAGER_HPP
-#define GEAROENIX_EDITOR_UI_MANAGER_HPP
+#pragma once
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
 #include <memory>
 
@@ -22,5 +21,3 @@ public:
     void update();
 };
 }
-
-#endif

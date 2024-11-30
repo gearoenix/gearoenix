@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_CAMERA_BLOOM_DATA_HPP
-#define GEAROENIX_RENDER_CAMERA_BLOOM_DATA_HPP
+#pragma once
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 
@@ -12,5 +11,3 @@ public:
     void show_debug_data();
 };
 }
-
-#endif

@@ -30,7 +30,7 @@ void gearoenix::vulkan::queue::Graph::SubmitData::add_provider(
         frame_data.resize(semaphores.size());
     else
         GX_ASSERT_D(semaphores.size() == frame_data.size());
-    for (std::size_t i = 0; i < frame_data.size(); ++i) {
+    for (std::uint64_t i = 0; i < frame_data.size(); ++i) {
         auto& frame = frame_data[i];
         auto& pw = frame.providers_waits;
         const auto& sem = semaphores[i];
@@ -48,7 +48,7 @@ void gearoenix::vulkan::queue::Graph::SubmitData::add_consumer(
         frame_data.resize(semaphores.size());
     else
         GX_ASSERT_D(semaphores.size() == frame_data.size());
-    for (std::size_t i = 0; i < frame_data.size(); ++i) {
+    for (std::uint64_t i = 0; i < frame_data.size(); ++i) {
         auto& cs = frame_data[i].consumers_signals;
         auto s = semaphores[i]->get_vulkan_data();
         GX_ASSERT_D(std::find(cs.begin(), cs.end(), s) == cs.end());
@@ -61,7 +61,7 @@ void gearoenix::vulkan::queue::Graph::update_traversing_level()
     auto& start_node = nodes.find(NodeLabel::Start)->second;
     start_node.clear_traversing_level(nodes);
     const auto max_tl = start_node.update_traversing_level(0, nodes);
-    submit_data.resize(static_cast<std::size_t>(max_tl));
+    submit_data.resize(static_cast<std::uint64_t>(max_tl));
 }
 
 void gearoenix::vulkan::queue::Graph::clear_submit_data()
@@ -76,7 +76,7 @@ void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node)
     if (node.get_traversed())
         return;
     node.set_traversed(true);
-    while (static_cast<std::size_t>(node.get_traversal_level()) + 1 > submit_data.size())
+    while (static_cast<std::uint64_t>(node.get_traversal_level()) + 1 > submit_data.size())
         submit_data.emplace_back();
     auto& sd = submit_data[node.get_traversal_level()];
     for (const NodeLabel provider_label : node.get_providers()) {
@@ -86,7 +86,7 @@ void gearoenix::vulkan::queue::Graph::update_submit_data(Node& node)
     for (const auto& consumer_label_semaphores : node.get_consumers()) {
         sd.add_consumer(consumer_label_semaphores.second);
     }
-    for (std::size_t frame_index = 0; frame_index < sd.frame_data.size(); ++frame_index) {
+    for (std::uint64_t frame_index = 0; frame_index < sd.frame_data.size(); ++frame_index) {
         sd.frame_data[frame_index].cmd = node.get_frame_commands()[frame_index];
     }
 }
@@ -99,7 +99,7 @@ void gearoenix::vulkan::queue::Graph::update()
         update_submit_data(node.second);
     auto& front = submit_data.front();
     auto& back = submit_data.back();
-    for (std::size_t frame_index = 0; frame_index < front.frame_data.size(); ++frame_index) {
+    for (std::uint64_t frame_index = 0; frame_index < front.frame_data.size(); ++frame_index) {
         auto& front_frame = front.frame_data[frame_index];
         auto& back_frame = back.frame_data[frame_index];
         front_frame.providers_waits.push_back(start_semaphore[frame_index]->get_vulkan_data());
@@ -112,7 +112,7 @@ void gearoenix::vulkan::queue::Graph::submit()
 {
     const auto frame_index = q.get_e().get_frame_number();
     const auto submit_data_end = submit_data.size() - 1;
-    for (std::size_t submit_data_index = 0; submit_data_index < submit_data_end; ++submit_data_index) {
+    for (std::uint64_t submit_data_index = 0; submit_data_index < submit_data_end; ++submit_data_index) {
         const auto& sd = submit_data[submit_data_index];
         const auto& frame = sd.frame_data[frame_index];
         q.submit(

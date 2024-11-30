@@ -27,9 +27,9 @@ gearoenix::vulkan::memory::Memory::Memory(
 {
 }
 
-std::size_t gearoenix::vulkan::memory::Memory::align(const engine::Engine& e, const std::size_t sz)
+std::uint64_t gearoenix::vulkan::memory::Memory::align(const engine::Engine& e, const std::uint64_t sz)
 {
-    return math::Numeric::align(sz, static_cast<std::size_t>(e.get_logical_device().get_physical_device().get_max_memory_alignment()));
+    return math::Numeric::align(sz, static_cast<std::uint64_t>(e.get_logical_device().get_physical_device().get_max_memory_alignment()));
 }
 
 gearoenix::vulkan::memory::Memory::~Memory()
@@ -40,7 +40,7 @@ gearoenix::vulkan::memory::Memory::~Memory()
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::size_t size)
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::uint64_t size)
 {
     const auto aligned_size = align(e, size);
     auto alc = allocator->allocate(aligned_size);
@@ -48,7 +48,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
         GX_LOG_D("No more space left in this Vulkan memory");
         return nullptr;
     }
-    void* const new_data = (data == nullptr) ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::size_t>(data) + (alc->get_offset() - allocator->get_offset()));
+    void* const new_data = (data == nullptr) ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::uint64_t>(data) + (alc->get_offset() - allocator->get_offset()));
     std::shared_ptr<Memory> result(new Memory(e, self.lock(), std::move(alc), new_data, place, type_index, vulkan_data));
     result->self = result;
     return result;

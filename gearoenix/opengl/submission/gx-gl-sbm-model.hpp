@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_GL_SUBMISSION_MODEL_HPP
-#define GEAROENIX_GL_SUBMISSION_MODEL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../math/gx-math-aabb.hpp"
@@ -31,14 +30,14 @@ struct Scene;
 struct Model final {
     math::Mat4x4<float> m;
     math::Mat4x4<float> inv_m;
-    std::size_t first_mesh_index = static_cast<std::size_t>(-1);
-    std::size_t last_mesh_index = static_cast<std::size_t>(-1);
-    std::size_t first_bone_index = static_cast<std::size_t>(-1);
-    std::size_t bones_count = 0;
-    std::size_t directional_lights_count = 0;
+    std::uint32_t first_mesh_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t last_mesh_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t first_bone_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t bones_count = 0;
+    std::uint32_t directional_lights_count = 0;
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_direction {};
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directional_lights_colour {};
-    std::size_t shadow_caster_directional_lights_count = 0;
+    std::uint32_t shadow_caster_directional_lights_count = 0;
     std::array<math::Mat4x4<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_normalised_vp {};
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_direction {};
     std::array<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directional_lights_colour {};
@@ -48,7 +47,7 @@ struct Model final {
     uint radiance = static_cast<uint>(-1);
     float radiance_lod_coefficient = 0.0;
     double reflection_probe_size = std::numeric_limits<double>::max();
-    std::size_t first_mvp_index = static_cast<std::size_t>(-1); // It is used for shadow
+    std::uint32_t first_mvp_index = static_cast<std::uint32_t>(-1); // It is used for shadow
     const char* name = nullptr;
 
     Model();
@@ -90,5 +89,4 @@ struct DebugModel final {
     DebugModel(gl::Camera* camera, physics::Transformation* transform);
 };
 }
-#endif
 #endif

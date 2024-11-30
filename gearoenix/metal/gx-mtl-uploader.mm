@@ -3,7 +3,7 @@
 #import "gx-mtl-engine.hpp"
 #import <Metal/MTLCommandBuffer.h>
 
-void gearoenix::metal::Uploader::upload(id<MTLBuffer> destination, const void* data, const std::size_t size, core::job::EndCaller&& c)
+void gearoenix::metal::Uploader::upload(id<MTLBuffer> destination, const void* data, const std::uint32_t size, core::job::EndCaller&& c)
 {
     auto source = [e.get_device() newBufferWithBytes:data length:static_cast<NSUInteger>(size) options:MTLResourceStorageModeShared];
     source.label = [NSString stringWithFormat:@"Gearoenix-UploadBuffer-%@", destination.label];
@@ -39,7 +39,7 @@ void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDe
     constexpr NSUInteger align_mask = 1;
     const NSUInteger pixel_size = static_cast<NSUInteger>(pixels[0].size()) / (width * height);
     NSUInteger buffer_size = 0;
-    for (std::size_t i = 0; i < pixels.size(); ++i) {
+    for (std::uint32_t i = 0; i < pixels.size(); ++i) {
         buffer_size += ((width * pixel_size + align_mask) & ~align_mask) * height;
         width >>= 1;
         height >>= 1;
@@ -61,7 +61,7 @@ void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDe
         [cmd addCompletedHandler:^(id<MTLCommandBuffer>) { dispatch_semaphore_signal(b_sem); }];
         auto enc = [cmd blitCommandEncoder];
         enc.label = [NSString stringWithFormat:@"Gearoenix-UploadEncoder-%@", destination.label];
-        for (std::size_t mip_i = 0; mip_i < pixels.size(); ++mip_i) {
+        for (std::uint32_t mip_i = 0; mip_i < pixels.size(); ++mip_i) {
             const auto& mip_pixel = pixels[mip_i];
             const uint8_t* src = reinterpret_cast<const uint8_t*>(mip_pixel.data());
             const NSUInteger w_dst = (width * pixel_size + align_mask) & ~align_mask;

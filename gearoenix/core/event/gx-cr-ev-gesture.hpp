@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_GESTURE_HPP
-#define GEAROENIX_CORE_EVENT_GESTURE_HPP
+#pragma once
 #include "gx-cr-ev-button.hpp"
 #include "gx-cr-ev-touch.hpp"
 #include <array>
@@ -95,5 +94,3 @@ public:
     }
 };
 }
-
-#endif

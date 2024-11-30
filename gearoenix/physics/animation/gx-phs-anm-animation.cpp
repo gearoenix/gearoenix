@@ -1,5 +1,4 @@
 #include "gx-phs-anm-animation.hpp"
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
@@ -21,9 +20,9 @@ gearoenix::physics::animation::Animation::~Animation() = default;
 
 gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(
     std::string name,
-    const std::size_t bones_channels_count,
-    const std::size_t bones_channels_first_index,
-    const std::size_t bones_channels_end_index)
+    const std::uint32_t bones_channels_count,
+    const std::uint32_t bones_channels_first_index,
+    const std::uint32_t bones_channels_end_index)
     : Animation(std::move(name))
     , bones_channels_count(bones_channels_count)
     , bones_channels_first_index(bones_channels_first_index)
@@ -35,7 +34,7 @@ gearoenix::physics::animation::ArmatureAnimation::~ArmatureAnimation() = default
 
 void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const double time)
 {
-    for (std::size_t bone_channel_index = bones_channels_first_index; bone_channel_index < bones_channels_end_index; ++bone_channel_index) {
+    for (std::uint32_t bone_channel_index = bones_channels_first_index; bone_channel_index < bones_channels_end_index; ++bone_channel_index) {
         animate(manager, manager.get_bones_channels()[bone_channel_index], time);
     }
 }
@@ -117,8 +116,8 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager,
 gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
     std::string name,
     std::shared_ptr<render::material::Sprite> sprite,
-    const std::size_t width,
-    const std::size_t height)
+    const std::uint32_t width,
+    const std::uint32_t height)
     : Animation(std::move(name))
     , sprite(std::move(sprite))
     , count(static_cast<double>(width * height))
@@ -132,16 +131,12 @@ void gearoenix::physics::animation::SpriteAnimation::animate(
     Manager&, const double time)
 {
     GX_ASSERT_D(time <= 1.0);
-    const auto pos = static_cast<std::size_t>(count * time);
+    const auto pos = static_cast<std::uint32_t>(count * time);
     const math::Vec2 v(static_cast<double>(pos % width), static_cast<double>(pos / width));
     sprite->get_uv_transform() = math::Vec4<float>(uv_scale, uv_scale * v);
 }
 
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
-
-namespace {
-auto animation_player_allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::animation::AnimationPlayer, 16>::construct();
-}
 
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::shared_ptr<Animation> animation,
@@ -155,17 +150,6 @@ gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
 }
 
 gearoenix::physics::animation::AnimationPlayer::~AnimationPlayer() = default;
-
-std::shared_ptr<gearoenix::physics::animation::AnimationPlayer> gearoenix::physics::animation::AnimationPlayer::construct(
-    std::shared_ptr<Animation> animation,
-    std::string&& name,
-    const double starting_time,
-    const core::ecs::entity_id_t entity_id)
-{
-    auto self = animation_player_allocator->make_shared(std::move(animation), std::move(name), starting_time, entity_id);
-    self->set_component_self(self);
-    return self;
-}
 
 void gearoenix::physics::animation::AnimationPlayer::update_time(const double delta_time)
 {
@@ -199,10 +183,4 @@ void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const d
 void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager)
 {
     animation->animate(manager, time);
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::animation::AnimationPlayer::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
 }

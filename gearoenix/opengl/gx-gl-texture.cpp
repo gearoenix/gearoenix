@@ -14,12 +14,12 @@
 #endif
 
 namespace {
-void flip_texture(std::vector<std::uint8_t>& pixels, const std::size_t height)
+void flip_texture(std::vector<std::uint8_t>& pixels, const std::uint32_t height)
 {
     GX_ASSERT_D(!pixels.empty());
     GX_ASSERT_D(height > 0);
-    const auto columns_count = pixels.size() / height;
-    for (std::size_t top = 0, top_index = 0, bottom = height - 1, bottom_index = pixels.size() - columns_count; top < bottom; ++top, --bottom) {
+    const auto columns_count = static_cast<std::uint32_t>(pixels.size()) / height;
+    for (std::uint32_t top = 0, top_index = 0, bottom = height - 1, bottom_index = static_cast<std::uint32_t>(pixels.size()) - columns_count; top < bottom; ++top, --bottom) {
         const auto next_top_index = top_index + columns_count;
         const auto next_bottom_index = bottom_index - columns_count;
         for (; top_index < next_top_index; ++top_index, ++bottom_index) {
@@ -29,7 +29,7 @@ void flip_texture(std::vector<std::uint8_t>& pixels, const std::size_t height)
     }
 }
 
-void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t height)
+void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::uint32_t height)
 {
     for (auto& mip_pixels : pixels) {
         flip_texture(mip_pixels, height);
@@ -37,7 +37,7 @@ void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::size_t he
     }
 }
 
-void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::size_t height)
+void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::uint32_t height)
 {
     for (auto& p : pixels)
         flip_texture(p, height);
@@ -197,7 +197,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         auto level_height = static_cast<sizei>(info.get_height());
         const auto mips_count = get_mipmaps_count();
         for (sint mip_index = 0; mip_index < static_cast<sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
-            data.resize(pixel_element_size * static_cast<std::size_t>(level_width * level_height));
+            data.resize(pixel_element_size * static_cast<std::uint32_t>(level_width * level_height));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
             glReadPixels(0, 0, level_width, level_height, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
             flip_texture(data, level_height);
@@ -264,7 +264,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
             auto level_aspect = static_cast<sizei>(info.get_width());
             const auto mips_count = get_mipmaps_count();
             for (sint mipmap_index = 0; mipmap_index < static_cast<sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
-                data.resize(static_cast<std::size_t>(level_aspect * level_aspect) * pixel_element_size);
+                data.resize(static_cast<std::uint32_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
                 flip_texture(data, level_aspect);
@@ -350,7 +350,7 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
         if (pixels.empty()) {
             glTexImage2D(GL_TEXTURE_2D, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
         } else {
-            for (std::size_t level_index = 0; level_index < pixels.size(); ++level_index) {
+            for (std::uint32_t level_index = 0; level_index < pixels.size(); ++level_index) {
                 const auto li = static_cast<gl::sint>(level_index);
                 auto lw = gl_img_width >> level_index;
                 if (lw < 1) {
@@ -405,13 +405,13 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
         }
         GX_GL_CHECK_D;
-        for (std::size_t face_index = 0; face_index < 6; ++face_index) {
+        for (std::uint32_t face_index = 0; face_index < 6; ++face_index) {
             const auto gl_face = convert(render::texture::FACES[face_index]);
             if (pixels.empty() || pixels[face_index].empty()) {
                 glTexImage2D(gl_face, 0, internal_format, gl_img_width, gl_img_height, 0, format, data_format, nullptr);
             } else {
                 const auto& face_pixels = pixels[face_index];
-                for (std::size_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
+                for (std::uint32_t level_index = 0; level_index < face_pixels.size(); ++level_index) {
                     const auto li = static_cast<gl::sint>(level_index);
                     auto lw = gl_img_width >> level_index;
                     if (lw < 1)

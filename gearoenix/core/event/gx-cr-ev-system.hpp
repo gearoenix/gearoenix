@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_SYSTEM_SYSTEM_HPP
-#define GEAROENIX_CORE_EVENT_SYSTEM_SYSTEM_HPP
+#pragma once
 
 namespace gearoenix::core::event::platform {
 struct WindowSizeChangeData final {
@@ -43,4 +42,3 @@ struct WindowSizeChangeData final {
     }
 };
 }
-#endif

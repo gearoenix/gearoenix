@@ -10,18 +10,16 @@
 #include <emscripten.h>
 #endif
 
-namespace
-{
-    bool sdl_initialized = false;
+namespace {
+bool sdl_initialized = false;
 
 #if GX_PLATFORM_WEBASSEMBLY
-    static void gearoenix_platform_application_loop(void* const arg)
-    {
-        reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
-    }
+static void gearoenix_platform_application_loop(void* const arg)
+{
+    reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
+}
 #endif
 }
-
 
 void gearoenix::platform::Application::initialize_sdl()
 {
@@ -287,7 +285,7 @@ std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions
 {
     std::uint32_t extensions_count = 0;
     SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, nullptr);
-    std::vector<const char*> extensions(static_cast<std::size_t>(extensions_count));
+    std::vector<const char*> extensions(static_cast<std::uint32_t>(extensions_count));
     SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, extensions.data());
     return extensions;
 }

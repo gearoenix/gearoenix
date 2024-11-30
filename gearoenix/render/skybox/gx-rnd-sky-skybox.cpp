@@ -1,7 +1,7 @@
 #include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Skybox::Skybox(
-    const std::type_index final_component_type_index,
+    const TypeIndex final_component_type_index,
     std::shared_ptr<mesh::Mesh>&& bound_mesh,
     Texture&& bound_texture,
     std::string&& name,

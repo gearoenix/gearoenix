@@ -12,6 +12,9 @@ gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     , animation_manager(new animation::Manager(render_engine))
     , constraint_manager(new constraint::Manager(render_engine))
 {
+    core::ecs::Component::register_type<collider::Aabb3>();
+    core::ecs::Component::register_type<collider::Frustum>();
+    core::ecs::Component::register_type<Transformation>();
 }
 
 gearoenix::physics::Engine::~Engine() = default;

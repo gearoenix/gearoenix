@@ -1,21 +1,10 @@
 #include "gx-phs-transformation.hpp"
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/gx-cr-string.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include <algorithm>
 #include <imgui/imgui.h>
-
-namespace {
-const auto allocator = gearoenix::core::allocator::SharedArray<gearoenix::physics::Transformation, 8192>::construct();
-}
-
-const gearoenix::core::ecs::Component::HierarchyTypes& gearoenix::physics::Transformation::get_hierarchy_types() const
-{
-    static const auto types = generate_hierarchy_types(this);
-    return types;
-}
 
 gearoenix::physics::Transformation::Transformation(
     std::string&& name,
@@ -442,17 +431,6 @@ void gearoenix::physics::Transformation::draw_gizmo()
         set_local_matrix(local_matrix);
     }
     is_gizmo_visible = false;
-}
-
-std::shared_ptr<gearoenix::physics::Transformation> gearoenix::physics::Transformation::construct(
-    std::string&& name,
-    Transformation* const parent,
-    const core::ecs::entity_id_t entity_id,
-    render::engine::Engine* const e)
-{
-    auto self = allocator->make_shared(std::move(name), parent, entity_id, e);
-    self->set_component_self(self);
-    return self;
 }
 
 void gearoenix::physics::Transformation::update(core::ecs::World* const world)

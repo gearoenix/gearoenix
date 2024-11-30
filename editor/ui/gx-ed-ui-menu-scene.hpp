@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_EDITOR_UI_MENU_SCENE_HPP
-#define GEAROENIX_EDITOR_UI_MENU_SCENE_HPP
+#pragma once
 #include <gearoenix/core/ecs/gx-cr-ecs-types.hpp>
 
 namespace gearoenix::platform {
@@ -20,5 +19,3 @@ public:
     void update();
 };
 }
-
-#endif

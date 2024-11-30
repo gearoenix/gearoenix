@@ -6,9 +6,9 @@
 
 gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     Engine& e,
-    const std::size_t directional_lights_count,
-    const std::size_t shadow_casters_directional_lights_count,
-    const std::size_t bones_count)
+    const std::uint32_t directional_lights_count,
+    const std::uint32_t shadow_casters_directional_lights_count,
+    const std::uint32_t bones_count)
     : Shader(e)
     , directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
@@ -18,7 +18,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     std::stringstream vs;
     vs << "#version 300 es\n";
     vs << "\n";
-    vs << "#define GX_PI 3.141592653589793238\n";
+    vs << "#define gx_pi 3.141592653589793238\n";
     vs << "\n";
     vs << "precision highp float;\n";
     vs << "precision highp int;\n";
@@ -72,7 +72,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     std::stringstream fs;
     fs << "#version 300 es\n";
     fs << "\n";
-    fs << "#define GX_PI 3.141592653589793238\n";
+    fs << "#define gx_pi 3.141592653589793238\n";
     fs << "\n";
     fs << "precision highp float;\n";
     fs << "precision highp int;\n";
@@ -119,7 +119,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "float distribution_ggx(const float normal_dot_half, const float roughness) {\n";
     fs << "    float a = normal_dot_half * roughness;\n";
     fs << "    float k = roughness / (1.0 - normal_dot_half * normal_dot_half + a * a);\n";
-    fs << "    return k * k * (1.0 / GX_PI);\n";
+    fs << "    return k * k * (1.0 / gx_pi);\n";
     fs << "}\n";
     fs << "\n";
     fs << "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n";
@@ -150,7 +150,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n";
     fs << "    vec3 fresnel = fresnel_schlick(dot(half_vec, view), f0, f90);\n";
     fs << "    vec3 specular = (ndf * geo) * fresnel;\n";
-    fs << "    vec3 diffuse = albedo * ( 1.0 / GX_PI);\n";
+    fs << "    vec3 diffuse = albedo * ( 1.0 / gx_pi);\n";
     fs << "    vec3 kd = (vec3(1.0) - fresnel) * (1.0 - metallic);\n";
     fs << "    return (diffuse * kd + specular) * light_color * normal_dot_light;\n";
     fs << "}\n";

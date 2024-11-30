@@ -13,12 +13,12 @@ gearoenix::render::camera::Builder::Builder(
     : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
-    auto frustum = physics::collider::Frustum::construct(
+    auto frustum = core::ecs::Component::construct<physics::collider::Frustum>(
         name + "-collider",
         physics::collider::Frustum::default_points,
         builder.get_id());
     builder.add_component(std::move(frustum));
-    builder.add_component(physics::Transformation::construct(
+    builder.add_component(core::ecs::Component::construct<physics::Transformation>(
         name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 

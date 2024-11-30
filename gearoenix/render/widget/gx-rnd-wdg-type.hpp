@@ -1,8 +1,8 @@
-#ifndef GEAROENIX_RENDER_WIDGET_TYPE_HPP
-#define GEAROENIX_RENDER_WIDGET_TYPE_HPP
-#include "../../core/gx-cr-types.hpp"
+#pragma once
+#include <cstdint>
+
 namespace gearoenix::render::widget {
-enum struct Type : core::TypeId {
+enum struct Type : std::uint8_t {
     Button = 1,
     Edit = 2,
     Empty = 3,
@@ -12,4 +12,3 @@ enum struct Type : core::TypeId {
     ColourChooser = 7,
 };
 }
-#endif

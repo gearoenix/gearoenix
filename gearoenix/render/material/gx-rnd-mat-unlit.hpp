@@ -5,7 +5,7 @@
 
 namespace gearoenix::render::material {
 struct Unlit : Material {
-    static constexpr std::size_t MAX_COUNT = 256;
+    constexpr static std::uint32_t MAX_COUNT = 256;
 
     GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
     GX_GETSET_VAL_PRT(float, alpha_cutoff, 0.0);

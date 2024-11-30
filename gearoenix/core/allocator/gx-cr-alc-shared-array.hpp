@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_ALLOCATOR_SHARED_ARRAY_HPP
-#define GEAROENIX_CORE_ALLOCATOR_SHARED_ARRAY_HPP
+#pragma once
 #include "../../math/gx-math-numeric.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <array>
@@ -9,12 +8,12 @@
 #include <mutex>
 
 namespace gearoenix::core::allocator {
-template <typename T, std::size_t S>
+template <typename T, std::int64_t S>
 struct SharedArray final {
 private:
-    static constexpr std::size_t gx_core_shared_array_align_size = 256;
-    static constexpr auto gx_core_shared_array_element_size = math::Numeric::align<std::size_t>(sizeof(T), gx_core_shared_array_align_size);
-    static constexpr std::size_t gx_core_shared_array_size = gx_core_shared_array_element_size * S;
+    constexpr static std::int64_t gx_core_shared_array_align_size = 256;
+    constexpr static std::int64_t gx_core_shared_array_element_size = math::Numeric::align<std::int64_t>(sizeof(T), gx_core_shared_array_align_size);
+    constexpr static std::int64_t gx_core_shared_array_size = gx_core_shared_array_element_size * S;
 
     std::mutex gx_core_shared_array_lock;
     std::array<std::uint8_t, gx_core_shared_array_size> gx_core_shared_array_objects;
@@ -26,7 +25,7 @@ private:
 #if GX_DEBUG_MODE
         std::memset(gx_core_shared_array_objects.data(), 0, gx_core_shared_array_objects.size());
 #endif
-        for (std::size_t i = S * gx_core_shared_array_element_size; i > 0;) {
+        for (std::int64_t i = S * gx_core_shared_array_element_size; i > 0;) {
             i -= gx_core_shared_array_element_size;
             gx_core_shared_array_free_pointers.push_back(reinterpret_cast<T*>(&gx_core_shared_array_objects[i]));
         }
@@ -74,7 +73,7 @@ public:
         }();
 #if GX_DEBUG_MODE
         const auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
-        for (std::size_t i = 0; i < gx_core_shared_array_element_size; ++i) {
+        for (std::int64_t i = 0; i < gx_core_shared_array_element_size; ++i) {
             GX_ASSERT(bs[i] == 0);
         }
 #endif
@@ -82,5 +81,3 @@ public:
     }
 };
 }
-
-#endif

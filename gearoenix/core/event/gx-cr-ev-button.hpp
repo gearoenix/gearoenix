@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
-#define GEAROENIX_CORE_EVENT_BUTTON_BUTTON_HPP
+#pragma once
 #include "../../math/gx-math-vector-2d.hpp"
 #include "../../platform/gx-plt-key.hpp"
 
@@ -47,4 +46,3 @@ public:
 };
 
 }
-#endif

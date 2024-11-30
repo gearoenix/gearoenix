@@ -13,7 +13,7 @@
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain.get_image_views().size());
-    frames.reserve(static_cast<std::size_t>(frames_count));
+    frames.reserve(static_cast<std::uint64_t>(frames_count));
     for (auto frame_index = decltype(frames_count) { 0 }; frame_index < frames_count; ++frame_index) {
         frames.emplace_back(new Frame(swapchain, depth_stencil, render_pass, frame_index));
     }

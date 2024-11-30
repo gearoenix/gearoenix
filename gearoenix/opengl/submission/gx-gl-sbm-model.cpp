@@ -23,7 +23,7 @@ gearoenix::gl::submission::Model::Model(
     physics::animation::Armature* const armature)
     : m(model_transform->get_global_matrix())
     , inv_m(model_transform->get_inverted_global_matrix().transposed())
-    , first_bone_index(static_cast<std::size_t>(-1))
+    , first_bone_index(static_cast<std::uint32_t>(-1))
     , irradiance(scene.default_reflection.second.irradiance)
     , radiance(scene.default_reflection.second.radiance)
     , radiance_lod_coefficient(scene.default_reflection.second.radiance_mips_count)
@@ -34,7 +34,7 @@ gearoenix::gl::submission::Model::Model(
     first_mesh_index = fmi;
     last_mesh_index = lmi;
     if (nullptr != armature) {
-        first_bone_index = scene.bones_data.size();
+        first_bone_index = static_cast<std::uint32_t>(scene.bones_data.size());
         e.get_physics_engine()->get_animation_manager()->loop_over_bones(
             [&](const physics::animation::Bone& bone) {
                 ++bones_count;
@@ -49,7 +49,7 @@ gearoenix::gl::submission::Model::Model(
 
 bool gearoenix::gl::submission::Model::has_transparent_material(const Scene& scene) const
 {
-    for (std::size_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
+    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
         if (scene.meshes[mesh_index].render_material->get_transparency() == render::material::Transparency::Transparent) {
             return true;
         }
@@ -59,7 +59,7 @@ bool gearoenix::gl::submission::Model::has_transparent_material(const Scene& sce
 
 bool gearoenix::gl::submission::Model::needs_mvp(const gearoenix::gl::submission::Scene& scene) const
 {
-    for (std::size_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
+    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
         if (scene.meshes[mesh_index].material->needs_mvp) {
             return true;
         }
@@ -72,7 +72,7 @@ void gearoenix::gl::submission::Model::render_shadow(
     const Camera& camera,
     uint& current_shader) const
 {
-    for (std::size_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
+    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
         const auto& mesh = scene.meshes[mesh_index];
         mesh.material->shadow(*this, mesh, camera, current_shader);
     }
@@ -81,7 +81,7 @@ void gearoenix::gl::submission::Model::render_shadow(
 void gearoenix::gl::submission::Model::render_forward(
     const Scene& scene, const Camera& camera, uint& current_shader) const
 {
-    for (std::size_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
+    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
         const auto& mesh = scene.meshes[mesh_index];
         mesh.material->forward_render(*this, mesh, camera, scene, current_shader);
     }
@@ -90,7 +90,7 @@ void gearoenix::gl::submission::Model::render_forward(
 void gearoenix::gl::submission::Model::render_deferred_gbuffers(
     const Scene& scene, const Camera& camera, uint& current_shader) const
 {
-    for (std::size_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
+    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
         const auto& mesh = scene.meshes[mesh_index];
         mesh.material->deferred_gbuffer_render(*this, mesh, camera, scene, current_shader);
     }

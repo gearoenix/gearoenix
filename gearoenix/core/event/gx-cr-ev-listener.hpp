@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_CORE_EVENT_LISTENER_HPP
-#define GEAROENIX_CORE_EVENT_LISTENER_HPP
+#pragma once
 #include "gx-cr-ev-event.hpp"
 
 namespace gearoenix::core::event {
@@ -15,4 +14,3 @@ struct Listener {
     [[nodiscard]] virtual Response on_event(const Data& event_data) = 0;
 };
 }
-#endif
