@@ -134,7 +134,7 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         return;
     }
     ImGui::Text("Type: %s", to_string(engine_type));
-    ImGui::Text("Frames Count: %zu", frames_count);
+    ImGui::Text("Frames Count: %llu", frames_count);
     world->show_debug_gui(*this);
     // TODO: I have to show all other things
     ImGui::TreePop();

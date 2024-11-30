@@ -10,7 +10,7 @@ struct Stream;
 
 namespace gearoenix::render::texture {
 struct TextureInfo final {
-    GX_GET_VAL_PRV(std::uint64_t, hash, 0);
+    GX_GET_VAL_PRV(std::uintptr_t, hash, 0);
     GX_GET_VAL_PRV(TextureFormat, format, TextureFormat::Unknown);
     GX_GET_CREF_PRV(SamplerInfo, sampler_info);
     GX_GET_VAL_PRV(std::uint32_t, width, 0);

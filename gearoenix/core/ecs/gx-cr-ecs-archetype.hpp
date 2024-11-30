@@ -134,7 +134,7 @@ private:
         }
     }
 
-    template <typename ComponentsTypesTuple, std::uint32_t... I, typename F>
+    template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
     void parallel_system(std::index_sequence<I...> const&, F&& fun)
     {
         const std::array<std::uint32_t, sizeof...(I)> indices = {

@@ -11,7 +11,7 @@ struct Stream;
 
 namespace gearoenix::render::texture {
 struct SamplerInfo final {
-    GX_GET_VAL_PRV(std::uint64_t, hash, 0);
+    GX_GET_VAL_PRV(std::uintptr_t, hash, 0);
     GX_GET_VAL_PRV(Filter, min_filter, Filter::LinearMipmapLinear);
     GX_GET_VAL_PRV(Filter, mag_filter, Filter::Linear);
     GX_GET_VAL_PRV(Wrap, wrap_s, Wrap::Repeat);
@@ -44,7 +44,7 @@ public:
 };
 
 struct SamplerInfoHasher final {
-    [[nodiscard]] inline std::uint64_t operator()(const SamplerInfo& sampler) const { return sampler.get_hash(); }
+    [[nodiscard]] std::uint64_t operator()(const SamplerInfo& sampler) const { return sampler.get_hash(); }
 };
 }
 
