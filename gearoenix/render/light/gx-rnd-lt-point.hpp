@@ -4,9 +4,9 @@
 namespace gearoenix::render::light {
 struct Point final : Light {
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndex TYPE_INDEX = 14;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 14;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
 
     math::Vec3<float> position = { 0.0f, 0.0f, 0.0f };
 

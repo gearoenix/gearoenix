@@ -12,7 +12,7 @@ private:
     platform::Application& platform_application;
     Manager& manager;
 
-    core::ecs::entity_id_t active_scene = core::ecs::INVALID_ENTITY_ID;
+    core::ecs::entity_id_t active_scene = core::ecs::invalid_entity_id;
 
 public:
     explicit MenuScene(Manager& manager);

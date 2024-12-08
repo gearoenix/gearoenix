@@ -1,5 +1,6 @@
 #include "gx-plt-sdl2-application.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
+#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-sdl2-key.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
@@ -37,7 +38,7 @@ void gearoenix::platform::Application::initialize_screen()
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     base.screen_size = math::Vec2(display_mode.w, display_mode.h);
-    const auto& config = RuntimeConfiguration::get(this);
+    const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
     if (config.get_fullscreen()) {
         base.initialize_window_size(base.screen_size.x, base.screen_size.y);
     }
@@ -52,7 +53,7 @@ void gearoenix::platform::Application::initialize_window()
 #if !GX_PLATFORM_WEBASSEMBLY
     core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-    if (const auto& config = RuntimeConfiguration::get(this); config.get_fullscreen()) {
+    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>(); config.get_fullscreen()) {
         core_flags |= SDL_WINDOW_FULLSCREEN;
         core_flags |= SDL_WINDOW_BORDERLESS;
         core_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -117,7 +118,7 @@ void gearoenix::platform::Application::initialize_mouse()
 
 bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
-    const auto& config = RuntimeConfiguration::get(this);
+    const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
     window = SDL_CreateWindow(
         config.get_application_name().c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -277,7 +278,7 @@ void gearoenix::platform::Application::set_caption(const std::string& s)
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
     SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-    RuntimeConfiguration::get(this).set_fullscreen(b);
+    core::ecs::Singleton::get<RuntimeConfiguration>().set_fullscreen(b);
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED

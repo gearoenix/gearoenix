@@ -1,4 +1,5 @@
 #include "gx-rnd-sky-manager.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
@@ -13,7 +14,7 @@
 gearoenix::render::skybox::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Skybox>();
+    core::ecs::ComponentType::add<Skybox>();
 }
 
 gearoenix::render::skybox::Manager::~Manager() = default;

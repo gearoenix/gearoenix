@@ -1,5 +1,6 @@
 #include "gx-cr-sync-channeled-workers.hpp"
 #include "../../platform/gx-plt-log.hpp"
+#include "gx-cr-sync-thread.hpp"
 
 void gearoenix::core::sync::ChanneledWorkers::Thread::kernel()
 {
@@ -37,7 +38,7 @@ gearoenix::core::sync::ChanneledWorkers::Thread::~Thread()
 
 gearoenix::core::sync::ChanneledWorkers::ChanneledWorkers()
 {
-    std::uint32_t count = std::thread::hardware_concurrency();
+    std::uint32_t count = threads_count();
     threads.reserve(count);
     for (std::uint32_t i = 0; i < count; ++i) {
         threads.emplace_back(new Thread(i));

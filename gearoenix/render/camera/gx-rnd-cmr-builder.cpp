@@ -1,24 +1,23 @@
 #include "gx-rnd-cmr-builder.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
 gearoenix::render::camera::Builder::Builder(
     engine::Engine& e, const std::string& name, core::job::EndCaller<>&& entity_in_world_callback,
     physics::Transformation* const parent_transform)
-    : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(entity_in_world_callback)))
+    : entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::string(name), std::move(entity_in_world_callback)))
 {
     auto& builder = entity_builder->get_builder();
-    auto frustum = core::ecs::Component::construct<physics::collider::Frustum>(
+    auto frustum = core::ecs::construct_component<physics::collider::Frustum>(
         name + "-collider",
         physics::collider::Frustum::default_points,
         builder.get_id());
     builder.add_component(std::move(frustum));
-    builder.add_component(core::ecs::Component::construct<physics::Transformation>(
+    builder.add_component(core::ecs::construct_component<physics::Transformation>(
         name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 

@@ -7,7 +7,7 @@
 gearoenix::render::scene::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Scene>();
+    core::ecs::ComponentType::add<Scene>();
 }
 
 gearoenix::render::scene::Manager::~Manager() = default;
@@ -20,7 +20,7 @@ std::shared_ptr<gearoenix::render::scene::Builder> gearoenix::render::scene::Man
 
 void gearoenix::render::scene::Manager::update() const
 {
-    e.get_world()->parallel_system<Scene>([](const core::ecs::entity_id_t scene_id, Scene* const s, const auto /*kernel_index*/) {
+    core::ecs::World::get()->parallel_system<Scene>([](const core::ecs::entity_id_t scene_id, Scene* const s, const auto /*kernel_index*/) {
         s->update(scene_id);
     });
 }

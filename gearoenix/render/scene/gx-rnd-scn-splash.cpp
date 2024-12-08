@@ -83,7 +83,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
     std::vector<std::uint32_t> plane_indices = { 0, 1, 3, 0, 3, 2 };
 
     auto entity_callback = core::job::EndCaller([this, end = start_callback]() -> void {
-        this->e.get_world()->get_component<Scene>(scene_id)->set_enabled(true);
+        core::ecs::World::get()->get_component<Scene>(scene_id)->set_enabled(true);
         (void)end;
     });
 
@@ -107,7 +107,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
 
     struct Values {
         engine::Engine& e;
-        std::shared_ptr<scene::Builder> scene_builder;
+        std::shared_ptr<Builder> scene_builder;
         core::job::EndCaller<> entity_callback;
         std::shared_ptr<Splash> splash;
 
@@ -123,7 +123,7 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
         Values(
             engine::Engine& e,
             std::shared_ptr<Splash>&& splash,
-            std::shared_ptr<scene::Builder>&& scene_builder,
+            std::shared_ptr<Builder>&& scene_builder,
             core::job::EndCaller<>&& entity_callback)
             : e(e)
             , scene_builder(std::move(scene_builder))
@@ -332,22 +332,22 @@ std::shared_ptr<gearoenix::render::scene::Splash> gearoenix::render::scene::Spla
 
 void gearoenix::render::scene::Splash::update()
 {
-    auto* const gear_tran = e.get_world()->get_component<physics::Transformation>(gear_id);
+    auto* const gear_tran = core::ecs::World::get()->get_component<physics::Transformation>(gear_id);
     if (gear_tran == nullptr)
         return;
-    auto* const glare_tran = e.get_world()->get_component<physics::Transformation>(glare_id);
+    auto* const glare_tran = core::ecs::World::get()->get_component<physics::Transformation>(glare_id);
     if (glare_tran == nullptr)
         return;
-    auto* const left_wing_tran = e.get_world()->get_component<physics::Transformation>(left_wing_id);
+    auto* const left_wing_tran = core::ecs::World::get()->get_component<physics::Transformation>(left_wing_id);
     if (left_wing_tran == nullptr)
         return;
-    auto* const right_wing_tran = e.get_world()->get_component<physics::Transformation>(right_wing_id);
+    auto* const right_wing_tran = core::ecs::World::get()->get_component<physics::Transformation>(right_wing_id);
     if (right_wing_tran == nullptr)
         return;
-    auto* const gearoenix_tran = e.get_world()->get_component<physics::Transformation>(gearoenix_text);
+    auto* const gearoenix_tran = core::ecs::World::get()->get_component<physics::Transformation>(gearoenix_text);
     if (gearoenix_tran == nullptr)
         return;
-    auto* const gearoenix_model = e.get_world()->get_component<model::Model>(gearoenix_text);
+    auto* const gearoenix_model = core::ecs::World::get()->get_component<model::Model>(gearoenix_text);
     if (gearoenix_model == nullptr)
         return;
 
@@ -396,5 +396,5 @@ void gearoenix::render::scene::Splash::update()
 
 void gearoenix::render::scene::Splash::hide()
 {
-    e.get_world()->get_component<Scene>(scene_id)->set_enabled(false);
+    core::ecs::World::get()->get_component<Scene>(scene_id)->set_enabled(false);
 }

@@ -1,4 +1,5 @@
 #include "gx-phs-transformation.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/gx-cr-string.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
@@ -11,7 +12,7 @@ gearoenix::physics::Transformation::Transformation(
     Transformation* const parent,
     const core::ecs::entity_id_t entity_id,
     render::engine::Engine* const e)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , Drawer(e)
     , scale(1.0)
     , parent(parent)
@@ -321,13 +322,13 @@ void gearoenix::physics::Transformation::set_parent(Transformation* const p)
     parent->children.insert(this);
 }
 
-void gearoenix::physics::Transformation::show_debug_gui(const render::engine::Engine& e)
+void gearoenix::physics::Transformation::show_debug_gui()
 {
     if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         return;
     }
 
-    Component::show_debug_gui(e);
+    Component::show_debug_gui();
 
     is_gizmo_visible = true; // maybe later I make it true based on the object selection
 
@@ -417,7 +418,7 @@ void gearoenix::physics::Transformation::show_debug_gui(const render::engine::En
 
     if (ImGui::TreeNode("Children")) {
         for (const auto& child : children) {
-            child->show_debug_gui(e);
+            child->show_debug_gui();
         }
         ImGui::TreePop();
     }
@@ -433,12 +434,12 @@ void gearoenix::physics::Transformation::draw_gizmo()
     is_gizmo_visible = false;
 }
 
-void gearoenix::physics::Transformation::update(core::ecs::World* const world)
+void gearoenix::physics::Transformation::update()
 {
-    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_without_inverse_root();
     });
-    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_inverse();
     });
 }

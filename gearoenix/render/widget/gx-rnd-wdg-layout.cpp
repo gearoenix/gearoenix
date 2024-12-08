@@ -30,7 +30,7 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::T
 gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWindowBasedPlacer::on_event(const core::event::Data& event_data)
 {
     if (event_data.get_source() == core::event::Id::PlatformWindowSizeChange) {
-        if (auto* const trn = e.get_world()->get_component<physics::Transformation>(model_entity_id); nullptr != trn) {
+        if (auto* const trn = core::ecs::World::get()->get_component<physics::Transformation>(model_entity_id); nullptr != trn) {
             set_location(*trn);
         } else {
             GX_UNEXPECTED;

@@ -9,17 +9,17 @@ struct Mesh;
 
 namespace gearoenix::render::model {
 struct Model : core::ecs::Component {
-    constexpr static TypeIndex TYPE_INDEX = 8;
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 8;
     constexpr static std::uint32_t MAX_COUNT = 8192;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_VAL_PRT(bool, is_transformable, false);
     GX_GET_CREF_PRT(std::vector<std::shared_ptr<mesh::Mesh>>, meshes);
 
     /// \note A model can be static while it has transform component.
     Model(
-        TypeIndex final_component_type,
+        core::ecs::component_index_t final_component_type,
         bool is_transformable,
         std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
         std::string&& name,
@@ -30,7 +30,7 @@ public:
     /// Now if it is empty it will be filtered by all cameras
     std::optional<boost::container::flat_set<core::ecs::entity_id_t>> cameras;
     std::uint64_t cameras_flags = static_cast<std::uint64_t>(-1);
-    core::ecs::entity_id_t scene_id = core::ecs::INVALID_ENTITY_ID;
+    core::ecs::entity_id_t scene_id = core::ecs::invalid_entity_id;
 
     ~Model() override;
 };

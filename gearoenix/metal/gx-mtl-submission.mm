@@ -136,7 +136,7 @@ void gearoenix::metal::SubmissionManager::update()
     [blit popDebugGroup];
     [blit endEncoding];
 
-    std::vector<id<MTLRenderCommandEncoder>> encoders(std::thread::hardware_concurrency());
+    std::vector<id<MTLRenderCommandEncoder>> encoders(core::sync::threads_count());
 
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];

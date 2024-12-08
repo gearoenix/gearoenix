@@ -1,4 +1,5 @@
 #include "gx-phs-anm-animation.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
@@ -143,7 +144,7 @@ gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     std::string&& name,
     const double starting_time,
     const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , time(starting_time)
     , animation(std::move(animation))
 {

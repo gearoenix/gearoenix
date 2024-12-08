@@ -1,4 +1,5 @@
 #include "gx-rnd-rfl-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
@@ -9,8 +10,8 @@ gearoenix::render::reflection::Builder::Builder(
     engine::Engine& e, std::string&& name,
     physics::Transformation* parent_transform,
     core::job::EndCaller<>&& end_callback)
-    : entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(end_callback)))
-    , transformation(core::ecs::Component::construct<physics::Transformation>(name + "-transform", parent_transform, entity_builder->get_id(), &e))
+    : entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::move(name), std::move(end_callback)))
+    , transformation(core::ecs::construct_component<physics::Transformation>(name + "-transform", parent_transform, entity_builder->get_id(), &e))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(transformation);

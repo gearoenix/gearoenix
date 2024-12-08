@@ -1,4 +1,5 @@
 #include "gx-rnd-eng-engine.hpp"
+#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-engine.hpp"
@@ -15,6 +16,7 @@
 #include "../skybox/gx-rnd-sky-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include <cinttypes>
+#include <imgui/imgui.h>
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
@@ -32,8 +34,6 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
-#include <imgui/imgui.h>
-
 gearoenix::render::engine::Engine::Engine(
     const Type engine_type,
     platform::Application& platform_application)
@@ -44,7 +44,6 @@ gearoenix::render::engine::Engine::Engine(
     , scene_manager(new scene::Manager(*this))
     , font_manager(new font::Manager(*this))
     , gizmo_manager(new gizmo::Manager(*this))
-    , world(new core::ecs::World())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
     core::job::register_current_thread();
@@ -74,7 +73,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     platform::Application& platform_application)
 {
     std::unique_ptr<Engine> result;
-    const auto& configuration = platform::RuntimeConfiguration::get(&platform_application);
+    const auto& configuration = core::ecs::Singleton::get<platform::RuntimeConfiguration>();
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
         result = std::make_unique<vulkan::engine::Engine>(platform_application);
@@ -112,7 +111,7 @@ void gearoenix::render::engine::Engine::start_frame()
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
-    world->update();
+    core::ecs::World::get()->update();
 }
 
 void gearoenix::render::engine::Engine::end_frame()
@@ -136,7 +135,7 @@ void gearoenix::render::engine::Engine::show_debug_gui()
     }
     ImGui::Text("Type: %s", to_string(engine_type));
     ImGui::Text("Frames Count: %" PRIu64, frames_count);
-    world->show_debug_gui(*this);
+    core::ecs::World::get()->show_debug_gui();
     // TODO: I have to show all other things
     ImGui::TreePop();
 }

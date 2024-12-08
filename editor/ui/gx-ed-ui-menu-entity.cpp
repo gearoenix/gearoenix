@@ -39,7 +39,7 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 
     const auto is_valid_path = is_valid_skybox_path(create_skybox_path);
 
-    auto& w = *manager.get_platform_application().get_base().get_render_engine()->get_world();
+    auto& w = *core::ecs::World::get();
     render::imgui::entity_name_text_input(w, create_skybox_entity_name);
     {
         const auto _ = render::imgui::set_wrong_input_text_style(create_skybox_path.empty() || is_valid_path);
@@ -57,14 +57,14 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
         if (ImGui::Button("Create")) {
             const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Skybox [" + create_skybox_path + "]...");
             const auto scene_id = scene_selector->get_selection();
-            core::job::send_job_io1([this, scene_id, progress_bar_id, w = &w] {
+            core::job::send_job_to_pool([this, scene_id, progress_bar_id, w = &w] {
                 manager.get_platform_application().get_base().get_render_engine()->get_skybox_manager()->build(
                     create_skybox_entity_name,
                     platform::stream::Path::create_absolute(create_skybox_path),
                     core::job::EndCaller([] {}),
                     core::job::EndCallerShared<render::skybox::Builder>([this, scene_id, progress_bar_id, w](auto&& skybox_builder) {
                         manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
-                        if (core::ecs::INVALID_ENTITY_ID == scene_id) {
+                        if (core::ecs::invalid_entity_id == scene_id) {
                             return;
                         }
                         auto* const s = w->get_component<render::scene::Scene>(scene_id);

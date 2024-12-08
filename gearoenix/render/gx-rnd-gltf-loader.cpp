@@ -1,4 +1,5 @@
 #include "gx-rnd-gltf-loader.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/animation/gx-phs-anm-bone.hpp"
 #include "../physics/animation/gx-phs-anm-interpolation.hpp"
@@ -889,10 +890,10 @@ struct DataLoader final {
             return parent_transform;
         } else {
             GX_ASSERT_D(!node.name.empty());
-            const auto entity_builder = e.get_world()->create_shared_builder(
+            const auto entity_builder = std::make_shared<core::ecs::EntitySharedBuilder>(
                 std::string(node.name),
                 core::job::EndCaller(entity_end_callback));
-            const auto transform = core::ecs::Component::construct<physics::Transformation>(
+            const auto transform = core::ecs::construct_component<physics::Transformation>(
                 node.name + "-transformation", parent_transform, entity_builder->get_id(), &e);
             entity_builder->get_builder().add_component(transform);
             scene_builder->get_scene().add_empty(entity_builder->get_id());
@@ -1179,7 +1180,7 @@ void load(
     const core::job::EndCaller<std::vector<std::shared_ptr<scene::Builder>>>& scenes_end_callback,
     const core::job::EndCaller<>& entity_end_callback)
 {
-    core::job::send_job_io1([&, file = file, scenes_end_callback, entity_end_callback] {
+    core::job::send_job_to_pool([&, file = file, scenes_end_callback, entity_end_callback] {
         auto loader = DataLoader::construct(e);
         loader->read_gltf(file);
         loader->load_scenes(scenes_end_callback, entity_end_callback);

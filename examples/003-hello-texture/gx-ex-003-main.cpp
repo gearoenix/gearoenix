@@ -22,6 +22,7 @@
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 typedef gearoenix::core::job::EndCaller<> GxEndCaller;
+typedef gearoenix::core::ecs::World GxWorld;
 
 typedef gearoenix::render::scene::Scene GxScene;
 typedef gearoenix::render::scene::Builder GxSceneBuilder;
@@ -52,7 +53,7 @@ typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndC
 typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
 
 struct GameApp final : gearoenix::core::Application {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
 
     explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
@@ -110,7 +111,7 @@ struct GameApp final : gearoenix::core::Application {
             "scene", 0.0,
             GxEndCaller([this] {
                 // Scene is hidden when it has been loaded, so we need to show it by following line:
-                render_engine.get_world()->get_component<GxScene>(scene_id)->set_enabled(true);
+                GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true);
             }));
         scene_id = scene_builder->get_id();
 

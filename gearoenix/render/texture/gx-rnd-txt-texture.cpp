@@ -1,5 +1,6 @@
 #include "gx-rnd-txt-texture.hpp"
 #include "../../math/gx-math-numeric.hpp"
+#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
@@ -36,21 +37,18 @@ void gearoenix::render::texture::Texture::write_image(
 }
 
 void gearoenix::render::texture::Texture::write_gx3d_image(
-    platform::stream::Stream& s,
-    const std::uint8_t* const data,
+    std::shared_ptr<platform::stream::Stream>&& s,
+    std::vector<std::uint8_t>&& data,
     const std::uint32_t img_width,
     const std::uint32_t img_height,
-    const TextureFormat format)
+    const TextureFormat format,
+    core::job::EndCaller<>&& end)
 {
-    const auto offset_of_size = s.tell();
-    s.write_fail_debug(static_cast<std::uint32_t>(0));
-    write_image(s, data, img_width, img_height, format);
-    const auto curr_off = s.tell();
-    s.seek(offset_of_size);
-    const auto sz = static_cast<std::uint32_t>((curr_off - offset_of_size) - sizeof(std::uint32_t));
-    GX_ASSERT(sz != 0);
-    s.write_fail_debug(sz);
-    s.seek(curr_off);
+    core::job::send_job_to_pool([s = std::move(s), data = std::move(data), img_width, img_height, format, end = std::move(end)]() mutable {
+        const std::shared_ptr<platform::stream::Stream> ms = std::make_shared<platform::stream::Memory>();
+        write_image(*ms, data.data(), img_width, img_height, format);
+        s->write(*ms);
+    });
 }
 
 gearoenix::render::texture::Texture::~Texture() = default;
@@ -80,7 +78,7 @@ std::vector<std::uint8_t> gearoenix::render::texture::Texture::convert_pixels(
         const std::uint64_t index = iter.get_pixel_index() * out_components_count;
         const float* const pixel_elements = iter.get_data();
         for (; i < in_components_count && i < out_components_count; ++i) {
-            const int c = static_cast<int>(pixel_elements[i] * 255.0f + 0.501f);
+            const auto c = static_cast<int>(pixel_elements[i] * 255.0f + 0.501f);
             result[index + i] = c >= 255 ? 255 : c <= 0.0 ? 0
                                                           : static_cast<std::uint8_t>(c);
         }

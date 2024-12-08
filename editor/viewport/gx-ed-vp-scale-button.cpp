@@ -20,7 +20,7 @@ gearoenix::editor::viewport::ScaleButton::ScaleButton(Application& app, const Bu
     toggled_background_colour = IM_COL32(90, 90, 200, 200);
     compute_values();
 
-    core::job::send_job_io1([this] {
+    core::job::send_job_to_pool([this] {
         auto& txt_mgr = *this->app.get_render_engine().get_texture_manager();
         const render::texture::TextureInfo txt_info;
         txt_mgr.create_2d_from_file(

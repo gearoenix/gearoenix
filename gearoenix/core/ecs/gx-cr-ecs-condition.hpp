@@ -1,6 +1,5 @@
 #pragma once
 #include <tuple>
-#include <type_traits>
 
 namespace gearoenix::core::ecs {
 template <typename T>
@@ -26,7 +25,7 @@ inline constexpr bool is_not_v = IsNot<T>::value;
 template <typename T>
 using not_t = typename IsNot<T>::type;
 
-template <typename... Args>
+template <typename...>
 struct CountNot final {
 };
 
@@ -44,7 +43,7 @@ template <typename... Args>
 struct All final {
     constexpr static std::uint32_t count = sizeof...(Args);
     template <std::uint32_t N>
-    using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
+    using type = std::tuple_element_t<N, std::tuple<Args...>>;
 };
 
 template <typename T>
@@ -72,7 +71,7 @@ template <typename... Args>
 struct Any final {
     constexpr static std::uint32_t count = sizeof...(Args);
     template <std::uint32_t N>
-    using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
+    using type = std::tuple_element_t<N, std::tuple<Args...>>;
 };
 
 template <typename T>
@@ -102,7 +101,7 @@ inline constexpr bool is_tuple_v = false;
 template <typename... T>
 inline constexpr bool is_tuple_v<std::tuple<T...>> = true;
 
-template <typename Tuple1, typename Tuple2>
+template <typename, typename>
 struct unique_merge final {
 };
 
@@ -141,12 +140,12 @@ struct ConditionTypesPack final {
 
     template <typename... Ts>
     struct Types<All<Ts...>> final {
-        using tuple = typename TuplesPack<typename std::tuple<Ts...>>::types;
+        using tuple = typename TuplesPack<std::tuple<Ts...>>::types;
     };
 
     template <typename... Ts>
     struct Types<Any<Ts...>> final {
-        using tuple = typename TuplesPack<typename std::tuple<Ts...>>::types;
+        using tuple = typename TuplesPack<std::tuple<Ts...>>::types;
     };
 
     using types = typename Types<T>::tuple;

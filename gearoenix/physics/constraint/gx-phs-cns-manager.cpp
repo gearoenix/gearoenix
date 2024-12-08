@@ -1,4 +1,5 @@
 #include "gx-phs-cns-manager.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-phs-cns-constraint.hpp"
@@ -7,8 +8,8 @@
 gearoenix::physics::constraint::Manager::Manager(render::engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Constraint>();
-    core::ecs::Component::register_type<JetController>();
+    core::ecs::ComponentType::add<Constraint>();
+    core::ecs::ComponentType::add<JetController>();
 }
 
 gearoenix::physics::constraint::Manager::~Manager() = default;
@@ -19,14 +20,14 @@ std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::physics::c
     core::job::EndCaller<>&& entity_exists_in_world) const
 {
     auto cmp_name = name + "-jet-controller";
-    auto eb = e.get_world()->create_shared_builder(std::move(name), std::move(entity_exists_in_world));
-    eb->get_builder().add_component(core::ecs::Component::construct<JetController>(e, std::move(transform), std::move(cmp_name), eb->get_id()));
+    auto eb = std::make_shared<core::ecs::EntitySharedBuilder>(std::move(name), std::move(entity_exists_in_world));
+    eb->get_builder().add_component(core::ecs::construct_component<JetController>(e, std::move(transform), std::move(cmp_name), eb->get_id()));
     return eb;
 }
 
 void gearoenix::physics::constraint::Manager::update()
 {
-    e.get_world()->parallel_system<Constraint>([&](const auto, auto* const cns, const auto) {
+    core::ecs::World::get()->parallel_system<Constraint>([&](const auto, auto* const cns, const auto) {
         cns->update();
     });
 }

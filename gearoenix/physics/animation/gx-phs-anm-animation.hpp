@@ -60,9 +60,9 @@ struct SpriteAnimation final : Animation {
 struct AnimationPlayer final : core::ecs::Component {
     friend struct Manager;
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndex TYPE_INDEX = 5;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 5;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_VAL_PRV(double, time, 0.0);
     GX_GETSET_VAL_PRV(double, speed, 1.0);

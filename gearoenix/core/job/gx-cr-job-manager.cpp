@@ -2,10 +2,10 @@
 #include "../gx-cr-function-loader.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../sync/gx-cr-sync-semaphore.hpp"
-
+#include "../sync/gx-cr-sync-thread.hpp"
 #include <boost/container/flat_map.hpp>
-
 #include <optional>
+#include <queue>
 #include <ranges>
 #include <thread>
 
@@ -30,6 +30,49 @@ struct WorkerData {
 std::mutex workers_lock;
 boost::container::flat_map<std::thread::id, std::unique_ptr<WorkerData>> workers;
 
+std::mutex tasks_lock;
+std::queue<std::function<void()>> tasks;
+
+std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
+
+[[nodiscard]] std::thread::id register_new_thread()
+{
+    auto worker = std::make_unique<WorkerData>();
+    worker->thread_data.emplace();
+    worker->thread = std::thread([data = worker.get()] {
+        data->thread_data->state = ThreadState::Working;
+        while (ThreadState::Working == data->thread_data->state) {
+            if (tasks.empty() && data->function_loader.empty()) {
+                data->thread_data->signal.lock();
+            }
+            if (ThreadState::Working != data->thread_data->state) {
+                break;
+            }
+            data->function_loader.unload();
+            std::function<void()> task;
+            {
+                const std::lock_guard _lg(tasks_lock);
+                if (tasks.empty()) {
+                    continue;
+                }
+                task = std::move(tasks.front());
+                tasks.pop();
+            }
+            task();
+        }
+        data->thread_data->state = ThreadState::Terminated;
+    });
+
+    pool_signals.push_back(&(worker->thread_data->signal));
+
+    auto return_value = worker->thread->get_id();
+
+    const std::lock_guard _lg(workers_lock);
+    workers.emplace(return_value, std::move(worker));
+
+    return return_value;
+}
+
 std::thread::id io1_thread_id;
 WorkerData* io1_worker = nullptr;
 
@@ -44,6 +87,12 @@ void gearoenix::core::job::initialise()
 
     io1_worker = workers.find(io1_thread_id)->second.get();
     net1_worker = workers.find(net1_thread_id)->second.get();
+
+    for (auto i = 2; i < sync::threads_count(); ++i) {
+        (void)register_new_thread();
+    }
+
+    pool_signals.shrink_to_fit();
 }
 
 void gearoenix::core::job::register_current_thread()
@@ -58,30 +107,6 @@ void gearoenix::core::job::register_thread(std::thread::id thread_id, std::optio
 
     const std::lock_guard _lg(workers_lock);
     workers.emplace(thread_id, std::move(worker));
-}
-
-std::thread::id gearoenix::core::job::register_new_thread()
-{
-    auto worker = std::make_unique<WorkerData>();
-    worker->thread_data.emplace();
-    worker->thread = std::thread([data = worker.get()] {
-        data->thread_data->state = ThreadState::Working;
-        while (ThreadState::Working == data->thread_data->state) {
-            data->thread_data->signal.lock();
-            if (ThreadState::Working != data->thread_data->state) {
-                break;
-            }
-            data->function_loader.unload();
-        }
-        data->thread_data->state = ThreadState::Terminated;
-    });
-
-    auto return_value = worker->thread->get_id();
-
-    const std::lock_guard _lg(workers_lock);
-    workers.emplace(return_value, std::move(worker));
-
-    return return_value;
 }
 
 void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, std::function<void()>&& job)
@@ -100,6 +125,17 @@ void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, st
     worker.function_loader.load(std::move(job));
     if (worker.thread_data.has_value()) {
         worker.thread_data->signal.release();
+    }
+}
+
+void gearoenix::core::job::send_job_to_pool(std::function<void()>&& job)
+{
+    {
+        std::lock_guard _lg(tasks_lock);
+        tasks.push(std::move(job));
+    }
+    for (auto* const s : pool_signals) {
+        s->release();
     }
 }
 

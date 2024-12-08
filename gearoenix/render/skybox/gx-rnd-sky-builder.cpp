@@ -5,10 +5,9 @@
 #include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Builder::Builder(
-    engine::Engine& e,
     std::string&& name,
     core::job::EndCaller<>&& entity_end_callback)
-    : entity_builder(e.get_world()->create_shared_builder(std::move(name), std::move(entity_end_callback)))
+    : entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::move(name), std::move(entity_end_callback)))
 {
 }
 

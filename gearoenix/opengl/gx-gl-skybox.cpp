@@ -1,7 +1,9 @@
 #include "gx-gl-skybox.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-entity-builder.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"
@@ -27,13 +29,18 @@ gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Textur
 }
 }
 
+void gearoenix::gl::Skybox::write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const
+{
+    GX_UNIMPLEMENTED;
+}
+
 gearoenix::gl::Skybox::Skybox(
     render::skybox::Texture&& texture,
     std::shared_ptr<Mesh>&& mesh,
     std::string&& name,
     const core::ecs::entity_id_t entity_id)
     : render::skybox::Skybox(
-          create_this_type_index(this),
+          core::ecs::ComponentType::create_index(this),
           std::shared_ptr<render::mesh::Mesh>(mesh),
           std::move(texture),
           std::move(name),
@@ -41,6 +48,15 @@ gearoenix::gl::Skybox::Skybox(
     , gl_texture(::convert(bound_texture))
     , gl_mesh(std::move(mesh))
 {
+}
+
+void gearoenix::gl::Skybox::construct(
+    std::string&&,
+    const core::ecs::entity_id_t,
+    std::shared_ptr<platform::stream::Stream>&&,
+    core::job::EndCallerShared<Component>&&)
+{
+    GX_UNIMPLEMENTED;
 }
 
 gearoenix::gl::Skybox::~Skybox() = default;
@@ -68,14 +84,13 @@ gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const
 }
 
 gearoenix::gl::SkyboxBuilder::SkyboxBuilder(
-    Engine& e,
     std::string&& name,
     render::skybox::Texture&& bound_texture,
     std::shared_ptr<render::mesh::Mesh>&& mesh,
     core::job::EndCaller<>&& entity_end_callback)
-    : Builder(e, std::move(name), std::move(entity_end_callback))
+    : Builder(std::move(name), std::move(entity_end_callback))
 {
-    entity_builder->get_builder().add_component(Skybox::construct<Skybox>(
+    entity_builder->get_builder().add_component(core::ecs::construct_component<Skybox>(
         std::move(bound_texture),
         std::static_pointer_cast<Mesh>(std::move(mesh)),
         entity_builder->get_builder().get_name() + "-gl-skybox",
@@ -88,7 +103,7 @@ gearoenix::gl::SkyboxManager::SkyboxManager(Engine& e)
     : Manager(e)
     , eng(e)
 {
-    core::ecs::Component::register_type<Skybox>();
+    core::ecs::ComponentType::add<Skybox>();
 }
 
 gearoenix::gl::SkyboxManager::~SkyboxManager() = default;
@@ -99,7 +114,7 @@ std::shared_ptr<gearoenix::render::skybox::Builder> gearoenix::gl::SkyboxManager
     std::shared_ptr<render::mesh::Mesh>&& mesh,
     core::job::EndCaller<>&& entity_end_callback)
 {
-    return std::make_shared<SkyboxBuilder>(eng, std::move(name), std::move(bound_texture), std::move(mesh), std::move(entity_end_callback));
+    return std::make_shared<SkyboxBuilder>(std::move(name), std::move(bound_texture), std::move(mesh), std::move(entity_end_callback));
 }
 
 #endif

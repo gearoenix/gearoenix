@@ -31,7 +31,7 @@ void gearoenix::core::FunctionLoader::unload()
     }
 }
 
-std::uint64_t gearoenix::core::FunctionLoader::get_loaded_count() const
+bool gearoenix::core::FunctionLoader::empty() const
 {
-    return static_cast<std::uint64_t>(load_functions.size());
+    return load_functions.empty();
 }

@@ -38,10 +38,10 @@ struct Camera : core::ecs::Component {
     friend struct Builder;
     friend struct Manager;
 
-    constexpr static TypeIndex TYPE_INDEX = 18;
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 18;
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     enum struct Usage : std::uint8_t {
         ReflectionProbe = 5,
@@ -56,8 +56,8 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_CREF_PRT(Target, target);
     GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, core::ecs::INVALID_ENTITY_ID); // It can be light or reflection probe or any other owner entity
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::INVALID_ENTITY_ID);
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, core::ecs::invalid_entity_id); // It can be light or reflection probe or any other owner entity
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::invalid_entity_id);
     GX_GETSET_VAL_PRT(std::uint64_t, flag, 1);
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);
@@ -77,7 +77,7 @@ struct Camera : core::ecs::Component {
 protected:
     Camera(
         engine::Engine& e,
-        TypeIndex final_type,
+        core::ecs::component_index_t final_type,
         const std::string& name,
         Target&& target,
         std::shared_ptr<physics::Transformation>&& transform,
@@ -104,7 +104,7 @@ public:
     void update_projection();
     void set_near(float);
     void set_far(float);
-    void show_debug_gui(const engine::Engine&) final;
+    void show_debug_gui() override;
     void enable_debug_mesh(core::job::EndCaller<>&& end);
     void disable_debug_mesh();
     [[nodiscard]] math::Ray3<double> generate_ray(const math::Vec2<double>& normalised_point) const;

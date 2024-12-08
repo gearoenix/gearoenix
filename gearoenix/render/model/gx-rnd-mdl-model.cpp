@@ -3,7 +3,7 @@
 #include "../texture/gx-rnd-txt-texture.hpp"
 
 gearoenix::render::model::Model::Model(
-    const TypeIndex final_component_type,
+    const core::ecs::component_index_t final_component_type,
     const bool is_transformable,
     std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
     std::string&& name,

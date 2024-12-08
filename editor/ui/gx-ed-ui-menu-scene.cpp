@@ -36,7 +36,7 @@ void gearoenix::editor::ui::MenuScene::update()
     if (ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser)) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Scenes from GLTF File...");
-            std::string file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
+            auto file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
             render::gltf::load(
                 *manager.get_platform_application().get_base().get_render_engine(),
                 platform::stream::Path::create_absolute(std::move(file_path_name)),
@@ -48,9 +48,9 @@ void gearoenix::editor::ui::MenuScene::update()
         ImGuiFileDialog::Instance()->Close();
     }
 
-    if (core::ecs::INVALID_ENTITY_ID == active_scene) {
-        platform_application.get_base().get_render_engine()->get_world()->synchronised_system<render::scene::Scene>([this](const auto id, auto* const scene) {
-            if (core::ecs::INVALID_ENTITY_ID != active_scene) {
+    if (core::ecs::invalid_entity_id == active_scene) {
+        core::ecs::World::get()->synchronised_system<render::scene::Scene>([this](const auto id, auto* const scene) {
+            if (core::ecs::invalid_entity_id != active_scene) {
                 return;
             }
             active_scene = id;

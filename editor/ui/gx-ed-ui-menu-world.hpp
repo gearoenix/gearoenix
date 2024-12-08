@@ -2,7 +2,7 @@
 
 namespace gearoenix::editor::ui {
 struct Manager;
-struct MenuProject final {
+struct MenuWorld final {
 private:
     Manager& manager;
     bool is_new_popup_open = false;
@@ -12,8 +12,8 @@ private:
     void show_settings();
 
 public:
-    explicit MenuProject(Manager& manager);
-    ~MenuProject();
+    explicit MenuWorld(Manager& manager);
+    ~MenuWorld();
     void update();
 };
 }

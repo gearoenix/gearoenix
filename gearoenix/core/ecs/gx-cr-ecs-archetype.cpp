@@ -1,11 +1,12 @@
 #include "gx-cr-ecs-archetype.hpp"
+#include "gx-cr-ecs-comp-type.hpp"
 #include <cstring>
 
 std::uint32_t gearoenix::core::ecs::Archetype::create_components_size(const id_t& id)
 {
     std::uint32_t s = 0;
     for (const auto ti : id) {
-        if (Component::get_type_info(ti).get_is_final()) {
+        if (ComponentType::get_info(ti).get_is_final()) {
             s += static_cast<std::uint32_t>(sizeof(std::shared_ptr<Component>));
         }
     }
@@ -17,7 +18,7 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     components_indices_t cis;
     std::uint32_t index = 0;
     for (const auto ti : id) {
-        const auto& info = Component::get_type_info(ti);
+        const auto& info = ComponentType::get_info(ti);
         if (!info.get_is_final()) {
             continue;
         }
@@ -34,7 +35,7 @@ std::string gearoenix::core::ecs::Archetype::create_name(const id_t& id)
 {
     std::string s = "[ ";
     for (const auto ti : id) {
-        const auto& info = Component::get_type_info(ti);
+        const auto& info = ComponentType::get_info(ti);
         if (!info.get_is_final()) {
             continue;
         }

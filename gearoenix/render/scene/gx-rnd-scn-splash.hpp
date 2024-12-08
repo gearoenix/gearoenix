@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SCENE_SPLASH_HPP
-#define GEAROENIX_RENDER_SCENE_SPLASH_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <optional>
@@ -13,11 +12,11 @@ struct Splash final {
     engine::Engine& e;
 
 private:
-    core::ecs::entity_id_t scene_id = core::ecs::INVALID_ENTITY_ID;
-    core::ecs::entity_id_t gear_id = core::ecs::INVALID_ENTITY_ID;
-    core::ecs::entity_id_t glare_id = core::ecs::INVALID_ENTITY_ID;
-    core::ecs::entity_id_t left_wing_id = core::ecs::INVALID_ENTITY_ID;
-    core::ecs::entity_id_t right_wing_id = core::ecs::INVALID_ENTITY_ID;
+    core::ecs::entity_id_t scene_id = core::ecs::invalid_entity_id;
+    core::ecs::entity_id_t gear_id = core::ecs::invalid_entity_id;
+    core::ecs::entity_id_t glare_id = core::ecs::invalid_entity_id;
+    core::ecs::entity_id_t left_wing_id = core::ecs::invalid_entity_id;
+    core::ecs::entity_id_t right_wing_id = core::ecs::invalid_entity_id;
     double wings_current_angle = 0.0f;
     double current_scale = 0.0f;
     double scale_animation_time_current = 0.0;
@@ -25,7 +24,7 @@ private:
     double text_animation_time_current = 0.0;
     bool is_animating_text = false;
     double after_animation = 0.0;
-    core::ecs::entity_id_t gearoenix_text = core::ecs::INVALID_ENTITY_ID;
+    core::ecs::entity_id_t gearoenix_text = core::ecs::invalid_entity_id;
     std::weak_ptr<Splash> weak_self;
     std::optional<core::job::EndCaller<>> end_callback;
 
@@ -40,5 +39,3 @@ public:
     void hide();
 };
 }
-
-#endif

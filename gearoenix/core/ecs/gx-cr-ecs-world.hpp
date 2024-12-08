@@ -1,9 +1,14 @@
 #pragma once
 #include "gx-cr-ecs-archetype.hpp"
+#include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include <boost/container/flat_map.hpp>
 #include <memory>
 #include <variant>
+
+namespace gearoenix::platform::stream {
+struct Stream;
+}
 
 namespace gearoenix::core::ecs {
 /// The World of ECS
@@ -15,8 +20,6 @@ private:
     // id -> (archetype, index)
     boost::container::flat_map<entity_id_t, Entity> entities;
     boost::container::flat_map<std::string, entity_id_t> name_to_entity_id;
-
-    std::mutex delayed_actions_lock;
 
     struct Action final {
         struct CreateEntity final {
@@ -34,17 +37,23 @@ private:
 
         struct DeleteComponents final {
             entity_id_t id;
-            std::vector<Component::TypeIndex> component_types;
+            std::vector<component_index_t> component_types;
         };
 
         job::EndCaller<> callback;
         std::variant<CreateEntity, DeleteEntity, AddComponents, DeleteComponents> variant;
     };
 
+    std::mutex delayed_actions_lock;
     std::vector<Action> delayed_actions;
 
+    void read_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback);
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback) const;
+
 public:
-    World() = default;
+    World();
+    [[nodiscard]] static World* get();
+    static void destroy();
     World(World&&) = delete;
     World(const World&) = delete;
     //--------------------------------------Entity creation----------------------------------------------
@@ -81,28 +90,28 @@ public:
     template <typename... ComponentsTypes>
     void remove_components(const entity_id_t ei)
     {
-        Component::types_check<ComponentsTypes...>();
-        const std::array<Component::TypeIndex, sizeof...(ComponentsTypes)> ts = {
-            Component::create_type_index<ComponentsTypes>()...,
+        ComponentType::check<ComponentsTypes...>();
+        const std::array<component_index_t, sizeof...(ComponentsTypes)> ts = {
+            ComponentsTypes::TYPE_INDEX...,
         };
         remove_components_list(ei, ts.data(), ts.size());
     }
 
-    void remove_components_list(entity_id_t, const Component::TypeIndex*, std::uint64_t);
+    void remove_components_list(entity_id_t, const component_index_t*, std::uint64_t);
 
     template <typename... ComponentsTypes>
     void delayed_remove_components(const entity_id_t ei, job::EndCaller<>&& callback)
     {
-        Component::types_check<ComponentsTypes...>();
+        ComponentType::check<ComponentsTypes...>();
         delayed_remove_components_list(
             ei,
             {
-                Component::create_type_index<ComponentsTypes>()...,
+                ComponentType::create_index<ComponentsTypes>()...,
             },
             std::move(callback));
     }
 
-    void delayed_remove_components_list(entity_id_t, std::vector<Component::TypeIndex>&&, job::EndCaller<>&& callback);
+    void delayed_remove_components_list(entity_id_t, std::vector<component_index_t>&&, job::EndCaller<>&& callback);
 
     /// It is better to not use it too often.
     /// It is recommended to design your code in a way that batches all of your uses and
@@ -186,8 +195,9 @@ public:
     /// It will do all the delayed actions
     void update();
 
-    void show_debug_gui(const render::engine::Engine&) const;
+    void show_debug_gui() const;
 
-    [[nodiscard]] std::shared_ptr<EntitySharedBuilder> create_shared_builder(std::string&& name, job::EndCaller<>&& entity_exists_in_world);
+    void read(const std::shared_ptr<platform::stream::Stream>& stream, job::EndCaller<>&& end_callback);
+    void write(const std::shared_ptr<platform::stream::Stream>& stream, job::EndCaller<>&& end_callback) const;
 };
 }

@@ -65,7 +65,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
 
 gearoenix::gl::Engine::~Engine()
 {
-    world = nullptr;
+    core::ecs::World::destroy();
     skybox_manager = nullptr;
     submission_manager = nullptr;
     texture_manager = nullptr;

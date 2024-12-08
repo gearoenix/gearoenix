@@ -13,9 +13,9 @@ struct Engine;
 namespace gearoenix::physics::constraint {
 struct JetController final : core::event::Listener, Constraint {
     constexpr static std::uint32_t MAX_COUNT = 8;
-    constexpr static TypeIndex TYPE_INDEX = 7;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 7;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Constraint::TYPE_INDEX };
 
     GX_GETSET_VAL_PRV(double, movement_speed, 10.0);
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);

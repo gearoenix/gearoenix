@@ -77,18 +77,30 @@ public:
     {
     }
 
-    EndCaller(const EndCaller<T>& o)
+    EndCaller(const EndCaller& o)
         : caller(o.caller)
               GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
         GX_ASSERT_D(nullptr != caller);
     }
 
-    EndCaller(EndCaller<T>&& o) noexcept
+    EndCaller(EndCaller&& o) noexcept
         : caller(std::move(o.caller))
               GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
         GX_ASSERT_D(nullptr != caller);
+    }
+
+    EndCaller& operator=(const EndCaller& o)
+    {
+        caller = o.caller;
+        return *this;
+    }
+
+    EndCaller& operator=(EndCaller&& o) noexcept
+    {
+        caller = std::move(o.caller);
+        return *this;
     }
 
 #ifdef GX_DEBUG_MODE

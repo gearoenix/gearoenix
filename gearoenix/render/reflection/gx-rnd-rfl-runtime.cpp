@@ -15,7 +15,7 @@
 
 gearoenix::render::reflection::Runtime::Runtime(
     engine::Engine& e,
-    const TypeIndex final_component_type_index,
+    const core::ecs::component_index_t final_component_type_index,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,

@@ -11,11 +11,18 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-allocator.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-type.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-type.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-condition.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-builder.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-builder.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-singleton.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-singleton.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-types.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.hpp
@@ -63,6 +70,8 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-semaphore.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-stop-point.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-stop-point.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-thread.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-thread.hpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-update-manager.cpp
 #        ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-update-manager.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/sync/gx-cr-sync-work-waiter.cpp

@@ -1,7 +1,10 @@
 #include "gx-plt-application.hpp"
 #include "../audio/gx-au-engine.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
+#include "../core/sync/gx-cr-sync-thread.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
@@ -30,8 +33,8 @@ void initialise_default_font(gearoenix::platform::Application& app)
 
 void register_types()
 {
-    gearoenix::core::ecs::Component::register_type<gearoenix::platform::RuntimeConfiguration>();
-    gearoenix::core::ecs::Component::register_type<gearoenix::render::RuntimeConfiguration>();
+    gearoenix::core::ecs::ComponentType::add<gearoenix::platform::RuntimeConfiguration>();
+    gearoenix::core::ecs::ComponentType::add<gearoenix::render::RuntimeConfiguration>();
 }
 }
 
@@ -42,7 +45,7 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     ImGui::StyleColorsDark();
     auto io_imgui = ImGui::GetIO();
     io_imgui.Fonts->AddFontDefault();
-    io_imgui.BackendPlatformName = RuntimeConfiguration::get(this).get_application_name().c_str();
+    io_imgui.BackendPlatformName = core::ecs::Singleton::get<RuntimeConfiguration>().get_application_name().c_str();
     key::initialize_imgui_keymap();
 }
 
@@ -52,12 +55,12 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
 {
     register_types();
 
-    GX_LOG_D("This machine has " << std::thread::hardware_concurrency() << " number of thread cores.");
+    GX_LOG_D("This machine has " << core::sync::threads_count() << " number of thread cores.");
     core::job::initialise();
 
     initialise_imgui();
 
-    if (const auto& config = RuntimeConfiguration::get(this); !config.get_fullscreen()) {
+    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>(); !config.get_fullscreen()) {
         initialize_window_size(
             static_cast<int>(config.get_window_width()),
             static_cast<int>(config.get_window_height()));
@@ -101,7 +104,7 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
 
 void gearoenix::platform::BaseApplication::update_window()
 {
-    if (const auto& config = RuntimeConfiguration::get(this);
+    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
         window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > config.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
         render_engine->window_resized();

@@ -10,9 +10,9 @@
 gearoenix::render::reflection::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Probe>();
-    core::ecs::Component::register_type<Runtime>();
-    core::ecs::Component::register_type<Baked>();
+    core::ecs::ComponentType::add<Probe>();
+    core::ecs::ComponentType::add<Runtime>();
+    core::ecs::ComponentType::add<Baked>();
 }
 
 gearoenix::render::reflection::Manager::~Manager() = default;
@@ -61,7 +61,7 @@ void gearoenix::render::reflection::Manager::build_baked(
 
 void gearoenix::render::reflection::Manager::update()
 {
-    e.get_world()->parallel_system<Runtime>(
+    core::ecs::World::get()->parallel_system<Runtime>(
         [](
             const core::ecs::entity_id_t /*entity_id*/,
             Runtime* const runtime_probe,

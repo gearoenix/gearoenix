@@ -192,11 +192,11 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_2D, object);
         auto pixel_element_size = format_pixel_size(info.get_format());
-        std::vector<std::uint8_t> data;
         auto level_width = static_cast<sizei>(info.get_width());
         auto level_height = static_cast<sizei>(info.get_height());
         const auto mips_count = get_mipmaps_count();
         for (sint mip_index = 0; mip_index < static_cast<sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
+            std::vector<std::uint8_t> data;
             data.resize(pixel_element_size * static_cast<std::uint32_t>(level_width * level_height));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
             glReadPixels(0, 0, level_width, level_height, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
@@ -207,7 +207,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
                 "texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
             write_image(l, data.data(), level_width, level_height, info.format);
 #endif
-            write_gx3d_image(*s, data.data(), level_width, level_height, info.get_format());
+            write_gx3d_image(std::shared_ptr(s), std::move(data), level_width, level_height, info.get_format(), core::job::EndCaller([c] { (void)c; }));
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
@@ -259,11 +259,11 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
         auto pixel_element_size = format_pixel_size(info.get_format());
-        std::vector<std::uint8_t> data;
         for (auto face : render::texture::FACES) {
             auto level_aspect = static_cast<sizei>(info.get_width());
             const auto mips_count = get_mipmaps_count();
             for (sint mipmap_index = 0; mipmap_index < static_cast<sint>(mips_count); ++mipmap_index, level_aspect >>= 1u) {
+                std::vector<std::uint8_t> data;
                 data.resize(static_cast<std::uint32_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
@@ -274,7 +274,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
                     "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
                 write_image(l, data.data(), level_aspect, level_aspect, info.format);
 #endif
-                write_gx3d_image(*s, data.data(), level_aspect, level_aspect, info.get_format());
+                write_gx3d_image(std::shared_ptr(s), std::move(data), level_aspect, level_aspect, info.get_format(), core::job::EndCaller([c] { (void)c; }));
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

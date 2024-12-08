@@ -34,9 +34,9 @@ gearoenix::editor::viewport::Camera::~Camera() = default;
 
 void gearoenix::editor::viewport::Camera::update()
 {
-    auto& w = *e.get_world();
+    auto& w = *core::ecs::World::get();
     if (camera) {
-        if (core::ecs::INVALID_ENTITY_ID == camera->get_scene_id()) {
+        if (core::ecs::invalid_entity_id == camera->get_scene_id()) {
             w.synchronised_system<render::scene::Scene>([this](const auto scene_id, auto* const scene) {
                 if (!scene->get_enabled()) {
                     return;
@@ -44,7 +44,7 @@ void gearoenix::editor::viewport::Camera::update()
                 camera->set_scene_id(scene_id);
                 scene->add_camera(camera->get_entity_id(), *camera);
 
-                e.get_world()->synchronised_system<render::camera::Camera>([this, scene_id](const auto camera_id, auto* const c) {
+                core::ecs::World::get()->synchronised_system<render::camera::Camera>([this, scene_id](const auto camera_id, auto* const c) {
                     if (camera_id == camera->get_entity_id()) {
                         return;
                     }

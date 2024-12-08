@@ -1,8 +1,9 @@
 #include "gx-phs-cld-frustum.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 
 gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points,
     const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , frustum(points)
 {
     for (const auto& p : points) {

@@ -1,5 +1,6 @@
 #define GX_PLATFORM_LOG_STD_OUT_ENABLED
 #include <gearoenix/core/allocator/gx-cr-alc-shared-array.hpp>
+#include <gearoenix/core/ecs/gx-cr-ecs-comp-allocator.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
@@ -67,12 +68,14 @@ using GxPbr = gearoenix::render::material::Pbr;
 using GxPbrPtr = std::shared_ptr<GxPbr>;
 using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
 
+using GxWorld = gearoenix::core::ecs::World;
+
 struct Position;
 struct Speed final : GxComp {
     constexpr static std::uint32_t MAX_COUNT = objects_count;
-    constexpr static TypeIndex TYPE_INDEX = 100;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static gearoenix::core::ecs::component_index_t TYPE_INDEX = 100;
+    constexpr static gearoenix::core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static gearoenix::core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     gearoenix::math::Vec3<double> value;
 
@@ -82,9 +85,9 @@ struct Speed final : GxComp {
 
 struct Position final : GxComp {
     constexpr static std::uint32_t MAX_COUNT = objects_count;
-    constexpr static TypeIndex TYPE_INDEX = 101;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static gearoenix::core::ecs::component_index_t TYPE_INDEX = 101;
+    constexpr static gearoenix::core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static gearoenix::core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     gearoenix::math::Vec3<double> value;
 
@@ -93,7 +96,7 @@ struct Position final : GxComp {
 };
 
 Speed::Speed()
-    : GxComp(create_this_type_index(this), "speed", 0)
+    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "speed", 0)
     , value(
           speed_distribution(random_engine),
           speed_distribution(random_engine),
@@ -137,7 +140,7 @@ void Speed::update(const Position& p)
 }
 
 Position::Position()
-    : GxComp(create_this_type_index(this), "position", 0)
+    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "position", 0)
     , value(
           space_distribution(random_engine),
           space_distribution(random_engine),
@@ -153,13 +156,13 @@ void Position::update(const double delta_time, const Speed& speed)
 }
 
 struct GameApp final : GxCoreApp {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
 
     explicit GameApp(GxPltApp& plt_app)
         : GxCoreApp(plt_app)
     {
-        GxComp::register_type<Position>();
-        GxComp::register_type<Speed>();
+        gearoenix::core::ecs::ComponentType::add<Position>();
+        gearoenix::core::ecs::ComponentType::add<Speed>();
 
         const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
 
@@ -201,7 +204,7 @@ struct GameApp final : GxCoreApp {
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
             "scene", 0.0, GxEndCaller([this] {
-                render_engine.get_world()->get_component<GxScene>(scene_id)->set_enabled(true);
+                GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true);
             }));
         scene_id = scene_builder->get_id();
 
@@ -211,8 +214,8 @@ struct GameApp final : GxCoreApp {
                 { std::move(meshes[model_index]) },
                 GxEndCaller([] { }),
                 true);
-            auto speed = Speed::construct<Speed>();
-            auto position = Position::construct<Position>();
+            auto speed = gearoenix::core::ecs::construct_component<Speed>();
+            auto position = gearoenix::core::ecs::construct_component<Position>();
             auto& model_transformation = model_builder->get_transformation();
             model_transformation.set_local_position(position->value);
             model_transformation.local_inner_scale(cube_size);
@@ -250,7 +253,7 @@ struct GameApp final : GxCoreApp {
     void update() override
     {
         Application::update();
-        render_engine.get_world()->parallel_system<GxAll<Speed, Position, GxTransformComp>>(
+        GxWorld::get()->parallel_system<GxAll<Speed, Position, GxTransformComp>>(
             [&](auto, Speed* const speed, Position* const position, GxTransformComp* const trn, const auto /*kernel_index*/) noexcept {
                 position->update(render_engine.get_delta_time(), *speed);
                 speed->update(*position);

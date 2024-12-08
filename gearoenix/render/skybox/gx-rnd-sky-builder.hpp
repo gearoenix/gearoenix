@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SKYBOX_BUILDER_HPP
-#define GEAROENIX_RENDER_SKYBOX_BUILDER_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
@@ -19,7 +18,6 @@ struct Builder {
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
     Builder(
-        engine::Engine& e,
         std::string&& name,
         core::job::EndCaller<>&& entity_end_callback);
 
@@ -35,4 +33,3 @@ public:
     [[nodiscard]] Skybox* get_skybox();
 };
 }
-#endif

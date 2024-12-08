@@ -11,13 +11,13 @@
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 struct GameApp final : gearoenix::core::Application {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::INVALID_ENTITY_ID;
+    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
 
     explicit GameApp(gearoenix::platform::Application& plt_app)
         : Application(plt_app)
     {
         gearoenix::core::job::EndCaller end_callback([this] {
-            render_engine.get_world()->get_component<gearoenix::render::scene::Scene>(scene_id)->set_enabled(true);
+            gearoenix::core::ecs::World::get()->get_component<gearoenix::render::scene::Scene>(scene_id)->set_enabled(true);
         });
 
         gearoenix::render::gltf::load(

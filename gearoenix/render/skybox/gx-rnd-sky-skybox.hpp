@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
-#define GEAROENIX_RENDER_SKYBOX_SKYBOX_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
 #include "gx-rnd-sky-types.hpp"
 
@@ -9,18 +8,18 @@ struct Mesh;
 
 namespace gearoenix::render::skybox {
 struct Skybox : core::ecs::Component {
-    constexpr static TypeIndex TYPE_INDEX = 16;
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 16;
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
     GX_GET_CREF_PRT(Texture, bound_texture);
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::INVALID_ENTITY_ID);
+    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::invalid_entity_id);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
 
     Skybox(
-        TypeIndex final_component_type_index,
+        core::ecs::component_index_t final_component_type_index,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         Texture&& bound_texture,
         std::string&& name,
@@ -32,5 +31,3 @@ public:
     [[nodiscard]] bool is_cube() const { return bound_texture.index() == 1; }
 };
 }
-
-#endif

@@ -33,14 +33,16 @@ struct CameraTarget final {
 };
 
 struct Camera final : render::camera::Camera {
-    constexpr static TypeIndex TYPE_INDEX = 17;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 17;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { render::camera::Camera::TYPE_INDEX };
 
     GX_GET_CREF_PRV(CameraTarget, gl_target);
 
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCaller<>&& end_callback) const override;
 
 public:
     Camera(
@@ -49,6 +51,11 @@ public:
     static void construct(
         Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
         std::shared_ptr<physics::Transformation>&& transform, core::ecs::entity_id_t entity_id);
+    static void construct(
+        std::string&& name,
+        core::ecs::entity_id_t entity_id,
+        std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCallerShared<Component>&& end);
     ~Camera() override;
 };
 

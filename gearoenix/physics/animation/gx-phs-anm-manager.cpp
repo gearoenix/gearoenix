@@ -1,4 +1,5 @@
 #include "gx-phs-anm-manager.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
@@ -48,8 +49,8 @@ void gearoenix::physics::animation::Manager::update_bone(const std::uint32_t ind
 gearoenix::physics::animation::Manager::Manager(render::engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<AnimationPlayer>();
-    core::ecs::Component::register_type<Armature>();
+    core::ecs::ComponentType::add<AnimationPlayer>();
+    core::ecs::ComponentType::add<Armature>();
 }
 
 gearoenix::physics::animation::Manager::~Manager() = default;
@@ -62,7 +63,7 @@ void gearoenix::physics::animation::Manager::create_armature(
 
     const auto root_index = static_cast<std::uint32_t>(bones.size());
 
-    auto arm = core::ecs::Component::construct<Armature>(builder.get_name() + "-armature", builder.get_id());
+    auto arm = core::ecs::construct_component<Armature>(builder.get_name() + "-armature", builder.get_id());
     arm->root_bone_index = root_index;
     builder.add_component(std::move(arm));
 
@@ -126,7 +127,7 @@ void gearoenix::physics::animation::Manager::create_animation_player(
     if (!info.name.empty()) {
         animations_map.emplace(info.name, anim);
     }
-    builder.add_component(core::ecs::Component::construct<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id()));
+    builder.add_component(core::ecs::construct_component<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id()));
 }
 
 void gearoenix::physics::animation::Manager::create_sprite_player(
@@ -140,14 +141,14 @@ void gearoenix::physics::animation::Manager::create_sprite_player(
     if (!name.empty()) {
         animations_map.emplace(std::move(name), anim);
     }
-    auto player = core::ecs::Component::construct<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
+    auto player = core::ecs::construct_component<AnimationPlayer>(std::move(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
     player->set_loop_range_time(0.0, 0.999);
     builder.add_component(std::move(player));
 }
 
 void gearoenix::physics::animation::Manager::update()
 {
-    e.get_world()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, Transformation>>(
+    core::ecs::World::get()->parallel_system<core::ecs::All<core::ecs::Any<AnimationPlayer, Armature>, Transformation>>(
         [this](auto, AnimationPlayer* const player, const Armature* const armature, Transformation* const model_transform, auto) {
             if (nullptr != player) {
                 player->update_time(e.get_delta_time());

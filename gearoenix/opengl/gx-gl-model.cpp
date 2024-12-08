@@ -1,6 +1,9 @@
 #include "gx-gl-model.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-entity-builder.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 
@@ -11,7 +14,7 @@ gearoenix::gl::Model::Model(
     const bool is_transformable,
     const core::ecs::entity_id_t entity_id)
     : render::model::Model(
-          create_this_type_index(this),
+          core::ecs::ComponentType::create_index(this),
           is_transformable,
           std::move(bound_meshes),
           std::move(name),
@@ -35,7 +38,7 @@ gearoenix::gl::ModelBuilder::ModelBuilder(
     : Builder(e, name, parent_transform, meshes, std::move(end_caller))
     , e(e)
 {
-    entity_builder->get_builder().add_component(Model::construct<Model>(
+    entity_builder->get_builder().add_component(core::ecs::construct_component<Model>(
         e, std::move(meshes), std::move(name), is_transformable, entity_builder->get_id()));
 }
 
@@ -55,7 +58,7 @@ std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::
 gearoenix::gl::ModelManager::ModelManager(Engine& e)
     : Manager(e)
 {
-    Model::register_type<Model>();
+    core::ecs::ComponentType::add<Model>();
 }
 
 gearoenix::gl::ModelManager::~ModelManager() = default;

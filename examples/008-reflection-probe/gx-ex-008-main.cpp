@@ -34,6 +34,7 @@ using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
 using GxEndCaller = gearoenix::core::job::EndCaller<>;
 
 using GxComp = gearoenix::core::ecs::Component;
+using GxWorld = gearoenix::core::ecs::World;
 using GxCoreApp = gearoenix::core::Application;
 using GxPltApp = gearoenix::platform::Application;
 using GxTransformComp = gearoenix::physics::Transformation;
@@ -130,7 +131,7 @@ struct GameApp final : GxCoreApp {
 #if defined(GX_EXAMPLE_008_EXPORT_ENVIRONMENT) || defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
                 const auto id = runtime_reflection_probe_builder->get_id();
                 runtime_reflection_probe_builder->get_runtime().set_on_rendered([id, this] {
-                    const auto* const r = render_engine.get_world()->get_component<GxReflectionRuntime>(id);
+                    const auto* const r = GxWorld::get()->get_component<GxReflectionRuntime>(id);
 #if defined(GX_EXAMPLE_008_EXPORT_REFLECTION)
                     const std::shared_ptr<GxStream> rl(
                         new GxLocal(platform_application, "exported.gx-reflection", true));

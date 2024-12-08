@@ -32,11 +32,12 @@ struct Texture {
         TextureFormat format);
 
     static void write_gx3d_image(
-        platform::stream::Stream& s,
-        const std::uint8_t* data,
+        std::shared_ptr<platform::stream::Stream>&& s,
+        std::vector<std::uint8_t>&& data,
         std::uint32_t img_width,
         std::uint32_t img_height,
-        TextureFormat format);
+        TextureFormat format,
+        core::job::EndCaller<>&& end);
 
 public:
     virtual ~Texture();

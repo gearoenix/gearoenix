@@ -1,6 +1,8 @@
 #include "gx-gl-reflection.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-entity-builder.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
@@ -14,7 +16,7 @@ gearoenix::gl::BakedReflection::BakedReflection(
     std::shared_ptr<TextureCube>&& rad,
     const math::Aabb3<double>& include_box,
     const core::ecs::entity_id_t entity_id)
-    : Baked(e, create_this_type_index(this), std::move(irr), std::move(rad), include_box, std::move(name), entity_id)
+    : Baked(e, core::ecs::ComponentType::create_index(this), std::move(irr), std::move(rad), include_box, std::move(name), entity_id)
 {
     gl_irradiance = std::dynamic_pointer_cast<TextureCube>(irradiance);
     gl_radiance = std::dynamic_pointer_cast<TextureCube>(radiance);
@@ -36,7 +38,7 @@ gearoenix::gl::RuntimeReflection::RuntimeReflection(
     const math::Aabb3<double>& include_box,
     std::string&& name,
     const core::ecs::entity_id_t entity_id)
-    : Runtime(e, create_this_type_index(this), receive_box, exclude_box, include_box, std::move(name), entity_id)
+    : Runtime(e, core::ecs::ComponentType::create_index(this), receive_box, exclude_box, include_box, std::move(name), entity_id)
     , gl_environment_targets_v()
     , gl_irradiance_targets_v()
 {
@@ -55,7 +57,7 @@ void gearoenix::gl::RuntimeReflection::construct(
     const core::ecs::entity_id_t entity_id,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
-    auto self = Component::construct<RuntimeReflection>(e, receive_box, exclude_box, include_box, std::move(name), entity_id);
+    auto self = core::ecs::construct_component<RuntimeReflection>(e, receive_box, exclude_box, include_box, std::move(name), entity_id);
     end_callback.set_return(std::shared_ptr(self));
     self->set_runtime_reflection_self(
         self, builder, environment_resolution, irradiance_resolution, radiance_resolution,
@@ -117,7 +119,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     : Builder(e, std::string(name), parent_transform, std::move(end_callback))
 {
     auto& builder = entity_builder->get_builder();
-    builder.add_component(core::ecs::Component::construct<BakedReflection>(
+    builder.add_component(core::ecs::construct_component<BakedReflection>(
         name + "-gl-reflection", e,
         std::dynamic_pointer_cast<TextureCube>(std::move(irradiance_texture)),
         std::dynamic_pointer_cast<TextureCube>(std::move(radiance_texture)),
@@ -201,9 +203,9 @@ gearoenix::gl::ReflectionManager::ReflectionManager(Engine& e)
     : Manager(e)
     , eng(e)
 {
-    core::ecs::Component::register_type<ReflectionProbe, RuntimeReflection>();
-    core::ecs::Component::register_type<BakedReflection>();
-    core::ecs::Component::register_type<RuntimeReflection>();
+    core::ecs::ComponentType::add<ReflectionProbe, RuntimeReflection>();
+    core::ecs::ComponentType::add<BakedReflection>();
+    core::ecs::ComponentType::add<RuntimeReflection>();
 }
 
 gearoenix::gl::ReflectionManager::~ReflectionManager() = default;

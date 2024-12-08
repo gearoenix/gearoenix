@@ -16,10 +16,10 @@ struct Target;
 struct TextureCube;
 
 struct ReflectionProbe {
-    constexpr static std::uint32_t MAX_COUNT = 0;
-    constexpr static core::ecs::Component::TypeIndex TYPE_INDEX = 21;
-    constexpr static core::ecs::Component::TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::Component::TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static std::uint32_t MAX_COUNT = render::reflection::Probe::MAX_COUNT;
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 21;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_irradiance);
     GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_radiance);
@@ -32,11 +32,10 @@ public:
 
 struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     constexpr static auto MAX_COUNT = Baked::MAX_COUNT;
-    constexpr static TypeIndex TYPE_INDEX = 19;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 19;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
 
-public:
     BakedReflection(
         std::string&& name,
         Engine& e,
@@ -54,9 +53,9 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTargetV;
 
     constexpr static auto MAX_COUNT = Runtime::MAX_COUNT;
-    constexpr static TypeIndex TYPE_INDEX = 15;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 15;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
 
     GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_environment);
     GX_GET_CREF_PRV(GlCubeTarget, gl_environment_targets);

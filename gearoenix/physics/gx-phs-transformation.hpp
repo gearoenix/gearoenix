@@ -7,10 +7,6 @@
 #include <boost/container/flat_set.hpp>
 #include <optional>
 
-namespace gearoenix::core::ecs {
-struct World;
-}
-
 namespace gearoenix::physics {
 struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     struct Rotation final {
@@ -43,9 +39,9 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     };
 
     constexpr static std::uint32_t MAX_COUNT = 8192;
-    constexpr static TypeIndex TYPE_INDEX = 23;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 23;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
@@ -107,8 +103,8 @@ public:
         const math::Vec3<double>& p);
     void add_child(Transformation* child);
     void set_parent(Transformation*);
-    void show_debug_gui(const render::engine::Engine&) override;
+    void show_debug_gui() override;
     void draw_gizmo() override;
-    static void update(core::ecs::World* world);
+    static void update();
 };
 }

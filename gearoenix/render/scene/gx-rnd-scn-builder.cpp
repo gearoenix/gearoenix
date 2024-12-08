@@ -1,4 +1,5 @@
 #include "gx-rnd-scn-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
@@ -17,10 +18,10 @@
 gearoenix::render::scene::Builder::Builder(
     engine::Engine& e, const std::string& name, const double layer, core::job::EndCaller<>&& end_callback)
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
+    , entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::string(name), std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(core::ecs::Component::construct<Scene>(e, layer, name + "-scene", b.get_id()));
+    b.add_component(core::ecs::construct_component<Scene>(e, layer, name + "-scene", b.get_id()));
 }
 
 gearoenix::render::scene::Builder::~Builder() = default;

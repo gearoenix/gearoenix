@@ -11,7 +11,7 @@
 
 gearoenix::render::light::Directional::Directional(std::string&& name,
     const core::ecs::entity_id_t entity_id)
-    : Light(create_this_type_index(this), std::move(name), entity_id)
+    : Light(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , direction(0.0f, 0.0f, -1.0f)
 {
 }
@@ -19,7 +19,7 @@ gearoenix::render::light::Directional::Directional(std::string&& name,
 gearoenix::render::light::Directional::~Directional() = default;
 
 gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
-    const TypeIndex final_type_index, std::string&& name, const core::ecs::entity_id_t entity_id)
+    const core::ecs::component_index_t final_type_index, std::string&& name, const core::ecs::entity_id_t entity_id)
     : Light(final_type_index, std::move(name), entity_id)
 {
 }
@@ -29,7 +29,7 @@ gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional()
     if (nullptr == shadow_camera) {
         return;
     }
-    auto* const world = shadow_camera->e.get_world();
+    auto* const world = core::ecs::World::get();
     if (nullptr == world) {
         return;
     }

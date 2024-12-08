@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_TEXTURE_ATTACHMENT_HPP
-#define GEAROENIX_RENDER_TEXTURE_ATTACHMENT_HPP
+#pragma once
 #include "gx-rnd-txt-face.hpp"
 #include <memory>
 #include <variant>
@@ -31,4 +30,3 @@ struct Attachment final {
     ~Attachment();
 };
 }
-#endif

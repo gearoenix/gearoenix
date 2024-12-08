@@ -1,12 +1,22 @@
-#include "gx-ed-ui-menu-project.hpp"
+#include "gx-ed-ui-menu-world.hpp"
 #include "gx-ed-ui-manager.hpp"
+#include "gx-ed-ui-window-overlay-progress-bar.hpp"
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
 #include <gearoenix/platform/sdl2/gx-plt-sdl2-application.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-stream.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-runtime-configuration.hpp>
 #include <imgui/imgui.h>
+#include <ImGuiFileDialog/ImGuiFileDialog.h>
+#include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include <gearoenix/core/ecs/gx-cr-ecs-singleton.hpp>
 
-void gearoenix::editor::ui::MenuProject::show_new_popup()
+namespace {
+    constexpr auto save_file_chooser = "gearoenix::editor::ui::MenuProject::save";
+}
+
+void gearoenix::editor::ui::MenuWorld::show_new_popup()
 {
     if (!is_new_popup_open) {
         return;
@@ -28,7 +38,7 @@ void gearoenix::editor::ui::MenuProject::show_new_popup()
     }
 }
 
-void gearoenix::editor::ui::MenuProject::show_settings()
+void gearoenix::editor::ui::MenuWorld::show_settings()
 {
     if (!is_settings_open) {
         return;
@@ -39,32 +49,29 @@ void gearoenix::editor::ui::MenuProject::show_settings()
         return;
     }
 
-    auto& e = *manager.get_platform_application().get_base().get_render_engine();
-    auto* const w = e.get_world();
-
     if (ImGui::TreeNode("Platform Settings")) {
-        platform::RuntimeConfiguration::get(manager.get_platform_application()).show_debug_gui(e);
+        core::ecs::Singleton::get<platform::RuntimeConfiguration>().show_debug_gui();
         ImGui::TreePop();
     }
 
     if (ImGui::TreeNode("Render Settings")) {
-        render::RuntimeConfiguration::get(w).show_debug_gui(e);
+        core::ecs::Singleton::get<render::RuntimeConfiguration>().show_debug_gui();
         ImGui::TreePop();
     }
 
     ImGui::End();
 }
 
-gearoenix::editor::ui::MenuProject::MenuProject(Manager& manager)
+gearoenix::editor::ui::MenuWorld::MenuWorld(Manager& manager)
     : manager(manager)
 {
 }
 
-gearoenix::editor::ui::MenuProject::~MenuProject() = default;
+gearoenix::editor::ui::MenuWorld::~MenuWorld() = default;
 
-void gearoenix::editor::ui::MenuProject::update()
+void gearoenix::editor::ui::MenuWorld::update()
 {
-    if (ImGui::BeginMenu("Project")) {
+    if (ImGui::BeginMenu("World")) {
         if (ImGui::MenuItem("New", "Ctrl+N")) {
             is_new_popup_open = true;
         }
@@ -77,12 +84,29 @@ void gearoenix::editor::ui::MenuProject::update()
         }
 
         if (ImGui::MenuItem("Save", "Ctrl+S", false)) { }
-        if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false)) { }
+        if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false))
+        {
+            ImGuiFileDialog::Instance()->OpenDialog(save_file_chooser, "Saving the project", ".gx-world");
+        }
         if (ImGui::MenuItem("Settings", "Ctrl+Alt+P")) {
             is_settings_open = true;
         }
         if (ImGui::MenuItem("Quit", "Ctrl+Shift+Q")) { }
         ImGui::EndMenu();
+    }
+
+    if (ImGuiFileDialog::Instance()->Display(save_file_chooser)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Saving The World File...");
+            const std::shared_ptr<platform::stream::Stream> stream(platform::stream::Local::open(
+                manager.get_platform_application(), ImGuiFileDialog::Instance()->GetFilePathName(), true));
+            core::ecs::World::get()->write(
+                stream, core::job::EndCaller([this, progress_bar_id]
+                {
+                    manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
+                }));
+        }
+        ImGuiFileDialog::Instance()->Close();
     }
 
     show_new_popup();

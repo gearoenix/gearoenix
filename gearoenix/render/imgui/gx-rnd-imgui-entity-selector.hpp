@@ -1,5 +1,4 @@
 #pragma once
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include <imgui/imgui.h>
@@ -31,9 +30,9 @@ public:
             entity_names.clear();
             ids.clear();
 
-            e.get_world()->synchronised_system<Condition>([this](const auto id, const auto...) {
+            core::ecs::World::get()->synchronised_system<Condition>([this](const auto id, const auto...) {
                 ids.push_back(id);
-                entity_names.push_back(e.get_world()->get_entity(id)->get_name().c_str());
+                entity_names.push_back(core::ecs::World::get()->get_entity(id)->get_name().c_str());
             });
         }
 
@@ -50,7 +49,7 @@ public:
         if (selected()) {
             return ids[current_selection];
         }
-        return core::ecs::INVALID_ENTITY_ID;
+        return core::ecs::invalid_entity_id;
     }
 };
 }

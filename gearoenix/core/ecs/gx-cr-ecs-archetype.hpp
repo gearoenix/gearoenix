@@ -4,7 +4,7 @@
 #include "../sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-condition.hpp"
-#include "gx-cr-ecs-entity.hpp"
+#include "gx-cr-ecs-entity-builder.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -17,20 +17,20 @@ struct Archetype final {
     friend struct World;
     friend struct Entity;
 
-    typedef Component::TypeIndexSet id_t;
-    typedef boost::container::flat_map<Component::TypeIndex, std::uint32_t> components_indices_t;
+    typedef component_index_set_t id_t;
+    typedef boost::container::flat_map<component_index_t, std::uint32_t> components_indices_t;
 
     template <typename T>
     struct ConditionCheck final {
-        [[nodiscard]] constexpr static bool match(const Component::TypeIndexSet& id)
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
         {
-            return id.contains(Component::create_type_index<T>());
+            return id.contains(T::TYPE_INDEX);
         }
     };
 
     template <typename Condition>
     struct ConditionCheck<Not<Condition>> final {
-        [[nodiscard]] constexpr static bool match(const Component::TypeIndexSet& id)
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
         {
             return !ConditionCheck<Condition>::match(id);
         }
@@ -38,7 +38,7 @@ struct Archetype final {
 
     template <typename... Conditions>
     struct ConditionCheck<All<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const Component::TypeIndexSet& id)
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
         {
             return (ConditionCheck<Conditions>::match(id) && ...);
         }
@@ -46,7 +46,7 @@ struct Archetype final {
 
     template <typename... Conditions>
     struct ConditionCheck<Any<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const Component::TypeIndexSet& id)
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
         {
             return (ConditionCheck<Conditions>::match(id) || ...);
         }
@@ -81,7 +81,7 @@ private:
     template <typename T>
     [[nodiscard]] std::uint32_t get_component_index() const
     {
-        const auto search = components_indices.find(Component::create_type_index<T>());
+        const auto search = components_indices.find(T::TYPE_INDEX);
         if (components_indices.end() == search) {
             return static_cast<std::uint32_t>(-1);
         }
@@ -92,7 +92,7 @@ private:
     template <typename ComponentType>
     [[nodiscard]] ComponentType* get_component(const std::shared_ptr<Component>* const components) const
     {
-        const auto search = components_indices.find(Component::create_type_index<ComponentType>());
+        const auto search = components_indices.find(ComponentType::TYPE_INDEX);
         if (components_indices.end() == search) {
             return nullptr;
         }
@@ -106,7 +106,7 @@ private:
     template <typename ComponentType>
     [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr(const std::shared_ptr<Component>* const components) const
     {
-        const auto search = components_indices.find(Component::create_type_index<ComponentType>());
+        const auto search = components_indices.find(ComponentType::TYPE_INDEX);
         if (components_indices.end() == search) {
             return nullptr;
         }

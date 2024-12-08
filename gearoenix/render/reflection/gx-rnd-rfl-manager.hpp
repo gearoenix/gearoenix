@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_MANAGER_MANAGER_HPP
-#define GEAROENIX_RENDER_MANAGER_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include <string>
@@ -64,4 +63,3 @@ public:
     virtual void update();
 };
 }
-#endif

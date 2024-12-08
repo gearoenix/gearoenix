@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+namespace {
 struct GearoenixCoreSyncParallelForData final {
     struct Job final {
         const std::function<void(unsigned int, unsigned int)>* const function;
@@ -26,7 +27,7 @@ struct GearoenixCoreSyncParallelForData final {
             while (is_running) {
                 signal.lock();
                 {
-                    std::lock_guard<std::mutex> _lg(jobs_lock);
+                    std::lock_guard _lg(jobs_lock);
                     std::swap(jobs, local_jobs);
                 }
                 for (const auto [function, signal] : local_jobs) {
@@ -54,42 +55,44 @@ struct GearoenixCoreSyncParallelForData final {
         gearoenix::core::sync::Semaphore* const sig)
     {
         {
-            std::lock_guard<std::mutex> _lg(jobs_lock);
+            std::lock_guard _lg(jobs_lock);
             jobs.push_back({ function, sig });
         }
         signal.release();
     }
 };
 
-static std::mutex gearoenix_core_sync_parallel_for_data_lock;
-static std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
+[[nodiscard]] std::mutex gearoenix_core_sync_parallel_for_data_lock;
+[[nodiscard]] std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
 
-static std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise()
+[[nodiscard]] std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise()
 {
     const auto id = std::this_thread::get_id();
     {
-        std::lock_guard<std::mutex> _lg(gearoenix_core_sync_parallel_for_data_lock); // This is super safe and maybe excessive (?)
-        auto search = gearoenix_core_sync_parallel_for_data.find(id);
-        if (gearoenix_core_sync_parallel_for_data.end() != search)
+        std::lock_guard _lg(gearoenix_core_sync_parallel_for_data_lock); // This is super safe and maybe excessive (?)
+        const auto search = gearoenix_core_sync_parallel_for_data.find(id);
+        if (gearoenix_core_sync_parallel_for_data.end() != search) {
             return search->second;
+        }
     }
-    const auto threads_count = static_cast<unsigned int>(std::thread::hardware_concurrency());
+    const auto tc = gearoenix::core::sync::threads_count();
     std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>> data;
-    data.reserve(threads_count - 1);
-    for (unsigned int thread_index = 1; thread_index < threads_count; ++thread_index) {
-        data.emplace_back(new GearoenixCoreSyncParallelForData(threads_count, thread_index));
+    data.reserve(tc - 1);
+    for (auto thread_index = decltype(tc) { 1 }; thread_index < tc; ++thread_index) {
+        data.emplace_back(new GearoenixCoreSyncParallelForData(tc, thread_index));
     }
-    std::lock_guard<std::mutex> _lg(gearoenix_core_sync_parallel_for_data_lock);
-    auto result = gearoenix_core_sync_parallel_for_data.emplace(id, std::move(data));
+    std::lock_guard _lg(gearoenix_core_sync_parallel_for_data_lock);
+    const auto result = gearoenix_core_sync_parallel_for_data.emplace(id, std::move(data));
     return result.first->second;
+}
 }
 
 void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned int, unsigned int)>& fun)
 {
-    auto& datas = gearoenix_core_sync_parallel_for_data_initialise();
+    const auto& datas = gearoenix_core_sync_parallel_for_data_initialise();
     Semaphore signal;
     const auto count = static_cast<unsigned int>(datas.size() + 1);
-    for (auto& data : datas) {
+    for (const auto& data : datas) {
         data->send_work(&fun, &signal);
     }
     fun(count, 0);

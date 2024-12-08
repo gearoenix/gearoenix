@@ -11,9 +11,9 @@ struct Engine;
 struct Mesh;
 
 struct Model final : render::model::Model {
-    constexpr static TypeIndex TYPE_INDEX = 9;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 9;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
 
     GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
 

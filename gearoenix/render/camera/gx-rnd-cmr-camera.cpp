@@ -1,4 +1,5 @@
 #include "gx-rnd-cmr-camera.hpp"
+#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
@@ -20,7 +21,7 @@ thread_local std::default_random_engine re(rd());
 
 gearoenix::render::camera::Camera::Camera(
     engine::Engine& e,
-    const TypeIndex final_type,
+    const core::ecs::component_index_t final_type,
     const std::string& name,
     Target&& target,
     std::shared_ptr<physics::Transformation>&& transform,
@@ -45,14 +46,14 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera()
 {
-    RuntimeConfiguration::get(e).get_runtime_resolution().remove_observer(resolution_cfg_observer);
+    core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().remove_observer(resolution_cfg_observer);
 }
 
 void gearoenix::render::camera::Camera::set_camera_self(const std::shared_ptr<Camera>& c)
 {
     camera_self = c;
     if (0 == resolution_cfg_observer) {
-        resolution_cfg_observer = RuntimeConfiguration::get(e).get_runtime_resolution().add_observer(
+        resolution_cfg_observer = core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().add_observer(
             [c = camera_self](const Resolution&) {
                 const auto cam = c.lock();
                 if (nullptr == cam) {
@@ -172,10 +173,10 @@ void gearoenix::render::camera::Camera::set_far(const float f)
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::show_debug_gui(const engine::Engine&)
+void gearoenix::render::camera::Camera::show_debug_gui()
 {
     if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        Component::show_debug_gui(e);
+        Component::show_debug_gui();
         bool input_changed = false;
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
         input_changed |= ImGui::InputFloat("Near", &near, 0.01f, 1.0f, "%.3f");

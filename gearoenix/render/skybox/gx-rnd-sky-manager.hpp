@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
-#define GEAROENIX_RENDER_SKYBOX_MANAGER_HPP
+#pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-sky-types.hpp"
 #include <string>
@@ -52,4 +51,3 @@ public:
         core::job::EndCallerShared<Builder>&& builder_callback);
 };
 }
-#endif

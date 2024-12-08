@@ -12,6 +12,8 @@
 #include <array>
 #include <boost/mp11/algorithm.hpp>
 
+#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
+
 #ifdef main
 #undef main
 #endif
@@ -224,18 +226,18 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
         }
     }
     constexpr std::uint32_t resolution = 256;
-    auto texture_info = TextureInfo()
-                            .set_format(TextureFormat::RgbaUint8)
-                            .set_sampler_info(SamplerInfo()
-                                    .set_min_filter(Filter::Linear)
-                                    .set_mag_filter(Filter::Linear)
-                                    .set_wrap_s(Wrap::ClampToEdge)
-                                    .set_wrap_t(Wrap::ClampToEdge)
-                                    .set_wrap_r(Wrap::ClampToEdge))
-                            .set_width(resolution)
-                            .set_height(resolution)
-                            .set_type(Type::Texture2D)
-                            .set_has_mipmap(false);
+    const auto texture_info = TextureInfo()
+                                  .set_format(TextureFormat::RgbaUint8)
+                                  .set_sampler_info(SamplerInfo()
+                                          .set_min_filter(Filter::Linear)
+                                          .set_mag_filter(Filter::Linear)
+                                          .set_wrap_s(Wrap::ClampToEdge)
+                                          .set_wrap_t(Wrap::ClampToEdge)
+                                          .set_wrap_r(Wrap::ClampToEdge))
+                                  .set_width(resolution)
+                                  .set_height(resolution)
+                                  .set_type(Type::Texture2D)
+                                  .set_has_mipmap(false);
     const auto pixels_vectors = create_brdflut_pixels();
     std::vector<std::uint8_t> pixels0(pixels_vectors.size() * sizeof(math::Vec4<std::uint8_t>));
     std::memcpy(pixels0.data(), pixels_vectors.data(), pixels0.size());
@@ -582,7 +584,7 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
 
 gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const
 {
-    switch (auto& resolution = RuntimeConfiguration::get(e).get_runtime_resolution().get(); resolution.index()) {
+    switch (auto& resolution = core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().get(); resolution.index()) {
     case boost::mp11::mp_find<Resolution, FixedResolution>::value: {
         const auto [width, height] = std::get<FixedResolution>(resolution);
         return { width, height };

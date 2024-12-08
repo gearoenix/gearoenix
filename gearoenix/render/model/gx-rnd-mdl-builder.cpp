@@ -1,4 +1,5 @@
 #include "gx-rnd-mdl-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
@@ -13,15 +14,15 @@ gearoenix::render::model::Builder::Builder(
     physics::Transformation* const parent_transform,
     const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
     core::job::EndCaller<>&& end_caller)
-    : entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_caller)))
+    : entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::string(name), std::move(end_caller)))
 {
     auto& builder = entity_builder->get_builder();
     math::Aabb3<double> box;
     for (const auto& m : bound_meshes) {
         box.put(m->get_buffer()->get_box());
     }
-    builder.add_component(core::ecs::Component::construct<physics::collider::Aabb3>(box, name + "-collider", builder.get_id()));
-    builder.add_component(core::ecs::Component::construct<physics::Transformation>(name + "-transformation", parent_transform, builder.get_id(), &e));
+    builder.add_component(core::ecs::construct_component<physics::collider::Aabb3>(box, name + "-collider", builder.get_id()));
+    builder.add_component(core::ecs::construct_component<physics::Transformation>(name + "-transformation", parent_transform, builder.get_id(), &e));
 }
 
 gearoenix::render::model::Builder::~Builder() = default;

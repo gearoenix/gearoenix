@@ -1,14 +1,22 @@
 #include "gx-gl-light.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
+#include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-entity-builder.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 
+void gearoenix::gl::ShadowCasterDirectionalLight::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const
+{
+    GX_UNIMPLEMENTED;
+}
+
 gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(
     std::string&& name, const core::ecs::entity_id_t entity_id)
-    : ShadowCasterDirectional(create_this_type_index(this), std::move(name), entity_id)
+    : ShadowCasterDirectional(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
 {
 }
 
@@ -40,7 +48,7 @@ gearoenix::gl::LightBuilder::LightBuilder(
     , eng(e)
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(ShadowCasterDirectionalLight::construct<ShadowCasterDirectionalLight>(name + "-gl-directional-shadow-caster", b.get_id()));
+    b.add_component(core::ecs::construct_component<ShadowCasterDirectionalLight>(name + "-gl-directional-shadow-caster", b.get_id()));
 }
 
 gearoenix::gl::LightBuilder::LightBuilder(
@@ -105,7 +113,7 @@ gearoenix::gl::LightManager::LightManager(Engine& e)
     : Manager(e)
     , eng(e)
 {
-    core::ecs::Component::register_type<ShadowCasterDirectionalLight>();
+    core::ecs::ComponentType::add<ShadowCasterDirectionalLight>();
 }
 
 gearoenix::gl::LightManager::~LightManager() = default;

@@ -12,9 +12,9 @@ struct Engine;
 namespace gearoenix::render {
 struct RuntimeConfiguration final : core::ecs::Component {
     constexpr static std::uint32_t MAX_COUNT = 1;
-    constexpr static TypeIndex TYPE_INDEX = 25;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 25;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GETSET_VAL_PRV(std::uint8_t, shadow_cascades_count, GX_RENDER_MAX_SHADOW_CASCADES);
     GX_GETSET_VAL_PRV(std::uint16_t, runtime_reflection_environment_resolution, GX_RENDER_DEFAULT_RUNTIME_REFLECTION_ENVIRONMENT_RESOLUTION);
@@ -32,12 +32,9 @@ public:
     explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;
     RuntimeConfiguration(RuntimeConfiguration&&) = delete;
-    [[nodiscard]] static RuntimeConfiguration& get(core::ecs::World* w);
-    [[nodiscard]] static RuntimeConfiguration& get(engine::Engine* e);
-    [[nodiscard]] static RuntimeConfiguration& get(engine::Engine& e);
     ~RuntimeConfiguration() override;
     void set_runtime_reflection_radiance_resolution(std::uint16_t value);
     [[nodiscard]] static std::uint8_t compute_radiance_mipmaps_count(std::uint16_t value);
-    void show_debug_gui(const engine::Engine&) override;
+    void show_debug_gui() override;
 };
 }

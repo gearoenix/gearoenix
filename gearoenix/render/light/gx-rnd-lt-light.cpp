@@ -3,7 +3,7 @@
 #include <imgui/imgui.h>
 
 gearoenix::render::light::Light::Light(
-    const TypeIndex final_type_index,
+    const core::ecs::component_index_t final_type_index,
     std::string&& name,
     const core::ecs::entity_id_t entity_id)
     : Component(final_type_index, std::move(name), entity_id)
@@ -12,12 +12,12 @@ gearoenix::render::light::Light::Light(
 
 gearoenix::render::light::Light::~Light() = default;
 
-void gearoenix::render::light::Light::show_debug_gui(const engine::Engine& e)
+void gearoenix::render::light::Light::show_debug_gui()
 {
     if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
         return;
     }
-    Component::show_debug_gui(e);
+    Component::show_debug_gui();
     ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
     ImGui::TreePop();
 }

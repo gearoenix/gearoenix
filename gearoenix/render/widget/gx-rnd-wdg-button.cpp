@@ -17,7 +17,7 @@
 void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     on_press = [this, fun = fun](const math::Vec3<double>& p) -> void {
-        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+        if (const auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id); nullptr != mdl)
             mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         fun(p);
     };
@@ -26,7 +26,7 @@ void gearoenix::render::widget::Button::set_on_press_impl(const std::function<vo
 void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<double>&)>& fun)
 {
     on_release = [this, fun = fun](const math::Vec3<double>& p) -> void {
-        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+        if (const auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id); nullptr != mdl)
             mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun(p);
     };
@@ -35,7 +35,7 @@ void gearoenix::render::widget::Button::set_on_release_impl(const std::function<
 void gearoenix::render::widget::Button::set_on_cancel_impl(const std::function<void()>& fun)
 {
     on_cancel = [this, fun = fun]() -> void {
-        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl)
+        if (const auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id); nullptr != mdl)
             mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         fun();
     };
@@ -180,7 +180,7 @@ void gearoenix::render::widget::Button::set_rest_texture(std::shared_ptr<texture
 {
     rest_texture = std::move(t);
     if (!is_pressed) {
-        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+        if (const auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
             mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         }
     }
@@ -190,7 +190,7 @@ void gearoenix::render::widget::Button::set_pressed_texture(std::shared_ptr<text
 {
     pressed_texture = std::move(t);
     if (is_pressed) {
-        if (const auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
+        if (const auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id); nullptr != mdl) {
             mdl->get_meshes()[0]->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         }
     }

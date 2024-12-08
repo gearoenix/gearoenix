@@ -1,14 +1,15 @@
 #include "gx-phs-cld-aabb.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name, const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , original_box(upper, lower)
     , updated_box(original_box)
 {
 }
 
 gearoenix::physics::collider::Aabb3::Aabb3(const math::Aabb3<double>& original_box, std::string&& name, const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , original_box(original_box)
     , updated_box(original_box)
 {

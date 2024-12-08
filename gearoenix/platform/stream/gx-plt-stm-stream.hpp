@@ -15,7 +15,6 @@ struct Path;
 struct Stream {
     GX_GETSET_VAL_PRT(bool, endian_compatibility, true);
 
-protected:
     Stream() = default;
     void built_in_type_read(void* data, std::uint64_t length);
 
@@ -28,18 +27,20 @@ public:
     [[nodiscard]] virtual std::uint64_t tell() = 0;
     [[nodiscard]] virtual std::uint64_t size() = 0;
     virtual void flush() = 0;
+    [[nodiscard]] virtual std::vector<std::uint8_t> get_file_content();
 
     void read(std::string& s);
+    void read(Stream& s);
 
     template <typename T>
     void read(std::vector<T>& data)
     {
-        const auto c = read<std::uint32_t>();
-        data.resize(static_cast<std::uint64_t>(c));
+        const auto c = read<std::uint64_t>();
+        data.resize(static_cast<std::uintptr_t>(c));
         if constexpr (sizeof(T) == 1) {
             GX_ASSERT(data.size() == read(data.data(), data.size()));
         } else {
-            for (std::uint32_t i = 0; i < c; ++i) {
+            for (auto i = decltype(c) { 0 }; i < c; ++i) {
                 read(data[i]);
             }
         }
@@ -66,10 +67,26 @@ public:
         return data;
     }
 
+    void write(Stream& s);
+
     template <typename T>
     [[nodiscard]] std::uint64_t write(const T& d)
     {
         return write(&d, sizeof(T));
+    }
+
+    template <typename T>
+    void write(const std::vector<T>& data)
+    {
+        const auto c = static_cast<std::uint64_t>(data.size());
+        GX_ASSERT(sizeof(c) == write(c));
+        if constexpr (sizeof(T) == 1) {
+            GX_ASSERT(data.size() == write(data.data(), data.size()));
+        } else {
+            for (auto i = decltype(c) { 0 }; i < c; ++i) {
+                GX_ASSERT(sizeof(T) == write(data[i]));
+            }
+        }
     }
 
     [[nodiscard]] bool write(const std::string& s);
@@ -82,7 +99,5 @@ public:
     }
 
     void write_fail_debug(const std::string& s);
-
-    [[nodiscard]] std::vector<std::uint8_t> get_file_content();
 };
 }

@@ -27,9 +27,9 @@ namespace gearoenix::render::light {
 struct Builder;
 struct Directional final : Light {
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndex TYPE_INDEX = 13;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 13;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
 
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
@@ -40,18 +40,18 @@ public:
 
 struct ShadowCasterDirectional : Light {
     constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static TypeIndex TYPE_INDEX = 11;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 11;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Light::TYPE_INDEX };
 
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, shadow_map);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
     GX_GET_CREF_PRV(std::shared_ptr<camera::Camera>, shadow_camera);
     GX_GET_CREF_PRV(std::shared_ptr<physics::collider::Frustum>, shadow_frustum);
     GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, shadow_transform);
-    GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, core::ecs::INVALID_ENTITY_ID);
+    GX_GET_VAL_PRT(core::ecs::entity_id_t, shadow_camera_entity_id, core::ecs::invalid_entity_id);
 
-    ShadowCasterDirectional(TypeIndex final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
+    ShadowCasterDirectional(core::ecs::component_index_t final_type_index, std::string&& name, core::ecs::entity_id_t entity_id);
 
 public:
     ~ShadowCasterDirectional() override;

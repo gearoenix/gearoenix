@@ -1,5 +1,6 @@
 #include "gx-ed-ui-menu-window.hpp"
 #include "gx-ed-ui-manager.hpp"
+#include <gearoenix/core/ecs/gx-cr-ecs-singleton.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <imgui/imgui.h>
@@ -12,7 +13,7 @@ gearoenix::editor::ui::MenuWindow::MenuWindow(Manager& manager)
 void gearoenix::editor::ui::MenuWindow::update()
 {
     if (ImGui::BeginMenu("Window")) {
-        if (const auto is_fullscreen = platform::RuntimeConfiguration::get(manager.get_platform_application()).get_fullscreen();
+        if (const auto is_fullscreen = core::ecs::Singleton::get<platform::RuntimeConfiguration>().get_fullscreen();
             ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
             manager.get_platform_application().set_window_fullscreen(!is_fullscreen);
         }

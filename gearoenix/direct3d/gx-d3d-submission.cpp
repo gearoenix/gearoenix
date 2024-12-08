@@ -28,7 +28,7 @@
 
 gearoenix::d3d::SubmissionManager::CameraData::Frame::Frame(Device& device)
 {
-    const std::uint32_t threads_count = std::thread::hardware_concurrency();
+    const std::uint32_t threads_count = core::sync::threads_count();
     threads_g_buffer_filler_commands.reserve(threads_count);
     threads_g_buffer_filler_command_lists_raw.reserve(threads_count);
     for (std::uint32_t thread_index = 0; thread_index < threads_count; ++thread_index) {

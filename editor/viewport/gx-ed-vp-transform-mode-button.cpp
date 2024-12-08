@@ -20,7 +20,7 @@ gearoenix::editor::viewport::TransformModeButton::TransformModeButton(Applicatio
     size = { height * 3.1f, height };
     compute_values();
 
-    core::job::send_job_io1([this] {
+    core::job::send_job_to_pool([this] {
         auto& txt_mgr = *this->app.get_render_engine().get_texture_manager();
         const render::texture::TextureInfo txt_info;
         txt_mgr.create_2d_from_file(

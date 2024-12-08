@@ -1,4 +1,5 @@
 #include "gx-phs-cns-jet-controller.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
@@ -87,7 +88,7 @@ gearoenix::physics::constraint::JetController::JetController(
     std::shared_ptr<Transformation>&& trn,
     std::string&& name,
     const core::ecs::entity_id_t entity_id)
-    : Constraint(create_this_type_index(this), std::move(name), entity_id)
+    : Constraint(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , transformation(std::move(trn))
     , e(e)
 {

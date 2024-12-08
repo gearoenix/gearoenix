@@ -12,19 +12,18 @@ gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     , animation_manager(new animation::Manager(render_engine))
     , constraint_manager(new constraint::Manager(render_engine))
 {
-    core::ecs::Component::register_type<collider::Aabb3>();
-    core::ecs::Component::register_type<collider::Frustum>();
-    core::ecs::Component::register_type<Transformation>();
+    core::ecs::ComponentType::add<collider::Aabb3>();
+    core::ecs::ComponentType::add<collider::Frustum>();
+    core::ecs::ComponentType::add<Transformation>();
 }
 
 gearoenix::physics::Engine::~Engine() = default;
 
 void gearoenix::physics::Engine::start_frame()
 {
-    auto* const world = render_engine.get_world();
     constraint_manager->update();
-    Transformation::update(world);
-    world->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>(
+    Transformation::update();
+    core::ecs::World::get()->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>(
         [&](const auto, const auto* const transform, auto* const cld, const auto) {
             if (transform->get_changed()) {
                 cld->update(transform->get_global_matrix());
@@ -35,8 +34,7 @@ void gearoenix::physics::Engine::start_frame()
 
 void gearoenix::physics::Engine::end_frame()
 {
-    auto* const world = render_engine.get_world();
-    world->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->clear_change();
     });
 }

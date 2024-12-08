@@ -1,5 +1,6 @@
 #include "gx-gl-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-transformation.hpp"
 #include "gx-gl-engine.hpp"
@@ -56,13 +57,20 @@ void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
     }));
 }
 
+void gearoenix::gl::Camera::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&&,
+    core::job::EndCaller<>&&) const
+{
+    GX_UNIMPLEMENTED;
+}
+
 gearoenix::gl::Camera::Camera(
     Engine& e,
     const std::string& name,
     render::camera::Target&& target,
     std::shared_ptr<physics::Transformation>&& transform,
     const core::ecs::entity_id_t entity_id)
-    : render::camera::Camera(e, create_this_type_index(this), name, std::move(target), std::move(transform), entity_id)
+    : render::camera::Camera(e, core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform), entity_id)
 {
 }
 
@@ -70,11 +78,20 @@ void gearoenix::gl::Camera::construct(
     Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
     std::shared_ptr<physics::Transformation>&& transform, const core::ecs::entity_id_t entity_id)
 {
-    c.set_return(Component::construct<Camera>(e, name, render::camera::Target(), std::move(transform), entity_id));
+    c.set_return(core::ecs::construct_component<Camera>(e, name, render::camera::Target(), std::move(transform), entity_id));
     c.get_return()->set_camera_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
     }));
+}
+
+void gearoenix::gl::Camera::construct(
+    std::string&&,
+    const core::ecs::entity_id_t,
+    std::shared_ptr<platform::stream::Stream>&&,
+    core::job::EndCallerShared<Component>&&)
+{
+    GX_UNIMPLEMENTED;
 }
 
 gearoenix::gl::Camera::~Camera() = default;
@@ -120,7 +137,7 @@ void gearoenix::gl::CameraManager::build(
 gearoenix::gl::CameraManager::CameraManager(Engine& e)
     : Manager(e)
 {
-    core::ecs::Component::register_type<Camera>();
+    core::ecs::ComponentType::add<Camera>();
 }
 
 void gearoenix::gl::CameraManager::window_resized()

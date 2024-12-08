@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SKYBOX_TYPES_HPP
-#define GEAROENIX_RENDER_SKYBOX_TYPES_HPP
+#pragma once
 #include <memory>
 #include <variant>
 
@@ -11,5 +10,3 @@ struct TextureCube;
 namespace gearoenix::render::skybox {
 typedef std::variant<std::shared_ptr<texture::Texture2D>, std::shared_ptr<texture::TextureCube>> Texture;
 }
-
-#endif

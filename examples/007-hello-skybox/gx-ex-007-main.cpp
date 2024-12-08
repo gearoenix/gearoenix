@@ -1,3 +1,4 @@
+#include <gearoenix/core/ecs/gx-cr-ecs-entity-builder.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>

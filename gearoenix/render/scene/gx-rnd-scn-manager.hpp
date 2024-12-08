@@ -1,5 +1,4 @@
-#ifndef GEAROENIX_RENDER_SCENE_MANAGER_HPP
-#define GEAROENIX_RENDER_SCENE_MANAGER_HPP
+#pragma once
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include <memory>
 #include <string>
@@ -24,4 +23,3 @@ public:
     void update() const;
 };
 }
-#endif

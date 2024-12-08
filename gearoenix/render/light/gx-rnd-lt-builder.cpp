@@ -1,4 +1,5 @@
 #include "gx-rnd-lt-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
@@ -13,11 +14,11 @@ gearoenix::render::light::Builder::Builder(
     const DirectionalInfo&,
     core::job::EndCaller<>&& end_callback)
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
+    , entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::string(name), std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(core::ecs::Component::construct<Directional>(name + "-directional-light", b.get_id()));
-    b.add_component(core::ecs::Component::construct<physics::Transformation>(name + "-light-directional-transform", parent_transform, b.get_id(), &e));
+    b.add_component(core::ecs::construct_component<Directional>(name + "-directional-light", b.get_id()));
+    b.add_component(core::ecs::construct_component<physics::Transformation>(name + "-light-directional-transform", parent_transform, b.get_id(), &e));
 }
 
 gearoenix::render::light::Builder::Builder(
@@ -27,10 +28,10 @@ gearoenix::render::light::Builder::Builder(
     const ShadowCasterDirectionalInfo&,
     core::job::EndCaller<>&& end_callback)
     : e(e)
-    , entity_builder(e.get_world()->create_shared_builder(std::string(name), std::move(end_callback)))
+    , entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::string(name), std::move(end_callback)))
 {
     auto& b = entity_builder->get_builder();
-    b.add_component(core::ecs::Component::construct<physics::Transformation>(
+    b.add_component(core::ecs::construct_component<physics::Transformation>(
         name + "-light-directional-shadow-caster-transform", parent_transform, b.get_id(), &e));
 }
 

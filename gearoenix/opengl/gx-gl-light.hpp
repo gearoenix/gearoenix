@@ -13,14 +13,17 @@ struct Texture2D;
 struct Target;
 
 struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirectional {
-    constexpr static TypeIndex TYPE_INDEX = 10;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX, Light::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 10;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX, Light::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX };
 
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target);
     GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1));
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
+
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCaller<>&& end_callback) const override;
 
 public:
     explicit ShadowCasterDirectionalLight(std::string&& name, core::ecs::entity_id_t entity_id);

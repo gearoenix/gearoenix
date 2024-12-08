@@ -14,6 +14,6 @@ public:
     ~FunctionLoader();
     void load(std::function<void()>&& fun);
     void unload();
-    [[nodiscard]] std::uint64_t get_loaded_count() const;
+    [[nodiscard]] bool empty() const;
 };
 }

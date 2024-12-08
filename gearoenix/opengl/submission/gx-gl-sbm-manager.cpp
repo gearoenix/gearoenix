@@ -1,5 +1,6 @@
 #include "gx-gl-sbm-manager.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-profiler.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
@@ -41,12 +42,9 @@
 #include "../shader/gx-gl-shd-skybox-equirectangular.hpp"
 #include "../shader/gx-gl-shd-ssao-resolve.hpp"
 #include "../shader/gx-gl-shd-unlit.hpp"
-
-#include <imgui/backends/imgui_impl_opengl3.h>
-
-#include <boost/mp11/algorithm.hpp>
-
 #include <algorithm>
+#include <boost/mp11/algorithm.hpp>
+#include <imgui/backends/imgui_impl_opengl3.h>
 
 #if GX_PLATFORM_INTERFACE_ANDROID || GX_PLATFORM_WEBASSEMBLY
 #define GX_ALGORITHM_EXECUTION
@@ -62,11 +60,12 @@
 
 void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes()
 {
-    auto& cfg = render::RuntimeConfiguration::get(e);
+    auto& cfg = core::ecs::Singleton::get<render::RuntimeConfiguration>();
     back_buffer_size_changed();
     resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) -> bool {
         back_buffer_size_changed();
-        return true; });
+        return true;
+    });
 }
 
 void gearoenix::gl::submission::Manager::back_buffer_size_changed()
@@ -205,7 +204,7 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 
 void gearoenix::gl::submission::Manager::fill_scenes()
 {
-    e.get_world()->synchronised_system<render::scene::Scene>(
+    core::ecs::World::get()->synchronised_system<render::scene::Scene>(
         [&, this](const auto scene_id, const auto* const scene) {
             if (!scene->get_enabled()) {
                 return;
@@ -226,7 +225,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
             scene_pool_ref.meshes.clear();
             scene_pool_ref.debug_mesh_data.clear();
             scene_pool_ref.name = &scene->get_name();
-            e.get_world()->synchronised_system<core::ecs::All<gl::Camera, physics::Transformation>>(
+            core::ecs::World::get()->synchronised_system<core::ecs::All<gl::Camera, physics::Transformation>>(
                 [&](const core::ecs::entity_id_t camera_id, gl::Camera* const camera, physics::Transformation* const transform) {
                     if (!camera->get_enabled()) {
                         return;
@@ -253,7 +252,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                         scene_pool_ref.debug_mesh_data.emplace_back(camera, transform);
                     }
                 });
-            e.get_world()->synchronised_system<ShadowCasterDirectionalLight>(
+            core::ecs::World::get()->synchronised_system<ShadowCasterDirectionalLight>(
                 [&](const auto light_id, const auto* const l) {
                     if (!l->get_enabled()) {
                         return;
@@ -272,7 +271,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                     };
                     scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, shadow_caster_directional_light_data);
                 });
-            e.get_world()->synchronised_system<gl::Skybox>([&](const auto skybox_id, const auto* const skybox) {
+            core::ecs::World::get()->synchronised_system<gl::Skybox>([&](const auto skybox_id, const auto* const skybox) {
                 if (!skybox->get_enabled()) {
                     return;
                 }
@@ -290,7 +289,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
                 scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
                 scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                e.get_world()->synchronised_system<core::ecs::Any<BakedReflection, RuntimeReflection>>(
+                core::ecs::World::get()->synchronised_system<core::ecs::Any<BakedReflection, RuntimeReflection>>(
                     [&](const core::ecs::entity_id_t reflection_id, BakedReflection* const baked, RuntimeReflection* const runtime) {
                         ReflectionProbe* gl_probe = nullptr;
                         render::reflection::Probe* render_probe = nullptr;
@@ -333,7 +332,7 @@ void gearoenix::gl::submission::Manager::fill_scenes()
 
 void gearoenix::gl::submission::Manager::update_scenes()
 {
-    e.get_world()->parallel_system<render::scene::Scene>(
+    core::ecs::World::get()->parallel_system<render::scene::Scene>(
         [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) {
             if (!render_scene->get_enabled()) {
                 return;
@@ -360,7 +359,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
         return;
     }
     bvh.reset();
-    e.get_world()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
+    core::ecs::World::get()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
         [&](
             const core::ecs::entity_id_t,
             const auto* const collider,
@@ -376,7 +375,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
 
 void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
-    e.get_world()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>, physics::animation::Armature>>(
+    core::ecs::World::get()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>, physics::animation::Armature>>(
         [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
@@ -478,7 +477,7 @@ void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, 
 
 void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
 {
-    e.get_world()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::Transformation>>(
+    core::ecs::World::get()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::Transformation>>(
         [&, this](
             const core::ecs::entity_id_t camera_id,
             const gl::Camera* const camera,
@@ -657,7 +656,7 @@ void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene)
 void gearoenix::gl::submission::Manager::render_reflection_probes()
 {
     push_debug_group("render-reflection-probes");
-    e.get_world()->synchronised_system<RuntimeReflection>(
+    core::ecs::World::get()->synchronised_system<RuntimeReflection>(
         [&](const core::ecs::entity_id_t, const RuntimeReflection* const r) {
             constexpr std::array face_uv_axis {
                 std::array { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
@@ -1214,7 +1213,7 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
 
 gearoenix::gl::submission::Manager::~Manager()
 {
-    render::RuntimeConfiguration::get(e).get_runtime_resolution().remove_observer(resolution_cfg_listener_id);
+    core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().remove_observer(resolution_cfg_listener_id);
 }
 
 void gearoenix::gl::submission::Manager::update()
@@ -1247,7 +1246,7 @@ void gearoenix::gl::submission::Manager::update()
 
 void gearoenix::gl::submission::Manager::window_resized()
 {
-    if (render::RuntimeConfiguration::get(e).get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value) {
+    if (core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value) {
         return;
     }
     back_buffer_size_changed();

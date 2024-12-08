@@ -87,7 +87,6 @@ struct Engine {
     GX_GET_UPTR_PRT(font::Manager, font_manager);
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
-    GX_GET_UPTR_PRT(core::ecs::World, world);
     GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
 
     Engine(Type engine_type, platform::Application& platform_application);

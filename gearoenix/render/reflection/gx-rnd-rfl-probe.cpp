@@ -5,7 +5,7 @@
 
 gearoenix::render::reflection::Probe::Probe(
     engine::Engine& e,
-    const TypeIndex final_component_type_index,
+    const core::ecs::component_index_t final_component_type_index,
     std::shared_ptr<texture::TextureCube>&& irradiance,
     std::shared_ptr<texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box,
@@ -22,7 +22,7 @@ gearoenix::render::reflection::Probe::Probe(
 
 gearoenix::render::reflection::Probe::Probe(
     engine::Engine& e,
-    const TypeIndex final_component_type_index,
+    const core::ecs::component_index_t final_component_type_index,
     const math::Aabb3<double>& include_box,
     std::string&& name,
     const core::ecs::entity_id_t entity_id)

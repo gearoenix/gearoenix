@@ -21,7 +21,7 @@ constexpr std::array default_event_ids {
 
 std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const
 {
-    const auto* const world = e.get_world();
+    const auto* const world = core::ecs::World::get();
     if (0 == model_entity_id) {
         return std::nullopt;
     }
@@ -29,7 +29,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
     if (nullptr == collider) {
         return std::nullopt;
     }
-    if (core::ecs::INVALID_ENTITY_ID == camera_entity_id) {
+    if (core::ecs::invalid_entity_id == camera_entity_id) {
         return std::nullopt;
     }
     const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
@@ -196,7 +196,7 @@ void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l)
 
 void gearoenix::render::widget::Widget::show()
 {
-    auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
+    auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id);
     GX_ASSERT_D(nullptr != mdl);
     mdl->set_enabled(true);
     for (auto& child : children) {
@@ -207,7 +207,7 @@ void gearoenix::render::widget::Widget::show()
 
 void gearoenix::render::widget::Widget::hide()
 {
-    auto* const mdl = e.get_world()->get_component<model::Model>(model_entity_id);
+    auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id);
     GX_ASSERT_D(nullptr != mdl);
     mdl->set_enabled(false);
     for (auto& child : children) {

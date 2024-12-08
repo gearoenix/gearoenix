@@ -1,4 +1,5 @@
 #include "gx-rnd-scn-scene.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
@@ -7,7 +8,7 @@
 
 gearoenix::render::scene::Scene::Scene(
     engine::Engine& e, const double layer, std::string&& name, const core::ecs::entity_id_t entity_id)
-    : Component(create_this_type_index(this), std::move(name), entity_id)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , e(e)
     , ssao_settings(0.08f, math::Numeric::epsilon<float>, 0.000f, 0.003f)
     , layer(layer)
@@ -61,17 +62,16 @@ void gearoenix::render::scene::Scene::add_empty(const core::ecs::entity_id_t ent
 
 void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_entity_id)
 {
-    auto* const world = e.get_world();
     std::uint64_t flag = 1;
     cameras_flags.clear();
-    world->synchronised_system<camera::Camera>([&](const core::ecs::entity_id_t id, camera::Camera* const cam) {
+    core::ecs::World::get()->synchronised_system<camera::Camera>([&](const core::ecs::entity_id_t id, camera::Camera* const cam) {
         if (!cam->get_enabled() || cam->get_scene_id() != scene_entity_id)
             return;
         cameras_flags[id] = flag;
         cam->set_flag(flag);
         flag <<= 1; });
     std::atomic refresh_bvh = false;
-    world->parallel_system<core::ecs::All<model::Model, physics::Transformation>>(
+    core::ecs::World::get()->parallel_system<core::ecs::All<model::Model, physics::Transformation>>(
         [&](const core::ecs::entity_id_t, model::Model* const mdl, const physics::Transformation* const trn, const auto /*kernel_index*/) {
             if (!mdl->get_enabled() || mdl->scene_id != scene_entity_id)
                 return;

@@ -2,21 +2,18 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "../../platform/gx-plt-application.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-cmr-builder.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
 gearoenix::render::camera::Manager::Manager(engine::Engine& e)
     : e(e)
 {
-    core::ecs::Component::register_type<Camera>();
+    core::ecs::ComponentType::add<Camera>();
 }
 
 void gearoenix::render::camera::Manager::update()
 {
-    auto* const world = e.get_world();
-    world->parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>(
+    core::ecs::World::get()->parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>(
         [](
             const core::ecs::entity_id_t /*entity-id*/,
             Camera* const cam,
@@ -37,7 +34,7 @@ void gearoenix::render::camera::Manager::update()
 
 void gearoenix::render::camera::Manager::window_resized()
 {
-    e.get_world()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) -> void {
+    core::ecs::World::get()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) -> void {
         c->update_target(core::job::EndCaller([] { }));
     });
 }

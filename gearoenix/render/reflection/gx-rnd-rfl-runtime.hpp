@@ -50,7 +50,7 @@ struct Runtime : Probe {
     typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MipedRoughness;
 
     constexpr static std::uint32_t MAX_COUNT = 8;
-    constexpr static TypeIndex TYPE_INDEX = 22;
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 22;
 
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, environment);
     GX_GET_CREF_PRT(CubeCamera, cameras);
@@ -74,7 +74,7 @@ struct Runtime : Probe {
 
     Runtime(
         engine::Engine& e,
-        TypeIndex final_component_type_index,
+        core::ecs::component_index_t final_component_type_index,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,

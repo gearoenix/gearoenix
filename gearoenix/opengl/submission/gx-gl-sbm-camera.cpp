@@ -1,12 +1,11 @@
 #include "gx-gl-sbm-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-gl-camera.hpp"
 #include "../gx-gl-target.hpp"
-#include "../gx-gl-texture.hpp"
-#include <thread>
 
 std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::BloomData::construct(
     const std::optional<render::camera::BloomData>& b)
@@ -20,10 +19,10 @@ std::optional<gearoenix::gl::submission::BloomData> gearoenix::gl::submission::B
 }
 
 gearoenix::gl::submission::Camera::Camera()
-    : threads_opaque_models_data(std::thread::hardware_concurrency())
-    , threads_translucent_models_data(std::thread::hardware_concurrency())
-    , threads_mvps(std::thread::hardware_concurrency())
-    , debug_meshes_threads(std::thread::hardware_concurrency())
+    : threads_opaque_models_data(core::sync::threads_count())
+    , threads_translucent_models_data(core::sync::threads_count())
+    , threads_mvps(core::sync::threads_count())
+    , debug_meshes_threads(core::sync::threads_count())
 {
 }
 

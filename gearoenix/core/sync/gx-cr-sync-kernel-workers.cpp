@@ -1,5 +1,6 @@
 #include "gx-cr-sync-kernel-workers.hpp"
 #include "gx-cr-sync-semaphore.hpp"
+#include "gx-cr-sync-thread.hpp"
 #include <utility>
 
 void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel_index)
@@ -13,7 +14,7 @@ void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel
     while (state == State::Running) {
         signals[kernel_index]->lock();
         GX_HELPER
-        std::lock_guard<std::mutex> _lock(*workers_syncers[kernel_index]);
+        std::lock_guard _lock(*workers_syncers[kernel_index]);
         for (const Worker& worker : workers) {
             GX_HELPER
             worker.waits[kernel_index]->lock();
@@ -28,7 +29,7 @@ void gearoenix::core::sync::KernelWorkers::thread_loop(const unsigned int kernel
 
 gearoenix::core::sync::KernelWorkers::KernelWorkers()
 {
-    const unsigned int kernels_count = std::thread::hardware_concurrency();
+    const unsigned int kernels_count = threads_count();
     signals.reserve(kernels_count);
     threads.reserve(kernels_count);
     workers_syncers.reserve(kernels_count);
@@ -42,11 +43,14 @@ gearoenix::core::sync::KernelWorkers::KernelWorkers()
 gearoenix::core::sync::KernelWorkers::~KernelWorkers()
 {
     state = State::Terminating;
-    while (state != State::Terminated)
-        for (const auto& s : signals)
+    while (state != State::Terminated) {
+        for (const auto& s : signals) {
             s->release();
-    for (std::thread& t : threads)
+        }
+    }
+    for (std::thread& t : threads) {
         t.join();
+    }
 }
 
 void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const unsigned int)> worker, std::function<void()> receiver)
@@ -54,7 +58,7 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void(const uns
     add_step([] { }, std::move(worker), [] { }, std::move(receiver));
 }
 
-void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(const unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver)
+void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender, std::function<void(unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver)
 {
     const auto kernels_count = threads.size();
     std::vector<std::shared_ptr<Semaphore>> waits;

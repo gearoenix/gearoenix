@@ -1,20 +1,85 @@
 #include "gx-cr-ecs-world.hpp"
+#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../gx-cr-string.hpp"
 #include <boost/mp11/algorithm.hpp>
 #include <imgui.h>
 
 namespace {
+std::mutex world_lock;
+auto world = std::make_unique<gearoenix::core::ecs::World>();
+
 gearoenix::core::ecs::Archetype::id_t create_archetype_id(const gearoenix::core::ecs::EntityBuilder::components_t& cs)
 {
     gearoenix::core::ecs::Archetype::id_t id;
     for (const auto& c : cs) {
         id.add(c.first);
-        for (const auto& info = gearoenix::core::ecs::Component::get_type_info(c.first); const auto pt : info.get_all_parents()) {
+        for (const auto& info = gearoenix::core::ecs::ComponentType::get_info(c.first); const auto pt : info.get_all_parents()) {
             id.add(pt);
         }
     }
     return id;
 }
+}
+
+void gearoenix::core::ecs::World::read_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& stream,
+    job::EndCaller<>&& end_callback)
+{
+    const auto count = stream->read<std::uint64_t>();
+    for (auto i = decltype(count) { 0 }; i < count; ++i) {
+        std::shared_ptr<platform::stream::Stream> ms = std::make_shared<platform::stream::Memory>();
+        stream->read(*ms);
+        const auto id = ms->read<entity_id_t>();
+        job::send_job_to_pool([this, id, ms = std::move(ms), e = end_callback]() mutable {
+            EntityBuilder::construct(
+                id, std::move(ms),
+                job::EndCallerShared<EntityBuilder>([this, end = std::move(e)](std::shared_ptr<EntityBuilder>&& eb) mutable {
+                    eb->end_caller = std::move(end);
+                    delayed_create_entity(std::move(*eb));
+                }));
+        });
+    }
+}
+
+void gearoenix::core::ecs::World::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& stream,
+    job::EndCaller<>&& end_callback) const
+{
+    auto entity_streams = std::make_shared<std::pair<std::mutex, std::vector<std::shared_ptr<platform::stream::Stream>>>>();
+    job::EndCaller end([this, s = std::move(stream), e = std::move(end_callback), es = entity_streams]() mutable {
+        const auto count = static_cast<std::uint64_t>(entities.size());
+        GX_ASSERT(sizeof(count) == s->write(count));
+        for (const auto& entity_stream : es->second) {
+            platform::stream::Stream& ms = *entity_stream;
+            s->write(ms);
+        }
+    });
+    for (const auto& entity : entities) {
+        job::send_job_to_pool([this, id = entity.first, end = end, es = entity_streams]() mutable {
+            const auto& e = entities.find(id)->second;
+            std::shared_ptr<platform::stream::Stream> s = std::make_shared<platform::stream::Memory>();
+            GX_ASSERT(sizeof(id) == s->write<decltype(id)>(id));
+            e.write(std::shared_ptr(s), job::EndCaller(end));
+            std::lock_guard _lg(es->first);
+            es->second.push_back(std::move(s));
+        });
+    }
+}
+
+gearoenix::core::ecs::World::World()
+{
+    const std::lock_guard _lg(world_lock);
+    GX_ASSERT(nullptr == world); // only one world should exist!
+}
+
+gearoenix::core::ecs::World* gearoenix::core::ecs::World::get()
+{
+    return world.get();
+}
+
+void gearoenix::core::ecs::World::destroy()
+{
+    world = nullptr;
 }
 
 void gearoenix::core::ecs::World::create_entity(EntityBuilder&& b)
@@ -92,7 +157,7 @@ void gearoenix::core::ecs::World::delayed_add_components_map(
 }
 
 void gearoenix::core::ecs::World::remove_components_list(
-    const entity_id_t id, const Component::TypeIndex* const ts, const std::uint64_t sz)
+    const entity_id_t id, const component_index_t* const ts, const std::uint64_t sz)
 {
     if (0 == sz) {
         GX_LOG_E("At least one component must be selected to remove. Entity: " << id);
@@ -111,7 +176,7 @@ void gearoenix::core::ecs::World::remove_components_list(
     for (auto ti = decltype(sz) { 0 }; ti < sz; ++ti) {
         const auto t = ts[ti];
         cs.erase(t);
-        const auto& t_info = Component::get_type_info(t);
+        const auto& t_info = ComponentType::get_info(t);
         for (const auto pt : t_info.get_all_parents()) {
             cs.erase(pt);
         }
@@ -123,7 +188,7 @@ void gearoenix::core::ecs::World::remove_components_list(
 
 void gearoenix::core::ecs::World::delayed_remove_components_list(
     const entity_id_t ei,
-    std::vector<Component::TypeIndex>&& cs,
+    std::vector<component_index_t>&& cs,
     job::EndCaller<>&& callback)
 {
     const std::lock_guard _lg(delayed_actions_lock);
@@ -222,7 +287,7 @@ void gearoenix::core::ecs::World::update()
     }
 }
 
-void gearoenix::core::ecs::World::show_debug_gui(const render::engine::Engine& e) const
+void gearoenix::core::ecs::World::show_debug_gui() const
 {
     if (ImGui::TreeNode(String::ptr_name(this).c_str())) {
         ImGui::Text("Number of Archetypes: %zu", archetypes.size());
@@ -235,7 +300,7 @@ void gearoenix::core::ecs::World::show_debug_gui(const render::engine::Engine& e
                         const auto entity_id = *reinterpret_cast<const entity_id_t*>(entity_ptr);
                         const auto search = entities.find(entity_id);
                         GX_ASSERT_D(search != entities.end());
-                        search->second.show_debug_gui(e);
+                        search->second.show_debug_gui();
                     }
                     ImGui::TreePop();
                 }
@@ -246,7 +311,18 @@ void gearoenix::core::ecs::World::show_debug_gui(const render::engine::Engine& e
     }
 }
 
-std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::core::ecs::World::create_shared_builder(std::string&& name, job::EndCaller<>&& entity_exists_in_world)
+void gearoenix::core::ecs::World::read(const std::shared_ptr<platform::stream::Stream>& stream,
+    job::EndCaller<>&& end_callback)
 {
-    return std::shared_ptr<EntitySharedBuilder>(new EntitySharedBuilder(this, std::move(name), std::move(entity_exists_in_world)));
+    job::send_job_to_pool([this, s = stream, e = std::move(end_callback)]() mutable {
+        read_in_io_context(std::move(s), std::move(e));
+    });
+}
+
+void gearoenix::core::ecs::World::write(
+    const std::shared_ptr<platform::stream::Stream>& stream, job::EndCaller<>&& end_callback) const
+{
+    job::send_job_to_pool([this, s = stream, e = std::move(end_callback)]() mutable {
+        write_in_io_context(std::move(s), std::move(e));
+    });
 }

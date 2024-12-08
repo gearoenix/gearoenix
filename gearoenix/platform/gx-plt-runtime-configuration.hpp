@@ -1,22 +1,14 @@
 #pragma once
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 
-namespace gearoenix::core::ecs {
-struct World;
-}
-
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::platform {
 struct Application;
 struct BaseApplication;
 struct RuntimeConfiguration final : core::ecs::Component {
     constexpr static std::uint32_t MAX_COUNT = 1;
-    constexpr static TypeIndex TYPE_INDEX = 26;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES {};
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 26;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GETSET_CREF_PRV(std::string, application_name);
     GX_GETSET_VAL_PRV(bool, fullscreen, false);
@@ -32,17 +24,11 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true);
     GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true);
 
-    explicit RuntimeConfiguration(core::ecs::entity_id_t);
-
 public:
+    explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;
     RuntimeConfiguration(RuntimeConfiguration&&) = delete;
-    [[nodiscard]] static RuntimeConfiguration& get(core::ecs::World* w);
-    [[nodiscard]] static RuntimeConfiguration& get(render::engine::Engine* e);
-    [[nodiscard]] static RuntimeConfiguration& get(Application* a);
-    [[nodiscard]] static RuntimeConfiguration& get(Application& a);
-    [[nodiscard]] static RuntimeConfiguration& get(BaseApplication* b);
     ~RuntimeConfiguration() override;
-    void show_debug_gui(const render::engine::Engine&) override;
+    void show_debug_gui() override;
 };
 }

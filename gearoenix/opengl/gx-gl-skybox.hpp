@@ -16,12 +16,15 @@ struct Mesh;
 struct Skybox final : render::skybox::Skybox {
     typedef std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> GlTexture;
 
-    constexpr static TypeIndex TYPE_INDEX = 27;
-    constexpr static TypeIndexSet ALL_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
-    constexpr static TypeIndexSet IMMEDIATE_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
+    constexpr static core::ecs::component_index_t TYPE_INDEX = 27;
+    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
+    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { render::skybox::Skybox::TYPE_INDEX };
 
     GX_GET_CREF_PRV(GlTexture, gl_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Mesh>, gl_mesh);
+
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCaller<>&& end_callback) const override;
 
 public:
     Skybox(
@@ -29,6 +32,11 @@ public:
         std::shared_ptr<Mesh>&& mesh,
         std::string&& name,
         core::ecs::entity_id_t entity_id);
+    static void construct(
+        std::string&& name,
+        core::ecs::entity_id_t entity_id,
+        std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCallerShared<Component>&& end);
     ~Skybox() override;
     [[nodiscard]] uint get_vertex_object() const;
     [[nodiscard]] uint get_index_buffer() const;
@@ -37,7 +45,6 @@ public:
 
 struct SkyboxBuilder final : render::skybox::Builder {
     SkyboxBuilder(
-        Engine& e,
         std::string&& name,
         render::skybox::Texture&& bound_texture,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
