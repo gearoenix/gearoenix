@@ -29,6 +29,15 @@ std::ios::openmode create_open_mode(const bool writable)
 {
     return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
 }
+
+[[nodiscard]] std::fstream create_file(const gearoenix::platform::Application& app, const std::string& name, const bool writable)
+{
+    std::fstream file(create_path(app, name), create_open_mode(writable));
+    if ((!file.is_open() || !file.good()) && writable) {
+        file.open(create_path(app, name), create_open_mode(writable) | std::ios::trunc);
+    }
+    return file;
+}
 }
 
 gearoenix::platform::stream::Local::Local(std::fstream file)
@@ -36,12 +45,9 @@ gearoenix::platform::stream::Local::Local(std::fstream file)
 {
 }
 
-gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, bool writable)
-    : file(create_path(app, name), create_open_mode(writable))
+gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, const bool writable)
+    : file(create_file(app, name, writable))
 {
-    if ((!file.is_open() || !file.good()) && writable) {
-        file.open(create_path(app, name), create_open_mode(writable) | std::ios::trunc);
-    }
     if (!file.is_open() || !file.good()) {
         GX_LOG_F("Can not open file: " << name);
     }
@@ -51,46 +57,41 @@ gearoenix::platform::stream::Local::~Local() = default;
 
 gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable)
 {
-    std::fstream file(create_path(app, name), std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in);
-    if (!file.is_open() || !file.good())
+    auto file = create_file(app, name, writable);
+    if (!file.is_open() || !file.good()) {
         return nullptr;
+    }
     return new Local(std::move(file));
 }
 
-std::uint64_t gearoenix::platform::stream::Local::read(void* const data, const std::uint64_t length)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::read(void* const data, const stream_size_t length)
 {
-    file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(length));
-    const auto result = (std::uint64_t)file.gcount();
-#ifdef GX_DEBUG_MODE
-    if (0 == result)
-        GX_UNEXPECTED;
-#endif
+    file.read(static_cast<char*>(data), static_cast<std::streamsize>(length));
+    const auto result = static_cast<stream_size_t>(file.gcount());
+    GX_ASSERT_D(0 != result);
     file.seekp(file.tellg());
     return result;
 }
 
-std::uint64_t gearoenix::platform::stream::Local::write(const void* const data, const std::uint64_t length)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::write(const void* const data, const stream_size_t length)
 {
-    const std::uint64_t before = (std::uint64_t)file.tellp();
-    file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(length));
-    const std::uint64_t result = ((std::uint64_t)file.tellp()) - before;
-#ifdef GX_DEBUG_MODE
-    if (0 == result)
-        GX_UNEXPECTED;
-#endif
+    const auto before = static_cast<stream_size_t>(file.tellp());
+    file.write(static_cast<const char*>(data), static_cast<std::streamsize>(length));
+    const auto result = static_cast<stream_size_t>(file.tellp()) - before;
+    GX_ASSERT_D(0 != result);
     file.seekg(file.tellp());
     return result;
 }
 
-void gearoenix::platform::stream::Local::seek(std::uint64_t offset)
+void gearoenix::platform::stream::Local::seek(const stream_size_t offset)
 {
     file.seekg(static_cast<std::streamoff>(offset));
     file.seekp(static_cast<std::streamoff>(offset));
 }
 
-std::uint64_t gearoenix::platform::stream::Local::tell()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::tell()
 {
-    return static_cast<std::uint64_t>(file.tellg());
+    return static_cast<stream_size_t>(file.tellg());
 }
 
 bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name)
@@ -99,13 +100,13 @@ bool gearoenix::platform::stream::Local::exist(const Application& app, const std
     return f.is_open() && f.good();
 }
 
-std::uint64_t gearoenix::platform::stream::Local::size()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::size()
 {
     const auto o = file.tellg();
     file.seekg(0, std::ios::end);
     const auto s = file.tellg();
     file.seekg(o);
-    return static_cast<std::uint64_t>(s);
+    return static_cast<stream_size_t>(s);
 }
 
 void gearoenix::platform::stream::Local::flush()

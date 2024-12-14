@@ -15,8 +15,8 @@ for ((i = 0; i < np; i++)); do
   pids[$i]=0
 done
 
-if command -v clang-format-18 &>/dev/null; then
-  clang_format=clang-format-18
+if command -v clang-format-19 &>/dev/null; then
+  clang_format=clang-format-19
 else
   clang_format=clang-format
 fi

@@ -1,6 +1,5 @@
 #include "gx-rnd-txt-texture.hpp"
 #include "../../math/gx-math-numeric.hpp"
-#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
@@ -45,18 +44,26 @@ void gearoenix::render::texture::Texture::write_gx3d_image(
     core::job::EndCaller<>&& end)
 {
     core::job::send_job_to_pool([s = std::move(s), data = std::move(data), img_width, img_height, format, end = std::move(end)]() mutable {
-        const std::shared_ptr<platform::stream::Stream> ms = std::make_shared<platform::stream::Memory>();
-        write_image(*ms, data.data(), img_width, img_height, format);
-        s->write(*ms);
+        write_image(*s, data.data(), img_width, img_height, format);
+        (void)end;
     });
 }
 
 gearoenix::render::texture::Texture::~Texture() = default;
 
-void gearoenix::render::texture::Texture::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>&) const
+void gearoenix::render::texture::Texture::write(
+    const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>&, const bool include_content) const
 {
+    s->write_fail_debug(include_content);
     s->write_fail_debug(name);
     info.write(*s);
+}
+
+void gearoenix::render::texture::Texture::write(
+    const std::shared_ptr<platform::stream::Stream>& s,
+    const core::job::EndCaller<>& c) const
+{
+    write(s, c, true);
 }
 
 std::uint64_t gearoenix::render::texture::Texture::get_mipmaps_count() const

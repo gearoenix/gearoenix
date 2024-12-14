@@ -7,6 +7,70 @@
 #include <algorithm>
 #include <imgui/imgui.h>
 
+void gearoenix::physics::Transformation::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s,
+    core::job::EndCaller<>&&) const
+{
+    local_matrix.get_position().write(*s);
+    rotation.get_quat().write(*s);
+    scale.write(*s);
+
+    s->write_fail_debug(static_cast<std::uint32_t>(children.size()));
+    for (const auto* const c : children) {
+        s->write_fail_debug(c->get_entity_id());
+    }
+    const auto has_parent = nullptr != parent;
+    s->write_fail_debug(has_parent);
+    if (has_parent) {
+        s->write_fail_debug(parent->get_entity_id());
+    }
+}
+
+void gearoenix::physics::Transformation::update_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s,
+    core::job::EndCaller<>&& e)
+{
+    math::Vec3<double> pos;
+    pos.read(*s);
+    math::Quat<double> rot;
+    rot.read(*s);
+    math::Vec3<double> scl;
+    scl.read(*s);
+
+    core::job::EndCaller end([this, s = component_self.lock(), e = std::move(e), pos, rot, scl] {
+        reset(scl, rot, pos);
+        (void)s;
+        (void)e;
+    });
+
+    const auto children_count = s->read<std::uint32_t>();
+    children.clear();
+    const auto children_lock = std::make_shared<std::mutex>();
+    for (auto i = decltype(children_count) { 0 }; i < children_count; ++i) {
+        core::ecs::World::get()->resolve([this, children_lock, id = s->read<core::ecs::entity_id_t>(), end] {
+            auto* const child = core::ecs::World::get()->get_component<Transformation>(id);
+            if (nullptr == child) {
+                return true;
+            }
+            const std::lock_guard _lg(*children_lock);
+            children.emplace(child);
+            (void)end;
+            return false;
+        });
+    }
+    if (s->read<bool>()) {
+        core::ecs::World::get()->resolve([this, id = s->read<core::ecs::entity_id_t>(), end = std::move(end)] {
+            auto* const p = core::ecs::World::get()->get_component<Transformation>(id);
+            if (nullptr == p) {
+                return true;
+            }
+            parent = p;
+            (void)end;
+            return false;
+        });
+    }
+}
+
 gearoenix::physics::Transformation::Transformation(
     std::string&& name,
     Transformation* const parent,

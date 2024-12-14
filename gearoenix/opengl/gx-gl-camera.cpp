@@ -57,28 +57,20 @@ void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
     }));
 }
 
-void gearoenix::gl::Camera::write_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&&,
-    core::job::EndCaller<>&&) const
-{
-    GX_UNIMPLEMENTED;
-}
-
 gearoenix::gl::Camera::Camera(
-    Engine& e,
     const std::string& name,
     render::camera::Target&& target,
     std::shared_ptr<physics::Transformation>&& transform,
     const core::ecs::entity_id_t entity_id)
-    : render::camera::Camera(e, core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform), entity_id)
+    : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform), entity_id)
 {
 }
 
 void gearoenix::gl::Camera::construct(
-    Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
+    const std::string& name, core::job::EndCallerShared<Camera>&& c,
     std::shared_ptr<physics::Transformation>&& transform, const core::ecs::entity_id_t entity_id)
 {
-    c.set_return(core::ecs::construct_component<Camera>(e, name, render::camera::Target(), std::move(transform), entity_id));
+    c.set_return(core::ecs::construct_component<Camera>(name, render::camera::Target(), std::move(transform), entity_id));
     c.get_return()->set_camera_self(c.get_return());
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
@@ -115,7 +107,7 @@ void gearoenix::gl::CameraBuilder::construct(
     const auto entity_id = builder_end_caller.get_return()->get_id();
     auto transform = builder_end_caller.get_return()->get_transformation_shared_ptr();
     Camera::construct(
-        e, name + "-gl-camera",
+        name + "-gl-camera",
         core::job::EndCallerShared<Camera>([b = std::move(builder_end_caller)](std::shared_ptr<Camera>&& c) {
             b.get_return()->get_entity_builder()->get_builder().add_component(std::move(c));
         }),

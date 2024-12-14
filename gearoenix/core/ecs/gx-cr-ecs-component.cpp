@@ -13,6 +13,11 @@ void gearoenix::core::ecs::Component::write_in_io_context(std::shared_ptr<platfo
     GX_UNIMPLEMENTED; // implement it for your final type
 }
 
+void gearoenix::core::ecs::Component::update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, job::EndCaller<>&&)
+{
+    GX_UNIMPLEMENTED; // implement it for your final type
+}
+
 gearoenix::core::ecs::Component::Component(const component_index_t final_type_index, std::string&& name, const entity_id_t entity_id)
     : final_type_index(final_type_index)
     , name(std::move(name))
@@ -70,12 +75,26 @@ void gearoenix::core::ecs::Component::write(
     job::EndCaller<>&& end_callback) const
 {
     job::send_job_to_pool([self = component_self.lock(), s = std::move(stream), e = std::move(end_callback)]() mutable {
-        GX_ASSERT(sizeof(self->final_type_index) == s->write(self->final_type_index));
-        GX_ASSERT(s->write(self->name));
-        GX_ASSERT(sizeof(self->enabled) == s->write(self->enabled));
-        GX_ASSERT(sizeof(self->entity_id) == s->write(self->entity_id));
-
+        s->write_fail_debug(self->final_type_index);
+        s->write_fail_debug(self->name);
+        s->write_fail_debug(self->enabled);
+        s->write_fail_debug(self->entity_id);
         self->write_in_io_context(std::move(s), std::move(e));
+    });
+}
+
+void gearoenix::core::ecs::Component::update(
+    std::shared_ptr<platform::stream::Stream>&& s,
+    job::EndCaller<>&& e)
+{
+    job::send_job_to_pool([self = component_self.lock(), s = std::move(s), e = std::move(e)]() mutable {
+        GX_ASSERT(self->final_type_index == s->read<component_index_t>());
+        std::string name;
+        s->read(name);
+        GX_ASSERT(self->name == name);
+        s->read(self->enabled);
+        GX_ASSERT(self->entity_id == s->read<decltype(self->entity_id)>());
+        self->update_in_io_context(std::move(s), std::move(e));
     });
 }
 
@@ -94,4 +113,11 @@ void gearoenix::core::ecs::Component::read(
         });
         ComponentType::get_stream_constructor(final_type_index)(std::move(name), entity_id, std::move(s), std::move(end));
     });
+}
+
+gearoenix::core::ecs::component_index_t gearoenix::core::ecs::Component::read_final_type_index(platform::stream::Stream& s)
+{
+    const auto final_type_index = s.read<component_index_t>();
+    s.seek(s.tell() - sizeof(final_type_index));
+    return final_type_index;
 }

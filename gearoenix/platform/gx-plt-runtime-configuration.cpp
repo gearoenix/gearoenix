@@ -12,6 +12,39 @@ namespace {
 constexpr auto entity_name = "gearoenix-platform-runtime-configuration";
 }
 
+void gearoenix::platform::RuntimeConfiguration::write_in_io_context(
+    std::shared_ptr<stream::Stream>&& stream,
+    core::job::EndCaller<>&&) const
+{
+    stream->write_fail_debug(application_name);
+    stream->write_fail_debug(fullscreen);
+    stream->write_fail_debug(landscape);
+    stream->write_fail_debug(window_width);
+    stream->write_fail_debug(window_height);
+    stream->write_fail_debug(window_resizing_event_interval_ms);
+    stream->write_fail_debug(show_cursor);
+    stream->write_fail_debug(vulkan_render_backend_enabled);
+    stream->write_fail_debug(direct3dx_render_backend_enabled);
+    stream->write_fail_debug(metal_render_backend_enabled);
+    stream->write_fail_debug(opengl_render_backend_enabled);
+}
+
+void gearoenix::platform::RuntimeConfiguration::update_in_io_context(
+    std::shared_ptr<stream::Stream>&& stream, core::job::EndCaller<>&&)
+{
+    stream->read(application_name);
+    stream->read(fullscreen);
+    stream->read(landscape);
+    stream->read(window_width);
+    stream->read(window_height);
+    stream->read(window_resizing_event_interval_ms);
+    stream->read(show_cursor);
+    stream->read(vulkan_render_backend_enabled);
+    stream->read(direct3dx_render_backend_enabled);
+    stream->read(metal_render_backend_enabled);
+    stream->read(opengl_render_backend_enabled);
+}
+
 gearoenix::platform::RuntimeConfiguration::RuntimeConfiguration(const core::ecs::entity_id_t id)
     : Component(core::ecs::ComponentType::create_index(this), entity_name, id)
     , application_name(GX_APPLICATION_NAME)

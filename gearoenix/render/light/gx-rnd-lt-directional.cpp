@@ -81,7 +81,7 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise_camera(
     const float camera_near,
     const float camera_aspect)
 {
-    shadow_camera->set_projection_data(camera::OrthographicProjectionData { .scale = camera_aspect });
+    shadow_camera->set_projection_data(camera::ProjectionData::construct_orthographic(camera_aspect));
     shadow_camera->set_far(camera_far);
     shadow_camera->set_near(camera_near);
 }
@@ -97,7 +97,7 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(
     std::vector<std::uint8_t> pixels0(resolution * resolution * 4);
     std::memset(pixels0.data(), 0, pixels0.size());
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
-    shadow_camera->e.get_texture_manager()->create_2d_from_pixels(
+    engine::Engine::get()->get_texture_manager()->create_2d_from_pixels(
         name + "-shadow-map",
         std::move(pixels),
         texture::TextureInfo()
@@ -125,11 +125,7 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(
     auto& e = shadow_map->get_e();
     e.get_texture_manager()->create_target(
         name + "-shadow-map-target",
-        { texture::Attachment {
-            .mipmap_level = 0,
-            .var = texture::Attachment2D {
-                .txt = shadow_map,
-            } } },
+        { texture::Attachment(texture::Attachment2D(std::shared_ptr(shadow_map))) },
         core::job::EndCallerShared<texture::Target>([e = std::move(end_callback), s = std::move(self)](std::shared_ptr<texture::Target>&& t) mutable {
             s->set_shadow_map_target(std::move(t));
             (void)e;

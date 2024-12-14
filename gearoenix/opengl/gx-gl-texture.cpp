@@ -1,6 +1,7 @@
 #include "gx-gl-texture.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../platform/stream/gx-plt-stm-local.hpp"
+#include "../platform/stream/gx-plt-stm-memory.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
@@ -182,10 +183,14 @@ gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f)
     }
 }
 
-void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const
+void gearoenix::gl::Texture2D::write(
+    const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
 {
-    render::texture::Texture2D::write(s, c);
-    core::job::send_job(e.get_jobs_thread_id(), [this, s, c] {
+    render::texture::Texture2D::write(s, c, content);
+    if (!content) {
+        return;
+    }
+    core::job::send_job(e.get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
@@ -195,6 +200,15 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
         auto level_width = static_cast<sizei>(info.get_width());
         auto level_height = static_cast<sizei>(info.get_height());
         const auto mips_count = get_mipmaps_count();
+        auto sss = std::make_shared<std::vector<std::shared_ptr<platform::stream::Stream>>>();
+        core::job::EndCaller end([c = std::move(c), sss, s = std::move(s)]() mutable {
+            core::job::send_job_to_pool([c = std::move(c), sss = std::move(sss), s = std::move(s)]() mutable {
+                for (auto& ss : *sss) {
+                    s->write(*ss);
+                }
+                (void)c;
+            });
+        });
         for (sint mip_index = 0; mip_index < static_cast<sint>(mips_count); ++mip_index, level_width >>= 1u, level_height >>= 1u) {
             std::vector<std::uint8_t> data;
             data.resize(pixel_element_size * static_cast<std::uint32_t>(level_width * level_height));
@@ -207,12 +221,14 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
                 "texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
             write_image(l, data.data(), level_width, level_height, info.format);
 #endif
-            write_gx3d_image(std::shared_ptr(s), std::move(data), level_width, level_height, info.get_format(), core::job::EndCaller([c] { (void)c; }));
+            auto ms = std::make_shared<platform::stream::Memory>();
+            sss->push_back(ms);
+            write_gx3d_image(std::move(ms), std::move(data), level_width, level_height, info.get_format(), core::job::EndCaller(end));
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
-        (void)c; });
+    });
 }
 
 void* gearoenix::gl::Texture2D::get_imgui_ptr() const
@@ -249,15 +265,28 @@ void gearoenix::gl::Texture2D::generate_mipmaps()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const
+void gearoenix::gl::TextureCube::write(
+    const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
 {
-    render::texture::TextureCube::write(s, c);
-    core::job::send_job(e.get_jobs_thread_id(), [this, s, c] {
+    render::texture::TextureCube::write(s, c, content);
+    if (!content) {
+        return;
+    }
+    core::job::send_job(e.get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindTexture(GL_TEXTURE_CUBE_MAP, object);
+        auto sss = std::make_shared<std::vector<std::shared_ptr<platform::stream::Stream>>>();
+        core::job::EndCaller end([c = std::move(c), sss, s = std::move(s)]() mutable {
+            core::job::send_job_to_pool([c = std::move(c), sss = std::move(sss), s = std::move(s)] {
+                for (auto& ss : *sss) {
+                    s->write(*ss);
+                }
+                (void)c;
+            });
+        });
         auto pixel_element_size = format_pixel_size(info.get_format());
         for (auto face : render::texture::FACES) {
             auto level_aspect = static_cast<sizei>(info.get_width());
@@ -274,13 +303,15 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
                     "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
                 write_image(l, data.data(), level_aspect, level_aspect, info.format);
 #endif
-                write_gx3d_image(std::shared_ptr(s), std::move(data), level_aspect, level_aspect, info.get_format(), core::job::EndCaller([c] { (void)c; }));
+                auto ms = std::make_shared<platform::stream::Memory>();
+                sss->push_back(ms);
+                write_gx3d_image(std::move(ms), std::move(data), level_aspect, level_aspect, info.get_format(), core::job::EndCaller(end));
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &framebuffer);
         GX_GL_CHECK_D;
-        (void)c; });
+    });
 }
 
 gearoenix::gl::TextureCube::TextureCube(

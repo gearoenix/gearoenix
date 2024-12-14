@@ -55,6 +55,9 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     GX_GET_PTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
 
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+
 public:
     Transformation(std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id, render::engine::Engine* e);
     ~Transformation() override;

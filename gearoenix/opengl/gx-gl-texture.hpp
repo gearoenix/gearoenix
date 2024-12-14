@@ -24,7 +24,7 @@ struct Texture2D final : render::texture::Texture2D {
     Engine& e;
     GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const override;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
     void* get_imgui_ptr() const override;
 
 public:
@@ -43,7 +43,7 @@ struct TextureCube final : render::texture::TextureCube {
     Engine& e;
     GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
-    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const override;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
 
 public:
     TextureCube(

@@ -24,18 +24,18 @@ struct ColourTuningAntiAliasingCombination final : ShaderCombination {
     Engine& e;
 
 private:
-    std::array<std::optional<ColourTuningAntiAliasing>, std::variant_size_v<render::camera::ColourTuning>> combination;
+    std::array<std::optional<ColourTuningAntiAliasing>, render::camera::ColourTuning::types_count> combination;
 
     explicit ColourTuningAntiAliasingCombination(Engine& e);
 
 public:
     [[nodiscard]] ColourTuningAntiAliasing& get(const render::camera::ColourTuning& colour_tuning)
     {
-        auto& result = combination[colour_tuning.index()];
+        auto& result = combination[colour_tuning.get_index()];
         if (result.has_value()) {
             return result.value();
         }
-        result.emplace(e, static_cast<std::uint32_t>(colour_tuning.index()));
+        result.emplace(e, static_cast<std::uint32_t>(colour_tuning.get_index()));
         return result.value();
     }
 };

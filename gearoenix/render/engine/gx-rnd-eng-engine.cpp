@@ -34,6 +34,10 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
+namespace {
+gearoenix::render::engine::Engine* instance = nullptr;
+}
+
 gearoenix::render::engine::Engine::Engine(
     const Type engine_type,
     platform::Application& platform_application)
@@ -47,6 +51,7 @@ gearoenix::render::engine::Engine::Engine(
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
     core::job::register_current_thread();
+    instance = this;
 }
 
 std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines()
@@ -98,7 +103,10 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     return result;
 }
 
-gearoenix::render::engine::Engine::~Engine() = default;
+gearoenix::render::engine::Engine::~Engine()
+{
+    instance = nullptr;
+}
 
 void gearoenix::render::engine::Engine::start_frame()
 {
@@ -138,4 +146,9 @@ void gearoenix::render::engine::Engine::show_debug_gui()
     core::ecs::World::get()->show_debug_gui();
     // TODO: I have to show all other things
     ImGui::TreePop();
+}
+
+gearoenix::render::engine::Engine* gearoenix::render::engine::Engine::get()
+{
+    return instance;
 }

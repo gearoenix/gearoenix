@@ -28,6 +28,9 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GET_VAL_PRV(std::uint8_t, runtime_reflection_radiance_levels, 1);
     GX_GET_REF_PRV(core::Observed<Resolution>, runtime_resolution);
 
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+
 public:
     explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;

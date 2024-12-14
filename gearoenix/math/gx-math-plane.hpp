@@ -2,6 +2,10 @@
 #include "gx-math-intersection-status.hpp"
 #include "gx-math-vector-4d.hpp"
 
+namespace gearoenix::platform::stream {
+struct Stream;
+}
+
 namespace gearoenix::math {
 template <typename Element>
 struct Sphere;
@@ -30,6 +34,18 @@ struct Plane {
     [[nodiscard]] constexpr Element get_distance(const Vec3<Element>& p) const
     {
         return normal_d.dot(Vec4<Element>(p, static_cast<Element>(1)));
+    }
+
+    void write(platform::stream::Stream& s) const
+    {
+        normal_d.write(s);
+        point.write(s);
+    }
+
+    void read(platform::stream::Stream& s)
+    {
+        normal_d.read(s);
+        point.read(s);
     }
 };
 }

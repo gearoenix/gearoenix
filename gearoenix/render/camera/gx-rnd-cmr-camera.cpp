@@ -9,7 +9,6 @@
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
-#include <boost/mp11/algorithm.hpp>
 #include <imgui/imgui.h>
 #include <random>
 
@@ -20,17 +19,14 @@ thread_local std::default_random_engine re(rd());
 }
 
 gearoenix::render::camera::Camera::Camera(
-    engine::Engine& e,
     const core::ecs::component_index_t final_type,
     const std::string& name,
     Target&& target,
     std::shared_ptr<physics::Transformation>&& transform,
     const core::ecs::entity_id_t entity_id)
     : Component(final_type, std::string(name), entity_id)
-    , e(e)
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))
-    , colour_tuning(GammaCorrection {})
     , debug_colour {
         urd(re),
         urd(re),
@@ -65,6 +61,71 @@ void gearoenix::render::camera::Camera::set_camera_self(const std::shared_ptr<Ca
     }
 }
 
+void gearoenix::render::camera::Camera::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s,
+    core::job::EndCaller<>&& end) const
+{
+    starting_clip_ending_clip.write(*s);
+    if (customised_target_aspect_ratio.has_value()) {
+        s->write_fail_debug(true);
+        s->write_fail_debug(*customised_target_aspect_ratio);
+    } else {
+        s->write_fail_debug(false);
+    }
+    s->write_fail_debug(parent_entity_id);
+    s->write_fail_debug(scene_id);
+    s->write_fail_debug(flag);
+    s->write_fail_debug(far);
+    s->write_fail_debug(near);
+    colour_tuning.write(*s);
+    projection_data.write(*s);
+    s->write_fail_debug(layer);
+    s->write_fail_debug(usage);
+    s->write_fail_debug(bloom_data.has_value());
+    if (bloom_data.has_value()) {
+        bloom_data->get_scatter_clamp_max_threshold_threshold_knee().write(*s);
+    }
+    exposure.write(*s);
+    s->write_fail_debug(transform->get_entity_id());
+    target.write(std::move(s), std::move(end));
+}
+
+void gearoenix::render::camera::Camera::update_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s,
+    core::job::EndCaller<>&& e)
+{
+    starting_clip_ending_clip.read(*s);
+    if (s->read<bool>()) {
+        customised_target_aspect_ratio.emplace();
+        s->read(*customised_target_aspect_ratio);
+    }
+    s->read(parent_entity_id);
+    s->read(scene_id);
+    s->read(flag);
+    s->read(far);
+    s->read(near);
+    colour_tuning.read(*s);
+    projection_data.read(*s);
+    s->read(layer);
+    s->read(usage);
+    if (s->read<bool>()) {
+        bloom_data.emplace();
+        bloom_data->get_scatter_clamp_max_threshold_threshold_knee().read(*s);
+    }
+    exposure.read(*s);
+    core::ecs::World::get()->resolve([this, id = s->read<core::ecs::entity_id_t>(), self = camera_self.lock(), e = e]() {
+        (void)self;
+        (void)e;
+        transform = core::ecs::World::get()->get_component_shared_ptr<physics::Transformation>(id);
+        return transform == nullptr;
+    });
+    Target::read(std::move(s), core::job::EndCaller<Target>([this, s = camera_self.lock(), e = std::move(e)](Target&& t) mutable {
+        (void)s;
+        target = std::move(t);
+        update_target(core::job::EndCaller([e = std::move(e)] { (void)e; }));
+    }));
+}
+
 void gearoenix::render::camera::Camera::generate_frustum_points(
     const math::Vec3<double>& location,
     const math::Vec3<double>& x,
@@ -73,12 +134,14 @@ void gearoenix::render::camera::Camera::generate_frustum_points(
     std::array<math::Vec3<double>, 8>& points) const
 {
     const auto [scale, fpn] = [&] {
-        if (const auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
-            const auto s = static_cast<double>(near * tanf(p->field_of_view_y * 0.5f));
+        if (projection_data.is_perspective()) {
+            const auto [field_of_view_y] = projection_data.get_perspective();
+            const auto s = static_cast<double>(near * tanf(field_of_view_y * 0.5f));
             return std::make_pair(s, (static_cast<double>(far) + static_cast<double>(near)) * s / static_cast<double>(near));
         }
-        if (const auto* const o = std::get_if<OrthographicProjectionData>(&projection_data)) {
-            const auto s = static_cast<double>(o->scale * 0.5f);
+        if (projection_data.is_orthographic()) {
+            const auto& [scale] = projection_data.get_orthographic();
+            const auto s = static_cast<double>(scale * 0.5f);
             return std::make_pair(s, s);
         }
         GX_UNEXPECTED;
@@ -135,22 +198,24 @@ void gearoenix::render::camera::Camera::set_projection_data(const ProjectionData
 
 bool gearoenix::render::camera::Camera::is_perspective() const
 {
-    return boost::mp11::mp_find<ProjectionData, PerspectiveProjectionData>::value == projection_data.index();
+    return projection_data.is_perspective();
 }
 
 bool gearoenix::render::camera::Camera::is_orthographic() const
 {
-    return boost::mp11::mp_find<ProjectionData, OrthographicProjectionData>::value == projection_data.index();
+    return projection_data.is_orthographic();
 }
 
 void gearoenix::render::camera::Camera::update_projection()
 {
     const auto target_aspect_ratio = get_target_aspect_ratio();
-    if (const auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
-        const auto s = 2.0f * near * tanf(p->field_of_view_y * 0.5f);
+    if (projection_data.is_perspective()) {
+        const auto& [field_of_view_y] = projection_data.get_perspective();
+        const auto s = 2.0f * near * tanf(field_of_view_y * 0.5f);
         projection = math::Mat4x4<float>::perspective(target_aspect_ratio * s, s, near, far);
-    } else if (const auto* const o = std::get_if<OrthographicProjectionData>(&projection_data)) {
-        projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * o->scale, o->scale, near, far);
+    } else if (projection_data.is_orthographic()) {
+        const auto& [scale] = projection_data.get_orthographic();
+        projection = math::Mat4x4<float>::orthographic(target_aspect_ratio * scale, scale, near, far);
     } else {
         GX_UNEXPECTED;
     }
@@ -183,10 +248,12 @@ void gearoenix::render::camera::Camera::show_debug_gui()
         if (customised_target_aspect_ratio.has_value()) {
             input_changed |= ImGui::InputFloat("Customised Target Aspect Ratio", &*customised_target_aspect_ratio, 0.01f, 1.0f, "%.3f");
         }
-        if (auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
-            input_changed |= ImGui::InputFloat("Field Of View Y", &p->field_of_view_y, 0.01f, 1.0f, "%.3f");
-        } else if (auto* const o = std::get_if<OrthographicProjectionData>(&projection_data)) {
-            input_changed |= ImGui::InputFloat("Scale", &o->scale, 0.01f, 1.0f, "%.3f");
+        if (projection_data.is_perspective()) {
+            auto& [field_of_view_y] = projection_data.get_perspective();
+            input_changed |= ImGui::InputFloat("Field Of View Y", &field_of_view_y, 0.01f, 1.0f, "%.3f");
+        } else if (projection_data.is_orthographic()) {
+            auto& [scale] = projection_data.get_orthographic();
+            input_changed |= ImGui::InputFloat("Scale", &scale, 0.01f, 1.0f, "%.3f");
         } else {
             GX_UNEXPECTED;
         }
@@ -219,11 +286,13 @@ void gearoenix::render::camera::Camera::disable_debug_mesh()
 gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(const math::Vec2<double>& normalised_point) const
 {
     const auto [scale, is_perspective] = [&] {
-        if (const auto* const p = std::get_if<PerspectiveProjectionData>(&projection_data)) {
-            return std::make_pair(static_cast<double>(2.0f * near * tanf(p->field_of_view_y * 0.5f)), true);
+        if (projection_data.is_perspective()) {
+            const auto [field_of_view_y] = projection_data.get_perspective();
+            return std::make_pair(static_cast<double>(2.0f * near * tanf(field_of_view_y * 0.5f)), true);
         }
-        if (const auto* const o = std::get_if<OrthographicProjectionData>(&projection_data)) {
-            return std::make_pair(static_cast<double>(o->scale), false);
+        if (projection_data.is_orthographic()) {
+            const auto [scale] = projection_data.get_orthographic();
+            return std::make_pair(static_cast<double>(scale), false);
         }
         GX_UNEXPECTED;
     }();
@@ -242,14 +311,14 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
 
 void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>&& end)
 {
-    e.get_material_manager()->get_unlit(
+    engine::Engine::get()->get_material_manager()->get_unlit(
         "dummy",
         core::job::EndCallerShared<material::Unlit>([this, self = camera_self.lock(), end = std::move(end)](std::shared_ptr<material::Unlit>&& material) mutable {
             if (nullptr == self) {
                 return;
             }
             std::string mesh_name = name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::uint64_t>(this));
-            (void)e.get_mesh_manager()->remove_if_exist(mesh_name);
+            (void)engine::Engine::get()->get_mesh_manager()->remove_if_exist(mesh_name);
             std::array<math::Vec3<double>, 8> points;
             generate_frustum_points(
                 math::Vec3(0.0),
@@ -266,7 +335,7 @@ void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>
                 0, 4, 1, 5, 2, 6, 3, 7, // edges
                 4, 5, 4, 6, 5, 7, 6, 7, // near
             };
-            e.get_mesh_manager()->build(
+            engine::Engine::get()->get_mesh_manager()->build(
                 std::move(mesh_name),
                 std::move(vertices),
                 std::move(indices),
@@ -301,10 +370,10 @@ void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& e
     if (!target.is_default()) {
         return;
     }
-    e.get_texture_manager()->create_default_camera_render_target(
+    engine::Engine::get()->get_texture_manager()->create_default_camera_render_target(
         name,
         core::job::EndCaller<texture::DefaultCameraTargets>([w = camera_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
-            auto s = w.lock();
+            const auto s = w.lock();
             if (nullptr == s) {
                 return;
             }

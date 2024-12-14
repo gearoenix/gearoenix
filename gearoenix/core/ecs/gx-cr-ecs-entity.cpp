@@ -51,19 +51,18 @@ void gearoenix::core::ecs::Entity::write(
         for (const auto& ci : archetype->components_indices) {
             indices.emplace(ci.second);
         }
-        auto streams = std::make_shared<std::vector<std::shared_ptr<platform::stream::Memory>>>(indices.size());
+        auto streams = std::make_shared<std::vector<std::shared_ptr<platform::stream::Stream>>>(indices.size());
         job::EndCaller end([n = name, s = std::move(s), e = std::move(e), ss = streams] {
-            GX_ASSERT(s->write(n));
-            const auto count = static_cast<std::uint64_t>(ss->size());
-            GX_ASSERT(sizeof(count) == s->write(count));
+            s->write_fail_debug(n);
+            s->write_fail_debug(static_cast<std::uint32_t>(ss->size()));
             for (const auto& ms : *ss) {
-                s->write(static_cast<platform::stream::Stream&>(*ms));
+                s->write(*ms);
             }
         });
         for (const auto i : indices) {
             auto ms = std::make_shared<platform::stream::Memory>();
             (*streams)[i] = ms;
-            components[i]->write(std::move(ms), std::move(end));
+            components[i]->write(std::move(ms), job::EndCaller(end));
         }
     });
 }

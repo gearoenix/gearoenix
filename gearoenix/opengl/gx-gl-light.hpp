@@ -26,7 +26,7 @@ struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirection
         core::job::EndCaller<>&& end_callback) const override;
 
 public:
-    explicit ShadowCasterDirectionalLight(std::string&& name, core::ecs::entity_id_t entity_id);
+    ShadowCasterDirectionalLight(std::string&& name, core::ecs::entity_id_t entity_id);
     ~ShadowCasterDirectionalLight() override;
     void set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback) override;
     void set_shadow_map_target(std::shared_ptr<render::texture::Target>&& t) override;

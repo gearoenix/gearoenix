@@ -1,5 +1,4 @@
 #include "gx-gl-target.hpp"
-
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
@@ -8,8 +7,8 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Target::Target(Engine& e, std::vector<render::texture::Attachment>&& attachments)
-    : render::texture::Target(std::move(attachments))
+gearoenix::gl::Target::Target(Engine& e, std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
+    : render::texture::Target(std::move(in_name), std::move(attachments))
     , e(e)
 {
 }
@@ -20,7 +19,7 @@ void gearoenix::gl::Target::construct(
     std::vector<render::texture::Attachment>&& attachments,
     core::job::EndCallerShared<render::texture::Target>&& end_callback)
 {
-    std::shared_ptr<Target> self(new Target(e, std::move(attachments)));
+    std::shared_ptr<Target> self(new Target(e, std::string(name), std::move(attachments)));
     GX_ASSERT_D(!self->attachments.empty());
     self->gl_attachments.reserve(self->attachments.size());
     std::vector<enumerated> binding_points;

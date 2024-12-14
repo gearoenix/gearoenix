@@ -3,6 +3,10 @@
 #include "gx-math-plane.hpp"
 #include <array>
 
+namespace gearoenix::platform::stream {
+struct Stream;
+}
+
 namespace gearoenix::math {
 template <typename Element>
 struct Frustum final {
@@ -61,6 +65,20 @@ struct Frustum final {
                 status = IntersectionStatus::Cut;
         }
         return status;
+    }
+
+    void write(platform::stream::Stream& s) const
+    {
+        for (const auto& plane : planes) {
+            plane.write(s);
+        }
+    }
+
+    void read(platform::stream::Stream& s)
+    {
+        for (auto& plane : planes) {
+            plane.read(s);
+        }
     }
 };
 }

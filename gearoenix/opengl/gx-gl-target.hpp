@@ -30,7 +30,7 @@ struct Target final : render::texture::Target {
     GX_GET_VAL_PRV(uint, framebuffer, static_cast<uint>(-1));
     GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments);
 
-    Target(Engine& e, std::vector<render::texture::Attachment>&& attachments);
+    Target(Engine& e, std::string&&, std::vector<render::texture::Attachment>&& attachments);
 
 public:
     static void construct(

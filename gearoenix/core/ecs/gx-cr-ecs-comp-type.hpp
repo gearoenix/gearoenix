@@ -127,7 +127,8 @@ public:
         static_assert(T::MAX_COUNT > 0);
         add(
             create_index<T>(),
-            { boost::core::demangle(typeid(T).name()),
+            Info(
+                boost::core::demangle(typeid(T).name()),
                 std::conditional_t<std::is_final_v<T>, allocator::SharedArray<T, T::MAX_COUNT>, allocator::SharedArray<char, 0>>::construct(),
                 T::ALL_PARENT_TYPE_INDICES,
                 T::IMMEDIATE_PARENT_TYPE_INDICES,
@@ -141,9 +142,9 @@ public:
                     if constexpr (HasReadConstructor<T> && std::is_final_v<T>) {
                         T::construct(std::move(n), i, std::move(s), std::move(e));
                     } else {
-                        GX_UNEXPECTED;
+                        GX_LOG_F("Type [" << boost::core::demangle(typeid(T).name()) << "] does not provide read constructor.");
                     }
-                } });
+                }));
     }
 
     [[nodiscard]] static const Info& get_info(const component_index_t ti) { return infos[ti]; }

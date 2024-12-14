@@ -1,7 +1,12 @@
 #include "gx-rnd-cmr-target.hpp"
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
+#include "../engine/gx-rnd-eng-engine.hpp"
+#include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
 
 gearoenix::render::camera::Target::Target() = default;
+
+gearoenix::render::camera::Target::~Target() = default;
 
 gearoenix::render::camera::Target::Target(Customised&& c)
     : target(std::move(c))
@@ -80,4 +85,28 @@ const gearoenix::render::camera::Target::Customised& gearoenix::render::camera::
 {
     GX_ASSERT(is_customised());
     return std::get<CUSTOMISED_VAR_INDEX>(target);
+}
+
+void gearoenix::render::camera::Target::write(
+    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
+{
+    const auto d = is_default();
+    s->write_fail_debug(d);
+    if (d) {
+        return;
+    }
+    std::get<CUSTOMISED_VAR_INDEX>(target).target->write(std::move(s), std::move(end));
+}
+
+void gearoenix::render::camera::Target::read(
+    std::shared_ptr<platform::stream::Stream>&& stream,
+    core::job::EndCaller<Target>&& end)
+{
+    if (stream->read<bool>()) {
+        end.set_return(construct_default(texture::DefaultCameraTargets()));
+        return;
+    }
+    engine::Engine::get()->get_texture_manager()->create_target(std::move(stream), core::job::EndCallerShared<texture::Target>([e = std::move(end)](std::shared_ptr<texture::Target>&& t) {
+        e.set_return(construct_customised(std::move(t)));
+    }));
 }

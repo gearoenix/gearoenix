@@ -41,15 +41,13 @@ struct Camera final : render::camera::Camera {
 
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
-    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream,
-        core::job::EndCaller<>&& end_callback) const override;
 
 public:
     Camera(
-        Engine& e, const std::string& name, render::camera::Target&& target,
+        const std::string& name, render::camera::Target&& target,
         std::shared_ptr<physics::Transformation>&& transform, core::ecs::entity_id_t entity_id);
     static void construct(
-        Engine& e, const std::string& name, core::job::EndCallerShared<Camera>&& c,
+        const std::string& name, core::job::EndCallerShared<Camera>&& c,
         std::shared_ptr<physics::Transformation>&& transform, core::ecs::entity_id_t entity_id);
     static void construct(
         std::string&& name,

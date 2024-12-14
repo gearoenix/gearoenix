@@ -14,6 +14,7 @@
 
 namespace {
 constexpr auto save_file_chooser = "gearoenix::editor::ui::MenuProject::save";
+constexpr auto save_file_chooser_filter = ".gx-world";
 }
 
 void gearoenix::editor::ui::MenuWorld::show_new_popup()
@@ -76,7 +77,11 @@ void gearoenix::editor::ui::MenuWorld::update()
             is_new_popup_open = true;
         }
 
-        if (ImGui::MenuItem("Open", "Ctrl+O")) { }
+        if (ImGui::MenuItem("Open", "Ctrl+O")) {
+            is_file_chooser_open = true;
+            file_chooser_title = "Opening a Gearoenix World File";
+            ImGuiFileDialog::Instance()->OpenDialog(save_file_chooser, file_chooser_title, save_file_chooser_filter, { .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField });
+        }
 
         if (ImGui::BeginMenu("Open Recent")) {
 
@@ -85,7 +90,9 @@ void gearoenix::editor::ui::MenuWorld::update()
 
         if (ImGui::MenuItem("Save", "Ctrl+S", false)) { }
         if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false)) {
-            ImGuiFileDialog::Instance()->OpenDialog(save_file_chooser, "Saving the project", ".gx-world");
+            is_file_chooser_open = false;
+            file_chooser_title = "Saving a Gearoenix World File";
+            ImGuiFileDialog::Instance()->OpenDialog(save_file_chooser, file_chooser_title, save_file_chooser_filter);
         }
         if (ImGui::MenuItem("Settings", "Ctrl+Alt+P")) {
             is_settings_open = true;
@@ -96,13 +103,21 @@ void gearoenix::editor::ui::MenuWorld::update()
 
     if (ImGuiFileDialog::Instance()->Display(save_file_chooser)) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
-            const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Saving The World File...");
+            const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add(std::string("Running Process [") + file_chooser_title + "]");
             const std::shared_ptr<platform::stream::Stream> stream(platform::stream::Local::open(
-                manager.get_platform_application(), ImGuiFileDialog::Instance()->GetFilePathName(), true));
-            core::ecs::World::get()->write(
-                stream, core::job::EndCaller([this, progress_bar_id] {
-                    manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
-                }));
+                manager.get_platform_application(), ImGuiFileDialog::Instance()->GetFilePathName(), !is_file_chooser_open));
+            if (is_file_chooser_open) {
+                core::ecs::World::get()->read(
+                    stream, core::job::EndCaller([this, progress_bar_id] {
+                        manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
+                    }));
+
+            } else {
+                core::ecs::World::get()->write(
+                    stream, core::job::EndCaller([this, progress_bar_id] {
+                        manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
+                    }));
+            }
         }
         ImGuiFileDialog::Instance()->Close();
     }

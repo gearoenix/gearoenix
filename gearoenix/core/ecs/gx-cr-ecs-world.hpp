@@ -15,11 +15,16 @@ namespace gearoenix::core::ecs {
 ///
 /// Main focus of this struct is performance of systems and memory usage
 struct World final {
+    typedef std::function<bool()> resolver_t;
+
 private:
     boost::container::flat_map<Archetype::id_t, std::unique_ptr<Archetype>> archetypes;
     // id -> (archetype, index)
     boost::container::flat_map<entity_id_t, Entity> entities;
     boost::container::flat_map<std::string, entity_id_t> name_to_entity_id;
+
+    std::mutex resolvers_lock;
+    std::vector<resolver_t> resolvers;
 
     struct Action final {
         struct CreateEntity final {
@@ -47,6 +52,7 @@ private:
     std::mutex delayed_actions_lock;
     std::vector<Action> delayed_actions;
 
+    void read_existing_entity(entity_id_t, std::shared_ptr<platform::stream::Stream>&&, job::EndCaller<>&&);
     void read_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback);
     void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback) const;
 
@@ -199,5 +205,6 @@ public:
 
     void read(const std::shared_ptr<platform::stream::Stream>& stream, job::EndCaller<>&& end_callback);
     void write(const std::shared_ptr<platform::stream::Stream>& stream, job::EndCaller<>&& end_callback) const;
+    void resolve(resolver_t&& r);
 };
 }

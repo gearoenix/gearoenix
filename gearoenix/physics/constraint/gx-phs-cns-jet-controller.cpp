@@ -1,11 +1,34 @@
 #include "gx-phs-cns-jet-controller.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/event/gx-cr-ev-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include "../gx-phs-transformation.hpp"
 #include <imgui/imgui.h>
+
+void gearoenix::physics::constraint::JetController::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&&) const
+{
+    s->write_fail_debug(movement_speed);
+    s->write_fail_debug(rotation_speed);
+    s->write_fail_debug(transformation->get_entity_id());
+}
+
+void gearoenix::physics::constraint::JetController::update_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& e)
+{
+    s->read(movement_speed);
+    s->read(rotation_speed);
+    const auto transform_id = s->read<core::ecs::entity_id_t>();
+    core::ecs::World::get()->resolve([this, self = component_self.lock(), transform_id, e = std::move(e)] {
+        (void)self;
+        (void)e;
+        transformation = core::ecs::World::get()->get_component_shared_ptr<Transformation>(transform_id);
+        return transformation == nullptr;
+    });
+}
 
 gearoenix::core::event::Listener::Response gearoenix::physics::constraint::JetController::on_event(const core::event::Data& d)
 {
@@ -90,7 +113,6 @@ gearoenix::physics::constraint::JetController::JetController(
     const core::ecs::entity_id_t entity_id)
     : Constraint(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , transformation(std::move(trn))
-    , e(e)
 {
     auto* const event_engine = e.get_platform_application().get_base().get_event_engine();
     event_engine->add_listener(core::event::Id::GestureDrag2D, this);
@@ -102,7 +124,8 @@ gearoenix::physics::constraint::JetController::JetController(
 
 gearoenix::physics::constraint::JetController::~JetController()
 {
-    auto* const event_engine = e.get_platform_application().get_base().get_event_engine();
+    auto* const engine = render::engine::Engine::get();
+    auto* const event_engine = engine->get_platform_application().get_base().get_event_engine();
     event_engine->remove_listener(core::event::Id::GestureDrag2D, 0.0f, this);
     event_engine->remove_listener(core::event::Id::GestureScale, 0.0f, this);
     event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
@@ -112,8 +135,8 @@ gearoenix::physics::constraint::JetController::~JetController()
 
 void gearoenix::physics::constraint::JetController::update()
 {
-
-    if (e.get_gizmo_manager()->is_processing_inputs()) {
+    auto* const engine = render::engine::Engine::get();
+    if (engine->get_gizmo_manager()->is_processing_inputs()) {
         clear_transforms();
         return;
     }
@@ -124,7 +147,7 @@ void gearoenix::physics::constraint::JetController::update()
         return;
     }
 
-    const auto delta_time = e.get_delta_time();
+    const auto delta_time = engine->get_delta_time();
     if (0.0 != rotate_x) {
         transformation->local_inner_x_rotate(rotate_x);
     }

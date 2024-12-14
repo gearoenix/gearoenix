@@ -85,22 +85,15 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             self->e.get_texture_manager()->create_target(
                 self->name + "-environment-target" + name_ext,
                 std::vector {
-                    texture::Attachment {
-                        .var = texture::AttachmentCube {
-                            .txt = self->environment,
-                            .face = face.face,
-                        } },
-                    texture::Attachment { .var = texture::Attachment2D {
-                                              .txt = self->environment_depth,
-                                          } },
-                },
+                    texture::Attachment(texture::AttachmentCube(std::shared_ptr(self->environment), face.face)),
+                    texture::Attachment(texture::Attachment2D(std::shared_ptr(self->environment_depth))) },
                 core::job::EndCallerShared<texture::Target>([main_end_callback, self, face_index, cam](std::shared_ptr<texture::Target>&& t) -> void {
                     self->environment_targets[face_index] = std::move(t);
                     cam->set_customised_target(std::shared_ptr(self->environment_targets[face_index]));
                 }));
             cam->set_near(face.near);
             cam->set_far(face.far);
-            cam->set_projection_data(camera::PerspectiveProjectionData { .field_of_view_y = static_cast<float>(std::numbers::pi * 0.5) });
+            cam->set_projection_data(camera::ProjectionData::construct_perspective(static_cast<float>(std::numbers::pi * 0.5)));
             cam->set_usage(camera::Camera::Usage::ReflectionProbe);
             cam->set_parent_entity_id(builder->get_id());
             cam->set_enabled(false);
@@ -111,12 +104,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             transform->set_local_position(self->receive_box.get_center());
             self->e.get_texture_manager()->create_target(
                 self->name + "-irradiance-target" + name_ext,
-                std::vector {
-                    texture::Attachment {
-                        .var = texture::AttachmentCube {
-                            .txt = self->irradiance,
-                            .face = face.face,
-                        } } },
+                std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(self->irradiance), face.face)) },
                 core::job::EndCallerShared<texture::Target>([main_end_callback, self, face_index, cam](std::shared_ptr<texture::Target>&& t) {
                     self->irradiance_targets[face_index] = std::move(t);
                 }));
@@ -124,13 +112,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             for (std::uint64_t mip_index = 0; mip_index < self->roughnesses.size(); ++mip_index) {
                 self->e.get_texture_manager()->create_target(
                     self->name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
-                    std::vector {
-                        texture::Attachment {
-                            .mipmap_level = static_cast<std::uint8_t>(mip_index),
-                            .var = texture::AttachmentCube {
-                                .txt = self->radiance,
-                                .face = face.face,
-                            } } },
+                    std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(self->radiance), face.face), static_cast<std::uint8_t>(mip_index)) },
                     core::job::EndCallerShared<texture::Target>([main_end_callback, self, face_index, mip_index, cam](std::shared_ptr<texture::Target>&& t) {
                         self->radiance_targets[face_index][mip_index] = std::move(t);
                     }));

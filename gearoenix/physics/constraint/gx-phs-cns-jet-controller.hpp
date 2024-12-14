@@ -21,7 +21,6 @@ struct JetController final : core::event::Listener, Constraint {
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
 
     std::shared_ptr<Transformation> transformation;
-    render::engine::Engine& e;
     double rotate_x = 0.0;
     double rotate_z = 0.0;
     double move_forward_accumulated = 0.0;
@@ -33,6 +32,8 @@ struct JetController final : core::event::Listener, Constraint {
     bool rotate_right = false;
     bool rotate = false;
 
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 
 public:

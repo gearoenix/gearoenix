@@ -1,6 +1,10 @@
 #pragma once
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 
+namespace gearoenix::platform::stream {
+struct Stream;
+}
+
 namespace gearoenix::render::camera {
 struct Exposure final {
     GX_GET_VAL_PRV(bool, enabled, true);
@@ -24,5 +28,7 @@ public:
     void enable();
     void disable();
     void show_debug_gui();
+    void write(platform::stream::Stream& s) const;
+    void read(platform::stream::Stream& s);
 };
 }

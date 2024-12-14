@@ -100,6 +100,9 @@ public:
         std::string&& name,
         std::vector<Attachment>&& attachments,
         core::job::EndCallerShared<Target>&& c);
+    void create_target(
+        std::shared_ptr<platform::stream::Stream>&& stream,
+        core::job::EndCallerShared<Target>&& c);
     [[nodiscard]] constexpr static float geometry_smith(
         const math::Vec3<float>& n,
         const math::Vec3<float>& v,

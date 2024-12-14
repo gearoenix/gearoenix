@@ -49,7 +49,6 @@ struct Camera : core::ecs::Component {
         Main = 23,
     };
 
-    engine::Engine& e;
     GX_GET_CREF_PRT(math::Mat4x4<float>, view);
     GX_GET_CREF_PRT(math::Mat4x4<float>, projection);
     GX_GET_CREF_PRT(math::Mat4x4<float>, view_projection);
@@ -62,21 +61,19 @@ struct Camera : core::ecs::Component {
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);
     GX_GET_REF_PRT(ColourTuning, colour_tuning);
-    GX_GET_VAL_PRT(ProjectionData, projection_data, PerspectiveProjectionData {});
+    GX_GET_CREF_PRT(ProjectionData, projection_data);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
     GX_GETSET_VAL_PRT(Usage, usage, Usage::Main);
     GX_GET_VAL_PRT(bool, debug_enabled, false);
     GX_GET_REFC_PRT(math::Vec4<float>, debug_colour);
-    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh);
+    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh); // TODO: remove this, Frustum collider will have gizmo
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
     GX_GET_CREF_PRT(Exposure, exposure);
     GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
-    GX_GET_CREF_PRV(std::weak_ptr<Camera>, camera_self);
-    GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, transform);
+    GX_GET_CREF_PRT(std::weak_ptr<Camera>, camera_self);
+    GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
 
-protected:
     Camera(
-        engine::Engine& e,
         core::ecs::component_index_t final_type,
         const std::string& name,
         Target&& target,
@@ -84,6 +81,9 @@ protected:
         core::ecs::entity_id_t entity_id);
 
     void set_camera_self(const std::shared_ptr<Camera>& camera_self);
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+    void show_debug_gui() override;
 
 public:
     ~Camera() override;
@@ -104,7 +104,6 @@ public:
     void update_projection();
     void set_near(float);
     void set_far(float);
-    void show_debug_gui() override;
     void enable_debug_mesh(core::job::EndCaller<>&& end);
     void disable_debug_mesh();
     [[nodiscard]] math::Ray3<double> generate_ray(const math::Vec2<double>& normalised_point) const;

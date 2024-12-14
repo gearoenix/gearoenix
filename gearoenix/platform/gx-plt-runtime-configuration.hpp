@@ -24,6 +24,9 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true);
     GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true);
 
+    void write_in_io_context(std::shared_ptr<stream::Stream>&& stream, core::job::EndCaller<>&& end_callback) const override;
+    void update_in_io_context(std::shared_ptr<stream::Stream>&&, core::job::EndCaller<>&&) override;
+
 public:
     explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;

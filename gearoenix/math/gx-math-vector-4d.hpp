@@ -210,12 +210,20 @@ struct Vec4 final {
         *this /= length();
     }
 
-    void read(platform::stream::Stream& f)
+    void write(platform::stream::Stream& s) const
     {
-        x = static_cast<Element>(f.read<float>());
-        y = static_cast<Element>(f.read<float>());
-        z = static_cast<Element>(f.read<float>());
-        w = static_cast<Element>(f.read<float>());
+        GX_ASSERT(sizeof(x) == s.write(x));
+        GX_ASSERT(sizeof(y) == s.write(y));
+        GX_ASSERT(sizeof(z) == s.write(z));
+        GX_ASSERT(sizeof(w) == s.write(w));
+    }
+
+    void read(platform::stream::Stream& s)
+    {
+        x = s.read<Element>();
+        y = s.read<Element>();
+        z = s.read<Element>();
+        w = s.read<Element>();
     }
 
     [[nodiscard]] constexpr const Element* data() const

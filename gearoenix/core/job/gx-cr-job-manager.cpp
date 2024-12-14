@@ -50,6 +50,9 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
             }
             data->function_loader.unload();
             std::function<void()> task;
+            if (tasks.empty()) {
+                continue;
+            }
             {
                 const std::lock_guard _lg(tasks_lock);
                 if (tasks.empty()) {

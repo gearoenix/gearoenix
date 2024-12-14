@@ -26,6 +26,7 @@ struct EntityBuilder final {
     GX_GET_CREF_PRV(component_index_set_t, all_types);
     components_t all_types_to_components;
     job::EndCaller<> end_caller;
+    std::mutex components_lock; // for add and deletion
 
     EntityBuilder(entity_id_t, std::string&& name, job::EndCaller<>&& end_caller);
 

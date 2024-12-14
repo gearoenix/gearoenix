@@ -6,7 +6,6 @@
 #include <memory>
 #include <optional>
 #include <type_traits>
-#include <vector>
 
 #if GX_DEBUG_MODE
 #define GX_END_CALLER_CATCH_CALLER_LOCATION true
@@ -94,12 +93,14 @@ public:
     EndCaller& operator=(const EndCaller& o)
     {
         caller = o.caller;
+        GX_ASSERT_D(nullptr != caller);
         return *this;
     }
 
     EndCaller& operator=(EndCaller&& o) noexcept
     {
         caller = std::move(o.caller);
+        GX_ASSERT_D(nullptr != caller);
         return *this;
     }
 

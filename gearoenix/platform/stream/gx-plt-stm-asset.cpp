@@ -19,7 +19,7 @@ gearoenix::platform::stream::Asset::~Asset() = default;
 #endif
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(
-    const platform::Application& platform_application, const std::string& name)
+    const Application& platform_application, const std::string& name)
 {
     const std::string file_name = "assets/" + name;
     auto* const asset = new Asset();
@@ -52,34 +52,31 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
     return asset;
 }
 
-std::uint64_t gearoenix::platform::stream::Asset::read(void* data, const std::uint64_t length)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::read(void* data, const stream_size_t length)
 {
 #ifdef GX_PLATFORM_ANDROID
-    const auto result = static_cast<std::uint64_t>(AAsset_read(file, data, static_cast<std::uint64_t>(length)));
+    const auto result = static_cast<stream_size_t>(AAsset_read(file, data, static_cast<stream_size_t>(length)));
 #elif defined(GX_USE_STD_FILE)
     file.read(static_cast<char*>(data), static_cast<std::streamsize>(length));
-    auto result = static_cast<std::uint64_t>(file.gcount());
+    auto result = static_cast<stream_size_t>(file.gcount());
 #else
 #error "Unexpected file interface"
 #endif
-#ifdef GX_DEBUG_MODE
-    if (result != length)
-        GX_UNEXPECTED;
-#endif
+    GX_ASSERT_D(result == length);
     return result;
 }
 
-std::uint64_t gearoenix::platform::stream::Asset::write(const void*, std::uint64_t)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::write(const void*, stream_size_t)
 {
-    GX_UNEXPECTED;
+    GX_UNEXPECTED; // Asset is only a readable stream
 }
 
 void gearoenix::platform::stream::Asset::flush()
 {
-    GX_UNEXPECTED; // Asset is only a reader stream
+    GX_UNEXPECTED; // Asset is only a readable stream
 }
 
-void gearoenix::platform::stream::Asset::seek(std::uint64_t offset)
+void gearoenix::platform::stream::Asset::seek(const stream_size_t offset)
 {
 #if defined(GX_USE_STD_FILE)
     file.seekg(static_cast<std::streamoff>(offset), std::ios::beg);
@@ -90,27 +87,27 @@ void gearoenix::platform::stream::Asset::seek(std::uint64_t offset)
 #endif
 }
 
-std::uint64_t gearoenix::platform::stream::Asset::tell()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::tell()
 {
 #if defined(GX_USE_STD_FILE)
-    return (std::uint64_t)file.tellg();
+    return static_cast<stream_size_t>(file.tellg());
 #elif defined(GX_PLATFORM_ANDROID)
-    return (std::uint64_t)AAsset_seek(file, 0, SEEK_CUR);
+    return (stream_size_t)AAsset_seek(file, 0, SEEK_CUR);
 #else
 #error "Unexpected file interface"
 #endif
 }
 
-std::uint64_t gearoenix::platform::stream::Asset::size()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::size()
 {
 #ifdef GX_USE_STD_FILE
     const auto c = file.tellg();
     file.seekg(0, std::ios::end);
-    const auto s = static_cast<std::uint64_t>(file.tellg());
+    const auto s = static_cast<stream_size_t>(file.tellg());
     file.seekg(c);
     return s;
 #elif defined(GX_PLATFORM_ANDROID)
-    return static_cast<std::uint64_t>(AAsset_getLength64(file));
+    return static_cast<stream_size_t>(AAsset_getLength64(file));
 #else
 #error "Unexpected file interface"
 #endif

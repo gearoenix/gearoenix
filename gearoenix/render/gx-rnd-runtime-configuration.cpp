@@ -2,17 +2,48 @@
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/gx-cr-string.hpp"
 #include "../math/gx-math-numeric.hpp"
+#include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "engine/gx-rnd-eng-engine.hpp"
 #include "imgui/gx-rnd-imgui-input-uint.hpp"
-#include "imgui/gx-rnd-imgui-observer.hpp"
 
 namespace {
 constexpr auto entity_name = "gearoenix-render-runtime-configuration";
 }
 
+void gearoenix::render::RuntimeConfiguration::write_in_io_context(
+    std::shared_ptr<platform::stream::Stream>&& stream,
+    core::job::EndCaller<>&&) const
+{
+    stream->write_fail_debug(shadow_cascades_count);
+    stream->write_fail_debug(runtime_reflection_environment_resolution);
+    stream->write_fail_debug(runtime_reflection_irradiance_resolution);
+    stream->write_fail_debug(maximum_cpu_render_memory_size);
+    stream->write_fail_debug(maximum_gpu_render_memory_size);
+    stream->write_fail_debug(maximum_gpu_buffer_size);
+    stream->write_fail_debug(maximum_dynamic_buffer_size);
+    stream->write_fail_debug(brdflut_resolution);
+    stream->write_fail_debug(runtime_reflection_radiance_resolution);
+    stream->write_fail_debug(runtime_reflection_radiance_levels);
+    runtime_resolution.write(*stream);
+}
+
+void gearoenix::render::RuntimeConfiguration::update_in_io_context(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&&)
+{
+    s->read(shadow_cascades_count);
+    s->read(runtime_reflection_environment_resolution);
+    s->read(runtime_reflection_irradiance_resolution);
+    s->read(maximum_cpu_render_memory_size);
+    s->read(maximum_gpu_render_memory_size);
+    s->read(maximum_gpu_buffer_size);
+    s->read(maximum_dynamic_buffer_size);
+    s->read(brdflut_resolution);
+    s->read(runtime_reflection_radiance_resolution);
+    s->read(runtime_reflection_radiance_levels);
+    runtime_resolution.read(*s);
+}
+
 gearoenix::render::RuntimeConfiguration::RuntimeConfiguration(const core::ecs::entity_id_t id)
     : Component(core::ecs::ComponentType::create_index(this), entity_name, id)
-    , runtime_resolution(FixedResolution {})
 {
     set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution);
 }
@@ -97,7 +128,7 @@ void gearoenix::render::RuntimeConfiguration::show_debug_gui()
 
     ImGui::Text("Runtime Resolution: ");
     ImGui::TableNextColumn();
-    GX_IMGUI_OBSERVER(runtime_resolution, imgui_show);
+    (void)runtime_resolution.show_debug_gui();
 
     ImGui::EndTable();
 

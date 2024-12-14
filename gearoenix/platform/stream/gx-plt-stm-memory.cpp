@@ -6,42 +6,44 @@ gearoenix::platform::stream::Memory::Memory() = default;
 
 gearoenix::platform::stream::Memory::~Memory() = default;
 
-std::uint64_t gearoenix::platform::stream::Memory::read(void* d, const std::uint64_t length)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::read(void* d, const stream_size_t length)
 {
     const auto sz = length + index;
     const auto result = sz > mem_data.size() ? mem_data.size() - index : length;
     if (0 == result) {
         return 0;
     }
-    std::memcpy(d, &(mem_data[index]), result);
+    std::memcpy(d, &mem_data[index], result);
     index += result;
     return result;
 }
 
-std::uint64_t gearoenix::platform::stream::Memory::write(const void* d, const std::uint64_t length)
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::write(const void* d, const stream_size_t length)
 {
     if (0 == length) {
         return 0;
     }
-    const auto end = length + index;
-    for (auto i = index; i < end; ++i) {
+    auto end = length + index;
+    end = end > mem_data.size() ? end - mem_data.size() : 0;
+    for (auto i = 0; i < end; ++i) {
         mem_data.push_back(0);
     }
-    std::memcpy(&(mem_data[index]), d, length);
+    std::memcpy(&mem_data[index], d, length);
+    index += length;
     return length;
 }
 
-void gearoenix::platform::stream::Memory::seek(const std::uint64_t offset)
+void gearoenix::platform::stream::Memory::seek(const stream_size_t offset)
 {
     index = offset;
 }
 
-std::uint64_t gearoenix::platform::stream::Memory::tell()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::tell()
 {
     return index;
 }
 
-std::uint64_t gearoenix::platform::stream::Memory::size()
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::size()
 {
     return mem_data.size();
 }

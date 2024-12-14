@@ -13,29 +13,32 @@ struct Application;
 namespace gearoenix::platform::stream {
 struct Path;
 struct Stream {
+    typedef std::uint64_t stream_size_t;
     GX_GETSET_VAL_PRT(bool, endian_compatibility, true);
 
     Stream() = default;
-    void built_in_type_read(void* data, std::uint64_t length);
+    void built_in_type_read(void* data, stream_size_t length);
 
 public:
     virtual ~Stream() = default;
     [[nodiscard]] static std::shared_ptr<Stream> open(const Path& path, Application& app);
-    [[nodiscard]] virtual std::uint64_t read(void* data, std::uint64_t length) = 0;
-    [[nodiscard]] virtual std::uint64_t write(const void* data, std::uint64_t length) = 0;
-    virtual void seek(std::uint64_t offset) = 0;
-    [[nodiscard]] virtual std::uint64_t tell() = 0;
-    [[nodiscard]] virtual std::uint64_t size() = 0;
+    [[nodiscard]] virtual stream_size_t read(void* data, stream_size_t length) = 0;
+    [[nodiscard]] virtual stream_size_t write(const void* data, stream_size_t length) = 0;
+    virtual void seek(stream_size_t offset) = 0;
+    [[nodiscard]] virtual stream_size_t tell() = 0;
+    [[nodiscard]] virtual stream_size_t size() = 0;
     virtual void flush() = 0;
     [[nodiscard]] virtual std::vector<std::uint8_t> get_file_content();
 
     void read(std::string& s);
+
+    /// \note don't forget to seek to zero if you are calling this function with a newly built stream.
     void read(Stream& s);
 
     template <typename T>
     void read(std::vector<T>& data)
     {
-        const auto c = read<std::uint64_t>();
+        const auto c = read<stream_size_t>();
         data.resize(static_cast<std::uintptr_t>(c));
         if constexpr (sizeof(T) == 1) {
             GX_ASSERT(data.size() == read(data.data(), data.size()));
@@ -70,7 +73,7 @@ public:
     void write(Stream& s);
 
     template <typename T>
-    [[nodiscard]] std::uint64_t write(const T& d)
+    [[nodiscard]] stream_size_t write(const T& d)
     {
         return write(&d, sizeof(T));
     }
@@ -78,7 +81,7 @@ public:
     template <typename T>
     void write(const std::vector<T>& data)
     {
-        const auto c = static_cast<std::uint64_t>(data.size());
+        const auto c = static_cast<stream_size_t>(data.size());
         GX_ASSERT(sizeof(c) == write(c));
         if constexpr (sizeof(T) == 1) {
             GX_ASSERT(data.size() == write(data.data(), data.size()));

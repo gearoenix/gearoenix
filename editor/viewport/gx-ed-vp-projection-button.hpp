@@ -13,7 +13,7 @@ struct Application;
 namespace gearoenix::editor::viewport {
 struct ProjectionButton final : Button {
     Application& app;
-    render::camera::ProjectionData previous_projection_data = render::camera::OrthographicProjectionData {};
+    render::camera::ProjectionData previous_projection_data = render::camera::ProjectionData::construct_orthographic();
 
     explicit ProjectionButton(Application& app);
     ~ProjectionButton() override;

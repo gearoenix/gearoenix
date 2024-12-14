@@ -24,6 +24,7 @@ struct Component {
     GX_GETSET_VAL_PRT(entity_id_t, entity_id, invalid_entity_id);
 
     virtual void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback) const;
+    virtual void update_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback);
 
 public:
     Component(component_index_t final_type_index, std::string&& name, entity_id_t entity_id);
@@ -35,6 +36,8 @@ public:
 
     virtual void show_debug_gui();
     void write(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback) const;
+    void update(std::shared_ptr<platform::stream::Stream>&& s, job::EndCaller<>&& e);
     static void read(std::shared_ptr<platform::stream::Stream>&& s, job::EndCallerShared<Component>&& e);
+    [[nodiscard]] static component_index_t read_final_type_index(platform::stream::Stream&);
 };
 }

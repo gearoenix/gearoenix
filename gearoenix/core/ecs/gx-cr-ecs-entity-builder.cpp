@@ -4,6 +4,10 @@
 #include "gx-cr-ecs-world.hpp"
 #include <imgui.h>
 
+namespace {
+const std::shared_ptr<gearoenix::core::ecs::Component> null_comp {};
+}
+
 gearoenix::core::ecs::EntityBuilder::EntityBuilder(const entity_id_t id, std::string&& name, job::EndCaller<>&& end_caller)
     : id(id)
     , name(std::move(name))
@@ -39,10 +43,11 @@ void gearoenix::core::ecs::EntityBuilder::construct(
         std::string name;
         s->read(name);
         e.set_return(std::shared_ptr<EntityBuilder>(new EntityBuilder(id, std::move(name), job::EndCaller([] { }))));
-        const auto count = s->read<std::uint64_t>();
+        const auto count = s->read<std::uint32_t>();
         for (auto i = decltype(count) { 0 }; i < count; ++i) {
             std::shared_ptr<platform::stream::Stream> ms = std::make_shared<platform::stream::Memory>();
             s->read(*ms);
+            ms->seek(0);
             job::send_job_to_pool([ms = std::move(ms), e]() mutable {
                 Component::read(std::move(ms), job::EndCallerShared<Component>([e = std::move(e)](std::shared_ptr<Component>&& c) {
                     e.get_return()->add_component(std::move(c));
@@ -57,13 +62,14 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
 {
     const auto search = all_types_to_components.find(component_type);
     if (all_types_to_components.end() == search) {
-        return {};
+        return null_comp;
     }
     return search->second;
 }
 
 void gearoenix::core::ecs::EntityBuilder::add_component(std::shared_ptr<Component>&& component)
 {
+    std::lock_guard _lg(components_lock);
     const auto fti = component->get_final_type_index();
     auto c = std::make_pair(fti, std::move(component));
     if (all_types.contains(fti)) {

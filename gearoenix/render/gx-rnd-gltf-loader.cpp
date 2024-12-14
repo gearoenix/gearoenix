@@ -692,15 +692,13 @@ struct DataLoader final {
                 if ("perspective" == cmr.type) {
                     GX_ASSERT(cmr.perspective.znear < cmr.perspective.zfar);
                     GX_ASSERT(cmr.perspective.znear > 0.0);
-                    rnd_cmr.set_projection_data(camera::PerspectiveProjectionData {
-                        .field_of_view_y = static_cast<float>(cmr.perspective.yfov) });
+                    rnd_cmr.set_projection_data(camera::ProjectionData::construct_perspective(static_cast<float>(cmr.perspective.yfov)));
                     rnd_cmr.set_far(static_cast<float>(cmr.perspective.zfar));
                     rnd_cmr.set_near(static_cast<float>(cmr.perspective.znear));
                 } else {
                     GX_ASSERT(cmr.orthographic.xmag == cmr.orthographic.ymag);
                     GX_ASSERT(cmr.orthographic.xmag > 0.0);
-                    rnd_cmr.set_projection_data(camera::OrthographicProjectionData {
-                        .scale = static_cast<float>(cmr.orthographic.xmag) });
+                    rnd_cmr.set_projection_data(camera::ProjectionData::construct_orthographic(static_cast<float>(cmr.orthographic.xmag)));
                     rnd_cmr.set_far(static_cast<float>(cmr.orthographic.zfar));
                     rnd_cmr.set_near(static_cast<float>(cmr.orthographic.znear));
                 }

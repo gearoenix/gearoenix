@@ -2,13 +2,21 @@
 #include <boost/container/flat_map.hpp>
 #include <functional>
 
+namespace gearoenix::platform::stream {
+struct Stream;
+}
+
 namespace gearoenix::core {
 template <typename T>
 struct Observed final {
+    typedef T type;
+    typedef std::function<bool(const type&)> listener_t;
+    typedef std::uint32_t id_t;
+
 private:
-    T value;
-    std::uint32_t last_id = 0;
-    boost::container::flat_map<std::uint32_t, std::function<bool(const T&)>> listeners;
+    type value;
+    id_t last_id = 0;
+    boost::container::flat_map<id_t, listener_t> listeners;
 
     void notify()
     {
@@ -30,38 +38,66 @@ public:
 
     ~Observed()
     {
-        if (listeners.empty())
+        if (listeners.empty()) {
             return;
+        }
         std::terminate();
     }
 
     // true means, keep the observer alive
-    [[nodiscard]] std::uint32_t add_observer(std::function<bool(const T&)>&& f)
+    [[nodiscard]] id_t add_observer(listener_t&& f)
     {
         const auto id = ++last_id;
         listeners.emplace(id, std::move(f));
         return id;
     }
 
-    void remove_observer(const std::uint32_t id)
+    void remove_observer(const id_t id)
     {
-        if (id == 0)
+        if (id == 0) {
             return;
+        }
         listeners.erase(id);
     }
 
-    void set(const T& new_value)
+    void set(const type& new_value)
     {
         value = new_value;
         notify();
     }
 
-    void set(T&& new_value)
+    void set(type&& new_value)
     {
         value = std::move(new_value);
         notify();
     }
 
-    [[nodiscard]] const T& get() const { return value; }
+    Observed& operator=(const type& new_value)
+    {
+        set(new_value);
+        return *this;
+    }
+
+    [[nodiscard]] const type& get() const { return value; }
+
+    void write(platform::stream::Stream& stream) const
+    {
+        value.write(stream);
+    }
+
+    void read(platform::stream::Stream& stream)
+    {
+        value.read(stream);
+        notify();
+    }
+
+    [[nodiscard]] bool show_debug_gui()
+    {
+        if (value.show_debug_gui()) {
+            notify();
+            return true;
+        }
+        return false;
+    }
 };
 }

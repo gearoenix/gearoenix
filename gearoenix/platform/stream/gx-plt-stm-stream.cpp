@@ -3,14 +3,14 @@
 #include "gx-plt-stm-local.hpp"
 #include "gx-plt-stm-path.hpp"
 
-void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const std::uint64_t length)
+void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, const stream_size_t length)
 {
     (void)read(data, length);
     if (endian_compatibility) {
         return;
     }
     auto* const c_data = static_cast<std::uint8_t*>(data);
-    for (std::uint64_t i = 0, j = length - 1; i < j; ++i, --j) {
+    for (stream_size_t i = 0, j = length - 1; i < j; ++i, --j) {
         const std::uint8_t tmp = c_data[i];
         c_data[i] = c_data[j];
         c_data[j] = tmp;
@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream
 
 void gearoenix::platform::stream::Stream::read(std::string& s)
 {
-    std::uint64_t sz = 0;
+    stream_size_t sz = 0;
     read(sz);
     s.resize(sz);
     GX_ASSERT(s.size() == read(s.data(), s.size()));
@@ -58,7 +58,7 @@ void gearoenix::platform::stream::Stream::write(Stream& s)
 
 bool gearoenix::platform::stream::Stream::write(const std::string& s)
 {
-    if (sizeof(std::uint64_t) != write(static_cast<std::uint64_t>(s.size()))) {
+    if (sizeof(stream_size_t) != write(static_cast<stream_size_t>(s.size()))) {
         return false;
     }
     if (s.size() != write(s.data(), s.size())) {

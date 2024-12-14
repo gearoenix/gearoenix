@@ -97,9 +97,9 @@ void gearoenix::render::scene::Splash::initialise(const core::job::EndCaller<>& 
             core::job::EndCallerShared<camera::Builder>([scene_builder](std::shared_ptr<camera::Builder>&& cb) {
                 cb->get_transformation().set_local_position({ 0.0, 0.0, 5.0 });
                 auto& camera = cb->get_camera();
-                camera.set_projection_data(camera::OrthographicProjectionData { .scale = 1.0 });
+                camera.set_projection_data(camera::ProjectionData::construct_orthographic(1.0f));
                 camera.disable_bloom();
-                camera.get_colour_tuning() = camera::RawColour {};
+                camera.get_colour_tuning() = camera::ColourTuning::Unchanged {};
                 scene_builder->add(std::move(cb));
             }),
             core::job::EndCaller(entity_callback));

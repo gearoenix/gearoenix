@@ -139,13 +139,13 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { .txt = gbuffers_albedo_metallic_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_position_depth_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { .txt = gbuffers_normal_ao_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { .txt = gbuffers_emission_roughness_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_irradiance_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { .txt = gbuffers_radiance_texture };
-    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { .txt = gbuffers_depth_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC].var = render::texture::Attachment2D { gbuffers_albedo_metallic_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH].var = render::texture::Attachment2D { gbuffers_position_depth_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].var = render::texture::Attachment2D { gbuffers_normal_ao_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS].var = render::texture::Attachment2D { gbuffers_emission_roughness_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE].var = render::texture::Attachment2D { gbuffers_irradiance_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE].var = render::texture::Attachment2D { gbuffers_radiance_texture };
+    attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_DEPTH].var = render::texture::Attachment2D { gbuffers_depth_texture };
     e.get_texture_manager()->create_target(
         "gearoenix-gbuffers", std::move(attachments),
         core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) { gbuffers_target = std::dynamic_pointer_cast<Target>(std::move(t)); }));
@@ -177,7 +177,7 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(1);
-    attachments[0].var = render::texture::Attachment2D { .txt = ssao_resolve_texture };
+    attachments[0].var = render::texture::Attachment2D { std::shared_ptr(ssao_resolve_texture) };
     e.get_texture_manager()->create_target(
         "gearoenix-ssao", std::move(attachments),
         core::job::EndCallerShared<render::texture::Target>([this](std::shared_ptr<render::texture::Target>&& t) { ssao_resolve_target = std::dynamic_pointer_cast<Target>(std::move(t)); }));
@@ -187,7 +187,7 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
 
 void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 {
-    constexpr std::array<float, 6> screen_vertices = {
+    constexpr std::array screen_vertices = {
         -1.0f, 3.0f, // 1
         -1.0f, -1.0f, // 2
         3.0f, -1.0f, // 3
@@ -1246,7 +1246,7 @@ void gearoenix::gl::submission::Manager::update()
 
 void gearoenix::gl::submission::Manager::window_resized()
 {
-    if (core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().get().index() == boost::mp11::mp_find<render::Resolution, render::FixedResolution>::value) {
+    if (core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().get().get_index() == render::Resolution::fixed_index) {
         return;
     }
     back_buffer_size_changed();

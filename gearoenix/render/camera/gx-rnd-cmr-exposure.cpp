@@ -2,6 +2,8 @@
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include <imgui.h>
 
+#include "../../platform/stream/gx-plt-stm-stream.hpp"
+
 void gearoenix::render::camera::Exposure::update()
 {
     // const auto ev100 = std::log2((aperture * aperture) / shutter_speed * 100.0f / sensitivity);
@@ -87,4 +89,27 @@ void gearoenix::render::camera::Exposure::show_debug_gui()
             ImGui::TreePop();
         }
     }
+}
+
+void gearoenix::render::camera::Exposure::write(platform::stream::Stream& s) const
+{
+    s.write_fail_debug(enabled);
+    if (!enabled) {
+        return;
+    }
+    s.write_fail_debug(aperture);
+    s.write_fail_debug(shutter_speed);
+    s.write_fail_debug(sensitivity);
+}
+
+void gearoenix::render::camera::Exposure::read(platform::stream::Stream& s)
+{
+    s.read(enabled);
+    if (!enabled) {
+        return;
+    }
+    s.read(aperture);
+    s.read(shutter_speed);
+    s.read(sensitivity);
+    update();
 }

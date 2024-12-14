@@ -24,13 +24,6 @@ struct Texture {
         const TextureInfo& info,
         engine::Engine& e);
 
-    static void write_image(
-        platform::stream::Stream& s,
-        const std::uint8_t* data,
-        std::uint32_t img_width,
-        std::uint32_t img_height,
-        TextureFormat format);
-
     static void write_gx3d_image(
         std::shared_ptr<platform::stream::Stream>&& s,
         std::vector<std::uint8_t>&& data,
@@ -39,9 +32,18 @@ struct Texture {
         TextureFormat format,
         core::job::EndCaller<>&& end);
 
+private:
+    static void write_image(
+        platform::stream::Stream& s,
+        const std::uint8_t* data,
+        std::uint32_t img_width,
+        std::uint32_t img_height,
+        TextureFormat format);
+
 public:
     virtual ~Texture();
-    virtual void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const;
+    virtual void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool include_content) const;
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const;
     [[nodiscard]] std::uint64_t get_mipmaps_count() const;
 
     [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(

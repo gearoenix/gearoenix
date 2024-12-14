@@ -175,6 +175,22 @@ struct Quat final {
         return os;
     }
 
+    void write(platform::stream::Stream& s) const
+    {
+        s.write_fail_debug(x);
+        s.write_fail_debug(y);
+        s.write_fail_debug(z);
+        s.write_fail_debug(w);
+    }
+
+    void read(platform::stream::Stream& s)
+    {
+        s.read(x);
+        s.read(y);
+        s.read(z);
+        s.read(w);
+    }
+
     [[nodiscard]] constexpr bool equal(const Quat& o, const Element tolerance = Numeric::epsilon<Element>) const
     {
         const auto a = (*this - o).abs();

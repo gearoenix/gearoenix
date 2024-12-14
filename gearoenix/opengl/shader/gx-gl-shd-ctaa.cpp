@@ -1,8 +1,7 @@
 #include "gx-gl-shd-ctaa.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include <boost/mp11/algorithm.hpp>
 
-constexpr static const char* const vertex_shader_src = "\
+constexpr static auto vertex_shader_src = "\
 #version 300 es\n\
 \n\
 precision highp float;\n\
@@ -19,8 +18,8 @@ void main() {\n\
 gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::uint32_t colour_tuning_index)
     : Shader(e)
 {
-    const bool is_gamma_correction_index = colour_tuning_index == boost::mp11::mp_find<render::camera::ColourTuning, render::camera::GammaCorrection>::value;
-    const bool is_colour_scale_index = colour_tuning_index == boost::mp11::mp_find<render::camera::ColourTuning, render::camera::Multiply>::value;
+    const bool is_gamma_correction_index = colour_tuning_index == render::camera::ColourTuning::gamma_correction_index;
+    const bool is_colour_scale_index = colour_tuning_index == render::camera::ColourTuning::multiply_index;
 
     set_vertex_shader(vertex_shader_src);
     std::stringstream fs;
@@ -118,8 +117,9 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::~ColourTuningAntiAliasing() = d
 
 void gearoenix::gl::shader::ColourTuningAntiAliasing::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(depth_texture);
@@ -127,12 +127,14 @@ void gearoenix::gl::shader::ColourTuningAntiAliasing::bind(uint& current_shader)
 
 void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::ColourTuning& colour_tuning)
 {
-    switch (colour_tuning.index()) {
-    case boost::mp11::mp_find<render::camera::ColourTuning, render::camera::GammaCorrection>::value:
-        set_gamma_exponent_data(reinterpret_cast<const float*>(&std::get<render::camera::GammaCorrection>(colour_tuning)));
+    switch (colour_tuning.get_index()) {
+    case render::camera::ColourTuning::gamma_correction_index:
+        set_gamma_exponent_data(colour_tuning.get_gamma_correction().gamma_exponent.data());
         break;
-    case boost::mp11::mp_find<render::camera::ColourTuning, render::camera::Multiply>::value:
-        set_colour_scale_data(reinterpret_cast<const float*>(&std::get<render::camera::Multiply>(colour_tuning).scale));
+    case render::camera::ColourTuning::multiply_index:
+        set_colour_scale_data(colour_tuning.get_multiply().scale.data());
+        break;
+    default:
         break;
     }
 }

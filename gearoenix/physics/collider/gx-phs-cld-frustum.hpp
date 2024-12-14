@@ -23,6 +23,9 @@ struct Frustum final : core::ecs::Component {
     GX_GET_CREF_PRV(math::Aabb3<double>, surrounding_box);
     GX_GET_CREF_PRV(math::Frustum<double>, frustum);
 
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+
 public:
     Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points, core::ecs::entity_id_t entity_id);
     /// For the arrangement of point go to the math::Frustum constructor
