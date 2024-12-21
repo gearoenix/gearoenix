@@ -93,7 +93,6 @@ public:
 struct ReflectionBuilder final : render::reflection::Builder {
 private:
     ReflectionBuilder(
-        Engine& e,
         const std::string& name,
         physics::Transformation* parent_transform,
         core::job::EndCaller<>&& end_callback);

@@ -79,11 +79,13 @@ public:
         return index == orthographic_index;
     }
 
-    [[nodiscard]] constexpr static ProjectionData construct_perspective(const float field_of_view_y = 0.8f) {
+    [[nodiscard]] constexpr static ProjectionData construct_perspective(const float field_of_view_y = 0.8f)
+    {
         return ProjectionData { Perspective { field_of_view_y } };
     }
 
-    [[nodiscard]] constexpr static ProjectionData construct_orthographic(const float scale = 1.0f) {
+    [[nodiscard]] constexpr static ProjectionData construct_orthographic(const float scale = 1.0f)
+    {
         return ProjectionData { Orthographic { scale } };
     }
 

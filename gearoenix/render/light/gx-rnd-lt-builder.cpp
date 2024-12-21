@@ -18,7 +18,7 @@ gearoenix::render::light::Builder::Builder(
 {
     auto& b = entity_builder->get_builder();
     b.add_component(core::ecs::construct_component<Directional>(name + "-directional-light", b.get_id()));
-    b.add_component(core::ecs::construct_component<physics::Transformation>(name + "-light-directional-transform", parent_transform, b.get_id(), &e));
+    b.add_component(core::ecs::construct_component<physics::Transformation>(name + "-light-directional-transform", parent_transform, b.get_id()));
 }
 
 gearoenix::render::light::Builder::Builder(
@@ -32,7 +32,7 @@ gearoenix::render::light::Builder::Builder(
 {
     auto& b = entity_builder->get_builder();
     b.add_component(core::ecs::construct_component<physics::Transformation>(
-        name + "-light-directional-shadow-caster-transform", parent_transform, b.get_id(), &e));
+        name + "-light-directional-shadow-caster-transform", parent_transform, b.get_id()));
 }
 
 gearoenix::render::light::Builder::~Builder() = default;

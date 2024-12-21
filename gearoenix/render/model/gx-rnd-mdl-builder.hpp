@@ -31,7 +31,6 @@ struct Builder {
     GX_GET_REFC_PRT(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
 
     Builder(
-        engine::Engine& e,
         const std::string& name,
         physics::Transformation* parent_transform,
         const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,

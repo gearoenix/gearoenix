@@ -35,7 +35,7 @@ gearoenix::gl::ModelBuilder::ModelBuilder(
     std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
     core::job::EndCaller<>&& end_caller,
     const bool is_transformable)
-    : Builder(e, name, parent_transform, meshes, std::move(end_caller))
+    : Builder(name, parent_transform, meshes, std::move(end_caller))
     , e(e)
 {
     entity_builder->get_builder().add_component(core::ecs::construct_component<Model>(

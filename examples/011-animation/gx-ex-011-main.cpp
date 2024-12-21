@@ -7,7 +7,7 @@
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
-#include <gearoenix/render/gx-rnd-gltf-loader.hpp>
+#include <gearoenix/render/gltf/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/reflection/gx-rnd-rfl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
@@ -63,7 +63,6 @@ GameApp::GameApp(GxPltApp& plt_app)
     : GxCoreApp(plt_app)
 {
     gearoenix::render::gltf::load(
-        render_engine,
         GxPath::create_asset("example-011.glb"),
         GxEndCallerT<std::vector<GxSceneBuilderPtr>>([this](auto&& scene_builders) {
             gltf_is_ready(scene_builders[0]);

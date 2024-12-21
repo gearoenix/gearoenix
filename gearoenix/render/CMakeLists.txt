@@ -29,6 +29,30 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gizmo/gx-rnd-gzm-drawer.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gizmo/gx-rnd-gzm-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gizmo/gx-rnd-gzm-manager.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-animation.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-animation.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-armature.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-armature.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-camera.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-camera.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-context.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-light.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-light.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-loader.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-material.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-material.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-mesh.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-node.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-skin.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-skin.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-texture.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-texture.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-tiny.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-transform.cpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-transform.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-name-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-selector.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-input-uint.hpp
@@ -138,8 +162,6 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/widget/gx-rnd-wdg-widget.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-build-configuration.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-gltf-loader.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-resolution.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-resolution.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/gx-rnd-runtime-configuration.cpp

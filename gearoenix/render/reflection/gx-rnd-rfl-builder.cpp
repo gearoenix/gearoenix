@@ -7,11 +7,11 @@
 #include "gx-rnd-rfl-runtime.hpp"
 
 gearoenix::render::reflection::Builder::Builder(
-    engine::Engine& e, std::string&& name,
+    std::string&& name,
     physics::Transformation* parent_transform,
     core::job::EndCaller<>&& end_callback)
     : entity_builder(std::make_shared<core::ecs::EntitySharedBuilder>(std::move(name), std::move(end_callback)))
-    , transformation(core::ecs::construct_component<physics::Transformation>(name + "-transform", parent_transform, entity_builder->get_id(), &e))
+    , transformation(core::ecs::construct_component<physics::Transformation>(name + "-transform", parent_transform, entity_builder->get_id()))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(transformation);

@@ -9,7 +9,6 @@
 #include "gx-rnd-mdl-model.hpp"
 
 gearoenix::render::model::Builder::Builder(
-    engine::Engine& e,
     const std::string& name,
     physics::Transformation* const parent_transform,
     const std::vector<std::shared_ptr<mesh::Mesh>>& bound_meshes,
@@ -22,7 +21,7 @@ gearoenix::render::model::Builder::Builder(
         box.put(m->get_buffer()->get_box());
     }
     builder.add_component(core::ecs::construct_component<physics::collider::Aabb3>(box, name + "-collider", builder.get_id()));
-    builder.add_component(core::ecs::construct_component<physics::Transformation>(name + "-transformation", parent_transform, builder.get_id(), &e));
+    builder.add_component(core::ecs::construct_component<physics::Transformation>(name + "-transformation", parent_transform, builder.get_id()));
 }
 
 gearoenix::render::model::Builder::~Builder() = default;

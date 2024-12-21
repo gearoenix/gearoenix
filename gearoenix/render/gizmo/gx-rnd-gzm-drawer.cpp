@@ -2,8 +2,8 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-gzm-manager.hpp"
 
-gearoenix::render::gizmo::Drawer::Drawer(engine::Engine* const e)
-    : gizmo_manager(e ? e->get_gizmo_manager() : nullptr)
+gearoenix::render::gizmo::Drawer::Drawer()
+    : gizmo_manager(engine::Engine::get() ? engine::Engine::get()->get_gizmo_manager() : nullptr)
 {
     if (gizmo_manager) {
         gizmo_manager->register_drawer(this);

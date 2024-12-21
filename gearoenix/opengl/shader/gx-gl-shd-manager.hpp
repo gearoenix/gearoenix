@@ -3,6 +3,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <boost/container/flat_map.hpp>
 #include <memory>
+#include <mutex>
 #include <typeindex>
 
 namespace gearoenix::gl {
@@ -15,6 +16,7 @@ struct Manager final {
     Engine& e;
 
 private:
+    std::mutex shaders_lock;
     /// TODO: use static-allocator in the core
     boost::container::flat_map<std::type_index, std::weak_ptr<ShaderCombination>> shaders;
 
@@ -25,6 +27,7 @@ public:
     [[nodiscard]] std::shared_ptr<SC> get()
     {
         const auto type_index = std::type_index(typeid(SC));
+        const std::lock_guard _lg(shaders_lock);
         if (auto search = shaders.find(type_index); shaders.end() != search) {
             if (auto s = search->second.lock()) {
                 return std::dynamic_pointer_cast<SC>(s);

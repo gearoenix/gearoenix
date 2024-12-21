@@ -100,11 +100,10 @@ void gearoenix::gl::RuntimeReflection::construct(
 gearoenix::gl::RuntimeReflection::~RuntimeReflection() = default;
 
 gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
-    Engine& e,
     const std::string& name,
     physics::Transformation* const parent_transform,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, std::string(name), parent_transform, std::move(end_callback))
+    : Builder(std::string(name), parent_transform, std::move(end_callback))
 {
 }
 
@@ -116,7 +115,7 @@ gearoenix::gl::ReflectionBuilder::ReflectionBuilder(
     std::shared_ptr<render::texture::TextureCube>&& irradiance_texture,
     std::shared_ptr<render::texture::TextureCube>&& radiance_texture,
     core::job::EndCaller<>&& end_callback)
-    : Builder(e, std::string(name), parent_transform, std::move(end_callback))
+    : Builder(std::string(name), parent_transform, std::move(end_callback))
 {
     auto& builder = entity_builder->get_builder();
     builder.add_component(core::ecs::construct_component<BakedReflection>(
@@ -140,7 +139,7 @@ void gearoenix::gl::ReflectionBuilder::construct_runtime(
     core::job::EndCaller<>&& entity_end_callback,
     core::job::EndCallerShared<ReflectionBuilder>&& probe_end_callback)
 {
-    const std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(e, std::string(name), parent_transform, std::move(entity_end_callback)));
+    const std::shared_ptr<ReflectionBuilder> builder(new ReflectionBuilder(std::string(name), parent_transform, std::move(entity_end_callback)));
     RuntimeReflection::construct(
         e, builder, receive_box, exclude_box, include_box, std::string(name),
         environment_resolution, irradiance_resolution, radiance_resolution,

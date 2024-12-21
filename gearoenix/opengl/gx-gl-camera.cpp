@@ -91,7 +91,7 @@ gearoenix::gl::Camera::~Camera() = default;
 gearoenix::gl::CameraBuilder::CameraBuilder(
     Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller,
     physics::Transformation* const parent_transform)
-    : Builder(e, name, std::move(entity_end_caller), parent_transform)
+    : Builder(name, std::move(entity_end_caller), parent_transform)
     , eng(e)
 {
 }

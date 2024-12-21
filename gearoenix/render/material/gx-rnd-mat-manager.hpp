@@ -16,6 +16,7 @@ struct Manager {
     engine::Engine& e;
 
 protected:
+    std::mutex materials_lock;
     std::map<std::string, std::weak_ptr<Material>> materials;
 
     explicit Manager(engine::Engine&);

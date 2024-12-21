@@ -36,7 +36,7 @@ struct Builder {
     GX_GET_CREF_PRT(CameraBuilders, faces_camera_builders);
 
     Builder(
-        engine::Engine& e, std::string&& name,
+        std::string&& name,
         physics::Transformation* parent_transform,
         core::job::EndCaller<>&& end_callback);
 

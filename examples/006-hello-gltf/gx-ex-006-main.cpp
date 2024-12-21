@@ -6,7 +6,7 @@
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
-#include <gearoenix/render/gx-rnd-gltf-loader.hpp>
+#include <gearoenix/render/gltf/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
@@ -21,7 +21,6 @@ struct GameApp final : gearoenix::core::Application {
         });
 
         gearoenix::render::gltf::load(
-            render_engine,
             gearoenix::platform::stream::Path::create_asset("sample.glb"),
             gearoenix::core::job::EndCaller<std::vector<std::shared_ptr<gearoenix::render::scene::Builder>>>([this, end_callback](auto&& ss) mutable {
                 auto scene_builder = std::move(ss[0]);

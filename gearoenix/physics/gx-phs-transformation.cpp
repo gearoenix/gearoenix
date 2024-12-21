@@ -74,10 +74,8 @@ void gearoenix::physics::Transformation::update_in_io_context(
 gearoenix::physics::Transformation::Transformation(
     std::string&& name,
     Transformation* const parent,
-    const core::ecs::entity_id_t entity_id,
-    render::engine::Engine* const e)
+    const core::ecs::entity_id_t entity_id)
     : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
-    , Drawer(e)
     , scale(1.0)
     , parent(parent)
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/job/gx-cr-job-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <memory>
 #include <vector>
 
@@ -17,7 +17,6 @@ struct Builder;
 
 namespace gearoenix::render::gltf {
 void load(
-    engine::Engine& e,
     const platform::stream::Path& file,
     const core::job::EndCaller<std::vector<std::shared_ptr<scene::Builder>>>& scenes_end_callback,
     const core::job::EndCaller<>& entity_end_callback);
