@@ -1,19 +1,24 @@
 #pragma once
-#include <map>
+#include "../../core/job/gx-cr-job-end-caller.hpp"
+#include <boost/container/flat_map.hpp>
 #include <memory>
 
 namespace gearoenix::physics::animation {
-struct BoneChannelBuilder;
+struct BoneBuilder;
 }
 
 namespace gearoenix::render::gltf {
 struct Context;
 struct Animations final {
     const Context& context;
-    std::map<int /*bone-node-index*/, std::unique_ptr<physics::animation::BoneChannelBuilder>> bones_channels;
+
+    boost::container::flat_map<int /*bone-node-index*/, std::shared_ptr<physics::animation::BoneBuilder>> bone_builders;
 
     explicit Animations(const Context& context);
     ~Animations();
-    void load();
+    void load(const core::job::EndCaller<>& end);
+    [[nodiscard]] int find_parent(int) const;
+    [[nodiscard]] physics::animation::BoneBuilder* get(int, const core::job::EndCaller<>& end);
+    [[nodiscard]] bool is_bone(int) const;
 };
 }

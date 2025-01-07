@@ -40,7 +40,6 @@ gearoenix::physics::Transformation* gearoenix::render::gltf::create_empty_entity
     const core::job::EndCaller<>& entity_end_callback,
     const std::shared_ptr<scene::Builder>& scene_builder)
 {
-
     if (!has_transformation(node_index, context)) {
         return parent_transform;
     }

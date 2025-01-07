@@ -1,15 +1,15 @@
 #include "gx-rnd-cmr-camera.hpp"
 #include "../../core/ecs/gx-cr-ecs-singleton.hpp"
-#include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
+#include "../imgui/gx-rnd-imgui-type-table.hpp"
+#include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
-#include <imgui/imgui.h>
 #include <random>
 
 namespace {
@@ -240,7 +240,7 @@ void gearoenix::render::camera::Camera::set_far(const float f)
 
 void gearoenix::render::camera::Camera::show_debug_gui()
 {
-    if (ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
+    imgui::tree_scope(this, [this] {
         Component::show_debug_gui();
         bool input_changed = false;
         input_changed |= ImGui::InputFloat("Far", &far, 0.01f, 1.0f, "%.3f");
@@ -266,8 +266,7 @@ void gearoenix::render::camera::Camera::show_debug_gui()
         if (bloom_data.has_value()) {
             bloom_data->show_debug_data();
         }
-        ImGui::TreePop();
-    }
+    });
 }
 
 void gearoenix::render::camera::Camera::enable_debug_mesh(core::job::EndCaller<>&& end)

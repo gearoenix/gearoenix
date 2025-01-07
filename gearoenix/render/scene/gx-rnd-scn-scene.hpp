@@ -39,13 +39,14 @@ struct Scene final : core::ecs::Component {
 
     GX_GET_RRF_PRV(engine::Engine, e);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, entities);
-    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, model_entities);
-    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, camera_entities);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, armature_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, baked_reflection_entities);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, camera_entities);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, empty_entities);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, light_entities);
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, model_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, runtime_reflection_entities);
     GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, skybox_entities);
-    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, light_entities);
-    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::entity_id_t>, empty_entities);
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRV(math::Vec4<float>, ssao_settings);
     GX_GETSET_VAL_PRV(double, layer, 0.0);
@@ -64,6 +65,8 @@ public:
     void add_skybox(core::ecs::entity_id_t entity, skybox::Skybox& s);
     void add_light(core::ecs::entity_id_t entity, light::Light& l);
     void add_empty(core::ecs::entity_id_t entity);
+    void add_armature(core::ecs::entity_id_t entity);
+    void add_entity(core::ecs::entity_id_t entity);
     void update(core::ecs::entity_id_t scene_entity_id);
 };
 }

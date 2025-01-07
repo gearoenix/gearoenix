@@ -1,5 +1,11 @@
 #pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
+#include <map>
+#include <memory>
+
+namespace gearoenix::physics::animation {
+struct Armature;
+}
 
 namespace gearoenix::physics {
 struct Transformation;
@@ -13,6 +19,8 @@ namespace gearoenix::render::gltf {
 struct Context;
 struct Armatures final {
     const Context& context;
+
+    std::map<int, std::shared_ptr<physics::animation::Armature>> map;
 
     explicit Armatures(const Context& context);
     ~Armatures();

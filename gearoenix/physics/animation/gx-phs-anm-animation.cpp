@@ -1,146 +1,193 @@
 #include "gx-phs-anm-animation.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../../core/gx-cr-string.hpp"
+#include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
+#include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
+#include "../gx-phs-transformation.hpp"
+#include "gx-phs-anm-bone.hpp"
 #include "gx-phs-anm-interpolation.hpp"
 #include "gx-phs-anm-manager.hpp"
 #include <algorithm>
 #include <utility>
 
-void gearoenix::physics::animation::ArmatureAnimationInfo::optimise()
-{
-    for (auto& c : channels)
-        c.optimise();
-}
-
-gearoenix::physics::animation::Animation::Animation(std::string name)
+gearoenix::physics::animation::Animation::Animation(std::string&& name)
     : name(std::move(name))
 {
 }
 
 gearoenix::physics::animation::Animation::~Animation() = default;
 
-gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(
-    std::string name,
-    const std::uint32_t bones_channels_count,
-    const std::uint32_t bones_channels_first_index,
-    const std::uint32_t bones_channels_end_index)
+void gearoenix::physics::animation::Animation::show_debug_gui()
+{
+    render::imgui::tree_scope(this, [this] {
+        render::imgui::table_scope(
+            "##gearoenix::physics::animation::Animation::show_debug_gui",
+            [this] {
+                ImGui::Text("Name:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", name.c_str());
+            });
+    });
+}
+
+gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(std::string&& name, std::shared_ptr<Bone>&& root_bone)
     : Animation(std::move(name))
-    , bones_channels_count(bones_channels_count)
-    , bones_channels_first_index(bones_channels_first_index)
-    , bones_channels_end_index(bones_channels_end_index)
+    , root_bone(std::move(root_bone))
 {
 }
 
 gearoenix::physics::animation::ArmatureAnimation::~ArmatureAnimation() = default;
 
-void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const double time)
+void gearoenix::physics::animation::ArmatureAnimation::animate(const double time)
 {
-    for (std::uint32_t bone_channel_index = bones_channels_first_index; bone_channel_index < bones_channels_end_index; ++bone_channel_index) {
-        animate(manager, manager.get_bones_channels()[bone_channel_index], time);
-    }
+    animate(*root_bone, time);
 }
 
-void gearoenix::physics::animation::ArmatureAnimation::animate(Manager& manager, const BoneChannel& bone_channel, const double time)
+void gearoenix::physics::animation::ArmatureAnimation::animate(const Bone& bone, const double time)
 {
-    Bone& bone = manager.get_bones()[bone_channel.target_bone_index];
-
-    auto scale = bone.transform->get_scale();
-    auto rotation = bone.transform->get_rotation();
-    auto translation = bone.transform->get_local_position();
+    auto& bone_transform = *bone.get_transform();
+    auto scale = bone_transform.get_scale();
+    auto rotation = bone_transform.get_rotation();
+    auto translation = bone_transform.get_local_position();
 
     bool transformed = false;
 
-    if (bone_channel.scale_samples_count > 0) {
+    if (const auto& scale_samples = bone.get_scale_samples(); !scale_samples.empty()) {
         transformed = true;
-        const auto scale_begin_iter = manager.get_scale_keyframes().begin() + static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.scale_samples_first_keyframe_index);
-        const auto scale_end_iter = manager.get_scale_keyframes().begin() + static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.scale_samples_end_keyframe_index);
-        const auto scale_search = std::upper_bound(
-            scale_begin_iter,
-            scale_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (scale_search == scale_begin_iter) {
-            scale = get_key(scale_begin_iter->second);
-        } else if (scale_search == scale_end_iter) {
-            scale = get_key((scale_begin_iter + (static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.scale_samples_count) - 1))->second);
-        } else if (scale_search->first == time) {
-            scale = get_key(scale_search->second);
+        if (const auto scale_search = bone.get_scale_samples().upper_bound(time); scale_search == scale_samples.begin() || scale_search->first == time) {
+            scale = scale_search->second.get_key();
+        } else if (scale_search == scale_samples.end()) {
+            scale = scale_samples.rbegin()->second.get_key();
         } else {
             scale = interpolate(*(scale_search - 1), *scale_search, time);
         }
     }
 
-    if (bone_channel.rotation_samples_count > 0) {
+    if (const auto& rotation_samples = bone.get_rotation_samples(); !rotation_samples.empty()) {
         transformed = true;
-        const auto rotation_begin_iter = manager.get_rotation_keyframes().begin() + static_cast<Manager::TimeQuatMap::difference_type>(bone_channel.rotation_samples_first_keyframe_index);
-        const auto rotation_end_iter = manager.get_rotation_keyframes().begin() + static_cast<Manager::TimeQuatMap::difference_type>(bone_channel.rotation_samples_end_keyframe_index);
-        const auto rotation_search = std::upper_bound(
-            rotation_begin_iter,
-            rotation_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (rotation_search == rotation_begin_iter) {
-            rotation = get_key(rotation_begin_iter->second);
-        } else if (rotation_search == rotation_end_iter) {
-            rotation = get_key((rotation_begin_iter + (static_cast<Manager::TimeQuatMap::difference_type>(bone_channel.rotation_samples_count) - 1))->second);
-        } else if (rotation_search->first == time) {
-            rotation = get_key(rotation_search->second);
+        if (const auto rotation_search = rotation_samples.upper_bound(time); rotation_search == rotation_samples.begin() || rotation_search->first == time) {
+            rotation = rotation_search->second.get_key();
+        } else if (rotation_search == rotation_samples.end()) {
+            rotation = rotation_samples.rbegin()->second.get_key();
         } else {
             rotation = interpolate(*(rotation_search - 1), *rotation_search, time).normalised();
         }
     }
 
-    if (bone_channel.translation_samples_count > 0) {
+    if (const auto& translation_samples = bone.get_translation_samples(); !translation_samples.empty()) {
         transformed = true;
-        const auto translation_begin_iter = manager.get_translation_keyframes().begin() + static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.translation_samples_first_keyframe_index);
-        const auto translation_end_iter = manager.get_translation_keyframes().begin() + static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.translation_samples_end_keyframe_index);
-        const auto translation_search = std::upper_bound(
-            translation_begin_iter,
-            translation_end_iter,
-            time,
-            [](const double a, const auto& b) { return a < b.first; });
-        if (translation_search == translation_begin_iter) {
-            translation = get_key(translation_begin_iter->second);
-        } else if (translation_search == translation_end_iter) {
-            translation = get_key((translation_begin_iter + (static_cast<Manager::TimeVec3Map::difference_type>(bone_channel.translation_samples_count) - 1))->second);
-        } else if (translation_search->first == time) {
-            translation = get_key(translation_search->second);
+        if (const auto translation_search = translation_samples.upper_bound(time); translation_search == translation_samples.begin() || translation_search->first == time) {
+            translation = translation_search->second.get_key();
+        } else if (translation_search == translation_samples.end()) {
+            translation = translation_samples.rbegin()->second.get_key();
         } else {
             translation = interpolate(*(translation_search - 1), *translation_search, time);
         }
     }
     if (transformed) {
-        bone.transform->reset(scale, rotation, translation);
+        bone_transform.reset(scale, rotation, translation);
+    }
+
+    for (const auto* const child : bone.get_children()) {
+        animate(*child, time);
     }
 }
 
+void gearoenix::physics::animation::ArmatureAnimation::show_debug_gui()
+{
+    render::imgui::tree_scope(this, [this] {
+        Animation::show_debug_gui();
+        render::imgui::table_scope(
+            "##gearoenix::physics::animation::ArmatureAnimation::show_debug_gui",
+            [this] {
+                ImGui::Text("Root Bone Entity ID:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%ul", root_bone->get_entity_id());
+            });
+        root_bone->show_debug_gui();
+    });
+}
+
 gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
-    std::string name,
-    std::shared_ptr<render::material::Sprite> sprite,
+    std::string&& name,
+    std::shared_ptr<render::material::Sprite>&& sprite,
     const std::uint32_t width,
     const std::uint32_t height)
     : Animation(std::move(name))
     , sprite(std::move(sprite))
     , count(static_cast<double>(width * height))
-    , width(width)
-    , height(height)
+    , aspect(width, height)
     , uv_scale(1.0 / static_cast<double>(width), 1.0f / static_cast<double>(height))
 {
 }
 
-void gearoenix::physics::animation::SpriteAnimation::animate(
-    Manager&, const double time)
+void gearoenix::physics::animation::SpriteAnimation::animate(const double time)
 {
     GX_ASSERT_D(time <= 1.0);
     const auto pos = static_cast<std::uint32_t>(count * time);
-    const math::Vec2 v(static_cast<double>(pos % width), static_cast<double>(pos / width));
+    const math::Vec2 v(static_cast<double>(pos % aspect.x), static_cast<double>(pos / aspect.y));
     sprite->get_uv_transform() = math::Vec4<float>(uv_scale, uv_scale * v);
+}
+
+void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()
+{
+    render::imgui::tree_scope(this, [this] {
+        Animation::show_debug_gui();
+        render::imgui::table_scope(
+            "##gearoenix::physics::animation::SpriteAnimation::show_debug_gui",
+            [this] {
+                ImGui::Text("Count:");
+                ImGui::TableNextColumn();
+                ImGui::Text("%ul", count);
+            });
+    });
 }
 
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
 
+void gearoenix::physics::animation::AnimationPlayer::show_debug_gui()
+{
+    render::imgui::tree_scope(this, [this] {
+        Component::show_debug_gui();
+        render::imgui::table_scope(
+            "##gearoenix::physics::animation::AnimationPlayer::show_debug_gui", [this] {
+                ImGui::Text("Time: ");
+                ImGui::TableNextColumn();
+                ImGui::InputDouble("##time", &time);
+                ImGui::TableNextColumn();
+
+                ImGui::Text("Speed: ");
+                ImGui::TableNextColumn();
+                ImGui::InputDouble("##speed", &speed);
+                ImGui::TableNextColumn();
+
+                ImGui::Text("Is Loop: ");
+                ImGui::TableNextColumn();
+                ImGui::Checkbox("##is_loop", &is_loop);
+                ImGui::TableNextColumn();
+
+                ImGui::Text("Loop Start Time: ");
+                ImGui::TableNextColumn();
+                ImGui::InputDouble("##loop_start_time", &loop_start_time);
+                ImGui::TableNextColumn();
+
+                ImGui::Text("Loop End Time: ");
+                ImGui::TableNextColumn();
+                ImGui::InputDouble("##loop_end_time", &loop_end_time);
+                ImGui::TableNextColumn();
+
+                loop_end_time = std::max(loop_start_time, loop_end_time);
+
+                ImGui::Text("Loop Time: ");
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", loop_length_time);
+            });
+    });
+}
+
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
-    std::shared_ptr<Animation> animation,
+    std::shared_ptr<Animation>&& animation,
     std::string&& name,
     const double starting_time,
     const core::ecs::entity_id_t entity_id)
@@ -181,7 +228,7 @@ void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const d
     loop_length_time = loop_end_time - loop_start_time;
 }
 
-void gearoenix::physics::animation::AnimationPlayer::animate(Manager& manager)
+void gearoenix::physics::animation::AnimationPlayer::animate() const
 {
-    animation->animate(manager, time);
+    animation->animate(time);
 }

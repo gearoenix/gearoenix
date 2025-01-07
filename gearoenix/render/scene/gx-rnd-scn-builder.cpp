@@ -1,6 +1,7 @@
 #include "gx-rnd-scn-builder.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../camera/gx-rnd-cmr-builder.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -102,10 +103,24 @@ void gearoenix::render::scene::Builder::add(std::shared_ptr<light::Builder>&& li
             add(std::shared_ptr(camera_builder));
         }
     }
-    const auto& name = light_builder->get_entity_builder()->get_builder().get_name();
+    const auto& name = light_builder->get_entity_builder()->get_name();
     GX_ASSERT(!name.empty());
     GX_ASSERT(!light_builders.contains(name));
     light_builders.emplace(std::string(name), std::move(light_builder));
+}
+
+void gearoenix::render::scene::Builder::add_armature(std::shared_ptr<core::ecs::EntitySharedBuilder>&& armature_builder)
+{
+    auto& b = entity_builder->get_builder();
+    auto& ab = armature_builder->get_builder();
+    auto* a = ab.get_component<physics::animation::Armature>();
+    GX_ASSERT_D(nullptr != a);
+    b.get_component<Scene>()->add_armature(ab.get_id());
+    a->set_scene_id(b.get_id());
+    const auto& name = armature_builder->get_name();
+    GX_ASSERT(!name.empty());
+    GX_ASSERT(!armature_builders.contains(name));
+    armature_builders.emplace(std::string(name), std::move(armature_builder));
 }
 
 gearoenix::render::scene::Scene& gearoenix::render::scene::Builder::get_scene()

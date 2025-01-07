@@ -43,6 +43,7 @@ struct Builder final {
     typedef std::map<std::string, std::shared_ptr<skybox::Builder>> SkyboxBuildersMap;
     typedef std::map<std::string, std::shared_ptr<reflection::Builder>> ReflectionBuildersMap;
     typedef std::map<std::string, std::shared_ptr<light::Builder>> LightBuildersMap;
+    typedef std::map<std::string, std::shared_ptr<core::ecs::EntitySharedBuilder>> ArmatureBuildersMap;
 
     engine::Engine& e;
     GX_GET_REFC_PRV(std::shared_ptr<core::ecs::EntitySharedBuilder>, entity_builder);
@@ -51,6 +52,7 @@ struct Builder final {
     GX_GET_CREF_PRV(SkyboxBuildersMap, skybox_builders);
     GX_GET_CREF_PRV(ReflectionBuildersMap, reflection_builders);
     GX_GET_CREF_PRV(LightBuildersMap, light_builders);
+    GX_GET_CREF_PRV(ArmatureBuildersMap, armature_builders);
 
 public:
     Builder(engine::Engine& e, const std::string& name, double layer, core::job::EndCaller<>&& end_callback);
@@ -65,6 +67,7 @@ public:
     void add(std::shared_ptr<reflection::Builder>&& reflection_builder);
     void add(std::shared_ptr<skybox::Builder>&& skybox_builder);
     void add(std::shared_ptr<light::Builder>&& light_builder);
+    void add_armature(std::shared_ptr<core::ecs::EntitySharedBuilder>&& armature_builder);
     [[nodiscard]] Scene& get_scene();
     [[nodiscard]] const Scene& get_scene() const;
     [[nodiscard]] core::ecs::entity_id_t get_id() const;

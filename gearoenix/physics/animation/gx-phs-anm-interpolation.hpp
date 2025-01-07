@@ -17,38 +17,24 @@ template <typename Value, typename T>
 {
     const auto td = end_keyframe.first - start_keyframe.first;
     const auto t = (time - start_keyframe.first) / td;
-    if (std::holds_alternative<KeyframeGltf2Bezier<Value>>(start_keyframe.second) && std::holds_alternative<KeyframeGltf2Bezier<Value>>(end_keyframe.second)) {
-        const auto& sk = std::get<KeyframeGltf2Bezier<Value>>(start_keyframe.second);
-        const auto& ek = std::get<KeyframeGltf2Bezier<Value>>(end_keyframe.second);
+    if (start_keyframe.second.is_gltf2_bezier() && end_keyframe.second.is_gltf2_bezier()) {
+        const auto& s_key = start_keyframe.second.get_key();
+        const auto& s_out = start_keyframe.second.get_out();
+        const auto& e_in = end_keyframe.second.get_in();
+        const auto& e_key = end_keyframe.second.get_key();
         const auto tp2 = t * t;
         const auto tp3 = tp2 * t;
         const auto tp2mp3 = tp2 * 3.0;
-        return (sk.key * ((tp3 * 2.0) - tp2mp3 + 1.0)) + (sk.out * (td * (tp3 - (tp2 * 2.0) + t))) + (ek.key * ((-2.0 * tp3) + tp2mp3)) + (ek.in * (td * (tp3 - tp2)));
+        return (s_key * ((tp3 * 2.0) - tp2mp3 + 1.0)) + (s_out * (td * (tp3 - (tp2 * 2.0) + t))) + (e_key * ((-2.0 * tp3) + tp2mp3)) + (e_in * (td * (tp3 - tp2)));
     }
-    if (std::holds_alternative<KeyframeStep<Value>>(start_keyframe.second) || std::holds_alternative<KeyframeStep<Value>>(end_keyframe.second)) {
-        if (t > 0.5)
-            return get_key(end_keyframe.second);
-        return get_key(start_keyframe.second);
-    }
-    const auto& sk = get_key(start_keyframe.second);
-    const auto& ek = get_key(end_keyframe.second);
-    if constexpr (std::is_same_v<Value, math::Quat<double>> || std::is_same_v<Value, math::Quat<float>>) {
-        // It can become better.
-        auto dot = sk.dot(ek);
-        if (dot > 0.999)
-            dot = 0.999; // Preventing NaN in acos
-        if (dot < -0.999)
-            dot = -0.999; // Preventing NaN in acos
-        const auto arc_cosine = std::acos(std::abs(dot));
-        if (arc_cosine < math::Numeric::epsilon<double>) {
-            return (sk * (1.0 - t)) + (ek * t); // Preventing NaN in slerp
+    if (start_keyframe.second.is_step() || end_keyframe.second.is_step()) {
+        if (t > 0.5) {
+            return end_keyframe.second.get_key();
         }
-        const auto arc_cosine_t = arc_cosine * t;
-        const auto e_sin = dot > 0.0 ? std::sin(arc_cosine_t) : -std::sin(arc_cosine_t);
-        const auto dom = 1.0 / std::sin(arc_cosine);
-        return (sk * (std::sin(arc_cosine - arc_cosine_t) * dom)) + (ek * (e_sin * dom));
-    } else {
-        return (sk * (1.0 - t)) + (ek * t);
+        return start_keyframe.second.get_key();
     }
+    const auto& sk = start_keyframe.second.get_key();
+    const auto& ek = end_keyframe.second.get_key();
+    return sk.linear_mix(ek, t);
 }
 }

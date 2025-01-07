@@ -1,7 +1,4 @@
 #include "../../core/ecs/gx-cr-ecs-entity-builder.hpp"
-#include "../../physics/animation/gx-phs-anm-bone.hpp"
-#include "../../physics/animation/gx-phs-anm-manager.hpp"
-#include "../../physics/gx-phs-engine.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -16,101 +13,13 @@
 namespace gearoenix::render::gltf {
 struct Mesh final {
     std::vector<std::shared_ptr<mesh::Mesh>> meshes;
-    std::vector<int> bone_index_map;
-    std::optional<physics::animation::BoneInfo> bones_info;
 };
-
-physics::animation::BoneInfo load_bone_info(
-    const int bone_node_index,
-    const Context& context,
-    const std::string& parent_name,
-    const std::map<std::string, int>& name_to_joint_index,
-    const math::Mat4x4<float>* inv_bind_mats)
-{
-    const auto& bone_node = context.data.nodes[bone_node_index];
-    physics::animation::BoneInfo bone_info(std::string(bone_node.name));
-    bone_info.parent_name = parent_name;
-    {
-        const auto search = name_to_joint_index.find(bone_node.name);
-        GX_ASSERT_D(name_to_joint_index.end() != search);
-        bone_info.inverse_bind = inv_bind_mats[search->second];
-    }
-    apply_transform(bone_node_index, context, *bone_info.transform);
-    bone_info.children.reserve(bone_node.children.size());
-    for (const auto child : bone_node.children) {
-        bone_info.children.push_back(load_bone_info(child, context, bone_node.name, name_to_joint_index, inv_bind_mats));
-    }
-    return bone_info;
-}
-
-void set_bone_map(
-    const physics::animation::BoneInfo& bone_info,
-    const std::map<std::string, int>& name_to_joint_index,
-    std::vector<int>& bone_index_map,
-    int& index)
-{
-    for (const auto& child : bone_info.children) {
-        const auto search = name_to_joint_index.find(child.name);
-        GX_ASSERT_D(name_to_joint_index.end() != search);
-        ++index;
-        bone_index_map[search->second] = index;
-    }
-    for (const auto& child : bone_info.children) {
-        set_bone_map(child, name_to_joint_index, bone_index_map, index);
-    }
-}
-
-std::pair<std::vector<int>, std::optional<physics::animation::BoneInfo>> process_skin(
-    const Context& context, const int node_index)
-{
-    const auto& node = context.data.nodes[node_index];
-    if (node.skin == -1) {
-        return std::make_pair(std::vector<int>(), std::nullopt);
-    }
-    const auto& skin = context.data.skins[node.skin];
-    std::vector<int> bone_index_map(skin.joints.size());
-    GX_ASSERT_D(-1 != skin.inverseBindMatrices);
-    const auto& inv_bind_mat_acc = context.data.accessors[skin.inverseBindMatrices];
-    GX_ASSERT_D(inv_bind_mat_acc.count == skin.joints.size());
-    GX_ASSERT_D(inv_bind_mat_acc.type == TINYGLTF_TYPE_MAT4);
-    GX_ASSERT_D(inv_bind_mat_acc.bufferView != -1);
-    const auto& inv_bind_mat_bv = context.data.bufferViews[inv_bind_mat_acc.bufferView];
-    GX_ASSERT_D(inv_bind_mat_bv.byteLength == inv_bind_mat_acc.count * sizeof(math::Mat4x4<float>));
-    GX_ASSERT_D(inv_bind_mat_bv.byteStride == 0);
-    const auto inv_bind_mats = reinterpret_cast<const math::Mat4x4<float>*>(
-        &context.data.buffers[inv_bind_mat_bv.buffer].data[inv_bind_mat_bv.byteOffset]);
-    std::set<int> root_bones_nodes;
-    std::map<std::string, int> name_to_joint_index;
-    int joint_index = 0;
-    for (const auto bone_node_index : skin.joints) {
-        root_bones_nodes.emplace(bone_node_index);
-        name_to_joint_index[context.data.nodes[bone_node_index].name] = joint_index;
-        ++joint_index;
-    }
-    for (const auto bone_node_index : skin.joints) {
-        const auto& bone_node = context.data.nodes[bone_node_index];
-        for (const auto child_node_index : bone_node.children) {
-            root_bones_nodes.erase(child_node_index);
-        }
-    }
-    GX_ASSERT(root_bones_nodes.size() == 1);
-    auto bones_info = load_bone_info(*root_bones_nodes.begin(), context, "", name_to_joint_index, inv_bind_mats);
-    joint_index = 0;
-    {
-        const auto search = name_to_joint_index.find(bones_info.name);
-        GX_ASSERT_D(name_to_joint_index.end() != search);
-        bone_index_map[search->second] = joint_index;
-    }
-    set_bone_map(bones_info, name_to_joint_index, bone_index_map, joint_index);
-    return { std::move(bone_index_map), std::move(bones_info) };
-}
 
 void load_mesh(
     const Context& context,
     const std::uint64_t mesh_index,
     const std::uint64_t primitive_index,
-    const core::job::EndCaller<>& end_callback,
-    const std::vector<int>& bone_index_map)
+    const core::job::EndCaller<>& end_callback)
 {
     const tinygltf::Mesh& msh = context.data.meshes[mesh_index];
     const tinygltf::Primitive& primitive = msh.primitives[primitive_index];
@@ -118,37 +27,35 @@ void load_mesh(
     const auto& acs = context.data.accessors;
     const auto& bvs = context.data.bufferViews;
     const auto& bfs = context.data.buffers;
-    auto pos_ai = static_cast<std::uint64_t>(-1);
-    auto nrm_ai = static_cast<std::uint64_t>(-1);
-    auto tng_ai = static_cast<std::uint64_t>(-1);
-    auto txc_ai = static_cast<std::uint64_t>(-1);
-    auto bwt_ai = static_cast<std::uint64_t>(-1);
-    auto bin_ai = static_cast<std::uint64_t>(-1);
-    const auto& attrs = primitive.attributes;
-    const bool is_animated = !bone_index_map.empty();
-    for (const auto& att : attrs) {
-        if ("POSITION" == att.first) {
-            pos_ai = static_cast<std::uint64_t>(att.second);
-        } else if ("NORMAL" == att.first) {
-            nrm_ai = static_cast<std::uint64_t>(att.second);
-        } else if ("TANGENT" == att.first) {
-            tng_ai = static_cast<std::uint64_t>(att.second);
-        } else if ("TEXCOORD_0" == att.first) {
-            txc_ai = static_cast<std::uint64_t>(att.second);
-        } else if (is_animated && "WEIGHTS_0" == att.first) {
-            bwt_ai = static_cast<std::uint64_t>(att.second);
-        } else if (is_animated && "JOINTS_0" == att.first) {
-            bin_ai = static_cast<std::uint64_t>(att.second);
+    auto pos_ai = -1;
+    auto nrm_ai = -1;
+    auto tng_ai = -1;
+    auto txc_ai = -1;
+    auto bwt_ai = -1;
+    auto bin_ai = -1;
+    for (const auto& attrs = primitive.attributes; const auto& [a_name, ai] : attrs) {
+        if ("POSITION" == a_name) {
+            pos_ai = ai;
+        } else if ("NORMAL" == a_name) {
+            nrm_ai = ai;
+        } else if ("TANGENT" == a_name) {
+            tng_ai = ai;
+        } else if ("TEXCOORD_0" == a_name) {
+            txc_ai = ai;
+        } else if ("WEIGHTS_0" == a_name) {
+            bwt_ai = ai;
+        } else if ("JOINTS_0" == a_name) {
+            bin_ai = ai;
         } else {
             GX_UNEXPECTED;
         }
     }
-    GX_ASSERT(pos_ai != static_cast<std::uint64_t>(-1));
-    GX_ASSERT(nrm_ai != static_cast<std::uint64_t>(-1));
-    const auto has_tangent = tng_ai != static_cast<std::uint64_t>(-1);
-    GX_ASSERT(txc_ai != static_cast<std::uint64_t>(-1));
-    GX_ASSERT(!is_animated || bwt_ai != static_cast<std::uint64_t>(-1));
-    GX_ASSERT(!is_animated || bin_ai != static_cast<std::uint64_t>(-1));
+    GX_ASSERT(pos_ai != -1);
+    GX_ASSERT(nrm_ai != -1);
+    const auto has_tangent = tng_ai != -1;
+    GX_ASSERT(txc_ai != -1);
+    const bool is_animated = bwt_ai != -1;
+    GX_ASSERT(!is_animated || bin_ai != -1);
 
     GX_ASSERT(-1 != primitive.indices);
     GX_ASSERT(-1 != primitive.material);
@@ -282,11 +189,7 @@ void load_mesh(
             }();
             std::uint64_t bi = 0;
             const auto convert_indices = [&]<typename T>() {
-                auto is = math::Vec4<int>(*reinterpret_cast<const math::Vec4<T>*>(&bin_b[bi]));
-                is.x = bone_index_map[is.x];
-                is.y = bone_index_map[is.y];
-                is.z = bone_index_map[is.z];
-                is.w = bone_index_map[is.w];
+                const auto is = math::Vec4<int>(*reinterpret_cast<const math::Vec4<T>*>(&bin_b[bi]));
                 return math::Vec4<float>(is) + math::Numeric::epsilon<float>;
             };
             switch (bin_a.componentType) {
@@ -413,14 +316,13 @@ void load_mesh(
 void load_mesh(
     const Context& context,
     const int mesh_index,
-    const core::job::EndCaller<>& end_callback,
-    const std::vector<int>& bone_index_map)
+    const core::job::EndCaller<>& end_callback)
 {
     const tinygltf::Mesh& msh = context.data.meshes[mesh_index];
     GX_LOG_D("Loading mesh: " << msh.name);
     context.meshes.meshes[mesh_index]->meshes.resize(msh.primitives.size());
     for (int primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
-        load_mesh(context, mesh_index, primitive_index, end_callback, bone_index_map);
+        load_mesh(context, mesh_index, primitive_index, end_callback);
     }
 }
 }
@@ -441,12 +343,9 @@ void gearoenix::render::gltf::Meshes::load(core::job::EndCaller<>&& end)
             continue;
         }
         const auto mesh_index = context.data.nodes[node_index].mesh;
-        core::job::send_job_to_pool([this, mesh_index, node_index, end] {
+        core::job::send_job_to_pool([this, mesh_index, end] {
             meshes[mesh_index] = std::make_unique<Mesh>();
-            auto [bone_index_map, bones_info] = process_skin(context, node_index);
-            load_mesh(context, mesh_index, end, bone_index_map);
-            meshes[mesh_index]->bone_index_map = std::move(bone_index_map);
-            meshes[mesh_index]->bones_info = std::move(bones_info);
+            load_mesh(context, mesh_index, end);
         });
     }
 }
@@ -479,22 +378,6 @@ bool gearoenix::render::gltf::Meshes::process(
         std::vector(meshes[node.mesh]->meshes),
         core::job::EndCaller(end),
         true);
-    if (meshes[node.mesh]->bone_index_map.size() > 1) {
-        engine::Engine::get()->get_physics_engine()->get_animation_manager()->create_armature(
-            model_builder->get_entity_builder()->get_builder(),
-            meshes[node.mesh]->bones_info.value());
-        const auto& skin = context.data.skins[node.skin];
-        physics::animation::ArmatureAnimationInfo armature_animation_info;
-        for (const auto bone_node_index : skin.joints) {
-            auto bone_channel_search = context.animations.bones_channels.find(bone_node_index);
-            GX_ASSERT(context.animations.bones_channels.end() != bone_channel_search);
-            armature_animation_info.channels.push_back(*bone_channel_search->second);
-        }
-        armature_animation_info.optimise();
-        engine::Engine::get()->get_physics_engine()->get_animation_manager()->create_animation_player(
-            model_builder->get_entity_builder()->get_builder(),
-            armature_animation_info);
-    }
     apply_transform(node_index, context, model_builder->get_transformation());
     scene_builder.add(std::move(model_builder));
     return true;

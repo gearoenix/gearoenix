@@ -3,10 +3,11 @@
 #include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-profiler.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/collider/gx-phs-cld-aabb.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
-#include "../../physics/gx-phs-engine.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/light/gx-rnd-lt-directional.hpp"
@@ -368,24 +369,25 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
             if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            bvh.add({ collider->get_updated_box(), BvhNodeModel(e, model, model_transform, scene_data, nullptr) });
+            bvh.add({ collider->get_updated_box(), BvhNodeModel(model, model_transform, scene_data, nullptr) });
         });
     bvh.create_nodes();
 }
 
 void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
 {
-    core::ecs::World::get()->synchronised_system<core::ecs::Any<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>, physics::animation::Armature>>(
+    core::ecs::World::get()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
         [&](
             const core::ecs::entity_id_t,
             physics::collider::Aabb3* const collider,
             gl::Model* const model,
-            physics::Transformation* const model_transform,
-            physics::animation::Armature* const armature) {
+            physics::Transformation* const model_transform) {
             if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            scene_data.dynamic_models.emplace_back(e, model, model_transform, scene_data, armature, collider);
+            const auto* const parent_transform = model_transform->get_parent();
+            auto* const armature = parent_transform ? core::ecs::World::get()->get_component<physics::animation::Armature>(parent_transform->get_entity_id()) : nullptr;
+            scene_data.dynamic_models.emplace_back(model, model_transform, scene_data, armature, collider);
         });
 }
 
@@ -498,7 +500,7 @@ void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::e
             }
             case render::camera::Camera::Usage::ReflectionProbe: {
                 camera_pool_index = scene_data.reflection_cameras[camera_id];
-                auto& reflection = scene_data.reflections[camera->get_parent_entity_id()];
+                const auto& reflection = scene_data.reflections[camera->get_parent_entity_id()];
                 self_irradiance = reflection.irradiance;
                 self_radiance = reflection.radiance;
                 break;

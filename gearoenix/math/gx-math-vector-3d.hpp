@@ -162,6 +162,16 @@ struct Vec3 final {
         }
     }
 
+    [[nodiscard]] constexpr Vec3 mix(const Vec3& o, const Element t) const
+    {
+        return (*this * (static_cast<Element>(1) - t)) + (o * t);
+    }
+
+    [[nodiscard]] constexpr Vec3 linear_mix(const Vec3& o, const Element t) const
+    {
+        return mix(o, t);
+    }
+
     template <typename T>
     [[nodiscard]] constexpr Element operator[](const T i) const
     {

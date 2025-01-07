@@ -119,6 +119,11 @@ struct Quat final {
         return { x * v, y * v, z * v, w * v };
     }
 
+    [[nodiscard]] constexpr Quat operator/(const Element v) const
+    {
+        return *this * (static_cast<Element>(1) / v);
+    }
+
     [[nodiscard]] constexpr Quat operator*(const Quat& o) const
     {
         return {
@@ -157,6 +162,11 @@ struct Quat final {
     [[nodiscard]] constexpr Quat operator-(const Element v) const
     {
         return { x - v, y - v, z - v, w - v };
+    }
+
+    [[nodiscard]] constexpr Quat operator-() const
+    {
+        return { -x, -y, -z, -w };
     }
 
     [[nodiscard]] constexpr Quat abs() const
@@ -223,6 +233,40 @@ struct Quat final {
         }
 
         return angles;
+    }
+
+    [[nodiscard]] constexpr Quat mix(const Quat& o, const Element t) const
+    {
+        return (*this * (static_cast<Element>(1) - t)) + (o * t);
+    }
+
+    [[nodiscard]] Quat slerp(const Quat& o, const Element t) const
+    {
+        auto oo = o;
+
+        auto cos_theta = dot(o);
+
+        // If cosTheta < 0, the interpolation will take the long way around the sphere.
+        // To fix this, one quat must be negated.
+        if (cos_theta < static_cast<Element>(0)) {
+            oo = -o;
+            cos_theta = -cos_theta;
+        }
+
+        // Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+        if (cos_theta > static_cast<Element>(1) - Numeric::epsilon<Element>) {
+            // Linear interpolation
+            return mix(oo, t);
+        }
+
+        // Essential Mathematics, page 467
+        const auto angle = std::acos(cos_theta);
+        return ((*this * std::sin((static_cast<Element>(1) - t) * angle)) + (oo * std::sin(t * angle))) / std::sin(angle);
+    }
+
+    [[nodiscard]] Quat linear_mix(const Quat& o, const Element t) const
+    {
+        return slerp(o, t);
     }
 
     [[nodiscard]] Vec3<Element> to_euler_degree() const

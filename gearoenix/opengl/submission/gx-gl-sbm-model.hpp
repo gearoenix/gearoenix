@@ -51,9 +51,7 @@ struct Model final {
     const char* name = nullptr;
 
     Model();
-    Model(
-        Engine& e, gl::Model* model, physics::Transformation* model_transform, Scene& scene,
-        physics::animation::Armature* armature);
+    Model(const gl::Model*, const physics::Transformation*, Scene&, const physics::animation::Armature*);
     [[nodiscard]] bool has_transparent_material(const Scene& scene) const;
     [[nodiscard]] bool needs_mvp(const Scene& scene) const;
     void render_shadow(const Scene& scene, const Camera& camera, uint& current_shader) const;
@@ -67,8 +65,7 @@ struct BvhNodeModel final {
 
     BvhNodeModel();
     BvhNodeModel(
-        Engine& e, gl::Model* gl_model, physics::Transformation* model_transform, Scene& scene,
-        physics::animation::Armature* armature);
+        const gl::Model* gl_model, const physics::Transformation* model_transform, Scene& scene, const physics::animation::Armature* armature);
 };
 
 struct DynamicModel final {
@@ -76,8 +73,8 @@ struct DynamicModel final {
     math::Aabb3<double> box;
 
     DynamicModel(
-        Engine& e, gl::Model* gl_model, physics::Transformation* model_transform, Scene& scene,
-        physics::animation::Armature* armature, physics::collider::Aabb3* collider);
+        const gl::Model* gl_model, const physics::Transformation* model_transform, Scene& scene,
+        const physics::animation::Armature* armature, const physics::collider::Aabb3* collider);
 };
 
 struct DebugModel final {
@@ -86,7 +83,7 @@ struct DebugModel final {
     uint vertex_object = 0;
     sizei indices_count = 0;
 
-    DebugModel(gl::Camera* camera, physics::Transformation* transform);
+    DebugModel(const gl::Camera* camera, const physics::Transformation* transform);
 };
 }
 #endif

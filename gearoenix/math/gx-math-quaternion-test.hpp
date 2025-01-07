@@ -12,9 +12,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
     using GxQuat = gearoenix::math::Quat<float>;
     using GxVec3 = gearoenix::math::Vec3<float>;
 
+    constexpr auto rand_dom = 10.0f;
+
     std::random_device rd;
     std::default_random_engine re(rd());
-    std::uniform_real_distribution dis(-10.0f, 10.0f);
+    std::uniform_real_distribution dis(-rand_dom, rand_dom);
 
     for (auto ti = 0; ti < 100; ++ti) {
         const auto x = dis(re);
@@ -187,6 +189,30 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
 
         if (!gxr1.equal({ glm_r1.x, glm_r1.y, glm_r1.z }) || !gxr1.equal({ glm_r2.x, glm_r2.y, glm_r2.z })) {
             BOOST_TEST_FAIL("GLM is different in Quaternion rotation");
+        }
+    }
+
+    for (auto ti = 0; ti < 1000; ++ti) {
+        const auto x0 = dis(re);
+        const auto y0 = dis(re);
+        const auto z0 = dis(re);
+        const auto w0 = dis(re);
+        const auto x1 = dis(re);
+        const auto y1 = dis(re);
+        const auto z1 = dis(re);
+        const auto w1 = dis(re);
+        const auto x2 = std::abs(dis(re) / rand_dom);
+
+        const auto gxq0 = GxQuat(x0, y0, z0, w0).normalised();
+        const auto gxq1 = GxQuat(x1, y1, z1, w1).normalised();
+        const auto gxq = gxq0.slerp(gxq1, x2);
+
+        const auto glm_q0 = glm::normalize(glm::quat(w0, x0, y0, z0));
+        const auto glm_q1 = glm::normalize(glm::quat(w1, x1, y1, z1));
+        const auto glm_q = glm::slerp(glm_q0, glm_q1, x2);
+
+        if (!gxq.safe_equal({ glm_q.x, glm_q.y, glm_q.z, glm_q.w })) {
+            BOOST_TEST_FAIL("GLM is different in Quaternion slerp");
         }
     }
 }

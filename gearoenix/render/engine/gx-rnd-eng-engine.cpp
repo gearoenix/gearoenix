@@ -1,12 +1,13 @@
 #include "gx-rnd-eng-engine.hpp"
 #include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/gx-cr-string.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
 #include "../gizmo/gx-rnd-gzm-manager.hpp"
+#include "../imgui/gx-rnd-imgui-type-table.hpp"
+#include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../light/gx-rnd-lt-manager.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -16,7 +17,6 @@
 #include "../skybox/gx-rnd-sky-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include <cinttypes>
-#include <imgui/imgui.h>
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
@@ -138,14 +138,12 @@ void gearoenix::render::engine::Engine::window_resized()
 
 void gearoenix::render::engine::Engine::show_debug_gui()
 {
-    if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        return;
-    }
-    ImGui::Text("Type: %s", to_string(engine_type));
-    ImGui::Text("Frames Count: %" PRIu64, frames_count);
-    core::ecs::World::get()->show_debug_gui();
-    // TODO: I have to show all other things
-    ImGui::TreePop();
+    imgui::tree_scope(this, [this] {
+        ImGui::Text("Type: %s", to_string(engine_type));
+        ImGui::Text("Frames Count: %" PRIu64, frames_count);
+        core::ecs::World::get()->show_debug_gui();
+        // TODO: I have to show all other things
+    });
 }
 
 gearoenix::render::engine::Engine* gearoenix::render::engine::Engine::get()

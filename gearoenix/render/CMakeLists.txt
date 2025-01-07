@@ -57,6 +57,8 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-selector.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-input-uint.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-style-wrong-input-text.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-type-table.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-type-tree.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp

@@ -9,7 +9,7 @@
 
 gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     : render_engine(render_engine)
-    , animation_manager(new animation::Manager(render_engine))
+    , animation_manager(new animation::Manager())
     , constraint_manager(new constraint::Manager(render_engine))
 {
     core::ecs::ComponentType::add<collider::Aabb3>();
@@ -21,15 +21,15 @@ gearoenix::physics::Engine::~Engine() = default;
 
 void gearoenix::physics::Engine::start_frame()
 {
+    animation_manager->update();
     constraint_manager->update();
     Transformation::update();
-    core::ecs::World::get()->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>(
+    core::ecs::World::get()->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>( // TODO: this should change to collider
         [&](const auto, const auto* const transform, auto* const cld, const auto) {
             if (transform->get_changed()) {
                 cld->update(transform->get_global_matrix());
             }
         });
-    animation_manager->update();
 }
 
 void gearoenix::physics::Engine::end_frame()

@@ -15,7 +15,7 @@ void load_scenes(
 {
     scenes_end_callback.set_return(std::vector<std::shared_ptr<scene::Builder>>(ctx->data.scenes.size()));
 
-    ctx->animations.load();
+    ctx->animations.load(entity_end_callback);
 
     core::job::EndCaller meshes_ready([ctx, scenes_end_callback, entity_end_callback] {
         const core::job::EndCaller gpu_end_callback([ctx, s = scenes_end_callback] { (void)s; (void)ctx; });

@@ -7,8 +7,8 @@ SET(GX_ENGINE_PHYSICS_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.hpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-channel.cpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-channel.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone-builder.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone-builder.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-interpolation.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-keyframe.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp

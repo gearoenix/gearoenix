@@ -77,8 +77,9 @@ void GameApp::update()
 
 void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
 {
-    if (const auto search = scene_builder->get_model_builders().find("Cesium_Man"); scene_builder->get_model_builders().end() != search) {
-        auto* const player = search->second->get_entity_builder()->get_builder().get_component<GxAnimationPlayer>();
+    auto& armature_builders = scene_builder->get_armature_builders();
+    if (const auto search = armature_builders.begin(); armature_builders.end() != search) {
+        auto* const player = search->second->get_builder().get_component<GxAnimationPlayer>();
         player->set_loop_range_time(1.0e-10, 1.98);
     }
 
@@ -102,7 +103,7 @@ void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
 
     auto& camera_builder = *scene_builder->get_camera_builders().begin()->second;
     auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder.get_transformation().get_component_self().lock());
-    trn->local_look_at({ -19.0, -19.0, 5.0 }, { -11.0, -11.0, 0.0 }, { 0.0, 0.0, 1.0 });
+    trn->local_look_at({ 19.0, 19.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
     const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
     auto ctrl_name = camera_builder.get_entity_builder()->get_builder().get_name() + "-controller";
     (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));

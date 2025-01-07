@@ -74,5 +74,6 @@ public:
     EntitySharedBuilder(std::string&& name, job::EndCaller<>&& end_caller);
     ~EntitySharedBuilder();
     [[nodiscard]] entity_id_t get_id() const { return builder.get_id(); }
+    [[nodiscard]] const std::string& get_name() const { return builder.get_name(); }
 };
 }

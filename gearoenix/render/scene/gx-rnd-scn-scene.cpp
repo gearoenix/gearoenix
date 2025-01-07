@@ -60,6 +60,17 @@ void gearoenix::render::scene::Scene::add_empty(const core::ecs::entity_id_t ent
     entities.insert(entity);
 }
 
+void gearoenix::render::scene::Scene::add_armature(const core::ecs::entity_id_t entity)
+{
+    armature_entities.insert(entity);
+    entities.insert(entity);
+}
+
+void gearoenix::render::scene::Scene::add_entity(const core::ecs::entity_id_t entity)
+{
+    entities.insert(entity);
+}
+
 void gearoenix::render::scene::Scene::update(const core::ecs::entity_id_t scene_entity_id)
 {
     std::uint64_t flag = 1;

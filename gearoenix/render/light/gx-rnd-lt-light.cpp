@@ -1,6 +1,5 @@
 #include "gx-rnd-lt-light.hpp"
-#include "../../core/gx-cr-string.hpp"
-#include <imgui/imgui.h>
+#include "../imgui/gx-rnd-imgui-type-tree.hpp"
 
 gearoenix::render::light::Light::Light(
     const core::ecs::component_index_t final_type_index,
@@ -14,10 +13,8 @@ gearoenix::render::light::Light::~Light() = default;
 
 void gearoenix::render::light::Light::show_debug_gui()
 {
-    if (!ImGui::TreeNode(core::String::ptr_name(this).c_str())) {
-        return;
-    }
-    Component::show_debug_gui();
-    ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
-    ImGui::TreePop();
+    imgui::tree_scope(this, [this] {
+        Component::show_debug_gui();
+        ImGui::InputFloat3("Colour", reinterpret_cast<float*>(&colour));
+    });
 }
