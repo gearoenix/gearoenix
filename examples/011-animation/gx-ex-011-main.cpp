@@ -80,7 +80,7 @@ void GameApp::gltf_is_ready(const GxSceneBuilderPtr& scene_builder)
     auto& armature_builders = scene_builder->get_armature_builders();
     if (const auto search = armature_builders.begin(); armature_builders.end() != search) {
         auto* const player = search->second->get_builder().get_component<GxAnimationPlayer>();
-        player->set_loop_range_time(1.0e-10, 1.98);
+        player->set_loop_range_time(1.0e-10, 3.98);
     }
 
     render_engine.get_skybox_manager()->build(

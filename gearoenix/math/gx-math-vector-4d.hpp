@@ -134,6 +134,20 @@ struct Vec4 final {
         return { x + o, y + o, z + o, w + o };
     }
 
+    [[nodiscard]] constexpr Vec4 operator+(const Vec4& o) const
+    {
+        return { x + o.x, y + o.y, z + o.z, w + o.w };
+    }
+
+    constexpr Vec4& operator+=(const Vec4& o)
+    {
+        x += o.x;
+        y += o.y;
+        z += o.z;
+        w += o.w;
+        return *this;
+    }
+
     [[nodiscard]] constexpr Vec4 operator*(const Element o) const
     {
         return { x * o, y * o, z * o, w * o };

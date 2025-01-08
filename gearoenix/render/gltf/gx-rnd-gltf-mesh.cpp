@@ -1,4 +1,5 @@
 #include "../../core/ecs/gx-cr-ecs-entity-builder.hpp"
+#include "../../math/gx-math-matrix-4d.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
@@ -8,7 +9,6 @@
 #include "../scene/gx-rnd-scn-builder.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
-#include <set>
 
 namespace gearoenix::render::gltf {
 struct Mesh final {
@@ -17,13 +17,13 @@ struct Mesh final {
 
 void load_mesh(
     const Context& context,
-    const std::uint64_t mesh_index,
-    const std::uint64_t primitive_index,
+    const int mesh_index,
+    const int primitive_index,
     const core::job::EndCaller<>& end_callback)
 {
-    const tinygltf::Mesh& msh = context.data.meshes[mesh_index];
-    const tinygltf::Primitive& primitive = msh.primitives[primitive_index];
-    GX_ASSERT(TINYGLTF_MODE_TRIANGLES == primitive.mode);
+    const auto& msh = context.data.meshes[mesh_index];
+    const auto& primitive = msh.primitives[primitive_index];
+    GX_ASSERT_D(TINYGLTF_MODE_TRIANGLES == primitive.mode);
     const auto& acs = context.data.accessors;
     const auto& bvs = context.data.bufferViews;
     const auto& bfs = context.data.buffers;
@@ -50,15 +50,15 @@ void load_mesh(
             GX_UNEXPECTED;
         }
     }
-    GX_ASSERT(pos_ai != -1);
-    GX_ASSERT(nrm_ai != -1);
+    GX_ASSERT_D(pos_ai != -1);
+    GX_ASSERT_D(nrm_ai != -1);
     const auto has_tangent = tng_ai != -1;
-    GX_ASSERT(txc_ai != -1);
+    GX_ASSERT_D(txc_ai != -1);
     const bool is_animated = bwt_ai != -1;
-    GX_ASSERT(!is_animated || bin_ai != -1);
+    GX_ASSERT_D(!is_animated || bin_ai != -1);
 
-    GX_ASSERT(-1 != primitive.indices);
-    GX_ASSERT(-1 != primitive.material);
+    GX_ASSERT_D(-1 != primitive.indices);
+    GX_ASSERT_D(-1 != primitive.material);
 
     const auto& pos_a = acs[pos_ai];
     const auto& nrm_a = acs[nrm_ai];
@@ -68,36 +68,36 @@ void load_mesh(
     const auto& bin_a = is_animated ? acs[bin_ai] : acs[txc_ai];
     const auto& ids_a = acs[primitive.indices];
 
-    GX_CHECK_EQUAL(pos_a.count, nrm_a.count);
+    GX_CHECK_EQUAL_D(pos_a.count, nrm_a.count);
     if (has_tangent) {
-        GX_CHECK_EQUAL(pos_a.count, tng_a->count);
+        GX_CHECK_EQUAL_D(pos_a.count, tng_a->count);
     }
-    GX_CHECK_EQUAL(pos_a.count, txc_a.count);
-    GX_ASSERT(!is_animated || pos_a.count == bwt_a.count);
-    GX_ASSERT(!is_animated || pos_a.count == bin_a.count);
+    GX_CHECK_EQUAL_D(pos_a.count, txc_a.count);
+    GX_ASSERT_D(!is_animated || pos_a.count == bwt_a.count);
+    GX_ASSERT_D(!is_animated || pos_a.count == bin_a.count);
 
-    GX_CHECK_EQUAL(pos_a.type, TINYGLTF_TYPE_VEC3);
-    GX_CHECK_EQUAL(nrm_a.type, TINYGLTF_TYPE_VEC3);
+    GX_CHECK_EQUAL_D(pos_a.type, TINYGLTF_TYPE_VEC3);
+    GX_CHECK_EQUAL_D(nrm_a.type, TINYGLTF_TYPE_VEC3);
     if (has_tangent) {
-        GX_CHECK_EQUAL(tng_a->type, TINYGLTF_TYPE_VEC4);
+        GX_CHECK_EQUAL_D(tng_a->type, TINYGLTF_TYPE_VEC4);
     }
-    GX_CHECK_EQUAL(txc_a.type, TINYGLTF_TYPE_VEC2);
-    GX_ASSERT(!is_animated || bwt_a.type == TINYGLTF_TYPE_VEC4);
-    GX_ASSERT(!is_animated || bin_a.type == TINYGLTF_TYPE_VEC4);
-    GX_CHECK_EQUAL(ids_a.type, TINYGLTF_TYPE_SCALAR);
+    GX_CHECK_EQUAL_D(txc_a.type, TINYGLTF_TYPE_VEC2);
+    GX_ASSERT_D(!is_animated || bwt_a.type == TINYGLTF_TYPE_VEC4);
+    GX_ASSERT_D(!is_animated || bin_a.type == TINYGLTF_TYPE_VEC4);
+    GX_CHECK_EQUAL_D(ids_a.type, TINYGLTF_TYPE_SCALAR);
 
-    GX_CHECK_EQUAL(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    GX_CHECK_EQUAL(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
     if (has_tangent) {
-        GX_CHECK_EQUAL(tng_a->componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+        GX_CHECK_EQUAL_D(tng_a->componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
     }
-    GX_CHECK_EQUAL(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    GX_ASSERT(!is_animated || bwt_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(!is_animated || bwt_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 
     const auto& pos_max = pos_a.maxValues;
     const auto& pos_min = pos_a.minValues;
-    GX_CHECK_EQUAL(pos_max.size(), 3);
-    GX_CHECK_EQUAL(pos_min.size(), 3);
+    GX_CHECK_EQUAL_D(pos_max.size(), 3);
+    GX_CHECK_EQUAL_D(pos_min.size(), 3);
 
     const math::Aabb3 box(
         math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
@@ -318,7 +318,7 @@ void load_mesh(
     const int mesh_index,
     const core::job::EndCaller<>& end_callback)
 {
-    const tinygltf::Mesh& msh = context.data.meshes[mesh_index];
+    const auto& msh = context.data.meshes[mesh_index];
     GX_LOG_D("Loading mesh: " << msh.name);
     context.meshes.meshes[mesh_index]->meshes.resize(msh.primitives.size());
     for (int primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {

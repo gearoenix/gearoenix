@@ -38,6 +38,11 @@ struct Mat4x4 final {
     {
     }
 
+    constexpr Mat4x4(const Vec4<Element>& c0, const Vec4<Element>& c1, const Vec4<Element>& c2, const Vec4<Element>& c3)
+        : columns { { c0, c1, c2, c3 } }
+    {
+    }
+
     explicit Mat4x4(platform::stream::Stream& f)
     {
         read(f);
@@ -76,6 +81,25 @@ struct Mat4x4 final {
         };
     }
 
+    [[nodiscard]] constexpr Mat4x4 operator*(const Element v) const
+    {
+        return {
+            columns[0] * v,
+            columns[1] * v,
+            columns[2] * v,
+            columns[3] * v,
+        };
+    }
+
+    constexpr Mat4x4& operator*=(const Element v)
+    {
+        columns[0] *= v;
+        columns[1] *= v;
+        columns[2] *= v;
+        columns[3] *= v;
+        return *this;
+    }
+
     [[nodiscard]] constexpr Mat4x4 operator*(const Mat4x4& m) const
     {
         Mat4x4 r;
@@ -95,6 +119,23 @@ struct Mat4x4 final {
             }
         }
         return *this;
+    }
+
+    constexpr Mat4x4& operator+=(const Mat4x4& o)
+    {
+        for (int i = 0; i < 4; ++i) {
+            columns[i] += o.columns[i];
+        }
+        return *this;
+    }
+
+    [[nodiscard]] constexpr Mat4x4 operator+(const Mat4x4& o) const
+    {
+        Mat4x4 r;
+        for (int i = 0; i < 4; ++i) {
+            r.columns[i] = columns[i] + o.columns[i];
+        }
+        return r;
     }
 
     constexpr void operator*=(const Mat4x4& m)

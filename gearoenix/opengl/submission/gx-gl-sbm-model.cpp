@@ -35,10 +35,9 @@ gearoenix::gl::submission::Model::Model(
         first_bone_index = static_cast<decltype(first_bone_index)>(scene.bones_data.size());
         bones_count = static_cast<decltype(bones_count)>(armature->get_all_bones().size());
         for (const auto* const bone : armature->get_all_bones()) {
-            const auto& trn = *bone->get_transform();
             scene.bones_data.push_back(Bone {
-                .m = math::Mat4x4<float>(trn.get_global_matrix()),
-                .inv_m = math::Mat4x4<float>(trn.get_inverted_global_matrix()),
+                .m = math::Mat4x4<float>(bone->get_global_matrix()),
+                .inv_m = math::Mat4x4<float>(bone->get_inverted_global_matrix()),
             });
         }
     }

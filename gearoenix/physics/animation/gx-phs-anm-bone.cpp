@@ -125,3 +125,22 @@ void gearoenix::physics::animation::Bone::add_child(Bone* const child)
     child->parent = this;
     children.insert(child);
 }
+
+void gearoenix::physics::animation::Bone::set_inverse_bind_matrix(const math::Mat4x4<double>& m)
+{
+    inverse_bind_matrix = m;
+    bind_matrix = m.inverted();
+}
+
+void gearoenix::physics::animation::Bone::update_matrices()
+{
+    global_matrix = transform->get_global_matrix() * inverse_bind_matrix;
+    inverted_global_matrix = bind_matrix * transform->get_inverted_global_matrix();
+}
+
+void gearoenix::physics::animation::Bone::update_all_bones_after_transform_updates()
+{
+    core::ecs::World::get()->parallel_system<Bone>([](auto, auto* const bone, auto) {
+        bone->update_matrices();
+    });
+}

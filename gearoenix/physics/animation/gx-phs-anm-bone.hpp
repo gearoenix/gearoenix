@@ -19,6 +19,10 @@ struct Bone final : core::ecs::Component {
     constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
 
     GX_GET_CREF_PRV(std::shared_ptr<Transformation>, transform);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, inverse_bind_matrix);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, bind_matrix);
     GX_GET_REF_PRV(Vec3KeyFrameMap, scale_samples);
     GX_GET_REF_PRV(QuatKeyFrameMap, rotation_samples);
     GX_GET_REF_PRV(Vec3KeyFrameMap, translation_samples);
@@ -37,5 +41,8 @@ public:
         core::ecs::entity_id_t entity_id);
     ~Bone() override;
     void add_child(Bone* child);
+    void set_inverse_bind_matrix(const math::Mat4x4<double>& m);
+    void update_matrices();
+    static void update_all_bones_after_transform_updates();
 };
 }

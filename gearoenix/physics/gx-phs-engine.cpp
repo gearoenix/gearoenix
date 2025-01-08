@@ -1,6 +1,7 @@
 #include "gx-phs-engine.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
+#include "animation/gx-phs-anm-bone.hpp"
 #include "animation/gx-phs-anm-manager.hpp"
 #include "collider/gx-phs-cld-aabb.hpp"
 #include "collider/gx-phs-cld-frustum.hpp"
@@ -24,6 +25,7 @@ void gearoenix::physics::Engine::start_frame()
     animation_manager->update();
     constraint_manager->update();
     Transformation::update();
+    animation::Bone::update_all_bones_after_transform_updates();
     core::ecs::World::get()->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>( // TODO: this should change to collider
         [&](const auto, const auto* const transform, auto* const cld, const auto) {
             if (transform->get_changed()) {
