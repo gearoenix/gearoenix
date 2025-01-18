@@ -1,10 +1,11 @@
 #include "gx-rnd-gzm-manager.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
-#include <ImGuizmo/ImGuizmo.h>
 #include <boost/functional/hash.hpp>
 #include <imgui/imgui.h>
 #include <tuple>
+// Keep it after imgui
+#include <ImGuizmo/ImGuizmo.h>
 
 gearoenix::render::gizmo::Manager::Manager(engine::Engine& e)
     : e(e)
