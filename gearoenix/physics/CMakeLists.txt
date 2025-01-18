@@ -24,6 +24,8 @@ SET(GX_ENGINE_PHYSICS_SRC
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/body/gx-phs-bd-type.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-aabb.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-aabb.hpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-collider.cpp
+        ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-collider.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-frustum.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-frustum.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/collider/gx-phs-cld-mesh.cpp

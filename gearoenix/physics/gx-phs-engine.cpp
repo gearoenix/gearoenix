@@ -13,6 +13,7 @@ gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     , animation_manager(new animation::Manager())
     , constraint_manager(new constraint::Manager(render_engine))
 {
+    core::ecs::ComponentType::add<collider::Collider>();
     core::ecs::ComponentType::add<collider::Aabb3>();
     core::ecs::ComponentType::add<collider::Frustum>();
     core::ecs::ComponentType::add<Transformation>();
@@ -26,12 +27,7 @@ void gearoenix::physics::Engine::start_frame()
     constraint_manager->update();
     Transformation::update();
     animation::Bone::update_all_bones_after_transform_updates();
-    core::ecs::World::get()->parallel_system<core::ecs::All<Transformation, collider::Aabb3>>( // TODO: this should change to collider
-        [&](const auto, const auto* const transform, auto* const cld, const auto) {
-            if (transform->get_changed()) {
-                cld->update(transform->get_global_matrix());
-            }
-        });
+    collider::Collider::update_all_after_transform_update();
 }
 
 void gearoenix::physics::Engine::end_frame()

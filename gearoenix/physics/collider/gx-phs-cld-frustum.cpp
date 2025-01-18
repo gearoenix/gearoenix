@@ -2,8 +2,7 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 
 void gearoenix::physics::collider::Frustum::write_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& stream,
-    core::job::EndCaller<>&&) const
+    std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&&) const
 {
     surrounding_box.write(*stream);
     frustum.write(*stream);
@@ -16,9 +15,17 @@ void gearoenix::physics::collider::Frustum::update_in_io_context(
     frustum.read(*s);
 }
 
-gearoenix::physics::collider::Frustum::Frustum(std::string&& name, const std::array<math::Vec3<double>, 8>& points,
+void gearoenix::physics::collider::Frustum::update_surrounding_box()
+{
+    // the actual update happens in the `update` function.
+}
+
+gearoenix::physics::collider::Frustum::Frustum(
+    std::shared_ptr<Transformation>&& transform,
+    std::string&& name,
+    const std::array<math::Vec3<double>, 8>& points,
     const core::ecs::entity_id_t entity_id)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
+    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
     , frustum(points)
 {
     for (const auto& p : points) {
@@ -39,10 +46,11 @@ void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<d
 
 bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3<double>& b) const
 {
-    return surrounding_box.check_intersection(b) && frustum.check_intersection_status(b) != math::IntersectionStatus::Out;
+    return Collider::check_intersection(b) && frustum.check_intersection_status(b) != math::IntersectionStatus::Out;
 }
 
-gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(const math::Aabb3<double>& b) const
+gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(
+    const math::Aabb3<double>& b) const
 {
     if (surrounding_box.check_intersection(b)) {
         return frustum.check_intersection_status(b);

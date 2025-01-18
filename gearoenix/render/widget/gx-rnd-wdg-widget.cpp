@@ -37,7 +37,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
         return std::nullopt;
     }
     const auto ray = camera->generate_ray(normalised_point);
-    if (auto dis = collider->get_updated_box().hit(ray, std::numeric_limits<double>::max()); dis.has_value()) {
+    if (const auto dis = collider->get_surrounding_box().hit(ray, std::numeric_limits<double>::max()); dis.has_value()) {
         return ray.get_point(dis.value());
     }
     return std::nullopt;

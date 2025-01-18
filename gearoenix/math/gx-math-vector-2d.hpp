@@ -1,9 +1,7 @@
 #pragma once
-#include "../platform/gx-plt-log.hpp"
 #include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-math-numeric.hpp"
 #include <cmath>
-#include <limits>
 #include <optional>
 #include <ostream>
 #include <type_traits>
@@ -219,6 +217,16 @@ struct Vec2 final {
     [[nodiscard]] constexpr Vec2<bool> less(const Element v) const
     {
         return { x < v, y < v };
+    }
+
+    [[nodiscard]] constexpr Vec2<bool> less(const Vec2& v) const
+    {
+        return { x < v.x, y < v.y };
+    }
+
+    [[nodiscard]] constexpr bool and_all() const
+    {
+        return x && y;
     }
 
     [[nodiscard]] constexpr Element dot(const Vec2& o) const

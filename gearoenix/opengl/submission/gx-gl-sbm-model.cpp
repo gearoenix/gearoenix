@@ -111,7 +111,7 @@ gearoenix::gl::submission::DynamicModel::DynamicModel(
     const physics::animation::Armature* const armature,
     const physics::collider::Aabb3* const collider)
     : base(gl_model, model_transform, scene, armature)
-    , box(collider->get_updated_box())
+    , box(collider->get_surrounding_box())
 {
 }
 

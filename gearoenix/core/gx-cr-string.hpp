@@ -35,8 +35,7 @@ struct String final {
         return hex_string;
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr static auto ptr_to_hex_string(const T* const ptr)
+    [[nodiscard]] constexpr static auto ptr_to_hex_string(const void* const ptr)
     {
         return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr));
     }

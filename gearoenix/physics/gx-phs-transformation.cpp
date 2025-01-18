@@ -3,6 +3,7 @@
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/gizmo/gx-rnd-gzm-manager.hpp"
+#include "../render/imgui/gx-rnd-imgui-math-vec.hpp"
 #include "../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include <algorithm>
@@ -388,7 +389,6 @@ void gearoenix::physics::Transformation::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
         Component::show_debug_gui();
-
         is_gizmo_visible = true; // maybe later I make it true based on the object selection
 
         auto l = get_local_position();
@@ -401,64 +401,21 @@ void gearoenix::physics::Transformation::show_debug_gui()
         render::imgui::table_scope("##gearoenix::physics::Transformation", [&, this] {
             ImGui::Text("Position:");
             ImGui::TableNextColumn();
-            ImGui::Text("X:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##position.x", &l.x, 0.01, 1.0, "%.3f");
-            ImGui::SameLine();
-            ImGui::Text("Y:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##position.y", &l.y, 0.01, 1.0, "%.3f");
-            ImGui::SameLine();
-            ImGui::Text("Z:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##position.z", &l.z, 0.01, 1.0, "%.3f");
+            input_changed |= render::imgui::show(l);
             ImGui::TableNextColumn();
 
             ImGui::Text("Rotation:  ");
             ImGui::TableNextColumn();
-            ImGui::Text("X:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            auto rotation_changed = ImGui::InputDouble("##rotation.x", &rotation.euler_in_degree->x, 0.1, 5.0, "%.3f");
-            rotation.euler_in_degree->x = math::Numeric::normalise_degree(rotation.euler_in_degree->x);
-            ImGui::SameLine();
-            ImGui::Text("Y:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            rotation_changed |= ImGui::InputDouble("##rotation.y", &rotation.euler_in_degree->y, 0.1, 5.0, "%.3f");
-            rotation.euler_in_degree->y = math::Numeric::normalise_degree(rotation.euler_in_degree->y);
-            ImGui::SameLine();
-            ImGui::Text("Z:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            rotation_changed |= ImGui::InputDouble("##rotation.z", &rotation.euler_in_degree->z, 0.1, 5.0, "%.3f");
-            rotation.euler_in_degree->z = math::Numeric::normalise_degree(rotation.euler_in_degree->z);
-            ImGui::TableNextColumn();
-
-            if (rotation_changed) {
+            if (render::imgui::show(*rotation.euler_in_degree)) {
+                rotation.euler_in_degree->normalise_degree();
                 rotation.quat = decltype(rotation.quat)::from_euler_degree(*rotation.euler_in_degree);
                 input_changed = true;
             }
+            ImGui::TableNextColumn();
 
             ImGui::Text("Scale:");
             ImGui::TableNextColumn();
-            ImGui::Text("X:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##scale.x", &s.x, 0.01, 1.0, "%.3f");
-            ImGui::SameLine();
-            ImGui::Text("Y:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##scale.y", &s.y, 0.01, 1.0, "%.3f");
-            ImGui::SameLine();
-            ImGui::Text("Z:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(100.0f);
-            input_changed |= ImGui::InputDouble("##scale.z", &s.z, 0.01, 1.0, "%.3f");
+            input_changed |= render::imgui::show(s);
         });
 
         if (input_changed) {

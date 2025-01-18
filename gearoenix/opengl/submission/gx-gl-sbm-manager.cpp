@@ -369,7 +369,7 @@ void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entit
             if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
                 return;
             }
-            bvh.add({ collider->get_updated_box(), BvhNodeModel(model, model_transform, scene_data, nullptr) });
+            bvh.add({ collider->get_surrounding_box(), BvhNodeModel(model, model_transform, scene_data, nullptr) });
         });
     bvh.create_nodes();
 }

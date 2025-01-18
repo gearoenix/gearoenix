@@ -169,6 +169,12 @@ struct Mat4x4 final {
     }
 
     /// It does not change position
+    [[nodiscard]] constexpr Vec3<Element> get_diameter() const
+    {
+        return { columns[0].x, columns[1].y, columns[2].z };
+    }
+
+    /// It does not change position
     constexpr void local_scale(const Element s)
     {
         local_scale(s, s, s);

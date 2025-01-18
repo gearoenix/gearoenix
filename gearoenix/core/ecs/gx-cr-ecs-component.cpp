@@ -1,12 +1,12 @@
 #include "gx-cr-ecs-component.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
-#include "../gx-cr-string.hpp"
+#include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
+#include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../macro/gx-cr-mcr-stringifier.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-world.hpp"
-#include <imgui/imgui.h>
 
 void gearoenix::core::ecs::Component::write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, job::EndCaller<>&&) const
 {
@@ -28,46 +28,33 @@ gearoenix::core::ecs::Component::Component(const component_index_t final_type_in
 
 void gearoenix::core::ecs::Component::show_debug_gui()
 {
-    if (!ImGui::TreeNode(String::ptr_name(this).c_str())) {
-        return;
-    }
+    render::imgui::tree_scope(this, [this] {
+        render::imgui::table_scope("##gearoenix::core::ecs::Component", [this] {
+            ImGui::Text("Enabled:");
+            ImGui::TableNextColumn();
+            ImGui::Checkbox("##" GX_STRINGIFY(enabled), &enabled);
+            ImGui::TableNextColumn();
 
-    if (!ImGui::BeginTable("##gearoenix::core::ecs::Component", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
-        return;
-    }
-    ImGui::TableSetupColumn("##labels", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("##inputs", ImGuiTableColumnFlags_WidthStretch, 0.999f);
+            ImGui::Text("Name:");
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", name.c_str());
+            ImGui::TableNextColumn();
 
-    ImGui::TableNextColumn();
+            ImGui::Text("Final Type: ");
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", ComponentType::get_name(final_type_index).c_str());
+            ImGui::TableNextColumn();
 
-    ImGui::AlignTextToFramePadding();
-    ImGui::Text("Enabled:");
-    ImGui::TableNextColumn();
-    ImGui::Checkbox("##" GX_STRINGIFY(enabled), &enabled);
-    ImGui::TableNextColumn();
+            ImGui::Text("Entity ID:");
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", entity_id);
+        });
 
-    ImGui::Text("Name:");
-    ImGui::TableNextColumn();
-    ImGui::Text("%s", name.c_str());
-    ImGui::TableNextColumn();
-
-    ImGui::Text("Final Type: ");
-    ImGui::TableNextColumn();
-    ImGui::Text("%s", ComponentType::get_name(final_type_index).c_str());
-    ImGui::TableNextColumn();
-
-    ImGui::Text("Entity ID:");
-    ImGui::TableNextColumn();
-    ImGui::Text("%u", entity_id);
-
-    ImGui::EndTable();
-
-    if (const auto* const entity_ptr = World::get()->get_entity(entity_id); nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
-        entity_ptr->show_debug_gui();
-        ImGui::TreePop();
-    }
-
-    ImGui::TreePop();
+        if (const auto* const entity_ptr = World::get()->get_entity(entity_id); nullptr != entity_ptr && ImGui::TreeNode("Entity")) {
+            entity_ptr->show_debug_gui();
+            ImGui::TreePop();
+        }
+    });
 }
 
 void gearoenix::core::ecs::Component::write(

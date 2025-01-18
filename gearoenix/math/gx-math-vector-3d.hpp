@@ -277,6 +277,13 @@ struct Vec3 final {
         return result;
     }
 
+    constexpr void normalise_degree()
+    {
+        x = Numeric::normalise_degree(x);
+        y = Numeric::normalise_degree(y);
+        z = Numeric::normalise_degree(z);
+    }
+
     /// \note Only on (this) unit(normalised) vectors will give expected result.
     [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const
     {

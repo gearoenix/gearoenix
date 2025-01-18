@@ -1,6 +1,7 @@
 #pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-math-intersection-status.hpp"
+#include "gx-math-matrix-4d.hpp"
 #include "gx-math-vector-3d.hpp"
 #include <array>
 #include <limits>
@@ -23,6 +24,8 @@ struct Sphere;
 
 template <typename Element>
 struct Aabb3 final {
+    constexpr static std::array<int, 8> counter_corners_indices = { 7, 6, 5, 4, 3, 2, 1, 0 };
+
     GX_GET_CREF_PRV(Vec3<Element>, upper);
     GX_GET_CREF_PRV(Vec3<Element>, lower);
     GX_GET_CREF_PRV(Vec3<Element>, diameter);
@@ -57,6 +60,26 @@ public:
     {
     }
 
+    template <typename T>
+    constexpr explicit Aabb3(const Aabb3<T>& o)
+        : upper(o.upper)
+        , lower(o.lower)
+        , diameter(o.diameter)
+        , center(o.center)
+        , volume(o.volume)
+    {
+    }
+
+    constexpr explicit Aabb3(const Mat4x4<Element>& m)
+        : diameter(m.get_diameter())
+        , center(m.get_position())
+        , volume(diameter.x * diameter.y * diameter.z)
+    {
+        const auto r = diameter * static_cast<Element>(0.5);
+        upper = center + r;
+        lower = center - r;
+    }
+
     constexpr void update()
     {
         diameter = upper - lower;
@@ -82,6 +105,15 @@ public:
         volume = static_cast<Element>(0);
     }
 
+    constexpr void reset(const Vec3<Element>& upper_point, const Vec3<Element>& lower_point)
+    {
+        upper = upper_point;
+        lower = lower_point;
+        diameter = upper - lower;
+        center = (upper + lower) * static_cast<Element>(0.5);
+        volume = diameter.x * diameter.y * diameter.z;
+    }
+
     constexpr void put(const Vec3<Element>& point)
     {
         put_without_update(point);
@@ -99,7 +131,7 @@ public:
         update();
     }
 
-    constexpr void put(const Aabb3<Element>& o)
+    constexpr void put(const Aabb3& o)
     {
         put_without_update(o);
         update();
@@ -115,10 +147,18 @@ public:
 
     /// For better performance but keep in mind call update after your puts finished
     /// In case your not sure about it, use put, it is safer
-    constexpr void put_without_update(const Aabb3<Element>& o)
+    constexpr void put_without_update(const Aabb3& o)
     {
         upper = upper.maximum(o.upper);
         lower = lower.minimum(o.lower);
+    }
+
+    [[nodiscard]] constexpr Mat4x4<Element> to_matrix() const
+    {
+        Mat4x4<Element> r;
+        r.set_position(center);
+        r.local_scale(diameter);
+        return r;
     }
 
     [[nodiscard]] constexpr std::optional<Element> hit(const Ray3<Element>& ray, const Element d_min) const
@@ -129,32 +169,35 @@ public:
         const auto t1 = (upper - ro) * rrd;
         const auto t_min = t0.minimum(t1).maximum();
         const auto t_max = t0.maximum(t1).minimum();
-        if (t_max >= static_cast<Element>(0) && t_min <= t_max && t_min < d_min)
+        if (t_max >= static_cast<Element>(0) && t_min <= t_max && t_min < d_min) {
             return t_min;
+        }
         return std::nullopt;
     }
 
-    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3<Element>& o) const
+    [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3& o) const
     {
         if (upper.x > o.upper.x
             && upper.y > o.upper.y
             && upper.z > o.upper.z
             && lower.x < o.lower.x
             && lower.y < o.lower.y
-            && lower.z < o.lower.z)
+            && lower.z < o.lower.z) {
             return IntersectionStatus::In;
-        if (check_intersection(o))
+        }
+        if (check_intersection(o)) {
             return IntersectionStatus::Cut;
+        }
         return IntersectionStatus::Out;
     }
 
     [[nodiscard]] constexpr bool check_intersection(const Sphere<Element>& sphere) const
     {
-        return check_intersection(Aabb3<Element>(
+        return check_intersection(Aabb3(
             sphere.get_center() + sphere.get_radius(), sphere.get_center() - sphere.get_radius()));
     }
 
-    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o, Aabb3<Element>& intersection) const
+    [[nodiscard]] constexpr bool check_intersection(const Aabb3& o, Aabb3& intersection) const
     {
         int equals = 0;
         const auto u = upper.minimum(o.upper);
@@ -169,13 +212,13 @@ public:
             }
         }
         if (equals < 3) {
-            intersection = Aabb3<Element>(u, l);
+            intersection = Aabb3(u, l);
             return true;
         }
         return false;
     }
 
-    [[nodiscard]] constexpr bool check_intersection(const Aabb3<Element>& o) const
+    [[nodiscard]] constexpr bool check_intersection(const Aabb3& o) const
     {
         const auto max_dis = diameter + o.diameter;
         const auto dis = (center - o.center).abs() * static_cast<Element>(2);
@@ -199,7 +242,7 @@ public:
         volume = d.x * d.y * d.z;
     }
 
-    constexpr void get_all_corners(std::array<math::Vec3<Element>, 8>& corners) const
+    constexpr void get_all_corners(std::array<Vec3<Element>, 8>& corners) const
     {
         corners[0].x = upper.x;
         corners[0].y = upper.y;
