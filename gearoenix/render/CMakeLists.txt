@@ -55,6 +55,7 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/gltf/gx-rnd-gltf-transform.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-name-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-entity-selector.hpp
+        ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-id.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-id.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-input-uint.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-math-vec.hpp
