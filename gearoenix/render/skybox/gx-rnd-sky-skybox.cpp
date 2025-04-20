@@ -1,12 +1,11 @@
 #include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Skybox::Skybox(
-    const core::ecs::component_index_t final_component_type_index,
+    const core::object_type_index_t final_component_type_index,
     std::shared_ptr<mesh::Mesh>&& bound_mesh,
     Texture&& bound_texture,
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-    : Component(final_component_type_index, std::move(name), entity_id)
+    std::string&& name)
+    : Component(final_component_type_index, std::move(name))
     , bound_mesh(std::move(bound_mesh))
     , bound_texture(std::move(bound_texture))
 {

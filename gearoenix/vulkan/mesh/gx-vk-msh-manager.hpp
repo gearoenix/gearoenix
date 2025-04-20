@@ -102,11 +102,11 @@ private:
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        const core::job::EndCaller& end_callback) final;
+        const core::job::EndCaller& end_callback) override;
 
 public:
     explicit Manager(engine::Engine& e);
-    ~Manager() final;
+    ~Manager() override;
     void update();
 };
 }

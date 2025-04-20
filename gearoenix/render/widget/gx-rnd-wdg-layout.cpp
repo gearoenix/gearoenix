@@ -6,8 +6,8 @@
 
 void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::Transformation& trn) const
 {
-    const auto wds = distance.to_world(e);
-    const auto& wsz = e.get_platform_application().get_base().get_window_size();
+    const auto wds = distance.to_world();
+    const auto& wsz = platform::Application::get().get_base().get_window_size();
     const auto war = static_cast<double>(wsz.x) / static_cast<double>(wsz.y);
     auto l = trn.get_local_position();
     switch (side) {
@@ -30,7 +30,7 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::T
 gearoenix::core::event::Listener::Response gearoenix::render::widget::LayoutWindowBasedPlacer::on_event(const core::event::Data& event_data)
 {
     if (event_data.get_source() == core::event::Id::PlatformWindowSizeChange) {
-        if (auto* const trn = core::ecs::World::get()->get_component<physics::Transformation>(model_entity_id); nullptr != trn) {
+        if (auto* const trn = model_entity->get_component<physics::Transformation>(); nullptr != trn) {
             set_location(*trn);
         } else {
             GX_UNEXPECTED;

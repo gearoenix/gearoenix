@@ -4,10 +4,7 @@
 namespace gearoenix::render::texture {
 struct TextureCube : Texture {
 protected:
-    TextureCube(
-        std::string name,
-        const TextureInfo& info,
-        engine::Engine& e);
+    TextureCube(std::string name, const TextureInfo& info);
 
 public:
     ~TextureCube() override;

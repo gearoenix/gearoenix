@@ -12,24 +12,37 @@
 #include <array>
 #include <boost/mp11/algorithm.hpp>
 
-#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
-
 #ifdef main
 #undef main
 #endif
 
-gearoenix::render::texture::Manager::Manager(engine::Engine& e)
-    : e(e)
-{
+namespace {
+gearoenix::render::texture::Manager* instance = nullptr;
 }
 
-gearoenix::render::texture::Manager::~Manager() = default;
+gearoenix::render::texture::Manager::Manager()
+{
+    GX_ASSERT_D(!instance);
+    instance = this;
+}
+
+gearoenix::render::texture::Manager::~Manager()
+{
+    GX_ASSERT_D(instance);
+    instance = nullptr;
+}
+
+gearoenix::render::texture::Manager& gearoenix::render::texture::Manager::get()
+{
+    GX_ASSERT_D(instance);
+    return *instance;
+}
 
 void gearoenix::render::texture::Manager::read_gx3d(
     const platform::stream::Path& path,
     core::job::EndCallerShared<Texture>&& c)
 {
-    const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
+    const auto stream = platform::stream::Stream::open(path);
     read_gx3d(*stream, std::move(c));
 }
 
@@ -81,7 +94,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
     const auto comp_bits = format_component_bits_count(txt_info.get_format());
     if (is_float) {
         GX_ASSERT(32 == comp_bits);
-        if (!e.get_specification().is_float_texture_supported) {
+        if (!engine::Engine::get().get_specification().is_float_texture_supported) {
             txt_info.set_format(TextureFormat::RgbaUint8); // No other format is supported
         }
     } else {
@@ -101,7 +114,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
                 Image::decode(data.data(), static_cast<std::uint32_t>(data.size()), comps_count, float_pixels, decode_w, decode_h, ignored);
                 GX_ASSERT(mip_w == decode_w);
                 GX_ASSERT(mip_h == decode_h);
-                if (e.get_specification().is_float_texture_supported) {
+                if (engine::Engine::get().get_specification().is_float_texture_supported) {
                     mip_pixels.resize(float_pixels.size() << 2);
                     std::memcpy(mip_pixels.data(), float_pixels.data(), mip_pixels.size());
                 } else {
@@ -213,9 +226,9 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
     }
     constexpr auto file_name = "default-brdflut.gx-2d-texture";
     {
-        std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(e.get_platform_application(), file_name));
+        std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(file_name));
         if (nullptr == stream) {
-            stream = std::unique_ptr<platform::stream::Stream>(platform::stream::Local::open(e.get_platform_application(), file_name));
+            stream = std::unique_ptr<platform::stream::Stream>(platform::stream::Local::open(file_name));
         }
         if (nullptr != stream) {
             read_gx3d(
@@ -257,7 +270,7 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
             }
             GX_ASSERT(nullptr != brdflut);
             c.set_return(std::shared_ptr(brdflut));
-            const std::shared_ptr<platform::stream::Stream> stream(new platform::stream::Local(e.get_platform_application(), file_name, true));
+            const std::shared_ptr<platform::stream::Stream> stream(new platform::stream::Local(file_name, true));
             brdflut->write(stream, core::job::EndCaller([] { }));
         }));
 }
@@ -398,7 +411,7 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
     std::vector<std::uint8_t> pixels0;
     TextureInfo new_info = info;
-    if (e.get_specification().is_float_texture_supported) {
+    if (engine::Engine::get().get_specification().is_float_texture_supported) {
         new_info.set_format(TextureFormat::RgbaFloat32);
         const auto pixels0_sz = pixels0f.size() * sizeof(float);
         pixels0.resize(pixels0_sz);
@@ -433,7 +446,7 @@ void gearoenix::render::texture::Manager::create_2d_from_file(
             }
         }
     }
-    const auto stream = platform::stream::Stream::open(path, e.get_platform_application());
+    const auto stream = platform::stream::Stream::open(path);
     GX_ASSERT(nullptr != stream);
     const auto data = stream->get_file_content();
     if (path.get_raw_data().ends_with(".hdr")) {
@@ -618,14 +631,14 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
 
 gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Manager::get_default_camera_render_target_dimensions() const
 {
-    switch (auto& resolution = core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().get(); resolution.get_index()) {
+    switch (auto& resolution = RuntimeConfiguration::get().get_runtime_resolution().get(); resolution.get_index()) {
     case Resolution::fixed_index: {
         const auto [width, height] = resolution.get_fixed();
         return { width, height };
     }
     case Resolution::screen_based_index: {
         const auto [nom, dom] = resolution.get_screen_based();
-        const auto wh = (e.get_platform_application().get_base().get_window_size() * static_cast<int>(nom)) / static_cast<int>(dom);
+        const auto wh = (platform::Application::get().get_base().get_window_size() * static_cast<int>(nom)) / static_cast<int>(dom);
         return math::Vec2<std::uint32_t> { wh };
     }
     default:

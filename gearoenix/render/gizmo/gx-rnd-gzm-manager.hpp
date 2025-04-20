@@ -8,14 +8,9 @@ namespace gearoenix::render::camera {
 struct Camera;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::gizmo {
 struct Drawer;
 struct Manager final {
-    engine::Engine& e;
     camera::Camera* current_camera = nullptr;
     boost::container::flat_multimap<float, int> axes_z_map;
 
@@ -29,9 +24,11 @@ private:
     std::uint64_t transform_mode = 0;
     std::uintptr_t active_handle = static_cast<std::uintptr_t>(-1);
 
+    Manager();
+
 public:
-    explicit Manager(engine::Engine& e);
     ~Manager();
+    [[nodiscard]] static Manager& get();
     void show_view();
     void set_viewport_camera(camera::Camera*);
     [[nodiscard]] bool show_transform(math::Mat4x4<double>&) const;

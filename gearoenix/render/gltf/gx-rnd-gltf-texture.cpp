@@ -75,7 +75,7 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
             GX_UNEXPECTED;
         }
     };
-    engine::Engine::get()->get_texture_manager()->create_2d_from_formatted(
+    texture::Manager::get().create_2d_from_formatted(
         std::string(img.name), img_ptr, img_sz,
         texture::TextureInfo()
             .set_format(texture::TextureFormat::Unknown)

@@ -27,3 +27,49 @@ These demos showcase Gearoenix running in WebAssembly, but keep in mind that web
 [Example 009 Baked Reflection Probes](https://gearoenix.com/engine/webassembly-samples/009-baked-reflection-probe/GearoenixExample009BakedReflectionProbe.html)
 
 [Example 010 Lighting](https://gearoenix.com/engine/webassembly-samples/010-lighting/GearoenixExample010Lighting.html)
+
+## Features
+
+### Core Engine Features:
+
+**🚀 High-Performance Multithreaded ECS:** Experience blazing-fast performance with our Entity Component System,
+meticulously engineered for multithreaded execution.
+
+**⚙️ Runtime Multi-Backend Graphics API Support:** Seamlessly deploy across platforms with support for OpenGL, Vulkan,
+Metal, and DirectX, ensuring optimal rendering on any device.
+
+**🎨 Versatile Shading Modes:** Achieve stunning visuals with a range of shading options, including PBR, Unlit,
+Transparent, and more.
+
+**📦 glTF/glb Importer:** Streamline your asset pipeline with native support for the industry-standard glTF and glb 
+formats.
+
+**🐞 Robust Debugging Tools:** Identify and resolve issues quickly with our comprehensive suite of validation checks and
+debugging tools.
+
+### Development Environment:
+
+**🛠️ First-Class Dear ImGui Integration:** Leverage the power and flexibility of Dear ImGui for all your UI needs.
+
+**🎛️ Built-in UI Widget System:** Create custom user interfaces with our integrated widget system, independent of Dear
+ImGui.
+
+**💻 Early-Stage Engine Editor:** Begin creating and refining your worlds with our integrated editor, designed to grow
+with your project.
+
+## Animation & Physics:
+
+**💃 Armature Animation:** Bring your characters to life with smooth and realistic armature-based animation.
+
+**✨ Sprite Animation:** Easily create dynamic 2D experiences with our dedicated sprite animation system.
+
+**⚙️ Early-Stage Physics Engine:** Simulate realistic interactions with our performant physics engine, featuring
+colliders, animation integration, and constraints.
+
+### Rendering Capabilities:
+
+**💡 Deferred and Forward Rendering:** Choose the rendering path that best suits your project's needs, with support for
+both deferred and forward rendering.
+
+**✨ Rendering Abstraction:** Future-proof your projects with our rendering abstraction layer, supporting both
+rasterization and ray tracing render modes.

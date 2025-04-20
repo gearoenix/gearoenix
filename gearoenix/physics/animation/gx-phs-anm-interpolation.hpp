@@ -25,7 +25,7 @@ template <typename Value, typename T>
         const auto tp2 = t * t;
         const auto tp3 = tp2 * t;
         const auto tp2mp3 = tp2 * 3.0;
-        return (s_key * ((tp3 * 2.0) - tp2mp3 + 1.0)) + (s_out * (td * (tp3 - (tp2 * 2.0) + t))) + (e_key * ((-2.0 * tp3) + tp2mp3)) + (e_in * (td * (tp3 - tp2)));
+        return s_key * (tp3 * 2.0 - tp2mp3 + 1.0) + s_out * (td * (tp3 - tp2 * 2.0 + t)) + e_key * (-2.0 * tp3 + tp2mp3) + e_in * (td * (tp3 - tp2));
     }
     if (start_keyframe.second.is_step() || end_keyframe.second.is_step()) {
         if (t > 0.5) {

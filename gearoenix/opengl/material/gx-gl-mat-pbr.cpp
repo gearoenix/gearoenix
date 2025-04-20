@@ -10,19 +10,19 @@
 #include "../submission/gx-gl-sbm-camera.hpp"
 #include "../submission/gx-gl-sbm-scene.hpp"
 
-gearoenix::gl::material::Pbr::Pbr(Engine& e, const std::string& name)
-    : render::material::Pbr(e, name)
+gearoenix::gl::material::Pbr::Pbr(const std::string& name)
+    : render::material::Pbr(name)
     , material::Material(false)
-    , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())
-    , forward_pbr_combination(e.get_shader_manager()->get<shader::ForwardPbrCombination>())
-    , gbuffers_filler_combination(e.get_specification().is_deferred_supported ? new shader::GBuffersFiller(e) : nullptr)
+    , shadow_caster_combination(shader::Manager::get().get<shader::ShadowCasterCombination>())
+    , forward_pbr_combination(shader::Manager::get().get<shader::ForwardPbrCombination>())
+    , gbuffers_filler_combination(Engine::get().get_specification().is_deferred_supported ? new shader::GBuffersFiller() : nullptr)
 {
 }
 
-void gearoenix::gl::material::Pbr::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c)
+void gearoenix::gl::material::Pbr::construct(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c)
 {
-    static const auto allocator = core::allocator::SharedArray<Pbr, MAX_COUNT>::construct();
-    const auto result = allocator->make_shared(e, name);
+    static const auto allocator = core::allocator::SharedArray<Pbr, max_count>::construct();
+    const auto result = allocator->make_shared(name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

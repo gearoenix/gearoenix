@@ -13,12 +13,12 @@ struct Manager final : public render::camera::Manager {
 private:
     engine::Engine& vk_e;
 
-    std::shared_ptr<render::camera::Builder> build(const std::string& name) final;
-    void update() final;
+    std::shared_ptr<render::camera::Builder> build(const std::string& name) override;
+    void update() override;
 
 public:
     explicit Manager(engine::Engine& e);
-    ~Manager() final;
+    ~Manager() override;
 };
 }
 

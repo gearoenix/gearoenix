@@ -5,46 +5,46 @@
 #include <optional>
 
 namespace gearoenix::gl::shader {
-struct BloomPrefilter final : public Shader {
+struct BloomPrefilter final : Shader {
     GX_GL_UNIFORM_VECTOR(texel_size, 2, 1);
     GX_GL_UNIFORM_VECTOR(scatter_clamp_max_threshold_threshold_knee, 4, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomPrefilter(Engine& e);
-    ~BloomPrefilter() final;
-    void bind(uint& current_shader) const final;
+    BloomPrefilter();
+    ~BloomPrefilter() override;
+    void bind(uint& current_shader) const override;
 };
 
-struct BloomHorizontal final : public Shader {
+struct BloomHorizontal final : Shader {
     GX_GL_UNIFORM_VECTOR(texel_size_mip_index, 3, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomHorizontal(Engine& e);
-    ~BloomHorizontal() final;
-    void bind(uint& current_shader) const final;
+    BloomHorizontal();
+    ~BloomHorizontal() override;
+    void bind(uint& current_shader) const override;
 };
 
-struct BloomVertical final : public Shader {
+struct BloomVertical final : Shader {
     GX_GL_UNIFORM_VECTOR(texel_size_mip_index, 3, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit BloomVertical(Engine& e);
-    ~BloomVertical() final;
-    void bind(uint& current_shader) const final;
+    BloomVertical();
+    ~BloomVertical() override;
+    void bind(uint& current_shader) const override;
 };
 
-struct BloomUpsampler final : public Shader {
+struct BloomUpsampler final : Shader {
     GX_GL_UNIFORM_VECTOR(scatter_src_mip_index, 2, 1);
     GX_GL_UNIFORM_TEXTURE(source_texture);
     GX_GL_UNIFORM_TEXTURE(low_texture);
 
 public:
-    explicit BloomUpsampler(Engine& e);
-    ~BloomUpsampler() final;
-    void bind(uint& current_shader) const final;
+    BloomUpsampler();
+    ~BloomUpsampler() override;
+    void bind(uint& current_shader) const override;
 };
 }
 #endif

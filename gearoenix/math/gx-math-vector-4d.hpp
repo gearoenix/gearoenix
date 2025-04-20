@@ -226,10 +226,10 @@ struct Vec4 final {
 
     void write(platform::stream::Stream& s) const
     {
-        GX_ASSERT(sizeof(x) == s.write(x));
-        GX_ASSERT(sizeof(y) == s.write(y));
-        GX_ASSERT(sizeof(z) == s.write(z));
-        GX_ASSERT(sizeof(w) == s.write(w));
+        s.write_fail_debug(x);
+        s.write_fail_debug(y);
+        s.write_fail_debug(z);
+        s.write_fail_debug(w);
     }
 
     void read(platform::stream::Stream& s)

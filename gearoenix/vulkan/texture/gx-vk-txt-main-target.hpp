@@ -53,8 +53,8 @@ public:
 
 public:
     MainTarget(memory::Manager& memory_manager, engine::Engine* e);
-    ~MainTarget() final;
-    [[nodiscard]] render::texture::Target* clone() const final;
+    ~MainTarget() override;
+    [[nodiscard]] render::texture::Target* clone() const override;
     void update();
     void present();
 };

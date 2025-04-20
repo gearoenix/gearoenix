@@ -1,10 +1,8 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
-#include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
@@ -12,56 +10,41 @@
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
+typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
+typedef gearoenix::physics::Transformation GxTran;
+typedef gearoenix::render::camera::Manager GxCamManager;
+typedef gearoenix::render::light::Light GxLight;
+typedef gearoenix::render::light::Manager GxLightManager;
+typedef gearoenix::render::light::ShadowCasterDirectional GxShadowCasterDirLight;
+typedef gearoenix::render::material::Manager GxMatManager;
 typedef gearoenix::render::material::Pbr GxPbr;
-typedef std::shared_ptr<GxPbr> GxPbrPtr;
-typedef gearoenix::core::job::EndCallerShared<GxPbr> GxPbrEndCaller;
+typedef gearoenix::render::mesh::Manager GxMeshManager;
 typedef gearoenix::render::mesh::Mesh GxMesh;
-typedef std::shared_ptr<GxMesh> GxMeshPtr;
-typedef gearoenix::core::job::EndCallerShared<GxMesh> GxMeshEndCaller;
-typedef gearoenix::render::camera::Builder GxCameraBuilder;
-typedef std::shared_ptr<GxCameraBuilder> GxCameraBuilderPtr;
-typedef gearoenix::core::job::EndCallerShared<GxCameraBuilder> GxCameraBuilderEndCaller;
+typedef gearoenix::render::model::Manager GxModelManager;
+typedef gearoenix::render::scene::Manager GxSceneManager;
+typedef gearoenix::render::scene::Scene GxScene;
 typedef gearoenix::render::PbrVertex GxPbrVertex;
+
+typedef std::shared_ptr<GxPbr> GxPbrPtr;
+typedef std::shared_ptr<GxMesh> GxMeshPtr;
+
 typedef gearoenix::core::job::EndCaller<> GxEndCaller;
-typedef gearoenix::render::scene::Builder GxSceneBuilder;
-typedef std::shared_ptr<GxSceneBuilder> GxSceneBuilderPtr;
-typedef gearoenix::render::light::Builder GxLightBuilder;
-typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
-typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndCaller;
+typedef gearoenix::core::job::EndCaller<GxEntityPtr> GxEntityEndCaller;
+typedef gearoenix::core::job::EndCallerShared<GxMesh> GxMeshEndCaller;
+typedef gearoenix::core::job::EndCallerShared<GxPbr> GxPbrEndCaller;
 
 struct GameApp final : gearoenix::core::Application {
-    explicit GameApp(gearoenix::platform::Application& plt_app)
-        : Application(plt_app)
+private:
+    GxEntityPtr scene_entity;
+
+public:
+    GameApp()
+        : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        render_engine.get_material_manager()->get_pbr(
-            "material",
-            GxPbrEndCaller([this](GxPbrPtr&& material) mutable {
-                set_material(std::move(material));
-            }));
-    }
-
-    void set_mesh(GxMeshPtr&& mesh)
-    {
-        auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([] { }));
-
-        auto model_builder = render_engine.get_model_manager()->build(
-            "triangle-model", nullptr,
-            { std::move(mesh) },
-            GxEndCaller([] { }),
-            true);
-        scene_builder->add(std::move(model_builder));
-
-        render_engine.get_camera_manager()->build(
-            "camera", nullptr,
-            GxCameraBuilderEndCaller([this, scene_builder = std::move(scene_builder)](GxCameraBuilderPtr&& camera_builder) mutable {
-                set_camera_builder(std::move(camera_builder), std::move(scene_builder));
-            }),
-            GxEndCaller([] {}));
+        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& material) { set_material(std::move(material)); }));
     }
 
     void set_material(GxPbrPtr&& material)
@@ -85,44 +68,43 @@ struct GameApp final : gearoenix::core::Application {
 
         std::vector<std::uint32_t> indices = { 0, 1, 2 };
 
-        render_engine.get_mesh_manager()->build(
+        GxMeshManager::get().build(
             "triangle-mesh",
             std::move(vertices),
             std::move(indices),
             std::move(material),
-            GxMeshEndCaller([this](GxMeshPtr&& m) {
-                set_mesh(std::move(m));
-            }));
+            GxMeshEndCaller([this](GxMeshPtr&& m) { set_mesh(std::move(m)); }));
     }
 
-    void set_camera_builder(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder)
+    void set_mesh(GxMeshPtr&& mesh)
     {
-        camera_builder->get_transformation().set_local_position({ 0.0f, 0.0f, 5.0f });
-        scene_builder->add(std::move(camera_builder));
+        auto model_builder = GxModelManager::get().build(
+            "triangle-model", scene_entity.get(), { std::move(mesh) }, true);
 
-        render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light", nullptr,
-            1024,
-            10.0f,
-            1.0f,
-            10.0f,
-            GxLightBuilderEndCaller([scene_builder = std::move(scene_builder)](GxLightBuilderPtr&& light_builder) {
-                set_light_builder(std::move(light_builder), scene_builder);
-            }),
-            GxEndCaller([] {}));
+        GxCamManager::get().build(
+            "camera", scene_entity.get(),
+            GxEntityEndCaller([this](GxEntityPtr&& camera_entity) { set_camera_builder(std::move(camera_entity)); }));
     }
 
-    static void set_light_builder(GxLightBuilderPtr&& light_builder, const GxSceneBuilderPtr& scene_builder)
+    void set_camera_builder(GxEntityPtr&& camera_entity)
     {
-        light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
-            { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder->get_light().colour = { 10.0f, 10.0f, 10.0f };
-        scene_builder->add(std::move(light_builder));
+        camera_entity->get_component<GxTran>()->set_local_position({ 0.0f, 0.0f, 5.0f });
 
-        scene_builder->get_scene().set_enabled(true);
+        GxLightManager::get().build_shadow_caster_directional(
+            "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
+            GxEntityEndCaller([this](GxEntityPtr&& light_entity) { set_light_builder(std::move(light_entity)); }));
     }
 
-    void update()
+    void set_light_builder(GxEntityPtr&& light_entity)
+    {
+        auto* const light = light_entity->get_component<GxShadowCasterDirLight>();
+        light->get_shadow_transform()->local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light->colour = { 10.0f, 10.0f, 10.0f };
+
+        scene_entity->add_to_world();
+    }
+
+    void update() override
     {
         Application::update();
     }

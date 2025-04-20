@@ -38,7 +38,7 @@ namespace gearoenix::render::camera {
 //
 //  public:
 //     explicit ArcController(std::shared_ptr<Camera> cam) ;
-//     ~ArcController()  final;
+//     ~ArcController()  override;
 //     void set_vertical_angle(double) ;
 //     void set_min_vertical_angle(double) ;
 //     void set_max_vertical_angle(double) ;
@@ -46,6 +46,6 @@ namespace gearoenix::render::camera {
 //     void set_min_distance(double) ;
 //     void set_max_distance(double) ;
 //     void set_target(const math::Vec3<double>&) ;
-//     [[nodiscard]] bool on_event(const core::event::Data& event_data)  final;
+//     [[nodiscard]] bool on_event(const core::event::Data& event_data)  override;
 //};
 }

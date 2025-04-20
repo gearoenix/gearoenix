@@ -11,6 +11,7 @@
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-model.hpp"
 #include "gx-gl-reflection.hpp"
+#include "gx-gl-scene.hpp"
 #include "gx-gl-skybox.hpp"
 #include "gx-gl-texture.hpp"
 #include "material/gx-gl-mat-manager.hpp"
@@ -21,7 +22,7 @@
 
 gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
-    , shader_manager(new shader::Manager(*this))
+    , shader_manager(new shader::Manager())
 {
     while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by caller*/
     }
@@ -45,21 +46,22 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
     specification.is_deferred_supported = false;
 
+    scene_manager = std::make_unique<SceneManager>();
     GX_GL_CHECK_D;
-    camera_manager = std::make_unique<CameraManager>(*this);
+    camera_manager = std::make_unique<CameraManager>();
     GX_GL_CHECK_D;
-    mesh_manager = std::make_unique<MeshManager>(*this);
+    mesh_manager = std::make_unique<MeshManager>();
     GX_GL_CHECK_D;
-    model_manager = std::make_unique<ModelManager>(*this);
+    model_manager = std::make_unique<ModelManager>();
     GX_GL_CHECK_D;
-    material_manager = std::make_unique<material::Manager>(*this);
+    material_manager = std::make_unique<material::Manager>();
     GX_GL_CHECK_D;
-    texture_manager = std::make_unique<TextureManager>(*this);
+    texture_manager = std::make_unique<TextureManager>();
     GX_GL_CHECK_D;
     submission_manager = std::make_unique<submission::Manager>(*this);
-    skybox_manager = std::make_unique<SkyboxManager>(*this);
-    reflection_manager = std::make_unique<ReflectionManager>(*this);
-    light_manager = std::make_unique<LightManager>(*this);
+    skybox_manager = std::make_unique<SkyboxManager>();
+    reflection_manager = std::make_unique<ReflectionManager>();
+    light_manager = std::make_unique<LightManager>();
     core::job::execute_current_thread_jobs();
 }
 

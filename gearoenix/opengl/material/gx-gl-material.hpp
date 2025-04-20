@@ -4,7 +4,6 @@
 #include "../gx-gl-types.hpp"
 
 namespace gearoenix::gl {
-struct Engine;
 struct Texture2D;
 }
 
@@ -17,9 +16,7 @@ struct Scene;
 
 namespace gearoenix::gl::material {
 struct Material {
-    const bool needs_mvp;
-
-    explicit Material(bool needs_mvp);
+    Material();
     virtual ~Material();
     virtual void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader);
     virtual void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader);

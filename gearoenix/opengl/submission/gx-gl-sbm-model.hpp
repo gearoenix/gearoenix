@@ -52,7 +52,6 @@ struct Model final {
 
     Model();
     Model(const gl::Model*, const physics::Transformation*, Scene&, const physics::animation::Armature*);
-    [[nodiscard]] bool has_transparent_material(const Scene& scene) const;
     [[nodiscard]] bool needs_mvp(const Scene& scene) const;
     void render_shadow(const Scene& scene, const Camera& camera, uint& current_shader) const;
     void render_forward(const Scene& scene, const Camera& camera, uint& current_shader) const;

@@ -18,8 +18,7 @@ gearoenix::platform::stream::Asset::~Asset()
 gearoenix::platform::stream::Asset::~Asset() = default;
 #endif
 
-gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(
-    const Application& platform_application, const std::string& name)
+gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(const std::string& name)
 {
     const std::string file_name = "assets/" + name;
     auto* const asset = new Asset();
@@ -31,7 +30,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
         file_path = core::String::join_path(path, file_name);
     }
 #else
-    const std::string file_path = platform_application.get_base().get_arguments().get_process_directory() + file_name;
+    const std::string file_path = Application::get().get_base().get_arguments().get_process_directory() + file_name;
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {

@@ -21,10 +21,10 @@ private:
         std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
         bool is_transformable);
 
-    void set_material(const render::material::Pbr& material_type) final;
+    void set_material(const render::material::Pbr& material_type) override;
 
 public:
-    ~Builder() final;
+    ~Builder() override;
 };
 }
 

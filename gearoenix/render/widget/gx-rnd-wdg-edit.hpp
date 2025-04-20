@@ -118,7 +118,7 @@ public:
         std::string name,
         engine::Engine* e,
         const core::job::EndCaller<core::job::EndCallerIgnore>& c);
-    ~Edit() final;
+    ~Edit() override;
     void set_text(
         const std::wstring& t,
         const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
@@ -126,12 +126,12 @@ public:
         const std::wstring& t,
         const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
     void active(bool b = true);
-    [[nodiscard]] bool on_event(const core::event::Data& d) final;
+    [[nodiscard]] bool on_event(const core::event::Data& d) override;
     void set_left_to_right(bool b);
     void insert(wchar_t character, const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
     void backspace(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
     void del(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
-    void selected(const math::Vec3<double>& point) final;
+    void selected(const math::Vec3<double>& point) override;
     void clear();
 };
 }

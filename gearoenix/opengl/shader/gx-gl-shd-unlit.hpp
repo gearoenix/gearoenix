@@ -13,14 +13,13 @@ struct Unlit final : Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    Unlit(Engine& e, bool has_uv_transform, bool has_alpha_cutoff, bool has_albedo_factor, bool has_albedo);
+    Unlit(bool has_uv_transform, bool has_alpha_cutoff, bool has_albedo_factor, bool has_albedo);
     ~Unlit() override;
     void bind(uint& current_shader) const override;
 };
 
 struct UnlitCombination final : ShaderCombination {
     friend struct Manager;
-    Engine& e;
 
 private:
     typedef std::array<std::optional<Unlit>, 2> has_albedo;
@@ -30,10 +29,7 @@ private:
 
     has_uv_transform combinations;
 
-    explicit UnlitCombination(Engine& e)
-        : e(e)
-    {
-    }
+    UnlitCombination() { }
 
 public: /// TODO: support bone-count too
     [[nodiscard]] Unlit& get(const bool uv_transform, const bool alpha_cutoff, const bool albedo_factor, const bool albedo)
@@ -46,7 +42,7 @@ public: /// TODO: support bone-count too
         if (s.has_value()) {
             return s.value();
         }
-        s.emplace(e, uv_transform, alpha_cutoff, albedo_factor, albedo);
+        s.emplace(uv_transform, alpha_cutoff, albedo_factor, albedo);
         return s.value();
     }
 };

@@ -1,22 +1,18 @@
 #pragma once
+#include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <string>
-
-namespace gearoenix::physics {
-struct Transformation;
-}
-
-namespace gearoenix::render::engine {
-struct Engine;
-}
 
 namespace gearoenix::render::camera {
 struct Builder;
 struct Manager {
 protected:
-    engine::Engine& e;
+    Manager();
 
-    explicit Manager(engine::Engine& e);
+    static void build_impl(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        const core::job::EndCaller<core::ecs::EntityPtr>& entity_callback);
 
 public:
     Manager(Manager&&) = delete;
@@ -24,14 +20,13 @@ public:
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
 
-    virtual ~Manager() = default;
+    virtual ~Manager();
+    [[nodiscard]] static Manager& get();
 
     virtual void build(
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        core::job::EndCallerShared<Builder>&& builder_end_caller,
-        core::job::EndCaller<>&& entity_end_caller)
-        = 0;
+        std::string&& name,
+        core::ecs::Entity* parent,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 
     virtual void update();
     virtual void window_resized();

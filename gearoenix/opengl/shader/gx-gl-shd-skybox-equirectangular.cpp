@@ -51,8 +51,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::SkyboxEquirectangular::SkyboxEquirectangular()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

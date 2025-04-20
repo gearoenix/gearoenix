@@ -36,8 +36,8 @@ public:
         const std::vector<render::texture::AttachmentInfo>& infos,
         engine::Engine* e,
         const core::job::EndCaller<core::job::EndCallerIgnore>& call);
-    ~Target() final;
-    [[nodiscard]] Target* clone() const final;
+    ~Target() override;
+    [[nodiscard]] Target* clone() const override;
 };
 }
 #endif

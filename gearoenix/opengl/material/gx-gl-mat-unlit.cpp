@@ -9,18 +9,18 @@
 #include "../submission/gx-gl-sbm-camera.hpp"
 #include "../submission/gx-gl-sbm-mesh.hpp"
 
-gearoenix::gl::material::Unlit::Unlit(Engine& e, const std::string& name)
-    : render::material::Unlit(e, name)
+gearoenix::gl::material::Unlit::Unlit(const std::string& name)
+    : render::material::Unlit(name)
     , gl::material::Material(true)
-    , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())
-    , unlit_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
+    , shadow_caster_combination(shader::Manager::get().get<shader::ShadowCasterCombination>())
+    , unlit_combination(shader::Manager::get().get<shader::UnlitCombination>())
 {
 }
 
-void gearoenix::gl::material::Unlit::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c)
+void gearoenix::gl::material::Unlit::construct(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c)
 {
-    static auto allocator = core::allocator::SharedArray<gl::material::Unlit, render::material::Unlit::MAX_COUNT>::construct();
-    auto result = allocator->make_shared(e, name);
+    static auto allocator = core::allocator::SharedArray<gl::material::Unlit, render::material::Unlit::max_count>::construct();
+    auto result = allocator->make_shared(name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

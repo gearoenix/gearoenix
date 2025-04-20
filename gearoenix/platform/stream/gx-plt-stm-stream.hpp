@@ -21,7 +21,7 @@ struct Stream {
 
 public:
     virtual ~Stream() = default;
-    [[nodiscard]] static std::shared_ptr<Stream> open(const Path& path, Application& app);
+    [[nodiscard]] static std::shared_ptr<Stream> open(const Path& path);
     [[nodiscard]] virtual stream_size_t read(void* data, stream_size_t length) = 0;
     [[nodiscard]] virtual stream_size_t write(const void* data, stream_size_t length) = 0;
     virtual void seek(stream_size_t offset) = 0;

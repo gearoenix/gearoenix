@@ -7,9 +7,9 @@ struct Final final : public Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    explicit Final(Engine& e);
-    ~Final() final;
-    void bind(uint& current_shader) const final;
+    Final();
+    ~Final() override;
+    void bind(uint& current_shader) const override;
 };
 }
 

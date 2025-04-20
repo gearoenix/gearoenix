@@ -3,8 +3,8 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::Sprite::Sprite(engine::Engine& e, const std::string& name)
-    : Material(e, name, Id::Sprite)
+gearoenix::render::material::Sprite::Sprite(const std::string& name)
+    : Material(name, Id::Sprite, true)
     , albedo_factor(1.0f, 1.0f, 1.0f, 1.0f)
     , uv_transform(1.0f, 1.0f, 0.0f, 0.0f)
 {
@@ -12,7 +12,7 @@ gearoenix::render::material::Sprite::Sprite(engine::Engine& e, const std::string
 
 void gearoenix::render::material::Sprite::initialise(core::job::EndCallerShared<Sprite>&& c)
 {
-    e.get_texture_manager()->create_2d_from_colour(
+    texture::Manager::get().create_2d_from_colour(
         math::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
         core::job::EndCallerShared<texture::Texture2D>([this, c = std::move(c)](std::shared_ptr<texture::Texture2D>&& t) {
             set_albedo(std::move(t));

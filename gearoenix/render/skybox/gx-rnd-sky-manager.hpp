@@ -1,11 +1,8 @@
 #pragma once
+#include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-sky-types.hpp"
 #include <string>
-
-namespace gearoenix::render::engine {
-struct Engine;
-}
 
 namespace gearoenix::platform::stream {
 struct Path;
@@ -16,13 +13,9 @@ struct Mesh;
 }
 
 namespace gearoenix::render::skybox {
-struct Builder;
 struct Manager {
-
 protected:
-    engine::Engine& e;
-
-    explicit Manager(engine::Engine& e);
+    Manager();
 
 public:
     Manager(Manager&&) = delete;
@@ -31,23 +24,23 @@ public:
     Manager& operator=(const Manager&) = delete;
     virtual ~Manager();
 
-    [[nodiscard]] virtual std::shared_ptr<Builder> build(
+    [[nodiscard]] virtual core::ecs::EntityPtr build(
         std::string&& name,
+        core::ecs::Entity* parent,
         Texture&& bound_texture,
-        std::shared_ptr<mesh::Mesh>&& bound_mesh,
-        core::job::EndCaller<>&& entity_end_callback)
+        std::shared_ptr<mesh::Mesh>&& bound_mesh)
         = 0;
 
     void build(
-        const std::string& name,
+        std::string&& name,
+        core::ecs::Entity* parent,
         const platform::stream::Path& texture_path,
-        core::job::EndCaller<>&& entity_end_callback,
-        core::job::EndCallerShared<Builder>&& builder_callback);
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 
     void build(
         std::string&& name,
+        core::ecs::Entity* parent,
         Texture&& bound_texture,
-        core::job::EndCaller<>&& entity_end_callback,
-        core::job::EndCallerShared<Builder>&& builder_callback);
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 };
 }

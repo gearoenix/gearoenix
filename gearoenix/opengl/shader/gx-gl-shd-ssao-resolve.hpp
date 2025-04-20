@@ -10,7 +10,7 @@ struct SsaoResolve final : Shader {
     GX_GL_UNIFORM_TEXTURE(normal_ao);
 
 public:
-    explicit SsaoResolve(Engine& e);
+    SsaoResolve();
     ~SsaoResolve() override;
     void bind(uint& current_shader) const override;
 };

@@ -9,20 +9,12 @@ namespace gearoenix::platform::stream {
 struct Stream;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::texture {
 struct Texture {
-    GX_GET_RRF_PRT(engine::Engine, e);
     GX_GET_REFC_PRT(std::string, name);
     GX_GET_CREF_PRT(TextureInfo, info);
 
-    Texture(
-        std::string name,
-        const TextureInfo& info,
-        engine::Engine& e);
+    Texture(std::string name, const TextureInfo& info);
 
     static void write_gx3d_image(
         std::shared_ptr<platform::stream::Stream>&& s,

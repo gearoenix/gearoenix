@@ -7,19 +7,17 @@
 #include "gx-gl-loader.hpp"
 #include "gx-gl-texture.hpp"
 
-gearoenix::gl::Target::Target(Engine& e, std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
+gearoenix::gl::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
     : render::texture::Target(std::move(in_name), std::move(attachments))
-    , e(e)
 {
 }
 
 void gearoenix::gl::Target::construct(
-    Engine& e,
     std::string&& name,
     std::vector<render::texture::Attachment>&& attachments,
     core::job::EndCallerShared<render::texture::Target>&& end_callback)
 {
-    std::shared_ptr<Target> self(new Target(e, std::string(name), std::move(attachments)));
+    std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
     GX_ASSERT_D(!self->attachments.empty());
     self->gl_attachments.reserve(self->attachments.size());
     std::vector<enumerated> binding_points;
@@ -52,7 +50,7 @@ void gearoenix::gl::Target::construct(
         }
     }
     end_callback.set_return(self);
-    core::job::send_job(e.get_jobs_thread_id(), [self = std::move(self), name = std::move(name), binding_points = std::move(binding_points), end_callback = std::move(end_callback)] {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [self = std::move(self), name = std::move(name), binding_points = std::move(binding_points), end_callback = std::move(end_callback)] {
         glGenFramebuffers(1, &self->framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, self->framebuffer);
         GX_GL_CHECK_D;
@@ -103,7 +101,7 @@ void gearoenix::gl::Target::construct(
 gearoenix::gl::Target::~Target()
 {
     attachments.clear();
-    core::job::send_job(e.get_jobs_thread_id(), [f = framebuffer] {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [f = framebuffer] {
         glDeleteFramebuffers(1, &f);
     });
 }

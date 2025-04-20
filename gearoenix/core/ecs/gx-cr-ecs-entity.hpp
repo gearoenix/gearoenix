@@ -1,41 +1,68 @@
 #pragma once
-#include "../job/gx-cr-job-end-caller.hpp"
-#include "../macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-cr-object-type-indices.hpp"
+#include "../gx-cr-object.hpp"
+#include "../gx-cr-static-flat-map.hpp"
+#include "gx-cr-ecs-entity-ptr.hpp"
 #include "gx-cr-ecs-types.hpp"
-#include <atomic>
-#include <memory>
-#include <string>
 
-namespace gearoenix::platform::stream {
-struct Stream;
+namespace gearoenix::core {
+struct ObjectStreamer;
 }
 
 namespace gearoenix::core::ecs {
 struct World;
 struct Archetype;
-struct EntityBuilder;
 struct Component;
 
-struct Entity final {
+struct Entity final : Object {
     friend struct World;
-    friend struct EntityBuilder;
+    friend struct Archetype;
 
-private:
-    static std::atomic<entity_id_t> last_id;
+    constexpr static std::size_t max_components = 32;
+    constexpr static std::size_t max_children = 8;
+    constexpr static auto max_count = 1024 * 16;
+    constexpr static auto object_type_index = gearoenix_core_ecs_entity_type_index;
 
-    Archetype* archetype = nullptr;
-    std::shared_ptr<Component>* components = nullptr;
-    GX_GET_CREF_PRV(std::string, name);
+    typedef static_flat_map<object_type_index_t, std::shared_ptr<Component>, max_components> components_t;
+    typedef static_flat_map<object_id_t, EntityPtr, max_children> children_t;
 
-    Entity(Archetype* archetype, std::shared_ptr<Component>* components, std::string&& name);
+    GX_GET_PTR_PRV(Entity, parent);
+    GX_GET_PTR_PRV(Archetype, archetype);
+
+    std::mutex components_lock;
+    GX_GET_CREF_PRV(components_t, all_types_to_components);
+
+    std::mutex children_lock;
+    GX_GET_CREF_PRV(children_t, children);
+
+    void write(std::shared_ptr<platform::stream::Stream>&&, std::shared_ptr<ObjectStreamer>&&, job::EndCaller<>&&) override;
 
 public:
-    Entity(Entity&&) noexcept;
-    Entity(const Entity&) = delete;
-    Entity& operator=(Entity&&) = default;
-    Entity& operator=(const Entity&) = delete;
-    ~Entity();
-    void show_debug_gui() const;
-    void write(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end_callback) const;
+    explicit Entity(std::string&& name);
+    [[nodiscard]] static EntityPtr construct(std::string&& name, Entity* parent);
+    ~Entity() override;
+    void set_parent(Entity* p);
+    void add_child(EntityPtr&& child);
+    /// It adds itself and all of its children to World, but it doesn't add its parents
+    void add_to_world();
+    void show_debug_gui() override;
+    void add_component(std::shared_ptr<Component>&& component);
+    void remove_component(object_type_index_t);
+    [[nodiscard]] bool contains_in_parents(const Entity* e) const;
+
+    [[nodiscard]] const std::shared_ptr<Component>& get_component(object_type_index_t component_type) const;
+
+    template <typename ComponentType>
+    [[nodiscard]] ComponentType* get_component() const
+    {
+        return static_cast<ComponentType*>(get_component(ComponentType::object_type_index).get());
+    }
+
+    template <typename ComponentType>
+    [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr() const
+    {
+        static_assert(std::is_base_of_v<Component, ComponentType>);
+        return std::static_pointer_cast<ComponentType>(get_component(ComponentType::object_type_index));
+    }
 };
 }

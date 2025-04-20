@@ -30,6 +30,7 @@ private:
     void fetch_events();
 
 public:
+    [[nodiscard]] static Application& get();
     explicit Application(GX_MAIN_ENTRY_ARGS_DEF);
     ~Application();
     void run(core::Application* = nullptr);

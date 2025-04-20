@@ -38,10 +38,8 @@ struct Camera : core::ecs::Component {
     friend struct Builder;
     friend struct Manager;
 
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 18;
-    constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto object_type_index = gearoenix_render_camera_type_index;
+    constexpr static auto max_count = 16;
 
     enum struct Usage : std::uint8_t {
         ReflectionProbe = 5,
@@ -55,8 +53,6 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_CREF_PRT(Target, target);
     GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, parent_entity_id, core::ecs::invalid_entity_id); // It can be light or reflection probe or any other owner entity
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::invalid_entity_id);
     GX_GETSET_VAL_PRT(std::uint64_t, flag, 1);
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);
@@ -64,25 +60,19 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(ProjectionData, projection_data);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
     GX_GETSET_VAL_PRT(Usage, usage, Usage::Main);
-    GX_GET_VAL_PRT(bool, debug_enabled, false);
     GX_GET_REFC_PRT(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh); // TODO: remove this, Frustum collider will have gizmo
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
     GX_GET_CREF_PRT(Exposure, exposure);
     GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
-    GX_GET_CREF_PRT(std::weak_ptr<Camera>, camera_self);
     GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
 
-    Camera(
-        core::ecs::component_index_t final_type,
-        const std::string& name,
-        Target&& target,
-        std::shared_ptr<physics::Transformation>&& transform,
-        core::ecs::entity_id_t entity_id);
+    Camera(core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
 
-    void set_camera_self(const std::shared_ptr<Camera>& camera_self);
-    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
-    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+    /// It should be called exactly after the shared_ptr got generated, and it has a valid weak_ptr of self.
+    void initialise();
+    void write(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const;
+    void read(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&);
     void show_debug_gui() override;
 
 public:

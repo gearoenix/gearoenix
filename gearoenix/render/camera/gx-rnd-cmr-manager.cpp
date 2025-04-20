@@ -1,25 +1,59 @@
 #include "gx-rnd-cmr-manager.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "gx-rnd-cmr-builder.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-gearoenix::render::camera::Manager::Manager(engine::Engine& e)
-    : e(e)
+namespace {
+gearoenix::render::camera::Manager* instance = nullptr;
+}
+
+gearoenix::render::camera::Manager::Manager()
 {
     core::ecs::ComponentType::add<Camera>();
+    GX_ASSERT_D(!instance);
+    instance = this;
+}
+
+void gearoenix::render::camera::Manager::build_impl(
+    std::string&& name, core::ecs::Entity* const parent, const core::job::EndCaller<core::ecs::EntityPtr>& entity_callback)
+{
+    auto entity = core::ecs::Entity::construct(std::move(name), parent);
+    auto transform = core::Object::construct<physics::Transformation>(entity->get_object_name() + "-transformation");
+    auto frustum = core::Object::construct<physics::collider::Frustum>(
+        std::shared_ptr(transform), entity->get_object_name() + "-collider", physics::collider::Frustum::default_points);
+    entity->add_component(std::move(frustum));
+    entity->add_component(std::move(transform));
+    entity_callback.set_return(std::move(entity));
+}
+
+gearoenix::render::camera::Manager::~Manager()
+{
+    GX_ASSERT_D(instance == this);
+    instance = nullptr;
+}
+
+gearoenix::render::camera::Manager& gearoenix::render::camera::Manager::get()
+{
+    GX_ASSERT_D(instance);
+    return *instance;
+}
+
+void gearoenix::render::camera::Manager::build(std::string&&, core::ecs::Entity*, core::job::EndCaller<core::ecs::EntityPtr>&&)
+{
+    GX_UNEXPECTED; // graphic backend must implement this.
 }
 
 void gearoenix::render::camera::Manager::update()
 {
-    core::ecs::World::get()->parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>(
+    core::ecs::World::get().parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>(
         [](
-            const core::ecs::entity_id_t /*entity-id*/,
-            Camera* const cam,
-            const physics::Transformation* const transform,
-            physics::collider::Frustum* const collider,
-            const unsigned int /*kernel_index*/) {
+            const auto /*entity-id*/,
+            auto* const cam,
+            const auto* const transform,
+            auto* const collider,
+            const auto /*kernel_index*/) {
             cam->set_view(math::Mat4x4<float>(transform->get_inverted_global_matrix()));
             std::array<math::Vec3<double>, 8> points;
             cam->generate_frustum_points(
@@ -34,7 +68,7 @@ void gearoenix::render::camera::Manager::update()
 
 void gearoenix::render::camera::Manager::window_resized()
 {
-    core::ecs::World::get()->parallel_system<core::ecs::All<Camera>>([](const core::ecs::entity_id_t, Camera* const c, const unsigned int) -> void {
+    core::ecs::World::get().parallel_system<core::ecs::All<Camera>>([](const auto, auto* const c, const auto) -> void {
         c->update_target(core::job::EndCaller([] { }));
     });
 }

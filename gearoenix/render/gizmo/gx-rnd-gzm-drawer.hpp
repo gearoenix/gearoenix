@@ -3,7 +3,6 @@
 namespace gearoenix::render::gizmo {
 struct Manager;
 struct Drawer {
-    Manager* const gizmo_manager;
     bool is_gizmo_visible = false;
 
     Drawer();

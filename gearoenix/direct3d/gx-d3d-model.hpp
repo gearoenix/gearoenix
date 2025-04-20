@@ -20,7 +20,7 @@ struct Model final : public core::ecs::Component {
         std::shared_ptr<Mesh>&& bound_mesh,
         UINT buffer_size,
         const std::string& name);
-    ~Model() final;
+    ~Model() override;
     Model(Model&&);
 };
 
@@ -36,10 +36,10 @@ private:
         std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
         bool is_transformable);
 
-    void set_material(const render::material::Pbr& material_type) final;
+    void set_material(const render::material::Pbr& material_type) override;
 
 public:
-    ~ModelBuilder() final;
+    ~ModelBuilder() override;
 };
 
 struct ModelManager final : public render::model::Manager {
@@ -48,11 +48,11 @@ private:
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
         core::job::EndCaller&& c,
-        bool is_transformable) final;
+        bool is_transformable) override;
 
 public:
     explicit ModelManager(Engine& e);
-    ~ModelManager() final;
+    ~ModelManager() override;
 };
 }
 

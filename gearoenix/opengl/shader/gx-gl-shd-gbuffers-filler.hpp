@@ -21,7 +21,7 @@ struct GBuffersFiller final : Shader {
     GX_GL_UNIFORM_TEXTURE(radiance);
 
 public:
-    explicit GBuffersFiller(Engine& e);
+    explicit GBuffersFiller();
     ~GBuffersFiller() override;
     void bind(uint& current_shader) const override;
 };

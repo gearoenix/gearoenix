@@ -1,14 +1,11 @@
 #pragma once
-#include "../allocator/gx-cr-alc-same-size-block.hpp"
 #include "../gx-cr-range.hpp"
 #include "../sync/gx-cr-sync-parallel-for.hpp"
-#include "gx-cr-ecs-component.hpp"
 #include "gx-cr-ecs-condition.hpp"
-#include "gx-cr-ecs-entity-builder.hpp"
+#include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-types.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
-#include <type_traits>
 
 namespace gearoenix::core::ecs {
 struct World;
@@ -18,13 +15,13 @@ struct Archetype final {
     friend struct Entity;
 
     typedef component_index_set_t id_t;
-    typedef boost::container::flat_map<component_index_t, std::uint32_t> components_indices_t;
+    typedef boost::container::flat_map<object_type_index_t, std::uint32_t> components_indices_t;
 
     template <typename T>
     struct ConditionCheck final {
         [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
         {
-            return id.contains(T::TYPE_INDEX);
+            return id.contains(T::object_type_index);
         }
     };
 
@@ -52,86 +49,40 @@ struct Archetype final {
         }
     };
 
-    constexpr static std::uint32_t header_size = sizeof(entity_id_t);
-
     const id_t id;
     const components_indices_t components_indices;
-    const std::uint32_t entity_size;
     const std::string name;
 
 private:
-    allocator::SameSizeBlock alc;
-    boost::container::flat_set<std::uint8_t*> entities;
+    std::mutex entities_lock;
+    boost::container::flat_set<Entity*> entities;
 
-    [[nodiscard]] static std::uint32_t create_components_size(const id_t&);
-
+    [[nodiscard]] static id_t create_id(const Entity* entity);
     [[nodiscard]] static components_indices_t create_components_indices(const id_t&);
-
     [[nodiscard]] static std::string create_name(const id_t&);
 
     explicit Archetype(const id_t&);
 
-    [[nodiscard]] std::shared_ptr<Component>* allocate_entity(entity_id_t);
-
-    [[nodiscard]] std::shared_ptr<Component>* allocate_entity(entity_id_t, const EntityBuilder::components_t&);
-
-    void delete_entity(std::shared_ptr<Component>* cs);
+    void add_entity(Entity*);
+    void delete_entity(Entity*);
+    [[nodiscard]] bool contains(Entity*) const;
 
     /// If it fails to find the component it will return -1
     template <typename T>
     [[nodiscard]] std::uint32_t get_component_index() const
     {
-        const auto search = components_indices.find(T::TYPE_INDEX);
+        const auto search = components_indices.find(T::object_type_index);
         if (components_indices.end() == search) {
             return static_cast<std::uint32_t>(-1);
         }
         return search->second;
     }
 
-    /// Returns null if it fails to find the component
-    template <typename ComponentType>
-    [[nodiscard]] ComponentType* get_component(const std::shared_ptr<Component>* const components) const
+    template <typename T, std::size_t I>
+    [[nodiscard]] static T* get_component(const Entity* const e, const std::uint32_t* const indices)
     {
-        const auto search = components_indices.find(ComponentType::TYPE_INDEX);
-        if (components_indices.end() == search) {
-            return nullptr;
-        }
-        if constexpr (std::is_base_of_v<Component, ComponentType>) {
-            return static_cast<ComponentType*>(components[search->second].get());
-        } else {
-            return dynamic_cast<ComponentType*>(components[search->second].get());
-        }
-    }
-
-    template <typename ComponentType>
-    [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr(const std::shared_ptr<Component>* const components) const
-    {
-        const auto search = components_indices.find(ComponentType::TYPE_INDEX);
-        if (components_indices.end() == search) {
-            return nullptr;
-        }
-        if constexpr (std::is_base_of_v<Component, ComponentType>) {
-            return std::static_pointer_cast<ComponentType>(components[search->second]);
-        } else {
-            return std::dynamic_pointer_cast<ComponentType>(components[search->second]);
-        }
-    }
-
-    void move_out_entity(std::shared_ptr<Component>* cs, EntityBuilder::components_t& components);
-
-    template <typename ComponentType, std::uint32_t I>
-    static ComponentType* get_component_ptr(const std::shared_ptr<Component>* cs, const std::uint32_t* const is)
-    {
-        const auto index = is[I];
-        if (static_cast<std::uint32_t>(-1) == index) {
-            return nullptr;
-        }
-        Component* const rc = cs[index].get();
-        if constexpr (std::is_final_v<ComponentType>) {
-            return static_cast<ComponentType*>(rc);
-        } else {
-            return dynamic_cast<ComponentType*>(rc);
-        }
+        const auto i = indices[I];
+        return i != static_cast<std::uint32_t>(-1) ? static_cast<T*>((e->get_all_types_to_components().begin() + i)->second.get()) : nullptr;
     }
 
     template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
@@ -140,10 +91,8 @@ private:
         const std::array<std::uint32_t, sizeof...(I)> indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
-        sync::ParallelFor::exec(entities.begin(), entities.end(), [&](const std::uint8_t* const ptr, const auto kernel_index) {
-            const auto id = *reinterpret_cast<const entity_id_t*>(ptr);
-            const auto* const cs = reinterpret_cast<const std::shared_ptr<Component>*>(&ptr[header_size]);
-            fun(id, get_component_ptr<std::tuple_element_t<I, ComponentsTypesTuple>, I>(cs, indices.data())..., kernel_index);
+        sync::ParallelFor::exec(entities.begin(), entities.end(), [&](auto* const e, const auto kernel_index) {
+            fun(e, get_component<std::tuple_element_t<I, ComponentsTypesTuple>, I>(e, indices.data())..., kernel_index);
         });
     }
 
@@ -160,10 +109,8 @@ private:
         const std::array<std::uint32_t, sizeof...(I)> indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
-        for (const auto* const ptr : entities) {
-            const auto entity_id = *reinterpret_cast<const entity_id_t*>(ptr);
-            const auto* const cs = reinterpret_cast<const std::shared_ptr<Component>*>(&ptr[header_size]);
-            fun(entity_id, get_component_ptr<std::tuple_element_t<I, ComponentsTypesTuple>, I>(cs, indices.data())...);
+        for (auto* const e : entities) {
+            fun(e, get_component<std::tuple_element_t<I, ComponentsTypesTuple>, I>(e, indices.data())...);
         }
     }
 
@@ -182,6 +129,7 @@ public:
     }
 
     Archetype(const Archetype&) = delete;
+    Archetype(Archetype&&) = delete;
     ~Archetype();
 };
 }

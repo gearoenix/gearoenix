@@ -1,22 +1,18 @@
 #pragma once
-#include "../../core/ecs/gx-cr-ecs-types.hpp"
 #include "../../core/event/gx-cr-ev-listener.hpp"
 #include "gx-rnd-wdg-size.hpp"
+
+namespace gearoenix::core::ecs {
+struct Entity;
+}
 
 namespace gearoenix::physics {
 struct Transformation;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::widget {
 struct Layout : core::event::Listener {
-    engine::Engine& e;
-
-    explicit Layout(engine::Engine& e)
-        : e(e) { };
+    Layout() { }
     ~Layout() override = default;
 };
 
@@ -30,14 +26,12 @@ struct LayoutWindowBasedPlacer final : Layout {
 
     const Size distance;
     const Side side;
-    const core::ecs::entity_id_t model_entity_id;
+    core::ecs::Entity* const model_entity;
 
-    LayoutWindowBasedPlacer(
-        engine::Engine& e, const Size distance, const Side side, const core::ecs::entity_id_t model_entity_id)
-        : Layout(e)
-        , distance(distance)
+    LayoutWindowBasedPlacer(const Size distance, const Side side, core::ecs::Entity* const model_entity)
+        : distance(distance)
         , side(side)
-        , model_entity_id(model_entity_id)
+        , model_entity(model_entity)
     {
     }
     ~LayoutWindowBasedPlacer() override = default;

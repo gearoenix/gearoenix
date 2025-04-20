@@ -1,12 +1,13 @@
 #include "gx-plt-application.hpp"
 #include "../audio/gx-au-engine.hpp"
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "../core/ecs/gx-cr-ecs-singleton.hpp"
+#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-thread.hpp"
 #include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
+#include "gx-plt-runtime-configuration.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
 #include <imgui/imgui.h>
 
@@ -14,10 +15,10 @@ namespace {
 constexpr double click_time_threshold = 0.3;
 constexpr double click_distance_threshold = 0.1;
 
-void initialise_default_font(gearoenix::platform::Application& app)
+void initialise_default_font()
 {
     const auto font = gearoenix::platform::stream::Stream::open(
-        gearoenix::platform::stream::Path::create_asset("default-font.ttf"), app);
+        gearoenix::platform::stream::Path::create_asset("default-font.ttf"));
     if (nullptr == font) {
         return;
     }
@@ -33,8 +34,6 @@ void initialise_default_font(gearoenix::platform::Application& app)
 
 void register_types()
 {
-    gearoenix::core::ecs::ComponentType::add<gearoenix::platform::RuntimeConfiguration>();
-    gearoenix::core::ecs::ComponentType::add<gearoenix::render::RuntimeConfiguration>();
 }
 }
 
@@ -45,7 +44,7 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     ImGui::StyleColorsDark();
     auto io_imgui = ImGui::GetIO();
     io_imgui.Fonts->AddFontDefault();
-    io_imgui.BackendPlatformName = core::ecs::Singleton::get<RuntimeConfiguration>().get_application_name().c_str();
+    io_imgui.BackendPlatformName = RuntimeConfiguration::get().get_application_name().c_str();
     key::initialize_imgui_keymap();
 }
 
@@ -60,7 +59,7 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
 
     initialise_imgui();
 
-    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>(); !config.get_fullscreen()) {
+    if (const auto& config = RuntimeConfiguration::get(); !config.get_fullscreen()) {
         initialize_window_size(
             static_cast<int>(config.get_window_width()),
             static_cast<int>(config.get_window_height()));
@@ -104,7 +103,7 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
 
 void gearoenix::platform::BaseApplication::update_window()
 {
-    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
+    if (const auto& config = RuntimeConfiguration::get();
         window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > config.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
         render_engine->window_resized();
@@ -286,17 +285,15 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
 
 void gearoenix::platform::BaseApplication::initialize_engine(Application& app)
 {
-    initialise_default_font(app);
+    initialise_default_font();
     render_engine = render::engine::Engine::construct(app);
     audio_engine = std::make_unique<audio::Engine>(app);
 }
 
-void gearoenix::platform::BaseApplication::initialize_core_application(
-    Application& app,
-    core::Application* const core_app)
+void gearoenix::platform::BaseApplication::initialize_core_application(core::Application* const core_app)
 {
     if (nullptr == core_app) {
-        core_application = std::make_unique<core::Application>(app);
+        core_application = std::make_unique<core::Application>();
     } else {
         core_application = std::unique_ptr<core::Application>(core_app);
     }
@@ -311,6 +308,7 @@ void gearoenix::platform::BaseApplication::going_to_be_closed()
 void gearoenix::platform::BaseApplication::terminate()
 {
     core_application = nullptr;
+    core::ecs::World::get().clear();
     render_engine = nullptr;
     ImGui::DestroyContext();
     core::job::terminate();

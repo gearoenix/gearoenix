@@ -11,18 +11,17 @@ struct TextureCube;
 
 namespace gearoenix::render::reflection {
 struct Baked : Probe {
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 20;
-    constexpr static std::uint32_t MAX_COUNT = 8;
+    constexpr static auto object_type_index = gearoenix_render_reflection_baked_type_index;
+    constexpr static auto max_count = 8;
+    constexpr static std::array all_parent_object_type_indices { Probe::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Probe::object_type_index };
 
 protected:
     Baked(
-        engine::Engine& e,
-        core::ecs::component_index_t final_component_type_index,
+        core::object_type_index_t final_component_type_index,
         std::shared_ptr<texture::TextureCube>&& irradiance,
         std::shared_ptr<texture::TextureCube>&& radiance,
-        const math::Aabb3<double>& include_box,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
+        const math::Aabb3<double>& include_box, std::string&& name);
 
 public:
     ~Baked() override;

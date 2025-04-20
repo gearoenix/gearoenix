@@ -1,8 +1,8 @@
 #include "gx-rnd-eng-engine.hpp"
-#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../../platform/gx-plt-runtime-configuration.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
 #include "../gizmo/gx-rnd-gzm-manager.hpp"
@@ -45,9 +45,7 @@ gearoenix::render::engine::Engine::Engine(
     , engine_type(engine_type)
     , platform_application(platform_application)
     , physics_engine(new physics::Engine(*this))
-    , scene_manager(new scene::Manager(*this))
-    , font_manager(new font::Manager(*this))
-    , gizmo_manager(new gizmo::Manager(*this))
+    , font_manager(new font::Manager())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
     core::job::register_current_thread();
@@ -78,7 +76,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     platform::Application& platform_application)
 {
     std::unique_ptr<Engine> result;
-    const auto& configuration = core::ecs::Singleton::get<platform::RuntimeConfiguration>();
+    const auto& configuration = platform::RuntimeConfiguration::get();
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
         result = std::make_unique<vulkan::engine::Engine>(platform_application);
@@ -119,7 +117,7 @@ void gearoenix::render::engine::Engine::start_frame()
     ++frame_number_from_start;
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
-    core::ecs::World::get()->update();
+    core::ecs::World::get().update();
 }
 
 void gearoenix::render::engine::Engine::end_frame()
@@ -141,12 +139,12 @@ void gearoenix::render::engine::Engine::show_debug_gui()
     imgui::tree_scope(this, [this] {
         ImGui::Text("Type: %s", to_string(engine_type));
         ImGui::Text("Frames Count: %" PRIu64, frames_count);
-        core::ecs::World::get()->show_debug_gui();
+        core::ecs::World::get().show_debug_gui();
         // TODO: I have to show all other things
     });
 }
 
-gearoenix::render::engine::Engine* gearoenix::render::engine::Engine::get()
+gearoenix::render::engine::Engine& gearoenix::render::engine::Engine::get()
 {
-    return instance;
+    return *instance;
 }

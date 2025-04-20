@@ -1,7 +1,7 @@
 #include "gx-plt-sdl2-application.hpp"
 #ifdef GX_PLATFORM_INTERFACE_SDL2
-#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../gx-plt-runtime-configuration.hpp"
 #include "gx-plt-sdl2-key.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../opengl/gx-gl-loader.hpp"
@@ -12,6 +12,7 @@
 #endif
 
 namespace {
+gearoenix::platform::Application* instance = nullptr;
 bool sdl_initialized = false;
 
 #if GX_PLATFORM_WEBASSEMBLY
@@ -38,7 +39,7 @@ void gearoenix::platform::Application::initialize_screen()
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     base.screen_size = math::Vec2(display_mode.w, display_mode.h);
-    const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
+    const auto& config = RuntimeConfiguration::get();
     if (config.get_fullscreen()) {
         base.initialize_window_size(base.screen_size.x, base.screen_size.y);
     }
@@ -53,7 +54,7 @@ void gearoenix::platform::Application::initialize_window()
 #if !GX_PLATFORM_WEBASSEMBLY
     core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-    if (const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>(); config.get_fullscreen()) {
+    if (const auto& config = RuntimeConfiguration::get(); config.get_fullscreen()) {
         core_flags |= SDL_WINDOW_FULLSCREEN;
         core_flags |= SDL_WINDOW_BORDERLESS;
         core_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -118,7 +119,7 @@ void gearoenix::platform::Application::initialize_mouse()
 
 bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
-    const auto& config = core::ecs::Singleton::get<RuntimeConfiguration>();
+    const auto& config = RuntimeConfiguration::get();
     window = SDL_CreateWindow(
         config.get_application_name().c_str(),
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -229,9 +230,15 @@ void gearoenix::platform::Application::fetch_events()
     }
 }
 
+gearoenix::platform::Application& gearoenix::platform::Application::get()
+{
+    return *instance;
+}
+
 gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF)
     : base(GX_MAIN_ENTRY_ARGS)
 {
+    instance = this;
     initialize_sdl();
     initialize_screen();
     initialize_window();
@@ -253,7 +260,7 @@ gearoenix::platform::Application::~Application()
 
 void gearoenix::platform::Application::run(core::Application* core_app)
 {
-    base.initialize_core_application(*this, core_app);
+    base.initialize_core_application(core_app);
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
     emscripten_set_main_loop_arg(gearoenix_platform_application_loop, this, 0, 1);
@@ -278,7 +285,7 @@ void gearoenix::platform::Application::set_caption(const std::string& s)
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
     SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-    core::ecs::Singleton::get<RuntimeConfiguration>().set_fullscreen(b);
+    RuntimeConfiguration::get().set_fullscreen(b);
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED

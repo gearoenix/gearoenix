@@ -1,6 +1,5 @@
 #include "gx-gl-camera.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-transformation.hpp"
 #include "gx-gl-engine.hpp"
@@ -14,7 +13,7 @@ gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render:
     if (target.is_default()) {
         const auto& d = target.get_default();
         CameraTarget result { .target = Default {} };
-        auto& gd = std::get<DEFAULT_VAR_INDEX>(result.target);
+        auto& gd = std::get<default_var_index>(result.target);
         gd.main = std::dynamic_pointer_cast<Target>(d.main);
         for (std::uint32_t ti = 0; ti < d.targets.size(); ++ti) {
             for (std::uint32_t mi = 0; mi < d.targets[ti].size(); ++mi) {
@@ -32,14 +31,14 @@ gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render:
 
 const gearoenix::gl::CameraTarget::Customised& gearoenix::gl::CameraTarget::get_customised() const
 {
-    GX_ASSERT(CUSTOMISED_VAR_INDEX == target.index());
-    return std::get<CUSTOMISED_VAR_INDEX>(target);
+    GX_ASSERT(customised_var_index == target.index());
+    return std::get<customised_var_index>(target);
 }
 
 const gearoenix::gl::CameraTarget::Default& gearoenix::gl::CameraTarget::get_default() const
 {
-    GX_ASSERT(DEFAULT_VAR_INDEX == target.index());
-    return std::get<DEFAULT_VAR_INDEX>(target);
+    GX_ASSERT(default_var_index == target.index());
+    return std::get<default_var_index>(target);
 }
 
 void gearoenix::gl::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
@@ -50,84 +49,46 @@ void gearoenix::gl::Camera::set_customised_target(std::shared_ptr<render::textur
 
 void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
 {
-    render::camera::Camera::update_target(core::job::EndCaller([this, self = get_camera_self().lock(), end = std::move(end)] {
+    render::camera::Camera::update_target(core::job::EndCaller([this, self = object_self.lock(), end = std::move(end)] {
         (void)end;
         (void)self;
         gl_target = CameraTarget::construct(target);
     }));
 }
 
-gearoenix::gl::Camera::Camera(
-    const std::string& name,
-    render::camera::Target&& target,
-    std::shared_ptr<physics::Transformation>&& transform,
-    const core::ecs::entity_id_t entity_id)
-    : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform), entity_id)
+gearoenix::gl::Camera::Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+    : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
 {
 }
 
-void gearoenix::gl::Camera::construct(
-    const std::string& name, core::job::EndCallerShared<Camera>&& c,
-    std::shared_ptr<physics::Transformation>&& transform, const core::ecs::entity_id_t entity_id)
+void gearoenix::gl::Camera::construct(const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
-    c.set_return(core::ecs::construct_component<Camera>(name, render::camera::Target(), std::move(transform), entity_id));
-    c.get_return()->set_camera_self(c.get_return());
+    c.set_return(Object::construct<Camera>(name, render::camera::Target(), std::move(transform)));
+    c.get_return()->initialise();
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();
     }));
 }
 
-void gearoenix::gl::Camera::construct(
-    std::string&&,
-    const core::ecs::entity_id_t,
-    std::shared_ptr<platform::stream::Stream>&&,
-    core::job::EndCallerShared<Component>&&)
-{
-    GX_UNIMPLEMENTED;
-}
-
 gearoenix::gl::Camera::~Camera() = default;
 
-gearoenix::gl::CameraBuilder::CameraBuilder(
-    Engine& e, const std::string& name, core::job::EndCaller<>&& entity_end_caller,
-    physics::Transformation* const parent_transform)
-    : Builder(name, std::move(entity_end_caller), parent_transform)
-    , eng(e)
-{
-}
-
-void gearoenix::gl::CameraBuilder::construct(
-    Engine& e, const std::string& name,
-    physics::Transformation* parent_transform,
-    core::job::EndCallerShared<Builder>&& builder_end_caller,
-    core::job::EndCaller<>&& entity_end_caller)
-{
-    builder_end_caller.set_return(std::make_shared<CameraBuilder>(
-        e, name, std::move(entity_end_caller), parent_transform));
-    const auto entity_id = builder_end_caller.get_return()->get_id();
-    auto transform = builder_end_caller.get_return()->get_transformation_shared_ptr();
-    Camera::construct(
-        name + "-gl-camera",
-        core::job::EndCallerShared<Camera>([b = std::move(builder_end_caller)](std::shared_ptr<Camera>&& c) {
-            b.get_return()->get_entity_builder()->get_builder().add_component(std::move(c));
-        }),
-        std::move(transform),
-        entity_id);
-}
-
-gearoenix::gl::CameraBuilder::~CameraBuilder() = default;
-
 void gearoenix::gl::CameraManager::build(
-    const std::string& name,
-    physics::Transformation* const parent_transform,
-    core::job::EndCallerShared<render::camera::Builder>&& builder_end_caller,
-    core::job::EndCaller<>&& entity_end_caller)
+    std::string&& name,
+    core::ecs::Entity* const parent,
+    core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
-    CameraBuilder::construct(dynamic_cast<Engine&>(e), name, parent_transform, std::move(builder_end_caller), std::move(entity_end_caller));
+    build_impl(std::move(name), parent, entity_callback);
+    const auto* const entity = entity_callback.get_return().get();
+    auto transform = entity->get_component_shared_ptr<physics::Transformation>();
+    Camera::construct(
+        entity->get_object_name() + "-gl-camera",
+        core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) {
+            end.get_return()->add_component(std::move(c));
+        }),
+        std::move(transform));
 }
 
-gearoenix::gl::CameraManager::CameraManager(Engine& e)
-    : Manager(e)
+gearoenix::gl::CameraManager::CameraManager()
 {
     core::ecs::ComponentType::add<Camera>();
 }

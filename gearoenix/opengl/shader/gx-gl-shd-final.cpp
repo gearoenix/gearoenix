@@ -42,8 +42,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::Final::Final(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::Final::Final()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);
@@ -56,8 +55,9 @@ gearoenix::gl::shader::Final::~Final() = default;
 
 void gearoenix::gl::shader::Final::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }

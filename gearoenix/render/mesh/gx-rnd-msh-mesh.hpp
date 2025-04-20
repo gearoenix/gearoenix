@@ -1,5 +1,6 @@
 #pragma once
-#include "../../math/gx-math-aabb.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <memory>
 
 namespace gearoenix::render::material {
 struct Material;
@@ -8,7 +9,7 @@ struct Material;
 namespace gearoenix::render::mesh {
 struct Buffer;
 struct Mesh {
-    constexpr static std::uint32_t MAX_COUNT = 8192;
+    constexpr static auto max_count = 8192;
 
     GX_GET_CREF_PRT(std::shared_ptr<Buffer>, buffer);
     GX_GET_CREF_PRT(std::shared_ptr<material::Material>, bound_material);

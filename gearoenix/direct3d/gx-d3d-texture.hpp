@@ -29,7 +29,7 @@ struct Texture2D final : public render::texture::Texture2D {
         UINT sampler_index,
         Microsoft::WRL::ComPtr<ID3D12Resource>&& resource,
         Descriptor&& descriptor);
-    ~Texture2D() final;
+    ~Texture2D() override;
 };
 
 struct TextureManager final : public render::texture::Manager {
@@ -50,12 +50,12 @@ private:
 
 public:
     TextureManager(Engine& e);
-    ~TextureManager() final;
+    ~TextureManager() override;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::job::EndCaller& c) final;
+        const core::job::EndCaller& c) override;
 
     static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out);
 };

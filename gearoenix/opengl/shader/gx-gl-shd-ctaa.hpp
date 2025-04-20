@@ -12,7 +12,7 @@ struct ColourTuningAntiAliasing final : Shader {
     GX_GL_UNIFORM_TEXTURE(depth_texture);
 
 public:
-    ColourTuningAntiAliasing(Engine& e, std::uint32_t colour_tuning_index);
+    explicit ColourTuningAntiAliasing(std::uint32_t colour_tuning_index);
     ~ColourTuningAntiAliasing() override;
     void bind(uint& current_shader) const override;
     void set(const render::camera::ColourTuning& colour_tuning);
@@ -21,12 +21,10 @@ public:
 struct ColourTuningAntiAliasingCombination final : ShaderCombination {
     friend struct Manager;
 
-    Engine& e;
-
 private:
     std::array<std::optional<ColourTuningAntiAliasing>, render::camera::ColourTuning::types_count> combination;
 
-    explicit ColourTuningAntiAliasingCombination(Engine& e);
+    ColourTuningAntiAliasingCombination();
 
 public:
     [[nodiscard]] ColourTuningAntiAliasing& get(const render::camera::ColourTuning& colour_tuning)
@@ -35,7 +33,7 @@ public:
         if (result.has_value()) {
             return result.value();
         }
-        result.emplace(e, static_cast<std::uint32_t>(colour_tuning.get_index()));
+        result.emplace(static_cast<std::uint32_t>(colour_tuning.get_index()));
         return result.value();
     }
 };

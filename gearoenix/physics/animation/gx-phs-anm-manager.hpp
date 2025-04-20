@@ -1,18 +1,10 @@
 #pragma once
+#include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include <map>
+#include <boost/container/flat_map.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
-
-namespace gearoenix::core::ecs {
-struct EntityBuilder;
-struct EntitySharedBuilder;
-}
-
-namespace gearoenix::physics {
-struct Transformation;
-}
 
 namespace gearoenix::render::material {
 struct Sprite;
@@ -25,7 +17,7 @@ struct Bone;
 struct Manager final {
 private:
     std::mutex this_lock;
-    std::map<std::string, std::shared_ptr<Animation>> animations_map;
+    boost::container::flat_map<std::string, std::shared_ptr<Animation>> animations;
 
 public:
     Manager();
@@ -36,17 +28,15 @@ public:
     void operator=(Manager&& o) = delete;
     void operator=(const Manager& o) = delete;
 
-    [[nodiscard]] std::shared_ptr<core::ecs::EntitySharedBuilder> create_armature_builder(
+    [[nodiscard]] core::ecs::EntityPtr create_armature(
         std::string&& name,
-        Transformation* parent_transform,
-        std::shared_ptr<Bone>&& root_bone,
-        core::job::EndCaller<>&& entity_end_callback);
+        core::ecs::Entity* parent,
+        std::shared_ptr<Bone>&& root_bone);
     void create_sprite(
-        core::ecs::EntityBuilder& builder,
+        core::ecs::EntityPtr& entity,
         std::shared_ptr<render::material::Sprite>&& sprite,
         std::uint32_t width,
         std::uint32_t height);
-
     void update() const;
 };
 }

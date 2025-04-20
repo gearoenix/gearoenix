@@ -4,7 +4,7 @@
 
 namespace gearoenix::render::material {
 struct Pbr : Material {
-    constexpr static std::uint32_t MAX_COUNT = 8192; // we need this number because of example 004 but for your need change it
+    constexpr static auto max_count = 8192; // we need this number because of example 004 but for your need change it
 
     GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
     GX_GET_REF_PRT(math::Vec4<float>, emission_roughness_factor);
@@ -17,7 +17,7 @@ struct Pbr : Material {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, occlusion);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, brdflut);
 
-    Pbr(engine::Engine& e, const std::string& name);
+    explicit Pbr(const std::string& name);
     void initialise(core::job::EndCallerShared<Pbr>&& c);
 
 public:

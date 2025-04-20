@@ -28,7 +28,7 @@ struct Numeric {
     template <typename T>
     [[nodiscard]] constexpr static T log2i(const T v)
     {
-        T i = static_cast<T>(1);
+        auto i = static_cast<T>(0);
         for (; v > static_cast<T>(1) << i; ++i) { }
         return i;
     }

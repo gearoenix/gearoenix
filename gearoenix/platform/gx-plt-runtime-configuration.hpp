@@ -1,15 +1,13 @@
 #pragma once
-#include "../core/ecs/gx-cr-ecs-component.hpp"
+#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <string>
+
+namespace gearoenix::platform::stream {
+struct Stream;
+}
 
 namespace gearoenix::platform {
-struct Application;
-struct BaseApplication;
-struct RuntimeConfiguration final : core::ecs::Component {
-    constexpr static std::uint32_t MAX_COUNT = 1;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 26;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
-
+struct RuntimeConfiguration final {
     GX_GETSET_CREF_PRV(std::string, application_name);
     GX_GETSET_VAL_PRV(bool, fullscreen, false);
     GX_GETSET_VAL_PRV(bool, landscape, true);
@@ -24,14 +22,16 @@ struct RuntimeConfiguration final : core::ecs::Component {
     GX_GETSET_VAL_PRV(bool, metal_render_backend_enabled, true);
     GX_GETSET_VAL_PRV(bool, opengl_render_backend_enabled, true);
 
-    void write_in_io_context(std::shared_ptr<stream::Stream>&& stream, core::job::EndCaller<>&& end_callback) const override;
-    void update_in_io_context(std::shared_ptr<stream::Stream>&&, core::job::EndCaller<>&&) override;
+    void write(stream::Stream&) const;
+    void read(stream::Stream&);
+
+    RuntimeConfiguration();
 
 public:
-    explicit RuntimeConfiguration(core::ecs::entity_id_t);
     RuntimeConfiguration(const RuntimeConfiguration&) = delete;
     RuntimeConfiguration(RuntimeConfiguration&&) = delete;
-    ~RuntimeConfiguration() override;
-    void show_debug_gui() override;
+    [[nodiscard]] static RuntimeConfiguration& get();
+    ~RuntimeConfiguration();
+    void show_debug_gui();
 };
 }

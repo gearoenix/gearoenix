@@ -77,16 +77,10 @@ public:                                                   \
     if (!x##_indices.empty())                                   \
     glUniform1iv(x, static_cast<sizei>(x##_indices.size()), x##_indices.data())
 
-namespace gearoenix::gl {
-struct Engine;
-}
-
 namespace gearoenix::gl::shader {
 struct Shader {
     GX_GET_VAL_PRT(uint, shader_program, static_cast<uint>(-1));
 
-protected:
-    Engine& e;
     uint vertex_object = 0;
     uint fragment_object = 0;
 
@@ -98,7 +92,7 @@ protected:
     void set_fragment_shader(const std::string& shd);
 
 public:
-    explicit Shader(Engine& e);
+    Shader();
     Shader(const Shader&) = delete;
     Shader(Shader&&) noexcept;
     Shader& operator=(Shader&&) noexcept;

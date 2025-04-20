@@ -5,12 +5,8 @@
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-pixel-iterator.hpp"
 
-gearoenix::render::texture::Texture::Texture(
-    std::string name,
-    const TextureInfo& info,
-    engine::Engine& e)
-    : e(e)
-    , name(std::move(name))
+gearoenix::render::texture::Texture::Texture(std::string name, const TextureInfo& info)
+    : name(std::move(name))
     , info(info)
 {
 }

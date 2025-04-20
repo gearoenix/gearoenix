@@ -1,17 +1,33 @@
 #include "gx-rnd-mdl-model.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
-#include "../texture/gx-rnd-txt-texture.hpp"
+#include "../material/gx-rnd-mat-material.hpp"
 
 gearoenix::render::model::Model::Model(
-    const core::ecs::component_index_t final_component_type,
-    const bool is_transformable,
-    std::vector<std::shared_ptr<mesh::Mesh>>&& bound_meshes,
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-    : Component(final_component_type, std::move(name), entity_id)
+    const core::object_type_index_t final_component_type, const bool is_transformable, meshes_set_t&& meshes, std::string&& name)
+    : Component(final_component_type, std::move(name))
     , is_transformable(is_transformable)
-    , meshes(std::move(bound_meshes))
+    , meshes(std::move(meshes))
 {
 }
 
 gearoenix::render::model::Model::~Model() = default;
+
+bool gearoenix::render::model::Model::has_transparent_material() const
+{
+    for (const auto& msh: meshes) {
+        if (msh->get_bound_material()->get_transparency() == material::Transparency::Transparent) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool gearoenix::render::model::Model::needs_mvp() const
+{
+    for (const auto& msh: meshes) {
+        if (msh->get_bound_material()->get_need_model_view_projection_matrix()) {
+            return true;
+        }
+    }
+    return false;
+}

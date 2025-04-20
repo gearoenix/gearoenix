@@ -2,12 +2,10 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 gearoenix::gl::shader::Unlit::Unlit(
-    Engine& e,
     const bool has_uv_transform,
     const bool has_alpha_cutoff,
     const bool has_albedo_factor,
     const bool has_albedo)
-    : Shader(e)
 {
     std::stringstream vs;
     vs << "#version 300 es\n";

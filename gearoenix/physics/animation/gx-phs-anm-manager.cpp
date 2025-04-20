@@ -1,5 +1,4 @@
 #include "gx-phs-anm-manager.hpp"
-#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-phs-transformation.hpp"
@@ -8,7 +7,7 @@
 #include "gx-phs-anm-bone.hpp"
 
 namespace {
-gearoenix::physics::animation::Manager* manager_ptr;
+gearoenix::physics::animation::Manager* instance;
 }
 
 gearoenix::physics::animation::Manager::Manager()
@@ -16,65 +15,68 @@ gearoenix::physics::animation::Manager::Manager()
     core::ecs::ComponentType::add<AnimationPlayer>();
     core::ecs::ComponentType::add<Armature>();
     core::ecs::ComponentType::add<Bone>();
-    GX_ASSERT_D(!manager_ptr);
-    manager_ptr = this;
+    GX_ASSERT_D(!instance);
+    instance = this;
 }
 
 gearoenix::physics::animation::Manager::~Manager()
 {
-    GX_ASSERT_D(manager_ptr);
-    manager_ptr = nullptr;
-    animations_map.clear();
+    GX_ASSERT_D(instance);
+    instance = nullptr;
+    animations.clear();
 }
 
 gearoenix::physics::animation::Manager* gearoenix::physics::animation::Manager::get()
 {
-    return manager_ptr;
+    return instance;
 }
 
-std::shared_ptr<gearoenix::core::ecs::EntitySharedBuilder> gearoenix::physics::animation::Manager::create_armature_builder(
+gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_armature(
     std::string&& name,
-    Transformation* const parent_transform,
-    std::shared_ptr<Bone>&& root_bone,
-    core::job::EndCaller<>&& entity_end_callback)
+    core::ecs::Entity* const parent,
+    std::shared_ptr<Bone>&& root_bone)
 {
-    auto eb = std::make_shared<core::ecs::EntitySharedBuilder>(std::move(name), std::move(entity_end_callback));
-    auto transform = core::ecs::construct_component<Transformation>(
-        eb->get_name() + "-transformation", parent_transform, eb->get_id());
-    auto& b = eb->get_builder();
-    auto anim = std::make_shared<ArmatureAnimation>(b.get_name() + "-animation", std::shared_ptr(root_bone));
-    b.add_component(std::shared_ptr(transform));
-    auto armature = core::ecs::construct_component<Armature>(eb->get_name() + "-armature", std::move(transform), eb->get_id());
+    auto entity = core::ecs::Entity::construct(std::move(name), parent);
+
+    auto transform = core::Object::construct<Transformation>(entity->get_object_name() + "-transformation");
+
+    auto anim = core::Object::construct<ArmatureAnimation>(entity->get_object_name() + "-animation", std::shared_ptr(root_bone));
+
+    auto armature = core::Object::construct<Armature>(entity->get_object_name() + "-armature", transform.get());
     armature->set_root_bone(std::move(root_bone));
-    b.add_component(std::move(armature));
-    b.add_component(core::ecs::construct_component<AnimationPlayer>(std::shared_ptr(anim), b.get_name() + "-animation-player", 0.0, b.get_id()));
-    auto anim_name = anim->name;
+
+    entity->add_component(std::move(armature));
+    entity->add_component(std::move(transform));
+
+    entity->add_component(core::Object::construct<AnimationPlayer>(std::shared_ptr(anim), entity->get_object_name() + "-animation-player", 0.0));
+    auto anim_name = anim->get_object_name();
     const std::lock_guard _lg(this_lock);
-    animations_map.emplace(std::move(anim_name), std::move(anim));
-    return eb;
+    animations.emplace(std::move(anim_name), std::move(anim));
+
+    return entity;
 }
 
 void gearoenix::physics::animation::Manager::create_sprite(
-    core::ecs::EntityBuilder& builder,
+    core::ecs::EntityPtr& entity,
     std::shared_ptr<render::material::Sprite>&& sprite,
     const std::uint32_t width,
     const std::uint32_t height)
 {
-    auto anim = std::make_shared<SpriteAnimation>(
-        builder.get_name() + "-sprite-animation", std::move(sprite), width, height);
-    auto player = core::ecs::construct_component<AnimationPlayer>(
-        std::shared_ptr(anim), builder.get_name() + "-animation-player", 0.0, builder.get_id());
+    auto anim = core::Object::construct<SpriteAnimation>(
+        entity->get_object_name() + "-sprite-animation", std::move(sprite), width, height);
+    auto player = core::Object::construct<AnimationPlayer>(
+        std::shared_ptr(anim), entity->get_object_name() + "-animation-player", 0.0);
     player->set_loop_range_time(0.0, 0.999);
-    builder.add_component(std::move(player));
-    auto anim_name = anim->name;
+    entity->add_component(std::move(player));
+    auto anim_name = anim->get_object_name();
     const std::lock_guard _lg(this_lock);
-    animations_map.emplace(std::move(anim_name), std::move(anim));
+    animations.emplace(std::move(anim_name), std::move(anim));
 }
 
 void gearoenix::physics::animation::Manager::update() const
 {
-    core::ecs::World::get()->parallel_system<AnimationPlayer>([this](auto, AnimationPlayer* const player, auto) {
-        player->update_time(render::engine::Engine::get()->get_delta_time());
+    core::ecs::World::get().parallel_system<AnimationPlayer>([this](auto, auto* const player, auto) {
+        player->update_time(render::engine::Engine::get().get_delta_time());
         player->animate();
     });
 }

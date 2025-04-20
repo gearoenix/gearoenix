@@ -17,11 +17,11 @@ private:
         std::string&& name,
         std::shared_ptr<render::mesh::Mesh>&& mesh,
         const core::job::EndCaller& c,
-        bool is_transformable) final;
+        bool is_transformable) override;
 
 public:
     explicit Manager(engine::Engine& e);
-    ~Manager() final;
+    ~Manager() override;
 };
 }
 #endif

@@ -40,12 +40,9 @@ void gearoenix::render::font::Font::init()
     line_growth = line_gap + fnt_height;
 }
 
-gearoenix::render::font::Font::Font(
-    engine::Engine& e,
-    const std::string& name)
-    : e(e)
-    , stb_font(new stbtt_fontinfo())
-    , ttf_data(platform::stream::Asset::construct(e.get_platform_application(), "fonts/" + name + ".ttf")->get_file_content())
+gearoenix::render::font::Font::Font(const std::string& name)
+    : stb_font(new stbtt_fontinfo())
+    , ttf_data(platform::stream::Asset::construct("fonts/" + name + ".ttf")->get_file_content())
 {
     init();
 }
@@ -122,8 +119,8 @@ void gearoenix::render::font::Font::bake(
         converter(color_vector.z),
         converter(color_vector.w),
     };
-    const auto max_texture_size = e.get_specification().texture_maximum_aspect;
-    const auto window_height = e.get_platform_application().get_base().get_window_size().y;
+    const auto max_texture_size = engine::Engine::get().get_specification().texture_maximum_aspect;
+    const auto window_height = platform::Application::get().get_base().get_window_size().y;
     const auto img_height_pixels = math::Numeric::raise_p2(
         static_cast<unsigned int>(std::ceil(static_cast<double>(window_height) * img_height)),
         max_texture_size, 16U);
@@ -198,7 +195,7 @@ void gearoenix::render::font::Font::bake(
                               .set_height(img_height_pixels)
                               .set_type(texture::Type::Texture2D)
                               .set_has_mipmap(false);
-    e.get_texture_manager()->create_2d_from_pixels(
+    texture::Manager::get().create_2d_from_pixels(
         "gearoenix-baked-tex2d-" + core::String::to_string(text),
         { std::move(img_pixels) }, txt_info, std::move(end));
 }
@@ -212,7 +209,7 @@ void gearoenix::render::font::Font::bake(
 {
     if (text.empty()) {
         img_width = img_height;
-        e.get_texture_manager()->create_2d_from_colour(math::Vec4(0.0f), std::move(end));
+        texture::Manager::get().create_2d_from_colour(math::Vec4(0.0f), std::move(end));
         return;
     }
     std::vector<double> widths(text.size() + 1);

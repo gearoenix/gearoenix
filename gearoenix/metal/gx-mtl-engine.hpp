@@ -20,11 +20,11 @@ struct Engine final : public render::engine::Engine {
     GX_GET_UPTR_PRV(SubmissionManager, submission_manager)
 
     Engine(platform::Application& platform_application);
-    ~Engine() final;
-    void start_frame() final;
-    void end_frame() final;
-    void window_resized() final;
-    void upload_imgui_fonts() final;
+    ~Engine() override;
+    void start_frame() override;
+    void end_frame() override;
+    void window_resized() override;
+    void upload_imgui_fonts() override;
     [[nodiscard]] static bool is_supported();
     [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
 };

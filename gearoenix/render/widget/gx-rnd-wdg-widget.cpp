@@ -21,18 +21,18 @@ constexpr std::array default_event_ids {
 
 std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const
 {
-    const auto* const world = core::ecs::World::get();
-    if (0 == model_entity_id) {
+    if (nullptr == model_entity) {
         return std::nullopt;
     }
-    const auto* const collider = world->get_component<physics::collider::Aabb3>(model_entity_id);
+    const auto* const collider = model_entity->get_component<physics::collider::Aabb3>();
     if (nullptr == collider) {
         return std::nullopt;
     }
-    if (core::ecs::invalid_entity_id == camera_entity_id) {
+    if (nullptr == camera_entity) {
         return std::nullopt;
     }
-    const auto [camera_transform, camera] = world->get_components<physics::Transformation, camera::Camera>(camera_entity_id);
+    const auto* const camera = camera_entity->get_component<camera::Camera>();
+    const auto* const camera_transform = camera_entity->get_component<physics::Transformation>();
     if (nullptr == camera_transform || nullptr == camera) {
         return std::nullopt;
     }
@@ -81,7 +81,7 @@ void gearoenix::render::widget::Widget::handle_movement_mouse(const core::event:
 
 void gearoenix::render::widget::Widget::handle_touch(const core::event::Data& event_data)
 {
-    if (e.get_platform_application().get_base().get_touch_states().size() > 1) {
+    if (platform::Application::get().get_base().get_touch_states().size() > 1) {
         handle_cancel();
         return;
     }
@@ -121,12 +121,8 @@ void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>&
     }
 }
 
-gearoenix::render::widget::Widget::Widget(
-    std::string&& n,
-    const Type widget_type,
-    engine::Engine& e)
-    : e(e)
-    , name(std::move(n))
+gearoenix::render::widget::Widget::Widget(std::string&& n, const Type widget_type)
+    : name(std::move(n))
     , widget_type(widget_type)
     , on_press([](const math::Vec3<double>&) -> void { })
     , on_release([](const math::Vec3<double>&) -> void { })
@@ -137,7 +133,7 @@ gearoenix::render::widget::Widget::Widget(
 
 gearoenix::render::widget::Widget::~Widget()
 {
-    auto& ee = *e.get_platform_application().get_base().get_event_engine();
+    auto& ee = *platform::Application::get().get_base().get_event_engine();
     for (const auto event_id : default_event_ids) {
         ee.remove_listener(event_id, this);
     }
@@ -171,19 +167,19 @@ void gearoenix::render::widget::Widget::set_sensitivity(const bool b)
     }
 }
 
-void gearoenix::render::widget::Widget::set_model_entity_id(const core::ecs::entity_id_t id)
+void gearoenix::render::widget::Widget::set_model_entity(core::ecs::EntityPtr&& e)
 {
-    model_entity_id = id;
+    model_entity = std::move(e);
 }
 
-void gearoenix::render::widget::Widget::set_camera_entity_id(const core::ecs::entity_id_t id)
+void gearoenix::render::widget::Widget::set_camera_entity(core::ecs::Entity* const e)
 {
-    camera_entity_id = id;
+    camera_entity = e;
 }
 
 void gearoenix::render::widget::Widget::register_for_events()
 {
-    auto& ee = *e.get_platform_application().get_base().get_event_engine();
+    auto& ee = *platform::Application::get().get_base().get_event_engine();
     for (const auto event_id : default_event_ids) {
         ee.add_listener(event_id, this);
     }
@@ -196,7 +192,7 @@ void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l)
 
 void gearoenix::render::widget::Widget::show()
 {
-    auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id);
+    auto* const mdl = model_entity->get_component<model::Model>();
     GX_ASSERT_D(nullptr != mdl);
     mdl->set_enabled(true);
     for (auto& child : children) {
@@ -207,7 +203,7 @@ void gearoenix::render::widget::Widget::show()
 
 void gearoenix::render::widget::Widget::hide()
 {
-    auto* const mdl = core::ecs::World::get()->get_component<model::Model>(model_entity_id);
+    auto* const mdl = model_entity->get_component<model::Model>();
     GX_ASSERT_D(nullptr != mdl);
     mdl->set_enabled(false);
     for (auto& child : children) {
@@ -224,7 +220,6 @@ void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& chil
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)
 {
     add_child(std::move(child), 0.0);
-    transform->add_child(child->transform.get());
 }
 
 gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(

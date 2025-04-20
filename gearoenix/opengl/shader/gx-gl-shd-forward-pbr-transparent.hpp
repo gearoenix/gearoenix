@@ -20,7 +20,7 @@ struct ForwardPbrTransparent final : Shader {
     GX_GL_UNIFORM_TEXTURE(radiance);
 
 public:
-    explicit ForwardPbrTransparent(Engine& e);
+    ForwardPbrTransparent();
     ~ForwardPbrTransparent() override;
     void bind(uint& current_shader) const override;
 };

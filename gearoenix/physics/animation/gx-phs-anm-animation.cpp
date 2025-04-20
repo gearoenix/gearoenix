@@ -1,5 +1,6 @@
 #include "gx-phs-anm-animation.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/gx-cr-string.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
@@ -11,28 +12,20 @@
 #include <algorithm>
 #include <utility>
 
-gearoenix::physics::animation::Animation::Animation(std::string&& name)
-    : name(std::move(name))
+gearoenix::physics::animation::Animation::Animation(const core::object_type_index_t fti, std::string&& name)
+    : Object(fti, std::move(name))
 {
 }
 
 gearoenix::physics::animation::Animation::~Animation() = default;
 
-void gearoenix::physics::animation::Animation::show_debug_gui()
+void gearoenix::physics::animation::Animation::write(platform::stream::Stream&) const
 {
-    render::imgui::tree_scope(this, [this] {
-        render::imgui::table_scope(
-            "##gearoenix::physics::animation::Animation::show_debug_gui",
-            [this] {
-                ImGui::Text("Name:");
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", name.c_str());
-            });
-    });
+    GX_TODO; // we need object streamer here
 }
 
 gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(std::string&& name, std::shared_ptr<Bone>&& root_bone)
-    : Animation(std::move(name))
+    : Animation(object_type_index, std::move(name))
     , root_bone(std::move(root_bone))
 {
 }
@@ -89,8 +82,10 @@ void gearoenix::physics::animation::ArmatureAnimation::animate(const Bone& bone,
         bone_transform.reset(scale, rotation, translation);
     }
 
-    for (const auto* const child : bone.get_children()) {
-        animate(*child, time);
+    for (const auto& child : bone.get_entity()->get_children()) {
+        if (const auto* const c = child.second->get_component<Bone>(); c) {
+            animate(*c, time);
+        }
     }
 }
 
@@ -101,12 +96,19 @@ void gearoenix::physics::animation::ArmatureAnimation::show_debug_gui()
         render::imgui::table_scope(
             "##gearoenix::physics::animation::ArmatureAnimation::show_debug_gui",
             [this] {
-                ImGui::Text("Root Bone Entity ID:");
+                ImGui::Text("Root Bone:");
                 ImGui::TableNextColumn();
-                ImGui::Text("%ul", root_bone->get_entity_id());
+                ImGui::Text("%s", root_bone->get_object_name().c_str());
             });
         root_bone->show_debug_gui();
     });
+}
+
+void gearoenix::physics::animation::ArmatureAnimation::write(platform::stream::Stream& s) const
+{
+    // Animation::write(s);
+    GX_TODO; // we need object streamer hear
+    // s.write_fail_debug(root_bone->get_entity_id());
 }
 
 gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
@@ -114,7 +116,7 @@ gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
     std::shared_ptr<render::material::Sprite>&& sprite,
     const std::uint32_t width,
     const std::uint32_t height)
-    : Animation(std::move(name))
+    : Animation(object_type_index, std::move(name))
     , sprite(std::move(sprite))
     , count(static_cast<double>(width * height))
     , aspect(width, height)
@@ -142,6 +144,16 @@ void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()
                 ImGui::Text("%ul", count);
             });
     });
+}
+
+void gearoenix::physics::animation::SpriteAnimation::write(platform::stream::Stream& s) const
+{
+    Animation::write(s);
+    GX_TODO; // we need object streamer here
+    // sprite->write(s);
+    s.write_fail_debug(count);
+    aspect.write(s);
+    uv_scale.write(s);
 }
 
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
@@ -187,11 +199,8 @@ void gearoenix::physics::animation::AnimationPlayer::show_debug_gui()
 }
 
 gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
-    std::shared_ptr<Animation>&& animation,
-    std::string&& name,
-    const double starting_time,
-    const core::ecs::entity_id_t entity_id)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
+    std::shared_ptr<Animation>&& animation, std::string&& name, const double starting_time)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
     , time(starting_time)
     , animation(std::move(animation))
 {
@@ -232,3 +241,14 @@ void gearoenix::physics::animation::AnimationPlayer::animate() const
 {
     animation->animate(time);
 }
+
+// void gearoenix::physics::animation::AnimationPlayer::write_in_io_context(
+//     std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&& end_caller) const
+// {
+//     stream->write_fail_debug(time);
+//     stream->write_fail_debug(speed);
+//     stream->write_fail_debug(is_loop);
+//     stream->write_fail_debug(loop_start_time);
+//     stream->write_fail_debug(loop_end_time);
+//     animation->write(*stream);
+// }

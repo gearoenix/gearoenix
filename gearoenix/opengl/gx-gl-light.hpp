@@ -1,85 +1,47 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-component.hpp"
-#include "../render/light/gx-rnd-lt-builder.hpp"
 #include "../render/light/gx-rnd-lt-directional.hpp"
 #include "../render/light/gx-rnd-lt-manager.hpp"
 #include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
-struct Engine;
 struct Texture2D;
 struct Target;
 
 struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirectional {
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 10;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX, Light::TYPE_INDEX };
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { ShadowCasterDirectional::TYPE_INDEX };
+    constexpr static auto object_type_index = gearoenix_gl_light_shadow_caster_directional_type_index;
+    constexpr static std::array all_parent_object_type_indices { ShadowCasterDirectional::object_type_index, Light::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { ShadowCasterDirectional::object_type_index };
 
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target);
     GX_GET_VAL_PRV(uint, shadow_map_texture_v, static_cast<uint>(-1));
     GX_GET_VAL_PRV(uint, shadow_map_target_v, static_cast<uint>(-1));
 
-    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream,
-        core::job::EndCaller<>&& end_callback) const override;
+    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&& end_callback) const;
 
 public:
-    ShadowCasterDirectionalLight(std::string&& name, core::ecs::entity_id_t entity_id);
+    explicit ShadowCasterDirectionalLight(std::string&& name);
     ~ShadowCasterDirectionalLight() override;
     void set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback) override;
     void set_shadow_map_target(std::shared_ptr<render::texture::Target>&& t) override;
 };
 
-struct LightBuilder final : render::light::Builder {
-    Engine& eng;
-
-private:
-    LightBuilder(
-        Engine& e,
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        const ShadowCasterDirectionalInfo& info,
-        core::job::EndCaller<>&& end_callback);
-
-public:
-    LightBuilder(
-        Engine& e,
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        const DirectionalInfo& info,
-        core::job::EndCaller<>&& end_callback);
-    static void construct(
-        Engine& e,
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        const ShadowCasterDirectionalInfo& info,
-        core::job::EndCallerShared<Builder>&& end_callback,
-        core::job::EndCaller<>&& entity_end_callback);
-    ~LightBuilder() override;
-};
-
 struct LightManager final : render::light::Manager {
-    Engine& eng;
-
 private:
-    [[nodiscard]] std::shared_ptr<render::light::Builder> build_directional(
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        core::job::EndCaller<>&& end_callback) override;
+    [[nodiscard]] core::ecs::EntityPtr build_directional(std::string&&, core::ecs::Entity*) override;
     void build_shadow_caster_directional(
-        const std::string& name,
-        physics::Transformation* parent_transform,
+        std::string&& name,
+        core::ecs::Entity* parent,
         std::uint32_t shadow_map_resolution,
         float camera_far,
         float camera_near,
         float camera_aspect,
-        core::job::EndCallerShared<render::light::Builder>&& end_callback,
-        core::job::EndCaller<>&& entity_end_callback) override;
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:
-    explicit LightManager(Engine& e);
+    LightManager();
     ~LightManager() override;
 };
 }

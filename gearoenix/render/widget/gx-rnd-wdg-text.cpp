@@ -8,81 +8,67 @@
 #include "../material/gx-rnd-mat-unlit.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
-#include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
-#include "../scene/gx-rnd-scn-builder.hpp"
 
-gearoenix::render::widget::Text::Text(
-    std::string&& n,
-    engine::Engine& e)
-    : Widget(std::move(n), Type::Text, e)
+gearoenix::render::widget::Text::Text(std::string&& n)
+    : Widget(std::move(n), Type::Text)
 {
 }
 
 void gearoenix::render::widget::Text::construct(
     std::string&& name,
-    const core::ecs::entity_id_t camera_id,
+    core::ecs::Entity* const camera_entity,
     std::shared_ptr<material::Unlit>&& mat,
     std::shared_ptr<Widget>&& parent,
-    std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<ConstructorReturn>&& end_callback)
+    core::job::EndCallerShared<Text>&& end_callback)
 {
-    auto& e = scene_builder->e;
-    e.get_mesh_manager()->build_plate(std::move(mat), core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
-        construct(std::move(n), c, std::move(msh), std::move(p), std::move(s), std::move(e));
+    mesh::Manager::get().build_plate(std::move(mat), core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
+        construct(std::move(n), c, std::move(msh), std::move(p), std::move(e));
     }));
 }
 
 void gearoenix::render::widget::Text::construct(
     std::string&& name,
-    const core::ecs::entity_id_t camera_id,
+    core::ecs::Entity* const camera_entity,
     std::shared_ptr<Widget>&& parent,
-    std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<ConstructorReturn>&& end_callback)
+    core::job::EndCallerShared<Text>&& end_callback)
 {
-    auto& e = scene_builder->e;
     const auto mat_name = name + "-material";
-    e.get_material_manager()->get_unlit(mat_name, core::job::EndCallerShared<material::Unlit>([n = std::move(name), c = camera_id, p = std::move(parent), s = std::move(scene_builder), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& mat) mutable {
-        construct(std::move(n), c, std::move(mat), std::move(p), std::move(s), std::move(e));
+    material::Manager::get().get_unlit(mat_name, core::job::EndCallerShared<material::Unlit>([n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& mat) mutable {
+        construct(std::move(n), c, std::move(mat), std::move(p), std::move(e));
     }));
 }
 
 void gearoenix::render::widget::Text::construct(
     std::string&& name,
-    const core::ecs::entity_id_t camera_id,
+    core::ecs::Entity* const camera_entity,
     std::shared_ptr<mesh::Mesh>&& msh,
     std::shared_ptr<Widget>&& parent,
-    std::shared_ptr<scene::Builder>&& scene_builder,
-    core::job::EndCaller<ConstructorReturn>&& end_callback)
+    core::job::EndCallerShared<Text>&& end_callback)
 {
-    auto& e = scene_builder->e;
-    std::shared_ptr<Text> r(new Text(std::move(name), e));
+    std::shared_ptr<Text> r(new Text(std::move(name)));
     r->text_material = std::dynamic_pointer_cast<material::Unlit>(msh->get_bound_material());
     r->text_material->set_transparency(material::Transparency::Transparent);
     r->text_self = r;
-    auto model_builder = e.get_model_manager()->build(
-        r->name + "-model-text", parent ? parent->get_transform().get() : nullptr,
-        { std::move(msh) },
-        core::job::EndCaller([] { }),
-        true);
-    r->set_model_entity_id(model_builder->get_id());
-    r->set_camera_entity_id(camera_id);
-    scene_builder->add(std::shared_ptr(model_builder));
+    auto model_entity = model::Manager::get().build(
+        r->name + "-model-text", parent ? parent->get_model_entity().get() : nullptr,
+        { std::move(msh) }, true);
+    r->set_model_entity(std::move(model_entity));
+    r->set_camera_entity(camera_entity);
     if (parent != nullptr) {
         parent->add_child(r);
     }
     r->parent = std::move(parent);
-    end_callback.set_return({ std::move(r), std::move(model_builder) });
+    end_callback.set_return(std::move(r));
 }
 
 gearoenix::render::widget::Text::~Text()
 {
-    core::ecs::World::get()->delayed_delete_entity(model_entity_id, core::job::EndCaller([] { }));
 }
 
 gearoenix::math::Vec2<double> gearoenix::render::widget::Text::get_text_size() const
 {
-    auto* const trn = core::ecs::World::get()->get_component<physics::Transformation>(model_entity_id);
+    auto* const trn = model_entity->get_component<physics::Transformation>();
     GX_ASSERT_D(nullptr != trn);
     return trn->get_scale().xy() * 2.0; // TODO not sure about 2 multiplication
 }
@@ -97,5 +83,5 @@ void gearoenix::render::widget::Text::update_text(const core::job::EndCaller<>& 
             self->text_material->set_albedo(std::move(t));
             (void)c;
         }));
-    core::ecs::World::get()->get_component<physics::Transformation>(model_entity_id)->local_inner_x_scale(width / img_dim.x);
+    model_entity->get_component<physics::Transformation>()->local_inner_x_scale(width / img_dim.x);
 }

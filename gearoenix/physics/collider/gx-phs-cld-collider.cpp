@@ -6,11 +6,8 @@
 #include "../gx-phs-transformation.hpp"
 
 gearoenix::physics::collider::Collider::Collider(
-    std::shared_ptr<Transformation>&& transform,
-    const core::ecs::component_index_t final_type_index,
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-    : Component(final_type_index, std::move(name), entity_id)
+    std::shared_ptr<Transformation>&& transform, const core::object_type_index_t final_type_index, std::string&& name)
+    : Component(final_type_index, std::move(name))
     , transform(std::move(transform))
 {
 }
@@ -42,7 +39,7 @@ gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::chec
 
 void gearoenix::physics::collider::Collider::update_all_after_transform_update()
 {
-    core::ecs::World::get()->parallel_system<Collider>(
+    core::ecs::World::get().parallel_system<Collider>(
         [&](const auto, auto* const cld, const auto) {
             cld->update_surrounding_box();
         });
@@ -50,6 +47,6 @@ void gearoenix::physics::collider::Collider::update_all_after_transform_update()
 
 void gearoenix::physics::collider::Collider::draw_gizmo()
 {
-    surrounding_box_changed = gizmo_manager->show(surrounding_box);
+    surrounding_box_changed = render::gizmo::Manager::get().show(surrounding_box);
     is_gizmo_visible = false;
 }

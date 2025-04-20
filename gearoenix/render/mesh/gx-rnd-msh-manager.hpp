@@ -7,10 +7,6 @@
 #include <memory>
 #include <vector>
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::material {
 struct Material;
 }
@@ -19,13 +15,11 @@ namespace gearoenix::render::mesh {
 struct Buffer;
 struct Mesh;
 struct Manager {
-    engine::Engine& e;
-
 protected:
     std::mutex buffers_lock;
     std::map<std::string, std::weak_ptr<Buffer>> buffers;
 
-    explicit Manager(engine::Engine& e);
+    Manager();
 
     virtual void build(
         std::string&& name,
@@ -43,6 +37,7 @@ protected:
 
 public:
     virtual ~Manager();
+    [[nodiscard]] static Manager& get();
 
     void build_icosphere(std::uint64_t subdivisions, std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
     void build_plate(std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);

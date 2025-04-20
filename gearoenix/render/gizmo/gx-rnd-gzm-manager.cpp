@@ -7,14 +7,29 @@
 // Keep it after imgui
 #include <ImGuizmo/ImGuizmo.h>
 
-gearoenix::render::gizmo::Manager::Manager(engine::Engine& e)
-    : e(e)
+namespace {
+gearoenix::render::gizmo::Manager* instance = nullptr;
+}
+
+gearoenix::render::gizmo::Manager::Manager()
 {
     enable_translation_handle();
     disable_local_transform_mode();
+    GX_ASSERT_D(!instance);
+    instance = this;
 }
 
-gearoenix::render::gizmo::Manager::~Manager() = default;
+gearoenix::render::gizmo::Manager::~Manager()
+{
+    GX_ASSERT_D(instance == this);
+    instance = nullptr;
+}
+
+gearoenix::render::gizmo::Manager& gearoenix::render::gizmo::Manager::get()
+{
+    static Manager m;
+    return m;
+}
 
 void gearoenix::render::gizmo::Manager::show_view()
 {

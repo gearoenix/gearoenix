@@ -22,7 +22,7 @@ struct Texture2D final : public render::texture::Texture2D {
         id<MTLSamplerState> sampler,
         const render::texture::TextureInfo& info,
         std::string name);
-    ~Texture2D() final;
+    ~Texture2D() override;
 };
 
 struct TextureManager final : public render::texture::Manager {
@@ -30,12 +30,12 @@ struct TextureManager final : public render::texture::Manager {
     const boost::container::flat_map<render::texture::SamplerInfo, id<MTLSamplerState>> samplers;
 
     TextureManager(Engine& e);
-    ~TextureManager() final;
+    ~TextureManager() override;
     [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
         std::string name,
         std::vector<std::vector<std::uint8_t>> pixels,
         const render::texture::TextureInfo& info,
-        const core::job::EndCaller& c) final;
+        const core::job::EndCaller& c) override;
 };
 }
 

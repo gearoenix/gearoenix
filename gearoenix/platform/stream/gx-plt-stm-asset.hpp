@@ -38,7 +38,7 @@ private:
 public:
     ~Asset() override;
     /// It will return null if file does not exist
-    [[nodiscard]] static Asset* construct(const Application& platform_application, const std::string& name);
+    [[nodiscard]] static Asset* construct(const std::string& name);
     [[nodiscard]] stream_size_t read(void* data, stream_size_t length) override;
     [[nodiscard]] stream_size_t write(const void* data, stream_size_t length) override;
     [[nodiscard]] stream_size_t tell() override;

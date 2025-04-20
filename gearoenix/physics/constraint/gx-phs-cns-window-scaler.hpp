@@ -16,15 +16,15 @@ struct WindowScaler final : public Constraint, public core::event::Listener {
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
 
 private:
-    void update() final;
+    void update() override;
 
 public:
     WindowScaler(core::Id id, std::string name, render::engine::Engine* e);
-    ~WindowScaler() final;
+    ~WindowScaler() override;
 
     void apply(double, double) final { }
 
-    [[nodiscard]] bool on_event(const core::event::Data& e) final;
+    [[nodiscard]] bool on_event(const core::event::Data& e) override;
 
     void register_listener();
 

@@ -1,54 +1,52 @@
 #include "gx-plt-runtime-configuration.hpp"
-#include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../render/imgui/gx-rnd-imgui-input-uint.hpp"
 #include "../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "gx-plt-application.hpp"
+#include "stream/gx-plt-stm-stream.hpp"
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
-namespace {
-constexpr auto entity_name = "gearoenix-platform-runtime-configuration";
+void gearoenix::platform::RuntimeConfiguration::write(stream::Stream& s) const
+{
+    s.write_fail_debug(application_name);
+    s.write_fail_debug(fullscreen);
+    s.write_fail_debug(landscape);
+    s.write_fail_debug(window_width);
+    s.write_fail_debug(window_height);
+    s.write_fail_debug(window_resizing_event_interval_ms);
+    s.write_fail_debug(show_cursor);
+    s.write_fail_debug(vulkan_render_backend_enabled);
+    s.write_fail_debug(direct3dx_render_backend_enabled);
+    s.write_fail_debug(metal_render_backend_enabled);
+    s.write_fail_debug(opengl_render_backend_enabled);
 }
 
-void gearoenix::platform::RuntimeConfiguration::write_in_io_context(
-    std::shared_ptr<stream::Stream>&& stream,
-    core::job::EndCaller<>&&) const
+void gearoenix::platform::RuntimeConfiguration::read(stream::Stream& s)
 {
-    stream->write_fail_debug(application_name);
-    stream->write_fail_debug(fullscreen);
-    stream->write_fail_debug(landscape);
-    stream->write_fail_debug(window_width);
-    stream->write_fail_debug(window_height);
-    stream->write_fail_debug(window_resizing_event_interval_ms);
-    stream->write_fail_debug(show_cursor);
-    stream->write_fail_debug(vulkan_render_backend_enabled);
-    stream->write_fail_debug(direct3dx_render_backend_enabled);
-    stream->write_fail_debug(metal_render_backend_enabled);
-    stream->write_fail_debug(opengl_render_backend_enabled);
+    s.read(application_name);
+    s.read(fullscreen);
+    s.read(landscape);
+    s.read(window_width);
+    s.read(window_height);
+    s.read(window_resizing_event_interval_ms);
+    s.read(show_cursor);
+    s.read(vulkan_render_backend_enabled);
+    s.read(direct3dx_render_backend_enabled);
+    s.read(metal_render_backend_enabled);
+    s.read(opengl_render_backend_enabled);
 }
 
-void gearoenix::platform::RuntimeConfiguration::update_in_io_context(
-    std::shared_ptr<stream::Stream>&& stream, core::job::EndCaller<>&&)
+gearoenix::platform::RuntimeConfiguration::RuntimeConfiguration()
+    : application_name(GX_APPLICATION_NAME)
 {
-    stream->read(application_name);
-    stream->read(fullscreen);
-    stream->read(landscape);
-    stream->read(window_width);
-    stream->read(window_height);
-    stream->read(window_resizing_event_interval_ms);
-    stream->read(show_cursor);
-    stream->read(vulkan_render_backend_enabled);
-    stream->read(direct3dx_render_backend_enabled);
-    stream->read(metal_render_backend_enabled);
-    stream->read(opengl_render_backend_enabled);
 }
 
-gearoenix::platform::RuntimeConfiguration::RuntimeConfiguration(const core::ecs::entity_id_t id)
-    : Component(core::ecs::ComponentType::create_index(this), entity_name, id)
-    , application_name(GX_APPLICATION_NAME)
+gearoenix::platform::RuntimeConfiguration& gearoenix::platform::RuntimeConfiguration::get()
 {
+    static RuntimeConfiguration instance;
+    return instance;
 }
 
 gearoenix::platform::RuntimeConfiguration::~RuntimeConfiguration() = default;
@@ -56,7 +54,6 @@ gearoenix::platform::RuntimeConfiguration::~RuntimeConfiguration() = default;
 void gearoenix::platform::RuntimeConfiguration::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
-        Component::show_debug_gui();
         render::imgui::table_scope("##gearoenix::platform::RuntimeConfiguration::show_debug_gui", [this] {
             ImGui::Text("Application Name:");
             ImGui::TableNextColumn();

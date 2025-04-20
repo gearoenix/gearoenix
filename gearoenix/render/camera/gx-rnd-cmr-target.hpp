@@ -19,8 +19,8 @@ struct Target final {
     };
 
 private:
-    constexpr static std::uint32_t CUSTOMISED_VAR_INDEX = 0;
-    constexpr static std::uint32_t DEFAULT_VAR_INDEX = 1;
+    constexpr static std::uint32_t customised_var_index = 0;
+    constexpr static std::uint32_t default_var_index = 1;
 
     std::variant<Customised, texture::DefaultCameraTargets> target = texture::DefaultCameraTargets {};
 

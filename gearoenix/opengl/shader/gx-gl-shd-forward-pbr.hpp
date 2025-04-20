@@ -6,7 +6,7 @@
 #include <optional>
 
 namespace gearoenix::gl::shader {
-struct ForwardPbr final : public Shader {
+struct ForwardPbr final : Shader {
     friend struct ForwardPbrCombination;
 
     // Camera data ---------------------------------------
@@ -29,7 +29,6 @@ struct ForwardPbr final : public Shader {
     GX_GL_UNIFORM_TEXTURE(radiance);
     GX_GL_UNIFORM_TEXTURE(brdflut);
 
-private:
     sint directional_light_direction = GX_GL_UNIFORM_FAILED;
     sint directional_light_colour = GX_GL_UNIFORM_FAILED;
     sizei directional_lights_count = static_cast<sizei>(-1);
@@ -45,13 +44,12 @@ private:
 
 public:
     ForwardPbr(
-        Engine& e,
         std::uint32_t directional_lights_count,
         std::uint32_t shadow_casters_directional_lights_count,
         std::uint32_t bones_count);
     ForwardPbr(ForwardPbr&&) noexcept;
-    ~ForwardPbr() final;
-    void bind(uint& current_shader) const final;
+    ~ForwardPbr() override;
+    void bind(uint& current_shader) const override;
     void set_shadow_caster_directional_light_normalised_vp_data(const void* data);
     void set_shadow_caster_directional_light_direction_data(const void* data);
     void set_shadow_caster_directional_light_colour_data(const void* data);
@@ -63,9 +61,8 @@ public:
     void set_directional_light_colour_data(const void* data);
 };
 
-struct ForwardPbrCombination final : public ShaderCombination {
+struct ForwardPbrCombination final : ShaderCombination {
     friend struct Manager;
-    Engine& e;
 
 private:
     typedef std::array<std::optional<ForwardPbr>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS + 1> directional_lights;
@@ -74,8 +71,7 @@ private:
 
     bones combinations;
 
-    explicit ForwardPbrCombination(Engine& e)
-        : e(e)
+    ForwardPbrCombination()
     {
     }
 
@@ -86,7 +82,7 @@ public:
         if (s.has_value()) {
             return s.value();
         }
-        s.emplace(e, directional_lights_count, shadow_casters_directional_lights_count, bones_count);
+        s.emplace(directional_lights_count, shadow_casters_directional_lights_count, bones_count);
         return s.value();
     }
 };
