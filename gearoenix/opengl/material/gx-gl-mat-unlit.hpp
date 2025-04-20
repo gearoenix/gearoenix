@@ -16,8 +16,8 @@ struct Unlit final : render::material::Unlit, Material {
     GX_GET_REFC_PRV(std::shared_ptr<shader::UnlitCombination>, unlit_combination);
 
 public:
-    Unlit(Engine& e, const std::string& name);
-    static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c);
+    explicit Unlit(const std::string& name);
+    static void construct(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c);
     ~Unlit() override;
     void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) override;
     void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;

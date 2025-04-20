@@ -7,8 +7,6 @@ SET(GX_ENGINE_PHYSICS_SRC
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-armature.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone.hpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone-builder.cpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-bone-builder.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-interpolation.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-keyframe.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/animation/gx-phs-anm-manager.cpp
@@ -41,8 +39,6 @@ SET(GX_ENGINE_PHYSICS_SRC
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-placer.hpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-scaler.cpp
 #        ${GX_ENGINE_PHYSICS_SRC_DIR}/constraint/gx-phs-cns-window-scaler.hpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-boundary.cpp
-        ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-boundary.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-constants.hpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-engine.cpp
         ${GX_ENGINE_PHYSICS_SRC_DIR}/gx-phs-engine.hpp

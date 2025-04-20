@@ -14,16 +14,21 @@ namespace gearoenix::physics::animation {
 struct Manager;
 struct Bone;
 
-struct Animation {
-    const std::string name;
+struct Animation : core::Object {
+    constexpr static auto max_count = 16;
+    constexpr static auto object_type_index = gearoenix_physics_animation_type_index;
 
-    explicit Animation(std::string&& name);
-    virtual ~Animation();
+    explicit Animation(core::object_type_index_t, std::string&& name);
+    ~Animation() override;
     virtual void animate(double time) = 0;
-    virtual void show_debug_gui();
+    virtual void write(platform::stream::Stream& s) const;
 };
 
 struct ArmatureAnimation final : Animation {
+    constexpr static auto object_type_index = gearoenix_physics_animation_armature_animation_type_index;
+    constexpr static std::array all_parent_object_type_indices { Animation::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Animation::object_type_index };
+
     /// Root bones that the animation applies on them
     const std::shared_ptr<Bone> root_bone;
 
@@ -32,9 +37,14 @@ struct ArmatureAnimation final : Animation {
     void animate(double time) override;
     static void animate(const Bone& bone, double time);
     void show_debug_gui() override;
+    void write(platform::stream::Stream& s) const override;
 };
 
 struct SpriteAnimation final : Animation {
+    constexpr static auto object_type_index = gearoenix_physics_animation_armature_animation_type_index;
+    constexpr static std::array all_parent_object_type_indices { Animation::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Animation::object_type_index };
+
     const std::shared_ptr<render::material::Sprite> sprite;
     const double count;
     const math::Vec2<std::uint32_t> aspect;
@@ -48,14 +58,13 @@ struct SpriteAnimation final : Animation {
     ~SpriteAnimation() override;
     void animate(double time) override;
     void show_debug_gui() override;
+    void write(platform::stream::Stream& s) const override;
 };
 
 struct AnimationPlayer final : core::ecs::Component {
     friend struct Manager;
-    constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 5;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto max_count = 16;
+    constexpr static auto object_type_index = gearoenix_physics_animation_player_type_index;
 
     GX_GET_VAL_PRV(double, time, 0.0);
     GX_GETSET_VAL_PRV(double, speed, 1.0);
@@ -68,12 +77,14 @@ struct AnimationPlayer final : core::ecs::Component {
     void show_debug_gui() override;
 
 public:
-    AnimationPlayer(std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time, core::ecs::entity_id_t entity_id);
+    AnimationPlayer(std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time);
     ~AnimationPlayer() override;
     void update_time(double delta_time);
     void set_loop_start_time(double t);
     void set_loop_end_time(double t);
     void set_loop_range_time(double start, double end);
     void animate() const;
+    // void write_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) const override;
+    // void update_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) override;
 };
 }

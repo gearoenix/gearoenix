@@ -25,10 +25,10 @@ public:
         const render::texture::TextureInfo& info,
         std::uint64_t aspect,
         const core::job::EndCaller<core::job::EndCallerIgnore>& call);
-    ~TextureCube() final;
+    ~TextureCube() override;
     void write_gx3d(
         const std::shared_ptr<platform::stream::Stream>& s,
-        const core::job::EndCaller<core::job::EndCallerIgnore>& c) final;
+        const core::job::EndCaller<core::job::EndCallerIgnore>& c) override;
 };
 }
 #endif

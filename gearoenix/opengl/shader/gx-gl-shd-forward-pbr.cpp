@@ -5,12 +5,10 @@
 #include <string>
 
 gearoenix::gl::shader::ForwardPbr::ForwardPbr(
-    Engine& e,
     const std::uint32_t directional_lights_count,
     const std::uint32_t shadow_casters_directional_lights_count,
     const std::uint32_t bones_count)
-    : Shader(e)
-    , directional_lights_count(static_cast<sizei>(directional_lights_count))
+    : directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
     , bones_matrices_count(static_cast<sizei>(bones_count * 2))
 {

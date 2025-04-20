@@ -4,21 +4,19 @@
 #include "../../render/material/gx-rnd-mat-manager.hpp"
 
 namespace gearoenix::gl {
-struct Engine;
 struct Texture2D;
 }
 
 namespace gearoenix::gl::material {
-struct Manager final : public render::material::Manager {
-    Engine& gl_e;
+struct Manager final : render::material::Manager {
 
 private:
-    void construct_pbr(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c) final;
-    void construct_unlit(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c) final;
-    void construct_sprite(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c) final;
+    void construct_pbr(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;
+    void construct_unlit(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c) override;
+    void construct_sprite(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c) override;
 
 public:
-    explicit Manager(Engine& e);
+    Manager();
 };
 }
 

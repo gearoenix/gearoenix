@@ -7,7 +7,6 @@
 #include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
-struct Engine;
 struct Uploader;
 
 [[nodiscard]] sint convert_internal_format(render::texture::TextureFormat f);
@@ -21,17 +20,13 @@ struct Uploader;
 struct Texture2D final : render::texture::Texture2D {
     friend struct TextureManager;
 
-    Engine& e;
     GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
     void* get_imgui_ptr() const override;
 
 public:
-    Texture2D(
-        Engine& e,
-        const render::texture::TextureInfo& info,
-        std::string&& name);
+    Texture2D(const render::texture::TextureInfo& info, std::string&& name);
     ~Texture2D() override;
     void bind(enumerated texture_unit) const;
     void generate_mipmaps();
@@ -40,24 +35,18 @@ public:
 struct TextureCube final : render::texture::TextureCube {
     friend struct TextureManager;
 
-    Engine& e;
     GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
 
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
 
 public:
-    TextureCube(
-        Engine& e,
-        const render::texture::TextureInfo& info,
-        std::string&& name);
+    TextureCube(const render::texture::TextureInfo& info, std::string&& name);
     ~TextureCube() override;
     void bind(enumerated texture_unit) const;
 };
 
 struct TextureManager final : render::texture::Manager {
-    Engine& eng;
-
-    explicit TextureManager(Engine& e);
+    TextureManager();
     ~TextureManager() override;
 
 private:

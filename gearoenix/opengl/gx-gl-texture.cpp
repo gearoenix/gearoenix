@@ -190,7 +190,7 @@ void gearoenix::gl::Texture2D::write(
     if (!content) {
         return;
     }
-    core::job::send_job(e.get_jobs_thread_id(), [this, s = s, c = c]() mutable {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
@@ -236,18 +236,14 @@ void* gearoenix::gl::Texture2D::get_imgui_ptr() const
     return reinterpret_cast<void*>(static_cast<std::uintptr_t>(object));
 }
 
-gearoenix::gl::Texture2D::Texture2D(
-    Engine& e,
-    const render::texture::TextureInfo& info,
-    std::string&& name)
-    : render::texture::Texture2D(std::move(name), info, e)
-    , e(e)
+gearoenix::gl::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& name)
+    : render::texture::Texture2D(std::move(name), info)
 {
 }
 
 gearoenix::gl::Texture2D::~Texture2D()
 {
-    core::job::send_job(e.get_jobs_thread_id(), [o = object] {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object] {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures(1, &o); });
 }
@@ -272,7 +268,7 @@ void gearoenix::gl::TextureCube::write(
     if (!content) {
         return;
     }
-    core::job::send_job(e.get_jobs_thread_id(), [this, s = s, c = c]() mutable {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
@@ -314,18 +310,14 @@ void gearoenix::gl::TextureCube::write(
     });
 }
 
-gearoenix::gl::TextureCube::TextureCube(
-    Engine& e,
-    const render::texture::TextureInfo& info,
-    std::string&& name)
-    : render::texture::TextureCube(std::move(name), info, e)
-    , e(e)
+gearoenix::gl::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& name)
+    : render::texture::TextureCube(std::move(name), info)
 {
 }
 
 gearoenix::gl::TextureCube::~TextureCube()
 {
-    core::job::send_job(e.get_jobs_thread_id(), [o = object]() {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object]() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glDeleteTextures(1, &o); });
 }
@@ -336,9 +328,7 @@ void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) const
     glBindTexture(GL_TEXTURE_CUBE_MAP, object);
 }
 
-gearoenix::gl::TextureManager::TextureManager(Engine& e)
-    : Manager(e)
-    , eng(e)
+gearoenix::gl::TextureManager::TextureManager()
 {
 }
 
@@ -351,7 +341,7 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
     flip_texture(pixels, info.get_height());
-    std::shared_ptr<Texture2D> result(new Texture2D(eng, info, std::move(name)));
+    std::shared_ptr<Texture2D> result(new Texture2D(info, std::move(name)));
     const bool needs_mipmap_generation = info.get_has_mipmap() && pixels.size() < 2;
     const auto internal_format = convert_internal_format(info.get_format());
     const auto format = convert_format(info.get_format());
@@ -359,7 +349,7 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     const auto gl_img_width = static_cast<sizei>(info.get_width());
     const auto gl_img_height = static_cast<sizei>(info.get_height());
     c.set_return(result);
-    core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
@@ -408,7 +398,7 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     const render::texture::TextureInfo& info,
     core::job::EndCallerShared<render::texture::TextureCube>&& c)
 {
-    std::shared_ptr<TextureCube> result(new TextureCube(eng, info, std::move(name)));
+    std::shared_ptr<TextureCube> result(new TextureCube(info, std::move(name)));
     const bool needs_mipmap_generation = info.get_has_mipmap() && (pixels.empty() || pixels[0].size() < 2);
     const auto internal_format = convert_internal_format(info.get_format());
     const auto format = convert_format(info.get_format());
@@ -417,7 +407,7 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     const auto gl_img_height = static_cast<gl::sizei>(info.get_height());
     flip_texture(pixels, info.get_height());
     c.set_return(result);
-    core::job::send_job(e.get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_CUBE_MAP, result->object);
@@ -467,7 +457,7 @@ void gearoenix::gl::TextureManager::create_target_v(
     std::vector<render::texture::Attachment>&& attachments,
     core::job::EndCallerShared<render::texture::Target>&& c)
 {
-    Target::construct(eng, std::move(name), std::move(attachments), std::move(c));
+    Target::construct(std::move(name), std::move(attachments), std::move(c));
 }
 
 #endif

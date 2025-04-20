@@ -4,10 +4,7 @@
 namespace gearoenix::render::texture {
 struct Texture2D : Texture {
 protected:
-    Texture2D(
-        std::string name,
-        const TextureInfo& info,
-        engine::Engine& e);
+    Texture2D(std::string name, const TextureInfo& info);
 
 public:
     ~Texture2D() override;

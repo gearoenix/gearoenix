@@ -50,7 +50,7 @@ void gearoenix::render::gltf::Materials::initialise(const int index) const
 
 void gearoenix::render::gltf::Materials::load(const int index, core::job::EndCaller<>&& end)
 {
-    engine::Engine::get()->get_material_manager()->get_pbr(
+    material::Manager::get().get_pbr(
         std::string(context.data.materials[index].name),
         core::job::EndCallerShared<material::Pbr>([this, end = std::move(end), index](std::shared_ptr<material::Pbr>&& m) {
             materials[index] = std::move(m);

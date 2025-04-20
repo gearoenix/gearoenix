@@ -11,7 +11,7 @@
 gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
     : render_engine(render_engine)
     , animation_manager(new animation::Manager())
-    , constraint_manager(new constraint::Manager(render_engine))
+    , constraint_manager(new constraint::Manager())
 {
     core::ecs::ComponentType::add<collider::Collider>();
     core::ecs::ComponentType::add<collider::Aabb3>();
@@ -32,7 +32,7 @@ void gearoenix::physics::Engine::start_frame()
 
 void gearoenix::physics::Engine::end_frame()
 {
-    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->clear_change();
     });
 }

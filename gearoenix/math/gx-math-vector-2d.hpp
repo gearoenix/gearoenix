@@ -305,6 +305,12 @@ struct Vec2 final {
         y = f.read<Element>();
     }
 
+    void write(platform::stream::Stream& s) const
+    {
+        s.write_fail_debug(x);
+        s.write_fail_debug(y);
+    }
+
     [[nodiscard]] constexpr static std::optional<Vec2> intersect(
         const Vec2& s11,
         const Vec2& s12,

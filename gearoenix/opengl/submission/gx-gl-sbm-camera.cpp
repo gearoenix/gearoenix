@@ -84,7 +84,7 @@ void gearoenix::gl::submission::Camera::clear(
             }
         }
     }
-    name = &gl_cam.get_name();
+    name = &gl_cam.get_object_name();
     viewport_clip = math::Vec4<sizei>(gl_cam.get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension));
     vp = gl_cam.get_view_projection();
     pos = location;
@@ -92,7 +92,7 @@ void gearoenix::gl::submission::Camera::clear(
     exposure_value = gl_cam.get_exposure().get_enabled() ? gl_cam.get_exposure().get_value() : 1.0f;
     colour_tuning = gl_cam.get_colour_tuning();
     bloom_data = BloomData::construct(gl_cam.get_bloom_data());
-    out_reference = gl_cam.get_parent_entity_id();
+    out_reference = gl_cam.get_entity()->get_parent();
 }
 
 #endif

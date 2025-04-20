@@ -1,9 +1,5 @@
 #pragma once
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::widget {
 struct Size final {
 private:
@@ -30,6 +26,6 @@ public:
     [[nodiscard]] bool is_width_based() const { return Type::WidthBased == type_index; }
     [[nodiscard]] bool is_height_based() const { return Type::HeightBased == type_index; }
     [[nodiscard]] bool is_pixel() const { return Type::PixelBased == type_index; }
-    [[nodiscard]] double to_world(const engine::Engine& e) const;
+    [[nodiscard]] double to_world() const;
 };
 }

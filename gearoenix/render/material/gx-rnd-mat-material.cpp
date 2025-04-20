@@ -1,10 +1,10 @@
 #include "gx-rnd-mat-material.hpp"
 #include <utility>
 
-gearoenix::render::material::Material::Material(engine::Engine& e, std::string name, const Id id)
-    : e(e)
-    , id(id)
+gearoenix::render::material::Material::Material(std::string name, const Id id, const bool need_model_view_projection_matrix)
+    : id(id)
     , name(std::move(name))
+    , need_model_view_projection_matrix(need_model_view_projection_matrix)
 {
 }
 

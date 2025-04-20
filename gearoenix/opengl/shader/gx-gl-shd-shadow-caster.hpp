@@ -13,7 +13,7 @@ struct ShadowCaster final : Shader {
 public:
     const sizei mvp_count;
 
-    explicit ShadowCaster(Engine& e, std::uint32_t bones_count = 0);
+    explicit ShadowCaster(std::uint32_t bones_count = 0);
     ~ShadowCaster() override;
     void bind(uint& current_shader) const override;
     void set_mvp_data(const void* data) const;
@@ -22,12 +22,10 @@ public:
 struct ShadowCasterCombination final : ShaderCombination {
     friend struct Manager;
 
-    Engine& e;
-
 private:
     std::array<std::optional<ShadowCaster>, GX_RENDER_MAX_BONES_COUNT + 1> shaders;
 
-    explicit ShadowCasterCombination(Engine& e);
+    ShadowCasterCombination();
 
 public:
     ~ShadowCasterCombination() override = default;
@@ -37,7 +35,7 @@ public:
         if (s.has_value()) {
             return s.value();
         }
-        return s.emplace(e, bones_count);
+        return s.emplace(bones_count);
     }
 };
 }

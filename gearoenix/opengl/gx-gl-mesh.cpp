@@ -10,20 +10,19 @@
 #include "material/gx-gl-material.hpp"
 
 namespace {
-const auto buffer_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Buffer, gearoenix::render::mesh::Buffer::MAX_COUNT>::construct();
-const auto mesh_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Mesh, gearoenix::render::mesh::Mesh::MAX_COUNT>::construct();
+const auto buffer_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Buffer, gearoenix::render::mesh::Buffer::max_count>::construct();
+const auto mesh_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Mesh, gearoenix::render::mesh::Mesh::max_count>::construct();
 }
 
-gearoenix::gl::Buffer::Buffer(Engine& e, const math::Aabb3<double>& box)
+gearoenix::gl::Buffer::Buffer(const math::Aabb3<double>& box)
     : render::mesh::Buffer(box)
-    , e(e)
 {
 }
 
 gearoenix::gl::Buffer::~Buffer()
 {
     GX_ASSERT_D(static_cast<uint>(-1) != vertex_object);
-    core::job::send_job(e.get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
+    core::job::send_job(Engine::get().get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
         GX_GL_CHECK_D;
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -37,19 +36,18 @@ gearoenix::gl::Buffer::~Buffer()
 }
 
 void gearoenix::gl::Buffer::construct(
-    Engine& e,
     std::string&& name,
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
     const math::Aabb3<double>& occlusion_box,
     core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
-    auto buffer = buffer_allocator->make_shared(e, occlusion_box);
+    auto buffer = buffer_allocator->make_shared(occlusion_box);
     buffer->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
     end_callback.set_return(buffer);
-    core::job::send_job(e.get_jobs_thread_id(), [c = std::move(end_callback), b = std::move(buffer), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
+    core::job::send_job(Engine::get().get_jobs_thread_id(), [c = std::move(end_callback), b = std::move(buffer), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(b->vertex_object));
         glBindVertexArray(b->vertex_object);
@@ -95,11 +93,9 @@ void gearoenix::gl::Buffer::construct(
 }
 
 gearoenix::gl::Mesh::Mesh(
-    Engine& e,
     std::shared_ptr<render::mesh::Buffer>&& buffer,
     std::shared_ptr<render::material::Material>&& material)
     : render::mesh::Mesh(std::move(buffer), std::move(material))
-    , e(e)
     , gl_buffer(std::dynamic_pointer_cast<Buffer>(this->buffer))
     , gl_material(std::dynamic_pointer_cast<material::Material>(bound_material))
     , cached_vertex_object(gl_buffer->get_vertex_object())
@@ -112,17 +108,14 @@ gearoenix::gl::Mesh::Mesh(
 gearoenix::gl::Mesh::~Mesh() = default;
 
 void gearoenix::gl::Mesh::construct(
-    Engine& e,
     std::shared_ptr<render::mesh::Buffer>&& buffer,
     std::shared_ptr<render::material::Material>&& material,
     const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
 {
-    end_callback.set_return(mesh_allocator->make_shared(e, std::move(buffer), std::move(material)));
+    end_callback.set_return(mesh_allocator->make_shared(std::move(buffer), std::move(material)));
 }
 
-gearoenix::gl::MeshManager::MeshManager(Engine& e)
-    : render::mesh::Manager(e)
-    , gl_e(e)
+gearoenix::gl::MeshManager::MeshManager()
 {
 }
 
@@ -135,7 +128,7 @@ void gearoenix::gl::MeshManager::build(
     const math::Aabb3<double>& occlusion_box,
     core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
-    Buffer::construct(gl_e, std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(end_callback));
+    Buffer::construct(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(end_callback));
 }
 
 void gearoenix::gl::MeshManager::build(
@@ -143,7 +136,7 @@ void gearoenix::gl::MeshManager::build(
     std::shared_ptr<render::material::Material>&& material,
     core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
 {
-    Mesh::construct(gl_e, std::move(buffer), std::move(material), std::move(end_callback));
+    Mesh::construct(std::move(buffer), std::move(material), std::move(end_callback));
 }
 
 #endif

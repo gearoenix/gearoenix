@@ -1,6 +1,5 @@
 #include "gx-gl-shd-radiance.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-engine.hpp"
 
 namespace {
@@ -108,8 +107,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::Radiance::Radiance(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::Radiance::Radiance()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

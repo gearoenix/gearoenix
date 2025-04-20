@@ -6,22 +6,18 @@
 #include <mutex>
 #include <typeindex>
 
-namespace gearoenix::gl {
-struct Engine;
-}
-
 namespace gearoenix::gl::shader {
 struct ShaderCombination;
 struct Manager final {
-    Engine& e;
-
 private:
     std::mutex shaders_lock;
     /// TODO: use static-allocator in the core
     boost::container::flat_map<std::type_index, std::weak_ptr<ShaderCombination>> shaders;
 
 public:
-    explicit Manager(Engine& e);
+    Manager();
+    ~Manager();
+    [[nodiscard]] static Manager& get();
 
     template <typename SC>
     [[nodiscard]] std::shared_ptr<SC> get()
@@ -32,11 +28,11 @@ public:
             if (auto s = search->second.lock()) {
                 return std::dynamic_pointer_cast<SC>(s);
             }
-            auto s = std::shared_ptr<SC>(new SC(e));
+            auto s = std::shared_ptr<SC>(new SC());
             search->second = s;
             return s;
         }
-        auto s = std::shared_ptr<SC>(new SC(e));
+        auto s = std::shared_ptr<SC>(new SC());
         shaders.emplace(type_index, s);
         return s;
     }

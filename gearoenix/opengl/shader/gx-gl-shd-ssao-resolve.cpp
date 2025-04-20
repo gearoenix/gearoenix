@@ -150,8 +150,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::SsaoResolve::SsaoResolve(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::SsaoResolve::SsaoResolve()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

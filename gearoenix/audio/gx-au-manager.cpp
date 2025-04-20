@@ -1,6 +1,5 @@
 #include "gx-au-manager.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
-#include "../platform/gx-plt-build-configuration.hpp"
 #include "../platform/stream/gx-plt-stm-stream.hpp"
 #include "gx-au-audio.hpp"
 #include "gx-au-engine.hpp"
@@ -23,7 +22,7 @@ std::uint64_t gearoenix::audio::Manager::create_audio(const std::string& asset_p
 
 std::uint64_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name)
 {
-    auto stream = platform::stream::Stream::open(asset_path, engine.get_platform_application());
+    const auto stream = platform::stream::Stream::open(asset_path);
     return create_audio(*stream, name);
 }
 

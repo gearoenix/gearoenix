@@ -12,7 +12,6 @@
 namespace gearoenix::gl {
 struct Texture2D;
 struct TextureCube;
-struct Engine;
 
 struct Target final : render::texture::Target {
     struct GlAttachment final {
@@ -26,17 +25,14 @@ struct Target final : render::texture::Target {
         enumerated binding_index = static_cast<enumerated>(-1);
     };
 
-    GX_GET_RRF_PRV(Engine, e);
     GX_GET_VAL_PRV(uint, framebuffer, static_cast<uint>(-1));
     GX_GET_CREF_PRV(std::vector<GlAttachment>, gl_attachments);
 
-    Target(Engine& e, std::string&&, std::vector<render::texture::Attachment>&& attachments);
+    Target(std::string&&, std::vector<render::texture::Attachment>&& attachments);
 
 public:
     static void construct(
-        Engine& e,
-        std::string&& name,
-        std::vector<render::texture::Attachment>&& attachments,
+        std::string&& name, std::vector<render::texture::Attachment>&& attachments,
         core::job::EndCallerShared<render::texture::Target>&& end_callback);
     ~Target() override;
     void bind() const;

@@ -2,8 +2,6 @@ SET(GX_ENGINE_RENDER_SRC_DIR ${GX_ENGINE_SRC_DIR}/render)
 SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-bloom-data.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-bloom-data.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-camera.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/camera/gx-rnd-cmr-colour-tuning.cpp
@@ -62,8 +60,6 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-style-wrong-input-text.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-type-table.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/imgui/gx-rnd-imgui-type-tree.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-builder.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-directional.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/light/gx-rnd-lt-light.cpp
@@ -90,32 +86,24 @@ SET(GX_ENGINE_RENDER_SRC
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/mesh/gx-rnd-msh-mesh.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/model/gx-rnd-mdl-model.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-baked.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-probe.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-probe.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/reflection/gx-rnd-rfl-runtime.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-scene.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/scene/gx-rnd-scn-splash.hpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.cpp
-        ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-builder.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.cpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-manager.hpp
         ${GX_ENGINE_RENDER_SRC_DIR}/skybox/gx-rnd-sky-skybox.cpp

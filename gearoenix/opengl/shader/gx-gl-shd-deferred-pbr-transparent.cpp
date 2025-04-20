@@ -68,8 +68,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::DeferredPbrTransparent::DeferredPbrTransparent()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

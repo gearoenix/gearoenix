@@ -9,20 +9,17 @@
 #include "../submission/gx-gl-sbm-camera.hpp"
 #include "../submission/gx-gl-sbm-mesh.hpp"
 
-gearoenix::gl::material::Sprite::Sprite(
-    Engine& e,
-    const std::string& name)
-    : render::material::Sprite(e, name)
-    , gl::material::Material(true)
-    , shadow_caster_combination(e.get_shader_manager()->get<shader::ShadowCasterCombination>())
-    , unlit_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
+gearoenix::gl::material::Sprite::Sprite(const std::string& name)
+    : render::material::Sprite(name)
+    , shadow_caster_combination(shader::Manager::get().get<shader::ShadowCasterCombination>())
+    , unlit_combination(shader::Manager::get().get<shader::UnlitCombination>())
 {
 }
 
-void gearoenix::gl::material::Sprite::construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c)
+void gearoenix::gl::material::Sprite::construct(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c)
 {
-    static auto allocator = core::allocator::SharedArray<gl::material::Sprite, render::material::Sprite::MAX_COUNT>::construct();
-    auto result = allocator->make_shared(e, name);
+    static auto allocator = core::allocator::SharedArray<gl::material::Sprite, render::material::Sprite::max_count>::construct();
+    auto result = allocator->make_shared(name);
     c.set_return(result);
     result->initialise(std::move(c));
 }

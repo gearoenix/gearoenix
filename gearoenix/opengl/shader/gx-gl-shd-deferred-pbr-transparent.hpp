@@ -12,7 +12,7 @@ struct DeferredPbrTransparent final : Shader {
     GX_GL_UNIFORM_TEXTURE(ssao_resolved);
 
 public:
-    explicit DeferredPbrTransparent(Engine& e);
+    DeferredPbrTransparent();
     ~DeferredPbrTransparent() override;
     void bind(uint& current_shader) const override;
 };

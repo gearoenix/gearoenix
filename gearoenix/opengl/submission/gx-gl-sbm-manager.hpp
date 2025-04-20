@@ -6,9 +6,7 @@
 #include "gx-gl-sbm-camera.hpp"
 #include "gx-gl-sbm-scene.hpp"
 #include <memory>
-#include <optional>
 #include <utility>
-#include <vector>
 
 namespace gearoenix::render::scene {
 struct Scene;
@@ -83,10 +81,9 @@ private:
 
     uint screen_vertex_object = 0;
     uint screen_vertex_buffer = 0;
-    boost::container::flat_map<core::ecs::entity_id_t, physics::accelerator::Bvh<BvhNodeModel>> scenes_bvhs;
     core::Pool<Camera> camera_pool;
     core::Pool<Scene> scene_pool;
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::Entity* /*scene-entity*/>, std::uint32_t /*scene-pool-index*/> scenes;
     math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
@@ -100,12 +97,9 @@ private:
 
     void fill_scenes();
     void update_scenes();
-    void update_scene(core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene);
-    void update_scene_bvh(core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh);
-    void update_scene_dynamic_models(core::ecs::entity_id_t scene_id, Scene& scene_data);
-    void update_scene_reflection_probes(Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh);
+    void update_scene(core::ecs::Entity* scene, Scene& scene_data, render::scene::Scene& render_scene);
     void update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh);
-    void update_scene_cameras(core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh);
+    void update_scene_cameras(core::ecs::Entity* scene, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh);
     void render_shadows();
     void render_shadows(const Scene& scene, const Camera& camera);
     void render_shadows(const Scene& scene);

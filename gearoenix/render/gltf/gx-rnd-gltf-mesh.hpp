@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include <vector>
 
 namespace gearoenix::physics {
@@ -25,10 +25,6 @@ struct Meshes final {
     ~Meshes();
     void load(core::job::EndCaller<>&&);
     [[nodiscard]] bool is_mesh(int node_index) const;
-    [[nodiscard]] bool process(
-        int node_index,
-        physics::Transformation* parent_transform,
-        const core::job::EndCaller<>& end,
-        scene::Builder& scene_builder) const;
+    [[nodiscard]] bool process(int node_index, core::ecs::Entity* parent) const;
 };
 }

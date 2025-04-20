@@ -3,12 +3,27 @@
 #include "gx-rnd-msh-mesh.hpp"
 #include <boost/container/flat_map.hpp>
 
-gearoenix::render::mesh::Manager::Manager(engine::Engine& e)
-    : e(e)
-{
+namespace {
+gearoenix::render::mesh::Manager* instance = nullptr;
 }
 
-gearoenix::render::mesh::Manager::~Manager() = default;
+gearoenix::render::mesh::Manager::Manager()
+{
+    GX_ASSERT_D(!instance);
+    instance = this;
+}
+
+gearoenix::render::mesh::Manager::~Manager()
+{
+    GX_ASSERT_D(instance == this);
+    instance = nullptr;
+}
+
+gearoenix::render::mesh::Manager& gearoenix::render::mesh::Manager::get()
+{
+    GX_ASSERT_D(instance);
+    return *instance;
+}
 
 void gearoenix::render::mesh::Manager::build_icosphere(
     const std::uint64_t subdivisions,

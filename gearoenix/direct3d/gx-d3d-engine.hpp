@@ -34,20 +34,20 @@ private:
     explicit Engine(platform::Application& platform_application);
     void device_lost_handle(int failed_tries);
     void window_resized(int failed_tries);
-    void window_resized() final;
+    void window_resized() override;
 
 public:
     Engine(Engine&&) = delete;
     Engine(const Engine&) = delete;
     Engine& operator=(Engine&&) = delete;
     Engine& operator=(const Engine&) = delete;
-    ~Engine() final;
+    ~Engine() override;
     [[nodiscard]] static bool is_supported();
     [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
 
-    void start_frame() final;
-    void end_frame() final;
-    void upload_imgui_fonts() final;
+    void start_frame() override;
+    void end_frame() override;
+    void upload_imgui_fonts() override;
 };
 }
 

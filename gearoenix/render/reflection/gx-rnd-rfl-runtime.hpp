@@ -26,7 +26,6 @@ struct Texture2D;
 }
 
 namespace gearoenix::render::reflection {
-struct Builder;
 struct Runtime : Probe {
     enum struct State {
         Uninitialized = 0,
@@ -46,18 +45,20 @@ struct Runtime : Probe {
 
     typedef std::array<CameraData, 6> CubeCamera;
     typedef std::array<std::shared_ptr<texture::Target>, 6> CubeTarget;
-    typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MipedCubeTarget;
-    typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MipedRoughness;
+    typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MippedCubeTarget;
+    typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MippedRoughness;
 
-    constexpr static std::uint32_t MAX_COUNT = 8;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 22;
+    constexpr static auto max_count = 8;
+    constexpr static auto object_type_index = gearoenix_render_reflection_runtime_type_index;
+    constexpr static std::array all_parent_object_type_indices { Probe::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Probe::object_type_index };
 
     GX_GET_CREF_PRT(std::shared_ptr<texture::TextureCube>, environment);
     GX_GET_CREF_PRT(CubeCamera, cameras);
     GX_GET_CREF_PRT(CubeTarget, environment_targets);
     GX_GET_CREF_PRT(CubeTarget, irradiance_targets);
-    GX_GET_CREF_PRT(MipedCubeTarget, radiance_targets);
-    GX_GET_CREF_PRT(MipedRoughness, roughnesses);
+    GX_GET_CREF_PRT(MippedCubeTarget, radiance_targets);
+    GX_GET_CREF_PRT(MippedRoughness, roughnesses);
     GX_GET_VAL_PRT(State, state, State::Uninitialized);
     GX_GET_VAL_PRT(std::uint32_t, state_environment_face, 0);
     GX_GET_VAL_PRT(std::uint32_t, state_irradiance_face, 0);
@@ -69,20 +70,15 @@ struct Runtime : Probe {
     GX_GETSET_VAL_PRT(bool, pending_to_start, false);
     GX_GET_CREF_PRT(math::Aabb3<double>, receive_box);
     GX_GET_CREF_PRT(math::Aabb3<double>, exclude_box);
-    GX_GET_CREF_PRT(std::weak_ptr<Runtime>, weak_runtime_self);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, environment_depth);
 
     Runtime(
-        engine::Engine& e,
-        core::ecs::component_index_t final_component_type_index,
+        core::object_type_index_t final_component_type_index,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
+        std::string&& name);
     void set_runtime_reflection_self(
-        const std::shared_ptr<Runtime>& runtime_self,
-        const std::shared_ptr<Builder>& builder,
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
@@ -92,7 +88,6 @@ public:
     ~Runtime() override;
     void set_location(const math::Vec3<double>& p);
     void update_state();
-    void set_scene_id(core::ecs::entity_id_t) override;
     void set_on_rendered(std::function<void()>&&);
     void export_baked(const std::shared_ptr<platform::stream::Stream>& s, core::job::EndCaller<>&& end_callback) const;
 };

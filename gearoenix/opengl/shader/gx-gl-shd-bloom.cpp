@@ -17,8 +17,7 @@ void main() {\n\
 }";
 }
 
-gearoenix::gl::shader::BloomPrefilter::BloomPrefilter(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::BloomPrefilter::BloomPrefilter()
 {
     // Vertex Shader -----------------------------------------------------------------------------------
     set_vertex_shader(vertex_shader_src);
@@ -86,8 +85,7 @@ void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomHorizontal::BloomHorizontal(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::BloomHorizontal::BloomHorizontal()
 {
     set_vertex_shader(vertex_shader_src);
 
@@ -139,8 +137,7 @@ void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomVertical::BloomVertical(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::BloomVertical::BloomVertical()
 {
     set_vertex_shader(vertex_shader_src);
 
@@ -188,8 +185,7 @@ void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(source_texture);
 }
 
-gearoenix::gl::shader::BloomUpsampler::BloomUpsampler(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::BloomUpsampler::BloomUpsampler()
 {
     set_vertex_shader(vertex_shader_src);
 

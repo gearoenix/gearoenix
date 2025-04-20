@@ -17,7 +17,7 @@ private:
         const std::shared_ptr<render::texture::TextureCube>& irradiance,
         const std::shared_ptr<render::texture::TextureCube>& radiance,
         const math::Aabb3<double>& include_box,
-        const core::job::EndCaller& end_callback) final;
+        const core::job::EndCaller& end_callback) override;
     std::shared_ptr<render::reflection::Builder> build_runtime(
         const std::string& name,
         const math::Aabb3<double>& receive_box,
@@ -26,12 +26,12 @@ private:
         std::uint64_t_t environment_resolution,
         std::uint64_t irradiance_resolution,
         std::uint64_t radiance_resolution,
-        const core::job::EndCaller& end_callback) final;
-    void update() final;
+        const core::job::EndCaller& end_callback) override;
+    void update() override;
 
 public:
     explicit Manager(engine::Engine& e);
-    ~Manager() final;
+    ~Manager() override;
 };
 }
 #endif

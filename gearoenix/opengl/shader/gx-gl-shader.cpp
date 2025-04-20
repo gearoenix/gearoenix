@@ -89,9 +89,8 @@ void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd)
     fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER);
 }
 
-gearoenix::gl::shader::Shader::Shader(Engine& e)
+gearoenix::gl::shader::Shader::Shader()
     : shader_program(glCreateProgram())
-    , e(e)
 {
     if (shader_program == 0) {
         GX_LOG_F("Error creating shader program.");
@@ -100,7 +99,6 @@ gearoenix::gl::shader::Shader::Shader(Engine& e)
 
 gearoenix::gl::shader::Shader::Shader(Shader&& o) noexcept
     : shader_program(o.shader_program)
-    , e(o.e)
     , vertex_object(o.vertex_object)
     , fragment_object(o.fragment_object)
 {
@@ -122,7 +120,7 @@ gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&&
 
 gearoenix::gl::shader::Shader::~Shader()
 {
-    core::job::send_job(e.get_jobs_thread_id(), [vo = vertex_object, fo = fragment_object, sp = shader_program] {
+    core::job::send_job(Engine::get().get_jobs_thread_id(), [vo = vertex_object, fo = fragment_object, sp = shader_program] {
         GX_GL_CHECK_D;
         if (static_cast<uint>(-1) != vo) {
             glDeleteShader(vo);

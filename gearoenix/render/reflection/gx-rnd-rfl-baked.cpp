@@ -3,14 +3,11 @@
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 
 gearoenix::render::reflection::Baked::Baked(
-    engine::Engine& e,
-    const core::ecs::component_index_t final_component_type_index,
+    const core::object_type_index_t final_component_type_index,
     std::shared_ptr<texture::TextureCube>&& irradiance,
     std::shared_ptr<texture::TextureCube>&& radiance,
-    const math::Aabb3<double>& include_box,
-    std::string&& name,
-    const core::ecs::entity_id_t entity_id)
-    : Probe(e, final_component_type_index, std::move(irradiance), std::move(radiance), include_box, std::move(name), entity_id)
+    const math::Aabb3<double>& include_box, std::string&& name)
+    : Probe(final_component_type_index, std::move(irradiance), std::move(radiance), include_box, std::move(name))
 {
 }
 

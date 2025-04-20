@@ -7,10 +7,6 @@
 
 struct stbtt_fontinfo;
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::texture {
 struct Manager;
 struct Texture2D;
@@ -18,8 +14,6 @@ struct Texture2D;
 
 namespace gearoenix::render::font {
 struct Font final {
-    engine::Engine& e;
-
 private:
     const std::unique_ptr<stbtt_fontinfo> stb_font;
     const std::vector<unsigned char> ttf_data;
@@ -32,9 +26,7 @@ private:
     void init();
 
 public:
-    Font(
-        engine::Engine& e,
-        const std::string& name);
+    explicit Font(const std::string& name);
     ~Font();
     /// This function returns n+1 horizontal length from start
     void compute_text_widths(const std::wstring& text, double text_height, std::vector<double>& widths) const;

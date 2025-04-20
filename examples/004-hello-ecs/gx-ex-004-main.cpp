@@ -1,25 +1,20 @@
 #define GX_PLATFORM_LOG_STD_OUT_ENABLED
 #include <gearoenix/core/allocator/gx-cr-alc-shared-array.hpp>
-#include <gearoenix/core/ecs/gx-cr-ecs-comp-allocator.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
-#include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-light.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
-#include <gearoenix/render/model/gx-rnd-mdl-builder.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
@@ -72,10 +67,10 @@ using GxWorld = gearoenix::core::ecs::World;
 
 struct Position;
 struct Speed final : GxComp {
-    constexpr static std::uint32_t MAX_COUNT = objects_count;
-    constexpr static gearoenix::core::ecs::component_index_t TYPE_INDEX = 100;
-    constexpr static gearoenix::core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static gearoenix::core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto MAX_COUNT = objects_count;
+    constexpr static auto object_type_index = 100;
+    constexpr static std::array all_parent_object_type_indices {};
+    constexpr static std::array immediate_parent_object_type_indices {};
 
     gearoenix::math::Vec3<double> value;
 
@@ -84,10 +79,8 @@ struct Speed final : GxComp {
 };
 
 struct Position final : GxComp {
-    constexpr static std::uint32_t MAX_COUNT = objects_count;
-    constexpr static gearoenix::core::ecs::component_index_t TYPE_INDEX = 101;
-    constexpr static gearoenix::core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static gearoenix::core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto MAX_COUNT = objects_count;
+    constexpr static auto object_type_index = 101;
 
     gearoenix::math::Vec3<double> value;
 
@@ -179,8 +172,7 @@ struct GameApp final : GxCoreApp {
                         1.0f
                     };
                     (*materials)[model_index] = std::move(m);
-                    (void)end;
-                }));
+                    (void)end; }));
         }
     }
 
@@ -195,17 +187,14 @@ struct GameApp final : GxCoreApp {
                 std::move(materials[model_index]),
                 GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
                     (*meshes)[model_index] = std::move(mesh);
-                    (void)end;
-                }));
+                    (void)end; }));
         }
     }
 
     void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
     {
         const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([this] {
-                GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true);
-            }));
+            "scene", 0.0, GxEndCaller([this] { GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true); }));
         scene_id = scene_builder->get_id();
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
@@ -231,8 +220,7 @@ struct GameApp final : GxCoreApp {
                 const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
                 auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
                 (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
-                scene_builder->add(std::move(camera_builder));
-            }),
+                scene_builder->add(std::move(camera_builder)); }),
             GxEndCaller([] {}));
 
         render_engine.get_light_manager()->build_shadow_caster_directional(
@@ -245,8 +233,7 @@ struct GameApp final : GxCoreApp {
                 light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
                     { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
                 light_builder->get_light().colour = { 8.0f, 8.0f, 8.0f };
-                scene_builder->add(std::move(light_builder));
-            }),
+                scene_builder->add(std::move(light_builder)); }),
             GxEndCaller([] {}));
     }
 

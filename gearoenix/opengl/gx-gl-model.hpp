@@ -2,7 +2,6 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
-#include "../render/model/gx-rnd-mdl-builder.hpp"
 #include "../render/model/gx-rnd-mdl-manager.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 
@@ -11,51 +10,29 @@ struct Engine;
 struct Mesh;
 
 struct Model final : render::model::Model {
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 9;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { render::model::Model::TYPE_INDEX };
+    typedef core::static_flat_set<std::shared_ptr<Mesh>, render::model::max_meshes_count_per_model> gl_meshes_set_t;
 
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<Mesh>>, gl_meshes);
+    constexpr static auto object_type_index = gearoenix_gl_model_type_index;
+    constexpr static std::array all_parent_object_type_indices { render::model::Model::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { render::model::Model::object_type_index };
+
+    GX_GET_CREF_PRV(gl_meshes_set_t, gl_meshes);
 
 public:
-    Model(
-        Engine& e,
-        std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
-        std::string&& name,
-        bool is_transformable,
-        core::ecs::entity_id_t entity_id);
+    Model(render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
     ~Model() override;
-};
-
-struct ModelBuilder final : render::model::Builder {
-    friend struct ModelManager;
-
-    Engine& e;
-
-private:
-    ModelBuilder(
-        Engine& e,
-        std::string&& name,
-        physics::Transformation* parent_transform,
-        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
-        core::job::EndCaller<>&& end_caller,
-        bool is_transformable);
-
-public:
-    ~ModelBuilder() override;
 };
 
 struct ModelManager final : render::model::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::model::Builder> build(
+    [[nodiscard]] core::ecs::EntityPtr build(
         std::string&& name,
-        physics::Transformation* parent_transform,
-        std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
-        core::job::EndCaller<>&& end_caller,
+        core::ecs::Entity* parent,
+        render::model::meshes_set_t&& meshes,
         bool is_transformable) override;
 
 public:
-    explicit ModelManager(Engine& e);
+    ModelManager();
     ~ModelManager() override;
 };
 }

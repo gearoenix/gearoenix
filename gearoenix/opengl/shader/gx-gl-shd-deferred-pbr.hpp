@@ -16,7 +16,7 @@ struct DeferredPbr final : Shader {
     GX_GL_UNIFORM_TEXTURE(brdflut);
 
 public:
-    explicit DeferredPbr(Engine& e);
+    DeferredPbr();
     ~DeferredPbr() override;
     void bind(uint& current_shader) const override;
 };

@@ -3,9 +3,8 @@
 #include "../gx-gl-engine.hpp"
 #include <sstream>
 
-gearoenix::gl::shader::ShadowCaster::ShadowCaster(Engine& e, const std::uint32_t bones_count)
-    : Shader(e)
-    , mvp_count(static_cast<sizei>(bones_count + 1))
+gearoenix::gl::shader::ShadowCaster::ShadowCaster(const std::uint32_t bones_count)
+    : mvp_count(static_cast<sizei>(bones_count + 1))
 {
     std::stringstream vs;
     vs << "#version 300 es\n";
@@ -82,8 +81,7 @@ void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const void* const data) c
     glUniformMatrix4fv(mvp, mvp_count, GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination(Engine& e)
-    : e(e)
+gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination()
 {
 }
 

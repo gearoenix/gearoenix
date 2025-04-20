@@ -5,24 +5,20 @@
 #include <memory>
 #include <string>
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::texture {
 struct Texture2D;
 }
 
 namespace gearoenix::render::material {
 struct Material {
-    engine::Engine& e;
     GX_GET_CVAL_PRV(Id, id);
     GX_GET_REFC_PRV(std::string, name);
     GX_GETSET_VAL_PRT(bool, is_shadow_caster, true);
     GX_GETSET_VAL_PRT(bool, is_shadow_receiver, true);
     GX_GETSET_VAL_PRT(Transparency, transparency, Transparency::Opaque);
+    GX_GET_CVAL_PRT(bool, need_model_view_projection_matrix);
 
-    Material(engine::Engine& e, std::string name, Id id);
+    Material(std::string name, Id id, bool need_model_view_projection_matrix);
 
 public:
     virtual ~Material();

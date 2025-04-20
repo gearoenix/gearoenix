@@ -27,10 +27,6 @@ namespace gearoenix::render::font {
 struct Manager;
 }
 
-namespace gearoenix::render::gizmo {
-struct Manager;
-}
-
 namespace gearoenix::render::light {
 struct Manager;
 }
@@ -86,7 +82,6 @@ struct Engine {
     GX_GET_UPTR_PRT(reflection::Manager, reflection_manager);
     GX_GET_UPTR_PRT(font::Manager, font_manager);
     GX_GET_UPTR_PRT(light::Manager, light_manager);
-    GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
     GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
 
     Engine(Type engine_type, platform::Application& platform_application);
@@ -102,6 +97,6 @@ public:
     virtual void window_resized();
     virtual void upload_imgui_fonts() = 0;
     virtual void show_debug_gui();
-    [[nodiscard]] static Engine* get();
+    [[nodiscard]] static Engine& get();
 };
 }

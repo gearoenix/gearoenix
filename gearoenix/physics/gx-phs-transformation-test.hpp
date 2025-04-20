@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
     gearoenix::core::ecs::ComponentType::add<gearoenix::physics::Transformation>();
 
-    gearoenix::physics::Transformation transform("transform", nullptr, 0);
+    gearoenix::physics::Transformation transform("transform");
     constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
 
     auto glmm = glm::identity<glm::dmat4>();

@@ -1,62 +1,35 @@
 #include "gx-gl-model.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
-#include "../core/ecs/gx-cr-ecs-comp-allocator.hpp"
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "../core/ecs/gx-cr-ecs-entity-builder.hpp"
+#include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 
-gearoenix::gl::Model::Model(
-    Engine&,
-    std::vector<std::shared_ptr<render::mesh::Mesh>>&& bound_meshes,
-    std::string&& name,
-    const bool is_transformable,
-    const core::ecs::entity_id_t entity_id)
-    : render::model::Model(
-          core::ecs::ComponentType::create_index(this),
-          is_transformable,
-          std::move(bound_meshes),
-          std::move(name),
-          entity_id)
+gearoenix::gl::Model::Model(render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
+    : render::model::Model(core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
 {
-    gl_meshes.reserve(meshes.size());
     for (const auto& mesh : meshes) {
-        gl_meshes.emplace_back(std::dynamic_pointer_cast<Mesh>(mesh));
+        auto m = std::dynamic_pointer_cast<Mesh>(mesh);
+        GX_ASSERT_D(m);
+        gl_meshes.insert(std::move(m));
     }
 }
 
 gearoenix::gl::Model::~Model() = default;
 
-gearoenix::gl::ModelBuilder::ModelBuilder(
-    Engine& e,
+gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(
     std::string&& name,
-    physics::Transformation* const parent_transform,
-    std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
-    core::job::EndCaller<>&& end_caller,
-    const bool is_transformable)
-    : Builder(name, parent_transform, meshes, std::move(end_caller))
-    , e(e)
-{
-    entity_builder->get_builder().add_component(core::ecs::construct_component<Model>(
-        e, std::move(meshes), std::move(name), is_transformable, entity_builder->get_id()));
-}
-
-gearoenix::gl::ModelBuilder::~ModelBuilder() = default;
-
-std::shared_ptr<gearoenix::render::model::Builder> gearoenix::gl::ModelManager::build(
-    std::string&& name,
-    physics::Transformation* parent_transform,
-    std::vector<std::shared_ptr<render::mesh::Mesh>>&& meshes,
-    core::job::EndCaller<>&& end_caller,
+    core::ecs::Entity* const parent,
+    render::model::meshes_set_t&& meshes,
     const bool is_transformable)
 {
-    return std::shared_ptr<render::model::Builder>(new ModelBuilder(
-        dynamic_cast<Engine&>(e), std::move(name), parent_transform, std::move(meshes), std::move(end_caller), is_transformable));
+    auto entity = Manager::build(std::move(name), parent, std::move(meshes), is_transformable);
+    entity->add_component(core::Object::construct<Model>(std::move(meshes), std::move(name), is_transformable));
+    return entity;
 }
 
-gearoenix::gl::ModelManager::ModelManager(Engine& e)
-    : Manager(e)
+gearoenix::gl::ModelManager::ModelManager()
 {
     core::ecs::ComponentType::add<Model>();
 }

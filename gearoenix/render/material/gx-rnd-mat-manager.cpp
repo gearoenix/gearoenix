@@ -4,12 +4,27 @@
 #include "gx-rnd-mat-sprite.hpp"
 #include "gx-rnd-mat-unlit.hpp"
 
-gearoenix::render::material::Manager::Manager(engine::Engine& e)
-    : e(e)
-{
+namespace {
+gearoenix::render::material::Manager* instance = nullptr;
 }
 
-gearoenix::render::material::Manager::~Manager() = default;
+gearoenix::render::material::Manager::Manager()
+{
+    GX_ASSERT_D(!instance);
+    instance = this;
+}
+
+gearoenix::render::material::Manager::~Manager()
+{
+    GX_ASSERT_D(instance);
+    instance = nullptr;
+}
+
+gearoenix::render::material::Manager& gearoenix::render::material::Manager::get()
+{
+    GX_ASSERT_D(instance);
+    return *instance;
+}
 
 #define GX_RND_MAT_RETURN_IF_FOUND(x)                                        \
     {                                                                        \

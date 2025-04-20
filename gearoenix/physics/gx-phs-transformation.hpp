@@ -4,7 +4,6 @@
 #include "../math/gx-math-matrix-4d.hpp"
 #include "../math/gx-math-quaternion.hpp"
 #include "../render/gizmo/gx-rnd-gzm-drawer.hpp"
-#include <boost/container/flat_set.hpp>
 #include <optional>
 
 namespace gearoenix::physics {
@@ -38,28 +37,22 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
         }
     };
 
-    constexpr static std::uint32_t MAX_COUNT = 8192;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 23;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto max_count = 8192;
+    constexpr static auto object_type_index = gearoenix_physics_transformation_type_index;
 
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
     GX_GET_CREF_PRV(math::Mat3x3<double>, rotation_matrix);
-
     GX_GET_CREF_PRV(Rotation, rotation);
     GX_GET_CREF_PRV(math::Vec3<double>, scale);
-
-    GX_GET_CREF_PRV(boost::container::flat_set<Transformation*>, children);
-    GX_GET_PTR_PRV(Transformation, parent);
     GX_GET_VAL_PRV(bool, changed, true);
 
-    void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
-    void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+    // void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
+    // void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
 
 public:
-    Transformation(std::string&& name, Transformation* parent, core::ecs::entity_id_t entity_id);
+    explicit Transformation(std::string&& name);
     ~Transformation() override;
     void set_local_matrix(const math::Mat4x4<double>&);
     [[nodiscard]] math::Vec3<double> get_global_position() const;
@@ -104,8 +97,6 @@ public:
         const math::Vec3<double>& y,
         const math::Vec3<double>& z,
         const math::Vec3<double>& p);
-    void add_child(Transformation* child);
-    void set_parent(Transformation*);
     void show_debug_gui() override;
     void draw_gizmo() override;
     static void update();

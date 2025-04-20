@@ -24,7 +24,7 @@ void gearoenix::render::texture::Attachment2D::read(
     core::job::EndCaller<Attachment2D>&& e)
 {
     core::job::send_job_to_pool([s = std::move(s), e = std::move(e)]() mutable {
-        engine::Engine::get()->get_texture_manager()->read_gx3d(
+        Manager::get().read_gx3d(
             *s,
             core::job::EndCallerShared<Texture>([e = std::move(e)](std::shared_ptr<Texture>&& t) {
                 e.set_return(Attachment2D(std::static_pointer_cast<Texture2D>(std::move(t))));
@@ -53,7 +53,7 @@ void gearoenix::render::texture::AttachmentCube::read(
 {
     core::job::send_job_to_pool([s = std::move(s), e = std::move(e)]() mutable {
         const auto face = s->read<Face>();
-        engine::Engine::get()->get_texture_manager()->read_gx3d(
+        Manager::get().read_gx3d(
             *s,
             core::job::EndCallerShared<Texture>([face, e = std::move(e)](std::shared_ptr<Texture>&& t) {
                 e.set_return(AttachmentCube(std::static_pointer_cast<TextureCube>(std::move(t)), face));

@@ -8,7 +8,7 @@ struct Irradiance final : Shader {
     GX_GL_UNIFORM_TEXTURE(environment);
 
 public:
-    explicit Irradiance(Engine& e);
+    Irradiance();
     ~Irradiance() override;
     void bind(uint& current_shader) const override;
 };

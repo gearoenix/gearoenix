@@ -8,22 +8,18 @@ struct Mesh;
 
 namespace gearoenix::render::skybox {
 struct Skybox : core::ecs::Component {
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 16;
-    constexpr static std::uint32_t MAX_COUNT = 16;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto object_type_index = gearoenix_render_skybox_type_index;
+    constexpr static std::uint32_t max_count = 16;
 
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
     GX_GET_CREF_PRT(Texture, bound_texture);
-    GX_GETSET_VAL_PRT(core::ecs::entity_id_t, scene_id, core::ecs::invalid_entity_id);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
 
     Skybox(
-        core::ecs::component_index_t final_component_type_index,
+        core::object_type_index_t final_component_type_index,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         Texture&& bound_texture,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
+        std::string&& name);
 
 public:
     ~Skybox() override;

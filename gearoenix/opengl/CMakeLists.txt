@@ -80,6 +80,8 @@ SET(GX_ENGINE_OPENGL_SRC
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-model.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-reflection.hpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-scene.cpp
+        ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-scene.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.cpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-skybox.hpp
         ${GX_ENGINE_OPENGL_SRC_DIR}/gx-gl-target.cpp

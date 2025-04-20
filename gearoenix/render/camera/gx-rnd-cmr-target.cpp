@@ -32,12 +32,12 @@ gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_d
 
 bool gearoenix::render::camera::Target::is_customised() const
 {
-    return target.index() == CUSTOMISED_VAR_INDEX;
+    return target.index() == customised_var_index;
 }
 
 bool gearoenix::render::camera::Target::is_default() const
 {
-    return target.index() == DEFAULT_VAR_INDEX;
+    return target.index() == default_var_index;
 }
 
 void gearoenix::render::camera::Target::set_customised(std::shared_ptr<texture::Target>&& customised_target)
@@ -48,11 +48,11 @@ void gearoenix::render::camera::Target::set_customised(std::shared_ptr<texture::
 double gearoenix::render::camera::Target::get_aspect_ratio() const
 {
     switch (target.index()) {
-    case CUSTOMISED_VAR_INDEX: {
-        return std::get<CUSTOMISED_VAR_INDEX>(target).target->get_aspect_ratio();
+    case customised_var_index: {
+        return std::get<customised_var_index>(target).target->get_aspect_ratio();
     }
-    case DEFAULT_VAR_INDEX: {
-        return std::get<DEFAULT_VAR_INDEX>(target).main->get_aspect_ratio();
+    case default_var_index: {
+        return std::get<default_var_index>(target).main->get_aspect_ratio();
     }
     default: {
         GX_UNEXPECTED;
@@ -63,11 +63,11 @@ double gearoenix::render::camera::Target::get_aspect_ratio() const
 gearoenix::math::Vec2<std::uint32_t> gearoenix::render::camera::Target::get_dimension() const
 {
     switch (target.index()) {
-    case CUSTOMISED_VAR_INDEX: {
-        return std::get<CUSTOMISED_VAR_INDEX>(target).target->get_dimension();
+    case customised_var_index: {
+        return std::get<customised_var_index>(target).target->get_dimension();
     }
-    case DEFAULT_VAR_INDEX: {
-        return std::get<DEFAULT_VAR_INDEX>(target).main->get_dimension();
+    case default_var_index: {
+        return std::get<default_var_index>(target).main->get_dimension();
     }
     default: {
         GX_UNEXPECTED;
@@ -78,13 +78,13 @@ gearoenix::math::Vec2<std::uint32_t> gearoenix::render::camera::Target::get_dime
 const gearoenix::render::texture::DefaultCameraTargets& gearoenix::render::camera::Target::get_default() const
 {
     GX_ASSERT(is_default());
-    return std::get<DEFAULT_VAR_INDEX>(target);
+    return std::get<default_var_index>(target);
 }
 
 const gearoenix::render::camera::Target::Customised& gearoenix::render::camera::Target::get_customised() const
 {
     GX_ASSERT(is_customised());
-    return std::get<CUSTOMISED_VAR_INDEX>(target);
+    return std::get<customised_var_index>(target);
 }
 
 void gearoenix::render::camera::Target::write(
@@ -95,7 +95,7 @@ void gearoenix::render::camera::Target::write(
     if (d) {
         return;
     }
-    std::get<CUSTOMISED_VAR_INDEX>(target).target->write(std::move(s), std::move(end));
+    std::get<customised_var_index>(target).target->write(std::move(s), std::move(end));
 }
 
 void gearoenix::render::camera::Target::read(
@@ -106,7 +106,7 @@ void gearoenix::render::camera::Target::read(
         end.set_return(construct_default(texture::DefaultCameraTargets()));
         return;
     }
-    engine::Engine::get()->get_texture_manager()->create_target(std::move(stream), core::job::EndCallerShared<texture::Target>([e = std::move(end)](std::shared_ptr<texture::Target>&& t) {
+    texture::Manager::get().create_target(std::move(stream), core::job::EndCallerShared<texture::Target>([e = std::move(end)](std::shared_ptr<texture::Target>&& t) {
         e.set_return(construct_customised(std::move(t)));
     }));
 }

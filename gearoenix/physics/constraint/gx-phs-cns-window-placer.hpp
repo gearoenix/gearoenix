@@ -17,15 +17,15 @@ struct WindowPlacer final : public Constraint, public core::event::Listener {
     GX_GET_CREF_PRV(DistanceFun, distance)
     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
 private:
-    void update() final;
+    void update() override;
 
 public:
     WindowPlacer(core::Id id, std::string name, render::engine::Engine* e);
-    ~WindowPlacer() final;
+    ~WindowPlacer() override;
 
     void apply(double, double) final { }
 
-    [[nodiscard]] bool on_event(const core::event::Data& e) final;
+    [[nodiscard]] bool on_event(const core::event::Data& e) override;
 
     void set_width_percentage(double v);
     void set_height_percentage(double v);

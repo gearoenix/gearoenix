@@ -26,7 +26,7 @@ gearoenix::gl::submission::Model::Model(
     , radiance(scene.default_reflection.second.radiance)
     , radiance_lod_coefficient(scene.default_reflection.second.radiance_mips_count)
     , reflection_probe_size(scene.default_reflection.second.size)
-    , name(model->get_name().c_str())
+    , name(model->get_object_name().c_str())
 {
     const auto [fmi, lmi] = scene.add_meshes(model->get_gl_meshes());
     first_mesh_index = fmi;
@@ -41,26 +41,6 @@ gearoenix::gl::submission::Model::Model(
             });
         }
     }
-}
-
-bool gearoenix::gl::submission::Model::has_transparent_material(const Scene& scene) const
-{
-    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
-        if (scene.meshes[mesh_index].render_material->get_transparency() == render::material::Transparency::Transparent) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool gearoenix::gl::submission::Model::needs_mvp(const Scene& scene) const
-{
-    for (std::uint32_t mesh_index = first_mesh_index; mesh_index < last_mesh_index; ++mesh_index) {
-        if (scene.meshes[mesh_index].material->needs_mvp) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void gearoenix::gl::submission::Model::render_shadow(

@@ -1,9 +1,7 @@
 #include "gx-rnd-gltf-transform.hpp"
-#include "../../core/ecs/gx-cr-ecs-comp-allocator.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "../scene/gx-rnd-scn-builder.hpp"
 #include "../scene/gx-rnd-scn-scene.hpp"
 #include "gx-rnd-gltf-context.hpp"
 
@@ -33,25 +31,16 @@ bool gearoenix::render::gltf::has_transformation(const int node_index, const Con
     return !node.rotation.empty() || !node.scale.empty() || !node.translation.empty();
 }
 
-gearoenix::physics::Transformation* gearoenix::render::gltf::create_empty_entity_transform(
+gearoenix::core::ecs::EntityPtr gearoenix::render::gltf::create_empty_entity_transform(
     const int node_index,
     const Context& context,
-    physics::Transformation* const parent_transform,
-    const core::job::EndCaller<>& entity_end_callback,
-    const std::shared_ptr<scene::Builder>& scene_builder)
+    core::ecs::Entity* const parent)
 {
-    if (!has_transformation(node_index, context)) {
-        return parent_transform;
-    }
     const auto& node = context.data.nodes[node_index];
     GX_ASSERT_D(!node.name.empty());
-    const auto entity_builder = std::make_shared<core::ecs::EntitySharedBuilder>(
-        std::string(node.name),
-        core::job::EndCaller(entity_end_callback));
-    const auto transform = core::ecs::construct_component<physics::Transformation>(
-        node.name + "-transformation", parent_transform, entity_builder->get_id());
-    entity_builder->get_builder().add_component(transform);
-    scene_builder->get_scene().add_empty(entity_builder->get_id());
+    auto entity = core::ecs::Entity::construct(std::string(node.name), parent);
+    auto transform = core::Object::construct<physics::Transformation>(node.name + "-transformation");
     apply_transform(node_index, context, *transform);
-    return transform.get();
+    entity->add_component(std::move(transform));
+    return entity;
 }

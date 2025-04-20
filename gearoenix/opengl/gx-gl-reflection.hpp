@@ -3,7 +3,6 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/reflection/gx-rnd-rfl-baked.hpp"
-#include "../render/reflection/gx-rnd-rfl-builder.hpp"
 #include "../render/reflection/gx-rnd-rfl-manager.hpp"
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "gx-gl-types.hpp"
@@ -16,10 +15,10 @@ struct Target;
 struct TextureCube;
 
 struct ReflectionProbe {
-    constexpr static std::uint32_t MAX_COUNT = render::reflection::Probe::MAX_COUNT;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 21;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto max_count = render::reflection::Probe::max_count;
+    constexpr static auto object_type_index = gearoenix_gl_reflection_probe_type_index;
+    constexpr static auto all_parent_object_type_indices = core::Object::all_parent_object_type_indices;
+    constexpr static auto immediate_parent_object_type_indices = core::Object::immediate_parent_object_type_indices;
 
     GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_irradiance);
     GX_GET_CREF_PRT(std::shared_ptr<TextureCube>, gl_radiance);
@@ -31,18 +30,12 @@ public:
 };
 
 struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
-    constexpr static auto MAX_COUNT = Baked::MAX_COUNT;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 19;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Baked::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
+    constexpr static auto max_count = Baked::max_count;
+    constexpr static auto object_type_index = gearoenix_gl_reflection_baked_type_index;
+    constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index };
 
-    BakedReflection(
-        std::string&& name,
-        Engine& e,
-        std::shared_ptr<TextureCube>&& irr,
-        std::shared_ptr<TextureCube>&& rad,
-        const math::Aabb3<double>& include_box,
-        core::ecs::entity_id_t entity_id);
+    BakedReflection(std::string&& name, std::shared_ptr<TextureCube>&& irr, std::shared_ptr<TextureCube>&& rad, const math::Aabb3<double>& include_box);
     ~BakedReflection() override;
 };
 
@@ -52,10 +45,10 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     typedef std::array<uint, 6> GlCubeTargetV;
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTargetV;
 
-    constexpr static auto MAX_COUNT = Runtime::MAX_COUNT;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 15;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX, Probe::TYPE_INDEX };
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES { Runtime::TYPE_INDEX, ReflectionProbe::TYPE_INDEX };
+    constexpr static auto max_count = Runtime::max_count;
+    constexpr static auto object_type_index = gearoenix_gl_reflection_runtime_type_index;
+    constexpr static std::array all_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index };
 
     GX_GET_CREF_PRV(std::shared_ptr<TextureCube>, gl_environment);
     GX_GET_CREF_PRV(GlCubeTarget, gl_environment_targets);
@@ -67,17 +60,15 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     GX_GET_CREF_PRV(GlCubeTargetV, gl_irradiance_targets_v);
     GX_GET_CREF_PRV(GlMippedCubeTargetV, gl_radiance_targets_v);
 
+    void initialise_gl();
+
 public:
     RuntimeReflection(
-        Engine& e,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
+        std::string&& name);
     static void construct(
-        Engine& e,
-        const std::shared_ptr<render::reflection::Builder>& builder,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
@@ -85,68 +76,32 @@ public:
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
-        core::ecs::entity_id_t entity_id,
         core::job::EndCallerShared<RuntimeReflection>&& end_callback);
     ~RuntimeReflection() override;
 };
 
-struct ReflectionBuilder final : render::reflection::Builder {
-private:
-    ReflectionBuilder(
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        core::job::EndCaller<>&& end_callback);
-
-public:
-    ReflectionBuilder(
-        Engine& e,
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        const math::Aabb3<double>& include_box,
-        std::shared_ptr<render::texture::TextureCube>&& irradiance_texture,
-        std::shared_ptr<render::texture::TextureCube>&& radiance_texture,
-        core::job::EndCaller<>&& end_callback);
-    static void construct_runtime(
-        Engine& e,
-        const std::string& name,
-        physics::Transformation* parent_transform,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
-        core::job::EndCaller<>&& entity_end_callback,
-        core::job::EndCallerShared<ReflectionBuilder>&& probe_end_callback);
-    ~ReflectionBuilder() override;
-};
-
 struct ReflectionManager final : render::reflection::Manager {
-    Engine& eng;
-
 private:
-    [[nodiscard]] std::shared_ptr<render::reflection::Builder> build_baked(
-        const std::string& name,
-        physics::Transformation* parent_transform,
+    [[nodiscard]] core::ecs::EntityPtr build_baked(
+        std::string&& name,
+        core::ecs::Entity* parent,
         std::shared_ptr<render::texture::TextureCube>&& irradiance,
         std::shared_ptr<render::texture::TextureCube>&& radiance,
-        const math::Aabb3<double>& include_box,
-        core::job::EndCaller<>&& end_callback) override;
+        const math::Aabb3<double>& include_box) override;
 
     void build_runtime(
-        const std::string& name,
-        physics::Transformation* parent_transform,
+        std::string&& name,
+        core::ecs::Entity* parent,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
-        core::job::EndCaller<>&& entity_end_callback,
-        core::job::EndCallerShared<render::reflection::Builder>&& probe_end_callback) override;
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:
-    explicit ReflectionManager(Engine& e);
+    ReflectionManager();
     ~ReflectionManager() override;
 };
 }

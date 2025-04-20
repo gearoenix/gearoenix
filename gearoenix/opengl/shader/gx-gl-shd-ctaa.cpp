@@ -15,8 +15,7 @@ void main() {\n\
     out_uv = position * 0.5 + 0.5;\n\
 }\n";
 
-gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(Engine& e, const std::uint32_t colour_tuning_index)
-    : Shader(e)
+gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(const std::uint32_t colour_tuning_index)
 {
     const bool is_gamma_correction_index = colour_tuning_index == render::camera::ColourTuning::gamma_correction_index;
     const bool is_colour_scale_index = colour_tuning_index == render::camera::ColourTuning::multiply_index;
@@ -139,8 +138,7 @@ void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::
     }
 }
 
-gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination(Engine& e)
-    : e(e)
+gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination()
 {
 }
 

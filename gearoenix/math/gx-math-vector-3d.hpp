@@ -465,16 +465,16 @@ struct Vec3 final {
 
     void read(platform::stream::Stream& s)
     {
-        x = static_cast<Element>(s.read<float>());
-        y = static_cast<Element>(s.read<float>());
-        z = static_cast<Element>(s.read<float>());
+        x = s.read<Element>();
+        y = s.read<Element>();
+        z = s.read<Element>();
     }
 
     void write(platform::stream::Stream& s) const
     {
-        s.write_fail_debug(static_cast<float>(x));
-        s.write_fail_debug(static_cast<float>(y));
-        s.write_fail_debug(static_cast<float>(z));
+        s.write_fail_debug(x);
+        s.write_fail_debug(y);
+        s.write_fail_debug(z);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec3& v)

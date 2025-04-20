@@ -8,7 +8,7 @@ struct Multiply final : Shader {
     GX_GL_UNIFORM_TEXTURE(source_texture);
 
 public:
-    explicit Multiply(Engine& e);
+    Multiply();
     ~Multiply() override;
     void bind(uint& current_shader) const override;
 };

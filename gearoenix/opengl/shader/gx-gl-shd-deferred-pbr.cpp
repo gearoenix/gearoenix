@@ -94,8 +94,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::DeferredPbr::DeferredPbr(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::DeferredPbr::DeferredPbr()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

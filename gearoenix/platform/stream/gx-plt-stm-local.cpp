@@ -8,7 +8,7 @@
 #endif
 
 namespace {
-std::string create_path(const gearoenix::platform::Application& app, const std::string& name)
+std::string create_path(const std::string& name)
 {
 #ifdef GX_PLATFORM_IOS
     (void)app;
@@ -20,7 +20,6 @@ std::string create_path(const gearoenix::platform::Application& app, const std::
 #elif defined(GX_PLATFORM_ANDROID)
     return std::string(app.get_android_application()->activity->internalDataPath) + "/" + name;
 #else
-    (void)app;
     return name;
 #endif
 }
@@ -30,11 +29,11 @@ std::ios::openmode create_open_mode(const bool writable)
     return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
 }
 
-[[nodiscard]] std::fstream create_file(const gearoenix::platform::Application& app, const std::string& name, const bool writable)
+[[nodiscard]] std::fstream create_file(const std::string& name, const bool writable)
 {
-    std::fstream file(create_path(app, name), create_open_mode(writable));
+    std::fstream file(create_path(name), create_open_mode(writable));
     if ((!file.is_open() || !file.good()) && writable) {
-        file.open(create_path(app, name), create_open_mode(writable) | std::ios::trunc);
+        file.open(create_path(name), create_open_mode(writable) | std::ios::trunc);
     }
     return file;
 }
@@ -45,8 +44,8 @@ gearoenix::platform::stream::Local::Local(std::fstream file)
 {
 }
 
-gearoenix::platform::stream::Local::Local(const Application& app, const std::string& name, const bool writable)
-    : file(create_file(app, name, writable))
+gearoenix::platform::stream::Local::Local(const std::string& name, const bool writable)
+    : file(create_file(name, writable))
 {
     if (!file.is_open() || !file.good()) {
         GX_LOG_F("Can not open file: " << name);
@@ -55,9 +54,9 @@ gearoenix::platform::stream::Local::Local(const Application& app, const std::str
 
 gearoenix::platform::stream::Local::~Local() = default;
 
-gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const Application& app, const std::string& name, const bool writable)
+gearoenix::platform::stream::Local* gearoenix::platform::stream::Local::open(const std::string& name, const bool writable)
 {
-    auto file = create_file(app, name, writable);
+    auto file = create_file(name, writable);
     if (!file.is_open() || !file.good()) {
         return nullptr;
     }
@@ -94,9 +93,9 @@ gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::
     return static_cast<stream_size_t>(file.tellg());
 }
 
-bool gearoenix::platform::stream::Local::exist(const Application& app, const std::string& name)
+bool gearoenix::platform::stream::Local::exist(const std::string& name)
 {
-    const std::ifstream f(create_path(app, name));
+    const std::ifstream f(create_path(name));
     return f.is_open() && f.good();
 }
 

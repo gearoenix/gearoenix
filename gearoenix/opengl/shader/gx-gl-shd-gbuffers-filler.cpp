@@ -101,8 +101,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::GBuffersFiller::GBuffersFiller(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::GBuffersFiller::GBuffersFiller()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

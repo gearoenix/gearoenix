@@ -5,7 +5,6 @@
 #include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
-#include "gx-plt-runtime-configuration.hpp"
 #include "gx-plt-touch.hpp"
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -81,7 +80,7 @@ public:
     void touch_up(FingerId finger_id);
     void touch_cancel(FingerId finger_id);
     void initialize_engine(Application&);
-    void initialize_core_application(Application&, core::Application*);
+    void initialize_core_application(core::Application*);
     void going_to_be_closed();
     void terminate();
     void update();

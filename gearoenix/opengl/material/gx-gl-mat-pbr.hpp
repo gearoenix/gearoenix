@@ -23,18 +23,18 @@ struct Pbr final : render::material::Pbr, Material {
     GX_GET_REFC_PRV(std::shared_ptr<shader::GBuffersFiller>, gbuffers_filler_combination); /// TODO it has too change to combination and support bones, ...
 
 public:
-    static void construct(Engine& e, const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c);
-    Pbr(Engine& e, const std::string& name);
-    ~Pbr() final;
-    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) final;
-    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) final;
-    void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) final;
-    void set_normal(std::shared_ptr<render::texture::Texture2D>&&) final;
-    void set_emission(std::shared_ptr<render::texture::Texture2D>&&) final;
-    void set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&&) final;
-    void set_occlusion(std::shared_ptr<render::texture::Texture2D>&&) final;
-    void set_brdflut(std::shared_ptr<render::texture::Texture2D>&&) final;
+    static void construct(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c);
+    explicit Pbr(const std::string& name);
+    ~Pbr() override;
+    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) override;
+    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
+    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
+    void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_occlusion(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_brdflut(std::shared_ptr<render::texture::Texture2D>&&) override;
 };
 }
 

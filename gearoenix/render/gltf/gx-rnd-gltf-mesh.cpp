@@ -1,12 +1,11 @@
-#include "../../core/ecs/gx-cr-ecs-entity-builder.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
 #include "../mesh/gx-rnd-msh-manager.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
-#include "../model/gx-rnd-mdl-builder.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
-#include "../scene/gx-rnd-scn-builder.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
 
@@ -295,7 +294,7 @@ void load_mesh(
 
     auto name = msh.name + "-primitive:" + std::to_string(primitive_index);
     if (is_animated) {
-        engine::Engine::get()->get_mesh_manager()->build(
+        mesh::Manager::get().build(
             std::move(name),
             std::move(animated_vertices),
             std::move(indices),
@@ -303,7 +302,7 @@ void load_mesh(
             std::shared_ptr(context.materials.materials[primitive.material]),
             std::move(mesh_end_callback));
     } else {
-        engine::Engine::get()->get_mesh_manager()->build(
+        mesh::Manager::get().build(
             std::move(name),
             std::move(vertices),
             std::move(indices),
@@ -362,23 +361,18 @@ bool gearoenix::render::gltf::Meshes::is_mesh(const int node_index) const
     return false;
 }
 
-bool gearoenix::render::gltf::Meshes::process(
-    const int node_index,
-    physics::Transformation* const parent_transform,
-    const core::job::EndCaller<>& end,
-    scene::Builder& scene_builder) const
+bool gearoenix::render::gltf::Meshes::process(const int node_index, core::ecs::Entity* const parent) const
 {
     const auto& node = context.data.nodes[node_index];
     if (!is_mesh(node_index)) {
         return false;
     }
-    auto model_builder = engine::Engine::get()->get_model_manager()->build(
-        std::string(node.name),
-        parent_transform,
-        std::vector(meshes[node.mesh]->meshes),
-        core::job::EndCaller(end),
-        true);
-    apply_transform(node_index, context, model_builder->get_transformation());
-    scene_builder.add(std::move(model_builder));
+    model::meshes_set_t meshes_set;
+    for (const auto& m : meshes[node.mesh]->meshes) {
+        meshes_set.insert(m);
+    }
+    auto entity = model::Manager::get().build(
+        std::string(node.name), parent, std::move(meshes_set), true);
+    apply_transform(node_index, context, *entity->get_component<physics::Transformation>());
     return true;
 }

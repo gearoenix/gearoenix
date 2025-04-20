@@ -1,11 +1,10 @@
 #include "gx-rnd-gltf-light.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-vector-3d.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
-#include "../light/gx-rnd-lt-builder.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
 #include "../light/gx-rnd-lt-light.hpp"
 #include "../light/gx-rnd-lt-manager.hpp"
-#include "../scene/gx-rnd-scn-builder.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
 
@@ -34,9 +33,8 @@ bool gearoenix::render::gltf::Lights::is_light(const int node_index) const
 }
 
 bool gearoenix::render::gltf::Lights::process(
-    const int node_index, physics::Transformation* const parent_transform,
-    const core::job::EndCaller<>& gpu_end_callback, const core::job::EndCaller<>& entity_end_callback,
-    const std::shared_ptr<scene::Builder>& scene_builder) const
+    const int node_index, core::ecs::Entity* const parent,
+    const core::job::EndCaller<>& end_callback) const
 {
     const auto& node = context.data.nodes[node_index];
     if (!is_light(node_index)) {
@@ -67,14 +65,12 @@ bool gearoenix::render::gltf::Lights::process(
     const auto colour = math::Vec3(colour_x, colour_y, colour_z) * intensity;
     const auto light_type = light_info.Get("type").Get<std::string>();
     GX_ASSERT_D(light_type == "directional");
-    engine::Engine::get()->get_light_manager()->build_shadow_caster_directional(
-        node.name, parent_transform, 1024, 20.0f, 1.0f, 35.0f,
-        core::job::EndCallerShared<light::Builder>([this, sb = scene_builder, node_index, le = gpu_end_callback, colour](std::shared_ptr<light::Builder>&& lb) {
-            lb->get_light().colour = colour;
-            apply_transform(node_index, context, *lb->get_shadow_caster_directional()->get_shadow_transform());
-            sb->add(std::move(lb));
-            (void)le;
-        }),
-        core::job::EndCaller(entity_end_callback));
+    light::Manager::get().build_shadow_caster_directional(
+        std::string(node.name), parent, 1024, 20.0f, 1.0f, 35.0f,
+        core::job::EndCaller<core::ecs::EntityPtr>([this, node_index, e = end_callback, colour](auto&& l) {
+            l->template get_component<light::Light>()->colour = colour;
+            apply_transform(node_index, context, *l->template get_component<light::ShadowCasterDirectional>()->get_shadow_transform());
+            (void)e;
+        }));
     return true;
 }

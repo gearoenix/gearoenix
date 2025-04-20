@@ -1,10 +1,9 @@
 #include "gx-rnd-cmr-camera.hpp"
-#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../gx-rnd-vertex.hpp"
-#include "../imgui/gx-rnd-imgui-type-table.hpp"
 #include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
@@ -19,12 +18,9 @@ thread_local std::default_random_engine re(rd());
 }
 
 gearoenix::render::camera::Camera::Camera(
-    const core::ecs::component_index_t final_type,
-    const std::string& name,
-    Target&& target,
-    std::shared_ptr<physics::Transformation>&& transform,
-    const core::ecs::entity_id_t entity_id)
-    : Component(final_type, std::string(name), entity_id)
+    const core::object_type_index_t final_type,
+    const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+    : Component(final_type, std::string(name))
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))
     , debug_colour {
@@ -42,16 +38,15 @@ gearoenix::render::camera::Camera::Camera(
 
 gearoenix::render::camera::Camera::~Camera()
 {
-    core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().remove_observer(resolution_cfg_observer);
+    RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_observer);
 }
 
-void gearoenix::render::camera::Camera::set_camera_self(const std::shared_ptr<Camera>& c)
+void gearoenix::render::camera::Camera::initialise()
 {
-    camera_self = c;
     if (0 == resolution_cfg_observer) {
-        resolution_cfg_observer = core::ecs::Singleton::get<RuntimeConfiguration>().get_runtime_resolution().add_observer(
-            [c = camera_self](const Resolution&) {
-                const auto cam = c.lock();
+        resolution_cfg_observer = RuntimeConfiguration::get().get_runtime_resolution().add_observer(
+            [c = object_self](const Resolution&) {
+                const auto cam = std::static_pointer_cast<Camera>(std::move(c.lock()));
                 if (nullptr == cam) {
                     return false;
                 }
@@ -61,9 +56,7 @@ void gearoenix::render::camera::Camera::set_camera_self(const std::shared_ptr<Ca
     }
 }
 
-void gearoenix::render::camera::Camera::write_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    core::job::EndCaller<>&& end) const
+void gearoenix::render::camera::Camera::write(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
 {
     starting_clip_ending_clip.write(*s);
     if (customised_target_aspect_ratio.has_value()) {
@@ -72,8 +65,6 @@ void gearoenix::render::camera::Camera::write_in_io_context(
     } else {
         s->write_fail_debug(false);
     }
-    s->write_fail_debug(parent_entity_id);
-    s->write_fail_debug(scene_id);
     s->write_fail_debug(flag);
     s->write_fail_debug(far);
     s->write_fail_debug(near);
@@ -86,21 +77,16 @@ void gearoenix::render::camera::Camera::write_in_io_context(
         bloom_data->get_scatter_clamp_max_threshold_threshold_knee().write(*s);
     }
     exposure.write(*s);
-    s->write_fail_debug(transform->get_entity_id());
     target.write(std::move(s), std::move(end));
 }
 
-void gearoenix::render::camera::Camera::update_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    core::job::EndCaller<>&& e)
+void gearoenix::render::camera::Camera::read(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end)
 {
     starting_clip_ending_clip.read(*s);
     if (s->read<bool>()) {
         customised_target_aspect_ratio.emplace();
         s->read(*customised_target_aspect_ratio);
     }
-    s->read(parent_entity_id);
-    s->read(scene_id);
     s->read(flag);
     s->read(far);
     s->read(near);
@@ -113,16 +99,16 @@ void gearoenix::render::camera::Camera::update_in_io_context(
         bloom_data->get_scatter_clamp_max_threshold_threshold_knee().read(*s);
     }
     exposure.read(*s);
-    core::ecs::World::get()->resolve([this, id = s->read<core::ecs::entity_id_t>(), self = camera_self.lock(), e = e]() {
+    core::ecs::World::get().resolve([this, self = object_self.lock(), end] {
         (void)self;
-        (void)e;
-        transform = core::ecs::World::get()->get_component_shared_ptr<physics::Transformation>(id);
+        (void)end;
+        transform = entity->get_component_shared_ptr<physics::Transformation>();
         return transform == nullptr;
     });
-    Target::read(std::move(s), core::job::EndCaller<Target>([this, s = camera_self.lock(), e = std::move(e)](Target&& t) mutable {
+    Target::read(std::move(s), core::job::EndCaller<Target>([this, s = object_self.lock(), end = std::move(end)](Target&& t) mutable {
         (void)s;
         target = std::move(t);
-        update_target(core::job::EndCaller([e = std::move(e)] { (void)e; }));
+        update_target(core::job::EndCaller([end = std::move(end)] { (void)end; }));
     }));
 }
 
@@ -310,14 +296,14 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
 
 void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>&& end)
 {
-    engine::Engine::get()->get_material_manager()->get_unlit(
+    material::Manager::get().get_unlit(
         "dummy",
-        core::job::EndCallerShared<material::Unlit>([this, self = camera_self.lock(), end = std::move(end)](std::shared_ptr<material::Unlit>&& material) mutable {
+        core::job::EndCallerShared<material::Unlit>([this, self = object_self.lock(), end = std::move(end)](std::shared_ptr<material::Unlit>&& material) mutable {
             if (nullptr == self) {
                 return;
             }
-            std::string mesh_name = name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::uint64_t>(this));
-            (void)engine::Engine::get()->get_mesh_manager()->remove_if_exist(mesh_name);
+            std::string mesh_name = object_name + "-camera-debug-mesh-ptr" + std::to_string(reinterpret_cast<std::uint64_t>(this));
+            (void)mesh::Manager::get().remove_if_exist(mesh_name);
             std::array<math::Vec3<double>, 8> points;
             generate_frustum_points(
                 math::Vec3(0.0),
@@ -334,7 +320,7 @@ void gearoenix::render::camera::Camera::create_debug_mesh(core::job::EndCaller<>
                 0, 4, 1, 5, 2, 6, 3, 7, // edges
                 4, 5, 4, 6, 5, 7, 6, 7, // near
             };
-            engine::Engine::get()->get_mesh_manager()->build(
+            mesh::Manager::get().build(
                 std::move(mesh_name),
                 std::move(vertices),
                 std::move(indices),
@@ -369,15 +355,16 @@ void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& e
     if (!target.is_default()) {
         return;
     }
-    engine::Engine::get()->get_texture_manager()->create_default_camera_render_target(
-        name,
-        core::job::EndCaller<texture::DefaultCameraTargets>([w = camera_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
+    texture::Manager::get().create_default_camera_render_target(
+        object_name,
+        core::job::EndCaller<texture::DefaultCameraTargets>([this, w = object_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
             const auto s = w.lock();
             if (nullptr == s) {
                 return;
             }
-            s->target = Target(std::move(t));
-            s->update_projection();
-            s->update_bloom();
+            target = Target(std::move(t));
+            update_projection();
+            update_bloom();
+            (void)s;
         }));
 }

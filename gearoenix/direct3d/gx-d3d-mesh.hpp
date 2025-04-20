@@ -23,18 +23,18 @@ struct Mesh final : public render::mesh::Mesh {
         UINT vertex_size,
         UINT vertices_size,
         UINT indices_count);
-    ~Mesh() final;
+    ~Mesh() override;
 };
 
 struct MeshManager final : render::mesh::Manager {
     explicit MeshManager(Engine& e);
-    ~MeshManager() final;
+    ~MeshManager() override;
     [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
         std::string&& name,
         std::vector<render::PbrVertex>&& vertices,
         std::vector<std::uint32_t>&& indices,
         math::Aabb3<double>&& occlusion_box,
-        core::job::EndCaller&& end_callback) final;
+        core::job::EndCaller&& end_callback) override;
 };
 }
 

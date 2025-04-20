@@ -37,7 +37,7 @@ public:
         const std::vector<std::uint32_t>& indices,
         math::Aabb3<double>&& occlusion_box,
         const core::job::EndCaller& end);
-    ~Mesh() final;
+    ~Mesh() override;
     [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const;
 };
 }

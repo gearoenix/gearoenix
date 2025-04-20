@@ -9,20 +9,14 @@ struct Transformation;
 
 namespace gearoenix::physics::collider {
 struct Collider : core::ecs::Component, render::gizmo::Drawer {
-    constexpr static std::uint32_t MAX_COUNT = 8192;
-    constexpr static core::ecs::component_index_t TYPE_INDEX = 30;
-    constexpr static core::ecs::component_index_set_t ALL_PARENT_TYPE_INDICES {};
-    constexpr static core::ecs::component_index_set_t IMMEDIATE_PARENT_TYPE_INDICES {};
+    constexpr static auto max_count = 8192;
+    constexpr static auto object_type_index = gearoenix_physics_collider_type_index;
 
     GX_GET_CREF_PRT(std::shared_ptr<Transformation>, transform);
     GX_GET_CREF_PRT(math::Aabb3<double>, surrounding_box);
     GX_GET_VAL_PRT(bool, surrounding_box_changed, false);
 
-    Collider(
-        std::shared_ptr<Transformation>&& transform,
-        core::ecs::component_index_t final_type_index,
-        std::string&& name,
-        core::ecs::entity_id_t entity_id);
+    Collider(std::shared_ptr<Transformation>&& transform, core::object_type_index_t final_type_index, std::string&& name);
     void show_debug_gui() override;
 
 public:

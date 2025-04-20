@@ -11,7 +11,6 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/allocator/gx-cr-alc-static-block.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-archetype.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-allocator.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-type.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-comp-type.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-component.cpp
@@ -19,10 +18,8 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-condition.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-builder.cpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-builder.hpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-singleton.cpp
-        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-singleton.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-ptr.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-entity-ptr.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-types.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/ecs/gx-cr-ecs-world.hpp
@@ -82,9 +79,16 @@ SET(GX_ENGINE_CORE_SRC
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-function-loader.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-language.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-object.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-object.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-object-streamer.cpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-object-streamer.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-object-type-indices.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-observed.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-pool.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-range.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-static-flat-map.hpp
+        ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-static-flat-set.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.cpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-string.hpp
         ${GX_ENGINE_CORE_SRC_DIR}/gx-cr-type-index-set.hpp

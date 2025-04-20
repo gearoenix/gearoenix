@@ -27,10 +27,10 @@ public:
         std::uint64_t img_width,
         std::uint64_t img_height,
         const core::job::EndCaller<core::job::EndCallerIgnore>& call);
-    ~Texture2D() final;
+    ~Texture2D() override;
     void write_gx3d(
         const std::shared_ptr<platform::stream::Stream>& s,
-        const gearoenix::core::job::EndCaller<gearoenix::core::job::EndCallerIgnore>&) final;
+        const gearoenix::core::job::EndCaller<gearoenix::core::job::EndCallerIgnore>&) override;
     [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format);
 };
 }

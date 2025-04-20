@@ -1,6 +1,5 @@
 #include "gx-gl-sbm-manager.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/ecs/gx-cr-ecs-singleton.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-profiler.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
@@ -47,13 +46,7 @@
 #include <boost/mp11/algorithm.hpp>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#if GX_PLATFORM_INTERFACE_ANDROID || GX_PLATFORM_WEBASSEMBLY
-#define GX_ALGORITHM_EXECUTION
-#else
-#include <execution>
 
-#define GX_ALGORITHM_EXECUTION std::execution::par_unseq,
-#endif
 
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../../platform/android/gx-plt-gl-context.hpp"
@@ -61,7 +54,7 @@
 
 void gearoenix::gl::submission::Manager::initialise_back_buffer_sizes()
 {
-    auto& cfg = core::ecs::Singleton::get<render::RuntimeConfiguration>();
+    auto& cfg = render::RuntimeConfiguration::get();
     back_buffer_size_changed();
     resolution_cfg_listener_id = cfg.get_runtime_resolution().add_observer([this](const render::Resolution&) -> bool {
         back_buffer_size_changed();
@@ -205,417 +198,26 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 
 void gearoenix::gl::submission::Manager::fill_scenes()
 {
-    core::ecs::World::get()->synchronised_system<render::scene::Scene>(
-        [&, this](const auto scene_id, const auto* const scene) {
-            if (!scene->get_enabled()) {
-                return;
-            }
-            const auto scene_pool_index = scene_pool.emplace([] { return Scene(); });
-            auto& scene_pool_ref = scene_pool[scene_pool_index];
-            if (!scenes_bvhs.contains(scene_id)) {
-                scenes_bvhs.emplace(scene_id, physics::accelerator::Bvh<BvhNodeModel>());
-            }
-            scene_pool_ref.skyboxes.clear();
-            scene_pool_ref.cameras.clear();
-            scene_pool_ref.reflections.clear();
-            scene_pool_ref.reflection_cameras.clear();
-            scene_pool_ref.shadow_cameras.clear();
-            scene_pool_ref.dynamic_models.clear();
-            scene_pool_ref.shadow_caster_directional_lights.clear();
-            scene_pool_ref.bones_data.clear();
-            scene_pool_ref.meshes.clear();
-            scene_pool_ref.debug_mesh_data.clear();
-            scene_pool_ref.name = &scene->get_name();
-            core::ecs::World::get()->synchronised_system<core::ecs::All<gl::Camera, physics::Transformation>>(
-                [&](const core::ecs::entity_id_t camera_id, gl::Camera* const camera, physics::Transformation* const transform) {
-                    if (!camera->get_enabled()) {
-                        return;
-                    }
-                    if (camera->get_scene_id() != scene_id) {
-                        return;
-                    }
-                    const auto camera_pool_index = camera_pool.emplace([&] { return Camera(); });
-                    switch (camera->get_usage()) {
-                    case render::camera::Camera::Usage::Main: {
-                        scene_pool_ref.cameras.emplace(std::make_pair(camera->get_layer(), camera_id), camera_pool_index);
-                        break;
-                    }
-                    case render::camera::Camera::Usage::ReflectionProbe: {
-                        scene_pool_ref.reflection_cameras.emplace(camera_id, camera_pool_index);
-                        break;
-                    }
-                    case render::camera::Camera::Usage::Shadow: {
-                        scene_pool_ref.shadow_cameras.emplace(camera_id, camera_pool_index);
-                        break;
-                    }
-                    }
-                    if (camera->get_debug_enabled()) {
-                        scene_pool_ref.debug_mesh_data.emplace_back(camera, transform);
-                    }
-                });
-            core::ecs::World::get()->synchronised_system<ShadowCasterDirectionalLight>(
-                [&](const auto light_id, const auto* const l) {
-                    if (!l->get_enabled()) {
-                        return;
-                    }
-                    if (scene_id != l->scene_id) {
-                        return;
-                    }
-                    DirectionalShadowCaster shadow_caster_directional_light_data {
-                        .frustum = l->get_shadow_frustum()->get_frustum(),
-                        .shadow_data = DirectionalShadow {
-                            .normalised_vp = l->get_shadow_camera()->get_view_projection(),
-                            .direction = math::Vec3<float>(l->get_shadow_transform()->get_z_axis()),
-                            .colour = l->colour,
-                            .shadow_map_texture = l->get_shadow_map_texture_v(),
-                        }
-                    };
-                    scene_pool_ref.shadow_caster_directional_lights.emplace(light_id, shadow_caster_directional_light_data);
-                });
-            core::ecs::World::get()->synchronised_system<gl::Skybox>([&](const auto skybox_id, const auto* const skybox) {
-                if (!skybox->get_enabled()) {
-                    return;
-                }
-                if (skybox->get_scene_id() != scene_id) {
-                    return;
-                }
-                scene_pool_ref.skyboxes.emplace(
-                    std::make_tuple(skybox->get_layer(), skybox_id, skybox->is_equirectangular()),
-                    Skybox {
-                        .vertex_object = skybox->get_vertex_object(),
-                        .albedo_txt = skybox->get_texture_object(),
-                    }); });
-            if (scene->get_reflection_probs_changed()) {
-                scene_pool_ref.default_reflection.second.size = -std::numeric_limits<double>::max();
-                scene_pool_ref.default_reflection.second.irradiance = black_cube->get_object();
-                scene_pool_ref.default_reflection.second.radiance = black_cube->get_object();
-                scene_pool_ref.default_reflection.second.radiance_mips_count = 0.0f;
-                core::ecs::World::get()->synchronised_system<core::ecs::Any<BakedReflection, RuntimeReflection>>(
-                    [&](const core::ecs::entity_id_t reflection_id, BakedReflection* const baked, RuntimeReflection* const runtime) {
-                        ReflectionProbe* gl_probe = nullptr;
-                        render::reflection::Probe* render_probe = nullptr;
-                        if (nullptr == runtime) {
-                            if (!baked->get_enabled()) {
-                                return;
-                            }
-                            if (baked->get_scene_id() != scene_id) {
-                                return;
-                            }
-                            gl_probe = baked;
-                            render_probe = baked;
-                        } else {
-                            if (!runtime->get_enabled()) {
-                                return;
-                            }
-                            if (runtime->get_scene_id() != scene_id) {
-                                return;
-                            }
-                            gl_probe = runtime;
-                            render_probe = runtime;
-                        }
-                        const Reflection r {
-                            .irradiance = gl_probe->get_gl_irradiance_v(),
-                            .radiance = gl_probe->get_gl_radiance_v(),
-                            .box = render_probe->get_include_box(),
-                            .size = render_probe->get_include_box().get_diameter().square_length(),
-                            .radiance_mips_count = static_cast<float>(render_probe->get_radiance_mips_count() - 1),
-                        };
-                        scene_pool_ref.reflections.emplace(reflection_id, r);
-                        if (r.size > scene_pool_ref.default_reflection.second.size) {
-                            scene_pool_ref.default_reflection.first = reflection_id;
-                            scene_pool_ref.default_reflection.second = r;
-                        }
-                    });
-            }
-            scenes.emplace(std::make_pair(scene->get_layer(), scene_id), scene_pool_index);
-        });
+    core::ecs::World::get().synchronised_system<render::scene::Scene>([&, this](auto* const scene_entity, const auto* const scene) {
+        if (!scene->get_enabled()) {
+            return;
+        }
+        const auto scene_pool_index = scene_pool.emplace([] { return Scene(); });
+        auto& scene_pool_ref = scene_pool[scene_pool_index];
+
+        scenes.emplace(std::make_pair(scene->get_layer(), scene_entity), scene_pool_index);
+    });
 }
 
 void gearoenix::gl::submission::Manager::update_scenes()
 {
-    core::ecs::World::get()->parallel_system<render::scene::Scene>(
-        [&, this](const core::ecs::entity_id_t scene_id, render::scene::Scene* const render_scene, const unsigned int /*kernel_index*/) {
+    core::ecs::World::get().parallel_system<render::scene::Scene>(
+        [&, this](auto* const scene_entity, auto* const render_scene, const auto /*kernel_index*/) {
             if (!render_scene->get_enabled()) {
                 return;
             }
-            auto& scene_data = scene_pool[scenes[std::make_pair(render_scene->get_layer(), scene_id)]];
-            update_scene(scene_id, scene_data, *render_scene);
-        });
-}
-
-void gearoenix::gl::submission::Manager::update_scene(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene)
-{
-    scene_data.ssao_settings = render_scene.get_ssao_settings();
-    auto& bvh = scenes_bvhs[scene_id];
-    update_scene_bvh(scene_id, scene_data, render_scene, bvh);
-    update_scene_dynamic_models(scene_id, scene_data);
-    update_scene_reflection_probes(scene_data, render_scene, bvh);
-    update_scene_lights(scene_data, bvh);
-    update_scene_cameras(scene_id, scene_data, bvh);
-}
-
-void gearoenix::gl::submission::Manager::update_scene_bvh(const core::ecs::entity_id_t scene_id, Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh)
-{
-    if (!render_scene.get_recreate_bvh()) {
-        return;
-    }
-    bvh.reset();
-    core::ecs::World::get()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
-        [&](
-            const core::ecs::entity_id_t,
-            const auto* const collider,
-            gl::Model* const model,
-            physics::Transformation* const model_transform) {
-            if (!model->get_enabled() || model->get_is_transformable() || model->scene_id != scene_id) {
-                return;
-            }
-            bvh.add({ collider->get_surrounding_box(), BvhNodeModel(model, model_transform, scene_data, nullptr) });
-        });
-    bvh.create_nodes();
-}
-
-void gearoenix::gl::submission::Manager::update_scene_dynamic_models(const core::ecs::entity_id_t scene_id, Scene& scene_data)
-{
-    core::ecs::World::get()->synchronised_system<core::ecs::All<physics::collider::Aabb3, gl::Model, physics::Transformation>>(
-        [&](
-            const core::ecs::entity_id_t,
-            physics::collider::Aabb3* const collider,
-            gl::Model* const model,
-            physics::Transformation* const model_transform) {
-            if (!model->get_enabled() || !model->get_is_transformable() || model->scene_id != scene_id) {
-                return;
-            }
-            const auto* const parent_transform = model_transform->get_parent();
-            auto* const armature = parent_transform ? core::ecs::World::get()->get_component<physics::animation::Armature>(parent_transform->get_entity_id()) : nullptr;
-            scene_data.dynamic_models.emplace_back(model, model_transform, scene_data, armature, collider);
-        });
-}
-
-void gearoenix::gl::submission::Manager::update_scene_reflection_probes(Scene& scene_data, render::scene::Scene& render_scene, physics::accelerator::Bvh<BvhNodeModel>& bvh)
-{
-    if (render_scene.get_recreate_bvh() || render_scene.get_reflection_probs_changed()) {
-        for (const auto& reflection : scene_data.reflections) {
-            bvh.call_on_intersecting(reflection.second.box, [&](std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                auto& m = bvh_node_data.user_data.model;
-                if (reflection.second.size > m.reflection_probe_size) {
-                    return;
-                }
-                m.irradiance = reflection.second.irradiance;
-                m.radiance = reflection.second.radiance;
-                m.reflection_probe_size = reflection.second.size;
-                m.radiance_lod_coefficient = reflection.second.radiance_mips_count; });
-        }
-    }
-
-    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& m, const unsigned int) {
-        for (const auto& reflection : scene_data.reflections) {
-            if (!reflection.second.box.check_intersection(m.box)) {
-                return;
-            }
-            auto& mm = m.base.model;
-            if (reflection.second.size > mm.reflection_probe_size) {
-                return;
-            }
-            mm.irradiance = reflection.second.irradiance;
-            mm.radiance = reflection.second.radiance;
-            mm.reflection_probe_size = reflection.second.size;
-            mm.radiance_lod_coefficient = reflection.second.radiance_mips_count;
-        } });
-}
-
-void gearoenix::gl::submission::Manager::update_scene_lights(Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
-{
-    bvh.call_on_all([&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
-        bvh_node_data.user_data.model.shadow_caster_directional_lights_count = 0;
-        bvh_node_data.user_data.model.directional_lights_count = 0; });
-    for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
-        bvh.call_on_intersecting(
-            shadow.second.frustum,
-            [&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
-                auto& m = bvh_node_data.user_data.model;
-                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count) {
-                    return; // it is full
-                }
-                m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
-                m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
-                m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
-                m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
-                ++m.shadow_caster_directional_lights_count;
-            },
-            [&](std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
-                auto& m = bvh_node_data.user_data.model;
-                if (m.directional_lights_direction.size() == m.directional_lights_count) {
-                    return;
-                }
-                m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
-                m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
-                ++m.directional_lights_count;
-            });
-    }
-    core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&](DynamicModel& md, const unsigned int) {
-        auto& m = md.base.model;
-        m.shadow_caster_directional_lights_count = 0;
-        m.directional_lights_count = 0;
-        for (const auto& shadow : scene_data.shadow_caster_directional_lights) {
-            if (shadow.second.frustum.check_intersection(md.box)) {
-                if (m.shadow_caster_directional_lights_normalised_vp.size() == m.shadow_caster_directional_lights_count) {
-                    return;
-                }
-                m.shadow_caster_directional_lights_normalised_vp[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.normalised_vp;
-                m.shadow_caster_directional_lights_direction[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.direction;
-                m.shadow_caster_directional_lights_colour[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.colour;
-                m.shadow_caster_directional_lights_shadow_map_texture[m.shadow_caster_directional_lights_count] = shadow.second.shadow_data.shadow_map_texture;
-                ++m.shadow_caster_directional_lights_count;
-            } else {
-                if (m.directional_lights_direction.size() == m.directional_lights_count) {
-                    return;
-                }
-                m.directional_lights_direction[m.directional_lights_count] = shadow.second.shadow_data.direction;
-                m.directional_lights_colour[m.directional_lights_count] = shadow.second.shadow_data.colour;
-                ++m.directional_lights_count;
-            }
-        } });
-}
-
-void gearoenix::gl::submission::Manager::update_scene_cameras(const core::ecs::entity_id_t scene_id, Scene& scene_data, physics::accelerator::Bvh<BvhNodeModel>& bvh)
-{
-    core::ecs::World::get()->parallel_system<core::ecs::All<gl::Camera, physics::collider::Frustum, physics::Transformation>>(
-        [&, this](
-            const core::ecs::entity_id_t camera_id,
-            const gl::Camera* const camera,
-            const physics::collider::Frustum* const frustum,
-            const physics::Transformation* const transform,
-            const unsigned int /*kernel_index*/) -> void {
-            if (!camera->get_enabled() || scene_id != camera->get_scene_id()) {
-                return;
-            }
-            const auto camera_location = transform->get_global_position();
-            auto camera_pool_index = static_cast<std::uint32_t>(-1);
-            uint self_irradiance = static_cast<uint>(-1);
-            uint self_radiance = static_cast<uint>(-1);
-            switch (camera->get_usage()) {
-            case render::camera::Camera::Usage::Main: {
-                camera_pool_index = scene_data.cameras[std::make_pair(camera->get_layer(), camera_id)];
-                break;
-            }
-            case render::camera::Camera::Usage::ReflectionProbe: {
-                camera_pool_index = scene_data.reflection_cameras[camera_id];
-                const auto& reflection = scene_data.reflections[camera->get_parent_entity_id()];
-                self_irradiance = reflection.irradiance;
-                self_radiance = reflection.radiance;
-                break;
-            }
-            case render::camera::Camera::Usage::Shadow: {
-                camera_pool_index = scene_data.shadow_cameras[camera_id];
-                break;
-            }
-            }
-            auto& camera_data = camera_pool[camera_pool_index];
-            camera_data.clear(*camera, math::Vec3<float>(camera_location));
-
-            // Recoding static models
-            bvh.call_on_intersecting(*frustum, [&, this](const std::remove_cvref_t<decltype(bvh)>::Data& bvh_node_data) {
-                if ((bvh_node_data.user_data.cameras_flags & camera->get_flag()) == 0) {
-                    return;
-                }
-                const auto dir = camera_location - bvh_node_data.box.get_center();
-                const auto dis = dir.square_length();
-                auto m = bvh_node_data.user_data.model;
-                if (self_irradiance == m.irradiance) {
-                    m.irradiance = black_cube->get_object();
-                }
-                if (self_radiance == m.radiance) {
-                    m.radiance = black_cube->get_object();
-                    m.radiance_lod_coefficient = 0.0f;
-                }
-                if (m.has_transparent_material(scene_data)) {
-                    camera_data.threads_translucent_models_data[0].emplace_back(dis, m);
-                } else {
-                    camera_data.threads_opaque_models_data[0].emplace_back(dis, m);
-                } });
-
-            // Recording dynamic models
-            core::sync::ParallelFor::exec(scene_data.dynamic_models.begin(), scene_data.dynamic_models.end(), [&, this](const DynamicModel& m, const unsigned int kernel_index) {
-                if ((m.base.cameras_flags & camera->get_flag()) == 0) {
-                    return;
-                }
-                if (!frustum->check_intersection(m.box)) {
-                    return;
-                }
-                const auto dir = camera_location - m.box.get_center();
-                const auto dis = dir.square_length();
-                auto md = m.base.model;
-                if (self_irradiance == md.irradiance) {
-                    md.irradiance = black_cube->get_object();
-                }
-                if (self_radiance == md.radiance) {
-                    md.radiance = black_cube->get_object();
-                    md.radiance_lod_coefficient = 0.0f;
-                }
-                if (md.has_transparent_material(scene_data)) {
-                    camera_data.threads_translucent_models_data[kernel_index].emplace_back(dis, md);
-                } else {
-                    camera_data.threads_opaque_models_data[kernel_index].emplace_back(dis, md);
-                } });
-
-            for (auto& v : camera_data.threads_opaque_models_data) {
-                std::ranges::move(v, std::back_inserter(camera_data.models_data));
-            }
-            const auto last_opaque_index = static_cast<decltype(camera_data.models_data)::difference_type>(camera_data.models_data.size());
-            for (auto& v : camera_data.threads_translucent_models_data) {
-                std::ranges::move(v, std::back_inserter(camera_data.models_data));
-            }
-            std::sort(
-                GX_ALGORITHM_EXECUTION
-                    camera_data.models_data.begin(),
-                camera_data.models_data.begin() + last_opaque_index,
-                [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-            std::sort(
-                GX_ALGORITHM_EXECUTION
-                        camera_data.models_data.begin()
-                    + last_opaque_index,
-                camera_data.models_data.end(),
-                [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-
-            core::sync::ParallelFor::execi(
-                camera_data.models_data.begin(),
-                camera_data.models_data.end(),
-                [&](const std::pair<double, Model>& d_m, const unsigned int index, const unsigned int kernel_index) {
-                    auto& m = d_m.second;
-                    if (!m.needs_mvp(scene_data) && camera->get_usage() != render::camera::Camera::Usage::Shadow) {
-                        return;
-                    }
-                    if (m.bones_count > 0) {
-                        const auto last_bone_index = m.first_bone_index + m.bones_count;
-                        for (auto i = m.first_bone_index; i < last_bone_index; ++i) {
-                            auto& bone_data = scene_data.bones_data[i];
-                            camera_data.threads_mvps[kernel_index].emplace_back(index, camera_data.vp * bone_data.m);
-                        }
-                    } else {
-                        camera_data.threads_mvps[kernel_index].emplace_back(index, camera_data.vp * m.m);
-                    }
-                });
-            auto current_model_index = static_cast<std::uint32_t>(-1);
-            for (auto& ms : camera_data.threads_mvps) {
-                for (auto& im : ms) {
-                    if (current_model_index != im.first) {
-                        camera_data.models_data[im.first].second.first_mvp_index = static_cast<std::uint32_t>(camera_data.mvps.size());
-                        current_model_index = im.first;
-                    }
-                    camera_data.mvps.push_back(im.second);
-                }
-            }
-
-            core::sync::ParallelFor::exec(
-                scene_data.debug_mesh_data.begin(),
-                scene_data.debug_mesh_data.end(),
-                [&](DebugModel m, const unsigned int kernel_index) {
-                    m.m = camera_data.vp * m.m;
-                    camera_data.debug_meshes_threads[kernel_index].push_back(std::move(m));
-                });
-            for (auto& v : camera_data.debug_meshes_threads) {
-                std::ranges::move(v, std::back_inserter(camera_data.debug_meshes));
-            }
+            auto& scene_data = scene_pool[scenes[std::make_pair(render_scene->get_layer(), scene_entity)]];
+            update_scene(scene_entity, scene_data, *render_scene);
         });
 }
 
@@ -624,8 +226,8 @@ void gearoenix::gl::submission::Manager::render_shadows()
     push_debug_group("render-shadows");
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
-    for (auto& scene_layer_entity_id_pool_index : scenes) {
-        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+    for (auto& scene_layer_entity_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_pool_index.second];
         render_shadows(scene);
     }
     GX_GL_CHECK_D;
@@ -658,8 +260,8 @@ void gearoenix::gl::submission::Manager::render_shadows(const Scene& scene)
 void gearoenix::gl::submission::Manager::render_reflection_probes()
 {
     push_debug_group("render-reflection-probes");
-    core::ecs::World::get()->synchronised_system<RuntimeReflection>(
-        [&](const core::ecs::entity_id_t, const RuntimeReflection* const r) {
+    core::ecs::World::get().synchronised_system<RuntimeReflection>(
+        [&](const auto* const, const auto* const r) {
             constexpr std::array face_uv_axis {
                 std::array { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
                 std::array { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
@@ -794,12 +396,12 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
     const std::array<float, 4> screen_uv_move_reserved { back_buffer_uv_move.x, back_buffer_uv_move.y, 0.0f, 0.0f };
     const auto* const gbuffers_attachments = gbuffers_target->get_gl_attachments().data();
     const auto* const ssao_resolved_attachments = ssao_resolve_target->get_gl_attachments().data();
-    for (auto& scene_layer_entity_id_pool_index : scenes) {
-        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+    for (auto& scene_layer_entity_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_pool_index.second];
         glDisable(GL_BLEND); // TODO find the best place for it
         set_framebuffer(gbuffers_target->get_framebuffer());
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+        for (auto& camera_layer_entity_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_pool_index.second];
             set_viewport_clip(camera.viewport_clip);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             for (auto& distance_model_data : camera.models_data) {
@@ -824,8 +426,8 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
         glBindTexture(GL_TEXTURE_2D, gbuffers_attachments[GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO].texture_object);
 
         ssao_resolve_shader->set_ssao_radius_move_start_end_data(reinterpret_cast<const float*>(&scene.ssao_settings));
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+        for (auto& camera_layer_entity_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_pool_index.second];
             ssao_resolve_shader->set_vp_data(reinterpret_cast<const float*>(&camera.vp));
             glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -834,8 +436,8 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
         // set_framebuffer(final_target->get_framebuffer()); TODO camera must do it
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+        for (auto& camera_layer_entity_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_pool_index.second];
 
             render_skyboxes(scene, camera);
 
@@ -901,11 +503,11 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
 void gearoenix::gl::submission::Manager::render_with_forward()
 {
     push_debug_group("render-forward");
-    for (auto& scene_layer_entity_id_pool_index : scenes) {
-        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
+    for (auto& scene_layer_entity_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_pool_index.second];
         render_reflection_probes(scene);
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+        for (auto& camera_layer_entity_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_pool_index.second];
             render_forward_camera(scene, camera);
             render_bloom(scene, camera);
             render_colour_correction_anti_aliasing(scene, camera);
@@ -935,10 +537,10 @@ void gearoenix::gl::submission::Manager::render_with_forward()
     glDisable(GL_DEPTH_TEST);
     final_shader->bind(current_shader);
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
-    for (auto& scene_layer_entity_id_pool_index : scenes) {
-        auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];
-        for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-            auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+    for (auto& scene_layer_entity_pool_index : scenes) {
+        auto& scene = scene_pool[scene_layer_entity_pool_index.second];
+        for (auto& camera_layer_entity_pool_index : scene.cameras) {
+            auto& camera = camera_pool[camera_layer_entity_pool_index.second];
             glBindTexture(GL_TEXTURE_2D, camera.colour_attachments[1]);
             glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -1113,8 +715,8 @@ void gearoenix::gl::submission::Manager::render_debug_meshes(const Scene& scene)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     unlit_coloured_shader.bind(current_shader);
-    for (auto& camera_layer_entity_id_pool_index : scene.cameras) {
-        const auto& camera = camera_pool[camera_layer_entity_id_pool_index.second];
+    for (auto& camera_layer_entity_pool_index : scene.cameras) {
+        const auto& camera = camera_pool[camera_layer_entity_pool_index.second];
         for (const auto& mesh : camera.debug_meshes) {
             unlit_coloured_shader.set_mvp_data(reinterpret_cast<const float*>(&mesh.m));
             unlit_coloured_shader.set_albedo_factor_data(reinterpret_cast<const float*>(&mesh.colour));
@@ -1167,31 +769,31 @@ void gearoenix::gl::submission::Manager::set_framebuffer(const uint framebuffer_
 
 gearoenix::gl::submission::Manager::Manager(Engine& e)
     : e(e)
-    , final_shader(new shader::Final(e))
-    , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr(e) : nullptr)
-    , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent(e) : nullptr)
-    , irradiance_shader(new shader::Irradiance(e))
-    , radiance_shader(new shader::Radiance(e))
-    , skybox_cube_shader(new shader::SkyboxCube(e))
-    , skybox_equirectangular_shader(new shader::SkyboxEquirectangular(e))
-    , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve(e) : nullptr)
-    , unlit_shader_combination(e.get_shader_manager()->get<shader::UnlitCombination>())
+    , final_shader(new shader::Final())
+    , deferred_pbr_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbr() : nullptr)
+    , deferred_pbr_transparent_shader(e.get_specification().is_deferred_supported ? new shader::DeferredPbrTransparent() : nullptr)
+    , irradiance_shader(new shader::Irradiance())
+    , radiance_shader(new shader::Radiance())
+    , skybox_cube_shader(new shader::SkyboxCube())
+    , skybox_equirectangular_shader(new shader::SkyboxEquirectangular())
+    , ssao_resolve_shader(e.get_specification().is_deferred_supported ? new shader::SsaoResolve() : nullptr)
+    , unlit_shader_combination(shader::Manager::get().get<shader::UnlitCombination>())
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
-    , multiply_shader(new shader::Multiply(e))
-    , bloom_prefilter_shader(new shader::BloomPrefilter(e))
-    , bloom_horizontal_shader(new shader::BloomHorizontal(e))
-    , bloom_vertical_shader(new shader::BloomVertical(e))
-    , bloom_upsampler_shader(new shader::BloomUpsampler(e))
-    , colour_tuning_anti_aliasing_shader_combination(e.get_shader_manager()->get<shader::ColourTuningAntiAliasingCombination>())
+    , multiply_shader(new shader::Multiply())
+    , bloom_prefilter_shader(new shader::BloomPrefilter())
+    , bloom_horizontal_shader(new shader::BloomHorizontal())
+    , bloom_vertical_shader(new shader::BloomVertical())
+    , bloom_upsampler_shader(new shader::BloomUpsampler())
+    , colour_tuning_anti_aliasing_shader_combination(shader::Manager::get().get<shader::ColourTuningAntiAliasingCombination>())
 {
-    e.get_texture_manager()->create_cube_from_colour(
+    render::texture::Manager::get().create_cube_from_colour(
         math::Vec4(0.0f),
         core::job::EndCallerShared<render::texture::TextureCube>(
             [this](std::shared_ptr<render::texture::TextureCube>&& t) {
                 black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
             }));
 
-    e.get_texture_manager()->get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>(
+    render::texture::Manager::get().get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>(
         [this](std::shared_ptr<render::texture::Texture2D>&& t) {
             brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
         }));
@@ -1215,7 +817,7 @@ gearoenix::gl::submission::Manager::Manager(Engine& e)
 
 gearoenix::gl::submission::Manager::~Manager()
 {
-    core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().remove_observer(resolution_cfg_listener_id);
+    render::RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_listener_id);
 }
 
 void gearoenix::gl::submission::Manager::update()
@@ -1248,7 +850,7 @@ void gearoenix::gl::submission::Manager::update()
 
 void gearoenix::gl::submission::Manager::window_resized()
 {
-    if (core::ecs::Singleton::get<render::RuntimeConfiguration>().get_runtime_resolution().get().get_index() == render::Resolution::fixed_index) {
+    if (render::RuntimeConfiguration::get().get_runtime_resolution().get().get_index() == render::Resolution::fixed_index) {
         return;
     }
     back_buffer_size_changed();

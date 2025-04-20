@@ -9,7 +9,7 @@ struct SkyboxEquirectangular final : Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
 
 public:
-    explicit SkyboxEquirectangular(Engine& e);
+    SkyboxEquirectangular();
     ~SkyboxEquirectangular() override;
     void bind(uint& current_shader) const override;
 };

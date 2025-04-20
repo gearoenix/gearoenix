@@ -5,6 +5,10 @@
 #include "../../render/camera/gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-gl-sbm-model.hpp"
 
+namespace gearoenix::core::ecs {
+struct Entity;
+}
+
 namespace gearoenix::physics {
 struct Transformation;
 }
@@ -18,26 +22,14 @@ struct Camera;
 }
 
 namespace gearoenix::gl::submission {
-struct BloomData final {
-    math::Vec4<float> scatter_clamp_max_threshold_threshold_knee;
-
-    [[nodiscard]] static std::optional<BloomData> construct(const std::optional<render::camera::BloomData>& b);
-};
 
 struct Camera final {
-    std::optional<BloomData> bloom_data = std::nullopt;
     std::array<uint, 2> colour_attachments {};
     uint depth_attachment = static_cast<uint>(-1);
     uint main_framebuffer = static_cast<uint>(-1);
     std::array<std::array<uint, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> framebuffers {};
     math::Vec4<sizei> viewport_clip;
-    math::Mat4x4<float> vp;
-    math::Vec3<float> pos;
-    core::ecs::entity_id_t out_reference = core::ecs::invalid_entity_id;
-    float skybox_scale = 1.0;
-    float exposure_value = 1.0f;
-    render::camera::ColourTuning colour_tuning;
-    const std::string* name = nullptr;
+
     std::vector<std::pair<double, Model>> models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_opaque_models_data;
     std::vector<std::vector<std::pair<double, Model>>> threads_translucent_models_data;

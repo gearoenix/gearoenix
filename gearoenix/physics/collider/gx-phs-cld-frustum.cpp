@@ -1,31 +1,27 @@
 #include "gx-phs-cld-frustum.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 
-void gearoenix::physics::collider::Frustum::write_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&&) const
-{
-    surrounding_box.write(*stream);
-    frustum.write(*stream);
-}
-
-void gearoenix::physics::collider::Frustum::update_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&&)
-{
-    surrounding_box.read(*s);
-    frustum.read(*s);
-}
+// void gearoenix::physics::collider::Frustum::write_in_io_context(
+//     std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&&) const
+// {
+//     surrounding_box.write(*stream);
+//     frustum.write(*stream);
+// }
+//
+// void gearoenix::physics::collider::Frustum::update_in_io_context(
+//     std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&&)
+// {
+//     surrounding_box.read(*s);
+//     frustum.read(*s);
+// }
 
 void gearoenix::physics::collider::Frustum::update_surrounding_box()
 {
     // the actual update happens in the `update` function.
 }
 
-gearoenix::physics::collider::Frustum::Frustum(
-    std::shared_ptr<Transformation>&& transform,
-    std::string&& name,
-    const std::array<math::Vec3<double>, 8>& points,
-    const core::ecs::entity_id_t entity_id)
-    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
+gearoenix::physics::collider::Frustum::Frustum(std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points)
+    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
     , frustum(points)
 {
     for (const auto& p : points) {

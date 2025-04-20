@@ -13,10 +13,6 @@ struct Stream;
 struct Path;
 }
 
-namespace gearoenix::render::engine {
-struct Engine;
-}
-
 namespace gearoenix::render::texture {
 struct Texture;
 struct Texture2D;
@@ -31,7 +27,6 @@ struct DefaultCameraTargets final {
 struct Manager {
 
 protected:
-    engine::Engine& e;
     std::mutex brdflut_lock;
     std::shared_ptr<Texture2D> brdflut;
     std::mutex checkers_lock;
@@ -62,8 +57,9 @@ protected:
         = 0;
 
 public:
-    explicit Manager(engine::Engine& e);
+    Manager();
     virtual ~Manager();
+    [[nodiscard]] static Manager& get();
     void read_gx3d(const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c);
     void read_gx3d(platform::stream::Stream& stream, core::job::EndCallerShared<Texture>&& c);
     void create_2d_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c);

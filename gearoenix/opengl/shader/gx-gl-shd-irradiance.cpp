@@ -63,8 +63,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::Irradiance::Irradiance(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::Irradiance::Irradiance()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

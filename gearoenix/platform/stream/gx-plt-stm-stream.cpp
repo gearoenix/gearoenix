@@ -17,13 +17,13 @@ void gearoenix::platform::stream::Stream::built_in_type_read(void* const data, c
     }
 }
 
-std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream::Stream::open(const Path& path, Application& app)
+std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream::Stream::open(const Path& path)
 {
     if (path.is_asset()) {
-        return std::shared_ptr<Stream>(Asset::construct(app, path.get_raw_data()));
+        return std::shared_ptr<Stream>(Asset::construct(path.get_raw_data()));
     }
     if (path.is_absolute()) {
-        return std::shared_ptr<Stream>(Local::open(app, path.get_raw_data()));
+        return std::shared_ptr<Stream>(Local::open(path.get_raw_data()));
     }
     return {};
 }

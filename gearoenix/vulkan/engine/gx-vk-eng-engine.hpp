@@ -59,16 +59,16 @@ struct Engine final : public render::engine::Engine {
 
 private:
     void initialize_frame();
-    void window_resized() final;
+    void window_resized() override;
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
     explicit Engine(platform::Application& platform_application);
-    ~Engine() final;
-    void start_frame() final;
-    void end_frame() final;
-    void upload_imgui_fonts() final;
+    ~Engine() override;
+    void start_frame() override;
+    void end_frame() override;
+    void upload_imgui_fonts() override;
 
     [[nodiscard]] Frame& get_current_frame();
     [[nodiscard]] const Frame& get_current_frame() const;

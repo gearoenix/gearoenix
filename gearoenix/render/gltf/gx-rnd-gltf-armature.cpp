@@ -1,11 +1,8 @@
 #include "gx-rnd-gltf-armature.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity-builder.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
-#include "../../physics/animation/gx-phs-anm-bone-builder.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "../scene/gx-rnd-scn-builder.hpp"
 #include "../scene/gx-rnd-scn-scene.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
@@ -48,12 +45,7 @@ bool gearoenix::render::gltf::Armatures::is_armature(const int node_index) const
     return true;
 }
 
-bool gearoenix::render::gltf::Armatures::process(
-    const int node_index,
-    physics::Transformation* const parent_transform,
-    const core::job::EndCaller<>& gpu_end_callback,
-    const core::job::EndCaller<>& entity_end_callback,
-    const std::shared_ptr<scene::Builder>& scene_builder) const
+bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs::Entity* const parent, const core::job::EndCaller<>& end_callback) const
 {
     const auto& node = context.data.nodes[node_index];
     if (!is_armature(node_index)) {
@@ -68,15 +60,13 @@ bool gearoenix::render::gltf::Armatures::process(
     } else {
         GX_LOG_F("The correct node for skin and mesh not found. Node: " << node.name);
     }
-    auto bone = std::shared_ptr(context.animations.bone_builders.find(bone_node_index)->second->bone);
+    auto bone = context.animations.bone_entities.find(bone_node_index)->second->get_component_shared_ptr<physics::animation::Bone>();
 
-    auto entity_builder = physics::animation::Manager::get()->create_armature_builder(
-        std::string(node.name), parent_transform, std::move(bone), core::job::EndCaller(entity_end_callback));
-    const auto& builder = entity_builder->get_builder();
-    auto* const transform = builder.get_component<physics::Transformation>();
+    auto entity = physics::animation::Manager::get()->create_armature(std::string(node.name), parent, std::move(bone));
+    auto* const transform = entity->get_component<physics::Transformation>();
     apply_transform(node_index, context, *transform);
-    context.nodes.process(mesh_node_index, transform, gpu_end_callback, entity_end_callback, scene_builder);
-    auto* const arm = builder.get_component<physics::animation::Armature>();
+    context.nodes.process(mesh_node_index, entity.get(), end_callback);
+    auto* const arm = entity->get_component<physics::animation::Armature>();
     const auto skin_index = context.data.nodes[mesh_node_index].skin;
     GX_ASSERT_D(skin_index != -1);
     const auto& skin = context.data.skins[skin_index];
@@ -85,7 +75,7 @@ bool gearoenix::render::gltf::Armatures::process(
     std::vector<int> bone_indices;
     bone_indices.reserve(bone_nodes.size());
     for (const auto bone_index : bone_nodes) {
-        auto* const ptr = context.animations.bone_builders.find(bone_index)->second->bone.get();
+        auto* const ptr = context.animations.bone_entities.find(bone_index)->second->get_component<physics::animation::Bone>();
         bone_indices.push_back(static_cast<int>(std::distance(arm_bones.begin(), std::ranges::find(arm_bones, ptr))));
     }
     arm->sort_all_bones(bone_indices);
@@ -110,6 +100,5 @@ bool gearoenix::render::gltf::Armatures::process(
     for (int i = 0; i < inv_mat_acc.count; ++i) {
         arm->get_all_bones()[i]->set_inverse_bind_matrix(inverse_bind_matrices[i]);
     }
-    scene_builder->add_armature(std::move(entity_builder));
     return true;
 }

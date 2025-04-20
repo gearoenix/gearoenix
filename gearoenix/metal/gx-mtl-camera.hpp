@@ -12,7 +12,7 @@ struct Camera final : public core::ecs::Component {
     UniformBuffer uniform;
 
     Camera(Engine& e, const std::string& name);
-    ~Camera() final;
+    ~Camera() override;
     Camera(Camera&&);
 };
 
@@ -23,16 +23,16 @@ private:
     CameraBuilder(Engine& e, const std::string& name);
 
 public:
-    ~CameraBuilder() final;
+    ~CameraBuilder() override;
 };
 
 struct CameraManager final : public render::camera::Manager {
 private:
-    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name) final;
+    [[nodiscard]] std::shared_ptr<render::camera::Builder> build(const std::string& name) override;
 
 public:
     explicit CameraManager(Engine& e);
-    ~CameraManager() final;
+    ~CameraManager() override;
 };
 }
 

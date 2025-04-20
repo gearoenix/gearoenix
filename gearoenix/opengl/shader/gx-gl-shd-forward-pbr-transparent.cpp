@@ -92,8 +92,7 @@ void main() {\n\
 }\n";
 }
 
-gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent(Engine& e)
-    : Shader(e)
+gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent()
 {
     set_vertex_shader(vertex_shader_src);
     set_fragment_shader(fragment_shader_src);

@@ -8,96 +8,77 @@
 #include "../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include <algorithm>
 
-void gearoenix::physics::Transformation::write_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    core::job::EndCaller<>&&) const
-{
-    local_matrix.get_position().write(*s);
-    rotation.get_quat().write(*s);
-    scale.write(*s);
+// void gearoenix::physics::Transformation::write_in_io_context(
+//     std::shared_ptr<platform::stream::Stream>&& s,
+//     core::job::EndCaller<>&&) const
+// {
+//     local_matrix.get_position().write(*s);
+//     rotation.get_quat().write(*s);
+//     scale.write(*s);
+//
+//     s->write_fail_debug(static_cast<std::uint32_t>(children.size()));
+//     for (const auto* const c : children) {
+//         s->write_fail_debug(c->get_entity_id());
+//     }
+//     const auto has_parent = nullptr != parent;
+//     s->write_fail_debug(has_parent);
+//     if (has_parent) {
+//         s->write_fail_debug(parent->get_entity_id());
+//     }
+// }
 
-    s->write_fail_debug(static_cast<std::uint32_t>(children.size()));
-    for (const auto* const c : children) {
-        s->write_fail_debug(c->get_entity_id());
-    }
-    const auto has_parent = nullptr != parent;
-    s->write_fail_debug(has_parent);
-    if (has_parent) {
-        s->write_fail_debug(parent->get_entity_id());
-    }
-}
+// void gearoenix::physics::Transformation::update_in_io_context(
+//     std::shared_ptr<platform::stream::Stream>&& s,
+//     core::job::EndCaller<>&& e)
+// {
+//     math::Vec3<double> pos;
+//     pos.read(*s);
+//     math::Quat<double> rot;
+//     rot.read(*s);
+//     math::Vec3<double> scl;
+//     scl.read(*s);
+//
+//     core::job::EndCaller end([this, s = component_self.lock(), e = std::move(e), pos, rot, scl] {
+//         reset(scl, rot, pos);
+//         (void)s;
+//         (void)e;
+//     });
+//
+//     const auto children_count = s->read<std::uint32_t>();
+//     children.clear();
+//     const auto children_lock = std::make_shared<std::mutex>();
+//     for (auto i = decltype(children_count) { 0 }; i < children_count; ++i) {
+//         core::ecs::World::get()->resolve([this, children_lock, id = s->read<core::ecs::entity_id_t>(), end] {
+//             auto* const child = core::ecs::World::get()->get_component<Transformation>(id);
+//             if (nullptr == child) {
+//                 return true;
+//             }
+//             const std::lock_guard _lg(*children_lock);
+//             children.emplace(child);
+//             (void)end;
+//             return false;
+//         });
+//     }
+//     if (s->read<bool>()) {
+//         core::ecs::World::get()->resolve([this, id = s->read<core::ecs::entity_id_t>(), end = std::move(end)] {
+//             auto* const p = core::ecs::World::get()->get_component<Transformation>(id);
+//             if (nullptr == p) {
+//                 return true;
+//             }
+//             parent = p;
+//             (void)end;
+//             return false;
+//         });
+//     }
+// }
 
-void gearoenix::physics::Transformation::update_in_io_context(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    core::job::EndCaller<>&& e)
-{
-    math::Vec3<double> pos;
-    pos.read(*s);
-    math::Quat<double> rot;
-    rot.read(*s);
-    math::Vec3<double> scl;
-    scl.read(*s);
-
-    core::job::EndCaller end([this, s = component_self.lock(), e = std::move(e), pos, rot, scl] {
-        reset(scl, rot, pos);
-        (void)s;
-        (void)e;
-    });
-
-    const auto children_count = s->read<std::uint32_t>();
-    children.clear();
-    const auto children_lock = std::make_shared<std::mutex>();
-    for (auto i = decltype(children_count) { 0 }; i < children_count; ++i) {
-        core::ecs::World::get()->resolve([this, children_lock, id = s->read<core::ecs::entity_id_t>(), end] {
-            auto* const child = core::ecs::World::get()->get_component<Transformation>(id);
-            if (nullptr == child) {
-                return true;
-            }
-            const std::lock_guard _lg(*children_lock);
-            children.emplace(child);
-            (void)end;
-            return false;
-        });
-    }
-    if (s->read<bool>()) {
-        core::ecs::World::get()->resolve([this, id = s->read<core::ecs::entity_id_t>(), end = std::move(end)] {
-            auto* const p = core::ecs::World::get()->get_component<Transformation>(id);
-            if (nullptr == p) {
-                return true;
-            }
-            parent = p;
-            (void)end;
-            return false;
-        });
-    }
-}
-
-gearoenix::physics::Transformation::Transformation(
-    std::string&& name,
-    Transformation* const parent,
-    const core::ecs::entity_id_t entity_id)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name), entity_id)
+gearoenix::physics::Transformation::Transformation(std::string&& name)
+    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
     , scale(1.0)
-    , parent(parent)
 {
-    if (nullptr != parent) {
-        parent->children.emplace(this);
-    }
 }
 
-gearoenix::physics::Transformation::~Transformation()
-{
-    for (const auto& c : children) {
-        if (c && this == c->parent) {
-            c->parent = nullptr;
-        }
-    }
-    children.clear();
-    if (parent) {
-        parent->children.erase(this);
-        parent = nullptr;
-    }
-}
+gearoenix::physics::Transformation::~Transformation() = default;
 
 void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<double>& lm)
 {
@@ -278,14 +259,16 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
 
 void gearoenix::physics::Transformation::update_without_inverse_root()
 {
-    if (nullptr != parent) {
+    if (nullptr != entity->get_parent()) {
         return;
     }
     if (changed) {
         global_matrix = local_matrix;
     }
-    for (const auto& child : children) {
-        child->update_without_inverse_child();
+    for (const auto& child : entity->get_children()) {
+        if (auto* const c = child.second->get_component<Transformation>(); c) {
+            c->update_without_inverse_child();
+        }
     }
 }
 
@@ -298,14 +281,17 @@ void gearoenix::physics::Transformation::update_inverse()
 
 void gearoenix::physics::Transformation::update_without_inverse_child()
 {
+    const auto* const parent = entity->get_parent()->get_component<Transformation>();
     if (parent->changed) {
         changed = true;
     }
     if (changed) {
         global_matrix = parent->global_matrix * local_matrix;
     }
-    for (const auto& child : children) {
-        child->update_without_inverse_child();
+    for (const auto& child : entity->get_children()) {
+        if (auto* const c = child.second->get_component<Transformation>(); c) {
+            c->update_without_inverse_child();
+        }
     }
 }
 
@@ -367,24 +353,6 @@ void gearoenix::physics::Transformation::reset(
     local_matrix.set_position(p);
 }
 
-void gearoenix::physics::Transformation::add_child(Transformation* const child)
-{
-    if (nullptr == child) {
-        return;
-    }
-    children.insert(child);
-    child->parent = this;
-}
-
-void gearoenix::physics::Transformation::set_parent(Transformation* const p)
-{
-    parent = p;
-    if (nullptr == parent) {
-        return;
-    }
-    parent->children.insert(this);
-}
-
 void gearoenix::physics::Transformation::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
@@ -421,19 +389,12 @@ void gearoenix::physics::Transformation::show_debug_gui()
         if (input_changed) {
             reset(s, rotation, l);
         }
-
-        if (ImGui::TreeNode("Children")) {
-            for (const auto& child : children) {
-                child->show_debug_gui();
-            }
-            ImGui::TreePop();
-        }
     });
 }
 
 void gearoenix::physics::Transformation::draw_gizmo()
 {
-    if (gizmo_manager->show_transform(local_matrix)) {
+    if (render::gizmo::Manager::get().show_transform(local_matrix)) {
         set_local_matrix(local_matrix);
     }
     is_gizmo_visible = false;
@@ -441,10 +402,10 @@ void gearoenix::physics::Transformation::draw_gizmo()
 
 void gearoenix::physics::Transformation::update()
 {
-    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_without_inverse_root();
     });
-    core::ecs::World::get()->parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
         transform->update_inverse();
     });
 }
