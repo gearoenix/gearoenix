@@ -1,18 +1,4 @@
-export module gearoenix.render.record.camera;
-
-import gearoenix.render.record.model;
-
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/gx-cr-static-flat-map.hpp"
-#include "../../core/gx-cr-static-flat-set.hpp"
-#include "../../physics/collider/gx-phs-cld-collider.hpp"
-#include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
-#include "../../physics/gx-phs-transformation.hpp"
-#include "../camera/gx-rnd-cmr-camera.hpp"
-#include "../reflection/gx-rnd-rfl-probe.hpp"
-#include <optional>
-#include <execution>
+#include "gx-rnd-rcd-camera.hpp"
 
 namespace gearoenix::render::record {
 export struct Bloom final {
@@ -31,6 +17,8 @@ export struct Camera final {
     std::optional<Bloom> bloom = std::nullopt;
     std::vector<std::pair<double, Model*>> translucent_models;
     std::vector<std::pair<double, Model*>> all_models;
+    std::vector<math::Mat4x4<float>> mvps;
+    std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
 
     void clear()
     {
