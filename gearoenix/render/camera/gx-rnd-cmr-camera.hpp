@@ -66,6 +66,7 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(Exposure, exposure);
     GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
     GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
+    GX_GET_CVAL_PRT(std::string, render_pass_name);
 
     Camera(core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
 

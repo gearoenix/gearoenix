@@ -22,6 +22,15 @@ struct Vec4 final {
     {
     }
 
+
+    constexpr Vec4(const Element x, const Element y, const Vec2<Element>& v)
+        : x(x)
+        , y(y)
+        , z(v.x)
+        , w(v.y)
+    {
+    }
+
     constexpr Vec4(const Vec3<Element>& v, const Element w)
         : x(v.x)
         , y(v.y)

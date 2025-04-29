@@ -7,30 +7,18 @@ gearoenix::gl::material::Material::Material() = default;
 gearoenix::gl::material::Material::~Material() = default;
 
 void gearoenix::gl::material::Material::shadow(
-    const submission::Model&,
-    const submission::Mesh&,
-    const submission::Camera&,
-    uint&)
+    const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint&)
 {
     GX_UNIMPLEMENTED;
 }
 
-void gearoenix::gl::material::Material::forward_render(
-    const submission::Model&,
-    const submission::Mesh&,
-    const submission::Camera&,
-    const submission::Scene&,
-    uint&)
+void gearoenix::gl::material::Material::render_forward(
+    const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint&)
 {
     GX_UNIMPLEMENTED;
 }
 
-void gearoenix::gl::material::Material::deferred_gbuffer_render(
-    const submission::Model&,
-    const submission::Mesh&,
-    const submission::Camera&,
-    const submission::Scene&,
-    uint&)
+void gearoenix::gl::material::Material::deferred_gbuffer_render(const Model&, const Mesh&, const Camera&, const Scene&, uint&)
 {
     GX_UNIMPLEMENTED;
 }

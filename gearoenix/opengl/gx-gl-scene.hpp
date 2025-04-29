@@ -3,7 +3,7 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../render/scene/gx-rnd-scn-manager.hpp"
 #include "../render/scene/gx-rnd-scn-scene.hpp"
-#include "submission/gx-gl-sbm-model.hpp"
+#include "gx-gl-types.hpp"
 
 namespace gearoenix::gl {
 struct Scene final : render::scene::Scene {
@@ -14,6 +14,9 @@ struct Scene final : render::scene::Scene {
     explicit Scene(std::string&& name, double layer);
     ~Scene() override;
     void update() override;
+    void render_shadows(uint& current_shader);
+    void render_reflection_probes(uint& current_shader) const;
+    void render_forward(uint& current_shader);
 };
 
 struct SceneManager final : render::scene::Manager {

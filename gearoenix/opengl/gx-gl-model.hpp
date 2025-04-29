@@ -4,10 +4,14 @@
 #include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/model/gx-rnd-mdl-manager.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
+#include "gx-gl-types.hpp"
+
+namespace gearoenix::render::record { struct Camera; struct CameraModel; struct Model; }
 
 namespace gearoenix::gl {
 struct Engine;
 struct Mesh;
+    struct Scene;
 
 struct Model final : render::model::Model {
     typedef core::static_flat_set<std::shared_ptr<Mesh>, render::model::max_meshes_count_per_model> gl_meshes_set_t;
@@ -21,6 +25,15 @@ struct Model final : render::model::Model {
 public:
     Model(render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
     ~Model() override;
+    void render_shadow(
+        const render::record::Camera& camera,
+        const render::record::CameraModel& camera_model,
+        uint& current_shader);
+    void render_forward(
+        const Scene& scene,
+        const render::record::Camera& camera,
+        const render::record::CameraModel& camera_model,
+        uint& current_shader);
 };
 
 struct ModelManager final : render::model::Manager {

@@ -26,9 +26,12 @@ public:
     static void construct(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c);
     explicit Pbr(const std::string& name);
     ~Pbr() override;
-    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) override;
-    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
+    void shadow(
+        const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel&, uint& current_shader) override;
+    void render_forward(
+        const Scene& scene, const render::record::Camera& camera, const render::record::CameraModel&,
+        const Model& model, const Mesh& mesh, uint& current_shader) override;
+    // void deferred_gbuffer_render(const Model& model, const Mesh& mesh, const Camera& camera, const Scene& scene, uint& current_shader) override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
