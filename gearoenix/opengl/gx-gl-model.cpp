@@ -5,6 +5,7 @@
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
+#include "material/gx-gl-material.hpp"
 
 gearoenix::gl::Model::Model(render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
     : render::model::Model(core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
@@ -17,6 +18,24 @@ gearoenix::gl::Model::Model(render::model::meshes_set_t&& ms, std::string&& name
 }
 
 gearoenix::gl::Model::~Model() = default;
+
+void gearoenix::gl::Model::render_shadow(
+        const render::record::Camera& camera,
+        const render::record::CameraModel& camera_model,
+        uint& current_shader)
+{
+    for (const auto& msh : gl_meshes) {
+        msh->get_gl_material()->shadow(*msh, camera, camera_model, current_shader);
+    }
+}
+
+void gearoenix::gl::Model::render_forward(const Scene& scene, const render::record::Camera& camera,
+    const render::record::CameraModel& camera_model, uint& current_shader)
+{
+    for (const auto& msh : gl_meshes) {
+        msh->get_gl_material()->render_forward(scene, camera, camera_model, *this, *msh, current_shader);
+    }
+}
 
 gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(
     std::string&& name,

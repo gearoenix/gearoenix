@@ -30,6 +30,7 @@ gearoenix::render::camera::Camera::Camera(
         urd(re),
     }
     , transform(std::move(transform))
+    , render_pass_name("render-shadows for camera " + object_name)
 {
     if (this->target.is_customised()) {
         exposure.disable();
