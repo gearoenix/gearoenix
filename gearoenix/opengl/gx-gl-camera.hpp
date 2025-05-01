@@ -8,8 +8,15 @@
 namespace gearoenix::render::record {  struct Camera; }
 
 namespace gearoenix::gl::shader {
-    struct SkyboxCube;
-    struct SkyboxEquirectangular;
+
+    struct ColourTuningAntiAliasingCombination;
+struct BloomHorizontal;
+struct BloomPrefilter;
+struct BloomUpsampler;
+struct BloomVertical;
+struct Multiply;
+struct SkyboxCube;
+struct SkyboxEquirectangular;
 }
 
 namespace gearoenix::gl {
@@ -26,6 +33,8 @@ struct CameraTarget final {
     struct Default final {
         std::shared_ptr<Target> main;
         std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
+        std::array<std::array<uint, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> framebuffers;
+        std::array<uint, 2> colour_attachments;
     };
 
     constexpr static std::uint32_t customised_var_index = 0;
@@ -45,8 +54,16 @@ struct Camera final : render::camera::Camera {
     constexpr static std::array immediate_parent_object_type_indices { render::camera::Camera::object_type_index };
 
     GX_GET_CREF_PRV(CameraTarget, gl_target);
+
+    GX_GET_CREF_PRV(std::shared_ptr<shader::BloomPrefilter>, bloom_prefilter_shader);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::BloomHorizontal>, bloom_horizontal_shader);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::BloomVertical>, bloom_vertical_shader);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::BloomUpsampler>, bloom_upsampler_shader);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::Multiply>, multiply_shader);
     GX_GET_CREF_PRV(std::shared_ptr<shader::SkyboxCube>, skybox_cube_shader);
     GX_GET_CREF_PRV(std::shared_ptr<shader::SkyboxEquirectangular>, skybox_equirectangular_shader);
+
+    GX_GET_CREF_PRV(std::shared_ptr<shader::ColourTuningAntiAliasingCombination>, colour_tuning_anti_aliasing_shader_combination);
 
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
@@ -55,9 +72,11 @@ public:
     Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform);
     static void construct(const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
     ~Camera() override;
-    void render_shadow(const render::record::Camera&, uint& current_shader);
-    void render_forward(const Scene& scene, const render::record::Camera&, uint& current_shader);
-    void render_forward_skyboxes(const Scene& scene, const render::record::Camera&, uint& current_shader);
+    void render_shadow(const render::record::Camera&, uint& current_shader) const;
+    void render_forward(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
+    void render_forward_skyboxes(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
+    void render_bloom(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
+    void render_colour_correction_anti_aliasing(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
 };
 
 struct CameraManager final : render::camera::Manager {

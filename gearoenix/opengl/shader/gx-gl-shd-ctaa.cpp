@@ -138,8 +138,6 @@ void gearoenix::gl::shader::ColourTuningAntiAliasing::set(const render::camera::
     }
 }
 
-gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination()
-{
-}
+gearoenix::gl::shader::ColourTuningAntiAliasingCombination::ColourTuningAntiAliasingCombination() = default;
 
 #endif
