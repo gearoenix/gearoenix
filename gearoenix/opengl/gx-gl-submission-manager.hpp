@@ -1,10 +1,11 @@
 #pragma once
-#include "../../render/gx-rnd-build-configuration.hpp"
+#include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include <memory>
-#include "../gx-gl-types.hpp"
-#include "../../math/gx-math-vector-4d.hpp"
-#include "boost/container/flat_map.hpp"
+#include "gx-gl-types.hpp"
+#include "../math/gx-math-vector-4d.hpp"
+#include "../core/gx-cr-singleton.hpp"
+#include <boost/container/flat_map.hpp>
 
 namespace gearoenix::gl {
     struct Camera;
@@ -16,15 +17,9 @@ struct TextureCube;
 }
 
 namespace gearoenix::gl::shader {
-struct BloomHorizontal;
-struct BloomPrefilter;
-struct BloomUpsampler;
-struct BloomVertical;
-struct ColourTuningAntiAliasingCombination;
 struct DeferredPbr;
 struct DeferredPbrTransparent;
 struct Final;
-struct Multiply;
 struct Irradiance;
 struct Radiance;
 struct SkyboxCube;
@@ -35,23 +30,15 @@ struct Unlit;
 }
 
 namespace gearoenix::gl::submission {
-struct Manager final {
+struct Manager final: core::Singleton<Manager> {
 private:
-    Engine& e;
+    const std::shared_ptr<shader::Final> final_shader;
+    const std::shared_ptr<shader::DeferredPbr> deferred_pbr_shader;
+    const std::shared_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
+    const std::shared_ptr<shader::Irradiance> irradiance_shader;
+    const std::shared_ptr<shader::Radiance> radiance_shader;
+    const std::shared_ptr<shader::SsaoResolve> ssao_resolve_shader;
 
-    const std::unique_ptr<shader::Final> final_shader;
-    const std::unique_ptr<shader::DeferredPbr> deferred_pbr_shader;
-    const std::unique_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
-    const std::unique_ptr<shader::Irradiance> irradiance_shader;
-    const std::unique_ptr<shader::Radiance> radiance_shader;
-    const std::unique_ptr<shader::SsaoResolve> ssao_resolve_shader;
-    const std::unique_ptr<shader::Multiply> multiply_shader;
-    const std::unique_ptr<shader::BloomPrefilter> bloom_prefilter_shader;
-    const std::unique_ptr<shader::BloomHorizontal> bloom_horizontal_shader;
-    const std::unique_ptr<shader::BloomVertical> bloom_vertical_shader;
-    const std::unique_ptr<shader::BloomUpsampler> bloom_upsampler_shader;
-
-    const std::shared_ptr<shader::ColourTuningAntiAliasingCombination> colour_tuning_anti_aliasing_shader_combination;
     const std::shared_ptr<shader::UnlitCombination> unlit_shader_combination;
     shader::Unlit& unlit_coloured_shader;
 
@@ -69,16 +56,16 @@ private:
     std::shared_ptr<TextureCube> black_cube;
 
     math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
-    float back_buffer_aspect_ratio = 999.0f;
+    float back_buffer_aspect_ratio = -999.999f;
     math::Vec2<float> back_buffer_uv_move { math::Numeric::epsilon<float> };
     math::Vec4<sizei> back_buffer_viewport_clip { static_cast<sizei>(-1) };
 
-    uint screen_vertex_object = 0;
-    uint screen_vertex_buffer = 0;
+    GX_GET_VAL_PRV(uint, screen_vertex_object, static_cast<uint>(-1));
+    GX_GET_VAL_PRV(uint, screen_vertex_buffer, static_cast<uint>(-1));
     math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
-    std::uint32_t resolution_cfg_listener_id = 0;
+    std::uint32_t resolution_cfg_listener_id = static_cast<std::uint32_t>(-1);
     boost::container::flat_map<double/*layer*/, Scene*> scenes;
 
     void initialise_back_buffer_sizes();
@@ -89,14 +76,12 @@ private:
 
     void render_shadows();
     void render_reflection_probes();
-    void render_bloom(const Scene& scene, const Camera& camera);
-    void render_colour_correction_anti_aliasing(const Scene& scene, const Camera& camera);
     void render_with_deferred();
     void render_with_forward();
     void render_imgui();
 
 public:
-    explicit Manager(Engine& e);
+    Manager();
     ~Manager();
     void update();
     void window_resized();

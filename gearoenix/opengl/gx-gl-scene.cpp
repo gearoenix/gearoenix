@@ -46,8 +46,8 @@ void gearoenix::gl::Scene::render_forward(uint& current_shader)
         auto& camera = record.cameras.cameras[camera_index];
         auto*const gl_cam = core::cast<Camera>(camera.camera);
         gl_cam->render_forward(*this, camera, current_shader);
-        gl_cam->render_bloom(*this);
-        gl_cam->render_colour_correction_anti_aliasing(*this);
+        gl_cam->render_bloom(*this, camera, current_shader);
+        gl_cam->render_colour_correction_anti_aliasing(*this, camera, current_shader);
     }
 }
 

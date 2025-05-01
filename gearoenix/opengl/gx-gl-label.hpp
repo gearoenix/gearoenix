@@ -5,11 +5,11 @@
 #include "gx-gl-loader.hpp"
 
 #ifdef GX_DEBUG_MODE
-#define GX_GL_LABELING_ENABLED
+#define GX_GL_LABELING_ENABLED true
 #endif
 
 namespace gearoenix::gl {
-#ifdef GX_GL_LABELING_ENABLED
+#if GX_GL_LABELING_ENABLED
 inline void set_buffer_label(const uint value, const std::string& name)
 {
     if (0 == reinterpret_cast<std::uintptr_t>(glObjectLabel)) {

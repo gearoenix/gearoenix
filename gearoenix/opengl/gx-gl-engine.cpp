@@ -16,7 +16,7 @@
 #include "gx-gl-texture.hpp"
 #include "material/gx-gl-mat-manager.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
-#include "submission/gx-gl-sbm-manager.hpp"
+#include "gx-gl-submission-manager.hpp"
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
