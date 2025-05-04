@@ -6,12 +6,16 @@
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "gx-gl-types.hpp"
 
-namespace gearoenix::render::record { struct Camera; struct CameraModel; struct Model; }
+namespace gearoenix::render::record {
+struct Camera;
+struct CameraModel;
+struct Model;
+}
 
 namespace gearoenix::gl {
 struct Engine;
 struct Mesh;
-    struct Scene;
+struct Scene;
 
 struct Model final : render::model::Model {
     typedef core::static_flat_set<std::shared_ptr<Mesh>, render::model::max_meshes_count_per_model> gl_meshes_set_t;

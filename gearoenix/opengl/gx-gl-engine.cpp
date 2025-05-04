@@ -13,10 +13,10 @@
 #include "gx-gl-reflection.hpp"
 #include "gx-gl-scene.hpp"
 #include "gx-gl-skybox.hpp"
+#include "gx-gl-submission-manager.hpp"
 #include "gx-gl-texture.hpp"
 #include "material/gx-gl-mat-manager.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
-#include "gx-gl-submission-manager.hpp"
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
@@ -58,7 +58,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
     GX_GL_CHECK_D;
     texture_manager = std::make_unique<TextureManager>();
     GX_GL_CHECK_D;
-    submission_manager = std::make_unique<submission::Manager>(*this);
+    submission_manager = std::make_unique<submission::Manager>();
     skybox_manager = std::make_unique<SkyboxManager>();
     reflection_manager = std::make_unique<ReflectionManager>();
     light_manager = std::make_unique<LightManager>();

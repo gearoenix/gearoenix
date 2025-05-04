@@ -16,7 +16,7 @@ constexpr auto max_meshes_count_per_model = 16;
 constexpr auto max_filtered_cameras_count = 8;
 
 typedef core::static_flat_set<std::shared_ptr<mesh::Mesh>, max_meshes_count_per_model> meshes_set_t;
-typedef core::static_flat_set<core::ecs::Entity*, max_filtered_cameras_count> filtered_cameras_set_t;
+typedef core::static_flat_set<camera::Camera*, max_filtered_cameras_count> filtered_cameras_set_t;
 
 struct Model : core::ecs::Component {
     constexpr static auto object_type_index = gearoenix_render_model_type_index;
@@ -25,12 +25,12 @@ struct Model : core::ecs::Component {
     GX_GET_VAL_PRT(bool, is_transformable, false);
     GX_GET_CREF_PRT(meshes_set_t, meshes);
 
-    /// \note A model can be static while it has transform component.
+    /// \note A model can be static while it has a transform component.
     Model(core::object_type_index_t final_component_type, bool is_transformable, meshes_set_t&& meshes, std::string&& name);
 
 public:
-    /// By having a value (even an empty one) we show that we want to have camera filtering enabled
-    /// Now if it is empty it will be filtered by all cameras
+    /// By having a value (even an empty one) we show that we want to have camera filtering enabled.
+    /// If it has value but the set is empty, it will be filtered by all the cameras.
     std::optional<filtered_cameras_set_t> cameras;
     std::uint64_t cameras_flags = static_cast<std::uint64_t>(-1);
 

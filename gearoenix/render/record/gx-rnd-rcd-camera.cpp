@@ -1,6 +1,8 @@
 #include "gx-rnd-rcd-camera.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
+#include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
@@ -64,16 +66,17 @@ void gearoenix::render::record::Camera::update_models(Models& models)
 
     core::sync::ParallelFor::execi(all_models.begin(), all_models.end(),
         [&](const auto& d_m, const auto i, const auto ki) {
-            auto* const m = d_m.second;
-            if (!m->needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
+            auto& rm = *d_m.second.model;
+            auto& m = *rm.model;
+            if (!m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
                 return;
             }
-            if (m.armature) {
-                for (auto* const bone : m.armature->get_bones()) {
-                    threads_mvps[ki].emplace_back(i, view_projection * bone->get_global_matrix());
+            if (rm.armature) {
+                for (auto* const bone : rm.armature->get_all_bones()) {
+                    threads_mvps[ki].emplace_back(i, view_projection * math::Mat4x4<float>(bone->get_global_matrix()));
                 }
             } else {
-                threads_mvps[ki].emplace_back(i, view_projection * m->m);
+                threads_mvps[ki].emplace_back(i, view_projection * math::Mat4x4<float>(rm.transform->get_global_matrix()));
             }
         });
 

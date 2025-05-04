@@ -282,8 +282,9 @@ private:
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         const auto intersection_status = cld.check_intersection_status(node.volume);
-        if (math::IntersectionStatus::Out == intersection_status)
+        if (math::IntersectionStatus::Out == intersection_status) {
             return;
+        }
         if (math::IntersectionStatus::In == intersection_status) {
             call_on_all(ptr, on_intersection);
             return;
@@ -354,8 +355,9 @@ public:
 
     void create_nodes()
     {
-        if (data.empty())
+        if (data.empty()) {
             return;
+        }
         accu_volume.update();
         accu_center_volume.update();
         create_node(0, data.size(), accu_center_volume, accu_volume);
@@ -363,32 +365,36 @@ public:
 
     [[nodiscard]] std::optional<std::pair<double, Data*>> hit(const math::Ray3<double>& ray, const double minimum_distance) const
     {
-        if (nodes.empty())
+        if (nodes.empty()) {
             return std::nullopt;
+        }
         return hit(reinterpret_cast<std::uintptr_t>(&nodes[0]), ray, minimum_distance);
     }
 
     template <typename Collider, typename Function>
     void call_on_intersecting(const Collider& cld, Function&& on_intersection)
     {
-        if (nodes.empty())
+        if (nodes.empty()) {
             return;
+        }
         call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[0]), cld, on_intersection);
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
     void call_on_intersecting(const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
     {
-        if (nodes.empty())
+        if (nodes.empty()) {
             return;
+        }
         call_on_intersecting(reinterpret_cast<std::uintptr_t>(&nodes[0]), cld, on_intersection, not_intersection);
     }
 
     template <typename Function>
     void call_on_all(Function&& function)
     {
-        if (nodes.empty())
+        if (nodes.empty()) {
             return;
+        }
         call_on_all(reinterpret_cast<std::uintptr_t>(&nodes[0]), function);
     }
 };

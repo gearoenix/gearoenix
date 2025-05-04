@@ -2,24 +2,23 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/gx-cr-cast.hpp"
-#include "../../render/record/gx-rnd-rcd-model.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
+#include "../../physics/animation/gx-phs-anm-bone.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../../render/light/gx-rnd-lt-directional.hpp"
+#include "../../render/light/gx-rnd-lt-light.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-light.hpp"
+#include "../../render/record/gx-rnd-rcd-model.hpp"
+#include "../gx-gl-camera.hpp"
 #include "../gx-gl-engine.hpp"
+#include "../gx-gl-mesh.hpp"
+#include "../gx-gl-reflection.hpp"
 #include "../gx-gl-texture.hpp"
 #include "../shader/gx-gl-shd-forward-pbr.hpp"
 #include "../shader/gx-gl-shd-gbuffers-filler.hpp"
 #include "../shader/gx-gl-shd-manager.hpp"
 #include "../shader/gx-gl-shd-shadow-caster.hpp"
-#include "../gx-gl-camera.hpp"
-#include "../gx-gl-mesh.hpp"
-#include "../gx-gl-model.hpp"
-#include "../gx-gl-reflection.hpp"
-#include "../../physics/gx-phs-transformation.hpp"
-#include "../../physics/animation/gx-phs-anm-armature.hpp"
-#include "../../physics/animation/gx-phs-anm-bone.hpp"
-#include "../../render/light/gx-rnd-lt-directional.hpp"
-#include "../../render/light/gx-rnd-lt-light.hpp"
 
 gearoenix::gl::material::Pbr::Pbr(const std::string& name)
     : render::material::Pbr(name)
@@ -95,19 +94,19 @@ void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::
 }
 
 void gearoenix::gl::material::Pbr::render_forward(
-        const Scene& scene,
-        const render::record::Camera& camera,
-        const render::record::CameraModel& camera_model,
-        const Model& model,
-        const Mesh& mesh,
-        uint& current_shader)
+    const Scene& scene,
+    const render::record::Camera& camera,
+    const render::record::CameraModel& camera_model,
+    const Model& model,
+    const Mesh& mesh,
+    uint& current_shader)
 {
     const auto& rm = *camera_model.model;
     const auto& rls = rm.lights;
     auto& shader = forward_pbr_combination->get(
         rm.bones_count,
-        rls.shadow_caster_directionals.size(),
-        rls.directionals.size());
+        static_cast<std::uint32_t>(rls.shadow_caster_directionals.size()),
+        static_cast<std::uint32_t>(rls.directionals.size()));
     shader.bind(current_shader);
     shader.set_vp_data(camera.view_projection.data());
     shader.set_camera_position_reserved_data(camera.position.data());
@@ -115,11 +114,9 @@ void gearoenix::gl::material::Pbr::render_forward(
     if (rm.bones_count > 0) {
         static std::vector<std::array<math::Mat4x4<float>, 2>> bones_data;
         bones_data.clear();
-        for (const auto* const b: rm.armature->get_all_bones()) {
-            bones_data.push_back({
-                math::Mat4x4<float>(b->get_global_matrix()),
-                math::Mat4x4<float>(b->get_inverted_global_matrix())
-            });
+        for (const auto* const b : rm.armature->get_all_bones()) {
+            bones_data.push_back({ math::Mat4x4<float>(b->get_global_matrix()),
+                math::Mat4x4<float>(b->get_inverted_global_matrix()) });
         }
         shader.set_bones_m_inv_m_data(bones_data.data()->data());
     } else {
@@ -154,8 +151,7 @@ void gearoenix::gl::material::Pbr::render_forward(
     if (!rls.directionals.empty()) {
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directionals_direction;
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directionals_colour;
-        for (const auto& [direction, light]: rls.directionals)
-        {
+        for (const auto& [direction, light] : rls.directionals) {
             directionals_colour.emplace_back(light->colour);
             directionals_direction.emplace_back(direction);
         }
@@ -168,8 +164,7 @@ void gearoenix::gl::material::Pbr::render_forward(
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> lights_direction;
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> lights_colour;
 
-        for (const auto* const l: rls.shadow_caster_directionals)
-        {
+        for (const auto* const l : rls.shadow_caster_directionals) {
             lights_colour.emplace_back(l->colour);
             lights_direction.emplace_back(l->direction);
             lights_vp.emplace_back(l->normalised_vp);

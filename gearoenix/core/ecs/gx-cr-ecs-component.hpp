@@ -9,7 +9,6 @@ struct Stream;
 namespace gearoenix::core::ecs {
 struct Entity;
 struct Component : Object {
-    friend struct Singleton;
     friend struct ComponentType;
 
     GX_GETSET_VAL_PRT(bool, enabled, true);
@@ -18,7 +17,7 @@ struct Component : Object {
     Component(object_type_index_t final_type_index, std::string&& name);
     Component(object_type_index_t final_type_index, object_id_t object_id, std::string&& name);
 
-    void write(platform::stream::Stream&) const;
+    virtual void write(platform::stream::Stream&) const;
     void read(platform::stream::Stream&);
 
 public:

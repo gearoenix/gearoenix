@@ -9,8 +9,10 @@
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../render/material/gx-rnd-mat-material.hpp"
 #include "../render/reflection/gx-rnd-rfl-runtime.hpp"
+#include "gx-gl-camera.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
+#include "gx-gl-context.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-label.hpp"
 #include "gx-gl-light.hpp"
@@ -18,8 +20,6 @@
 #include "gx-gl-scene.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
-#include "gx-gl-context.hpp"
-#include "gx-gl-camera.hpp"
 #include "shader/gx-gl-shd-deferred-pbr-transparent.hpp"
 #include "shader/gx-gl-shd-deferred-pbr.hpp"
 #include "shader/gx-gl-shd-final.hpp"
@@ -29,8 +29,8 @@
 #include "shader/gx-gl-shd-ssao-resolve.hpp"
 #include "shader/gx-gl-shd-unlit.hpp"
 #include <algorithm>
-#include <ranges>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <ranges>
 
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../../platform/android/gx-plt-gl-context.hpp"
@@ -59,8 +59,7 @@ void gearoenix::gl::submission::Manager::back_buffer_size_changed()
 
 void gearoenix::gl::submission::Manager::initialise_gbuffers()
 {
-    if (!render::engine::Engine::get().get_specification().is_deferred_supported)
-    {
+    if (!render::engine::Engine::get().get_specification().is_deferred_supported) {
         return;
     }
 
@@ -137,8 +136,7 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
 
 void gearoenix::gl::submission::Manager::initialise_ssao()
 {
-    if (!render::engine::Engine::get().get_specification().is_deferred_supported)
-    {
+    if (!render::engine::Engine::get().get_specification().is_deferred_supported) {
         return;
     }
 
@@ -192,7 +190,7 @@ void gearoenix::gl::submission::Manager::render_shadows()
     push_debug_group("render-shadows");
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
-    for(auto* const scene : scenes | std::views::values) {
+    for (auto* const scene : scenes | std::views::values) {
         scene->render_shadows(current_shader);
     }
     GX_GL_CHECK_D;
@@ -219,7 +217,7 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
                 return;
             case render::reflection::Runtime::State::IrradianceFace: {
                 const auto fi = r->get_state_irradiance_face();
-                set_framebuffer(r->get_gl_irradiance_targets_v()[fi]);
+                ctx::set_framebuffer(r->get_gl_irradiance_targets_v()[fi]);
                 const auto w = static_cast<sizei>(r->get_irradiance()->get_info().get_width());
                 ctx::set_viewport_scissor_clip({ 0, 0, w, w });
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -238,7 +236,7 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
             case render::reflection::Runtime::State::RadianceFaceLevel: {
                 const auto fi = r->get_state_radiance_face();
                 const auto li = r->get_state_radiance_level();
-                set_framebuffer(r->get_gl_radiance_targets_v()[fi][li]);
+                ctx::set_framebuffer(r->get_gl_radiance_targets_v()[fi][li]);
                 const auto w = static_cast<sizei>(r->get_radiance()->get_info().get_width() >> li);
                 ctx::set_viewport_scissor_clip({ 0, 0, w, w });
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -407,7 +405,7 @@ void gearoenix::gl::submission::Manager::render_with_forward()
     final_shader->bind(current_shader);
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
     for (auto* const scene : scenes | std::views::values) {
-        const auto& record_cameras =  scene->get_record().cameras;
+        const auto& record_cameras = scene->get_record().cameras;
         for (auto& camera_index : record_cameras.mains | std::views::values) {
             auto& camera = *core::cast<Camera>(record_cameras.cameras[camera_index].camera);
             glBindTexture(GL_TEXTURE_2D, camera.get_gl_target().get_default().colour_attachments[1]);
@@ -433,12 +431,13 @@ void gearoenix::gl::submission::Manager::render_imgui()
 }
 
 gearoenix::gl::submission::Manager::Manager()
-    : final_shader(shader::Manager::get_shader<shader::Final>())
-    , deferred_pbr_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get_shader<shader::DeferredPbr>() : nullptr)
-    , deferred_pbr_transparent_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get_shader<shader::DeferredPbrTransparent>() : nullptr)
-    , irradiance_shader(shader::Manager::get_shader< shader::Irradiance>())
-    , radiance_shader(shader::Manager::get_shader<shader::Radiance>())
-    , ssao_resolve_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get_shader<shader::SsaoResolve>() : nullptr)
+    : Singleton(this)
+    , final_shader(shader::Manager::get().get_shader<shader::Final>())
+    , deferred_pbr_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::DeferredPbr>() : nullptr)
+    , deferred_pbr_transparent_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::DeferredPbrTransparent>() : nullptr)
+    , irradiance_shader(shader::Manager::get().get_shader<shader::Irradiance>())
+    , radiance_shader(shader::Manager::get().get_shader<shader::Radiance>())
+    , ssao_resolve_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::SsaoResolve>() : nullptr)
     , unlit_shader_combination(shader::Manager::get().get_combiner<shader::UnlitCombination>())
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
 {
@@ -479,13 +478,12 @@ gearoenix::gl::submission::Manager::~Manager()
 void gearoenix::gl::submission::Manager::update()
 {
     scenes.clear();
-    core::ecs::World::get().synchronised_system<Scene>([&] (auto*const scene) -> void {
+    core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, auto* const scene) -> void {
         if (!scene->get_enabled()) {
             return;
         }
         scenes.emplace(scene->get_layer(), scene);
     });
-
 
     render_shadows();
     render_reflection_probes();

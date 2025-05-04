@@ -1,31 +1,32 @@
 #pragma once
 #include "macro/gx-cr-mcr-assert.hpp"
 
-namespace gearoenix::core
-{
-    template <typename Target>
-    struct Singleton
+namespace gearoenix::core {
+template <typename Target>
+struct Singleton {
+private:
+    [[nodiscard]] constexpr static Target*& get_singleton_instance()
     {
-    private:
-        static Target* instance = nullptr;
+        static Target* singleton_instance = nullptr;
+        return singleton_instance;
+    }
 
-    protected:
-        Singleton()
-        {
-            GX_ASSERT_D(instance == nullptr);
-            instance = this;
-        }
+protected:
+    explicit Singleton(Target* const ptr)
+    {
+        GX_ASSERT_D(get_singleton_instance() == nullptr);
+        get_singleton_instance() = ptr;
+    }
 
-    public:
-        virtual ~Singleton()
-        {
-            GX_ASSERT_D(instance == this);
-            instance = nullptr;
-        }
+public:
+    virtual ~Singleton()
+    {
+        get_singleton_instance() = nullptr;
+    }
 
-        [[nodiscard]] static Target& get()
-        {
-            return *instance;
-        }
-    };
+    [[nodiscard]] static Target& get()
+    {
+        return *get_singleton_instance();
+    }
+};
 }
