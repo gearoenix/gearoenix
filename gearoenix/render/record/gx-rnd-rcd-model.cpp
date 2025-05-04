@@ -5,6 +5,7 @@
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
+#include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 #include <boost/functional/hash.hpp>
 
@@ -28,23 +29,21 @@ void gearoenix::render::record::Models::update(core::ecs::Entity* const scene_en
 
     std::atomic refresh_static_bvh = false;
     core::ecs::World::get().parallel_system<core::ecs::All<model::Model, physics::Transformation, physics::collider::Collider>>(
-        [&](auto* const e, auto* const mdl, const auto* const trn, const auto* const cld, const auto kernel_index) {
-            if (!mdl->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || e->contains_in_parents(scene_entity)) {
+        [&](auto* const e, auto* const mdl, auto* const trn, auto* const cld, const auto kernel_index) {
+            if (!mdl->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
                 return;
             }
 
             if (mdl->cameras.has_value()) {
                 mdl->cameras_flags = 0;
                 for (const auto& cameras = mdl->cameras.value(); const auto camera_id : cameras) {
-                    if (auto camera_search = cameras.find(camera_id); cameras.end() != camera_search) {
-                        mdl->cameras_flags |= camera_search->second.cam->get_flag();
-                    }
+                    mdl->cameras_flags |= camera_id->get_flag();
                 }
             } else {
                 mdl->cameras_flags = static_cast<std::uint64_t>(-1);
             }
 
-            auto* const parent_entity = e->get_parent_entity();
+            auto* const parent_entity = e->get_parent();
             auto* const armature = parent_entity ? parent_entity->template get_component<physics::animation::Armature>() : nullptr;
             const auto bones_count = armature ? static_cast<std::uint32_t>(armature->get_all_bones().size()) : 0;
 
@@ -66,7 +65,7 @@ void gearoenix::render::record::Models::update(core::ecs::Entity* const scene_en
                 if (trn->get_changed()) {
                     refresh_static_bvh = true;
                 }
-                td.static_models_hash = boost::hash_combine(td.static_models_hash, boost::hash_value(e->get_object_id()));
+                boost::hash_combine(td.static_models_hash, boost::hash_value(e->get_object_id()));
             }
         });
 

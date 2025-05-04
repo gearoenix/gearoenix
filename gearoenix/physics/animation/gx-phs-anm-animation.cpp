@@ -104,7 +104,7 @@ void gearoenix::physics::animation::ArmatureAnimation::show_debug_gui()
     });
 }
 
-void gearoenix::physics::animation::ArmatureAnimation::write(platform::stream::Stream& s) const
+void gearoenix::physics::animation::ArmatureAnimation::write(platform::stream::Stream&) const
 {
     // Animation::write(s);
     GX_TODO; // we need object streamer hear

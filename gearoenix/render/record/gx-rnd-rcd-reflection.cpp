@@ -12,7 +12,7 @@ void gearoenix::render::record::Reflections::update(core::ecs::Entity* const sce
             if (!probe->get_enabled() || !entity->contains_in_parents(scene_entity)) {
                 return;
             }
-            data.insert(entity, Data { .probe = probe });
+            data.emplace(entity, Data { .probe = probe });
         });
 }
 

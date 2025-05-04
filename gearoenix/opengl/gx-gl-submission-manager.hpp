@@ -1,19 +1,19 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include <memory>
-#include "gx-gl-types.hpp"
-#include "../math/gx-math-vector-4d.hpp"
 #include "../core/gx-cr-singleton.hpp"
+#include "../math/gx-math-vector-4d.hpp"
+#include "gx-gl-types.hpp"
 #include <boost/container/flat_map.hpp>
+#include <memory>
 
 namespace gearoenix::gl {
-    struct Camera;
+struct Camera;
 struct Engine;
 struct Target;
 struct Texture2D;
 struct TextureCube;
-    struct Scene;
+struct Scene;
 }
 
 namespace gearoenix::gl::shader {
@@ -30,7 +30,7 @@ struct Unlit;
 }
 
 namespace gearoenix::gl::submission {
-struct Manager final: core::Singleton<Manager> {
+struct Manager final : core::Singleton<Manager> {
 private:
     const std::shared_ptr<shader::Final> final_shader;
     const std::shared_ptr<shader::DeferredPbr> deferred_pbr_shader;
@@ -66,7 +66,7 @@ private:
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
     std::uint32_t resolution_cfg_listener_id = static_cast<std::uint32_t>(-1);
-    boost::container::flat_map<double/*layer*/, Scene*> scenes;
+    boost::container::flat_map<double /*layer*/, Scene*> scenes;
 
     void initialise_back_buffer_sizes();
     void back_buffer_size_changed();
@@ -82,7 +82,7 @@ private:
 
 public:
     Manager();
-    ~Manager();
+    ~Manager() override;
     void update();
     void window_resized();
 };

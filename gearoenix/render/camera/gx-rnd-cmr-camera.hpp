@@ -53,7 +53,7 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_CREF_PRT(Target, target);
     GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
-    GX_GETSET_VAL_PRT(std::uint64_t, flag, 1);
+    GX_GETSET_VAL_PRT(std::uint64_t, flag, 0);
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);
     GX_GET_REF_PRT(ColourTuning, colour_tuning);
@@ -61,7 +61,6 @@ struct Camera : core::ecs::Component {
     GX_GETSET_VAL_PRT(double, layer, 0.0);
     GX_GETSET_VAL_PRT(Usage, usage, Usage::Main);
     GX_GET_REFC_PRT(math::Vec4<float>, debug_colour);
-    GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, debug_mesh); // TODO: remove this, Frustum collider will have gizmo
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
     GX_GET_CREF_PRT(Exposure, exposure);
     GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
@@ -95,11 +94,8 @@ public:
     void update_projection();
     void set_near(float);
     void set_far(float);
-    void enable_debug_mesh(core::job::EndCaller<>&& end);
-    void disable_debug_mesh();
     [[nodiscard]] math::Ray3<double> generate_ray(const math::Vec2<double>& normalised_point) const;
     virtual void set_customised_target(std::shared_ptr<texture::Target>&&);
-    virtual void create_debug_mesh(core::job::EndCaller<>&& end);
     virtual void disable_bloom();
     virtual void enable_bloom();
     virtual void update_bloom();

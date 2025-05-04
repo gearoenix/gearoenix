@@ -19,9 +19,10 @@ public:
     explicit Sprite(const std::string& name);
     static void construct(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c);
     ~Sprite() override;
-    void shadow(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, uint& current_shader) override;
-    void forward_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
-    void deferred_gbuffer_render(const submission::Model& model, const submission::Mesh& mesh, const submission::Camera& camera, const submission::Scene& scene, uint& current_shader) override;
+    void shadow(const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint& current_shader) override;
+    void render_forward(
+        const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint& current_shader) override;
+    void deferred_gbuffer_render(const Model&, const Mesh&, const Camera&, const Scene&, uint& current_shader) override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
 };
 }

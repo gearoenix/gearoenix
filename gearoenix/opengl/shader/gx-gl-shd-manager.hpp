@@ -1,6 +1,7 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../../core/gx-cr-singleton.hpp"
 #include <boost/container/flat_map.hpp>
 #include <memory>
 #include <mutex>
@@ -8,8 +9,8 @@
 
 namespace gearoenix::gl::shader {
 struct ShaderCombination;
-    struct Shader;
-struct Manager final {
+struct Shader;
+struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex combinations_lock;
     boost::container::flat_map<std::type_index, std::weak_ptr<ShaderCombination>> combinations;
@@ -18,8 +19,7 @@ private:
 
 public:
     Manager();
-    ~Manager();
-    [[nodiscard]] static Manager& get();
+    ~Manager() override;
 
     template <typename SC>
     [[nodiscard]] std::shared_ptr<SC> get_combiner()

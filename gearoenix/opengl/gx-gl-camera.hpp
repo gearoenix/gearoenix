@@ -5,11 +5,13 @@
 #include "../render/camera/gx-rnd-cmr-manager.hpp"
 #include "gx-gl-types.hpp"
 
-namespace gearoenix::render::record {  struct Camera; }
+namespace gearoenix::render::record {
+struct Camera;
+}
 
 namespace gearoenix::gl::shader {
 
-    struct ColourTuningAntiAliasingCombination;
+struct ColourTuningAntiAliasingCombination;
 struct BloomHorizontal;
 struct BloomPrefilter;
 struct BloomUpsampler;
@@ -20,7 +22,7 @@ struct SkyboxEquirectangular;
 }
 
 namespace gearoenix::gl {
-    struct Scene;
+struct Scene;
 struct Target;
 struct Texture2D;
 

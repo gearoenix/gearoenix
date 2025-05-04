@@ -20,9 +20,9 @@ gearoenix::gl::Model::Model(render::model::meshes_set_t&& ms, std::string&& name
 gearoenix::gl::Model::~Model() = default;
 
 void gearoenix::gl::Model::render_shadow(
-        const render::record::Camera& camera,
-        const render::record::CameraModel& camera_model,
-        uint& current_shader)
+    const render::record::Camera& camera,
+    const render::record::CameraModel& camera_model,
+    uint& current_shader)
 {
     for (const auto& msh : gl_meshes) {
         msh->get_gl_material()->shadow(*msh, camera, camera_model, current_shader);

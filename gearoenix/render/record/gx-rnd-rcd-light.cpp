@@ -2,6 +2,9 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
+#include "../../physics/collider/gx-phs-cld-frustum.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
 #include "gx-rnd-rcd-model.hpp"
 
@@ -23,23 +26,25 @@ void gearoenix::render::record::Lights::update(core::ecs::Entity* const scene_en
     shadow_caster_directionals.clear();
 
     core::ecs::World::get().parallel_system<core::ecs::All<light::ShadowCasterDirectional, physics::Transformation>>(
-        [&](auto* const e, auto* const l, const auto* const trn, const auto kernel_index) {
+        [&](auto* const e, auto* const l, auto* const trn, const auto kernel_index) {
             if (!l->get_enabled() || !trn->get_enabled() || e->contains_in_parents(scene_entity)) {
                 return;
             }
 
-            threads[kernel_index].lights.emplace_back(
-                l->get_shadow_frustum()->get_frustum(),
-                l->get_shadow_camera()->get_view_projection(),
-                math::Vec3<float>(l->get_shadow_transform()->get_z_axis()),
-                l->colour,
-                e,
-                l,
-                trn);
+            threads[kernel_index].shadow_caster_directionals.push_back(
+                ShadowCasterDirectionalLightData {
+                    .frustum = l->get_shadow_frustum()->get_frustum(),
+                    .normalised_vp = l->get_shadow_camera()->get_view_projection(),
+                    .direction = math::Vec3<float>(l->get_shadow_transform()->get_z_axis()),
+                    .colour = l->colour,
+                    .entity = e,
+                    .shadow_caster_directional = l,
+                    .transform = trn,
+                });
         });
 }
 
-void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh<Model>& bvh) const
+void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh<Model>& bvh)
 {
     using node_t = std::remove_cvref_t<decltype(bvh)>::Data;
 
@@ -48,7 +53,7 @@ void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh<
         n.user_data.lights.directionals.clear();
     });
 
-    for (const auto& shadow : shadow_caster_directionals) {
+    for (auto& shadow : shadow_caster_directionals) {
         bvh.call_on_intersecting(
             shadow.frustum,
             [&](node_t& node) {
@@ -57,27 +62,31 @@ void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh<
                     if (directionals.size() == directionals.max_size()) {
                         return;
                     }
-                    directionals.emplace_back(shadow.direction, shadow.shadow_caster_directional);
+                    directionals.push_back(ModelDirectionalLight {
+                        .direction = shadow.direction, .light = shadow.shadow_caster_directional });
                     return;
                 }
-                shadow_caster_directionals.emplace_back(&shadow);
+                shadow_caster_directionals.push_back(&shadow);
             },
             [&](node_t& node) {
                 auto& [directionals, _] = node.user_data.lights;
                 if (directionals.size() == directionals.max_size()) {
                     return;
                 }
-                directionals.emplace_back(shadow.direction, shadow.shadow_caster_directional);
+                directionals.push_back(ModelDirectionalLight {
+                    .direction = shadow.direction,
+                    .light = shadow.shadow_caster_directional,
+                });
             });
     }
 }
 
-void gearoenix::render::record::Lights::update_dynamic_models(Models& models) const
+void gearoenix::render::record::Lights::update_dynamic_models(Models& models)
 {
     update_models(models.dynamic_models_bvh);
 }
 
-void gearoenix::render::record::Lights::update_static_models(Models& models) const
+void gearoenix::render::record::Lights::update_static_models(Models& models)
 {
     update_models(models.static_models_bvh);
 }

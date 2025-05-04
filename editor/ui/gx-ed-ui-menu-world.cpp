@@ -2,7 +2,6 @@
 #include "gx-ed-ui-manager.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 #include <ImGuiFileDialog/ImGuiFileDialog.h>
-#include <gearoenix/core/ecs/gx-cr-ecs-singleton.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
 #include <gearoenix/platform/sdl2/gx-plt-sdl2-application.hpp>

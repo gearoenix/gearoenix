@@ -30,6 +30,8 @@ struct ShadowCasterDirectionalLightData final {
     core::ecs::Entity* entity = nullptr;
     light::ShadowCasterDirectional* shadow_caster_directional = nullptr;
     physics::Transformation* transform = nullptr;
+
+    ~ShadowCasterDirectionalLightData() = default;
 };
 
 struct LightThreadData final {
@@ -44,8 +46,8 @@ struct Lights final {
 
     Lights();
     void update(core::ecs::Entity* scene_entity);
-    void update_models(physics::accelerator::Bvh<Model>& bvh) const;
-    void update_dynamic_models(Models& models) const;
-    void update_static_models(Models& models) const;
+    void update_models(physics::accelerator::Bvh<Model>& bvh);
+    void update_dynamic_models(Models& models);
+    void update_static_models(Models& models);
 };
 }

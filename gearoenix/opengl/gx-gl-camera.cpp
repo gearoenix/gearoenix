@@ -4,23 +4,23 @@
 #include "../physics/gx-phs-transformation.hpp"
 #include "../render/record/gx-rnd-rcd-camera.hpp"
 #include "../render/record/gx-rnd-rcd-model.hpp"
-#include "gx-gl-engine.hpp"
-#include "gx-gl-target.hpp"
-#include "gx-gl-texture.hpp"
-#include "gx-gl-label.hpp"
+#include "gx-gl-check.hpp"
 #include "gx-gl-context.hpp"
+#include "gx-gl-engine.hpp"
+#include "gx-gl-label.hpp"
 #include "gx-gl-model.hpp"
 #include "gx-gl-scene.hpp"
-#include "gx-gl-check.hpp"
 #include "gx-gl-skybox.hpp"
-#include "shader/gx-gl-shd-ctaa.hpp"
 #include "gx-gl-submission-manager.hpp"
-#include <boost/mp11/algorithm.hpp>
+#include "gx-gl-target.hpp"
+#include "gx-gl-texture.hpp"
 #include "shader/gx-gl-shd-bloom.hpp"
+#include "shader/gx-gl-shd-ctaa.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
 #include "shader/gx-gl-shd-multiply.hpp"
 #include "shader/gx-gl-shd-skybox-cube.hpp"
 #include "shader/gx-gl-shd-skybox-equirectangular.hpp"
+#include <boost/mp11/algorithm.hpp>
 
 gearoenix::gl::CameraTarget::~CameraTarget() = default;
 
@@ -76,13 +76,13 @@ void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
 
 gearoenix::gl::Camera::Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
     : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
-    , bloom_prefilter_shader(shader::Manager::get_shader<shader::BloomPrefilter>())
-    , bloom_horizontal_shader(shader::Manager::get_shader<shader::BloomHorizontal>())
-    , bloom_vertical_shader(shader::Manager::get_shader<shader::BloomVertical>())
-    , bloom_upsampler_shader(shader::Manager::get_shader<shader::BloomUpsampler>())
-    , multiply_shader(shader::Manager::get_shader<shader::Multiply>())
-    , skybox_cube_shader(shader::Manager::get_shader<shader::SkyboxCube>())
-    , skybox_equirectangular_shader(shader::Manager::get_shader<shader::SkyboxEquirectangular>())
+    , bloom_prefilter_shader(shader::Manager::get().get_shader<shader::BloomPrefilter>())
+    , bloom_horizontal_shader(shader::Manager::get().get_shader<shader::BloomHorizontal>())
+    , bloom_vertical_shader(shader::Manager::get().get_shader<shader::BloomVertical>())
+    , bloom_upsampler_shader(shader::Manager::get().get_shader<shader::BloomUpsampler>())
+    , multiply_shader(shader::Manager::get().get_shader<shader::Multiply>())
+    , skybox_cube_shader(shader::Manager::get().get_shader<shader::SkyboxCube>())
+    , skybox_equirectangular_shader(shader::Manager::get().get_shader<shader::SkyboxEquirectangular>())
     , colour_tuning_anti_aliasing_shader_combination(shader::Manager::get().get_combiner<shader::ColourTuningAntiAliasingCombination>())
 {
 }
@@ -123,13 +123,11 @@ void gearoenix::gl::Camera::render_forward(const Scene& scene, const render::rec
     debug_group += object_name;
 #endif
 
-    push_debug_group( debug_group);
+    push_debug_group(debug_group);
     GX_GL_CHECK_D;
-    if (target.is_customised())
-    {
+    if (target.is_customised()) {
         ctx::set_framebuffer(gl_target.get_customised().target->get_framebuffer());
-    } else
-    {
+    } else {
         ctx::set_framebuffer(gl_target.get_default().main->get_framebuffer());
     }
     ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
@@ -157,7 +155,7 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
     debug_group += ", and for camera: ";
     debug_group += object_name;
 
-    push_debug_group( debug_group);
+    push_debug_group(debug_group);
     glDepthMask(GL_FALSE);
     // Rendering skyboxes
     const auto camera_pos_scale = math::Vec4(cmr.position, cmr.skybox_scale);
@@ -188,11 +186,9 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
         const auto& gl_txt = gl_sky.get_gl_texture();
         constexpr auto texture_2d_index = boost::mp11::mp_find<Skybox::GlTexture, std::shared_ptr<Texture2D>>::value;
         constexpr auto texture_cube_index = boost::mp11::mp_find<Skybox::GlTexture, std::shared_ptr<TextureCube>>::value;
-        if (is_equirectangular)
-        {
+        if (is_equirectangular) {
             glBindTexture(GL_TEXTURE_2D, std::get<texture_2d_index>(gl_txt)->get_object());
-        } else
-        {
+        } else {
             glBindTexture(GL_TEXTURE_CUBE_MAP, std::get<texture_cube_index>(gl_txt)->get_object());
         }
         glBindVertexArray(gl_sky.get_vertex_object());

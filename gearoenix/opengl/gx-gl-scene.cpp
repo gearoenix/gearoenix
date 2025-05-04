@@ -1,11 +1,11 @@
 #include "gx-gl-scene.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include <ranges>
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "gx-gl-label.hpp"
-#include "gx-gl-context.hpp"
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "gx-gl-camera.hpp"
+#include "gx-gl-context.hpp"
+#include "gx-gl-label.hpp"
+#include <ranges>
 
 gearoenix::gl::Scene::Scene(std::string&& name, const double layer)
     : render::scene::Scene(core::ecs::ComponentType::create_index(this), layer, std::move(name))
@@ -44,7 +44,7 @@ void gearoenix::gl::Scene::render_forward(uint& current_shader)
     render_reflection_probes(current_shader);
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& camera = record.cameras.cameras[camera_index];
-        auto*const gl_cam = core::cast<Camera>(camera.camera);
+        auto* const gl_cam = core::cast<Camera>(camera.camera);
         gl_cam->render_forward(*this, camera, current_shader);
         gl_cam->render_bloom(*this, camera, current_shader);
         gl_cam->render_colour_correction_anti_aliasing(*this, camera, current_shader);

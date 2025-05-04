@@ -5,11 +5,11 @@
 void gearoenix::render::record::Skyboxes::update(core::ecs::Entity* const scene_entity)
 {
     skyboxes.clear();
-    core::ecs::World::get().synchronised_system<skybox::Skybox>([&](auto* const entity, const auto* const skybox) {
+    core::ecs::World::get().synchronised_system<skybox::Skybox>([&](auto* const entity, auto* const skybox) {
         if (!skybox->get_enabled() || !entity->contains_in_parents(scene_entity)) {
             return;
         }
-        skyboxes.insert(
+        skyboxes.emplace(
             skybox->get_layer(),
             Data {
                 .entity = entity,
