@@ -19,12 +19,11 @@ struct Entity final : Object {
     friend struct Archetype;
 
     constexpr static std::size_t max_components = 32;
-    constexpr static std::size_t max_children = 8;
     constexpr static auto max_count = 1024 * 16;
     constexpr static auto object_type_index = gearoenix_core_ecs_entity_type_index;
 
     typedef static_flat_map<object_type_index_t, std::shared_ptr<Component>, max_components> components_t;
-    typedef static_flat_map<object_id_t, EntityPtr, max_children> children_t;
+    typedef boost::container::flat_map<object_id_t, EntityPtr> children_t;
 
     GX_GET_PTR_PRV(Entity, parent);
     GX_GET_PTR_PRV(Archetype, archetype);
@@ -43,7 +42,7 @@ public:
     ~Entity() override;
     void set_parent(Entity* p);
     void add_child(EntityPtr&& child);
-    /// It adds itself and all of its children to World, but it doesn't add its parents
+    /// It adds itself and all of its children to the World, but it doesn't add its parents.
     void add_to_world();
     void show_debug_gui() override;
     void add_component(std::shared_ptr<Component>&& component);

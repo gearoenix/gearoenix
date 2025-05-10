@@ -1,8 +1,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
@@ -20,16 +18,14 @@
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
-typedef gearoenix::core::ecs::World GxWorld;
 typedef gearoenix::core::job::EndCaller<> GxEndCaller;
 typedef gearoenix::physics::Transformation GxTransform;
 typedef gearoenix::physics::constraint::Manager GxConstraintManager;
-typedef gearoenix::physics::constraint::JetController GxJetController;
 typedef gearoenix::platform::stream::Path GxPath;
 typedef gearoenix::render::camera::Manager GxCamManager;
-typedef gearoenix::render::material::Manager GxMatManager;
 typedef gearoenix::render::light::Manager GxLightManager;
 typedef gearoenix::render::light::ShadowCasterDirectional GxShadowCaster;
+typedef gearoenix::render::material::Manager GxMatManager;
 typedef gearoenix::render::material::Pbr GxPbr;
 typedef gearoenix::render::mesh::Manager GxMeshManager;
 typedef gearoenix::render::mesh::Mesh GxMesh;
@@ -55,7 +51,7 @@ private:
     GxEntityPtr scene_entity;
 
 public:
-    explicit GameApp()
+    GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
         GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void {
