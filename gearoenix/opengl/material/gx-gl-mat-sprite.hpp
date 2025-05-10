@@ -21,7 +21,7 @@ public:
     ~Sprite() override;
     void shadow(const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint& current_shader) override;
     void render_forward(
-        const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint& current_shader) override;
+        const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Mesh&, uint& current_shader) override;
     void deferred_gbuffer_render(const Model&, const Mesh&, const Camera&, const Scene&, uint& current_shader) override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
 };

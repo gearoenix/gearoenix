@@ -13,7 +13,7 @@ void gearoenix::gl::material::Material::shadow(
 }
 
 void gearoenix::gl::material::Material::render_forward(
-    const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint&)
+    const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Mesh&, uint&)
 {
     GX_UNIMPLEMENTED;
 }

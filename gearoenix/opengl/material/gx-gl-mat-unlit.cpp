@@ -50,7 +50,6 @@ void gearoenix::gl::material::Unlit::render_forward(
     const Scene&,
     const render::record::Camera& cam,
     const render::record::CameraModel& cmm,
-    const Model&,
     const Mesh& mesh,
     uint& current_shader)
 {

@@ -8,8 +8,8 @@
 #include "constraint/gx-phs-cns-manager.hpp"
 #include "gx-phs-transformation.hpp"
 
-gearoenix::physics::Engine::Engine(render::engine::Engine& render_engine)
-    : render_engine(render_engine)
+gearoenix::physics::Engine::Engine()
+    : Singleton(this)
     , animation_manager(new animation::Manager())
     , constraint_manager(new constraint::Manager())
 {

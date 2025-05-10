@@ -4,6 +4,7 @@
 #include "gx-phs-cns-jet-controller.hpp"
 
 gearoenix::physics::constraint::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<Constraint>();
     core::ecs::ComponentType::add<JetController>();

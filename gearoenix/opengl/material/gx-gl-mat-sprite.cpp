@@ -48,10 +48,9 @@ void gearoenix::gl::material::Sprite::shadow(
 }
 
 void gearoenix::gl::material::Sprite::render_forward(
-    const Scene& scene,
+    const Scene&,
     const render::record::Camera& camera,
     const render::record::CameraModel& camera_model,
-    const Model& model,
     const Mesh& mesh,
     uint& current_shader)
 {

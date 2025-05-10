@@ -120,7 +120,7 @@ gearoenix::gl::shader::Shader& gearoenix::gl::shader::Shader::operator=(Shader&&
 
 gearoenix::gl::shader::Shader::~Shader()
 {
-    core::job::send_job(Engine::get().get_jobs_thread_id(), [vo = vertex_object, fo = fragment_object, sp = shader_program] {
+    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [vo = vertex_object, fo = fragment_object, sp = shader_program] {
         GX_GL_CHECK_D;
         if (static_cast<uint>(-1) != vo) {
             glDeleteShader(vo);

@@ -44,7 +44,9 @@ public:
     GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& material) { set_material(std::move(material)); }));
+        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& material) -> void {
+            set_material(std::move(material));
+        }));
     }
 
     void set_material(GxPbrPtr&& material)

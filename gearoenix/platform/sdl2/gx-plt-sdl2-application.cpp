@@ -243,7 +243,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF)
     initialize_screen();
     initialize_window();
     initialize_mouse();
-    base.initialize_engine(*this);
+    base.initialize_engine();
 }
 
 gearoenix::platform::Application::~Application()

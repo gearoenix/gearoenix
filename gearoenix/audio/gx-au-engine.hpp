@@ -1,10 +1,7 @@
 #pragma once
+#include "../core/gx-cr-singleton.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../core/sync/gx-cr-sync-semaphore.hpp"
-#include "../platform/gx-plt-build-configuration.hpp"
 #include "gx-au-manager.hpp"
-#include <chrono>
-#include <thread>
 
 namespace FMOD {
 class System;
@@ -15,14 +12,13 @@ struct Application;
 }
 
 namespace gearoenix::audio {
-struct Engine final {
-    GX_GET_RRF_PRV(platform::Application, platform_application);
+struct Engine final : core::Singleton<Engine> {
     GX_GET_REF_PRV(Manager, manager);
     GX_GET_PTR_PRV(FMOD::System, system);
 
 public:
-    explicit Engine(platform::Application&);
-    ~Engine();
+    Engine();
+    ~Engine() override;
 
     void update();
 };

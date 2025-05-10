@@ -22,7 +22,7 @@ gearoenix::gl::Buffer::Buffer(const math::Aabb3<double>& box)
 gearoenix::gl::Buffer::~Buffer()
 {
     GX_ASSERT_D(static_cast<uint>(-1) != vertex_object);
-    core::job::send_job(Engine::get().get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
+    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [vo = vertex_object, vb = vertex_buffer, ib = index_buffer] {
         GX_GL_CHECK_D;
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -47,7 +47,7 @@ void gearoenix::gl::Buffer::construct(
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
     end_callback.set_return(buffer);
-    core::job::send_job(Engine::get().get_jobs_thread_id(), [c = std::move(end_callback), b = std::move(buffer), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
+    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c = std::move(end_callback), b = std::move(buffer), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
         GX_GL_CHECK_D;
         glGenVertexArrays(1, &(b->vertex_object));
         glBindVertexArray(b->vertex_object);

@@ -24,7 +24,7 @@ gearoenix::gl::material::Pbr::Pbr(const std::string& name)
     : render::material::Pbr(name)
     , shadow_caster_combination(shader::Manager::get().get_combiner<shader::ShadowCasterCombination>())
     , forward_pbr_combination(shader::Manager::get().get_combiner<shader::ForwardPbrCombination>())
-    , gbuffers_filler_combination(Engine::get().get_specification().is_deferred_supported ? new shader::GBuffersFiller() : nullptr)
+    , gbuffers_filler_combination(core::Singleton<Engine>::get().get_specification().is_deferred_supported ? new shader::GBuffersFiller() : nullptr)
 {
 }
 
@@ -94,10 +94,9 @@ void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::
 }
 
 void gearoenix::gl::material::Pbr::render_forward(
-    const Scene& scene,
+    const Scene&,
     const render::record::Camera& camera,
     const render::record::CameraModel& camera_model,
-    const Model& model,
     const Mesh& mesh,
     uint& current_shader)
 {

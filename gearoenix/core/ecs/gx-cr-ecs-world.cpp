@@ -5,15 +5,9 @@
 #include <boost/mp11/algorithm.hpp>
 #include <imgui.h>
 
-namespace {
-std::mutex world_lock;
-auto world = std::make_unique<gearoenix::core::ecs::World>();
-}
-
 gearoenix::core::ecs::World::World()
+    : Singleton(this)
 {
-    const std::lock_guard _lg(world_lock);
-    GX_ASSERT(nullptr == world); // only one world should exist!
     Object::register_type<Entity>();
 }
 
@@ -21,16 +15,6 @@ gearoenix::core::ecs::World::~World()
 {
     GX_ASSERT_D(resolvers.empty());
     GX_ASSERT_D(delayed_actions.empty());
-}
-
-gearoenix::core::ecs::World& gearoenix::core::ecs::World::get()
-{
-    return *world;
-}
-
-void gearoenix::core::ecs::World::destroy()
-{
-    world = nullptr;
 }
 
 void gearoenix::core::ecs::World::add_entity(Entity* const e)

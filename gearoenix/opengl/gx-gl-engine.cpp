@@ -20,11 +20,12 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
-gearoenix::gl::Engine::Engine(platform::Application& platform_application)
-    : render::engine::Engine(render::engine::Type::OpenGL, platform_application)
+gearoenix::gl::Engine::Engine()
+    : render::engine::Engine(render::engine::Type::OpenGL)
+    , Singleton<Engine>(this)
     , shader_manager(new shader::Manager())
 {
-    while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by caller*/
+    while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by others*/
     }
     GX_GL_CHECK_D;
     ImGui_ImplOpenGL3_Init("#version 300 es");
@@ -67,7 +68,7 @@ gearoenix::gl::Engine::Engine(platform::Application& platform_application)
 
 gearoenix::gl::Engine::~Engine()
 {
-    core::ecs::World::destroy();
+    world = nullptr;
     skybox_manager = nullptr;
     submission_manager = nullptr;
     texture_manager = nullptr;
@@ -117,12 +118,12 @@ bool gearoenix::gl::Engine::is_supported()
     return load_library();
 }
 
-std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct(platform::Application& platform_application)
+std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct()
 {
     if (!is_supported()) {
         return {};
     }
-    return std::make_unique<Engine>(platform_application);
+    return std::make_unique<Engine>();
 }
 
 #endif

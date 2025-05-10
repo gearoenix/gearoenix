@@ -8,8 +8,8 @@
 #include <fmod/fmod_errors.h>
 #endif
 
-gearoenix::audio::Engine::Engine(platform::Application& app)
-    : platform_application(app)
+gearoenix::audio::Engine::Engine()
+    : Singleton(this)
     , manager(*this)
 {
 #if !GX_PLATFORM_WEBASSEMBLY

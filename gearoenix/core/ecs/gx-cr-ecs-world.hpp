@@ -1,4 +1,5 @@
 #pragma once
+#include "../gx-cr-singleton.hpp"
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-entity-ptr.hpp"
@@ -16,8 +17,8 @@ struct Archetype;
 
 /// The World of ECS
 ///
-/// Main focus of this struct is performance of systems and memory usage
-struct World final {
+/// Main focus of this struct is the performance of systems and memory usage
+struct World final : Singleton<World> {
     typedef std::function<bool()> resolver_t;
 
     constexpr static auto max_archetypes_count = 16;
@@ -49,13 +50,11 @@ private:
 
 public:
     World();
-    ~World();
-    [[nodiscard]] static World& get();
-    static void destroy();
+    ~World() override;
     World(World&&) = delete;
     World(const World&) = delete;
 
-    /// You must know your context (state of world), unless you want to end up having race
+    /// You must know your context (state of the world), unless you want to end up having race
     void add_entity(Entity*);
     /// Recommended way to add an entity, in case you do not know the context you're in.
     void delayed_add_entity(Entity*);

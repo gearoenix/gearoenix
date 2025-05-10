@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/gx-cr-singleton.hpp"
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
@@ -60,10 +61,10 @@ struct Manager;
 }
 
 namespace gearoenix::render::engine {
-struct Engine {
+struct Engine : core::Singleton<Engine> {
+    GX_GET_CREF_PRT(std::unique_ptr<core::ecs::World>, world);
     GX_GET_CVAL_PRT(std::thread::id, jobs_thread_id);
     GX_GET_CVAL_PRT(Type, engine_type);
-    GX_GET_RRF_PRT(platform::Application, platform_application);
     GX_GET_UPTR_PRT(physics::Engine, physics_engine);
     GX_GET_CREF_PRT(Specification, specification);
     GX_GET_VAL_PRT(std::uint64_t, frames_count, 2);
@@ -84,19 +85,18 @@ struct Engine {
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
 
-    Engine(Type engine_type, platform::Application& platform_application);
+    explicit Engine(Type engine_type);
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
     [[nodiscard]] static std::set<Type> get_available_engines();
-    [[nodiscard]] static std::unique_ptr<Engine> construct(platform::Application& platform_application);
-    virtual ~Engine();
+    [[nodiscard]] static std::unique_ptr<Engine> construct();
+    ~Engine() override;
     virtual void start_frame();
     virtual void end_frame();
     virtual void window_resized();
     virtual void upload_imgui_fonts() = 0;
     virtual void show_debug_gui();
-    [[nodiscard]] static Engine& get();
 };
 }

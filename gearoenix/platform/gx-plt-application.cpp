@@ -5,7 +5,6 @@
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-thread.hpp"
-#include "../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
@@ -49,7 +48,8 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
 }
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
-    : arguments(GX_MAIN_ENTRY_ARGS)
+    : Singleton(this)
+    , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
 {
     register_types();
@@ -283,11 +283,11 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
     touch_states.erase(finger_id);
 }
 
-void gearoenix::platform::BaseApplication::initialize_engine(Application& app)
+void gearoenix::platform::BaseApplication::initialize_engine()
 {
     initialise_default_font();
-    render_engine = render::engine::Engine::construct(app);
-    audio_engine = std::make_unique<audio::Engine>(app);
+    render_engine = render::engine::Engine::construct();
+    audio_engine = std::make_unique<audio::Engine>();
 }
 
 void gearoenix::platform::BaseApplication::initialize_core_application(core::Application* const core_app)
