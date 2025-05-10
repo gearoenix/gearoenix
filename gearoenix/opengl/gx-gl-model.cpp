@@ -33,7 +33,7 @@ void gearoenix::gl::Model::render_forward(const Scene& scene, const render::reco
     const render::record::CameraModel& camera_model, uint& current_shader)
 {
     for (const auto& msh : gl_meshes) {
-        msh->get_gl_material()->render_forward(scene, camera, camera_model, *this, *msh, current_shader);
+        msh->get_gl_material()->render_forward(scene, camera, camera_model, *msh, current_shader);
     }
 }
 

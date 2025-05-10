@@ -30,7 +30,7 @@ void gearoenix::core::ecs::Component::read(platform::stream::Stream& s)
 {
     enabled = s.read<bool>();
     const auto entity_id = s.read<object_id_t>();
-    GX_TODO; // fetch the entity from object stream
+    GX_TODO; // Fetch the entity from an object stream.
 }
 
 gearoenix::core::ecs::Component::~Component() = default;

@@ -1,5 +1,6 @@
 #pragma once
 #include "../core/event/gx-cr-ev-point.hpp"
+#include "../core/gx-cr-singleton.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../math/gx-math-vector-2d.hpp"
 #include "gx-plt-arguments.hpp"
@@ -19,10 +20,6 @@ namespace gearoenix::core {
 struct Application;
 }
 
-namespace gearoenix::core::sync {
-struct WorkWaiter;
-}
-
 namespace gearoenix::core::event {
 struct Engine;
 }
@@ -33,7 +30,7 @@ struct Engine;
 
 namespace gearoenix::platform {
 struct Application;
-struct BaseApplication final {
+struct BaseApplication final : core::Singleton<BaseApplication> {
     friend struct Application;
 
     typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
@@ -47,10 +44,10 @@ struct BaseApplication final {
     GX_GET_CREF_PRV(math::Vec2<int>, window_position);
     GX_GET_VAL_PRV(bool, window_is_up, false);
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_position);
-    /// Its value is in range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
+    /// Its value is in the range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position);
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_position);
-    /// Its value is in range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
+    /// Its value is in the range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position);
     GX_GET_UPTR_PRV(render::engine::Engine, render_engine);
     GX_GET_UPTR_PRV(audio::Engine, audio_engine);
@@ -64,7 +61,7 @@ struct BaseApplication final {
 
 public:
     explicit BaseApplication(GX_MAIN_ENTRY_ARGS_DEF);
-    ~BaseApplication();
+    ~BaseApplication() override;
     void initialize_window_position(int x, int y);
     void initialize_window_size(int w, int h);
     void update_window_size(int w, int h);
@@ -79,7 +76,7 @@ public:
     void touch_move(FingerId finger_id, double x, double y);
     void touch_up(FingerId finger_id);
     void touch_cancel(FingerId finger_id);
-    void initialize_engine(Application&);
+    void initialize_engine();
     void initialize_core_application(core::Application*);
     void going_to_be_closed();
     void terminate();

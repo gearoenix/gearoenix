@@ -1,66 +1,66 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
-#include <gearoenix/render/light/gx-rnd-lt-builder.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-manager.hpp>
 #include <gearoenix/render/material/gx-rnd-mat-pbr.hpp>
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
-typedef gearoenix::core::job::EndCaller<> GxEndCaller;
+typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
 typedef gearoenix::core::ecs::World GxWorld;
-
-typedef gearoenix::render::scene::Scene GxScene;
-typedef gearoenix::render::scene::Builder GxSceneBuilder;
-typedef std::shared_ptr<GxSceneBuilder> GxSceneBuilderPtr;
-
+typedef gearoenix::core::job::EndCaller<> GxEndCaller;
+typedef gearoenix::physics::Transformation GxTransform;
+typedef gearoenix::physics::constraint::Manager GxConstraintManager;
+typedef gearoenix::physics::constraint::JetController GxJetController;
+typedef gearoenix::platform::stream::Path GxPath;
+typedef gearoenix::render::camera::Manager GxCamManager;
+typedef gearoenix::render::material::Manager GxMatManager;
+typedef gearoenix::render::light::Manager GxLightManager;
+typedef gearoenix::render::light::ShadowCasterDirectional GxShadowCaster;
 typedef gearoenix::render::material::Pbr GxPbr;
-typedef gearoenix::core::job::EndCallerShared<GxPbr> GxPbrEndCaller;
-typedef std::shared_ptr<GxPbr> GxPbrPtr;
-
+typedef gearoenix::render::mesh::Manager GxMeshManager;
+typedef gearoenix::render::mesh::Mesh GxMesh;
+typedef gearoenix::render::model::Manager GxMdlManager;
+typedef gearoenix::render::scene::Manager GxSceneManager;
+typedef gearoenix::render::scene::Scene GxScene;
+typedef gearoenix::render::texture::Manager GxTexManager;
+typedef gearoenix::render::texture::Texture2D GxTexture2D;
 typedef gearoenix::render::texture::TextureInfo GxTextureInfo;
 typedef gearoenix::render::texture::TextureFormat GxTextureFormat;
 typedef gearoenix::render::texture::Type GxTextureType;
-typedef gearoenix::render::texture::Texture2D GxTexture2D;
+
+typedef gearoenix::core::job::EndCaller<GxEntityPtr> GxEntityEndCaller;
+typedef gearoenix::core::job::EndCallerShared<GxMesh> GxMeshEndCaller;
+typedef gearoenix::core::job::EndCallerShared<GxPbr> GxPbrEndCaller;
 typedef gearoenix::core::job::EndCallerShared<GxTexture2D> GxTexture2DEndCaller;
+typedef std::shared_ptr<GxMesh> GxMeshPtr;
+typedef std::shared_ptr<GxPbr> GxPbrPtr;
 typedef std::shared_ptr<GxTexture2D> GxTexture2DPtr;
 
-typedef gearoenix::render::mesh::Mesh GxMesh;
-typedef gearoenix::core::job::EndCallerShared<GxMesh> GxMeshEndCaller;
-typedef std::shared_ptr<GxMesh> GxMeshPtr;
-
-typedef gearoenix::render::camera::Builder GxCameraBuilder;
-typedef gearoenix::core::job::EndCallerShared<GxCameraBuilder> GxCameraBuilderEndCaller;
-typedef std::shared_ptr<GxCameraBuilder> GxCameraBuilderPtr;
-typedef gearoenix::physics::Transformation GxTransform;
-
-typedef gearoenix::render::light::Builder GxLightBuilder;
-typedef gearoenix::core::job::EndCallerShared<GxLightBuilder> GxLightBuilderEndCaller;
-typedef std::shared_ptr<GxLightBuilder> GxLightBuilderPtr;
-
 struct GameApp final : gearoenix::core::Application {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
+private:
+    GxEntityPtr scene_entity;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app)
-        : Application(plt_app)
+public:
+    explicit GameApp()
+        : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        render_engine.get_material_manager()->get_pbr(
-            "material",
-            GxPbrEndCaller([this](GxPbrPtr&& m) { material_is_ready(std::move(m)); }));
+        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void {
+            material_is_ready(std::move(m));
+        }));
     }
 
     void material_is_ready(GxPbrPtr&& material)
@@ -74,106 +74,80 @@ struct GameApp final : gearoenix::core::Application {
                 pixels[k].push_back(255);
             }
         }
-        render_engine.get_texture_manager()->create_2d_from_pixels(
-            "coloured-mipmaps",
-            std::move(pixels),
-            GxTextureInfo()
-                .set_format(GxTextureFormat::RgbaUint8)
-                .set_width(64)
-                .set_height(64)
-                .set_type(GxTextureType::Texture2D),
-            GxTexture2DEndCaller([this, m = std::move(material)](GxTexture2DPtr&& t) mutable { texture_is_ready(std::move(m), std::move(t)); }));
 
-        // Or you can load an image, before that make sure you have the image in the assets folder
-        //         render_engine.get_texture_manager()->create_2d_from_file(
-        //            "gearoenix-logo",
-        //            // gearoenix::platform::AbsolutePath("../../../../assets/gearoenix-logo.png"),
-        //            gearoenix::platform::stream::Path::create_asset("logo.png"),
-        //            GxTextureInfo(),
-        //            GxTexture2DEndCaller([this, m = std::move(material)](GxTexture2DPtr&& t) mutable {
-        //                    texture_is_ready(std::move(m), std::move(t));}));
+        constexpr bool use_texture_file = false;
+        constexpr bool use_abs_path = false;
+
+        if constexpr (use_texture_file) {
+            // Or you can load an image before that make sure you have the image in the assets' folder.
+            GxTexManager::get().create_2d_from_file(
+                use_abs_path ? GxPath::create_absolute("../../../../assets/gearoenix-logo.png") : GxPath::create_asset("logo.png"),
+                GxTextureInfo(),
+                GxTexture2DEndCaller([this, m = std::move(material)](GxTexture2DPtr&& t) mutable {
+                    texture_is_ready(std::move(m), std::move(t));
+                }));
+        } else {
+            GxTexManager::get().create_2d_from_pixels(
+                "coloured-mipmaps",
+                std::move(pixels),
+                GxTextureInfo()
+                    .set_format(GxTextureFormat::RgbaUint8)
+                    .set_width(64)
+                    .set_height(64)
+                    .set_type(GxTextureType::Texture2D),
+                GxTexture2DEndCaller([this, m = std::move(material)](GxTexture2DPtr&& t) mutable {
+                    texture_is_ready(std::move(m), std::move(t));
+                }));
+        }
     }
 
     void texture_is_ready(GxPbrPtr&& material, GxTexture2DPtr&& texture)
     {
         material->set_albedo(std::move(texture));
 
-        render_engine.get_mesh_manager()->build_plate(
+        GxMeshManager::get().build_plate(
             std::move(material),
-            GxMeshEndCaller([this](GxMeshPtr&& mesh) mutable {
+            GxMeshEndCaller([this](GxMeshPtr&& mesh) -> void {
                 mesh_is_ready(std::move(mesh));
             }));
     }
 
     void mesh_is_ready(GxMeshPtr&& mesh)
     {
-        auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0,
-            GxEndCaller([this] {
-                // Scene is hidden when it has been loaded, so we need to show it by following line:
-                GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true);
-            }));
-        scene_id = scene_builder->get_id();
+        auto model_builder = GxMdlManager::get().build(
+            "triangle", scene_entity.get(), { std::move(mesh) }, false);
 
-        auto model_builder = render_engine.get_model_manager()->build(
-            "triangle", nullptr,
-            { std::move(mesh) },
-            GxEndCaller([] {
-                // Here, it is not important for us to know when the model entity is actually in the world and
-                // functioning, if it was, we had to add some code for handling this callback properly.
-            }),
-            true);
-        scene_builder->add(std::move(model_builder));
-
-        render_engine.get_camera_manager()->build(
-            "camera", nullptr,
-            GxCameraBuilderEndCaller([this, sb = std::move(scene_builder)](GxCameraBuilderPtr&& cb) mutable {
-                camera_is_ready(std::move(cb), std::move(sb));
-            }),
-            GxEndCaller([] {
-                // Here, it is not important for us to know when the camera entity is actually in the world and
-                // functioning, if it was, we had to add some code for handling this callback properly.
+        GxCamManager::get().build(
+            "camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
+                camera_is_ready(std::move(e));
             }));
     }
 
-    void camera_is_ready(GxCameraBuilderPtr&& camera_builder, GxSceneBuilderPtr&& scene_builder) const
+    void camera_is_ready(GxEntityPtr&& camera_entity)
     {
-        auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
+        auto trn = camera_entity->get_component_shared_ptr<GxTransform>();
         trn->set_local_position({ 0.0f, 0.0f, 5.0f });
-        auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
-        const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
-        (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
-        scene_builder->add(std::move(camera_builder));
 
-        render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light",
-            nullptr,
-            1024,
-            10.0f,
-            1.0f,
-            10.0f,
-            GxLightBuilderEndCaller([sb = std::move(scene_builder)](GxLightBuilderPtr&& lb) mutable {
-                light_is_ready(std::move(sb), std::move(lb));
-            }),
-            GxEndCaller([] {
-                // Here, it is not important for us to know when the light entity is actually in the world and
-                // functioning, if it was, we had to add some code for handling this callback properly.
+        (void)GxConstraintManager::get().create_jet_controller(
+            camera_entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+
+        GxLightManager::get().build_shadow_caster_directional(
+            "directional-light", scene_entity.get(), 1024,
+            10.0f, 1.0f, 10.0f,
+            GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
+                light_is_ready(std::move(e));
             }));
     }
 
-    static void light_is_ready(GxSceneBuilderPtr&& scene_builder, GxLightBuilderPtr&& light_builder)
+    void light_is_ready(GxEntityPtr&& light_entity)
     {
-        light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
+        auto* const light = light_entity->get_component<GxShadowCaster>();
+        light->get_shadow_transform()->local_look_at(
             { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-        light_builder->get_light().colour = { 8.0f, 8.0f, 8.0f };
-        scene_builder->add(std::move(light_builder));
-        (void)std::move(scene_builder);
-        GX_LOG_D("Initialised");
-    }
+        light->colour = { 8.0f, 8.0f, 8.0f };
 
-    void update() override
-    {
-        Application::update();
+        scene_entity->add_to_world();
+        GX_LOG_D("Initialised");
     }
 };
 

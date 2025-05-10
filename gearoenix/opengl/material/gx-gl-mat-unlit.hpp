@@ -20,7 +20,7 @@ public:
     static void construct(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c);
     ~Unlit() override;
     void shadow(const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint&) override;
-    void render_forward(const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint&) override;
+    void render_forward(const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Mesh&, uint&) override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
 };
 }

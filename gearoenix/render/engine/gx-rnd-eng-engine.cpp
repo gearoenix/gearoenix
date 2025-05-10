@@ -34,22 +34,16 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
-namespace {
-gearoenix::render::engine::Engine* instance = nullptr;
-}
-
-gearoenix::render::engine::Engine::Engine(
-    const Type engine_type,
-    platform::Application& platform_application)
-    : jobs_thread_id(std::this_thread::get_id())
+gearoenix::render::engine::Engine::Engine(const Type engine_type)
+    : Singleton(this)
+    , world(new core::ecs::World())
+    , jobs_thread_id(std::this_thread::get_id())
     , engine_type(engine_type)
-    , platform_application(platform_application)
-    , physics_engine(new physics::Engine(*this))
+    , physics_engine(new physics::Engine())
     , font_manager(new font::Manager())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
     core::job::register_current_thread();
-    instance = this;
 }
 
 std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines()
@@ -72,8 +66,7 @@ std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get
     return result;
 }
 
-std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct(
-    platform::Application& platform_application)
+std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct()
 {
     std::unique_ptr<Engine> result;
     const auto& configuration = platform::RuntimeConfiguration::get();
@@ -94,7 +87,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
 #endif
 #ifdef GX_RENDER_OPENGL_ENABLED
     if (result == nullptr && configuration.get_opengl_render_backend_enabled() && gl::Engine::is_supported()) {
-        result = gl::Engine::construct(platform_application);
+        result = gl::Engine::construct();
     }
 #endif
     GX_CHECK_NOT_EQUAL(result, nullptr);
@@ -103,7 +96,6 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
 
 gearoenix::render::engine::Engine::~Engine()
 {
-    instance = nullptr;
 }
 
 void gearoenix::render::engine::Engine::start_frame()
@@ -122,7 +114,7 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame, in start_frame of Engine, we prepare every thing for user interaction
+    physics_engine->start_frame(); // Don't mistake this with the actual start of frame; in start_frame of Engine, we prepare everything for user interaction.
     camera_manager->update();
     scene_manager->update();
     reflection_manager->update();
@@ -142,9 +134,4 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         core::ecs::World::get().show_debug_gui();
         // TODO: I have to show all other things
     });
-}
-
-gearoenix::render::engine::Engine& gearoenix::render::engine::Engine::get()
-{
-    return *instance;
 }

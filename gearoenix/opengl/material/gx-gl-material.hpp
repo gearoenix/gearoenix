@@ -27,7 +27,7 @@ struct Material {
     virtual void shadow(
         const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint& current_shader);
     virtual void render_forward(
-        const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Model&, const Mesh&, uint& current_shader);
+        const Scene&, const render::record::Camera&, const render::record::CameraModel&, const Mesh&, uint& current_shader);
     virtual void deferred_gbuffer_render(const Model&, const Mesh&, const Camera&, const Scene&, uint& current_shader);
 };
 }
