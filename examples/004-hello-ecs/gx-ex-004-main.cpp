@@ -1,5 +1,7 @@
 #define GX_PLATFORM_LOG_STD_OUT_ENABLED
+
 #include <gearoenix/core/allocator/gx-cr-alc-shared-array.hpp>
+#include <gearoenix/core/ecs/gx-cr-ecs-entity-ptr.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
@@ -34,43 +36,38 @@ std::uniform_real_distribution colour_distribution(0.5f, 1.0f);
 
 template <typename... Ts>
 using GxAll = gearoenix::core::ecs::All<Ts...>;
-
 template <typename T>
 using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
-using GxEndCaller = gearoenix::core::job::EndCaller<>;
+template <typename T>
+using GxEndCaller = gearoenix::core::job::EndCaller<T>;
 
-using GxComp = gearoenix::core::ecs::Component;
-using GxCoreApp = gearoenix::core::Application;
-using GxPltApp = gearoenix::platform::Application;
-using GxTransformComp = gearoenix::physics::Transformation;
-using GxTransform = gearoenix::physics::Transformation;
-
-using GxScene = gearoenix::render::scene::Scene;
-
-using GxCameraBuilder = gearoenix::render::camera::Builder;
-using GxCameraBuilderPtr = std::shared_ptr<GxCameraBuilder>;
-using GxCameraBuilderEndCaller = GxEndCallerShared<GxCameraBuilder>;
-
-using GxLightBuilder = gearoenix::render::light::Builder;
-using GxLightBuilderPtr = std::shared_ptr<GxLightBuilder>;
-using GxLightBuilderEndCaller = GxEndCallerShared<GxLightBuilder>;
-
-using GxMesh = gearoenix::render::mesh::Mesh;
-using GxMeshPtr = std::shared_ptr<GxMesh>;
-using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
-
-using GxPbr = gearoenix::render::material::Pbr;
-using GxPbrPtr = std::shared_ptr<GxPbr>;
-using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
-
-using GxWorld = gearoenix::core::ecs::World;
+typedef gearoenix::core::Application GxCoreApp;
+typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
+typedef gearoenix::core::ecs::Component GxComp;
+typedef gearoenix::core::ecs::World GxWorld;
+typedef gearoenix::physics::constraint::Manager GxConstraintManager;
+typedef gearoenix::physics::Transformation GxTransform;
+typedef gearoenix::render::camera::Manager GxCameraManager;
+typedef gearoenix::render::engine::Engine GxRenderEngine;
+typedef gearoenix::render::light::Manager GxLightManager;
+typedef gearoenix::render::light::ShadowCasterDirectional GxShadowCaster;
+typedef gearoenix::render::material::Manager GxMatManager;
+typedef gearoenix::render::material::Pbr GxPbr;
+typedef gearoenix::render::mesh::Manager GxMeshManager;
+typedef gearoenix::render::mesh::Mesh GxMesh;
+typedef gearoenix::render::model::Manager GxModelManager;
+typedef gearoenix::render::scene::Manager GxSceneManager;
+typedef GxEndCaller<GxEntityPtr> GxEntityEndCaller;
+typedef GxEndCallerShared<GxMesh> GxMeshEndCaller;
+typedef GxEndCallerShared<GxPbr> GxPbrEndCaller;
+typedef std::shared_ptr<GxMesh> GxMeshPtr;
+typedef std::shared_ptr<GxPbr> GxPbrPtr;
 
 struct Position;
+
 struct Speed final : GxComp {
-    constexpr static auto MAX_COUNT = objects_count;
-    constexpr static auto object_type_index = 100;
-    constexpr static std::array all_parent_object_type_indices {};
-    constexpr static std::array immediate_parent_object_type_indices {};
+    constexpr static auto max_count = objects_count;
+    constexpr static auto object_type_index = gearoenix_last_component_type_index + 1;
 
     gearoenix::math::Vec3<double> value;
 
@@ -79,8 +76,8 @@ struct Speed final : GxComp {
 };
 
 struct Position final : GxComp {
-    constexpr static auto MAX_COUNT = objects_count;
-    constexpr static auto object_type_index = 101;
+    constexpr static auto max_count = objects_count;
+    constexpr static auto object_type_index = gearoenix_last_component_type_index + 2;
 
     gearoenix::math::Vec3<double> value;
 
@@ -89,7 +86,7 @@ struct Position final : GxComp {
 };
 
 Speed::Speed()
-    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "speed", 0)
+    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "speed")
     , value(
           speed_distribution(random_engine),
           speed_distribution(random_engine),
@@ -133,7 +130,7 @@ void Speed::update(const Position& p)
 }
 
 Position::Position()
-    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "position", 0)
+    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "position")
     , value(
           space_distribution(random_engine),
           space_distribution(random_engine),
@@ -149,20 +146,22 @@ void Position::update(const double delta_time, const Speed& speed)
 }
 
 struct GameApp final : GxCoreApp {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
+private:
+    GxEntityPtr scene_entity;
 
-    explicit GameApp(GxPltApp& plt_app)
-        : GxCoreApp(plt_app)
+public:
+    GameApp()
+        : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
         gearoenix::core::ecs::ComponentType::add<Position>();
         gearoenix::core::ecs::ComponentType::add<Speed>();
 
         const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
 
-        const GxEndCaller end([this, materials] { materials_ready(*materials); });
+        const GxEndCaller<void> end([this, materials] { materials_ready(*materials); });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            render_engine.get_material_manager()->get_pbr(
+            GxMatManager::get().get_pbr(
                 "material-" + std::to_string(model_index),
                 GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
                     m->get_albedo_factor() = {
@@ -180,10 +179,10 @@ struct GameApp final : GxCoreApp {
     {
         const auto meshes = std::make_shared<std::array<GxMeshPtr, objects_count>>();
 
-        const GxEndCaller end([this, meshes] { meshes_ready(*meshes); });
+        const GxEndCaller<void> end([this, meshes] { meshes_ready(*meshes); });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            render_engine.get_mesh_manager()->build_cube(
+            GxMeshManager::get().build_cube(
                 std::move(materials[model_index]),
                 GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
                     (*meshes)[model_index] = std::move(mesh);
@@ -193,56 +192,47 @@ struct GameApp final : GxCoreApp {
 
     void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
     {
-        const auto scene_builder = render_engine.get_scene_manager()->build(
-            "scene", 0.0, GxEndCaller([this] { GxWorld::get()->get_component<GxScene>(scene_id)->set_enabled(true); }));
-        scene_id = scene_builder->get_id();
-
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            auto model_builder = render_engine.get_model_manager()->build(
-                "triangle" + std::to_string(model_index), nullptr,
-                { std::move(meshes[model_index]) },
-                GxEndCaller([] { }),
-                true);
-            auto speed = gearoenix::core::ecs::construct_component<Speed>();
-            auto position = gearoenix::core::ecs::construct_component<Position>();
-            auto& model_transformation = model_builder->get_transformation();
-            model_transformation.set_local_position(position->value);
-            model_transformation.local_inner_scale(cube_size);
-            model_builder->get_entity_builder()->get_builder().add_components(std::move(speed), std::move(position));
-            scene_builder->add(std::move(model_builder));
+            auto entity = GxModelManager::get().build(
+                "triangle" + std::to_string(model_index), scene_entity.get(),
+                { std::move(meshes[model_index]) }, true);
+            auto speed = Speed::construct<Speed>();
+            auto position = Position::construct<Position>();
+            auto* const trn = entity->get_component<GxTransform>();
+            trn->set_local_position(position->value);
+            trn->local_inner_scale(cube_size);
+            entity->add_component(std::move(speed));
+            entity->add_component(std::move(position));
         }
 
-        render_engine.get_camera_manager()->build(
-            "camera", nullptr,
-            GxCameraBuilderEndCaller([this, scene_builder](GxCameraBuilderPtr&& camera_builder) {
-                auto trn = std::dynamic_pointer_cast<GxTransform>(camera_builder->get_transformation().get_component_self().lock());
-                trn->set_local_position({ 0.0f, 0.0f, 5.0f });
-                const auto& cm = *render_engine.get_physics_engine()->get_constraint_manager();
-                auto ctrl_name = camera_builder->get_entity_builder()->get_builder().get_name() + "-controller";
-                (void)cm.create_jet_controller(std::move(ctrl_name), std::move(trn), GxEndCaller([] { }));
-                scene_builder->add(std::move(camera_builder)); }),
-            GxEndCaller([] {}));
+        const GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
 
-        render_engine.get_light_manager()->build_shadow_caster_directional(
-            "directional-light", nullptr,
-            1024,
-            10.0f,
-            1.0f,
-            20.0f,
-            GxLightBuilderEndCaller([scene_builder](GxLightBuilderPtr&& light_builder) {
-                light_builder->get_shadow_caster_directional()->get_shadow_transform()->local_look_at(
+        GxCameraManager::get().build(
+            "camera", scene_entity.get(),
+            GxEntityEndCaller([this, end](GxEntityPtr&& entity) -> void {
+                auto trn = entity->get_component_shared_ptr<GxTransform>();
+                trn->set_local_position({ 0.0f, 0.0f, 5.0f });
+                (void)GxConstraintManager::get().create_jet_controller(
+                    entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+            }));
+
+        GxLightManager::get().build_shadow_caster_directional(
+            "directional-light", scene_entity.get(),
+            1024, 10.0f, 1.0f, 20.0f,
+            GxEntityEndCaller([this, end](GxEntityPtr&& entity) {
+                auto* const l = entity->get_component<GxShadowCaster>();
+                l->get_shadow_transform()->local_look_at(
                     { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
-                light_builder->get_light().colour = { 8.0f, 8.0f, 8.0f };
-                scene_builder->add(std::move(light_builder)); }),
-            GxEndCaller([] {}));
+                l->colour = { 8.0f, 8.0f, 8.0f };
+            }));
     }
 
     void update() override
     {
         Application::update();
-        GxWorld::get()->parallel_system<GxAll<Speed, Position, GxTransformComp>>(
-            [&](auto, Speed* const speed, Position* const position, GxTransformComp* const trn, const auto /*kernel_index*/) noexcept {
-                position->update(render_engine.get_delta_time(), *speed);
+        GxWorld::get().parallel_system<GxAll<Speed, Position, GxTransform>>(
+            [&](auto, Speed* const speed, Position* const position, GxTransform* const trn, const auto /*kernel_index*/) noexcept {
+                position->update(GxRenderEngine::get().get_delta_time(), *speed);
                 speed->update(*position);
                 trn->set_local_position(position->value);
             });

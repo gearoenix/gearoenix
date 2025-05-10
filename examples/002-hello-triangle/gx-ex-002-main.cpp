@@ -108,11 +108,6 @@ public:
 
         scene_entity->add_to_world();
     }
-
-    void update() override
-    {
-        Application::update();
-    }
 };
 
 GEAROENIX_START(GameApp)
