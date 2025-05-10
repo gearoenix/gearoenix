@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include <string>
@@ -13,10 +14,14 @@ struct TextureCube;
 }
 
 namespace gearoenix::render::reflection {
-struct Manager {
+struct Baked;
+struct Manager : core::Singleton<Manager> {
+    GX_GET_CREF_PRT(std::shared_ptr<Baked>, black);
 
+public:
     Manager();
-    virtual ~Manager();
+    ~Manager() override;
+
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;

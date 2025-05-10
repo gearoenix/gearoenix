@@ -43,10 +43,7 @@ struct Bloom final {
 };
 
 struct Camera final {
-    math::Mat4x4<float> view_projection;
     math::Vec4<float> viewport_clip;
-    math::Vec3<float> position;
-    std::optional<Bloom> bloom = std::nullopt;
     /// This field is used for scaling the skybox to the far end and at the same time preventing clipping
     float skybox_scale = 1.0f;
     core::ecs::Entity* entity = nullptr;
@@ -60,6 +57,7 @@ struct Camera final {
     std::vector<math::Mat4x4<float>> mvps;
     std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
 
+    Camera();
     void clear();
     void update_models(physics::accelerator::Bvh<Model>& bvh);
     void update_models(Models& models);

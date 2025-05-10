@@ -158,10 +158,10 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
     push_debug_group(debug_group);
     glDepthMask(GL_FALSE);
     // Rendering skyboxes
-    const auto camera_pos_scale = math::Vec4(cmr.position, cmr.skybox_scale);
+    const math::Vec4 camera_pos_scale = { math::Vec3<float>(cmr.transform->get_global_position()), cmr.skybox_scale };
     bool is_equirectangular_current = true;
     skybox_equirectangular_shader->bind(current_shader);
-    skybox_equirectangular_shader->set_vp_data(cmr.view_projection.data());
+    skybox_equirectangular_shader->set_vp_data(cmr.camera->get_view_projection().data());
     skybox_equirectangular_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
     auto skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
     for (const auto& distance_skybox : scene.get_record().skyboxes.skyboxes) {
@@ -171,12 +171,12 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
             is_equirectangular_current = is_equirectangular;
             if (is_equirectangular) {
                 skybox_equirectangular_shader->bind(current_shader);
-                skybox_equirectangular_shader->set_vp_data(cmr.view_projection.data());
+                skybox_equirectangular_shader->set_vp_data(cmr.camera->get_view_projection().data());
                 skybox_equirectangular_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
                 skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
             } else {
                 skybox_cube_shader->bind(current_shader);
-                skybox_cube_shader->set_vp_data(cmr.view_projection.data());
+                skybox_cube_shader->set_vp_data(cmr.camera->get_view_projection().data());
                 skybox_cube_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
                 skybox_texture_bind_index = static_cast<enumerated>(skybox_cube_shader->get_albedo_index());
             }

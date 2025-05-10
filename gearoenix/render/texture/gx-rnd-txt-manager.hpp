@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
 #include "../gx-rnd-build-configuration.hpp"
@@ -24,7 +25,7 @@ struct DefaultCameraTargets final {
     std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
 };
 
-struct Manager {
+struct Manager : core::Singleton<Manager> {
 
 protected:
     std::mutex brdflut_lock;
@@ -58,8 +59,7 @@ protected:
 
 public:
     Manager();
-    virtual ~Manager();
-    [[nodiscard]] static Manager& get();
+    ~Manager() override;
     void read_gx3d(const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c);
     void read_gx3d(platform::stream::Stream& stream, core::job::EndCallerShared<Texture>&& c);
     void create_2d_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c);
