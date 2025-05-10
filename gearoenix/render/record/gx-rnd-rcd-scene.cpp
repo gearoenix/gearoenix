@@ -14,4 +14,6 @@ void gearoenix::render::record::Scene::update(core::ecs::Entity* const scene_ent
     core::sync::ParallelFor::exec(par_fns.begin(), par_fns.end(), [&](const auto& f, const auto) { f(); });
 
     cameras.update_models(models);
+    lights.update_models(models.static_models_bvh);
+    lights.update_models(models.dynamic_models_bvh);
 }

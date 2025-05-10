@@ -1,8 +1,7 @@
 #include "gx-gl-reflection.hpp"
-
-#include "../core/ecs/gx-cr-ecs-entity.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
@@ -139,10 +138,19 @@ void gearoenix::gl::ReflectionManager::build_runtime(
 }
 
 gearoenix::gl::ReflectionManager::ReflectionManager()
+    : Singleton<ReflectionManager>(this)
 {
     core::ecs::ComponentType::add<ReflectionProbe, RuntimeReflection>();
     core::ecs::ComponentType::add<BakedReflection>();
     core::ecs::ComponentType::add<RuntimeReflection>();
+
+    Singleton<TextureManager>::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](auto&& t) {
+        auto gt1 = std::dynamic_pointer_cast<TextureCube>(std::move(t));
+        auto gt2 = gt1;
+        black = core::Object::construct<BakedReflection>(
+            "reflection-default-black", std::move(gt1), std::move(gt2),
+            math::Aabb3(math::Vec3(std::numeric_limits<double>::max()), -math::Vec3(std::numeric_limits<double>::max())));
+    }));
 }
 
 gearoenix::gl::ReflectionManager::~ReflectionManager() = default;

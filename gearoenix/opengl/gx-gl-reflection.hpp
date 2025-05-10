@@ -80,7 +80,7 @@ public:
     ~RuntimeReflection() override;
 };
 
-struct ReflectionManager final : render::reflection::Manager {
+struct ReflectionManager final : render::reflection::Manager, core::Singleton<ReflectionManager> {
 private:
     [[nodiscard]] core::ecs::EntityPtr build_baked(
         std::string&& name,

@@ -7,6 +7,7 @@
 #include "gx-rnd-rfl-runtime.hpp"
 
 gearoenix::render::reflection::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<Probe>();
     core::ecs::ComponentType::add<Runtime>();

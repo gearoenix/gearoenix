@@ -108,8 +108,10 @@ void gearoenix::gl::material::Pbr::render_forward(
         static_cast<std::uint32_t>(rls.shadow_caster_directionals.size()),
         static_cast<std::uint32_t>(rls.directionals.size()));
     shader.bind(current_shader);
-    shader.set_vp_data(camera.view_projection.data());
-    shader.set_camera_position_reserved_data(camera.position.data());
+    shader.set_vp_data(camera.camera->get_view_projection().data());
+
+    const math::Vec4 camera_position = { math::Vec3<float>(camera.transform->get_global_position()), 1.0f };
+    shader.set_camera_position_reserved_data(camera_position.data());
 
     if (rm.bones_count > 0) {
         static std::vector<std::array<math::Mat4x4<float>, 2>> bones_data;
@@ -152,6 +154,9 @@ void gearoenix::gl::material::Pbr::render_forward(
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directionals_direction;
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directionals_colour;
         for (const auto& [direction, light] : rls.directionals) {
+            if (!light) {
+                break;
+            }
             directionals_colour.emplace_back(light->colour);
             directionals_direction.emplace_back(direction);
         }
@@ -165,6 +170,9 @@ void gearoenix::gl::material::Pbr::render_forward(
         boost::container::static_vector<math::Vec3<float>, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> lights_colour;
 
         for (const auto* const l : rls.shadow_caster_directionals) {
+            if (!l) {
+                break;
+            }
             lights_colour.emplace_back(l->colour);
             lights_direction.emplace_back(l->direction);
             lights_vp.emplace_back(l->normalised_vp);

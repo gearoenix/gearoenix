@@ -45,7 +45,7 @@ public:
     void bind(enumerated texture_unit) const;
 };
 
-struct TextureManager final : render::texture::Manager {
+struct TextureManager final : render::texture::Manager, core::Singleton<TextureManager> {
     TextureManager();
     ~TextureManager() override;
 

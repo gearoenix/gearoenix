@@ -7,9 +7,15 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
-#include "../reflection/gx-rnd-rfl-probe.hpp"
+#include "../reflection/gx-rnd-rfl-baked.hpp"
+#include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "gx-rnd-rcd-model.hpp"
 #include <execution>
+
+gearoenix::render::record::Camera::Camera()
+    : threads_mvps(core::sync::threads_count())
+{
+}
 
 void gearoenix::render::record::Camera::clear()
 {
@@ -22,6 +28,8 @@ void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh<
     using node_t = std::remove_cvref_t<decltype(bvh)>::Data;
 
     const auto camera_location = transform->get_global_position();
+    auto* const black_probe = reflection::Manager::get().get_black().get();
+
     bvh.call_on_intersecting(*collider, [&, this](node_t& node) -> void {
         if ((node.user_data.model->cameras_flags & camera->get_flag()) == 0) {
             return;
@@ -30,7 +38,7 @@ void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh<
         const auto dis = dir.square_length();
         auto& m = node.user_data;
         if (parent_reflection_probe == m.probe) {
-            m.probe = nullptr;
+            m.probe = black_probe;
         }
         if (m.model->has_transparent_material()) {
             translucent_models.emplace_back(dis, &m);
@@ -73,10 +81,10 @@ void gearoenix::render::record::Camera::update_models(Models& models)
             }
             if (rm.armature) {
                 for (auto* const bone : rm.armature->get_all_bones()) {
-                    threads_mvps[ki].emplace_back(i, view_projection * math::Mat4x4<float>(bone->get_global_matrix()));
+                    threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
                 }
             } else {
-                threads_mvps[ki].emplace_back(i, view_projection * math::Mat4x4<float>(rm.transform->get_global_matrix()));
+                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
             }
         });
 
@@ -116,7 +124,7 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
             cam_ref.camera = cam;
             cam_ref.transform = trn;
             cam_ref.collider = cld;
-            ////////////////// TODO.........................................................
+
             indices_map.emplace(e, last_camera_index);
             switch (cam->get_usage()) {
             case camera::Camera::Usage::Main: {
@@ -143,9 +151,7 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
 
 void gearoenix::render::record::Cameras::update_models(Models& models)
 {
-    core::sync::ParallelFor::exec(
-        cameras.begin(), cameras.begin() + last_camera_index,
-        [&](auto& c, const auto) {
-            c.update_models(models);
-        });
+    core::sync::ParallelFor::exec(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
+        c.update_models(models);
+    });
 }

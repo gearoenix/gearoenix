@@ -27,7 +27,7 @@ void gearoenix::render::record::Lights::update(core::ecs::Entity* const scene_en
 
     core::ecs::World::get().parallel_system<core::ecs::All<light::ShadowCasterDirectional, physics::Transformation>>(
         [&](auto* const e, auto* const l, auto* const trn, const auto kernel_index) {
-            if (!l->get_enabled() || !trn->get_enabled() || e->contains_in_parents(scene_entity)) {
+            if (!l->get_enabled() || !trn->get_enabled() || !e->contains_in_parents(scene_entity)) {
                 return;
             }
 
@@ -42,6 +42,13 @@ void gearoenix::render::record::Lights::update(core::ecs::Entity* const scene_en
                     .transform = trn,
                 });
         });
+
+    for (auto& t : threads) {
+        shadow_caster_directionals.insert(
+            shadow_caster_directionals.end(),
+            std::make_move_iterator(t.shadow_caster_directionals.begin()),
+            std::make_move_iterator(t.shadow_caster_directionals.end()));
+    }
 }
 
 void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh<Model>& bvh)

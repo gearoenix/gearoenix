@@ -16,27 +16,12 @@
 #undef main
 #endif
 
-namespace {
-gearoenix::render::texture::Manager* instance = nullptr;
-}
-
 gearoenix::render::texture::Manager::Manager()
+    : Singleton(this)
 {
-    GX_ASSERT_D(!instance);
-    instance = this;
 }
 
-gearoenix::render::texture::Manager::~Manager()
-{
-    GX_ASSERT_D(instance);
-    instance = nullptr;
-}
-
-gearoenix::render::texture::Manager& gearoenix::render::texture::Manager::get()
-{
-    GX_ASSERT_D(instance);
-    return *instance;
-}
+gearoenix::render::texture::Manager::~Manager() = default;
 
 void gearoenix::render::texture::Manager::read_gx3d(
     const platform::stream::Path& path,
@@ -359,7 +344,7 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
             }
         }
     }
-    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented in near future.
+    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented soon.
     GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
     GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
     GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
@@ -397,7 +382,7 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
             }
         }
     }
-    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented in near future.
+    GX_ASSERT(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented soon.
     GX_ASSERT(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
     GX_ASSERT(0 == info.get_width()); // dimension changing does not have a high priority
     GX_ASSERT(0 == info.get_height()); // dimension changing does not have a high priority
@@ -581,7 +566,7 @@ gearoenix::math::Vec2<float> gearoenix::render::texture::Manager::integrate_brdf
 
     constexpr unsigned int SAMPLE_COUNT = 1024u;
     for (unsigned int i = 0u; i < SAMPLE_COUNT; ++i) {
-        // generates a sample vector that's biased towards the
+        // generates a sample vector biased towards the
         // preferred alignment direction (importance sampling).
         const auto xi = math::Vec2<float>::hammersley(i, SAMPLE_COUNT);
         const auto h = math::Vec3<float>::importance_sample_ggx(xi, n, roughness);
@@ -651,7 +636,7 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
     core::job::EndCaller<DefaultCameraTargets>&& callback)
 {
     static std::atomic unique_id = 0;
-    ++unique_id; // This allows to have multiple initialisations.
+    ++unique_id; // This allows having multiple initialisations.
 
     const auto unique_id_str = std::to_string(unique_id);
 

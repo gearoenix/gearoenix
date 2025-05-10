@@ -76,6 +76,7 @@ gearoenix::gl::Engine::~Engine()
     camera_manager = nullptr;
     physics_engine = nullptr;
     material_manager = nullptr;
+    reflection_manager = nullptr;
     core::job::execute_current_thread_jobs();
     ImGui_ImplOpenGL3_DestroyFontsTexture();
     ImGui_ImplOpenGL3_Shutdown();

@@ -259,7 +259,7 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
 
 void gearoenix::physics::Transformation::update_without_inverse_root()
 {
-    if (nullptr != entity->get_parent()) {
+    if (const auto* const parent = entity->get_parent(); parent != nullptr && parent->get_component<Transformation>() != nullptr) {
         return;
     }
     if (changed) {

@@ -329,6 +329,7 @@ void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) const
 }
 
 gearoenix::gl::TextureManager::TextureManager()
+    : Singleton<TextureManager>(this)
 {
 }
 

@@ -57,7 +57,14 @@ void gearoenix::render::RuntimeConfiguration::set_runtime_reflection_radiance_re
 
 std::uint8_t gearoenix::render::RuntimeConfiguration::compute_radiance_mipmaps_count(const std::uint16_t value)
 {
-    return static_cast<std::uint8_t>(math::Numeric::floor_log2(value) - 3);
+    const auto mc = math::Numeric::floor_log2(value);
+    if (mc < 3) {
+        return static_cast<std::uint8_t>(mc);
+    }
+    if (mc < 6) {
+        return 3;
+    }
+    return static_cast<std::uint8_t>(mc - 3);
 }
 
 void gearoenix::render::RuntimeConfiguration::show_debug_gui()

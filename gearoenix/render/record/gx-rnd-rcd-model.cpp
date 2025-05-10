@@ -7,6 +7,9 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
+#include "../reflection/gx-rnd-rfl-baked.hpp"
+#include "../reflection/gx-rnd-rfl-manager.hpp"
+#include "../reflection/gx-rnd-rfl-probe.hpp"
 #include <boost/functional/hash.hpp>
 
 void gearoenix::render::record::ModelThreadData::clear()
@@ -28,6 +31,8 @@ void gearoenix::render::record::Models::update(core::ecs::Entity* const scene_en
     }
 
     std::atomic refresh_static_bvh = false;
+    auto* const black_probe = reflection::Manager::get().get_black().get();
+
     core::ecs::World::get().parallel_system<core::ecs::All<model::Model, physics::Transformation, physics::collider::Collider>>(
         [&](auto* const e, auto* const mdl, auto* const trn, auto* const cld, const auto kernel_index) {
             if (!mdl->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
@@ -55,6 +60,7 @@ void gearoenix::render::record::Models::update(core::ecs::Entity* const scene_en
                 .armature = armature,
                 .transform = trn,
                 .collider = cld,
+                .probe = black_probe,
                 .bones_count = bones_count,
             };
 

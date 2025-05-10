@@ -52,13 +52,16 @@ void gearoenix::gl::LightManager::build_shadow_caster_directional(
     const float camera_aspect,
     core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
-    auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    entity->add_component(core::Object::construct<ShadowCasterDirectionalLight>(entity->get_object_name() + "-gl-directional-shadow-caster"));
-    const auto* const ptr = entity.get();
-    entity_callback.set_return(std::move(entity));
-    ptr->get_component_shared_ptr<ShadowCasterDirectionalLight>()->initialise(
-        shadow_map_resolution, camera_far, camera_near, camera_aspect,
-        core::job::EndCaller([e = std::move(entity_callback)] { }));
+    Manager::build_shadow_caster_directional(
+        std::move(name), parent, shadow_map_resolution, camera_far, camera_near, camera_aspect,
+        core::job::EndCaller<core::ecs::EntityPtr>([&](core::ecs::EntityPtr&& entity) -> void {
+            auto* const e = entity.get();
+            e->add_component(core::Object::construct<ShadowCasterDirectionalLight>(e->get_object_name() + "-gl-directional-shadow-caster"));
+            entity_callback.set_return(std::move(entity));
+            e->get_component_shared_ptr<ShadowCasterDirectionalLight>()->initialise(
+                shadow_map_resolution, camera_far, camera_near, camera_aspect,
+                core::job::EndCaller([e = std::move(entity_callback)] { (void)e; }));
+        }));
 }
 
 gearoenix::gl::LightManager::LightManager()
