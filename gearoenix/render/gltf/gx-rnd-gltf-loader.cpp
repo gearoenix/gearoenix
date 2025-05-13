@@ -55,12 +55,12 @@ void read_gltf(const std::shared_ptr<Context>& ctx, const platform::stream::Path
 
 void load(
     const platform::stream::Path& file,
-    const core::job::EndCaller<std::vector<core::ecs::EntityPtr>>& scenes_end_callback)
+    core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback)
 {
-    core::job::send_job_to_pool([file = file, scenes_end_callback] {
+    core::job::send_job_to_pool([file = file, scene_entities_end_callback] {
         const auto context = std::make_shared<Context>();
         read_gltf(context, file);
-        load_scenes(context, scenes_end_callback);
+        load_scenes(context, scene_entities_end_callback);
     });
 }
 }

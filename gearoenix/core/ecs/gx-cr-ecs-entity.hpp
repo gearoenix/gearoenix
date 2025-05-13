@@ -32,7 +32,7 @@ struct Entity final : Object {
     GX_GET_CREF_PRV(components_t, all_types_to_components);
 
     std::mutex children_lock;
-    GX_GET_CREF_PRV(children_t, children);
+    GX_GET_REF_PRV(children_t, children);
 
     void write(std::shared_ptr<platform::stream::Stream>&&, std::shared_ptr<ObjectStreamer>&&, job::EndCaller<>&&) override;
 
