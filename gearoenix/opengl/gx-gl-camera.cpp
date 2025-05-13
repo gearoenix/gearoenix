@@ -76,20 +76,23 @@ void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
 
 gearoenix::gl::Camera::Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
     : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
-    , bloom_prefilter_shader(shader::Manager::get().get_shader<shader::BloomPrefilter>())
-    , bloom_horizontal_shader(shader::Manager::get().get_shader<shader::BloomHorizontal>())
-    , bloom_vertical_shader(shader::Manager::get().get_shader<shader::BloomVertical>())
-    , bloom_upsampler_shader(shader::Manager::get().get_shader<shader::BloomUpsampler>())
-    , multiply_shader(shader::Manager::get().get_shader<shader::Multiply>())
-    , skybox_cube_shader(shader::Manager::get().get_shader<shader::SkyboxCube>())
-    , skybox_equirectangular_shader(shader::Manager::get().get_shader<shader::SkyboxEquirectangular>())
-    , colour_tuning_anti_aliasing_shader_combination(shader::Manager::get().get_combiner<shader::ColourTuningAntiAliasingCombination>())
 {
 }
 
 void gearoenix::gl::Camera::construct(const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
     c.set_return(Object::construct<Camera>(name, render::camera::Target(), std::move(transform)));
+    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c] {
+        auto& self = *c.get_return();
+        self.bloom_prefilter_shader = shader::Manager::get().get_shader<shader::BloomPrefilter>();
+        self.bloom_horizontal_shader = shader::Manager::get().get_shader<shader::BloomHorizontal>();
+        self.bloom_vertical_shader = shader::Manager::get().get_shader<shader::BloomVertical>();
+        self.bloom_upsampler_shader = shader::Manager::get().get_shader<shader::BloomUpsampler>();
+        self.multiply_shader = shader::Manager::get().get_shader<shader::Multiply>();
+        self.skybox_cube_shader = shader::Manager::get().get_shader<shader::SkyboxCube>();
+        self.skybox_equirectangular_shader = shader::Manager::get().get_shader<shader::SkyboxEquirectangular>();
+        self.colour_tuning_anti_aliasing_shader_combination = shader::Manager::get().get_combiner<shader::ColourTuningAntiAliasingCombination>();
+    });
     c.get_return()->initialise();
     c.get_return()->update_target(core::job::EndCaller([c] {
         c.get_return()->enable_bloom();

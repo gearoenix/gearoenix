@@ -4,39 +4,64 @@
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-builder.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
 #include <gearoenix/render/gltf/gx-rnd-gltf-loader.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-builder.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
+#include <ranges>
+
+template <typename T>
+using GxEndCaller = gearoenix::core::job::EndCaller<T>;
+
+typedef gearoenix::core::ecs::Entity GxEntity;
+typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
+typedef gearoenix::core::Object GxObject;
+typedef gearoenix::physics::constraint::Manager GxConstraintManager;
+typedef gearoenix::physics::Transformation GxTransform;
+typedef gearoenix::platform::stream::Path GxPath;
+typedef gearoenix::render::camera::Camera GxCamera;
+typedef std::vector<GxEntityPtr> GxEntityPtrs;
 
 struct GameApp final : gearoenix::core::Application {
-    gearoenix::core::ecs::entity_id_t scene_id = gearoenix::core::ecs::invalid_entity_id;
+private:
+    GxEntityPtrs scene_entities;
 
-    explicit GameApp(gearoenix::platform::Application& plt_app)
-        : Application(plt_app)
+public:
+    GameApp()
     {
-        gearoenix::core::job::EndCaller end_callback([this] {
-            gearoenix::core::ecs::World::get()->get_component<gearoenix::render::scene::Scene>(scene_id)->set_enabled(true);
-        });
-
         gearoenix::render::gltf::load(
-            gearoenix::platform::stream::Path::create_asset("sample.glb"),
-            gearoenix::core::job::EndCaller<std::vector<std::shared_ptr<gearoenix::render::scene::Builder>>>([this, end_callback](auto&& ss) mutable {
-                auto scene_builder = std::move(ss[0]);
-                scene_id = scene_builder->get_id();
-                auto& cb = *scene_builder->get_camera_builders().begin()->second;
-                (void)render_engine.get_physics_engine()->get_constraint_manager()->create_jet_controller(
-                    cb.get_entity_builder()->get_builder().get_name() + "-controller",
-                    std::dynamic_pointer_cast<gearoenix::physics::Transformation>(cb.get_transformation().get_component_self().lock()),
-                    std::move(end_callback));
-            }),
-            end_callback);
+            GxPath::create_asset("sample.glb"),
+            GxEndCaller<std::vector<GxEntityPtr>>([this](std::vector<GxEntityPtr>&& in_scene_entities) -> void {
+                scene_entities = std::move(in_scene_entities);
+                for (auto& e : scene_entities) {
+                    if (find_main_camera(e.get())) {
+                        break;
+                    }
+                }
+            }));
     }
 
-    void update() override
+    [[nodiscard]] bool find_main_camera(GxEntity* const e)
     {
-        Application::update();
+        if (const auto* const c = e->get_component<GxCamera>(); c && c->get_usage() == GxCamera::Usage::Main) {
+            set_camera(e);
+            return true;
+        }
+        for (auto& c : e->get_children() | std::views::values) {
+            if (find_main_camera(c.get())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void set_camera(const GxEntity* const e)
+    {
+        (void)GxConstraintManager::get().create_jet_controller(
+            e->get_object_name() + "-controller",
+            e->get_component_shared_ptr<GxTransform>(),
+            scene_entities[0].get());
+
+        scene_entities[0]->add_to_world();
     }
 };
 

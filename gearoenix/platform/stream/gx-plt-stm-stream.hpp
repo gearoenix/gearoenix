@@ -32,7 +32,7 @@ public:
 
     void read(std::string& s);
 
-    /// \note don't forget to seek to zero if you are calling this function with a newly built stream.
+    /// \note Remember to seek to zero if you are calling this function with a newly built stream.
     void read(Stream& s);
 
     template <typename T>
