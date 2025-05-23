@@ -1,5 +1,4 @@
 #include "gx-rnd-gltf-loader.hpp"
-#define TINYGLTF_IMPLEMENTATION
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
@@ -18,7 +17,7 @@ void load_scenes(
     core::job::EndCaller meshes_ready([ctx, scenes_end_callback] {
         const core::job::EndCaller gpu_end_callback([ctx, s = scenes_end_callback] { (void)s; (void)ctx; });
         for (int index = 0; index < ctx->data.scenes.size(); ++index) {
-            const tinygltf::Scene& scn = ctx->data.scenes[index];
+            const auto& scn = ctx->data.scenes[index];
             GX_LOG_D("Loading scene: " << scn.name);
             auto scene_entity = scene::Manager::get().build(std::string(scn.name), 0.0);
             for (const int scene_node_index : scn.nodes) {
@@ -42,11 +41,19 @@ void load_scenes(
 void read_gltf(const std::shared_ptr<Context>& ctx, const platform::stream::Path& file)
 {
     std::string err, warn;
-    const auto stream = platform::stream::Stream::open(file);
-    GX_ASSERT(nullptr != stream);
-    const auto file_data = stream->get_file_content();
-    if (!ctx->context.LoadBinaryFromMemory(&ctx->data, &err, &warn, file_data.data(), static_cast<unsigned int>(file_data.size())) || !err.empty()) {
-        GX_LOG_F("Error in GLTF loader: " << err);
+    if (const auto& raw_path = file.get_raw_data(); raw_path.ends_with(".gltf")) {
+        if (!ctx->context.LoadASCIIFromFile(&ctx->data, &err, &warn, raw_path)) {
+            GX_LOG_F("Error in GLTF loader: " << err);
+        }
+    } else if (raw_path.ends_with(".glb")) {
+        const auto stream = platform::stream::Stream::open(file);
+        GX_ASSERT(nullptr != stream);
+        const auto file_data = stream->get_file_content();
+        if (!ctx->context.LoadBinaryFromMemory(&ctx->data, &err, &warn, file_data.data(), static_cast<unsigned int>(file_data.size())) || !err.empty()) {
+            GX_LOG_F("Error in GLTF loader: " << err);
+        }
+    } else {
+        GX_LOG_F("Error in GLTF loader: Unknown file type: " << raw_path);
     }
     if (!warn.empty()) {
         GX_LOG_E("Warning in GLTF loader: " << warn);

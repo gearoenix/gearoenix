@@ -1,4 +1,6 @@
 #include "gx-rnd-mdl-model.hpp"
+#include "../imgui/gx-rnd-imgui-type-table.hpp"
+#include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../material/gx-rnd-mat-material.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 
@@ -11,6 +13,26 @@ gearoenix::render::model::Model::Model(
 }
 
 gearoenix::render::model::Model::~Model() = default;
+
+void gearoenix::render::model::Model::show_debug_gui()
+{
+    imgui::tree_scope(this, [this] {
+        Component::show_debug_gui();
+
+        imgui::table_scope("##gearoenix::render::model::Model", [this] {
+            ImGui::Text("Transformable:");
+            ImGui::TableNextColumn();
+            ImGui::Checkbox("##is_transformable", &is_transformable);
+        });
+
+        if (!meshes.empty() && ImGui::TreeNode("Meshes")) {
+            for (const auto& msh : meshes) {
+                msh->show_debug_gui();
+            }
+            ImGui::TreePop();
+        }
+    });
+}
 
 bool gearoenix::render::model::Model::has_transparent_material() const
 {

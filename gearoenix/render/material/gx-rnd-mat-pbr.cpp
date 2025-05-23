@@ -1,10 +1,12 @@
 #include "gx-rnd-mat-pbr.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../imgui/gx-rnd-imgui-type-table.hpp"
+#include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::Pbr::Pbr(const std::string& name)
-    : Material(name, Id::Pbr, false)
+gearoenix::render::material::Pbr::Pbr(const core::object_type_index_t final_type_index, std::string&& name)
+    : Material(final_type_index, std::move(name), false)
     , albedo_factor(1.0f)
     , emission_roughness_factor(1.0f)
     , normal_metallic_factor(1.0f)
@@ -57,6 +59,30 @@ gearoenix::render::material::Pbr::~Pbr() = default;
 void gearoenix::render::material::Pbr::set_albedo(std::shared_ptr<texture::Texture2D>&& o)
 {
     albedo = std::move(o);
+}
+
+void gearoenix::render::material::Pbr::show_debug_gui()
+{
+    imgui::tree_scope(this, [this] {
+        Material::show_debug_gui();
+
+        imgui::table_scope("##gearoenix::render::material::Pbr", [this] {
+            constexpr ImVec2 image_size { 200.0f, 200.0f };
+
+#define GX_MAT_HELPER(name, var)                    \
+    ImGui::Text(name ": ");                         \
+    ImGui::TableNextColumn();                       \
+    ImGui::Image(var->get_imgui_ptr(), image_size); \
+    ImGui::TableNextColumn();
+
+            GX_MAT_HELPER("Albedo", albedo);
+            GX_MAT_HELPER("Normal", normal);
+            GX_MAT_HELPER("Metallic Roughness", metallic_roughness);
+            GX_MAT_HELPER("Emission", emission);
+            GX_MAT_HELPER("Occlusion", occlusion);
+            GX_MAT_HELPER("BRDF LUT", brdflut);
+        });
+    });
 }
 
 void gearoenix::render::material::Pbr::set_normal(std::shared_ptr<texture::Texture2D>&& o)

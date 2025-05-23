@@ -25,5 +25,6 @@ public:
     Mesh& operator=(const Mesh&) = delete;
 
     virtual void set_material(std::shared_ptr<material::Material>&& material);
+    virtual void show_debug_gui();
 };
 }

@@ -34,7 +34,9 @@ void gearoenix::core::ecs::Entity::write(
 void gearoenix::core::ecs::Entity::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
-        render::imgui::table_scope("##gearoenix::core::ecs::Entity", [this] {
+        Object::show_debug_gui();
+
+        if (!all_types_to_components.empty() && ImGui::TreeNode("Components")) {
             static_flat_set<Component*, max_components> components;
             for (const auto& ci : all_types_to_components) {
                 components.emplace(ci.second.get());
@@ -42,7 +44,20 @@ void gearoenix::core::ecs::Entity::show_debug_gui()
             for (auto* const c : components) {
                 c->show_debug_gui();
             }
-        });
+            ImGui::TreePop();
+        }
+
+        if (!children.empty() && ImGui::TreeNode("Children")) {
+            for (auto& c : children) {
+                c.second->show_debug_gui();
+            }
+            ImGui::TreePop();
+        }
+
+        if (parent && ImGui::TreeNode("Parent")) {
+            parent->show_debug_gui();
+            ImGui::TreePop();
+        }
     });
 }
 

@@ -58,11 +58,10 @@ void gearoenix::render::widget::Button::construct(
     std::shared_ptr<Widget>&& parent,
     core::job::EndCallerShared<Button>&& end_callback)
 {
-    const auto material_name = name + "-material";
     core::job::EndCallerShared<material::Unlit> mat_end([n = std::move(name), pt = std::move(pressed_texture_asset), r = std::move(rest_texture_asset), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
         construct(std::move(n), std::move(m), std::move(pt), std::move(r), c, std::move(p), std::move(e));
     });
-    material::Manager::get().get_unlit(material_name, std::move(mat_end));
+    material::Manager::get().get_unlit(name + "-material", std::move(mat_end));
 }
 
 void gearoenix::render::widget::Button::construct(

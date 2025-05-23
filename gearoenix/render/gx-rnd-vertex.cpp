@@ -25,9 +25,9 @@ std::ostream& operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v
 const void* gearoenix::render::get_data(const Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case PBR_VERTEX_VARIANT_TYPE_INDEX:
         return std::get<std::vector<PbrVertex>>(vertices).data();
-    case 1:
+    case PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return std::get<std::vector<PbrVertexAnimated>>(vertices).data();
     default:
         GX_UNEXPECTED;
@@ -37,9 +37,9 @@ const void* gearoenix::render::get_data(const Vertices& vertices)
 std::uint64_t gearoenix::render::get_element_size(const Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case PBR_VERTEX_VARIANT_TYPE_INDEX:
         return sizeof(PbrVertex);
-    case 1:
+    case PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return sizeof(PbrVertexAnimated);
     default:
         GX_UNEXPECTED;
@@ -49,9 +49,9 @@ std::uint64_t gearoenix::render::get_element_size(const Vertices& vertices)
 bool gearoenix::render::has_bone_weights(const Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case PBR_VERTEX_VARIANT_TYPE_INDEX:
         return false;
-    case 1:
+    case PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return true;
     default:
         GX_UNEXPECTED;
@@ -61,9 +61,9 @@ bool gearoenix::render::has_bone_weights(const Vertices& vertices)
 bool gearoenix::render::has_bone_indices(const Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case PBR_VERTEX_VARIANT_TYPE_INDEX:
         return false;
-    case 1:
+    case PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return true;
     default:
         GX_UNEXPECTED;
@@ -187,9 +187,9 @@ void gearoenix::render::calculate_tangents(PbrVertices& vertices, const std::vec
 std::uint64_t gearoenix::core::count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case render::PBR_VERTEX_VARIANT_TYPE_INDEX:
         return std::get<std::vector<render::PbrVertex>>(vertices).size();
-    case 1:
+    case render::PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return std::get<std::vector<render::PbrVertexAnimated>>(vertices).size();
     default:
         GX_UNEXPECTED;
@@ -199,9 +199,9 @@ std::uint64_t gearoenix::core::count(const render::Vertices& vertices)
 std::uint64_t gearoenix::core::bytes_count(const render::Vertices& vertices)
 {
     switch (vertices.index()) {
-    case 0:
+    case render::PBR_VERTEX_VARIANT_TYPE_INDEX:
         return std::get<std::vector<render::PbrVertex>>(vertices).size() * sizeof(render::PbrVertex);
-    case 1:
+    case render::PBR_VERTEX_ANIMATED_VARIANT_TYPE_INDEX:
         return std::get<std::vector<render::PbrVertexAnimated>>(vertices).size() * sizeof(render::PbrVertexAnimated);
     default:
         GX_UNEXPECTED;

@@ -46,13 +46,14 @@ void gearoenix::gl::Buffer::construct(
     buffer->indices_count = static_cast<sizei>(indices.size());
     const auto vs_size = static_cast<sizeiptr>(core::bytes_count(vertices));
     const auto is_size = static_cast<sizeiptr>(sizeof(std::uint32_t) * indices.size());
-    end_callback.set_return(buffer);
-    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c = std::move(end_callback), b = std::move(buffer), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
+    end_callback.set_return(std::move(buffer));
+    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c = std::move(end_callback), vs = std::move(vertices), is = std::move(indices), vs_size, is_size, name = std::move(name)] {
         GX_GL_CHECK_D;
-        glGenVertexArrays(1, &(b->vertex_object));
-        glBindVertexArray(b->vertex_object);
-        glGenBuffers(1, &(b->vertex_buffer));
-        glBindBuffer(GL_ARRAY_BUFFER, b->vertex_buffer);
+        auto& b = dynamic_cast<Buffer&>(*c.get_return());
+        glGenVertexArrays(1, &b.vertex_object);
+        glBindVertexArray(b.vertex_object);
+        glGenBuffers(1, &b.vertex_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, b.vertex_buffer);
         glBufferData(GL_ARRAY_BUFFER, vs_size, render::get_data(vs), GL_STATIC_DRAW);
         glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION);
         glEnableVertexAttribArray(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_NORMAL);
@@ -81,13 +82,15 @@ void gearoenix::gl::Buffer::construct(
         if (render::has_bone_indices(vs)) {
             glVertexAttribPointer(GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_BONE_INDICES, 4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(pointer));
         }
-        glGenBuffers(1, &(b->index_buffer));
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b->index_buffer);
+        glGenBuffers(1, &b.index_buffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b.index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, is_size, is.data(), GL_STATIC_DRAW);
         glBindVertexArray(0);
-        set_buffer_label(b->vertex_buffer, name + "-vertex-buffer");
-        set_buffer_label(b->index_buffer, name + "-index-buffer");
-        set_vertex_array_label(b->vertex_object, name + "-vertex-array");
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        set_buffer_label(b.vertex_buffer, name + "-vertex-buffer");
+        set_buffer_label(b.index_buffer, name + "-index-buffer");
+        set_vertex_array_label(b.vertex_object, name + "-vertex-array");
         GX_GL_CHECK_D;
     });
 }
@@ -115,9 +118,7 @@ void gearoenix::gl::Mesh::construct(
     end_callback.set_return(mesh_allocator->make_shared(std::move(buffer), std::move(material)));
 }
 
-gearoenix::gl::MeshManager::MeshManager()
-{
-}
+gearoenix::gl::MeshManager::MeshManager() = default;
 
 gearoenix::gl::MeshManager::~MeshManager() = default;
 
@@ -136,7 +137,7 @@ void gearoenix::gl::MeshManager::build(
     std::shared_ptr<render::material::Material>&& material,
     core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
 {
-    Mesh::construct(std::move(buffer), std::move(material), std::move(end_callback));
+    Mesh::construct(std::move(buffer), std::move(material), end_callback);
 }
 
 #endif

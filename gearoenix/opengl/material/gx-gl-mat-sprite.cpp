@@ -1,6 +1,5 @@
 #include "gx-gl-mat-sprite.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../gx-gl-engine.hpp"
@@ -10,17 +9,16 @@
 #include "../shader/gx-gl-shd-shadow-caster.hpp"
 #include "../shader/gx-gl-shd-unlit.hpp"
 
-gearoenix::gl::material::Sprite::Sprite(const std::string& name)
-    : render::material::Sprite(name)
+gearoenix::gl::material::Sprite::Sprite(std::string&& name)
+    : render::material::Sprite(object_type_index, std::move(name))
     , shadow_caster_combination(shader::Manager::get().get_combiner<shader::ShadowCasterCombination>())
     , unlit_combination(shader::Manager::get().get_combiner<shader::UnlitCombination>())
 {
 }
 
-void gearoenix::gl::material::Sprite::construct(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c)
+void gearoenix::gl::material::Sprite::construct(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c)
 {
-    static auto allocator = core::allocator::SharedArray<Sprite, max_count>::construct();
-    const auto result = allocator->make_shared(name);
+    const auto result = Object::construct<Sprite>(std::move(name));
     c.set_return(result);
     result->initialise(std::move(c));
 }

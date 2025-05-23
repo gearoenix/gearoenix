@@ -1,6 +1,5 @@
 #include "gx-gl-mat-pbr.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../../core/gx-cr-cast.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
@@ -20,18 +19,17 @@
 #include "../shader/gx-gl-shd-manager.hpp"
 #include "../shader/gx-gl-shd-shadow-caster.hpp"
 
-gearoenix::gl::material::Pbr::Pbr(const std::string& name)
-    : render::material::Pbr(name)
+gearoenix::gl::material::Pbr::Pbr(std::string&& name)
+    : render::material::Pbr(object_type_index, std::move(name))
     , shadow_caster_combination(shader::Manager::get().get_combiner<shader::ShadowCasterCombination>())
     , forward_pbr_combination(shader::Manager::get().get_combiner<shader::ForwardPbrCombination>())
     , gbuffers_filler_combination(core::Singleton<Engine>::get().get_specification().is_deferred_supported ? new shader::GBuffersFiller() : nullptr)
 {
 }
 
-void gearoenix::gl::material::Pbr::construct(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c)
+void gearoenix::gl::material::Pbr::construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c)
 {
-    static const auto allocator = core::allocator::SharedArray<Pbr, max_count>::construct();
-    const auto result = allocator->make_shared(name);
+    const auto result = Object::construct<Pbr>(std::move(name));
     c.set_return(result);
     result->initialise(std::move(c));
 }
