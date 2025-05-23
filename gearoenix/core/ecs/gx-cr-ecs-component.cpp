@@ -38,9 +38,9 @@ gearoenix::core::ecs::Component::~Component() = default;
 void gearoenix::core::ecs::Component::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
-        render::imgui::table_scope("##gearoenix::core::ecs::Component", [this] {
-            Object::show_debug_gui();
+        Object::show_debug_gui();
 
+        render::imgui::table_scope("##gearoenix::core::ecs::Component", [this] {
             ImGui::Text("Enabled:");
             ImGui::TableNextColumn();
             ImGui::Checkbox("##enabled", &enabled);
@@ -54,5 +54,6 @@ void gearoenix::core::ecs::Component::show_debug_gui()
         if (nullptr != entity && ImGui::TreeNode("Entity")) {
             entity->show_debug_gui();
             ImGui::TreePop();
-        } });
+        }
+    });
 }

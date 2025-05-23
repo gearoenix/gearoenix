@@ -33,8 +33,7 @@ void gearoenix::render::widget::Text::construct(
     std::shared_ptr<Widget>&& parent,
     core::job::EndCallerShared<Text>&& end_callback)
 {
-    const auto mat_name = name + "-material";
-    material::Manager::get().get_unlit(mat_name, core::job::EndCallerShared<material::Unlit>([n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& mat) mutable {
+    material::Manager::get().get_unlit(name + "-material", core::job::EndCallerShared<material::Unlit>([n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& mat) mutable {
         construct(std::move(n), c, std::move(mat), std::move(p), std::move(e));
     }));
 }

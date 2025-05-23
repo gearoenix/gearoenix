@@ -40,8 +40,7 @@ void gearoenix::render::widget::Label::construct(
     std::shared_ptr<Widget>&& parent,
     core::job::EndCallerShared<Label>&& end_callback)
 {
-    const auto material_name = name + "-material";
-    material::Manager::get().get_unlit(material_name, core::job::EndCallerShared<material::Unlit>([n = std::move(name), t = std::move(background_texture), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
+    material::Manager::get().get_unlit(name + "-material", core::job::EndCallerShared<material::Unlit>([n = std::move(name), t = std::move(background_texture), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
         construct(std::move(n), std::move(t), std::move(m), c, std::move(p), std::move(e));
     }));
 }

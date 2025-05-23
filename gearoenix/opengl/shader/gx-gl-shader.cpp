@@ -23,7 +23,8 @@ void gearoenix::gl::shader::Shader::link() const
     if (is_success == 0) {
         info_log[max_length - 1] = '\n';
         GX_LOG_F("Error linking shader program: " << info_log);
-    } else if (info_log.size() > 5) {
+    }
+    if (info_log.size() > 5) {
         info_log[max_length - 1] = '\n';
         GX_LOG_D("Shader linking log is: " << info_log);
     }
@@ -92,6 +93,7 @@ void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd)
 gearoenix::gl::shader::Shader::Shader()
     : shader_program(glCreateProgram())
 {
+    GX_ASSERT_D(core::Singleton<Engine>::get().get_jobs_thread_id() == std::this_thread::get_id());
     if (shader_program == 0) {
         GX_LOG_F("Error creating shader program.");
     }

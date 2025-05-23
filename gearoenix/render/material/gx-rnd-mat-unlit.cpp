@@ -3,8 +3,8 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::material::Unlit::Unlit(const std::string& name)
-    : Material(name, Id::Unlit, true)
+gearoenix::render::material::Unlit::Unlit(const core::object_type_index_t final_type_index, std::string&& name)
+    : Material(final_type_index, std::move(name), true)
     , albedo_factor(1.0f, 1.0f, 1.0f, 1.0f)
 {
 }

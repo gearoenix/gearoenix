@@ -4,7 +4,11 @@
 
 namespace gearoenix::render::material {
 struct Pbr : Material {
-    constexpr static auto max_count = 8192; // we need this number because of example 004 but for your need change it
+    /// We need this number because of example-004 but for your project change it.
+    constexpr static auto max_count = 8192;
+    constexpr static auto object_type_index = gearoenix_render_material_pbr_type_index;
+    constexpr static std::array all_parent_object_type_indices { Material::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { Material::object_type_index };
 
     GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
     GX_GET_REF_PRT(math::Vec4<float>, emission_roughness_factor);
@@ -17,12 +21,13 @@ struct Pbr : Material {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, occlusion);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, brdflut);
 
-    explicit Pbr(const std::string& name);
+    Pbr(core::object_type_index_t final_type_index, std::string&& name);
     void initialise(core::job::EndCallerShared<Pbr>&& c);
 
 public:
     ~Pbr() override;
     void set_albedo(std::shared_ptr<texture::Texture2D>&&) override;
+    void show_debug_gui() override;
     virtual void set_normal(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_emission(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_metallic_roughness(std::shared_ptr<texture::Texture2D>&&);

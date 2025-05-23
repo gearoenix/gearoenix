@@ -1,7 +1,6 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include <memory>
 #include <vector>
 
 namespace gearoenix::platform::stream {

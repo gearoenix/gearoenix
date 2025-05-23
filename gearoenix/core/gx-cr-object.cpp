@@ -7,6 +7,7 @@
 gearoenix::core::Object::ObjectTypeInfos gearoenix::core::Object::object_type_infos;
 boost::container::flat_map<std::string, gearoenix::core::object_type_index_t> gearoenix::core::Object::object_type_name_to_index;
 std::atomic<gearoenix::core::object_id_t> gearoenix::core::Object::latest_id = 8;
+std::mutex gearoenix::core::Object::all_objects_lock;
 std::vector<std::weak_ptr<gearoenix::core::Object>> gearoenix::core::Object::all_objects = {};
 
 void gearoenix::core::Object::register_type(const object_type_index_t t, ObjectTypeInfo&& info)
@@ -79,6 +80,8 @@ void gearoenix::core::Object::show_debug_gui()
 void gearoenix::core::Object::register_object(const std::shared_ptr<Object>& object)
 {
     object->object_self = object;
+
+    std::lock_guard _l(all_objects_lock);
     while (all_objects.size() <= object->object_id) {
         all_objects.emplace_back();
     }
@@ -150,6 +153,14 @@ std::shared_ptr<gearoenix::core::Object> gearoenix::core::Object::find_object(co
         return all_objects[id].lock();
     }
     return nullptr;
+}
+
+bool gearoenix::core::Object::is_castable_to(const object_type_index_t ti) const
+{
+    if (object_final_type_index == ti) {
+        return true;
+    }
+    return get_all_parent_types().contains(ti);
 }
 
 void gearoenix::core::Object::read(

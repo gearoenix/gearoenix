@@ -80,6 +80,7 @@ struct Object {
     static ObjectTypeInfos object_type_infos;
     static boost::container::flat_map<std::string, object_type_index_t> object_type_name_to_index;
     static std::atomic<object_id_t> latest_id;
+    static std::mutex all_objects_lock;
     static std::vector<std::weak_ptr<Object>> all_objects;
 
     static void register_type(object_type_index_t t, ObjectTypeInfo&&);
@@ -189,5 +190,7 @@ public:
     {
         return cast<T>(find_object(id));
     }
+
+    [[nodiscard]] virtual bool is_castable_to(object_type_index_t ti) const;
 };
 }

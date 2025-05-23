@@ -9,7 +9,6 @@
 namespace gearoenix::render::record {
 struct Camera;
 struct CameraModel;
-struct Model;
 }
 
 namespace gearoenix::gl {

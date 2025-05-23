@@ -11,9 +11,9 @@ namespace gearoenix::gl::material {
 struct Manager final : render::material::Manager {
 
 private:
-    void construct_pbr(const std::string& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;
-    void construct_unlit(const std::string& name, core::job::EndCallerShared<render::material::Unlit>&& c) override;
-    void construct_sprite(const std::string& name, core::job::EndCallerShared<render::material::Sprite>&& c) override;
+    void construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;
+    void construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c) override;
+    void construct_sprite(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c) override;
 
 public:
     Manager();

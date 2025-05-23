@@ -1,5 +1,4 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
-#include "../../math/gx-math-matrix-4d.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
@@ -14,11 +13,7 @@ struct Mesh final {
     std::vector<std::shared_ptr<mesh::Mesh>> meshes;
 };
 
-void load_mesh(
-    const Context& context,
-    const int mesh_index,
-    const int primitive_index,
-    const core::job::EndCaller<>& end_callback)
+void load_mesh(const Context& context, const int mesh_index, const int primitive_index, const core::job::EndCaller<>& end_callback)
 {
     const auto& msh = context.data.meshes[mesh_index];
     const auto& primitive = msh.primitives[primitive_index];
@@ -235,7 +230,7 @@ void load_mesh(
     }
 
     const auto* const ids_b = &bfs[ids_bv.buffer].data[ids_bv.byteOffset];
-    const std::uint64_t ids_bi_inc = [&]() {
+    const std::uint64_t ids_bi_inc = [&] {
         if (ids_bv.byteStride > 0)
             return ids_bv.byteStride;
         switch (ids_a.componentType) {
@@ -295,33 +290,24 @@ void load_mesh(
     auto name = msh.name + "-primitive:" + std::to_string(primitive_index);
     if (is_animated) {
         mesh::Manager::get().build(
-            std::move(name),
-            std::move(animated_vertices),
-            std::move(indices),
-            box,
-            std::shared_ptr(context.materials.materials[primitive.material]),
-            std::move(mesh_end_callback));
+            std::move(name), std::move(animated_vertices), std::move(indices), box,
+            std::shared_ptr(context.materials.materials[primitive.material]), std::move(mesh_end_callback));
     } else {
         mesh::Manager::get().build(
-            std::move(name),
-            std::move(vertices),
-            std::move(indices),
-            box,
-            std::shared_ptr(context.materials.materials[primitive.material]),
-            std::move(mesh_end_callback));
+            std::move(name), std::move(vertices), std::move(indices), box,
+            std::shared_ptr(context.materials.materials[primitive.material]), std::move(mesh_end_callback));
     }
 }
 
-void load_mesh(
-    const Context& context,
-    const int mesh_index,
-    const core::job::EndCaller<>& end_callback)
+void load_mesh(const Context& context, const int mesh_index, const core::job::EndCaller<>& end_callback)
 {
     const auto& msh = context.data.meshes[mesh_index];
     GX_LOG_D("Loading mesh: " << msh.name);
     context.meshes.meshes[mesh_index]->meshes.resize(msh.primitives.size());
     for (int primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
-        load_mesh(context, mesh_index, primitive_index, end_callback);
+        core::job::send_job_to_pool([&context, mesh_index, primitive_index, end_callback] {
+            load_mesh(context, mesh_index, primitive_index, end_callback);
+        });
     }
 }
 }
@@ -371,8 +357,7 @@ bool gearoenix::render::gltf::Meshes::process(const int node_index, core::ecs::E
     for (const auto& m : meshes[node.mesh]->meshes) {
         meshes_set.insert(m);
     }
-    auto entity = model::Manager::get().build(
-        std::string(node.name), parent, std::move(meshes_set), true);
+    auto entity = model::Manager::get().build(std::string(node.name), parent, std::move(meshes_set), true);
     apply_transform(node_index, context, *entity->get_component<physics::Transformation>());
     return true;
 }

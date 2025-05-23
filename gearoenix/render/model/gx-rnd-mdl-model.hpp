@@ -35,6 +35,7 @@ public:
     std::uint64_t cameras_flags = static_cast<std::uint64_t>(-1);
 
     ~Model() override;
+    void show_debug_gui() override;
     [[nodiscard]] bool has_transparent_material() const;
     [[nodiscard]] bool needs_mvp() const;
 };

@@ -6,8 +6,23 @@
 
 namespace {
 #if GX_DEBUG_MODE
+std::mutex gx_textures_names_lock;
 std::unordered_set<std::string> gx_textures_names;
 #endif
+
+auto convert_wrap(const int w)
+{
+    switch (w) {
+    case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+        return gearoenix::render::texture::Wrap::ClampToEdge;
+    case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+        return gearoenix::render::texture::Wrap::Mirror;
+    case TINYGLTF_TEXTURE_WRAP_REPEAT:
+        return gearoenix::render::texture::Wrap::Repeat;
+    default:
+        GX_UNEXPECTED;
+    }
+}
 }
 
 gearoenix::render::gltf::Textures::Textures(const Context& c)
@@ -23,24 +38,29 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
     GX_LOG_D("Loading texture: " << txt.name);
     const auto& img = context.data.images[txt.source];
     GX_LOG_D("Loading image: " << img.name);
+    GX_LOG_D("Loading URI: " << img.uri);
+    auto txt_name = img.name;
+    if (txt_name.empty()) {
+        txt_name = img.uri;
+    }
+    if (txt_name.empty()) {
+        txt_name = txt.name;
+    }
+
 #if GX_DEBUG_MODE
     {
+        const std::lock_guard _lg(gx_textures_names_lock);
         const auto sz_before = gx_textures_names.size();
-        gx_textures_names.insert(img.name);
+        gx_textures_names.insert(txt_name);
         const auto sz_after = gx_textures_names.size();
         GX_ASSERT_D(sz_before < sz_after);
     }
 #endif
-    GX_ASSERT(!img.as_is); // Only image through bufferView is supported.
-    GX_ASSERT(img.bufferView >= 0); // Only image through bufferView is supported.
-    GX_ASSERT(img.mimeType.ends_with("jpeg") || img.mimeType.ends_with("png")); // Only these formats are supported.
-    const auto& img_bv = context.data.bufferViews[img.bufferView];
-    const auto& img_b = context.data.buffers[img_bv.buffer];
-    const void* const img_ptr = &img_b.data[img_bv.byteOffset];
-    const auto img_sz = static_cast<std::uint32_t>(img_bv.byteLength);
+
     const auto& smp = context.data.samplers[txt.sampler];
     GX_LOG_D("Loading sampler: " << smp.name);
     bool needs_mipmap = false;
+
     const auto convert_filter = [&](const int f) {
         switch (f) {
         case TINYGLTF_TEXTURE_FILTER_LINEAR:
@@ -63,37 +83,34 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
             GX_UNEXPECTED;
         }
     };
-    const auto convert_wrap = [&](const int w) {
-        switch (w) {
-        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
-            return texture::Wrap::ClampToEdge;
-        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
-            return texture::Wrap::Mirror;
-        case TINYGLTF_TEXTURE_WRAP_REPEAT:
-            return texture::Wrap::Repeat;
-        default:
-            GX_UNEXPECTED;
-        }
-    };
-    texture::Manager::get().create_2d_from_formatted(
-        std::string(img.name), img_ptr, img_sz,
-        texture::TextureInfo()
-            .set_format(texture::TextureFormat::Unknown)
-            .set_sampler_info(texture::SamplerInfo()
-                    .set_min_filter(convert_filter(smp.minFilter))
-                    .set_mag_filter(convert_filter(smp.magFilter))
-                    .set_wrap_s(convert_wrap(smp.wrapS))
-                    .set_wrap_t(convert_wrap(smp.wrapT)))
-            .set_width(0)
-            .set_height(0)
-            .set_depth(0)
-            .set_type(texture::Type::Unknown)
-            .set_has_mipmap(needs_mipmap),
-        core::job::EndCallerShared<texture::Texture2D>(
-            [this, index, end = std::move(end)](std::shared_ptr<texture::Texture2D>&& t) {
-                texture_2ds[index] = std::move(t);
-                (void)end;
-            }));
+
+    const auto min_filter = convert_filter(smp.minFilter);
+    const auto mag_filter = convert_filter(smp.magFilter);
+
+    const auto txt_info = texture::TextureInfo()
+                              .set_format(texture::TextureFormat::RgbaUint8)
+                              .set_sampler_info(texture::SamplerInfo()
+                                      .set_min_filter(min_filter)
+                                      .set_mag_filter(mag_filter)
+                                      .set_wrap_s(convert_wrap(smp.wrapS))
+                                      .set_wrap_t(convert_wrap(smp.wrapT)))
+                              .set_width(img.width)
+                              .set_height(img.height)
+                              .set_depth(0)
+                              .set_type(texture::Type::Texture2D)
+                              .set_has_mipmap(needs_mipmap);
+
+    core::job::EndCallerShared<texture::Texture2D> txt_end([this, index, end = std::move(end)](std::shared_ptr<texture::Texture2D>&& t) {
+        texture_2ds[index] = std::move(t);
+        (void)end;
+    });
+
+    GX_ASSERT_D(img.width > 0);
+    GX_ASSERT_D(img.height > 0);
+    GX_ASSERT_D(!img.as_is);
+    GX_ASSERT_D(img.image.size() == img.width * img.height * 4);
+
+    texture::Manager::get().create_2d_from_pixels(std::move(txt_name), { img.image }, txt_info, std::move(txt_end));
 }
 
 void gearoenix::render::gltf::Textures::load(core::job::EndCaller<>&& end)
