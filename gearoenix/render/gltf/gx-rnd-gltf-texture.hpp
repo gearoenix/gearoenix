@@ -11,9 +11,11 @@ namespace gearoenix::render::gltf {
 struct Context;
 struct Textures final {
     const Context& context;
-    std::vector<std::shared_ptr<texture::Texture2D>> texture_2ds;
+    std::vector<std::string> textures_names;
+    std::mutex textures_map_lock;
+    std::map<std::string, std::shared_ptr<texture::Texture2D>> textures_map;
 
-    Textures(const Context&);
+    explicit Textures(const Context&);
     ~Textures();
     void load(int index, core::job::EndCaller<>&&);
     void load(core::job::EndCaller<>&&);

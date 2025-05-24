@@ -109,7 +109,7 @@ void gearoenix::gl::Camera::render_shadow(const render::record::Camera& cmr, uin
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     for (auto& distance_model_data : cmr.all_models) {
         auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast<Model>(camera_model.model->model);
+        auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_shadow(cmr, camera_model, current_shader);
     }
     pop_debug_group();
@@ -141,7 +141,7 @@ void gearoenix::gl::Camera::render_forward(const Scene& scene, const render::rec
     // Rendering forward pbr
     for (auto& distance_model_data : cmr.all_models) {
         auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast<Model>(camera_model.model->model);
+        auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_forward(scene, cmr, camera_model, current_shader);
         GX_GL_CHECK_D;
     }

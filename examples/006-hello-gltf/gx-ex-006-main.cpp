@@ -43,7 +43,11 @@ public:
         gearoenix::render::gltf::load(
             // GxPath::create_asset("sample.glb"),
             GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\FlightHelmet\glTF\FlightHelmet.gltf)"),
-            GxEndCaller<std::vector<GxEntityPtr>>([this](std::vector<GxEntityPtr>&& in_scene_entities) -> void {
+            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\cube.gltf)"),
+            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\002-textured-cube.gltf)"),
+            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\003-textured-cubes.gltf)"),
+            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\004-flight-helmet.gltf)"),
+            GxEndCaller<std::vector<GxEntityPtr>>([this](std::vector<GxEntityPtr>&& in_scene_entities) {
                 scene_entities = std::move(in_scene_entities);
                 GX_ASSERT_D(!scene_entities.empty()); // No scene entities found.
                 bool camera_found = false;
@@ -83,17 +87,15 @@ public:
     void create_camera()
     {
         GxCamManager::get().build("camera", scene_entities[0].get(), GxEntityEndCaller([this](GxEntityPtr&& e) {
+            e->get_component<GxTransform>()->local_look_at({ 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
             set_camera(e.get());
         }));
     }
 
     void set_camera(const GxEntity* const e)
     {
-        e->get_component<GxTransform>()->local_look_at({ 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
-
         (void)GxConstraintManager::get().create_jet_controller(
-            e->get_object_name() + "-controller",
-            e->get_component_shared_ptr<GxTransform>(),
+            e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(),
             scene_entities[0].get());
 
         scene_entities[0]->add_to_world();

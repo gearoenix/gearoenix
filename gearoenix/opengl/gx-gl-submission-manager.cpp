@@ -407,7 +407,7 @@ void gearoenix::gl::submission::Manager::render_with_forward()
     for (auto* const scene : scenes | std::views::values) {
         const auto& record_cameras = scene->get_record().cameras;
         for (auto& camera_index : record_cameras.mains | std::views::values) {
-            auto& camera = *core::cast<Camera>(record_cameras.cameras[camera_index].camera);
+            auto& camera = *core::cast_ptr<Camera>(record_cameras.cameras[camera_index].camera);
             glBindTexture(GL_TEXTURE_2D, camera.get_gl_target().get_default().colour_attachments[1]);
             glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);

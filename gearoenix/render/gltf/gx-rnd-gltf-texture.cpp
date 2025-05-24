@@ -5,11 +5,6 @@
 #include <unordered_set>
 
 namespace {
-#if GX_DEBUG_MODE
-std::mutex gx_textures_names_lock;
-std::unordered_set<std::string> gx_textures_names;
-#endif
-
 auto convert_wrap(const int w)
 {
     switch (w) {
@@ -39,23 +34,6 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
     const auto& img = context.data.images[txt.source];
     GX_LOG_D("Loading image: " << img.name);
     GX_LOG_D("Loading URI: " << img.uri);
-    auto txt_name = img.name;
-    if (txt_name.empty()) {
-        txt_name = img.uri;
-    }
-    if (txt_name.empty()) {
-        txt_name = txt.name;
-    }
-
-#if GX_DEBUG_MODE
-    {
-        const std::lock_guard _lg(gx_textures_names_lock);
-        const auto sz_before = gx_textures_names.size();
-        gx_textures_names.insert(txt_name);
-        const auto sz_after = gx_textures_names.size();
-        GX_ASSERT_D(sz_before < sz_after);
-    }
-#endif
 
     const auto& smp = context.data.samplers[txt.sampler];
     GX_LOG_D("Loading sampler: " << smp.name);
@@ -100,8 +78,30 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
                               .set_type(texture::Type::Texture2D)
                               .set_has_mipmap(needs_mipmap);
 
-    core::job::EndCallerShared<texture::Texture2D> txt_end([this, index, end = std::move(end)](std::shared_ptr<texture::Texture2D>&& t) {
-        texture_2ds[index] = std::move(t);
+    auto txt_name = img.name;
+    if (txt_name.empty()) {
+        txt_name = img.uri;
+    }
+    if (txt_name.empty()) {
+        txt_name = txt.name;
+    }
+
+    // TODO: The reason for the following string concatenation is that, right now,
+    // the texture buffer and the sampler are one object, later in engine we have to make separation between them.
+    txt_name += "-info:" + std::to_string(txt_info.get_hash());
+    textures_names[index] = txt_name;
+
+    {
+        const std::lock_guard _lg(textures_map_lock);
+        if (textures_map.contains(txt_name)) {
+            return;
+        }
+        textures_map.emplace(txt_name, nullptr);
+    }
+
+    core::job::EndCallerShared<texture::Texture2D> txt_end([this, txt_name, end = std::move(end)](std::shared_ptr<texture::Texture2D>&& t) {
+        const std::lock_guard _(textures_map_lock);
+        textures_map[txt_name] = std::move(t);
         (void)end;
     });
 
@@ -115,28 +115,24 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
 
 void gearoenix::render::gltf::Textures::load(core::job::EndCaller<>&& end)
 {
-    const core::job::EndCaller e([e = std::move(end)] {
-#if GX_DEBUG_MODE
-        gx_textures_names = decltype(gx_textures_names) {};
-#endif
-        (void)e;
-    });
-
-    GX_ASSERT_D(texture_2ds.empty());
-    texture_2ds.resize(context.data.textures.size());
+    GX_ASSERT_D(textures_names.empty());
+    GX_ASSERT_D(textures_map.empty());
+    textures_names.resize(context.data.textures.size());
     for (int index = 0; index < context.data.textures.size(); ++index) {
-        core::job::send_job_to_pool([index, this, e = e]() mutable {
+        core::job::send_job_to_pool([index, this, e = end]() mutable {
             load(index, std::move(e));
         });
     }
 }
 
 const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::gltf::Textures::get(
-    const int index,
-    const std::shared_ptr<texture::Texture2D>& default_value) const
+    const int index, const std::shared_ptr<texture::Texture2D>& default_value) const
 {
     if (index < 0) {
         return default_value;
     }
-    return texture_2ds[index];
+    const auto search = textures_map.find(textures_names[index]);
+    GX_ASSERT_D(search != textures_map.end());
+    GX_ASSERT_D(search->second != nullptr);
+    return search->second;
 }
