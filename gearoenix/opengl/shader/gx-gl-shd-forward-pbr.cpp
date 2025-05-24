@@ -59,10 +59,10 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         vs << "        (bones_m_inv_m[bone_index.w] * bones_weight.w);\n";
     }
     vs << "    vec4 pos = m * vec4(position, 1.0);\n";
-    vs << "    out_nrm = (inv_m * vec4(normal, 0.0)).xyz;\n";
-    vs << "    out_tng = (inv_m * vec4(tangent.xyz, 0.0)).xyz;\n";
+    vs << "    out_nrm = normalize((inv_m * vec4(normal, 0.0)).xyz);\n";
+    vs << "    out_tng = normalize((inv_m * vec4(tangent.xyz, 0.0)).xyz);\n";
     vs << "    out_pos = pos.xyz;\n";
-    vs << "    out_btg = cross(out_nrm, out_tng) * tangent.w;\n";
+    vs << "    out_btg = normalize(cross(out_nrm, out_tng) * tangent.w);\n";
     vs << "    gl_Position = vp * pos;\n";
     vs << "}\n";
     set_vertex_shader(vs.str());
@@ -176,14 +176,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "        illumination += compute_light(\n";
         fs << "            directional_light_direction[" << dir_i << "],\n";
         fs << "            directional_light_colour[" << dir_i << "],\n";
-        fs << "            -eye,\n";
-        fs << "            nrm,\n";
-        fs << "            normal_dot_view,\n";
-        fs << "            roughness,\n";
-        fs << "            metallic,\n";
-        fs << "            f0,\n";
-        fs << "            f90,\n";
-        fs << "            alb.xyz);\n";
+        fs << "            -eye, nrm, normal_dot_view, roughness, metallic, f0, f90, alb.xyz);\n";
         fs << "    }\n";
     }
     for (int dir_i = 0; dir_i < static_cast<int>(shadow_casters_directional_lights_count); ++dir_i) {

@@ -188,7 +188,7 @@ public:
     template <typename T>
     [[nodiscard]] static std::shared_ptr<T> find_object_t(const object_id_t id)
     {
-        return cast<T>(find_object(id));
+        return cast_shared<T>(find_object(id));
     }
 
     [[nodiscard]] virtual bool is_castable_to(object_type_index_t ti) const;

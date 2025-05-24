@@ -24,7 +24,7 @@ void gearoenix::gl::Scene::render_shadows(uint& current_shader)
     push_debug_group(shadow_render_pass_name);
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
         auto& cmr_rcd = record.cameras.cameras[index];
-        core::cast<Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, current_shader);
+        core::cast_ptr<Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, current_shader);
     }
     pop_debug_group();
 }
@@ -44,7 +44,7 @@ void gearoenix::gl::Scene::render_forward(uint& current_shader)
     render_reflection_probes(current_shader);
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& camera = record.cameras.cameras[camera_index];
-        auto* const gl_cam = core::cast<Camera>(camera.camera);
+        auto* const gl_cam = core::cast_ptr<Camera>(camera.camera);
         gl_cam->render_forward(*this, camera, current_shader);
         gl_cam->render_bloom(*this, camera, current_shader);
         gl_cam->render_colour_correction_anti_aliasing(*this, camera, current_shader);

@@ -8,6 +8,9 @@
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
 
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+
 namespace gearoenix::render::gltf {
 struct Mesh final {
     std::vector<std::shared_ptr<mesh::Mesh>> meshes;
@@ -29,16 +32,22 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     auto bin_ai = -1;
     for (const auto& attrs = primitive.attributes; const auto& [a_name, ai] : attrs) {
         if ("POSITION" == a_name) {
+            GX_ASSERT_D(pos_ai == -1);
             pos_ai = ai;
         } else if ("NORMAL" == a_name) {
+            GX_ASSERT_D(nrm_ai == -1);
             nrm_ai = ai;
         } else if ("TANGENT" == a_name) {
+            GX_ASSERT_D(tng_ai == -1);
             tng_ai = ai;
         } else if ("TEXCOORD_0" == a_name) {
+            GX_ASSERT_D(txc_ai == -1);
             txc_ai = ai;
         } else if ("WEIGHTS_0" == a_name) {
+            GX_ASSERT_D(bwt_ai == -1);
             bwt_ai = ai;
         } else if ("JOINTS_0" == a_name) {
+            GX_ASSERT_D(bin_ai == -1);
             bin_ai = ai;
         } else {
             GX_UNEXPECTED;
@@ -58,40 +67,35 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     const auto& nrm_a = acs[nrm_ai];
     const auto* const tng_a = has_tangent ? &acs[tng_ai] : nullptr;
     const auto& txc_a = acs[txc_ai];
-    const auto& bwt_a = is_animated ? acs[bwt_ai] : acs[txc_ai];
-    const auto& bin_a = is_animated ? acs[bin_ai] : acs[txc_ai];
+    const auto* const bwt_a = is_animated ? &acs[bwt_ai] : nullptr;
+    const auto* const bin_a = is_animated ? &acs[bin_ai] : nullptr;
     const auto& ids_a = acs[primitive.indices];
 
-    GX_CHECK_EQUAL_D(pos_a.count, nrm_a.count);
-    if (has_tangent) {
-        GX_CHECK_EQUAL_D(pos_a.count, tng_a->count);
-    }
-    GX_CHECK_EQUAL_D(pos_a.count, txc_a.count);
-    GX_ASSERT_D(!is_animated || pos_a.count == bwt_a.count);
-    GX_ASSERT_D(!is_animated || pos_a.count == bin_a.count);
+    GX_ASSERT_D(pos_a.count > 0);
+    GX_ASSERT_D(pos_a.count == nrm_a.count);
+    GX_ASSERT_D(!tng_a || pos_a.count == tng_a->count);
+    GX_ASSERT_D(pos_a.count == txc_a.count);
+    GX_ASSERT_D(!is_animated || pos_a.count == bwt_a->count);
+    GX_ASSERT_D(!is_animated || pos_a.count == bin_a->count);
 
-    GX_CHECK_EQUAL_D(pos_a.type, TINYGLTF_TYPE_VEC3);
-    GX_CHECK_EQUAL_D(nrm_a.type, TINYGLTF_TYPE_VEC3);
-    if (has_tangent) {
-        GX_CHECK_EQUAL_D(tng_a->type, TINYGLTF_TYPE_VEC4);
-    }
-    GX_CHECK_EQUAL_D(txc_a.type, TINYGLTF_TYPE_VEC2);
-    GX_ASSERT_D(!is_animated || bwt_a.type == TINYGLTF_TYPE_VEC4);
-    GX_ASSERT_D(!is_animated || bin_a.type == TINYGLTF_TYPE_VEC4);
-    GX_CHECK_EQUAL_D(ids_a.type, TINYGLTF_TYPE_SCALAR);
+    GX_ASSERT_D(pos_a.type == TINYGLTF_TYPE_VEC3);
+    GX_ASSERT_D(nrm_a.type == TINYGLTF_TYPE_VEC3);
+    GX_ASSERT_D(!tng_a || tng_a->type == TINYGLTF_TYPE_VEC4);
+    GX_ASSERT_D(txc_a.type == TINYGLTF_TYPE_VEC2);
+    GX_ASSERT_D(!is_animated || bwt_a->type == TINYGLTF_TYPE_VEC4);
+    GX_ASSERT_D(!is_animated || bin_a->type == TINYGLTF_TYPE_VEC4);
+    GX_ASSERT_D(ids_a.type == TINYGLTF_TYPE_SCALAR);
 
-    GX_CHECK_EQUAL_D(pos_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    GX_CHECK_EQUAL_D(nrm_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    if (has_tangent) {
-        GX_CHECK_EQUAL_D(tng_a->componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    }
-    GX_CHECK_EQUAL_D(txc_a.componentType, TINYGLTF_COMPONENT_TYPE_FLOAT);
-    GX_ASSERT_D(!is_animated || bwt_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(pos_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(nrm_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(!tng_a || tng_a->componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(txc_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(!is_animated || bwt_a->componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 
     const auto& pos_max = pos_a.maxValues;
     const auto& pos_min = pos_a.minValues;
-    GX_CHECK_EQUAL_D(pos_max.size(), 3);
-    GX_CHECK_EQUAL_D(pos_min.size(), 3);
+    GX_ASSERT_D(pos_max.size() == 3);
+    GX_ASSERT_D(pos_min.size() == 3);
 
     const math::Aabb3 box(
         math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
@@ -102,183 +106,159 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     std::vector<std::uint32_t> indices(ids_a.count);
 
     const auto& pos_bv = bvs[pos_a.bufferView];
+    GX_ASSERT_D(pos_bv.target == GL_ARRAY_BUFFER);
     const auto& nrm_bv = bvs[nrm_a.bufferView];
-    const auto* const tng_bv = has_tangent ? &bvs[tng_a->bufferView] : nullptr;
+    GX_ASSERT_D(nrm_bv.target == GL_ARRAY_BUFFER);
+    const auto* const tng_bv = tng_a ? &bvs[tng_a->bufferView] : nullptr;
+    GX_ASSERT_D(!tng_bv || tng_bv->target == GL_ARRAY_BUFFER);
     const auto& txc_bv = bvs[txc_a.bufferView];
-    const auto& bwt_bv = is_animated ? bvs[bwt_a.bufferView] : bvs[txc_a.bufferView];
-    const auto& bin_bv = is_animated ? bvs[bin_a.bufferView] : bvs[txc_a.bufferView];
+    GX_ASSERT_D(txc_bv.target == GL_ARRAY_BUFFER);
+    const auto* const bwt_bv = is_animated ? &bvs[bwt_a->bufferView] : nullptr;
+    GX_ASSERT_D(!bwt_bv || bwt_bv->target == GL_ARRAY_BUFFER);
+    const auto* const bin_bv = is_animated ? &bvs[bin_a->bufferView] : nullptr;
+    GX_ASSERT_D(!bin_bv || bin_bv->target == GL_ARRAY_BUFFER);
     const auto& ids_bv = bvs[ids_a.bufferView];
+    GX_ASSERT_D(ids_bv.target == GL_ELEMENT_ARRAY_BUFFER);
 
     {
-        const auto* const pos_b = &bfs[pos_bv.buffer].data[pos_bv.byteOffset];
-        const std::uint64_t pos_bi_inc = pos_bv.byteStride > 0 ? pos_bv.byteStride : sizeof(math::Vec3<float>);
-        std::uint64_t bi = 0;
+        const auto& buff = bfs[pos_bv.buffer];
+        auto bi = pos_bv.byteOffset + pos_a.byteOffset;
+        const auto bi_inc = pos_a.ByteStride(pos_bv);
         for (auto& vertex : vertices) {
-            vertex.position = *reinterpret_cast<const math::Vec3<float>*>(&pos_b[bi]);
-            bi += pos_bi_inc;
+            vertex.position = *reinterpret_cast<const math::Vec3<float>*>(&buff.data[bi]);
+            bi += bi_inc;
         }
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
     {
-        const auto* const nrm_b = &bfs[nrm_bv.buffer].data[nrm_bv.byteOffset];
-        const std::uint64_t nrm_bi_inc = nrm_bv.byteStride > 0 ? nrm_bv.byteStride : sizeof(math::Vec3<float>);
-        std::uint64_t bi = 0;
+        const auto& buff = bfs[nrm_bv.buffer];
+        auto bi = nrm_bv.byteOffset + nrm_a.byteOffset;
+        const auto bi_inc = nrm_a.ByteStride(nrm_bv);
         for (auto& vertex : vertices) {
-            vertex.normal = *reinterpret_cast<const math::Vec3<float>*>(&nrm_b[bi]);
-            bi += nrm_bi_inc;
+            vertex.normal = *reinterpret_cast<const math::Vec3<float>*>(&buff.data[bi]);
+            bi += bi_inc;
         }
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
-    if (has_tangent) {
-        const auto* const tng_b = &bfs[tng_bv->buffer].data[tng_bv->byteOffset];
+    if (tng_bv) {
+        const auto& buff = bfs[tng_bv->buffer];
+        auto bi = tng_bv->byteOffset + tng_a->byteOffset;
         GX_ASSERT_D(tng_bv->byteStride <= 0 || tng_bv->byteStride >= sizeof(math::Vec4<float>));
-        const std::uint64_t tng_bi_inc = tng_bv->byteStride > 0 ? tng_bv->byteStride : sizeof(math::Vec4<float>);
-        std::uint64_t bi = 0;
+        const auto bi_inc = tng_a->ByteStride(*tng_bv);
         for (auto& vertex : vertices) {
-            vertex.tangent = *reinterpret_cast<const math::Vec4<float>*>(&tng_b[bi]);
-            bi += tng_bi_inc;
+            vertex.tangent = *reinterpret_cast<const math::Vec4<float>*>(&buff.data[bi]);
+            bi += bi_inc;
         }
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
     {
-        const auto* const txc_b = &bfs[txc_bv.buffer].data[txc_bv.byteOffset];
-        const std::uint64_t txc_bi_inc = txc_bv.byteStride > 0 ? txc_bv.byteStride : sizeof(math::Vec2<float>);
-        std::uint64_t bi = 0;
+        const auto& buff = bfs[txc_bv.buffer];
+        auto bi = txc_bv.byteOffset + txc_a.byteOffset;
+        const auto bi_inc = txc_a.ByteStride(txc_bv);
         for (auto& vertex : vertices) {
-            vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&txc_b[bi]);
+            vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&buff.data[bi]);
             vertex.uv.y = 1.0f - vertex.uv.y;
-            bi += txc_bi_inc;
+            bi += bi_inc;
         }
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
-    if (is_animated) {
-        {
-            const auto* const bwt_b = &bfs[bwt_bv.buffer].data[bwt_bv.byteOffset];
-            const std::uint64_t bwt_bi_inc = bwt_bv.byteStride > 0 ? bwt_bv.byteStride : sizeof(math::Vec4<float>);
-            std::uint64_t bi = 0;
-            for (auto& vertex : animated_vertices) {
-                vertex.bone_weights = *reinterpret_cast<const math::Vec4<float>*>(&bwt_b[bi]);
-                bi += bwt_bi_inc;
-            }
+    if (bwt_bv) {
+        const auto& buff = bfs[bwt_bv->buffer];
+        auto bi = bwt_bv->byteOffset + bwt_a->byteOffset;
+        const auto bi_inc = bwt_a->ByteStride(*bwt_bv);
+        for (auto& vertex : animated_vertices) {
+            vertex.bone_weights = *reinterpret_cast<const math::Vec4<float>*>(&buff.data[bi]);
+            bi += bi_inc;
         }
-
-        {
-            const auto* const bin_b = &bfs[bin_bv.buffer].data[bin_bv.byteOffset];
-            const auto bin_bi_inc = [&]() -> std::uint64_t {
-                if (bin_bv.byteStride > 0)
-                    return bin_bv.byteStride;
-                switch (bin_a.componentType) {
-                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-                case TINYGLTF_COMPONENT_TYPE_INT:
-                    return 16;
-                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-                case TINYGLTF_COMPONENT_TYPE_SHORT:
-                    return 8;
-                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-                case TINYGLTF_COMPONENT_TYPE_BYTE:
-                    return 4;
-                default:
-                    GX_UNEXPECTED;
-                }
-            }();
-            std::uint64_t bi = 0;
-            const auto convert_indices = [&]<typename T>() {
-                const auto is = math::Vec4<int>(*reinterpret_cast<const math::Vec4<T>*>(&bin_b[bi]));
-                return math::Vec4<float>(is) + math::Numeric::epsilon<float>;
-            };
-            switch (bin_a.componentType) {
-            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::uint32_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            case TINYGLTF_COMPONENT_TYPE_INT:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::int32_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::uint16_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            case TINYGLTF_COMPONENT_TYPE_SHORT:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::int16_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::uint8_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            case TINYGLTF_COMPONENT_TYPE_BYTE:
-                for (auto& vertex : animated_vertices) {
-                    vertex.bone_indices = convert_indices.operator()<std::int8_t>();
-                    bi += bin_bi_inc;
-                }
-                break;
-            default:
-                GX_UNEXPECTED;
-            }
-        }
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
-    const auto* const ids_b = &bfs[ids_bv.buffer].data[ids_bv.byteOffset];
-    const std::uint64_t ids_bi_inc = [&] {
-        if (ids_bv.byteStride > 0)
-            return ids_bv.byteStride;
-        switch (ids_a.componentType) {
+    if (bin_bv) {
+        const auto& buff = bfs[bin_bv->buffer];
+        auto bi = bin_bv->byteOffset + bin_a->byteOffset;
+        const auto bi_inc = bin_a->ByteStride(*bin_bv);
+        const auto convert_indices = [&]<typename T>() {
+            auto ret = math::Vec4<float>(*reinterpret_cast<const math::Vec4<T>*>(&buff.data[bi])) + math::Numeric::epsilon<float>;
+            bi += bi_inc;
+            return ret;
+        };
+        switch (bin_a->componentType) {
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::uint32_t>();
+            }
+            break;
         case TINYGLTF_COMPONENT_TYPE_INT:
-            return sizeof(std::uint32_t);
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::int32_t>();
+            }
+            break;
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::uint16_t>();
+            }
+            break;
         case TINYGLTF_COMPONENT_TYPE_SHORT:
-            return sizeof(std::uint16_t);
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::int16_t>();
+            }
+            break;
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::uint8_t>();
+            }
+            break;
         case TINYGLTF_COMPONENT_TYPE_BYTE:
-            return sizeof(std::uint8_t);
+            for (auto& vertex : animated_vertices) {
+                vertex.bone_indices = convert_indices.operator()<std::int8_t>();
+            }
+            break;
         default:
             GX_UNEXPECTED;
         }
-    }();
-    std::uint64_t bi = 0;
-    switch (ids_a.componentType) {
-    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-    case TINYGLTF_COMPONENT_TYPE_INT:
-        for (auto& i : indices) {
-            i = *reinterpret_cast<const std::uint32_t*>(&ids_b[bi]);
-            bi += ids_bi_inc;
+        GX_ASSERT_D(buff.data.size() >= bi);
+    }
+    {
+        const auto& buff = bfs[ids_bv.buffer];
+        auto bi = ids_bv.byteOffset + ids_a.byteOffset;
+        const auto bi_inc = ids_a.ByteStride(ids_bv);
+        switch (ids_a.componentType) {
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            for (auto& i : indices) {
+                i = *reinterpret_cast<const std::uint32_t*>(&buff.data[bi]);
+                bi += bi_inc;
+            }
+            break;
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            for (auto& i : indices) {
+                i = *reinterpret_cast<const std::uint16_t*>(&buff.data[bi]);
+                bi += bi_inc;
+            }
+            break;
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            for (auto& i : indices) {
+                i = *reinterpret_cast<const std::uint8_t*>(&buff.data[bi]);
+                bi += bi_inc;
+            }
+            break;
+        default:
+            GX_UNEXPECTED;
         }
-        break;
-    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-    case TINYGLTF_COMPONENT_TYPE_SHORT:
-        for (auto& i : indices) {
-            i = *reinterpret_cast<const std::uint16_t*>(&ids_b[bi]);
-            bi += ids_bi_inc;
-        }
-        break;
-    case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-    case TINYGLTF_COMPONENT_TYPE_BYTE:
-        for (auto& i : indices) {
-            i = *reinterpret_cast<const std::uint8_t*>(&ids_b[bi]);
-            bi += ids_bi_inc;
-        }
-        break;
-    default:
-        GX_UNEXPECTED;
+        GX_ASSERT_D(buff.data.size() >= bi);
     }
 
     if (!has_tangent) {
         calculate_tangents(vertices, indices);
     }
 
-    for (std::uint64_t vi = 0; vi < animated_vertices.size(); ++vi) {
+    for (auto vi = decltype(animated_vertices.size()) { 0 }; vi < animated_vertices.size(); ++vi) {
         animated_vertices[vi].base = vertices[vi];
     }
 
@@ -287,15 +267,15 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
         (void)end_callback;
     });
 
+    auto material = context.materials.materials[primitive.material];
+
     auto name = msh.name + "-primitive:" + std::to_string(primitive_index);
     if (is_animated) {
         mesh::Manager::get().build(
-            std::move(name), std::move(animated_vertices), std::move(indices), box,
-            std::shared_ptr(context.materials.materials[primitive.material]), std::move(mesh_end_callback));
+            std::move(name), std::move(animated_vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
     } else {
         mesh::Manager::get().build(
-            std::move(name), std::move(vertices), std::move(indices), box,
-            std::shared_ptr(context.materials.materials[primitive.material]), std::move(mesh_end_callback));
+            std::move(name), std::move(vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
     }
 }
 

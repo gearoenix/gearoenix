@@ -46,7 +46,7 @@ void gearoenix::gl::material::Pbr::shadow(
     shadow_caster_shader.bind(current_shader);
     shadow_caster_shader.set_mvp_data(&camera.mvps[recorded_cam_model.first_mvp_index]);
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
-    shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
+    shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(alpha_factor_alpha_cutoff.data());
 
     glActiveTexture(GL_TEXTURE0 + shadow_caster_shader.get_albedo_index());
     glBindTexture(GL_TEXTURE_2D, gl_albedo->get_object());
@@ -124,9 +124,9 @@ void gearoenix::gl::material::Pbr::render_forward(
         shader.set_m_data(m.data());
         shader.set_inv_m_data(inv_m.data());
     }
-    shader.set_albedo_factor_data(reinterpret_cast<const float*>(&albedo_factor));
-    shader.set_normal_metallic_factor_data(reinterpret_cast<const float*>(&normal_metallic_factor));
-    shader.set_emission_roughness_factor_data(reinterpret_cast<const float*>(&emission_roughness_factor));
+    shader.set_albedo_factor_data(albedo_factor.data());
+    shader.set_normal_metallic_factor_data(normal_metallic_factor.data());
+    shader.set_emission_roughness_factor_data(emission_roughness_factor.data());
     alpha_cutoff_occlusion_strength_reserved_reserved.z = static_cast<float>(rm.probe->get_radiance_mips_count());
     shader.set_alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved_data(alpha_cutoff_occlusion_strength_reserved_reserved.data());
 
@@ -141,9 +141,9 @@ void gearoenix::gl::material::Pbr::render_forward(
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_occlusion_index()));
     glBindTexture(GL_TEXTURE_2D, gl_occlusion->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_irradiance_index()));
-    glBindTexture(GL_TEXTURE_CUBE_MAP, core::cast<const TextureCube>(rm.probe->get_irradiance().get())->get_object());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, core::cast_ptr<const TextureCube>(rm.probe->get_irradiance().get())->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_radiance_index()));
-    glBindTexture(GL_TEXTURE_CUBE_MAP, core::cast<const TextureCube>(rm.probe->get_radiance().get())->get_object());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, core::cast_ptr<const TextureCube>(rm.probe->get_radiance().get())->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_brdflut_index()));
     glBindTexture(GL_TEXTURE_2D, gl_brdflut->get_object());
 
@@ -181,7 +181,7 @@ void gearoenix::gl::material::Pbr::render_forward(
 
         for (std::uint32_t ti = 0; ti < rls.shadow_caster_directionals.size(); ++ti) {
             glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_shadow_caster_directional_light_shadow_map_indices()[ti]));
-            glBindTexture(GL_TEXTURE_2D, core::cast<const Texture2D>(rls.shadow_caster_directionals[ti]->shadow_caster_directional->get_shadow_map().get())->get_object());
+            glBindTexture(GL_TEXTURE_2D, core::cast_ptr<const Texture2D>(rls.shadow_caster_directionals[ti]->shadow_caster_directional->get_shadow_map().get())->get_object());
         }
     }
 
