@@ -37,7 +37,7 @@ template <typename T>
 
         ImGui::Text("Volume:");
         ImGui::TableNextColumn();
-        ImGui::Text("%d", v.get_volume());
+        ImGui::Text("%lf", v.get_volume());
     });
     return result;
 }

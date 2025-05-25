@@ -27,6 +27,12 @@ gearoenix::gl::Engine::Engine()
 {
     while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by others*/
     }
+
+    GX_LOG_D("OpenGL Vendor: " << glGetString(GL_VENDOR));
+    GX_LOG_D("OpenGL Render: " << glGetString(GL_RENDERER));
+    GX_LOG_D("OpenGL Version: " << glGetString(GL_VERSION));
+    GX_LOG_D("OpenGL Shading Language Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION));
+
     GX_GL_CHECK_D;
     ImGui_ImplOpenGL3_Init("#version 300 es");
     glGetError();
