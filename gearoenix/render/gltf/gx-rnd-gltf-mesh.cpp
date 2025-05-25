@@ -27,7 +27,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     auto pos_ai = -1;
     auto nrm_ai = -1;
     auto tng_ai = -1;
-    auto txc_ai = -1;
+    auto tx0_ai = -1;
     auto bwt_ai = -1;
     auto bin_ai = -1;
     for (const auto& attrs = primitive.attributes; const auto& [a_name, ai] : attrs) {
@@ -41,8 +41,8 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
             GX_ASSERT_D(tng_ai == -1);
             tng_ai = ai;
         } else if ("TEXCOORD_0" == a_name) {
-            GX_ASSERT_D(txc_ai == -1);
-            txc_ai = ai;
+            GX_ASSERT_D(tx0_ai == -1);
+            tx0_ai = ai;
         } else if ("WEIGHTS_0" == a_name) {
             GX_ASSERT_D(bwt_ai == -1);
             bwt_ai = ai;
@@ -56,7 +56,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(pos_ai != -1);
     GX_ASSERT_D(nrm_ai != -1);
     const auto has_tangent = tng_ai != -1;
-    GX_ASSERT_D(txc_ai != -1);
+    const auto has_tex_coord0 = tx0_ai != -1;
     const bool is_animated = bwt_ai != -1;
     GX_ASSERT_D(!is_animated || bin_ai != -1);
 
@@ -66,7 +66,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     const auto& pos_a = acs[pos_ai];
     const auto& nrm_a = acs[nrm_ai];
     const auto* const tng_a = has_tangent ? &acs[tng_ai] : nullptr;
-    const auto& txc_a = acs[txc_ai];
+    const auto* const tx0_a = has_tex_coord0 ? &acs[tx0_ai] : nullptr;
     const auto* const bwt_a = is_animated ? &acs[bwt_ai] : nullptr;
     const auto* const bin_a = is_animated ? &acs[bin_ai] : nullptr;
     const auto& ids_a = acs[primitive.indices];
@@ -74,14 +74,14 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(pos_a.count > 0);
     GX_ASSERT_D(pos_a.count == nrm_a.count);
     GX_ASSERT_D(!tng_a || pos_a.count == tng_a->count);
-    GX_ASSERT_D(pos_a.count == txc_a.count);
+    GX_ASSERT_D(!tx0_a || pos_a.count == tx0_a->count);
     GX_ASSERT_D(!is_animated || pos_a.count == bwt_a->count);
     GX_ASSERT_D(!is_animated || pos_a.count == bin_a->count);
 
     GX_ASSERT_D(pos_a.type == TINYGLTF_TYPE_VEC3);
     GX_ASSERT_D(nrm_a.type == TINYGLTF_TYPE_VEC3);
     GX_ASSERT_D(!tng_a || tng_a->type == TINYGLTF_TYPE_VEC4);
-    GX_ASSERT_D(txc_a.type == TINYGLTF_TYPE_VEC2);
+    GX_ASSERT_D(!tx0_a || tx0_a->type == TINYGLTF_TYPE_VEC2);
     GX_ASSERT_D(!is_animated || bwt_a->type == TINYGLTF_TYPE_VEC4);
     GX_ASSERT_D(!is_animated || bin_a->type == TINYGLTF_TYPE_VEC4);
     GX_ASSERT_D(ids_a.type == TINYGLTF_TYPE_SCALAR);
@@ -89,7 +89,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(pos_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
     GX_ASSERT_D(nrm_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
     GX_ASSERT_D(!tng_a || tng_a->componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
-    GX_ASSERT_D(txc_a.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
+    GX_ASSERT_D(!tx0_a || tx0_a->componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
     GX_ASSERT_D(!is_animated || bwt_a->componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 
     const auto& pos_max = pos_a.maxValues;
@@ -111,8 +111,8 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(nrm_bv.target == GL_ARRAY_BUFFER);
     const auto* const tng_bv = tng_a ? &bvs[tng_a->bufferView] : nullptr;
     GX_ASSERT_D(!tng_bv || tng_bv->target == GL_ARRAY_BUFFER);
-    const auto& txc_bv = bvs[txc_a.bufferView];
-    GX_ASSERT_D(txc_bv.target == GL_ARRAY_BUFFER);
+    const auto* const tx0_bv = tx0_a ? &bvs[tx0_a->bufferView] : nullptr;
+    GX_ASSERT_D(!tx0_bv || tx0_bv->target == GL_ARRAY_BUFFER);
     const auto* const bwt_bv = is_animated ? &bvs[bwt_a->bufferView] : nullptr;
     GX_ASSERT_D(!bwt_bv || bwt_bv->target == GL_ARRAY_BUFFER);
     const auto* const bin_bv = is_animated ? &bvs[bin_a->bufferView] : nullptr;
@@ -143,6 +143,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     }
 
     if (tng_bv) {
+        GX_ASSERT_D(tng_a);
         const auto& buff = bfs[tng_bv->buffer];
         auto bi = tng_bv->byteOffset + tng_a->byteOffset;
         GX_ASSERT_D(tng_bv->byteStride <= 0 || tng_bv->byteStride >= sizeof(math::Vec4<float>));
@@ -154,10 +155,11 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
         GX_ASSERT_D(buff.data.size() >= bi);
     }
 
-    {
-        const auto& buff = bfs[txc_bv.buffer];
-        auto bi = txc_bv.byteOffset + txc_a.byteOffset;
-        const auto bi_inc = txc_a.ByteStride(txc_bv);
+    if (tx0_bv) {
+        GX_ASSERT_D(tx0_a);
+        const auto& buff = bfs[tx0_bv->buffer];
+        auto bi = tx0_bv->byteOffset + tx0_a->byteOffset;
+        const auto bi_inc = tx0_a->ByteStride(*tx0_bv);
         for (auto& vertex : vertices) {
             vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&buff.data[bi]);
             vertex.uv.y = 1.0f - vertex.uv.y;

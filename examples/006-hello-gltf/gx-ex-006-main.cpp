@@ -42,11 +42,9 @@ public:
     {
         gearoenix::render::gltf::load(
             // GxPath::create_asset("sample.glb"),
-            GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\FlightHelmet\glTF\FlightHelmet.gltf)"),
-            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\cube.gltf)"),
-            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\002-textured-cube.gltf)"),
-            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\003-textured-cubes.gltf)"),
-            // GxPath::create_absolute(R"(C:\projects\assets\gltf-samples\004-flight-helmet.gltf)"),
+            // GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\Avocado\glTF\Avocado.gltf)"),
+            // GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\FlightHelmet\glTF\FlightHelmet.gltf)"),
+            GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\RiggedSimple\glTF\RiggedSimple.gltf)"),
             GxEndCaller<std::vector<GxEntityPtr>>([this](std::vector<GxEntityPtr>&& in_scene_entities) {
                 scene_entities = std::move(in_scene_entities);
                 GX_ASSERT_D(!scene_entities.empty()); // No scene entities found.
@@ -87,7 +85,7 @@ public:
     void create_camera()
     {
         GxCamManager::get().build("camera", scene_entities[0].get(), GxEntityEndCaller([this](GxEntityPtr&& e) {
-            e->get_component<GxTransform>()->local_look_at({ 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
+            e->get_component<GxTransform>()->local_look_at({ 2.0, 2.0, 2.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
             set_camera(e.get());
         }));
     }
@@ -130,7 +128,7 @@ public:
     {
         auto* const light = light_entity->get_component<GxShadowDirLight>();
         light->get_shadow_transform()->local_look_at({ 5.0, 5.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
-        light->colour = { 10.0f, 10.0f, 10.0f };
+        light->colour = { 2.0f, 2.0f, 2.0f };
     }
 
     void update() override
