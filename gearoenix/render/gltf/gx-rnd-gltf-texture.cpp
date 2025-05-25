@@ -35,48 +35,54 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
     GX_LOG_D("Loading image: " << img.name);
     GX_LOG_D("Loading URI: " << img.uri);
 
-    const auto& smp = context.data.samplers[txt.sampler];
-    GX_LOG_D("Loading sampler: " << smp.name);
-    bool needs_mipmap = false;
+    bool needs_mipmap = true;
+    auto sampler = texture::SamplerInfo();
 
-    const auto convert_filter = [&](const int f) {
-        switch (f) {
-        case TINYGLTF_TEXTURE_FILTER_LINEAR:
-            return texture::Filter::Linear;
-        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
-            needs_mipmap = true;
-            return texture::Filter::LinearMipmapLinear;
-        case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
-            needs_mipmap = true;
-            return texture::Filter::LinearMipmapNearest;
-        case TINYGLTF_TEXTURE_FILTER_NEAREST:
-            return texture::Filter::Nearest;
-        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
-            needs_mipmap = true;
-            return texture::Filter::NearestMipmapLinear;
-        case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
-            needs_mipmap = true;
-            return texture::Filter::NearestMipmapNearest;
-        default:
-            GX_UNEXPECTED;
-        }
-    };
+    if (txt.sampler >= 0) {
+        const auto& smp = context.data.samplers[txt.sampler];
+        GX_LOG_D("Loading sampler: " << smp.name);
 
-    const auto min_filter = convert_filter(smp.minFilter);
-    const auto mag_filter = convert_filter(smp.magFilter);
+        const auto convert_filter = [&](const int f) {
+            switch (f) {
+            case TINYGLTF_TEXTURE_FILTER_LINEAR:
+                needs_mipmap = false;
+                return texture::Filter::Linear;
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+                needs_mipmap = true;
+                return texture::Filter::LinearMipmapLinear;
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+                needs_mipmap = true;
+                return texture::Filter::LinearMipmapNearest;
+            case TINYGLTF_TEXTURE_FILTER_NEAREST:
+                needs_mipmap = false;
+                return texture::Filter::Nearest;
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
+                needs_mipmap = false;
+                return texture::Filter::NearestMipmapLinear;
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+                needs_mipmap = true;
+                return texture::Filter::NearestMipmapNearest;
+            default:
+                GX_UNEXPECTED;
+            }
+        };
 
-    const auto txt_info = texture::TextureInfo()
-                              .set_format(texture::TextureFormat::RgbaUint8)
-                              .set_sampler_info(texture::SamplerInfo()
-                                      .set_min_filter(min_filter)
-                                      .set_mag_filter(mag_filter)
-                                      .set_wrap_s(convert_wrap(smp.wrapS))
-                                      .set_wrap_t(convert_wrap(smp.wrapT)))
-                              .set_width(img.width)
-                              .set_height(img.height)
-                              .set_depth(0)
-                              .set_type(texture::Type::Texture2D)
-                              .set_has_mipmap(needs_mipmap);
+        sampler.set_min_filter(convert_filter(smp.minFilter));
+        sampler.set_mag_filter(convert_filter(smp.magFilter));
+
+        sampler.set_wrap_s(convert_wrap(smp.wrapS));
+        sampler.set_wrap_t(convert_wrap(smp.wrapT));
+    }
+
+    auto txt_info = texture::TextureInfo();
+    txt_info
+        .set_format(texture::TextureFormat::RgbaUint8)
+        .set_sampler_info(sampler)
+        .set_width(img.width)
+        .set_height(img.height)
+        .set_depth(0)
+        .set_type(texture::Type::Texture2D)
+        .set_has_mipmap(needs_mipmap);
 
     auto txt_name = img.name;
     if (txt_name.empty()) {

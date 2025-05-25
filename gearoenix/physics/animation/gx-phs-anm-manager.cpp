@@ -15,6 +15,9 @@ gearoenix::physics::animation::Manager::Manager()
     core::ecs::ComponentType::add<AnimationPlayer>();
     core::ecs::ComponentType::add<Armature>();
     core::ecs::ComponentType::add<Bone>();
+    core::Object::register_type<Animation>();
+    core::Object::register_type<ArmatureAnimation>();
+    core::Object::register_type<SpriteAnimation>();
     GX_ASSERT_D(!instance);
     instance = this;
 }

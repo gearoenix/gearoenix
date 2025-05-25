@@ -41,7 +41,7 @@ struct ArmatureAnimation final : Animation {
 };
 
 struct SpriteAnimation final : Animation {
-    constexpr static auto object_type_index = gearoenix_physics_animation_armature_animation_type_index;
+    constexpr static auto object_type_index = gearoenix_physics_animation_sprite_animation_type_index;
     constexpr static std::array all_parent_object_type_indices { Animation::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Animation::object_type_index };
 
