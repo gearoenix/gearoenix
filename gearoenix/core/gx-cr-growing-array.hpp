@@ -17,11 +17,11 @@ public:
         const GrowingArray& ref;
 
     public:
-        using difference_type = typename array_t::const_iterator::difference_type;
-        using value_type = typename array_t::const_iterator::value_type;
-        using pointer = typename array_t::const_iterator::pointer;
-        using reference = typename array_t::const_iterator::reference;
-        using iterator_category = typename array_t::const_iterator::iterator_category;
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = const T*;
+        using reference = const T&;
+        using iterator_category = std::forward_iterator_tag;
 
         constexpr const_iterator(const std::uintptr_t index, const GrowingArray& ref)
             : index(index)

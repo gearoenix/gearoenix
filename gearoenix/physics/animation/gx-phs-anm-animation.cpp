@@ -141,7 +141,7 @@ void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()
             [this] {
                 ImGui::Text("Count:");
                 ImGui::TableNextColumn();
-                ImGui::Text("%ul", count);
+                ImGui::Text("%lf", count);
             });
     });
 }
@@ -193,7 +193,7 @@ void gearoenix::physics::animation::AnimationPlayer::show_debug_gui()
 
                 ImGui::Text("Loop Time: ");
                 ImGui::TableNextColumn();
-                ImGui::Text("%d", loop_length_time);
+                ImGui::Text("%lf", loop_length_time);
             });
     });
 }

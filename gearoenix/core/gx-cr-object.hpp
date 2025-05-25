@@ -85,7 +85,7 @@ struct Object {
 
     static void register_type(object_type_index_t t, ObjectTypeInfo&&);
 
-    template <int N>
+    template <std::uintptr_t N>
     [[nodiscard]] static ObjectTypeIndexSet create_object_type_index_set(const std::array<object_type_index_t, N>& indices)
     {
         ObjectTypeIndexSet set;

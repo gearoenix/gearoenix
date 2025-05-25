@@ -29,7 +29,7 @@ struct Bone final : core::ecs::Component {
     GX_GET_REF_PRV(Vec3KeyFrameMap, translation_samples);
     GX_GETSET_VAL_PRV(std::uint32_t, index_in_armature, static_cast<std::uint32_t>(-1));
 
-    void write(platform::stream::Stream&) const;
+    void write(platform::stream::Stream&) const override;
     void read(platform::stream::Stream&, core::job::EndCaller<>&&);
 
 public:

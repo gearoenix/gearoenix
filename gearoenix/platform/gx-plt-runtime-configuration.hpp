@@ -1,5 +1,6 @@
 #pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include <cstdint>
 #include <string>
 
 namespace gearoenix::platform::stream {
