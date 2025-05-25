@@ -1,0 +1,7 @@
+{
+    "dependencies": [
+        "sdl3"
+    ],
+    "version": "0.1",
+    "name": "gearoenix"
+}

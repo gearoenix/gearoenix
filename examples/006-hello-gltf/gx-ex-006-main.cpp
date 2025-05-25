@@ -43,8 +43,8 @@ public:
         gearoenix::render::gltf::load(
             // GxPath::create_asset("sample.glb"),
             // GxPath::create_absolute(R"(C:\projects\glTF-Sample-Assets\Models\Avocado\glTF\Avocado.gltf)"),
-            GxPath::create_absolute("/home/thany/projects/glTF-Sample-Assets/Models/FlightHelmet/glTF/FlightHelmet.gltf"),
-            // GxPath::create_absolute("~/projects/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
+            // GxPath::create_absolute("/home/thany/projects/glTF-Sample-Assets/Models/FlightHelmet/glTF/FlightHelmet.gltf"),
+            GxPath::create_absolute("/home/thany/projects/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
             GxEndCaller<std::vector<GxEntityPtr>>([this](std::vector<GxEntityPtr>&& in_scene_entities) {
                 scene_entities = std::move(in_scene_entities);
                 GX_ASSERT_D(!scene_entities.empty()); // No scene entities found.
