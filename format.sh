@@ -34,7 +34,7 @@ else
   exit 1
 fi
 
-expected_version=19
+expected_version=20
 
 if ((major_version < expected_version)); then
   echo "${text_red}Error clang-format major version is equal to or greater than ${expected_version}.${text_reset}"
@@ -43,7 +43,7 @@ fi
 
 format_func() {
   echo "$1"
-  ${clang_format} -i -style=WebKit "$1" &
+  ${clang_format} -i "$1" &
   pids[$pi]=$!
   pi=$((pi + 1))
   pi=$((pi % np))

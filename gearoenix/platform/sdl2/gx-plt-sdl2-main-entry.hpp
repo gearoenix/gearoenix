@@ -9,7 +9,7 @@
 
 #define GX_MAIN_ENTRY_ARGS argc, argv
 
-#if GX_PLATFORM_WEBASSEMBLY
+#if GX_PLATFORM_WEBASSEMBLY || GX_PLATFORM_LINUX
 #define GX_SDL_MAIN int main
 #else
 #define GX_SDL_MAIN extern "C" SDLMAIN_DECLSPEC int main

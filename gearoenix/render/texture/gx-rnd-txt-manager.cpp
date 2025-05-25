@@ -169,6 +169,7 @@ void gearoenix::render::texture::Manager::create_2d_from_colour(
                                                                                      : colour.z * 255.0f + 0.51f);
     pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
                                                                                      : colour.w * 255.0f + 0.51f);
+
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
         const std::lock_guard _lg(textures_2d_lock);
@@ -453,6 +454,7 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
                                                                                      : colour.z * 255.0f + 0.51f);
     pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
                                                                                      : colour.w * 255.0f + 0.51f);
+
     auto name = "colour{" + std::to_string(pixels0[0]) + "," + std::to_string(pixels0[1]) + "," + std::to_string(pixels0[2]) + "," + std::to_string(pixels0[3]) + "}";
     {
         const std::lock_guard _lg(textures_cube_lock);

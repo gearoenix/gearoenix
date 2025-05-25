@@ -23,7 +23,7 @@ public:
     ~Armature() override;
     void set_root_bone(std::shared_ptr<Bone>&&);
     void sort_all_bones(const std::vector<int>& bone_indices);
-    void write(platform::stream::Stream&) const;
+    void write(platform::stream::Stream&) const override;
     void read(platform::stream::Stream&, core::job::EndCaller<>&&);
 };
 }

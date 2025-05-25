@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/container/flat_map.hpp>
+#include <cstdint>
 #include <functional>
 
 namespace gearoenix::platform::stream {

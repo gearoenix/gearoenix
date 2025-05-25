@@ -27,12 +27,12 @@ template <typename T>
 
         ImGui::Text("Diameter:");
         ImGui::TableNextColumn();
-        ImGui::Text("X: %d, Y: %d, Z: %d", v.get_diameter().x, v.get_diameter().y, v.get_diameter().z);
+        ImGui::Text("X: %lf, Y: %lf, Z: %lf", v.get_diameter().x, v.get_diameter().y, v.get_diameter().z);
         ImGui::TableNextColumn();
 
         ImGui::Text("Center:");
         ImGui::TableNextColumn();
-        ImGui::Text("X: %d, Y: %d, Z: %d", v.get_center().x, v.get_center().y, v.get_center().z);
+        ImGui::Text("X: %lf, Y: %lf, Z: %lf", v.get_center().x, v.get_center().y, v.get_center().z);
         ImGui::TableNextColumn();
 
         ImGui::Text("Volume:");

@@ -62,8 +62,8 @@ struct GearoenixCoreSyncParallelForData final {
     }
 };
 
-[[nodiscard]] std::mutex gearoenix_core_sync_parallel_for_data_lock;
-[[nodiscard]] std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
+std::mutex gearoenix_core_sync_parallel_for_data_lock;
+std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
 
 [[nodiscard]] std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise()
 {
