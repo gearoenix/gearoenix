@@ -140,6 +140,6 @@ enum struct Action {
     Triple,
 };
 
-void initialize_imgui_keymap();
+[[nodiscard]] int convert_keyboard_to_imgui(Id);
 [[nodiscard]] int convert_mouse_to_imgui(Id);
 }

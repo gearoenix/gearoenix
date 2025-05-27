@@ -1,5 +1,5 @@
-SET(GX_EDITOR_UI_SRC_DIR ${GX_EDITOR_SRC_DIR}/ui)
-SET(GX_EDITOR_UI_SRC
+set(GX_EDITOR_UI_SRC_DIR ${GX_EDITOR_SRC_DIR}/ui)
+set(GX_EDITOR_UI_SRC
         ${GX_EDITOR_UI_SRC_DIR}/gx-ed-ui-manager.cpp
         ${GX_EDITOR_UI_SRC_DIR}/gx-ed-ui-manager.hpp
         ${GX_EDITOR_UI_SRC_DIR}/gx-ed-ui-menu-bar.cpp

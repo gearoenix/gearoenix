@@ -2,7 +2,7 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include <boost/functional/hash.hpp>
-#include <imgui/imgui.h>
+#include <imgui.h>
 #include <tuple>
 // Keep it after imgui
 #include <ImGuizmo/ImGuizmo.h>

@@ -1,7 +1,7 @@
 #include "gx-rnd-mat-transparency.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../imgui/gx-rnd-imgui-id.hpp"
-#include <imgui/imgui.h>
+#include <ImGui/imgui.h>
 
 bool gearoenix::render::material::show_debug_gui(Transparency& inout)
 {

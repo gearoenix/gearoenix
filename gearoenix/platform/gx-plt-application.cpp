@@ -8,7 +8,7 @@
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 namespace {
 constexpr double click_time_threshold = 0.3;
@@ -44,7 +44,6 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     auto io_imgui = ImGui::GetIO();
     io_imgui.Fonts->AddFontDefault();
     io_imgui.BackendPlatformName = RuntimeConfiguration::get().get_application_name().c_str();
-    key::initialize_imgui_keymap();
 }
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
@@ -163,7 +162,7 @@ void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const k
 {
     const auto pressed = a == key::Action::Press;
     auto& io = ImGui::GetIO();
-    io.KeysDown[static_cast<int>(k)] = pressed;
+    io.AddKeyEvent(static_cast<ImGuiKey>(key::convert_keyboard_to_imgui(k)), pressed);
     switch (k) {
     case key::Id::LeftControl:
     case key::Id::RightControl:

@@ -1,0 +1,15 @@
+[submodule "gearoenix/submodules/ImGuiFileDialog"]
+	path = gearoenix/submodules/ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
+[submodule "gearoenix/submodules/ImGuizmo"]
+	path = gearoenix/submodules/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "gearoenix/submodules/ImGui"]
+	path = gearoenix/submodules/ImGui
+	url = https://github.com/ocornut/imgui.git
+[submodule "gearoenix/submodules/TinyGLTF"]
+	path = gearoenix/submodules/TinyGLTF
+	url = https://github.com/syoyo/tinygltf.git
+[submodule "gearoenix/submodules/stb"]
+	path = gearoenix/submodules/stb
+	url = https://github.com/nothings/stb.git

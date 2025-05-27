@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/gx-cr-string.hpp"
-#include <imgui/imgui.h>
+#include <ImGui/imgui.h>
 
 namespace gearoenix::render::imgui {
 template <typename T, typename Function>

@@ -1,6 +1,6 @@
 #pragma once
 #include "gx-rnd-imgui-id.hpp"
-#include <imgui/imgui.h>
+#include <ImGui/imgui.h>
 
 namespace gearoenix::render::imgui {
 template <typename Function>

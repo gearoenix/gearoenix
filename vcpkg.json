@@ -1,7 +1,8 @@
 {
-    "dependencies": [
-        "sdl3"
-    ],
-    "version": "0.1",
-    "name": "gearoenix"
+  "name": "gearoenix",
+  "version": "0.1",
+  "dependencies": [
+    "boost",
+    "sdl2"
+  ]
 }
