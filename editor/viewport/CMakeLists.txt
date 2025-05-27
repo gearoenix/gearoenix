@@ -1,5 +1,5 @@
-SET(GX_EDITOR_VIEWPORT_SRC_DIR ${GX_EDITOR_SRC_DIR}/viewport)
-SET(GX_EDITOR_VIEWPORT_SRC
+set(GX_EDITOR_VIEWPORT_SRC_DIR ${GX_EDITOR_SRC_DIR}/viewport)
+set(GX_EDITOR_VIEWPORT_SRC
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-button.cpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-button.hpp
         ${GX_EDITOR_VIEWPORT_SRC_DIR}/gx-ed-vp-camera.cpp

@@ -1,11 +1,6 @@
-INCLUDE(CTest)
-ENABLE_TESTING()
+include(CTest)
+enable_testing()
 
-ADD_EXECUTABLE (GearoenixGameEngineTests
-        ${GX_ENGINE_TEST_SRC}
-        gx-test-main.cpp)
-
-GX_ENGINE_PREPARE_TARGET(GearoenixGameEngineTests)
-TARGET_INCLUDE_DIRECTORIES (GearoenixGameEngineTests PRIVATE ${CMAKE_SOURCE_DIR} ${GX_GLM_PATH})
-ADD_TEST (NAME GearoenixGameEngineTests COMMAND GearoenixGameEngineTests)
-MESSAGE(STATUS "Gearoenix test target has been  created.")
+gx_prepare_target(GearoenixGameEngineTests SOURCES ${GX_ENGINE_TEST_SRC} gx-test-main.cpp)
+target_include_directories(GearoenixGameEngineTests PRIVATE ${CMAKE_SOURCE_DIR} ${GX_GLM_PATH})
+add_test(NAME GearoenixGameEngineTests COMMAND GearoenixGameEngineTests)

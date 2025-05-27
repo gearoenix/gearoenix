@@ -1,18 +1,27 @@
-SET(GX_ENGINE_SRC_DIR ${CMAKE_SOURCE_DIR}/gearoenix)
+set(GX_ENGINE_SRC_DIR ${CMAKE_SOURCE_DIR}/gearoenix)
 
-MESSAGE(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}.")
+message(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}.")
 
-FILE(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
-SET(GX_ENGINE_TEST_SRC ${GX_ENGINE_SRC})
-LIST(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*-test\\.hpp$")
-LIST(FILTER GX_ENGINE_TEST_SRC INCLUDE REGEX ".*-test\\.hpp$")
+file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
 
-SOURCE_GROUP(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_SRC})
-SOURCE_GROUP(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_TEST_SRC})
+list(FILTER GX_ENGINE_SUBMODULES_SRC INCLUDE REGEX ".*gearoenix/submodules/.*")
+list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*gearoenix/submodules/.*")
 
-SET(GX_ENGINE_TEST_SRC ${GX_ENGINE_TEST_SRC} PARENT_SCOPE)
+set(GX_ENGINE_TEST_SRC ${GX_ENGINE_SRC})
+list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*-test\\.hpp$")
+list(FILTER GX_ENGINE_TEST_SRC INCLUDE REGEX ".*-test\\.hpp$")
 
-SET(GX_ENGINE_IMGUI_SRC
+source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_SRC})
+source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_TEST_SRC})
+
+set(GX_ENGINE_TEST_SRC ${GX_ENGINE_TEST_SRC} PARENT_SCOPE)
+
+set(GX_ENGINE_SUBMODULE_DIR ${GX_ENGINE_SRC_DIR}/submodules)
+
+set_source_files_properties(${GX_ENGINE_SUBMODULES_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
+
+set(GX_IMGUI_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGui)
+add_library(ImGui STATIC
         ${GX_IMGUI_PATH}/imgui.cpp
         ${GX_IMGUI_PATH}/imgui_demo.cpp
         ${GX_IMGUI_PATH}/imgui_draw.cpp
@@ -21,81 +30,88 @@ SET(GX_ENGINE_IMGUI_SRC
         ${GX_IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
         ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp
         ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp)
-SET_SOURCE_FILES_PROPERTIES(${GX_ENGINE_IMGUI_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
-SOURCE_GROUP("imgui" FILES ${GX_ENGINE_IMGUI_SRC})
-SET(GX_ENGINE_SRC ${GX_ENGINE_SRC} ${GX_ENGINE_IMGUI_SRC})
+target_compile_options(ImGui PRIVATE ${GX_NO_WARNING_FLAG})
+target_compile_definitions(ImGui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
+target_include_directories(ImGui PRIVATE ${GX_IMGUI_PATH})
+target_link_libraries(ImGui PUBLIC Vulkan::Headers)
 
-SET(GX_ENGINE_IMGUI_FB_SRC ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
-SET_SOURCE_FILES_PROPERTIES(${GX_ENGINE_IMGUI_FB_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
-SOURCE_GROUP("imgui-fb" FILES ${GX_ENGINE_IMGUI_FB_SRC})
-SET(GX_ENGINE_SRC ${GX_ENGINE_SRC} ${GX_ENGINE_IMGUI_FB_SRC})
+set(GX_IMGUI_FB_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGuiFileDialog)
+add_library(ImGuiFileDialog STATIC ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
+target_compile_options(ImGuiFileDialog PRIVATE ${GX_NO_WARNING_FLAG})
+target_include_directories(ImGuiFileDialog PRIVATE ${GX_IMGUI_PATH})
 
-SET(GX_ENGINE_IMGIZMO_SRC
+set(GX_IMGIZMO_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGuizmo)
+add_library(ImGuizmo STATIC
         ${GX_IMGIZMO_PATH}/GraphEditor.cpp
         ${GX_IMGIZMO_PATH}/ImCurveEdit.cpp
         ${GX_IMGIZMO_PATH}/ImGradient.cpp
         ${GX_IMGIZMO_PATH}/ImGuizmo.cpp
         ${GX_IMGIZMO_PATH}/ImSequencer.cpp)
-SET_SOURCE_FILES_PROPERTIES(${GX_ENGINE_IMGIZMO_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
-SOURCE_GROUP("imgizmo" FILES ${GX_ENGINE_IMGIZMO_SRC})
-SET(GX_ENGINE_SRC ${GX_ENGINE_SRC} ${GX_ENGINE_IMGIZMO_SRC})
+target_compile_options(ImGuizmo PRIVATE ${GX_NO_WARNING_FLAG})
+target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 
-ADD_LIBRARY(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
+add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
+target_link_libraries(GearoenixGameEngine PUBLIC
+        ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2main SDL2::SDL2-static Boost::headers)
+target_include_directories(GearoenixGameEngine PRIVATE ${GX_ENGINE_SUBMODULE_DIR} ${GX_IMGUI_PATH})
 
-FOREACH (GX_LIB ${GX_DEBUG_LIBS})
-    TARGET_LINK_LIBRARIES(GearoenixGameEngine debug ${GX_LIB})
-ENDFOREACH ()
+foreach (GX_LIB ${GX_DEBUG_LIBS})
+    target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})
+endforeach ()
 
-FOREACH (GX_LIB ${GX_RELEASE_LIBS})
-    TARGET_LINK_LIBRARIES(GearoenixGameEngine optimized ${GX_LIB})
-ENDFOREACH ()
+foreach (GX_LIB ${GX_RELEASE_LIBS})
+    target_link_libraries(GearoenixGameEngine PUBLIC optimized ${GX_LIB})
+endforeach ()
 
-ADD_CUSTOM_TARGET(GearoenixAssets)
+add_custom_target(GearoenixAssets)
 
-FUNCTION(GX_ENGINE_PREPARE_TARGET GX_CURRENT_TARGET)
-    MESSAGE(STATUS "Preparing target ${GX_CURRENT_TARGET}")
-    IF (APPLE)
-        GX_METAL_PREPARE_TARGET(${GX_CURRENT_TARGET})
-        TARGET_LINK_LIBRARIES(${GX_CURRENT_TARGET} "-framework Metal -framework MetalKit")
-        IF (GX_IN_IOS)
-            TARGET_LINK_LIBRARIES(${GX_CURRENT_TARGET} "-framework UIKit")
-        ELSE (GX_IN_IOS)
-            TARGET_LINK_LIBRARIES(${GX_CURRENT_TARGET} "-framework Cocoa")
-        ENDIF (GX_IN_IOS)
-    ENDIF (APPLE)
-    TARGET_LINK_LIBRARIES(${GX_CURRENT_TARGET} GearoenixGameEngine)
-    IF (GX_IN_WINDOWS)
-        SET(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
-        ADD_CUSTOM_COMMAND(
-                TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/fmod.dll $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
-    ELSEIF (GX_IN_ANDROID)
-        SET(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
-    ELSEIF (GX_IN_LINUX)
-        SET(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
-        ADD_CUSTOM_COMMAND(
-                TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/libfmod.so $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
-        ADD_CUSTOM_COMMAND(
-                TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/libfmod.so.13 $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
-        ADD_CUSTOM_COMMAND(
-                TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_SDK_LIBS_PATH}/libfmod.so.13.11 $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>)
-    ENDIF ()
+function(gx_prepare_target GX_CURRENT_TARGET)
+    message(STATUS "Preparing target ${GX_CURRENT_TARGET}")
+
+    cmake_parse_arguments(PARSED_ARGS "" "" "SOURCES" ${ARGN})
+
+    if (NOT PARSED_ARGS_SOURCES)
+        message(FATAL_ERROR "gx_prepare_target: SOURCES argument is required.")
+    endif ()
+
+    if (${GX_IN_ANDROID})
+        add_library(main SHARED ${PARSED_ARGS_SOURCES})
+        set(GX_CURRENT_TARGET main)
+    else ()
+        add_executable(${GX_CURRENT_TARGET} ${GEAROENIX_EXE_TARGET} ${PARSED_ARGS_SOURCES})
+    endif ()
+    target_include_directories(${GX_CURRENT_TARGET} PRIVATE ${CMAKE_SOURCE_DIR})
+
+    if (APPLE)
+        gx_metal_prepare_target(${GX_CURRENT_TARGET})
+        target_link_libraries(${GX_CURRENT_TARGET} "-framework Metal -framework MetalKit")
+        if (GX_IN_IOS)
+            target_link_libraries(${GX_CURRENT_TARGET} "-framework UIKit")
+        else (GX_IN_IOS)
+            target_link_libraries(${GX_CURRENT_TARGET} "-framework Cocoa")
+        endif (GX_IN_IOS)
+    endif (APPLE)
+    target_link_libraries(${GX_CURRENT_TARGET} PRIVATE GearoenixGameEngine)
+    if (GX_IN_WINDOWS)
+        set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
+    elseif (GX_IN_ANDROID)
+        set(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
+    elseif (GX_IN_LINUX)
+        set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
+    endif ()
     # In WASM, for now, we have different approach for tha assets.
-    IF (NOT GX_IN_WASM)
-        ADD_CUSTOM_COMMAND(
+    if (NOT GX_IN_WASM)
+        add_custom_command(
                 TARGET ${GX_CURRENT_TARGET} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${GX_ASSET_DIR})
-        FILE(GLOB GX_ASSET_FILES ${GX_MAIN_ASSETS_PATH}/*)
-        FOREACH (GX_ASSET_FILE ${GX_ASSET_FILES})
-            ADD_CUSTOM_COMMAND(
+        file(GLOB GX_ASSET_FILES ${GX_MAIN_ASSETS_PATH}/*)
+        foreach (GX_ASSET_FILE ${GX_ASSET_FILES})
+            add_custom_command(
                     TARGET ${GX_CURRENT_TARGET} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_ASSET_FILE} ${GX_ASSET_DIR})
-        ENDFOREACH ()
-        ADD_DEPENDENCIES(${GX_CURRENT_TARGET} GearoenixAssets)
-    ENDIF ()
-ENDFUNCTION(GX_ENGINE_PREPARE_TARGET)
+        endforeach ()
+        add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)
+    endif ()
+endfunction(gx_prepare_target)
 
-SET(GX_ENGINE_SRC_DIR ${GX_ENGINE_SRC_DIR} PARENT_SCOPE)
+set(GX_ENGINE_SRC_DIR ${GX_ENGINE_SRC_DIR} PARENT_SCOPE)

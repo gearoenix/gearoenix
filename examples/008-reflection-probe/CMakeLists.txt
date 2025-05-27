@@ -1,13 +1,6 @@
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+set(GX_SRC_DIR ${GX_EXAMPLES_SRC_DIR}/008-reflection-probe)
+set(GX_SRC ${GX_SRC_DIR}/gx-ex-008-main.cpp)
 
-SET(GX_SRC_DIR ${GX_EXAMPLES_SRC_DIR}/008-reflection-probe)
-
-SET(GX_SRC ${GX_SRC_DIR}/gx-ex-008-main.cpp)
-
-IF (NOT CMAKE_SYSTEM_NAME MATCHES "Android")
-    ADD_EXECUTABLE(GearoenixExample008ReflectionProbe ${GEAROENIX_EXE_TARGET} ${GX_SRC})
-    GX_ENGINE_PREPARE_TARGET(GearoenixExample008ReflectionProbe)
-ELSEIF (GX_ENABLE_EXAMPLE_008_REFLECTION_PROBE)
-    ADD_LIBRARY(main SHARED ${GX_SRC})
-    GX_ENGINE_PREPARE_TARGET(main)
-ENDIF ()
+if (GX_ENABLE_EXAMPLE_008_REFLECTION_PROBE OR NOT GX_IN_ANDROID)
+    gx_prepare_target(GearoenixExample008ReflectionProbe SOURCES ${GX_SRC})
+endif ()

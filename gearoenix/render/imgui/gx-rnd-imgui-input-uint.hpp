@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 #define GX_IMGUI_VAR_INPUT_UINT(x)                       \
     [&] {                                                \

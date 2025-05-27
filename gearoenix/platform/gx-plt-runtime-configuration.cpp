@@ -6,7 +6,7 @@
 #include "../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "gx-plt-application.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
-#include <imgui/misc/cpp/imgui_stdlib.h>
+#include <ImGui/misc/cpp/imgui_stdlib.h>
 
 void gearoenix::platform::RuntimeConfiguration::write(stream::Stream& s) const
 {

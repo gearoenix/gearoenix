@@ -69,10 +69,10 @@ void gearoenix::render::material::Pbr::show_debug_gui()
         imgui::table_scope("##gearoenix::render::material::Pbr", [this] {
             constexpr ImVec2 image_size { 200.0f, 200.0f };
 
-#define GX_MAT_HELPER(name, var)                    \
-    ImGui::Text(name ": ");                         \
-    ImGui::TableNextColumn();                       \
-    ImGui::Image(var->get_imgui_ptr(), image_size); \
+#define GX_MAT_HELPER(name, var)                                                   \
+    ImGui::Text(name ": ");                                                        \
+    ImGui::TableNextColumn();                                                      \
+    ImGui::Image(reinterpret_cast<ImTextureID>(var->get_imgui_ptr()), image_size); \
     ImGui::TableNextColumn();
 
             GX_MAT_HELPER("Albedo", albedo);

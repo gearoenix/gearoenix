@@ -1,7 +1,7 @@
 #pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-rnd-imgui-id.hpp"
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 namespace gearoenix::render::imgui {
 template <typename T>
