@@ -51,9 +51,9 @@ target_compile_options(ImGuizmo PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
-target_link_libraries(GearoenixGameEngine PUBLIC
-        ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2main SDL2::SDL2-static Boost::headers)
-target_include_directories(GearoenixGameEngine PRIVATE ${GX_ENGINE_SUBMODULE_DIR} ${GX_IMGUI_PATH})
+target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2main SDL2::SDL2 Boost::headers)
+target_include_directories(GearoenixGameEngine PRIVATE ${GX_IMGUI_PATH})
+target_include_directories(GearoenixGameEngine PUBLIC ${GX_ENGINE_SUBMODULE_DIR})
 
 foreach (GX_LIB ${GX_DEBUG_LIBS})
     target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})
@@ -92,11 +92,10 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         endif (GX_IN_IOS)
     endif (APPLE)
     target_link_libraries(${GX_CURRENT_TARGET} PRIVATE GearoenixGameEngine)
-    if (GX_IN_WINDOWS)
-        set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
-    elseif (GX_IN_ANDROID)
+
+    if (GX_IN_ANDROID)
         set(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
-    elseif (GX_IN_LINUX)
+    else ()
         set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
     endif ()
     # In WASM, for now, we have different approach for tha assets.

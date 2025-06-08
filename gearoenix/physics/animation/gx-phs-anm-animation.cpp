@@ -110,6 +110,31 @@ void gearoenix::physics::animation::ArmatureAnimation::write(platform::stream::S
     GX_TODO; // we need object streamer hear
     // s.write_fail_debug(root_bone->get_entity_id());
 }
+gearoenix::math::Vec2<double> gearoenix::physics::animation::ArmatureAnimation::get_start_end() const
+{
+    math::Vec2 start_end { std::numeric_limits<double>::max(), -std::numeric_limits<double>::max() };
+    const auto smp_fun = [&] <typename SMP> (const SMP& s) {
+        if (!s.empty()) {
+            start_end.x = std::min(s.begin()->first, start_end.x);
+            start_end.y = std::max(s.rbegin()->first, start_end.y);
+        }
+    };
+    std::function<void(const Bone&)> trav_fun;
+    trav_fun = [&](const Bone& b) {
+        smp_fun(b.get_translation_samples());
+        smp_fun(b.get_rotation_samples());
+        smp_fun(b.get_scale_samples());
+        const auto& cs = b.get_entity()->get_children();
+        for (const auto& c : cs) {
+            const auto* const cb =  c.second->get_component<Bone>();
+            if (cb) {
+                trav_fun(*cb);
+            }
+        }
+    };
+    trav_fun(*root_bone);
+    return start_end;
+}
 
 gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
     std::string&& name,
@@ -154,6 +179,10 @@ void gearoenix::physics::animation::SpriteAnimation::write(platform::stream::Str
     s.write_fail_debug(count);
     aspect.write(s);
     uv_scale.write(s);
+}
+gearoenix::math::Vec2<double> gearoenix::physics::animation::SpriteAnimation::get_start_end() const
+{
+    GX_UNIMPLEMENTED;
 }
 
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
@@ -204,6 +233,9 @@ gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
     , time(starting_time)
     , animation(std::move(animation))
 {
+    const auto loop_start_end = this->animation->get_start_end();
+    loop_start_time = loop_start_end.x;
+    loop_end_time = loop_start_end.y;
 }
 
 gearoenix::physics::animation::AnimationPlayer::~AnimationPlayer() = default;

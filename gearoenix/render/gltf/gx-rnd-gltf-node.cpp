@@ -42,9 +42,9 @@ bool gearoenix::render::gltf::Nodes::process_empty(const int node_index, core::e
         return false;
     }
     const auto& node = context.data.nodes[node_index];
-    const auto transform = create_empty_entity_transform(node_index, context, parent);
+    auto empty_entity = create_empty_entity_transform(node_index, context, parent);
     for (const auto child : node.children) {
-        process(child, parent, end_callback);
+        process(child, empty_entity.get(), end_callback);
     }
     return true;
 }

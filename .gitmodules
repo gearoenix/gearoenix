@@ -13,3 +13,6 @@
 [submodule "gearoenix/submodules/stb"]
 	path = gearoenix/submodules/stb
 	url = https://github.com/nothings/stb.git
+[submodule "gearoenix/submodules/glTF-Sample-Assets"]
+	path = gearoenix/submodules/glTF-Sample-Assets
+	url = git@github.com:KhronosGroup/glTF-Sample-Assets.git

@@ -5,7 +5,7 @@
 #include "gx-ed-ui-menu-window.hpp"
 #include "gx-ed-ui-menu-world.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
-#include <imgui/imgui.h>
+#include <ImGui/imgui.h>
 
 gearoenix::editor::ui::MenuBar::MenuBar(Manager& manager)
     : manager(manager)

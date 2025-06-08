@@ -112,9 +112,9 @@ void gearoenix::render::gltf::Animations::load()
             GX_ASSERT_D(input_byte_length <= input_bv.byteLength);
             GX_ASSERT_D(0 == input_bv.byteStride);
             GX_ASSERT_D(0 == output_bv.byteStride);
-            std::memcpy(times.data(), &context.data.buffers[input_bv.buffer].data[input_bv.byteOffset], input_byte_length);
+            std::memcpy(times.data(), &context.data.buffers[input_bv.buffer].data[input_bv.byteOffset + input.byteOffset], input_byte_length);
             const auto& output_b = context.data.buffers[output_bv.buffer].data;
-            const auto output_b_ptr = reinterpret_cast<std::uint64_t>(&output_b[output_bv.byteOffset]);
+            const auto output_b_ptr = reinterpret_cast<std::uint64_t>(&output_b[output_bv.byteOffset + output.byteOffset]);
             if ("translation" == chn.target_path) {
                 GX_ASSERT_D(output.type == TINYGLTF_TYPE_VEC3);
                 read_output(bone_entity->get_component<physics::animation::Bone>()->get_translation_samples(), input, output, output_bv, interpolation, output_b_ptr, times);
@@ -149,6 +149,7 @@ gearoenix::core::ecs::Entity* gearoenix::render::gltf::Animations::get(const int
         return nullptr;
     }
 
+    std::lock_guard bone_entities_lock_guard(bone_entities_lock);
     if (const auto search = bone_entities.find(node_index); bone_entities.end() != search) {
         return search->second.get();
     }
