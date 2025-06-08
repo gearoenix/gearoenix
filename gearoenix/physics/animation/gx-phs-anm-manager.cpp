@@ -40,6 +40,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_a
     std::shared_ptr<Bone>&& root_bone)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
+    root_bone->get_entity()->set_parent(entity.get());
 
     auto transform = core::Object::construct<Transformation>(entity->get_object_name() + "-transformation");
 

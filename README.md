@@ -10,10 +10,6 @@ Gearoenix game engine.
 [![codecov](https://codecov.io/gh/gearoenix/gearoenix/branch/master/graph/badge.svg?token=48NJY46U15)](https://codecov.io/gh/gearoenix/gearoenix)
 [![Discord](https://img.shields.io/discord/700169912605474856.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/uGs66W6AM3)
 
-## Licensing
-
-The engine itself is completely free to use, but the engine is using FMOD for sound, and it is not free to use, one can replace the FMOD and use other libraries for sound.
-
 ## Examples
 
 The `examples/` folder contains code demonstrating Gearoenix's functionalities. 
@@ -74,3 +70,17 @@ both deferred and forward rendering.
 
 **✨ Rendering Abstraction:** Future-proof your projects with our rendering abstraction layer, supporting both
 rasterization and ray tracing render modes.
+
+## Build Process
+
+ - `git clone --recurse-submodules --shallow-submodules --depth=1 --branch=master https://github.com/gearoenix/gearoenix.git`
+ - `cd gearoenix`
+ - `cmake --preset release .`
+ - `cmake --build --preset release .`
+
+## Licensing
+
+The engine is free to use, **but**:
+ - You can't claim you have written the code.
+ - Any change in the code must be re-stated.
+ - If you ever used this project, you ought to acknowledge this project and its main contributors.

@@ -71,7 +71,7 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
     GX_ASSERT_D(skin_index != -1);
     const auto& skin = context.data.skins[skin_index];
     const auto& bone_nodes = skin.joints;
-    auto& arm_bones = arm->get_all_bones();
+    const auto& arm_bones = arm->get_all_bones();
     std::vector<int> bone_indices;
     bone_indices.reserve(bone_nodes.size());
     for (const auto bone_index : bone_nodes) {
@@ -90,8 +90,8 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
     GX_ASSERT_D(inv_mat_acc.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
     const auto& inv_mat_bv = context.data.bufferViews[inv_mat_acc.bufferView];
     GX_ASSERT_D(inv_mat_bv.buffer >= 0);
-    const auto* const mat_b = &context.data.buffers[inv_mat_bv.buffer].data[inv_mat_bv.byteOffset];
-    const auto mat_bi_inc = inv_mat_bv.byteStride > 0 ? inv_mat_bv.byteStride : sizeof(math::Mat4x4<float>);
+    const auto* const mat_b = &context.data.buffers[inv_mat_bv.buffer].data[inv_mat_bv.byteOffset + inv_mat_acc.byteOffset];
+    const auto mat_bi_inc = inv_mat_acc.ByteStride(inv_mat_bv);
     auto mat_bi = decltype(mat_bi_inc) { 0 };
     for (auto& mat : inverse_bind_matrices) {
         mat = math::Mat4x4<double>(*reinterpret_cast<const math::Mat4x4<float>*>(&mat_b[mat_bi]));

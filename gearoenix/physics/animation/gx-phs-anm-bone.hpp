@@ -13,9 +13,6 @@ struct Manager;
 typedef boost::container::flat_map<double, Keyframe<math::Vec3<double>>> Vec3KeyFrameMap;
 typedef boost::container::flat_map<double, Keyframe<math::Quat<double>>> QuatKeyFrameMap;
 struct Bone final : core::ecs::Component {
-    constexpr static auto max_bone_children_count = 8;
-    typedef core::static_flat_set<Bone*, max_bone_children_count> bone_children_t;
-
     constexpr static auto max_count = 1024;
     constexpr static auto object_type_index = gearoenix_physics_animation_bone_type_index;
 

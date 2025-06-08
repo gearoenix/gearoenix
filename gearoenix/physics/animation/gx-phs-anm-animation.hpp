@@ -22,6 +22,7 @@ struct Animation : core::Object {
     ~Animation() override;
     virtual void animate(double time) = 0;
     virtual void write(platform::stream::Stream& s) const;
+    [[nodiscard]] virtual math::Vec2<double> get_start_end() const = 0;
 };
 
 struct ArmatureAnimation final : Animation {
@@ -38,6 +39,7 @@ struct ArmatureAnimation final : Animation {
     static void animate(const Bone& bone, double time);
     void show_debug_gui() override;
     void write(platform::stream::Stream& s) const override;
+    [[nodiscard]] math::Vec2<double> get_start_end() const override;
 };
 
 struct SpriteAnimation final : Animation {
@@ -59,6 +61,7 @@ struct SpriteAnimation final : Animation {
     void animate(double time) override;
     void show_debug_gui() override;
     void write(platform::stream::Stream& s) const override;
+    [[nodiscard]] math::Vec2<double> get_start_end() const override;
 };
 
 struct AnimationPlayer final : core::ecs::Component {
