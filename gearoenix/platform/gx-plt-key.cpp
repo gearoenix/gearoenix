@@ -18,6 +18,8 @@ int gearoenix::platform::key::convert_keyboard_to_imgui(const Id id)
         { Id::Enter, ImGuiKey_Enter },
         { Id::Select, ImGuiKey_Menu },
         { Id::Start, ImGuiKey_LeftSuper },
+        { Id::LeftSuper, ImGuiKey_LeftSuper },
+        { Id::RightSuper, ImGuiKey_RightSuper },
         { Id::Home, ImGuiKey_Home },
         { Id::End, ImGuiKey_End },
         { Id::Delete, ImGuiKey_Delete },
@@ -79,7 +81,9 @@ int gearoenix::platform::key::convert_keyboard_to_imgui(const Id id)
         return search->second;
     }
 
-    GX_UNEXPECTED;
+    GX_LOG_E("Unexpected key input");
+
+    return 0;
 }
 
 int gearoenix::platform::key::convert_mouse_to_imgui(const Id m)

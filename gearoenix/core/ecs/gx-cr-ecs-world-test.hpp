@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     ComponentType::add<Speed>();
 
     static EntityPtr e1, e2, e3, e4, e5;
-    auto& w = World::get();
+    auto w = World{};
 
     w.clear();
 

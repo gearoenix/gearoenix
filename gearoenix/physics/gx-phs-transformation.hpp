@@ -42,7 +42,7 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
 
     GX_GET_CREF_PRV(math::Mat4x4<double>, local_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
-    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, transposed_inverted_global_matrix);
     GX_GET_CREF_PRV(math::Mat3x3<double>, rotation_matrix);
     GX_GET_CREF_PRV(Rotation, rotation);
     GX_GET_CREF_PRV(math::Vec3<double>, scale);

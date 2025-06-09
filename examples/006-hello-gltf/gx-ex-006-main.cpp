@@ -85,7 +85,7 @@ public:
     void create_camera()
     {
         GxCamManager::get().build("camera", scene_entities[0].get(), GxEntityEndCaller([this](GxEntityPtr&& e) {
-            e->get_component<GxTransform>()->local_look_at({ 2.0, 2.0, 2.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
+            e->get_component<GxTransform>()->local_look_at({ 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
             set_camera(e.get());
         }));
     }
@@ -120,14 +120,14 @@ public:
     void create_light()
     {
         GxLightMgr::get().build_shadow_caster_directional(
-            "directional-light", scene_entities[0].get(), 1024, 10.0f, 1.0f, 1.0f,
+            "directional-light", scene_entities[0].get(), 1024, 20.0f, 1.0f, 50.0f,
             GxEntityEndCaller([this](GxEntityPtr&& l) { set_light(std::move(l)); }));
     }
 
     static void set_light(GxEntityPtr&& light_entity)
     {
         auto* const light = light_entity->get_component<GxShadowDirLight>();
-        light->get_shadow_transform()->local_look_at({ 5.0, 5.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
+        light->get_shadow_transform()->local_look_at({ 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
         light->colour = { 2.0f, 2.0f, 2.0f };
     }
 

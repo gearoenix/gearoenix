@@ -40,7 +40,7 @@ void gearoenix::physics::collider::Aabb3::draw_gizmo()
     if (surrounding_box_changed) {
         std::array<math::Vec3<double>, 8> corners;
         surrounding_box.get_all_corners(corners);
-        const auto& im = transform->get_inverted_global_matrix();
+        const auto& im = transform->get_transposed_inverted_global_matrix().transposed();
         original_box.reset((im * math::Vec4(corners[0], 1.0)).xyz());
         for (auto i = 1; i < corners.size(); ++i) {
             original_box.put_without_update((im * math::Vec4(corners[i], 1.0)).xyz());

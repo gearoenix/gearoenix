@@ -16,11 +16,9 @@ source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_TEST_SRC})
 
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_TEST_SRC} PARENT_SCOPE)
 
-set(GX_ENGINE_SUBMODULE_DIR ${GX_ENGINE_SRC_DIR}/submodules)
-
 set_source_files_properties(${GX_ENGINE_SUBMODULES_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
 
-set(GX_IMGUI_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGui)
+set(GX_IMGUI_PATH ${GX_SUBMODULES_DIR}/ImGui)
 add_library(ImGui STATIC
         ${GX_IMGUI_PATH}/imgui.cpp
         ${GX_IMGUI_PATH}/imgui_demo.cpp
@@ -35,12 +33,12 @@ target_compile_definitions(ImGui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
 target_include_directories(ImGui PRIVATE ${GX_IMGUI_PATH})
 target_link_libraries(ImGui PUBLIC Vulkan::Headers)
 
-set(GX_IMGUI_FB_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGuiFileDialog)
+set(GX_IMGUI_FB_PATH ${GX_SUBMODULES_DIR}/ImGuiFileDialog)
 add_library(ImGuiFileDialog STATIC ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
 target_compile_options(ImGuiFileDialog PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGuiFileDialog PRIVATE ${GX_IMGUI_PATH})
 
-set(GX_IMGIZMO_PATH ${GX_ENGINE_SUBMODULE_DIR}/ImGuizmo)
+set(GX_IMGIZMO_PATH ${GX_SUBMODULES_DIR}/ImGuizmo)
 add_library(ImGuizmo STATIC
         ${GX_IMGIZMO_PATH}/GraphEditor.cpp
         ${GX_IMGIZMO_PATH}/ImCurveEdit.cpp
@@ -53,7 +51,7 @@ target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
 target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2main SDL2::SDL2 Boost::headers)
 target_include_directories(GearoenixGameEngine PRIVATE ${GX_IMGUI_PATH})
-target_include_directories(GearoenixGameEngine PUBLIC ${GX_ENGINE_SUBMODULE_DIR})
+target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
 
 foreach (GX_LIB ${GX_DEBUG_LIBS})
     target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})

@@ -107,12 +107,15 @@ static const boost::container::flat_map<SDL_Keycode, gearoenix::platform::key::I
     { SDLK_KP_PLUS, gearoenix::platform::key::Id::NumpadPlus },
     { SDLK_KP_ENTER, gearoenix::platform::key::Id::NumpadEnter },
     { SDLK_KP_PERIOD, gearoenix::platform::key::Id::NumpadDot },
+    { SDLK_LGUI, gearoenix::platform::key::Id::LeftSuper },
+    { SDLK_RGUI, gearoenix::platform::key::Id::RightSuper },
 };
 
 gearoenix::platform::key::Id gearoenix::platform::convert_sdl_key(const SDL_Keycode key)
 {
-    if (const auto search = gearoenix_sdl_keyboard_map.find(key); gearoenix_sdl_keyboard_map.end() != search)
+    if (const auto search = gearoenix_sdl_keyboard_map.find(key); gearoenix_sdl_keyboard_map.end() != search) {
         return search->second;
+    }
     GX_LOG_E("Unhandled button: " << key << " in SDL2 platform interface.");
     return key::Id::Unknown;
 }

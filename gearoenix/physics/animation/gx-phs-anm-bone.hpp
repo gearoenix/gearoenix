@@ -18,7 +18,7 @@ struct Bone final : core::ecs::Component {
 
     GX_GET_CREF_PRV(std::shared_ptr<Transformation>, transform);
     GX_GET_CREF_PRV(math::Mat4x4<double>, global_matrix);
-    GX_GET_CREF_PRV(math::Mat4x4<double>, inverted_global_matrix);
+    GX_GET_CREF_PRV(math::Mat4x4<double>, transposed_inverted_global_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, inverse_bind_matrix);
     GX_GET_CREF_PRV(math::Mat4x4<double>, bind_matrix);
     GX_GET_REF_PRV(Vec3KeyFrameMap, scale_samples);
