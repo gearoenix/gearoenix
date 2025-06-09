@@ -90,13 +90,13 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Bone::build(std::
 void gearoenix::physics::animation::Bone::set_inverse_bind_matrix(const math::Mat4x4<double>& m)
 {
     inverse_bind_matrix = m;
-    bind_matrix = m.inverted();
+    bind_matrix = m.inverted().transposed();
 }
 
 void gearoenix::physics::animation::Bone::update_matrices()
 {
     global_matrix = transform->get_global_matrix() * inverse_bind_matrix;
-    inverted_global_matrix = bind_matrix * transform->get_inverted_global_matrix();
+    transposed_inverted_global_matrix = transform->get_transposed_inverted_global_matrix() * bind_matrix;
 }
 
 void gearoenix::physics::animation::Bone::update_all_bones_after_transform_updates()

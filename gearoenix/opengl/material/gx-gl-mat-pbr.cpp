@@ -115,12 +115,12 @@ void gearoenix::gl::material::Pbr::render_forward(
         bones_data.clear();
         for (const auto* const b : rm.armature->get_all_bones()) {
             bones_data.push_back({ math::Mat4x4<float>(b->get_global_matrix()),
-                math::Mat4x4<float>(b->get_inverted_global_matrix()) });
+                math::Mat4x4<float>(b->get_transposed_inverted_global_matrix()) });
         }
         shader.set_bones_m_inv_m_data(bones_data.data()->data());
     } else {
         const auto m = math::Mat4x4<float>(rm.transform->get_global_matrix());
-        const auto inv_m = math::Mat4x4<float>(rm.transform->get_inverted_global_matrix());
+        const auto inv_m = math::Mat4x4<float>(rm.transform->get_transposed_inverted_global_matrix());
         shader.set_m_data(m.data());
         shader.set_inv_m_data(inv_m.data());
     }

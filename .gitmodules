@@ -16,3 +16,6 @@
 [submodule "gearoenix/submodules/glTF-Sample-Assets"]
 	path = gearoenix/submodules/glTF-Sample-Assets
 	url = git@github.com:KhronosGroup/glTF-Sample-Assets.git
+[submodule "gearoenix/submodules/glm"]
+	path = gearoenix/submodules/glm
+	url = https://github.com/g-truc/glm.git

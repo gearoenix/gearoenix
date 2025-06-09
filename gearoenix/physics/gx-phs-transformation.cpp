@@ -275,7 +275,7 @@ void gearoenix::physics::Transformation::update_without_inverse_root()
 void gearoenix::physics::Transformation::update_inverse()
 {
     if (changed) {
-        inverted_global_matrix = global_matrix.inverted();
+        transposed_inverted_global_matrix = global_matrix.inverted().transposed();
     }
 }
 
@@ -302,7 +302,7 @@ void gearoenix::physics::Transformation::clear_change()
 
 void gearoenix::physics::Transformation::reset()
 {
-    global_matrix = local_matrix = inverted_global_matrix = decltype(local_matrix) {};
+    global_matrix = local_matrix = transposed_inverted_global_matrix = decltype(local_matrix) {};
     rotation_matrix = {};
     rotation = Rotation();
     scale = decltype(scale)(1.0);
