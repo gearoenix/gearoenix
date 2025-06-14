@@ -2,6 +2,7 @@
 #include "gx-phs-transformation.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/mat4x4.hpp>
@@ -44,4 +45,18 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             GX_TEST_FLOAT_NEAR(gxq.z, glmq.z);
         }
     }
+
+    gearoenix::math::Mat4x4<double> local;
+
+    {
+        glmm
+    }
+
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            glmm[i][j] = local[i][j] = dis(re);
+        }
+    }
+
 }
