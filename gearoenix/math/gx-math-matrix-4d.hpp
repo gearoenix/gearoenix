@@ -144,6 +144,21 @@ struct Mat4x4 final {
         *this = o;
     }
 
+    [[nodiscard]] constexpr bool equal(const Mat4x4& o, const Element tolerance = Numeric::epsilon<Element>) const
+    {
+        if (o == *this) {
+            return true;
+        }
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                if (!Numeric::equal(columns[i][j], o[i][j], tolerance)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     [[nodiscard]] constexpr bool operator==(const Mat4x4& m) const
     {
         for (int i = 0; i < 4; ++i) {
