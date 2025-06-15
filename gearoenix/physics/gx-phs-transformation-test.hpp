@@ -46,17 +46,28 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
         }
     }
 
-    gearoenix::math::Mat4x4<double> local;
+    for (int tests_count = 0; tests_count < 100; ++tests_count) {
+        const auto tran = glm::dvec3(dis(re), dis(re), dis(re));
+        const auto rot = glm::normalize(glm::dquat(dis(re), dis(re), dis(re), dis(re)));
+        const auto scale = glm::abs(glm::dvec3(dis(re), dis(re), dis(re))) + gx_epsilon;
 
-    {
-        glmm
-    }
+        glmm = glm::translate(glm::dmat4(1.0), tran) * glm::mat4_cast(rot) * glm::scale(glm::dmat4(1.0), scale);
 
-
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            glmm[i][j] = local[i][j] = dis(re);
+        gearoenix::math::Mat4x4<double> local;
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                local[i][j] = glmm[i][j];
+            }
         }
-    }
 
+        transform.set_local_matrix(local);
+
+        const auto gxt = transform.get_local_position();
+        const auto gxs = transform.get_scale();
+        const auto gxq = transform.get_rotation().get_quat();
+
+        BOOST_TEST_CHECK(gxt.equal({tran.x, tran.y, tran.z}));
+        BOOST_TEST_CHECK(gxs.equal({scale.x, scale.y, scale.z}));
+        BOOST_TEST_CHECK(gxq.safe_equal({rot.x, rot.y, rot.z, rot.w}));
+    }
 }
