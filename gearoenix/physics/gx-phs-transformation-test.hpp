@@ -2,9 +2,9 @@
 #include "gx-phs-transformation.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -66,8 +66,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
         const auto gxs = transform.get_scale();
         const auto gxq = transform.get_rotation().get_quat();
 
-        BOOST_TEST_CHECK(gxt.equal({tran.x, tran.y, tran.z}));
-        BOOST_TEST_CHECK(gxs.equal({scale.x, scale.y, scale.z}));
-        BOOST_TEST_CHECK(gxq.safe_equal({rot.x, rot.y, rot.z, rot.w}));
+        BOOST_TEST_CHECK(gxt.equal({ tran.x, tran.y, tran.z }));
+        BOOST_TEST_CHECK(gxs.equal({ scale.x, scale.y, scale.z }));
+        BOOST_TEST_CHECK(gxq.safe_equal({ rot.x, rot.y, rot.z, rot.w }));
     }
 }

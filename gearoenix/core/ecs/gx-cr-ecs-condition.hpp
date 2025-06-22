@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <tuple>
 
 namespace gearoenix::core::ecs {

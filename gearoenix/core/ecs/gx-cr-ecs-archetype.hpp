@@ -1,5 +1,4 @@
 #pragma once
-#include "../gx-cr-range.hpp"
 #include "../sync/gx-cr-sync-parallel-for.hpp"
 #include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-entity.hpp"
@@ -8,8 +7,6 @@
 #include <boost/container/flat_set.hpp>
 
 namespace gearoenix::core::ecs {
-struct World;
-struct Entity;
 struct Archetype final {
     friend struct World;
     friend struct Entity;
@@ -67,7 +64,7 @@ private:
     void delete_entity(Entity*);
     [[nodiscard]] bool contains(Entity*) const;
 
-    /// If it fails to find the component it will return -1
+    /// If it fails to find the component, it will return -1
     template <typename T>
     [[nodiscard]] std::uint32_t get_component_index() const
     {
@@ -88,7 +85,7 @@ private:
     template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
     void parallel_system(std::index_sequence<I...> const&, F&& fun)
     {
-        const std::array<std::uint32_t, sizeof...(I)> indices = {
+        const std::array indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
         sync::ParallelFor::exec(entities.begin(), entities.end(), [&](auto* const e, const auto kernel_index) {
@@ -99,14 +96,14 @@ private:
     template <typename Condition, typename F>
     void parallel_system_conditioned(F&& fun)
     {
-        parallel_system<typename ConditionTypesPack<Condition>::types>(
-            std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>(), fun);
+        using types = typename ConditionTypesPack<Condition>::types;
+        parallel_system<types>(std::make_index_sequence<std::tuple_size_v<types>>(), fun);
     }
 
     template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
     void synchronised_system(std::index_sequence<I...> const&, F&& fun)
     {
-        const std::array<std::uint32_t, sizeof...(I)> indices = {
+        const std::array indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
         for (auto* const e : entities) {
@@ -117,8 +114,8 @@ private:
     template <typename Condition, typename F>
     void synchronised_system_conditioned(F&& fun)
     {
-        synchronised_system<typename ConditionTypesPack<Condition>::types>(
-            std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>(), fun);
+        using types = typename ConditionTypesPack<Condition>::types;
+        synchronised_system<types>(std::make_index_sequence<std::tuple_size_v<types>>(), fun);
     }
 
 public:
