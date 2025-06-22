@@ -113,7 +113,7 @@ void gearoenix::physics::animation::ArmatureAnimation::write(platform::stream::S
 gearoenix::math::Vec2<double> gearoenix::physics::animation::ArmatureAnimation::get_start_end() const
 {
     math::Vec2 start_end { std::numeric_limits<double>::max(), -std::numeric_limits<double>::max() };
-    const auto smp_fun = [&] <typename SMP> (const SMP& s) {
+    const auto smp_fun = [&]<typename SMP>(const SMP& s) {
         if (!s.empty()) {
             start_end.x = std::min(s.begin()->first, start_end.x);
             start_end.y = std::max(s.rbegin()->first, start_end.y);
@@ -126,7 +126,7 @@ gearoenix::math::Vec2<double> gearoenix::physics::animation::ArmatureAnimation::
         smp_fun(b.get_scale_samples());
         const auto& cs = b.get_entity()->get_children();
         for (const auto& c : cs) {
-            const auto* const cb =  c.second->get_component<Bone>();
+            const auto* const cb = c.second->get_component<Bone>();
             if (cb) {
                 trav_fun(*cb);
             }

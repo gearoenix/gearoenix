@@ -16,7 +16,7 @@ public:
     explicit ShadowCaster(std::uint32_t bones_count = 0);
     ~ShadowCaster() override;
     void bind(uint& current_shader) const override;
-    void set_mvp_data(const void* data) const;
+    void set_mvp_data(const float* data) const;
 };
 
 struct ShadowCasterCombination final : ShaderCombination {

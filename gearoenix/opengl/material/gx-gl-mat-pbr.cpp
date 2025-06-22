@@ -44,7 +44,18 @@ void gearoenix::gl::material::Pbr::shadow(
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(recorded_cam_model.model->bones_count);
     shadow_caster_shader.bind(current_shader);
-    shadow_caster_shader.set_mvp_data(&camera.mvps[recorded_cam_model.first_mvp_index]);
+
+    // std::vector<math::Mat4x4<float>> bones_ms;
+    // if (recorded_cam_model.model->bones_count > 0) {
+    //     for (const auto* const b : recorded_cam_model.model->armature->get_all_bones()) {
+    //         bones_ms.push_back(camera.camera->get_view_projection() * math::Mat4x4<float>(b->get_global_matrix()));
+    //     }
+    // } else {
+    //     bones_ms.push_back(camera.camera->get_view_projection() * math::Mat4x4<float>(recorded_cam_model.model->transform->get_global_matrix()));
+    // }
+    // shadow_caster_shader.set_mvp_data(bones_ms.data()->data());
+    shadow_caster_shader.set_mvp_data(camera.mvps[recorded_cam_model.first_mvp_index].data());
+
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
     shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(alpha_factor_alpha_cutoff.data());
 

@@ -1,46 +1,39 @@
 #include "gx-cr-sync-parallel-for.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-cr-sync-semaphore.hpp"
-#include <map>
+#include "gx-cr-sync-thread.hpp"
 #include <vector>
 
 namespace {
-struct GearoenixCoreSyncParallelForData final {
-    struct Job final {
-        const std::function<void(unsigned int, unsigned int)>* const function;
-        gearoenix::core::sync::Semaphore* const signal;
-    };
-
+struct Data final {
     gearoenix::core::sync::Semaphore signal {};
-    std::mutex jobs_lock {};
-    std::vector<Job> jobs;
-    bool is_running = true;
-    bool terminated = false;
+    std::atomic<const std::function<void(unsigned int /* count */, unsigned int /* index */)>*> job_function = nullptr;
+    std::atomic<gearoenix::core::sync::Semaphore*> job_signal = nullptr;
+    std::atomic<bool> is_running = true;
+    std::atomic<bool> terminated = false;
     std::thread thread;
 
-    GearoenixCoreSyncParallelForData(const unsigned int count, const unsigned int index)
+    // Only because of some compilers and std implementations, otherwise there was no need for this function
+    Data(const Data&) { GX_UNEXPECTED; }
+
+    Data(const unsigned int count, const unsigned int index)
     {
-        // It was causing problem in linux in debug mode
+        // It was causing a problem in linux in debug mode
         thread = std::thread([count, index, this] {
-            std::vector<Job> local_jobs;
-            is_running = true;
             while (is_running) {
                 signal.lock();
-                {
-                    std::lock_guard _lg(jobs_lock);
-                    std::swap(jobs, local_jobs);
+                if (const auto* const fun = job_function.load(); fun != nullptr) {
+                    (*fun)(count, index);
+                    job_function = nullptr;
+                    (*job_signal).release();
+                    job_signal = nullptr;
                 }
-                for (const auto [function, signal] : local_jobs) {
-                    (*function)(count, index);
-                    signal->release();
-                }
-                local_jobs.clear();
             }
             terminated = true;
         });
     }
 
-    ~GearoenixCoreSyncParallelForData()
+    ~Data()
     {
         do {
             is_running = false;
@@ -54,46 +47,32 @@ struct GearoenixCoreSyncParallelForData final {
         const std::function<void(unsigned int, unsigned int)>* const function,
         gearoenix::core::sync::Semaphore* const sig)
     {
-        {
-            std::lock_guard _lg(jobs_lock);
-            jobs.push_back({ function, sig });
-        }
+        job_function = function;
+        job_signal = sig;
         signal.release();
     }
 };
 
-std::mutex gearoenix_core_sync_parallel_for_data_lock;
-std::map<std::thread::id, std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>> gearoenix_core_sync_parallel_for_data;
-
-[[nodiscard]] std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>>& gearoenix_core_sync_parallel_for_data_initialise()
+[[nodiscard]] std::vector<Data> initialise_data()
 {
-    const auto id = std::this_thread::get_id();
-    {
-        std::lock_guard _lg(gearoenix_core_sync_parallel_for_data_lock); // This is super safe and maybe excessive (?)
-        const auto search = gearoenix_core_sync_parallel_for_data.find(id);
-        if (gearoenix_core_sync_parallel_for_data.end() != search) {
-            return search->second;
-        }
-    }
-    const auto tc = gearoenix::core::sync::threads_count();
-    std::vector<std::unique_ptr<GearoenixCoreSyncParallelForData>> data;
+    const auto tc = static_cast<unsigned int>(gearoenix::core::sync::threads_count());
+    std::vector<Data> data;
     data.reserve(tc - 1);
     for (auto thread_index = decltype(tc) { 1 }; thread_index < tc; ++thread_index) {
-        data.emplace_back(new GearoenixCoreSyncParallelForData(tc, thread_index));
+        data.emplace_back(tc, thread_index);
     }
-    std::lock_guard _lg(gearoenix_core_sync_parallel_for_data_lock);
-    const auto result = gearoenix_core_sync_parallel_for_data.emplace(id, std::move(data));
-    return result.first->second;
+    return data;
 }
 }
 
 void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned int, unsigned int)>& fun)
 {
-    const auto& datas = gearoenix_core_sync_parallel_for_data_initialise();
-    Semaphore signal;
-    const auto count = static_cast<unsigned int>(datas.size() + 1);
-    for (const auto& data : datas) {
-        data->send_work(&fun, &signal);
+    thread_local std::vector<Data> data = initialise_data();
+    thread_local Semaphore signal;
+    static const auto count = static_cast<unsigned int>(data.size() + 1);
+
+    for (auto& d : data) {
+        d.send_work(&fun, &signal);
     }
     fun(count, 0);
     for (unsigned int index = 1; index < count; ++index) {

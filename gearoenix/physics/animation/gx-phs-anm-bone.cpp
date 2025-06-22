@@ -61,7 +61,7 @@ void gearoenix::physics::animation::Bone::read(platform::stream::Stream& s, core
         (void)self;
         (void)end;
         bool not_resolved = false;
-        GX_TODO; // object streamer can have better solution for this, instead of resolving
+        GX_TODO; // object streamer can have a better solution for this, instead of resolving
         if (transform == nullptr) {
             transform = entity->get_component_shared_ptr<Transformation>();
             not_resolved |= transform == nullptr;

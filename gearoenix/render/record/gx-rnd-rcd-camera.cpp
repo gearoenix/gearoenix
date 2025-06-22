@@ -1,5 +1,6 @@
 #include "gx-rnd-rcd-camera.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
@@ -72,21 +73,20 @@ void gearoenix::render::record::Camera::update_models(Models& models)
         std::make_move_iterator(translucent_models.begin()),
         std::make_move_iterator(translucent_models.end()));
 
-    core::sync::ParallelFor::execi(all_models.begin(), all_models.end(),
-        [&](const auto& d_m, const auto i, const auto ki) {
-            auto& rm = *d_m.second.model;
-            auto& m = *rm.model;
-            if (!m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
-                return;
+    core::sync::ParallelFor::execi(all_models.begin(), all_models.end(), [&](const auto& d_m, const auto i, const auto ki) {
+        const auto& rm = *d_m.second.model;
+        const auto& m = *rm.model;
+        if (!m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
+            return;
+        }
+        if (rm.armature) {
+            for (auto* const bone : rm.armature->get_all_bones()) {
+                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
             }
-            if (rm.armature) {
-                for (auto* const bone : rm.armature->get_all_bones()) {
-                    threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
-                }
-            } else {
-                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
-            }
-        });
+        } else {
+            threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
+        }
+    });
 
     mvps.clear();
     auto current_model_index = static_cast<std::uint32_t>(-1);
