@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <stacktrace>
 
 namespace gearoenix::core::sync {
 struct ParallelFor final {
@@ -10,39 +11,45 @@ struct ParallelFor final {
     ~ParallelFor() = delete;
 
     template <typename Iter>
-    static void advance(Iter& iter, const Iter& end, auto n)
+    [[nodiscard]] static bool advance(Iter& curr_iter, const Iter& iter_end, const auto n)
     {
-        for (auto i = decltype(n) { 0 }; i < n; ++i, ++iter) {
-            if (iter == end) {
-                return;
+        for (auto i = decltype(n) { 0 };; ++i, ++curr_iter) {
+            if (curr_iter == iter_end) {
+                return false;
+            }
+            if (i >= n) {
+                return true;
             }
         }
     }
 
     template <typename Iter, typename Fun>
-    static void exec(Iter first, Iter end, Fun&& f)
+    static void exec(Iter iter_first, Iter iter_end, Fun&& f)
     {
         exec([&](const auto kernels_count, const auto kernel_index) {
-            Iter iter = first;
-            advance(iter, end, kernel_index);
-            while (iter != end) {
-                f(*iter, kernel_index);
-                advance(iter, end, kernels_count);
+            Iter curr_iter = iter_first;
+            if (!advance(curr_iter, iter_end, kernel_index)) {
+                return;
             }
+            do {
+                f(*curr_iter, kernel_index);
+            } while (advance(curr_iter, iter_end, kernels_count));
         });
     }
 
     template <typename Iter, typename Fun>
-    static void execi(Iter first, Iter end, Fun&& f)
+    static void execi(Iter iter_first, Iter iter_end, Fun&& f)
     {
         exec([&](const auto kernels_count, const auto kernel_index) {
             auto index = kernel_index;
-            Iter iter = first;
-            advance(iter, end, kernel_index);
-            for (; iter != end; index += kernels_count) {
-                f(*iter, index, kernel_index);
-                advance(iter, end, kernels_count);
+            Iter curr_iter = iter_first;
+            if (!advance(curr_iter, iter_end, kernel_index)) {
+                return;
             }
+            do {
+                f(*curr_iter, index, kernel_index);
+                index += kernels_count;
+            } while (advance(curr_iter, iter_end, kernels_count));
         });
     }
 };

@@ -20,7 +20,7 @@ public:
     template <typename Duration>
     void lock_for(const Duration& timeout_time)
     {
-        std::unique_lock<std::mutex> lock(m);
+        std::unique_lock lock(m);
         if (c.wait_for(lock, timeout_time, [this] { return count > 0; })) {
             --count;
         }

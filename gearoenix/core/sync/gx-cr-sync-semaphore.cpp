@@ -1,13 +1,13 @@
 #include "gx-cr-sync-semaphore.hpp"
 
-gearoenix::core::sync::Semaphore::Semaphore(int count)
+gearoenix::core::sync::Semaphore::Semaphore(const int count)
     : count(count)
 {
 }
 
 void gearoenix::core::sync::Semaphore::lock()
 {
-    std::unique_lock<std::mutex> lock(m);
+    std::unique_lock lock(m);
     c.wait(lock, [this] {
         return count > 0;
     });
@@ -16,7 +16,7 @@ void gearoenix::core::sync::Semaphore::lock()
 
 void gearoenix::core::sync::Semaphore::release()
 {
-    std::lock_guard<std::mutex> _lock(m);
+    std::lock_guard _lock(m);
     ++count;
     c.notify_all();
 }

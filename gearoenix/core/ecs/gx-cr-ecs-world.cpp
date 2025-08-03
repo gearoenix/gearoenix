@@ -81,14 +81,14 @@ void gearoenix::core::ecs::World::update()
         std::swap(actions, delayed_actions);
     }
 
-    constexpr auto create_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Add>::value;
+    constexpr auto add_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Add>::value;
     constexpr auto delete_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Delete>::value;
     constexpr auto pullout_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::PullOut>::value;
 
     for (auto& [variant] : actions) {
         switch (variant.index()) {
-        case create_entity_index:
-            add_entity(std::move(std::get<create_entity_index>(std::move(variant)).entity));
+        case add_entity_index:
+            add_entity(std::move(std::get<add_entity_index>(std::move(variant)).entity));
             break;
         case delete_entity_index:
             delete_entity(std::move(std::get<delete_entity_index>(std::move(variant)).entity));

@@ -6,11 +6,13 @@
 
 namespace {
 struct Data final {
-    gearoenix::core::sync::Semaphore signal {};
-    std::atomic<const std::function<void(unsigned int /* count */, unsigned int /* index */)>*> job_function = nullptr;
-    std::atomic<gearoenix::core::sync::Semaphore*> job_signal = nullptr;
-    std::atomic<bool> is_running = true;
-    std::atomic<bool> terminated = false;
+    typedef const std::function<void(unsigned int /* count */, unsigned int /* index */)> job_t;
+
+    gearoenix::core::sync::Semaphore job_available_signal;
+    gearoenix::core::sync::Semaphore job_finished_signal;
+    job_t* job;
+    bool is_running = false;
+    bool is_terminated = false;
     std::thread thread;
 
     // Only because of some compilers and std implementations, otherwise there was no need for this function
@@ -18,38 +20,47 @@ struct Data final {
 
     Data(const unsigned int count, const unsigned int index)
     {
-        // It was causing a problem in linux in debug mode
         thread = std::thread([count, index, this] {
+            job = nullptr;
+            is_terminated = false;
+            is_running = true;
+
             while (is_running) {
-                signal.lock();
-                if (const auto* const fun = job_function.load(); fun != nullptr) {
-                    (*fun)(count, index);
-                    job_function = nullptr;
-                    (*job_signal).release();
-                    job_signal = nullptr;
+                job_available_signal.lock();
+                if (!is_running) {
+                    break;
                 }
+                (*job)(count, index);
+                job = nullptr;
+                job_finished_signal.release();
             }
-            terminated = true;
+
+            is_terminated = true;
         });
+        do {
+            std::this_thread::yield();
+        } while (!is_running);
     }
 
     ~Data()
     {
         do {
             is_running = false;
-            signal.release();
+            job_available_signal.release();
             std::this_thread::yield();
-        } while (!terminated || !thread.joinable());
+        } while (!is_terminated || !thread.joinable());
         thread.join();
     }
 
-    void send_work(
-        const std::function<void(unsigned int, unsigned int)>* const function,
-        gearoenix::core::sync::Semaphore* const sig)
+    void send_work(const std::function<void(unsigned int, unsigned int)>& function)
     {
-        job_function = function;
-        job_signal = sig;
-        signal.release();
+        job = &function;
+        job_available_signal.release();
+    }
+
+    void wait_for_job_to_finish()
+    {
+        job_finished_signal.lock();
     }
 };
 
@@ -67,15 +78,15 @@ struct Data final {
 
 void gearoenix::core::sync::ParallelFor::exec(const std::function<void(unsigned int, unsigned int)>& fun)
 {
-    thread_local std::vector<Data> data = initialise_data();
-    thread_local Semaphore signal;
-    static const auto count = static_cast<unsigned int>(data.size() + 1);
-
-    for (auto& d : data) {
-        d.send_work(&fun, &signal);
+    thread_local std::vector<Data> data;
+    if (data.empty()) {
+        data = initialise_data();
     }
-    fun(count, 0);
-    for (unsigned int index = 1; index < count; ++index) {
-        signal.lock();
+    for (auto& d : data) {
+        d.send_work(fun);
+    }
+    fun(static_cast<unsigned int>(data.size() + 1), 0);
+    for (auto& d : data) {
+        d.wait_for_job_to_finish();
     }
 }

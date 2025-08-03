@@ -1,5 +1,6 @@
 #pragma once
 #include "../math/gx-math-numeric.hpp"
+#include <array>
 #include <cstdint>
 #include <initializer_list>
 #include <vector>
@@ -15,7 +16,7 @@ struct TypeIndexSet final {
     constexpr static element_t elements_and_mod = element_bits_count - 1;
 
 private:
-    element_t bits[ElementsCount] = {};
+    std::array<element_t, ElementsCount> bits = {};
 
 public:
     constexpr TypeIndexSet() = default;
@@ -113,7 +114,7 @@ public:
 
     [[nodiscard]] constexpr bool contains(const element_t type_i) const
     {
-        return static_cast<element_t>(0) != (bits[type_i >> elements_shift] & (static_cast<element_t>(1) << (type_i & elements_and_mod)));
+        return type_i < bits_count && static_cast<element_t>(0) != (bits[type_i >> elements_shift] & (static_cast<element_t>(1) << (type_i & elements_and_mod)));
     }
 
     [[nodiscard]] constexpr bool contains(const TypeIndexSet& o) const
