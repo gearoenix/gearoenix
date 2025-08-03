@@ -49,7 +49,7 @@ target_compile_options(ImGuizmo PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
-target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2main SDL2::SDL2 Boost::headers)
+target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2 Boost::headers)
 target_include_directories(GearoenixGameEngine PRIVATE ${GX_IMGUI_PATH})
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
 
@@ -66,11 +66,11 @@ add_custom_target(GearoenixAssets)
 function(gx_prepare_target GX_CURRENT_TARGET)
     message(STATUS "Preparing target ${GX_CURRENT_TARGET}")
 
-    cmake_parse_arguments(PARSED_ARGS "" "" "SOURCES" ${ARGN})
+    cmake_parse_arguments(PARSED_ARGS "CUSTOM_MAIN" "" "SOURCES" ${ARGN})
 
     if (NOT PARSED_ARGS_SOURCES)
         message(FATAL_ERROR "gx_prepare_target: SOURCES argument is required.")
-    endif ()
+    endif (NOT PARSED_ARGS_SOURCES)
 
     if (${GX_IN_ANDROID})
         add_library(main SHARED ${PARSED_ARGS_SOURCES})
@@ -79,6 +79,10 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         add_executable(${GX_CURRENT_TARGET} ${GEAROENIX_EXE_TARGET} ${PARSED_ARGS_SOURCES})
     endif ()
     target_include_directories(${GX_CURRENT_TARGET} PRIVATE ${CMAKE_SOURCE_DIR})
+
+    if (NOT PARSED_ARGS_CUSTOM_MAIN)
+        target_link_libraries(${GX_CURRENT_TARGET} PUBLIC SDL2::SDL2main)
+    endif (NOT PARSED_ARGS_CUSTOM_MAIN)
 
     if (APPLE)
         gx_metal_prepare_target(${GX_CURRENT_TARGET})

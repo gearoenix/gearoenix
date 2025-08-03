@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-./format.sh
+python ./format.py
 git add --all
 git commit
 git push

@@ -1,6 +1,11 @@
 #include "gx-cr-ecs-entity-ptr.hpp"
 #include "gx-cr-ecs-world.hpp"
 
+gearoenix::core::ecs::EntityPtr::EntityPtr(std::shared_ptr<Entity>&& ptr)
+    : ptr(std::move(ptr))
+{
+}
+
 gearoenix::core::ecs::EntityPtr::~EntityPtr()
 {
     clear();

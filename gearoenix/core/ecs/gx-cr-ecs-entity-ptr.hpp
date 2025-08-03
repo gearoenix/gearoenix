@@ -11,10 +11,7 @@ private:
     std::shared_ptr<Entity> ptr;
 
 public:
-    explicit EntityPtr(std::shared_ptr<Entity>&& ptr = nullptr)
-        : ptr(std::move(ptr))
-    {
-    }
+    explicit EntityPtr(std::shared_ptr<Entity>&& ptr = nullptr);
     ~EntityPtr();
 
     EntityPtr(const EntityPtr&);

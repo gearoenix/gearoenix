@@ -120,7 +120,7 @@ private:
 
 public:
     template <typename Condition>
-    [[nodiscard]] constexpr bool satisfy()
+    [[nodiscard]] constexpr bool satisfy() const
     {
         return ConditionCheck<Condition>::match(id);
     }
