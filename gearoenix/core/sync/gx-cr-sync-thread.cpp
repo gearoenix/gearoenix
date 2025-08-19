@@ -3,5 +3,6 @@
 
 std::int32_t gearoenix::core::sync::threads_count()
 {
-    return static_cast<std::int32_t>(std::thread::hardware_concurrency());
+    const auto count = static_cast<std::int32_t>(std::thread::hardware_concurrency());
+    return count;
 }

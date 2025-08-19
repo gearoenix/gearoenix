@@ -11,7 +11,7 @@ void gearoenix::render::record::Scene::update(core::ecs::Entity* const scene_ent
         std::function<void()>([&] -> void { skyboxes.update(scene_entity); }),
     };
 
-    core::sync::ParallelFor::exec(par_fns.begin(), par_fns.end(), [&](const auto& f, const auto) { f(); });
+    core::sync::parallel_for(par_fns, [&](const auto& f, const auto) { f(); });
 
     cameras.update_models(models);
     lights.update_models(models.static_models_bvh);

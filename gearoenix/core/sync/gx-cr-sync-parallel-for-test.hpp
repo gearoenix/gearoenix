@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_sync_parallel_for)
         for (auto j = decltype(i) { 0 }; j < i; ++j) {
             seen[j] = std::make_unique<std::atomic<int>>(0);
         }
-        gearoenix::core::sync::ParallelFor::exec(seen.begin(), seen.end(), [](auto& s, auto) { ++*s; });
+        gearoenix::core::sync::parallel_for(seen, [](auto& s, auto) { ++*s; });
         for (const auto& v : seen) {
             BOOST_CHECK(*v == 1);
         }
