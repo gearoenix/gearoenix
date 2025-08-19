@@ -405,7 +405,7 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     } else {
         new_info.set_format(TextureFormat::RgbaUint8);
         pixels0.resize(pixels0f.size());
-        core::sync::ParallelFor::execi(pixels0f.begin(), pixels0f.end(), [&](const float p, const unsigned int index, unsigned int) {
+        core::sync::parallel_for_i(pixels0f, [&](const float p, const unsigned int index, unsigned int) {
             pixels0[index] = p >= 1.0f ? 255 : p <= 0.0f ? 0
                                                          : static_cast<std::uint8_t>(p * 255.0f + 0.501f);
         });
@@ -599,7 +599,7 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
 {
     std::vector<math::Vec4<std::uint8_t>> pixels(resolution * resolution);
     const auto inv_res = 1.0f / static_cast<float>(resolution);
-    core::sync::ParallelFor::execi(pixels.begin(), pixels.end(), [&](auto& pixel, const std::uint32_t index, auto) {
+    core::sync::parallel_for_i(pixels, [&](auto& pixel, const std::uint32_t index, auto) {
         const auto roughness_index = (resolution - 1) - index / resolution;
         auto p = integrate_brdf(
             (static_cast<float>(index % resolution) + 0.5f) * inv_res,

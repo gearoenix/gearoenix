@@ -83,25 +83,25 @@ private:
     }
 
     template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
-    void parallel_system(std::index_sequence<I...> const&, F&& fun)
+    void parallel_system(std::index_sequence<I...> const&, const F& fun)
     {
         const std::array indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
         };
-        sync::ParallelFor::exec(entities.begin(), entities.end(), [&](auto* const e, const auto kernel_index) {
+        sync::parallel_for(entities, [&](auto* const e, const auto kernel_index) {
             fun(e, get_component<std::tuple_element_t<I, ComponentsTypesTuple>, I>(e, indices.data())..., kernel_index);
         });
     }
 
     template <typename Condition, typename F>
-    void parallel_system_conditioned(F&& fun)
+    void parallel_system_conditioned(const F& fun)
     {
         using types = typename ConditionTypesPack<Condition>::types;
         parallel_system<types>(std::make_index_sequence<std::tuple_size_v<types>>(), fun);
     }
 
     template <typename ComponentsTypesTuple, std::uintptr_t... I, typename F>
-    void synchronised_system(std::index_sequence<I...> const&, F&& fun)
+    void synchronised_system(std::index_sequence<I...> const&, const F& fun)
     {
         const std::array indices = {
             (get_component_index<std::tuple_element_t<I, ComponentsTypesTuple>>())...,
@@ -112,7 +112,7 @@ private:
     }
 
     template <typename Condition, typename F>
-    void synchronised_system_conditioned(F&& fun)
+    void synchronised_system_conditioned(const F& fun)
     {
         using types = typename ConditionTypesPack<Condition>::types;
         synchronised_system<types>(std::make_index_sequence<std::tuple_size_v<types>>(), fun);

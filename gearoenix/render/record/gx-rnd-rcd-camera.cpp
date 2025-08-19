@@ -73,7 +73,7 @@ void gearoenix::render::record::Camera::update_models(Models& models)
         std::make_move_iterator(translucent_models.begin()),
         std::make_move_iterator(translucent_models.end()));
 
-    core::sync::ParallelFor::execi(all_models.begin(), all_models.end(), [&](const auto& d_m, const auto i, const auto ki) {
+    core::sync::parallel_for_i(all_models, [&](const auto& d_m, const auto i, const auto ki) {
         const auto& rm = *d_m.second.model;
         const auto& m = *rm.model;
         if (!m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
@@ -151,7 +151,9 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
 
 void gearoenix::render::record::Cameras::update_models(Models& models)
 {
-    core::sync::ParallelFor::exec(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
-        c.update_models(models);
-    });
+    if (last_camera_index > 0) {
+        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
+            c.update_models(models);
+        });
+    }
 }

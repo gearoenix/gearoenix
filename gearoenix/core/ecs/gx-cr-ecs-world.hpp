@@ -70,7 +70,7 @@ public:
 
     /// Highly optimized way of system execution
     template <typename Condition, typename F>
-    void parallel_system(F&& fun)
+    void parallel_system(const F& fun)
     {
         for (const auto& archetype : archetypes) {
             auto& archetype_ref = *archetype.second;
@@ -84,7 +84,7 @@ public:
     /// Less performant way of system execution.
     /// Good for highly conflicting systems, it can't be executed parallelly.
     template <typename Condition, typename F>
-    void synchronised_system(F&& fun)
+    void synchronised_system(const F& fun)
     {
         for (auto& archetype : archetypes) {
             if (!archetype.second->satisfy<Condition>()) {
