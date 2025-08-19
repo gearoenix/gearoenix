@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../math/gx-math-aabb.hpp"
 #include "../gx-rnd-vertex.hpp"
@@ -14,7 +15,7 @@ struct Material;
 namespace gearoenix::render::mesh {
 struct Buffer;
 struct Mesh;
-struct Manager {
+struct Manager : core::Singleton<Manager> {
 protected:
     std::mutex buffers_lock;
     std::map<std::string, std::weak_ptr<Buffer>> buffers;
@@ -36,8 +37,7 @@ protected:
         = 0;
 
 public:
-    virtual ~Manager();
-    [[nodiscard]] static Manager& get();
+    ~Manager() override;
 
     void build_icosphere(std::uint64_t subdivisions, std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);
     void build_plate(std::shared_ptr<material::Material>&& material, core::job::EndCallerShared<Mesh>&& end_callback);

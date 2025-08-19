@@ -5,15 +5,10 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "gx-rnd-cmr-camera.hpp"
 
-namespace {
-gearoenix::render::camera::Manager* instance = nullptr;
-}
-
 gearoenix::render::camera::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<Camera>();
-    GX_ASSERT_D(!instance);
-    instance = this;
 }
 
 void gearoenix::render::camera::Manager::build_impl(
@@ -28,17 +23,7 @@ void gearoenix::render::camera::Manager::build_impl(
     entity_callback.set_return(std::move(entity));
 }
 
-gearoenix::render::camera::Manager::~Manager()
-{
-    GX_ASSERT_D(instance == this);
-    instance = nullptr;
-}
-
-gearoenix::render::camera::Manager& gearoenix::render::camera::Manager::get()
-{
-    GX_ASSERT_D(instance);
-    return *instance;
-}
+gearoenix::render::camera::Manager::~Manager() = default;
 
 void gearoenix::render::camera::Manager::build(std::string&&, core::ecs::Entity*, core::job::EndCaller<core::ecs::EntityPtr>&&)
 {

@@ -5,10 +5,12 @@
 #include "gx-au-engine.hpp"
 #include "gx-au-macros.hpp"
 
-gearoenix::audio::Manager::Manager(Engine& engine)
-    : engine(engine)
+gearoenix::audio::Manager::Manager()
+    : Singleton(this)
 {
 }
+
+gearoenix::audio::Manager::~Manager() = default;
 
 std::uint64_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name)
 {

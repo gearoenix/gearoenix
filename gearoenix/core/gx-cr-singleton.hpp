@@ -19,6 +19,11 @@ protected:
     }
 
 public:
+    Singleton(Singleton&&) = delete;
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(Singleton&&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
     virtual ~Singleton()
     {
         get_singleton_instance() = nullptr;

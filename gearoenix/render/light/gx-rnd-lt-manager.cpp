@@ -5,31 +5,16 @@
 #include "gx-rnd-lt-directional.hpp"
 #include "gx-rnd-lt-point.hpp"
 
-namespace {
-gearoenix::render::light::Manager* instance = nullptr;
-}
-
 gearoenix::render::light::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<Light>();
     core::ecs::ComponentType::add<Directional>();
     core::ecs::ComponentType::add<Point>();
     core::ecs::ComponentType::add<ShadowCasterDirectional>();
-    GX_ASSERT_D(!instance);
-    instance = this;
 }
 
-gearoenix::render::light::Manager::~Manager()
-{
-    GX_ASSERT_D(this == instance);
-    instance = nullptr;
-}
-
-gearoenix::render::light::Manager& gearoenix::render::light::Manager::get()
-{
-    GX_ASSERT_D(instance);
-    return *instance;
-}
+gearoenix::render::light::Manager::~Manager() = default;
 
 gearoenix::core::ecs::EntityPtr gearoenix::render::light::Manager::build_directional(std::string&& name, core::ecs::Entity* const parent)
 {

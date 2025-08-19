@@ -6,11 +6,8 @@
 #include "gx-phs-anm-armature.hpp"
 #include "gx-phs-anm-bone.hpp"
 
-namespace {
-gearoenix::physics::animation::Manager* instance;
-}
-
 gearoenix::physics::animation::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<AnimationPlayer>();
     core::ecs::ComponentType::add<Armature>();
@@ -18,20 +15,11 @@ gearoenix::physics::animation::Manager::Manager()
     core::Object::register_type<Animation>();
     core::Object::register_type<ArmatureAnimation>();
     core::Object::register_type<SpriteAnimation>();
-    GX_ASSERT_D(!instance);
-    instance = this;
 }
 
 gearoenix::physics::animation::Manager::~Manager()
 {
-    GX_ASSERT_D(instance);
-    instance = nullptr;
     animations.clear();
-}
-
-gearoenix::physics::animation::Manager* gearoenix::physics::animation::Manager::get()
-{
-    return instance;
 }
 
 gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_armature(

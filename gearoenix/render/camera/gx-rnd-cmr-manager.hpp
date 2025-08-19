@@ -1,11 +1,12 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <string>
 
 namespace gearoenix::render::camera {
 struct Builder;
-struct Manager {
+struct Manager : core::Singleton<Manager> {
 protected:
     Manager();
 
@@ -15,13 +16,7 @@ protected:
         const core::job::EndCaller<core::ecs::EntityPtr>& entity_callback);
 
 public:
-    Manager(Manager&&) = delete;
-    Manager(const Manager&) = delete;
-    Manager& operator=(Manager&&) = delete;
-    Manager& operator=(const Manager&) = delete;
-
-    virtual ~Manager();
-    [[nodiscard]] static Manager& get();
+    ~Manager() override;
 
     virtual void build(
         std::string&& name,

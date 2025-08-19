@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <boost/container/flat_map.hpp>
 #include <memory>
@@ -14,19 +15,14 @@ namespace gearoenix::physics::animation {
 struct Armature;
 struct Animation;
 struct Bone;
-struct Manager final {
+struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex this_lock;
     boost::container::flat_map<std::string, std::shared_ptr<Animation>> animations;
 
 public:
     Manager();
-    ~Manager();
-    [[nodiscard]] static Manager* get();
-    Manager(Manager&&) = delete;
-    Manager(const Manager&) = delete;
-    void operator=(Manager&& o) = delete;
-    void operator=(const Manager& o) = delete;
+    ~Manager() override;
 
     [[nodiscard]] core::ecs::EntityPtr create_armature(
         std::string&& name,

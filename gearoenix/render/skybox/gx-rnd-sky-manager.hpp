@@ -1,5 +1,6 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "gx-rnd-sky-types.hpp"
 #include <string>
@@ -13,16 +14,12 @@ struct Mesh;
 }
 
 namespace gearoenix::render::skybox {
-struct Manager {
+struct Manager : core::Singleton<Manager> {
 protected:
     Manager();
 
 public:
-    Manager(Manager&&) = delete;
-    Manager(const Manager&) = delete;
-    Manager& operator=(Manager&&) = delete;
-    Manager& operator=(const Manager&) = delete;
-    virtual ~Manager();
+    ~Manager() override;
 
     [[nodiscard]] virtual core::ecs::EntityPtr build(
         std::string&& name,

@@ -12,6 +12,7 @@
 #include "gx-rnd-sky-skybox.hpp"
 
 gearoenix::render::skybox::Manager::Manager()
+    : Singleton(this)
 {
     core::ecs::ComponentType::add<Skybox>();
 }

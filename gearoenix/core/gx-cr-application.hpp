@@ -1,5 +1,6 @@
 #pragma once
 #include "../platform/gx-plt-application.hpp"
+#include "gx-cr-singleton.hpp"
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #define GEAROENIX_START(ApplicationMainClass) GX_MAIN_ENTRY(                 \
@@ -12,9 +13,9 @@
 #endif
 
 namespace gearoenix::core {
-struct Application {
+struct Application : Singleton<Application> {
     Application();
-    virtual ~Application();
+    ~Application() override;
     virtual void update();
 };
 }

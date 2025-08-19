@@ -7,28 +7,13 @@
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "gx-rnd-mdl-model.hpp"
 
-namespace {
-gearoenix::render::model::Manager* instance = nullptr;
-}
-
 gearoenix::render::model::Manager::Manager()
+    : Singleton(this)
 {
-    GX_ASSERT_D(!instance);
-    instance = this;
     core::ecs::ComponentType::add<Model>();
 }
 
-gearoenix::render::model::Manager::~Manager()
-{
-    GX_ASSERT_D(instance);
-    instance = nullptr;
-}
-
-gearoenix::render::model::Manager& gearoenix::render::model::Manager::get()
-{
-    GX_ASSERT_D(instance);
-    return *instance;
-}
+gearoenix::render::model::Manager::~Manager() = default;
 
 gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(std::string&& name, core::ecs::Entity* const parent, meshes_set_t&& meshes, const bool)
 {

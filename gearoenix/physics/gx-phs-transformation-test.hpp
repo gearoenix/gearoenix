@@ -1,17 +1,18 @@
 #pragma once
+#include "../render/gizmo/gx-rnd-gzm-manager.hpp"
 #include "gx-phs-transformation.hpp"
-#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 #include <random>
 
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
+    const auto gizo_manager = std::make_unique<gearoenix::render::gizmo::Manager>();
+    (void)gizo_manager; // We need this to be available.
+
     gearoenix::core::ecs::ComponentType::add<gearoenix::physics::Transformation>();
 
     gearoenix::physics::Transformation transform("transform");

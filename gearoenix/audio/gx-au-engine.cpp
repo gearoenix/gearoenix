@@ -5,7 +5,6 @@
 
 gearoenix::audio::Engine::Engine()
     : Singleton(this)
-    , manager(*this)
 {
 }
 

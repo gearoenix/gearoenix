@@ -23,8 +23,6 @@ struct Engine final : core::Singleton<Engine> {
 public:
     Engine();
     ~Engine() override;
-    Engine(Engine&&) = delete;
-    Engine(const Engine&) = delete;
     void start_frame();
     void end_frame();
 };
