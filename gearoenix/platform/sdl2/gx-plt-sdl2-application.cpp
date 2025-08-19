@@ -12,7 +12,6 @@
 #endif
 
 namespace {
-gearoenix::platform::Application* instance = nullptr;
 bool sdl_initialized = false;
 
 #if GX_PLATFORM_WEBASSEMBLY
@@ -230,15 +229,10 @@ void gearoenix::platform::Application::fetch_events()
     }
 }
 
-gearoenix::platform::Application& gearoenix::platform::Application::get()
-{
-    return *instance;
-}
-
 gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF)
-    : base(GX_MAIN_ENTRY_ARGS)
+    : Singleton(this)
+    , base(GX_MAIN_ENTRY_ARGS)
 {
-    instance = this;
     initialize_sdl();
     initialize_screen();
     initialize_window();

@@ -181,7 +181,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
 
     auto values = std::make_shared<Values>(weak_self.lock(), std::move(entity_callback));
 
-    auto font = font::Manager::get().get("Roboto-Bold");
+    auto font = font::Manager::get().get_font("Roboto-Bold");
 
     material::Manager::get().get_unlit(
         "gearoenix-splash-bg",

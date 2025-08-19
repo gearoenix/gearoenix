@@ -41,6 +41,7 @@ gearoenix::render::engine::Engine::Engine(const Type engine_type)
     , engine_type(engine_type)
     , physics_engine(new physics::Engine())
     , font_manager(new font::Manager())
+    , gizmo_manager(new gizmo::Manager())
     , last_frame_time(std::chrono::high_resolution_clock::now())
 {
     core::job::register_current_thread();

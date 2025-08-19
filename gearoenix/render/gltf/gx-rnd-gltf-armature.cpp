@@ -62,7 +62,7 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
     }
     auto bone = context.animations.bone_entities.find(bone_node_index)->second->get_component_shared_ptr<physics::animation::Bone>();
 
-    auto entity = physics::animation::Manager::get()->create_armature(std::string(node.name), parent, std::move(bone));
+    auto entity = physics::animation::Manager::get().create_armature(std::string(node.name), parent, std::move(bone));
     auto* const transform = entity->get_component<physics::Transformation>();
     apply_transform(node_index, context, *transform);
     context.nodes.process(mesh_node_index, entity.get(), end_callback);
