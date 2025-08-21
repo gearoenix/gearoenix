@@ -13,10 +13,8 @@ thread_local std::uniform_real_distribution urd(0.5f, 1.0f);
 thread_local std::default_random_engine re(rd());
 }
 
-gearoenix::render::camera::Camera::Camera(
-    const core::object_type_index_t final_type,
-    const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform)
-    : Component(final_type, std::string(name))
+gearoenix::render::camera::Camera::Camera(core::ecs::Entity* const entity, const core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+    : Component(entity, final_type, std::string(name))
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))
     , debug_colour {

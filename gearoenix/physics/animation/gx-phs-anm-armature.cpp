@@ -17,7 +17,7 @@ void gearoenix::physics::animation::Armature::insert_bone(Bone* const bone)
 
 void gearoenix::physics::animation::Armature::write(platform::stream::Stream& stream) const
 {
-    GX_TODO; // I have to use object streamer
+    GX_TODO; // I have to use an object streamer
     stream.write_fail_debug(root_bone->get_object_id());
     stream.write_fail_debug(static_cast<std::uint32_t>(all_bones.size()));
     for (const auto* const bone : all_bones) {
@@ -54,8 +54,8 @@ void gearoenix::physics::animation::Armature::read(platform::stream::Stream& str
     });
 }
 
-gearoenix::physics::animation::Armature::Armature(std::string&& name, Transformation* transform)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::animation::Armature::Armature(core::ecs::Entity* const entity, std::string&& name, Transformation* transform)
+    : Component(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , transform(transform)
 {
 }

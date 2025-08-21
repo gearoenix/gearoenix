@@ -7,8 +7,8 @@
 #include "gx-gl-mesh.hpp"
 #include "material/gx-gl-material.hpp"
 
-gearoenix::gl::Model::Model(render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
-    : render::model::Model(core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
+gearoenix::gl::Model::Model(core::ecs::Entity* const entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
+    : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
 {
     for (const auto& mesh : meshes) {
         auto m = std::dynamic_pointer_cast<Mesh>(mesh);
@@ -44,7 +44,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(
     const bool is_transformable)
 {
     auto entity = Manager::build(std::move(name), parent, std::move(meshes), is_transformable);
-    entity->add_component(core::Object::construct<Model>(std::move(meshes), std::move(name), is_transformable));
+    entity->add_component(core::Object::construct<Model>(entity.get(), std::move(meshes), std::move(name), is_transformable));
     return entity;
 }
 

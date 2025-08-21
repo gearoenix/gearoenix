@@ -16,6 +16,7 @@ struct Skybox : core::ecs::Component {
     GX_GETSET_VAL_PRT(double, layer, 0.0);
 
     Skybox(
+        core::ecs::Entity* entity,
         core::object_type_index_t final_component_type_index,
         std::shared_ptr<mesh::Mesh>&& bound_mesh,
         Texture&& bound_texture,

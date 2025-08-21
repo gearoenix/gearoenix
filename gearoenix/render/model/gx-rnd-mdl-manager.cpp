@@ -22,8 +22,8 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(std::st
     for (const auto& m : meshes) {
         box.put(m->get_buffer()->get_box());
     }
-    auto transform = core::Object::construct<physics::Transformation>(entity->get_object_name() + "-transformation");
-    entity->add_component(core::Object::construct<physics::collider::Aabb3>(std::shared_ptr(transform), box, entity->get_object_name() + "-collider"));
+    auto transform = core::Object::construct<physics::Transformation>(entity.get(), entity->get_object_name() + "-transformation");
+    entity->add_component(core::Object::construct<physics::collider::Aabb3>(entity.get(), std::shared_ptr(transform), box, entity->get_object_name() + "-collider"));
     entity->add_component(std::move(transform));
     return entity;
 }

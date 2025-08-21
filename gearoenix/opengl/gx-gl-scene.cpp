@@ -7,8 +7,8 @@
 #include "gx-gl-label.hpp"
 #include <ranges>
 
-gearoenix::gl::Scene::Scene(std::string&& name, const double layer)
-    : render::scene::Scene(core::ecs::ComponentType::create_index(this), layer, std::move(name))
+gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const double layer)
+    : render::scene::Scene(entity, core::ecs::ComponentType::create_index(this), layer, std::move(name))
 {
 }
 
@@ -61,7 +61,7 @@ gearoenix::gl::SceneManager::~SceneManager() = default;
 gearoenix::core::ecs::EntityPtr gearoenix::gl::SceneManager::build(std::string&& name, double layer) const
 {
     auto entity = Manager::build(std::move(name), layer);
-    entity->add_component(core::Object::construct<Scene>(entity->get_object_name() + "-scene", layer));
+    entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));
     return entity;
 }
 

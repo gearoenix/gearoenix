@@ -17,16 +17,15 @@ void gearoenix::physics::collider::Aabb3::update_surrounding_box()
     surrounding_box.update();
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(
-    std::shared_ptr<Transformation>&& transform, const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
-    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::collider::Aabb3::Aabb3(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name)
+    : Collider(entity, std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
     , original_box(upper, lower)
 {
     surrounding_box = original_box;
 }
 
-gearoenix::physics::collider::Aabb3::Aabb3(std::shared_ptr<Transformation>&& transform, const math::Aabb3<double>& original_box, std::string&& name)
-    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::collider::Aabb3::Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Aabb3<double>& original_box, std::string&& name)
+    : Collider(entity, std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
     , original_box(original_box)
 {
     surrounding_box = original_box;

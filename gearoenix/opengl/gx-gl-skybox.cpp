@@ -33,10 +33,8 @@ gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Textur
 //     GX_UNIMPLEMENTED;
 // }
 
-gearoenix::gl::Skybox::Skybox(render::skybox::Texture&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name)
-    : render::skybox::Skybox(
-          core::ecs::ComponentType::create_index(this), std::shared_ptr<render::mesh::Mesh>(mesh),
-          std::move(texture), std::move(name))
+gearoenix::gl::Skybox::Skybox(core::ecs::Entity* const entity, render::skybox::Texture&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name)
+    : render::skybox::Skybox(entity, core::ecs::ComponentType::create_index(this), std::shared_ptr<render::mesh::Mesh>(mesh), std::move(texture), std::move(name))
     , gl_texture(::convert(bound_texture))
     , gl_mesh(std::move(mesh))
 {
@@ -80,9 +78,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::gl::SkyboxManager::build(
     std::shared_ptr<render::mesh::Mesh>&& mesh)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    entity->add_component(
-        core::Object::construct<Skybox>(std::move(texture), std::static_pointer_cast<Mesh>(std::move(mesh)),
-            entity->get_object_name() + "-gl-skybox"));
+    entity->add_component(core::Object::construct<Skybox>(entity.get(), std::move(texture), std::static_pointer_cast<Mesh>(std::move(mesh)), entity->get_object_name() + "-gl-skybox"));
     return entity;
 }
 

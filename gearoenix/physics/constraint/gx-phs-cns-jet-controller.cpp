@@ -106,8 +106,8 @@ gearoenix::core::event::Listener::Response gearoenix::physics::constraint::JetCo
     return Response::Continue;
 }
 
-gearoenix::physics::constraint::JetController::JetController(std::shared_ptr<Transformation>&& trn, std::string&& name)
-    : Constraint(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::constraint::JetController::JetController(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& trn, std::string&& name)
+    : Constraint(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , transformation(std::move(trn))
 {
     auto* const event_engine = platform::Application::get().get_base().get_event_engine();

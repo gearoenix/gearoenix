@@ -20,8 +20,8 @@ void gearoenix::physics::collider::Frustum::update_surrounding_box()
     // the actual update happens in the `update` function.
 }
 
-gearoenix::physics::collider::Frustum::Frustum(std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points)
-    : Collider(std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::collider::Frustum::Frustum(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points)
+    : Collider(entity, std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
     , frustum(points)
 {
     for (const auto& p : points) {

@@ -30,7 +30,7 @@ struct Directional final : Light {
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
 public:
-    explicit Directional(std::string&& name);
+    Directional(core::ecs::Entity* entity, std::string&& name);
     ~Directional() override;
 };
 
@@ -47,7 +47,7 @@ struct ShadowCasterDirectional : Light {
     GX_GET_CREF_PRV(std::shared_ptr<physics::Transformation>, shadow_transform);
     GX_GET_CREF_PRT(core::ecs::EntityPtr, shadow_camera_entity);
 
-    ShadowCasterDirectional(core::object_type_index_t final_type_index, std::string&& name);
+    ShadowCasterDirectional(core::ecs::Entity* entity, core::object_type_index_t final_type_index, std::string&& name);
 
 public:
     ~ShadowCasterDirectional() override;

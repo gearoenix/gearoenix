@@ -51,7 +51,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::gltf::create_empty_entity_tra
     const auto& node = context.data.nodes[node_index];
     GX_ASSERT_D(!node.name.empty());
     auto entity = core::ecs::Entity::construct(std::string(node.name), parent);
-    auto transform = core::Object::construct<physics::Transformation>(node.name + "-transformation");
+    auto transform = core::Object::construct<physics::Transformation>(entity.get(), node.name + "-transformation");
     apply_transform(node_index, context, *transform);
     entity->add_component(std::move(transform));
     return entity;

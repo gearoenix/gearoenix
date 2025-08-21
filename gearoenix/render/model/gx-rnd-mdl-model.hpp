@@ -26,7 +26,7 @@ struct Model : core::ecs::Component {
     GX_GET_CREF_PRT(meshes_set_t, meshes);
 
     /// \note A model can be static while it has a transform component.
-    Model(core::object_type_index_t final_component_type, bool is_transformable, meshes_set_t&& meshes, std::string&& name);
+    Model(core::ecs::Entity* entity, core::object_type_index_t final_component_type, bool is_transformable, meshes_set_t&& meshes, std::string&& name);
 
 public:
     /// By having a value (even an empty one) we show that we want to have camera filtering enabled.

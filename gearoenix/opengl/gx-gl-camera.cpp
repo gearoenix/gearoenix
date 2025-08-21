@@ -74,14 +74,14 @@ void gearoenix::gl::Camera::update_target(core::job::EndCaller<>&& end)
     }));
 }
 
-gearoenix::gl::Camera::Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
-    : render::camera::Camera(core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
+gearoenix::gl::Camera::Camera(core::ecs::Entity* const entity, const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+    : render::camera::Camera(entity, core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
 {
 }
 
-void gearoenix::gl::Camera::construct(const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
+void gearoenix::gl::Camera::construct(core::ecs::Entity* const entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
-    c.set_return(Object::construct<Camera>(name, render::camera::Target(), std::move(transform)));
+    c.set_return(Object::construct<Camera>(entity, name, render::camera::Target(), std::move(transform)));
     core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c] {
         auto& self = *c.get_return();
         self.bloom_prefilter_shader = shader::Manager::get().get_shader<shader::BloomPrefilter>();
@@ -391,10 +391,9 @@ void gearoenix::gl::CameraManager::build(
     core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
     build_impl(std::move(name), parent, entity_callback);
-    const auto* const entity = entity_callback.get_return().get();
+    auto* const entity = entity_callback.get_return().get();
     auto transform = entity->get_component_shared_ptr<physics::Transformation>();
-    Camera::construct(
-        entity->get_object_name() + "-gl-camera",
+    Camera::construct(entity, entity->get_object_name() + "-gl-camera",
         core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) {
             end.get_return()->add_component(std::move(c));
         }),

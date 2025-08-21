@@ -24,7 +24,7 @@ struct Skybox final : render::skybox::Skybox {
     //                          core::job::EndCaller<> &&end_callback) const override;
 
 public:
-    Skybox(render::skybox::Texture&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name);
+    Skybox(core::ecs::Entity* entity, render::skybox::Texture&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name);
     // static void construct(std::string &&name,std::shared_ptr<platform::stream::Stream> &&stream,core::job::EndCallerShared<Component> &&end);
     ~Skybox() override;
     [[nodiscard]] uint get_vertex_object() const;

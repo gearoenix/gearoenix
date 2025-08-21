@@ -35,7 +35,7 @@ struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index };
 
-    BakedReflection(std::string&& name, std::shared_ptr<TextureCube>&& irr, std::shared_ptr<TextureCube>&& rad, const math::Aabb3<double>& include_box);
+    BakedReflection(core::ecs::Entity* entity, std::string&& name, std::shared_ptr<TextureCube>&& irr, std::shared_ptr<TextureCube>&& rad, const math::Aabb3<double>& include_box);
     ~BakedReflection() override;
 };
 
@@ -64,11 +64,13 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
 
 public:
     RuntimeReflection(
+        core::ecs::Entity* entity,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
         std::string&& name);
     static void construct(
+        core::ecs::Entity* entity,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,

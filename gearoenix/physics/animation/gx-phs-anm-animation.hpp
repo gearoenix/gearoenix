@@ -80,7 +80,7 @@ struct AnimationPlayer final : core::ecs::Component {
     void show_debug_gui() override;
 
 public:
-    AnimationPlayer(std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time);
+    AnimationPlayer(core::ecs::Entity* entity, std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time);
     ~AnimationPlayer() override;
     void update_time(double delta_time);
     void set_loop_start_time(double t);

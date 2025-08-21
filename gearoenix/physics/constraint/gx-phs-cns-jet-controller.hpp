@@ -33,7 +33,7 @@ struct JetController final : core::event::Listener, Constraint {
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 
 public:
-    JetController(std::shared_ptr<Transformation>&&, std::string&& name);
+    JetController(core::ecs::Entity* entity, std::shared_ptr<Transformation>&&, std::string&& name);
     ~JetController() override;
     void update() override;
     void clear_transforms();

@@ -12,7 +12,7 @@ struct Light : core::ecs::Component {
     bool is_shadow_caster = false;
 
 protected:
-    Light(core::object_type_index_t final_type_index, std::string&& name);
+    Light(core::ecs::Entity* entity, core::object_type_index_t final_type_index, std::string&& name);
 
 public:
     ~Light() override;

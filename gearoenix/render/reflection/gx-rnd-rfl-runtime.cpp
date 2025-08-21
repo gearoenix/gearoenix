@@ -11,12 +11,13 @@
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 
 gearoenix::render::reflection::Runtime::Runtime(
+    core::ecs::Entity* const entity,
     const core::object_type_index_t final_component_type_index,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
     std::string&& name)
-    : Probe(final_component_type_index, include_box, std::move(name))
+    : Probe(entity, final_component_type_index, include_box, std::move(name))
     , on_rendered([] { })
     , receive_box(receive_box)
     , exclude_box(exclude_box)
@@ -70,6 +71,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             .set_type(texture::Type::TextureCube)
             .set_has_mipmap(true);
     auto runtime_self = object_self.lock();
+
     const core::job::EndCaller when_all_textures_are_ready([this, _s = runtime_self, faces, main_end_callback = std::move(end_callback)]() -> void {
         for (auto face_index = 0; face_index < 6; ++face_index) {
             const auto& face = faces[face_index];
@@ -180,7 +182,6 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             std::move(camera_name), entity,
             core::job::EndCaller<core::ecs::EntityPtr>([this, face_index, when_all_textures_are_ready, self = runtime_self](core::ecs::EntityPtr&& camera_entity) {
                 cameras[face_index].cmr = camera_entity->get_component_shared_ptr<camera::Camera>();
-                ;
                 cameras[face_index].trn = camera_entity->get_component_shared_ptr<physics::Transformation>();
                 (void)when_all_textures_are_ready;
                 (void)self;

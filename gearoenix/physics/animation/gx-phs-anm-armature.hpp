@@ -19,7 +19,7 @@ struct Armature final : core::ecs::Component {
     void insert_bone(Bone* bone);
 
 public:
-    Armature(std::string&& name, Transformation* transform);
+    Armature(core::ecs::Entity* entity, std::string&& name, Transformation* transform);
     ~Armature() override;
     void set_root_bone(std::shared_ptr<Bone>&&);
     void sort_all_bones(const std::vector<int>& bone_indices);

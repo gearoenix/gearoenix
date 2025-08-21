@@ -10,7 +10,7 @@ struct Point final : Light {
 
     math::Vec3<float> position = { 0.0f, 0.0f, 0.0f };
 
-    explicit Point(std::string&& name);
+    Point(core::ecs::Entity* entity, std::string&& name);
     ~Point() override;
 };
 }

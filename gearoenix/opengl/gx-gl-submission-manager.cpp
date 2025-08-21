@@ -245,12 +245,12 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
                 glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
                 radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
                 const auto roughness = static_cast<float>(r->get_roughnesses()[li]);
-                radiance_shader->set_roughness_data(reinterpret_cast<const float*>(&roughness));
+                radiance_shader->set_roughness_data(&roughness);
                 const float roughness_p_4 = roughness * roughness * roughness * roughness;
-                radiance_shader->set_roughness_p_4_data(reinterpret_cast<const float*>(&roughness_p_4));
+                radiance_shader->set_roughness_p_4_data(&roughness_p_4);
                 const auto resolution = static_cast<float>(r->get_environment()->get_info().get_width());
                 const float sa_texel = (static_cast<float>(std::numbers::pi) / 1.5f) / (resolution * resolution);
-                radiance_shader->set_sa_texel_data(reinterpret_cast<const float*>(&sa_texel));
+                radiance_shader->set_sa_texel_data(&sa_texel);
                 glBindVertexArray(screen_vertex_object);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
                 return;

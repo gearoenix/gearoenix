@@ -27,7 +27,7 @@ struct Frustum final : Collider {
     void update_surrounding_box() override;
 
 public:
-    Frustum(std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points);
+    Frustum(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points);
     /// For the arrangement of point go to the math::Frustum constructor
     void update(const std::array<math::Vec3<double>, 8>& points);
     [[nodiscard]] bool check_intersection(const math::Aabb3<double>& box) const override;

@@ -11,7 +11,7 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
-    explicit Scene(std::string&& name, double layer);
+    Scene(core::ecs::Entity* entity, std::string&& name, double layer);
     ~Scene() override;
     void update() override;
     void render_shadows(uint& current_shader);

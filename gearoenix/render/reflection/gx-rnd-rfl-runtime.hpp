@@ -73,6 +73,7 @@ struct Runtime : Probe {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, environment_depth);
 
     Runtime(
+        core::ecs::Entity* entity,
         core::object_type_index_t final_component_type_index,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
