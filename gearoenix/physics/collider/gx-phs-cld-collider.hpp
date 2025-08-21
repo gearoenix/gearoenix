@@ -16,7 +16,7 @@ struct Collider : core::ecs::Component, render::gizmo::Drawer {
     GX_GET_CREF_PRT(math::Aabb3<double>, surrounding_box);
     GX_GET_VAL_PRT(bool, surrounding_box_changed, false);
 
-    Collider(std::shared_ptr<Transformation>&& transform, core::object_type_index_t final_type_index, std::string&& name);
+    Collider(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, core::object_type_index_t final_type_index, std::string&& name);
     void show_debug_gui() override;
 
 public:

@@ -2,7 +2,6 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../gx-phs-transformation.hpp"
-#include <vector>
 
 void gearoenix::physics::animation::Bone::write(platform::stream::Stream& s) const
 {
@@ -70,8 +69,8 @@ void gearoenix::physics::animation::Bone::read(platform::stream::Stream& s, core
     });
 }
 
-gearoenix::physics::animation::Bone::Bone(std::shared_ptr<Transformation>&& transform, std::string&& name)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::animation::Bone::Bone(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, std::string&& name)
+    : Component(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , transform(std::move(transform))
 {
 }
@@ -81,9 +80,9 @@ gearoenix::physics::animation::Bone::~Bone() = default;
 gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Bone::build(std::string&& name, core::ecs::Entity* const parent)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    auto transform = construct<Transformation>(entity->get_object_name() + "-transformation");
+    auto transform = construct<Transformation>(entity.get(), entity->get_object_name() + "-transformation");
     entity->add_component(std::shared_ptr(transform));
-    entity->add_component(construct<Bone>(std::move(transform), entity->get_object_name() + "-bone"));
+    entity->add_component(construct<Bone>(entity.get(), std::move(transform), entity->get_object_name() + "-bone"));
     return entity;
 }
 

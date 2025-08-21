@@ -5,9 +5,8 @@
 #include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../gx-phs-transformation.hpp"
 
-gearoenix::physics::collider::Collider::Collider(
-    std::shared_ptr<Transformation>&& transform, const core::object_type_index_t final_type_index, std::string&& name)
-    : Component(final_type_index, std::move(name))
+gearoenix::physics::collider::Collider::Collider(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, const core::object_type_index_t final_type_index, std::string&& name)
+    : Component(entity, final_type_index, std::move(name))
     , transform(std::move(transform))
 {
 }

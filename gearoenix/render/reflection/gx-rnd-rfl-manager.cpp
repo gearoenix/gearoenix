@@ -59,13 +59,9 @@ void gearoenix::render::reflection::Manager::build_baked(
 
 void gearoenix::render::reflection::Manager::update()
 {
-    core::ecs::World::get().parallel_system<Runtime>(
-        [](
-            const auto /*entity_id*/,
-            auto* const runtime_probe,
-            const unsigned int /*kernel_index*/) {
-            if (runtime_probe->get_enabled()) {
-                runtime_probe->update_state();
-            }
-        });
+    core::ecs::World::get().parallel_system<Runtime>([](const auto /*entity_id*/, auto* const runtime_probe, const unsigned int /*kernel_index*/) {
+        if (runtime_probe->get_enabled()) {
+            runtime_probe->update_state();
+        }
+    });
 }

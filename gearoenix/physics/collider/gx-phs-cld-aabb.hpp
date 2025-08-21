@@ -13,8 +13,8 @@ struct Aabb3 final : Collider {
     void update_surrounding_box() override;
 
 public:
-    Aabb3(std::shared_ptr<Transformation>&& transform, const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
-    Aabb3(std::shared_ptr<Transformation>&& transform, const math::Aabb3<double>& original_box, std::string&& name);
+    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
+    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Aabb3<double>& original_box, std::string&& name);
     ~Aabb3() override;
     void draw_gizmo() override;
 };

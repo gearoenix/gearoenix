@@ -7,17 +7,16 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-gearoenix::render::light::Directional::Directional(std::string&& name)
-    : Light(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::render::light::Directional::Directional(core::ecs::Entity* const entity, std::string&& name)
+    : Light(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , direction(0.0f, 0.0f, -1.0f)
 {
 }
 
 gearoenix::render::light::Directional::~Directional() = default;
 
-gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
-    const core::object_type_index_t final_type_index, std::string&& name)
-    : Light(final_type_index, std::move(name))
+gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(core::ecs::Entity* const entity, const core::object_type_index_t final_type_index, std::string&& name)
+    : Light(entity, final_type_index, std::move(name))
 {
 }
 

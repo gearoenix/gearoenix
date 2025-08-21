@@ -17,7 +17,7 @@
 //     scale.write(*s);
 //
 //     s->write_fail_debug(static_cast<std::uint32_t>(children.size()));
-//     for (const auto* const c : children) {
+//     for (const auto* const c: children) {
 //         s->write_fail_debug(c->get_entity_id());
 //     }
 //     const auto has_parent = nullptr != parent;
@@ -72,8 +72,8 @@
 //     }
 // }
 
-gearoenix::physics::Transformation::Transformation(std::string&& name)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::Transformation::Transformation(core::ecs::Entity* const entity, std::string&& name)
+    : Component(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , scale(1.0)
 {
 }

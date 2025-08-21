@@ -9,11 +9,12 @@
 gearoenix::gl::ReflectionProbe::~ReflectionProbe() = default;
 
 gearoenix::gl::BakedReflection::BakedReflection(
+    core::ecs::Entity* const entity,
     std::string&& name,
     std::shared_ptr<TextureCube>&& irr,
     std::shared_ptr<TextureCube>&& rad,
     const math::Aabb3<double>& include_box)
-    : Baked(core::ecs::ComponentType::create_index(this), std::move(irr), std::move(rad), include_box, std::move(name))
+    : Baked(entity, core::ecs::ComponentType::create_index(this), std::move(irr), std::move(rad), include_box, std::move(name))
 {
     gl_irradiance = std::dynamic_pointer_cast<TextureCube>(irradiance);
     gl_radiance = std::dynamic_pointer_cast<TextureCube>(radiance);
@@ -63,17 +64,19 @@ void gearoenix::gl::RuntimeReflection::initialise_gl()
 }
 
 gearoenix::gl::RuntimeReflection::RuntimeReflection(
+    core::ecs::Entity* const entity,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
     std::string&& name)
-    : Runtime(core::ecs::ComponentType::create_index(this), receive_box, exclude_box, include_box, std::move(name))
+    : Runtime(entity, core::ecs::ComponentType::create_index(this), receive_box, exclude_box, include_box, std::move(name))
     , gl_environment_targets_v()
     , gl_irradiance_targets_v()
 {
 }
 
 void gearoenix::gl::RuntimeReflection::construct(
+    core::ecs::Entity* const entity,
     const math::Aabb3<double>& receive_box,
     const math::Aabb3<double>& exclude_box,
     const math::Aabb3<double>& include_box,
@@ -83,7 +86,7 @@ void gearoenix::gl::RuntimeReflection::construct(
     const std::uint32_t radiance_resolution,
     core::job::EndCallerShared<RuntimeReflection>&& end_callback)
 {
-    auto self = Object::construct<RuntimeReflection>(receive_box, exclude_box, include_box, std::move(name));
+    auto self = Object::construct<RuntimeReflection>(entity, receive_box, exclude_box, include_box, std::move(name));
     auto* const ptr = self.get();
     end_callback.set_return(std::move(self));
     ptr->set_runtime_reflection_self(environment_resolution, irradiance_resolution, radiance_resolution,
@@ -103,7 +106,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::gl::ReflectionManager::build_baked(
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
     entity->add_component(core::Object::construct<BakedReflection>(
-        entity->get_object_name() + "-gl-reflection",
+        entity.get(), entity->get_object_name() + "-gl-reflection",
         std::dynamic_pointer_cast<TextureCube>(std::move(irradiance)),
         std::dynamic_pointer_cast<TextureCube>(std::move(radiance)),
         include_box));
@@ -122,9 +125,10 @@ void gearoenix::gl::ReflectionManager::build_runtime(
     core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    const auto* const ptr = entity.get();
+    auto* const ptr = entity.get();
     entity_callback.set_return(std::move(entity));
     RuntimeReflection::construct(
+        ptr,
         receive_box,
         exclude_box,
         include_box,
@@ -144,11 +148,11 @@ gearoenix::gl::ReflectionManager::ReflectionManager()
     core::ecs::ComponentType::add<BakedReflection>();
     core::ecs::ComponentType::add<RuntimeReflection>();
 
-    Singleton<TextureManager>::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](auto&& t) {
+    Singleton<TextureManager>::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
         auto gt1 = std::dynamic_pointer_cast<TextureCube>(std::move(t));
         auto gt2 = gt1;
         black = core::Object::construct<BakedReflection>(
-            "reflection-default-black", std::move(gt1), std::move(gt2),
+            nullptr, "reflection-default-black", std::move(gt1), std::move(gt2),
             math::Aabb3(math::Vec3(std::numeric_limits<double>::max()), -math::Vec3(std::numeric_limits<double>::max())));
     }));
 }

@@ -12,10 +12,10 @@ struct Component : Object {
     friend struct ComponentType;
 
     GX_GETSET_VAL_PRT(bool, enabled, true);
-    GX_GETSET_PTR_PRT(Entity, entity);
+    GX_GET_PTR_PRT(Entity, entity);
 
-    Component(object_type_index_t final_type_index, std::string&& name);
-    Component(object_type_index_t final_type_index, object_id_t object_id, std::string&& name);
+    Component(Entity* entity, object_type_index_t final_type_index, std::string&& name);
+    Component(Entity* entity, object_type_index_t final_type_index, object_id_t object_id, std::string&& name);
 
     virtual void write(platform::stream::Stream&) const;
     void read(platform::stream::Stream&);
@@ -27,5 +27,6 @@ public:
     Component& operator=(Component&&) = delete;
     Component& operator=(const Component&) = delete;
     void show_debug_gui() override;
+    virtual void set_entity(Entity* e);
 };
 }

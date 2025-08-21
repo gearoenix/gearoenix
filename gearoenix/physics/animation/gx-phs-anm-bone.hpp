@@ -30,7 +30,7 @@ struct Bone final : core::ecs::Component {
     void read(platform::stream::Stream&, core::job::EndCaller<>&&);
 
 public:
-    Bone(std::shared_ptr<Transformation>&& transform, std::string&& name);
+    Bone(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, std::string&& name);
     ~Bone() override;
     [[nodiscard]] static core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent);
     void set_inverse_bind_matrix(const math::Mat4x4<double>& m);

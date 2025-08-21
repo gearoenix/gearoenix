@@ -16,7 +16,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::constraint::Manager::create_
     std::string&& name, std::shared_ptr<Transformation>&& transform, core::ecs::Entity* const parent) const
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    entity->add_component(core::Object::construct<JetController>(std::move(transform), entity->get_object_name() + "-jet-controller"));
+    entity->add_component(core::Object::construct<JetController>(entity.get(), std::move(transform), entity->get_object_name() + "-jet-controller"));
     return entity;
 }
 

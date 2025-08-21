@@ -1,6 +1,5 @@
 #include "gx-gl-light.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
@@ -13,8 +12,8 @@ void gearoenix::gl::ShadowCasterDirectionalLight::write_in_io_context(
     GX_UNIMPLEMENTED;
 }
 
-gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(std::string&& name)
-    : ShadowCasterDirectional(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::gl::ShadowCasterDirectionalLight::ShadowCasterDirectionalLight(core::ecs::Entity* const entity, std::string&& name)
+    : ShadowCasterDirectional(entity, core::ecs::ComponentType::create_index(this), std::move(name))
 {
 }
 
@@ -39,7 +38,7 @@ void gearoenix::gl::ShadowCasterDirectionalLight::set_shadow_map_target(std::sha
 gearoenix::core::ecs::EntityPtr gearoenix::gl::LightManager::build_directional(std::string&& name, core::ecs::Entity* const parent)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    entity->add_component(core::Object::construct<render::light::Directional>(entity->get_object_name() + "-directional-light"));
+    entity->add_component(core::Object::construct<render::light::Directional>(entity.get(), entity->get_object_name() + "-directional-light"));
     return entity;
 }
 
@@ -56,7 +55,7 @@ void gearoenix::gl::LightManager::build_shadow_caster_directional(
         std::move(name), parent, shadow_map_resolution, camera_far, camera_near, camera_aspect,
         core::job::EndCaller<core::ecs::EntityPtr>([&](core::ecs::EntityPtr&& entity) -> void {
             auto* const e = entity.get();
-            e->add_component(core::Object::construct<ShadowCasterDirectionalLight>(e->get_object_name() + "-gl-directional-shadow-caster"));
+            e->add_component(core::Object::construct<ShadowCasterDirectionalLight>(e, e->get_object_name() + "-gl-directional-shadow-caster"));
             entity_callback.set_return(std::move(entity));
             e->get_component_shared_ptr<ShadowCasterDirectionalLight>()->initialise(
                 shadow_map_resolution, camera_far, camera_near, camera_aspect,

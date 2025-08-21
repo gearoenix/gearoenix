@@ -71,8 +71,8 @@ struct Camera final : render::camera::Camera {
     void update_target(core::job::EndCaller<>&& end) override;
 
 public:
-    Camera(const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform);
-    static void construct(const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
+    Camera(core::ecs::Entity* entity, const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform);
+    static void construct(core::ecs::Entity* entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
     ~Camera() override;
     void render_shadow(const render::record::Camera&, uint& current_shader) const;
     void render_forward(const Scene& scene, const render::record::Camera&, uint& current_shader) const;

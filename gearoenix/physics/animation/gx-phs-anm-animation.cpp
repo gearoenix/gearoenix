@@ -21,7 +21,7 @@ gearoenix::physics::animation::Animation::~Animation() = default;
 
 void gearoenix::physics::animation::Animation::write(platform::stream::Stream&) const
 {
-    GX_TODO; // we need object streamer here
+    GX_TODO; // we need an object streamer here
 }
 
 gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(std::string&& name, std::shared_ptr<Bone>&& root_bone)
@@ -174,7 +174,7 @@ void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()
 void gearoenix::physics::animation::SpriteAnimation::write(platform::stream::Stream& s) const
 {
     Animation::write(s);
-    GX_TODO; // we need object streamer here
+    GX_TODO; // we need an object streamer here
     // sprite->write(s);
     s.write_fail_debug(count);
     aspect.write(s);
@@ -227,9 +227,8 @@ void gearoenix::physics::animation::AnimationPlayer::show_debug_gui()
     });
 }
 
-gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(
-    std::shared_ptr<Animation>&& animation, std::string&& name, const double starting_time)
-    : Component(core::ecs::ComponentType::create_index(this), std::move(name))
+gearoenix::physics::animation::AnimationPlayer::AnimationPlayer(core::ecs::Entity* const entity, std::shared_ptr<Animation>&& animation, std::string&& name, const double starting_time)
+    : Component(entity, core::ecs::ComponentType::create_index(this), std::move(name))
     , time(starting_time)
     , animation(std::move(animation))
 {

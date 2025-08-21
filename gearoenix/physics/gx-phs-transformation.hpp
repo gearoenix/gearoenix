@@ -52,7 +52,7 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     // void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
 
 public:
-    explicit Transformation(std::string&& name);
+    explicit Transformation(core::ecs::Entity* entity, std::string&& name);
     ~Transformation() override;
     void set_local_matrix(const math::Mat4x4<double>&);
     [[nodiscard]] math::Vec3<double> get_global_position() const;

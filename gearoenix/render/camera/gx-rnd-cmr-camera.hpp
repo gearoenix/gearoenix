@@ -67,7 +67,7 @@ struct Camera : core::ecs::Component {
     GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
     GX_GET_CVAL_PRT(std::string, render_pass_name);
 
-    Camera(core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
+    Camera(core::ecs::Entity* entity, core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
 
     /// It should be called exactly after the shared_ptr got generated, and it has a valid weak_ptr of self.
     void initialise();

@@ -8,14 +8,16 @@
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-world.hpp"
 
-gearoenix::core::ecs::Component::Component(const object_type_index_t final_type_index, std::string&& name)
+gearoenix::core::ecs::Component::Component(Entity* const entity, const object_type_index_t final_type_index, std::string&& name)
     : Object(final_type_index, std::move(name))
+    , entity(entity)
 {
     GX_ASSERT_D(ComponentType::check(final_type_index));
 }
 
-gearoenix::core::ecs::Component::Component(const object_type_index_t final_type_index, const object_id_t object_id, std::string&& name)
+gearoenix::core::ecs::Component::Component(Entity* const entity, const object_type_index_t final_type_index, const object_id_t object_id, std::string&& name)
     : Object(final_type_index, object_id, std::move(name))
+    , entity(entity)
 {
     GX_ASSERT_D(ComponentType::check(final_type_index));
 }
@@ -56,4 +58,9 @@ void gearoenix::core::ecs::Component::show_debug_gui()
             ImGui::TreePop();
         }
     });
+}
+
+void gearoenix::core::ecs::Component::set_entity(Entity* const e)
+{
+    entity = e;
 }

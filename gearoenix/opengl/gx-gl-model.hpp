@@ -26,7 +26,7 @@ struct Model final : render::model::Model {
     GX_GET_CREF_PRV(gl_meshes_set_t, gl_meshes);
 
 public:
-    Model(render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
+    Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
     ~Model() override;
     void render_shadow(
         const render::record::Camera& camera,

@@ -18,6 +18,7 @@ struct Baked : Probe {
 
 protected:
     Baked(
+        core::ecs::Entity* entity,
         core::object_type_index_t final_component_type_index,
         std::shared_ptr<texture::TextureCube>&& irradiance,
         std::shared_ptr<texture::TextureCube>&& radiance,
