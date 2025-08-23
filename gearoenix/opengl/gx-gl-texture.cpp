@@ -11,7 +11,7 @@
 #include <vector>
 
 #ifdef GX_DEBUG_MODE
-// #define GX_DEBUG_TEXTURE_WRITE
+#define GX_DEBUG_TEXTURE_WRITE false
 #endif
 
 namespace {
@@ -215,11 +215,10 @@ void gearoenix::gl::Texture2D::write(
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, object, mip_index);
             glReadPixels(0, 0, level_width, level_height, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
             flip_texture(data, level_height);
-#ifdef GX_DEBUG_TEXTURE_WRITE
-            const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
-            platform::stream::Local l(e.get_platform_application(),
-                "texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
-            write_image(l, data.data(), level_width, level_height, info.format);
+#if GX_DEBUG_TEXTURE_WRITE
+            const auto ext = render::texture::format_has_float_component(info.get_format()) ? "hdr" : "png";
+            platform::stream::Local l("texture-2d-gl-name-" + name + "-level-" + std::to_string(mip_index) + "." + ext, true);
+            render::texture::Image::write_image(l, data.data(), level_width, level_height, info.format);
 #endif
             auto ms = std::make_shared<platform::stream::Memory>();
             sss->push_back(ms);
@@ -293,7 +292,7 @@ void gearoenix::gl::TextureCube::write(
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
                 flip_texture(data, level_aspect);
-#ifdef GX_DEBUG_TEXTURE_WRITE
+#if GX_DEBUG_TEXTURE_WRITE
                 const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
                 platform::stream::Local l(e.get_platform_application(),
                     "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);

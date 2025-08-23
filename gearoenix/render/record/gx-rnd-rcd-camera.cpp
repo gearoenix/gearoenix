@@ -113,6 +113,10 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
 
     last_camera_index = 0;
     indices_map.clear();
+    mains.clear();
+    shadow_casters.clear();
+    reflections.clear();
+
     std::uint64_t flag = 1;
     core::ecs::World::get().synchronised_system<core::ecs::All<camera::Camera, physics::Transformation, physics::collider::Collider>>(
         [&](auto* const e, auto* const cam, auto* const trn, auto* const cld) {
