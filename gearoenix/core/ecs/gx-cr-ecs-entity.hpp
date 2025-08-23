@@ -2,6 +2,7 @@
 #include "../gx-cr-object-type-indices.hpp"
 #include "../gx-cr-object.hpp"
 #include "../gx-cr-static-flat-map.hpp"
+#include "gx-cr-ecs-condition.hpp"
 #include "gx-cr-ecs-entity-ptr.hpp"
 #include "gx-cr-ecs-types.hpp"
 
@@ -36,6 +37,38 @@ struct Entity final : Object {
 
     void write(std::shared_ptr<platform::stream::Stream>&&, std::shared_ptr<ObjectStreamer>&&, job::EndCaller<>&&) override;
 
+    template <typename T>
+    struct ConditionCheck final {
+        [[nodiscard]] constexpr static bool match(const components_t& id)
+        {
+            return id.contains(T::object_type_index);
+        }
+    };
+
+    template <typename Condition>
+    struct ConditionCheck<Not<Condition>> final {
+        [[nodiscard]] constexpr static bool match(const components_t& id)
+        {
+            return !ConditionCheck<Condition>::match(id);
+        }
+    };
+
+    template <typename... Conditions>
+    struct ConditionCheck<All<Conditions...>> final {
+        [[nodiscard]] constexpr static bool match(const components_t& id)
+        {
+            return (ConditionCheck<Conditions>::match(id) && ...);
+        }
+    };
+
+    template <typename... Conditions>
+    struct ConditionCheck<Any<Conditions...>> final {
+        [[nodiscard]] constexpr static bool match(const components_t& id)
+        {
+            return (ConditionCheck<Conditions>::match(id) || ...);
+        }
+    };
+
 public:
     explicit Entity(std::string&& name);
     [[nodiscard]] static EntityPtr construct(std::string&& name, Entity* parent);
@@ -62,6 +95,12 @@ public:
     {
         static_assert(std::is_base_of_v<Component, ComponentType>);
         return std::static_pointer_cast<ComponentType>(get_component(ComponentType::object_type_index));
+    }
+
+    template <typename Condition>
+    [[nodiscard]] constexpr bool satisfy() const
+    {
+        return ConditionCheck<Condition>::match(all_types_to_components);
     }
 };
 }

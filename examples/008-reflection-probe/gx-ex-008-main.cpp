@@ -20,8 +20,8 @@
 #include <gearoenix/render/texture/gx-rnd-txt-texture-cube.hpp>
 
 namespace {
-constexpr auto EXPORT_ENVIRONMENT = false;
-constexpr auto EXPORT_REFLECTION = false;
+constexpr auto EXPORT_ENVIRONMENT = true;
+constexpr auto EXPORT_REFLECTION = true;
 constexpr auto EXPORT_ANY = EXPORT_ENVIRONMENT || EXPORT_REFLECTION;
 
 template <typename T>
