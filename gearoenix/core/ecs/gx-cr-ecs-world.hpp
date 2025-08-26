@@ -3,6 +3,7 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-entity-ptr.hpp"
+#include <map>
 #include <memory>
 #include <variant>
 
@@ -48,6 +49,9 @@ private:
     std::mutex delayed_actions_lock;
     std::vector<Action> delayed_actions;
 
+    std::mutex entities_names_map_lock;
+    std::map<std::string, std::weak_ptr<Entity>> entities_names_map;
+
 public:
     World();
     ~World() override;
@@ -67,6 +71,8 @@ public:
 
     [[nodiscard]] Archetype* get_archetype(const EntityPtr&);
     [[nodiscard]] Archetype* get_archetype(const Entity*);
+
+    [[nodiscard]] std::optional<EntityPtr> get_entity(const std::string& name);
 
     /// Highly optimized way of system execution
     template <typename Condition, typename F>

@@ -5,18 +5,13 @@
 
 namespace gearoenix::render::imgui {
 struct EntitySelector final {
-    engine::Engine& e;
-
     GX_GET_CREF_PRV(std::vector<const char*>, entity_names);
-    GX_GET_CREF_PRV(std::vector<core::ecs::entity_id_t>, ids);
+    GX_GET_CREF_PRV(std::vector<core::ecs::Entity*>, ids);
     std::uint64_t last_update = 0;
     int current_selection = -1;
 
 public:
-    explicit EntitySelector(engine::Engine& e)
-        : e(e)
-    {
-    }
+    EntitySelector() = default;
 
     EntitySelector(EntitySelector&&) = delete;
     EntitySelector(const EntitySelector&) = delete;
@@ -24,19 +19,23 @@ public:
     template <typename Condition>
     void show()
     {
-        if (e.get_frame_number_from_start() != last_update) {
-            last_update = e.get_frame_number_from_start();
+        if (engine::Engine::get().get_frame_number_from_start() != last_update) {
+            last_update = engine::Engine::get().get_frame_number_from_start();
 
             entity_names.clear();
             ids.clear();
 
-            core::ecs::World::get()->synchronised_system<Condition>([this](const auto id, const auto...) {
-                ids.push_back(id);
-                entity_names.push_back(core::ecs::World::get()->get_entity(id)->get_name().c_str());
+            core::ecs::World::get().synchronised_system<Condition>([this](auto* const e, const auto...) {
+                ids.push_back(e);
+                entity_names.push_back(e->get_object_name().c_str());
             });
         }
 
-        ImGui::Combo("Select Scene", &current_selection, entity_names.data(), static_cast<int>(entity_names.size()));
+        if (entity_names.empty()) {
+            current_selection = -1;
+        } else {
+            ImGui::Combo("Select Scene", &current_selection, entity_names.data(), static_cast<int>(entity_names.size()));
+        }
     }
 
     [[nodiscard]] bool selected() const
@@ -44,12 +43,12 @@ public:
         return current_selection >= 0;
     }
 
-    [[nodiscard]] core::ecs::entity_id_t get_selection() const
+    [[nodiscard]] core::ecs::Entity* get_selection() const
     {
         if (selected()) {
             return ids[current_selection];
         }
-        return core::ecs::invalid_entity_id;
+        return nullptr;
     }
 };
 }

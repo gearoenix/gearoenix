@@ -1,4 +1,5 @@
 #include "gx-ed-vp-button.hpp"
+
 #include <gearoenix/core/gx-cr-string.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 
@@ -43,7 +44,7 @@ void gearoenix::editor::viewport::Button::show()
     }
 
     if (nullptr != icon_ptr) {
-        dl->AddImage(icon_ptr, icon_start_point, icon_end_point, { 0, 1 }, { 1, 0 });
+        dl->AddImage(static_cast<ImTextureID>(reinterpret_cast<std::size_t>(icon_ptr)), icon_start_point, icon_end_point, { 0, 1 }, { 1, 0 });
     }
 
     if (toggled ? !toggled_text.empty() : !text.empty()) {

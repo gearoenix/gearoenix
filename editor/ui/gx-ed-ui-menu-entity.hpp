@@ -7,11 +7,8 @@ struct EntitySelector;
 }
 
 namespace gearoenix::editor::ui {
-struct Manager;
 struct MenuEntity final {
 private:
-    Manager& manager;
-
     bool is_create_skybox_open = false;
     std::string create_skybox_entity_name;
     std::string create_skybox_path;
@@ -22,8 +19,9 @@ private:
     void show_create_menu();
 
 public:
-    explicit MenuEntity(Manager& manager);
+    MenuEntity();
     ~MenuEntity();
     void update();
+    void renew();
 };
 }

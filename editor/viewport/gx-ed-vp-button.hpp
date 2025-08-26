@@ -1,6 +1,8 @@
 #pragma once
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
-#include <imgui/imgui.h>
+
+#include <ImGui/imgui.h>
+
 #include <memory>
 #include <string>
 

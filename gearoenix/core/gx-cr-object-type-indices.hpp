@@ -4,6 +4,8 @@
 namespace gearoenix::core {
 typedef std::uint32_t object_type_index_t;
 typedef std::uint32_t object_id_t;
+
+constexpr auto invalid_object_id = static_cast<object_id_t>(-1);
 }
 
 /// For all types which are derived from @code gearoenix::core::ecs::Component @endcode or they have a derived class that is derived from Component.

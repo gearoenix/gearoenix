@@ -1,8 +1,11 @@
 #pragma once
-#include <atomic>
-#include <boost/container/flat_map.hpp>
-#include <functional>
+#include <gearoenix/core/gx-cr-singleton.hpp>
 #include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
+
+#include <boost/container/flat_map.hpp>
+
+#include <atomic>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -29,12 +32,14 @@ public:
     void update() const;
 };
 
-struct WindowOverlayProgressBarManager final {
+struct WindowOverlayProgressBarManager final : core::Singleton<WindowOverlayProgressBarManager> {
 private:
     std::atomic<int> id_generator = 0;
     boost::container::flat_map<int, std::shared_ptr<WindowOverlayProgressBar>> bars;
 
 public:
+    WindowOverlayProgressBarManager();
+    ~WindowOverlayProgressBarManager() override;
     [[nodiscard]] int add(
         const std::string& progress_bar_text,
         std::optional<std::function<float()>>&& progress_indicator = std::nullopt);

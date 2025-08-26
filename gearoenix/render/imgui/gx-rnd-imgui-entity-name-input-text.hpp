@@ -5,9 +5,9 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
 namespace gearoenix::render::imgui {
-inline bool entity_name_text_input(core::ecs::World& world, std::string& name)
+inline bool entity_name_text_input(std::string& name)
 {
-    const auto _ = set_wrong_input_text_style(world.get_entity(name) == nullptr);
+    const auto _ = set_wrong_input_text_style(core::ecs::World::get().get_entity(name).has_value());
     return ImGui::InputTextWithHint("Entity Name", "Must be a unique name", &name);
 }
 }

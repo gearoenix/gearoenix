@@ -50,7 +50,7 @@ target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
 target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2 Boost::headers)
-target_include_directories(GearoenixGameEngine PRIVATE ${GX_IMGUI_PATH})
+target_include_directories(GearoenixGameEngine PUBLIC ${GX_IMGUI_PATH})
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
 
 foreach (GX_LIB ${GX_DEBUG_LIBS})

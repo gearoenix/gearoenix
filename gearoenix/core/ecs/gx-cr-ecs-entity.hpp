@@ -81,8 +81,8 @@ public:
     void add_component(std::shared_ptr<Component>&& component);
     void remove_component(object_type_index_t);
     [[nodiscard]] bool contains_in_parents(const Entity* e) const;
-
     [[nodiscard]] const std::shared_ptr<Component>& get_component(object_type_index_t component_type) const;
+    [[nodiscard]] EntityPtr get_ptr() const;
 
     template <typename ComponentType>
     [[nodiscard]] ComponentType* get_component() const

@@ -6,9 +6,11 @@
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-thread.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
+#include "../render/imgui/gx-rnd-imgui-popup.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
-#include <imgui.h>
+
+#include <ImGui/imgui.h>
 
 namespace {
 constexpr double click_time_threshold = 0.3;
@@ -50,6 +52,17 @@ gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
     : Singleton(this)
     , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
+    , should_window_be_closed([this] {
+        static constexpr char name[] = "Quit Gearoenix application?";
+        static constexpr char body[] = "Are you sure you want to quit this Gearoenix instance?\nYou will loose your current unsaved progress in your game or work!";
+        static const std::function<void()> fun = [this] {
+            running = false;
+        };
+
+        render::imgui::show_sure_popup(name, window_is_going_to_be_closed, body, fun);
+
+        return !running;
+    })
 {
     register_types();
 
@@ -298,14 +311,14 @@ void gearoenix::platform::BaseApplication::initialize_core_application(core::App
     }
 }
 
-void gearoenix::platform::BaseApplication::going_to_be_closed()
+void gearoenix::platform::BaseApplication::close()
 {
     running = false;
-    GX_TODO;
 }
 
 void gearoenix::platform::BaseApplication::terminate()
 {
+    running = false;
     core_application = nullptr;
     core::ecs::World::get().clear();
     render_engine = nullptr;
@@ -317,6 +330,11 @@ void gearoenix::platform::BaseApplication::update()
 {
     update_window();
     render_engine->start_frame();
+
+    if (window_is_going_to_be_closed) {
+        running = !should_window_be_closed();
+    }
+
     core_application->update();
     audio_engine->update();
     render_engine->end_frame();

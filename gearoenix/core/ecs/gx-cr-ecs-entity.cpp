@@ -1,6 +1,5 @@
 #include "gx-cr-ecs-entity.hpp"
 #include "../../platform/stream/gx-plt-stm-memory.hpp"
-#include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../gx-cr-object-streamer.hpp"
 #include "../gx-cr-static-flat-set.hpp"
@@ -157,4 +156,9 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
     }
     static const std::shared_ptr<Component> null_comp = nullptr;
     return null_comp;
+}
+
+gearoenix::core::ecs::EntityPtr gearoenix::core::ecs::Entity::get_ptr() const
+{
+    return EntityPtr(cast_shared<Entity>(object_self.lock()));
 }

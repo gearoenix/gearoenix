@@ -180,7 +180,7 @@ void gearoenix::platform::Application::fetch_events()
             base.character_input(e.text.text[0]);
             break;
         case SDL_QUIT:
-            base.going_to_be_closed();
+            base.set_window_is_going_to_be_closed(true);
             break;
         case SDL_APP_WILLENTERBACKGROUND:
             break;

@@ -43,6 +43,7 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
     GX_GET_CREF_PRV(math::Vec2<int>, window_size);
     GX_GET_CREF_PRV(math::Vec2<int>, window_position);
     GX_GET_VAL_PRV(bool, window_is_up, false);
+    GX_GETSET_VAL_PRV(bool, window_is_going_to_be_closed, false);
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_position);
     /// Its value is in the range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
     GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position);
@@ -54,6 +55,7 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
     GX_GET_UPTR_PRV(core::event::Engine, event_engine);
     GX_GET_UPTR_PRV(core::Application, core_application);
     GX_GET_CREF_PRV(TouchStateMap, touch_states);
+    GX_GETSET_CREF_PRV(std::function<bool()>, should_window_be_closed);
     GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);
     GX_GET_VAL_PRV(std::chrono::high_resolution_clock::time_point, last_time_window_resized, std::chrono::high_resolution_clock::now());
 
@@ -78,7 +80,7 @@ public:
     void touch_cancel(FingerId finger_id);
     void initialize_engine();
     void initialize_core_application(core::Application*);
-    void going_to_be_closed();
+    void close();
     void terminate();
     void update();
 

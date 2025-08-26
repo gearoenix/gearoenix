@@ -20,6 +20,8 @@ gearoenix::core::ecs::World::~World()
 void gearoenix::core::ecs::World::add_entity(Entity* const e)
 {
     get_archetype(e)->add_entity(e);
+    const std::lock_guard _lg(entities_names_map_lock);
+    entities_names_map.emplace(e->get_object_name(), cast_shared<Entity>(e->get_object_self().lock()));
 }
 
 void gearoenix::core::ecs::World::delayed_add_entity(Entity* const e)
@@ -71,6 +73,20 @@ gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(cons
         GX_ASSERT_D("Insertion in archetype map was not successful");
     }
     return search->second.get();
+}
+
+std::optional<gearoenix::core::ecs::EntityPtr> gearoenix::core::ecs::World::get_entity(const std::string& name)
+{
+    const std::lock_guard _lg(entities_names_map_lock);
+    const auto search = entities_names_map.find(name);
+    if (search == entities_names_map.end()) {
+        return std::nullopt;
+    }
+    auto ptr = search->second.lock();
+    if (!ptr) {
+        return std::nullopt;
+    }
+    return std::make_optional(EntityPtr(std::move(ptr)));
 }
 
 void gearoenix::core::ecs::World::update()
