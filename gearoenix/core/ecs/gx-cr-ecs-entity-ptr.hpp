@@ -21,6 +21,14 @@ public:
 
     [[nodiscard]] bool operator==(const EntityPtr& other) const { return ptr == other.ptr; }
     [[nodiscard]] bool operator==(const Entity* const other) const { return ptr.get() == other; }
+    [[nodiscard]] bool operator<(const EntityPtr& other) const { return ptr < other.ptr; }
+    [[nodiscard]] bool operator<(const Entity* const other) const { return ptr.get() < other; }
+    [[nodiscard]] bool operator<=(const EntityPtr& other) const { return ptr <= other.ptr; }
+    [[nodiscard]] bool operator<=(const Entity* const other) const { return ptr.get() <= other; }
+    [[nodiscard]] bool operator>(const EntityPtr& other) const { return ptr > other.ptr; }
+    [[nodiscard]] bool operator>(const Entity* const other) const { return ptr.get() > other; }
+    [[nodiscard]] bool operator>=(const EntityPtr& other) const { return ptr >= other.ptr; }
+    [[nodiscard]] bool operator>=(const Entity* const other) const { return ptr.get() >= other; }
 
     [[nodiscard]] const Entity* get() const { return ptr.get(); }
     [[nodiscard]] Entity* get() { return ptr.get(); }

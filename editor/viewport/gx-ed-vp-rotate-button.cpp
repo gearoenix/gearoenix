@@ -1,15 +1,16 @@
 #include "gx-ed-vp-rotate-button.hpp"
 #include "../gx-editor-main.hpp"
+
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
-#include <imgui/imgui.h>
 
-gearoenix::editor::viewport::RotateButton::RotateButton(Application& app, const Button& previous)
-    : app(app)
-    , previous(previous)
+#include <ImGui/imgui.h>
+
+gearoenix::editor::viewport::RotateButton::RotateButton(const Button& previous)
+    : previous(previous)
 {
     tooltip = "Enable rotation gizmo";
     toggled_tooltip = "Disable rotation gizmo";
@@ -21,9 +22,8 @@ gearoenix::editor::viewport::RotateButton::RotateButton(Application& app, const 
     compute_values();
 
     core::job::send_job_to_pool([this] {
-        auto& txt_mgr = *this->app.get_render_engine().get_texture_manager();
         const render::texture::TextureInfo txt_info;
-        txt_mgr.create_2d_from_file(
+        render::texture::Manager::get().create_2d_from_file(
             platform::stream::Path::create_asset("icons/rotate.png"),
             txt_info,
             core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
@@ -40,9 +40,9 @@ void gearoenix::editor::viewport::RotateButton::update()
     show();
     if (clicked_in_this_frame) {
         if (toggled) {
-            app.get_render_engine().get_gizmo_manager()->enable_rotation_handle();
+            render::gizmo::Manager::get().enable_rotation_handle();
         } else {
-            app.get_render_engine().get_gizmo_manager()->disable_rotation_handle();
+            render::gizmo::Manager::get().disable_rotation_handle();
         }
     }
 }

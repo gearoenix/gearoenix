@@ -1,5 +1,7 @@
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
-#include <imgui/imgui.h>
+
+#include <ImGui/imgui.h>
+
 #include <utility>
 
 gearoenix::editor::ui::WindowOverlayProgressBar::WindowOverlayProgressBar(
@@ -29,6 +31,13 @@ void gearoenix::editor::ui::WindowOverlayProgressBar::update() const
         ImGui::EndPopup();
     }
 }
+
+gearoenix::editor::ui::WindowOverlayProgressBarManager::WindowOverlayProgressBarManager()
+    : Singleton(this)
+{
+}
+
+gearoenix::editor::ui::WindowOverlayProgressBarManager::~WindowOverlayProgressBarManager() = default;
 
 int gearoenix::editor::ui::WindowOverlayProgressBarManager::add(
     const std::string& progress_bar_text,

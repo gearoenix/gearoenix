@@ -4,13 +4,12 @@
 #include "gx-ed-vp-transform-mode-button.hpp"
 #include "gx-ed-vp-translate-button.hpp"
 
-gearoenix::editor::viewport::GizmoButtons::GizmoButtons(Application& app, const Button& previous)
-    : app(app)
-    , previous(previous)
-    , transform_mode(new TransformModeButton(app, previous))
-    , translate(new TranslateButton(app, *transform_mode))
-    , rotate(new RotateButton(app, *translate))
-    , scale(new ScaleButton(app, *rotate))
+gearoenix::editor::viewport::GizmoButtons::GizmoButtons(const Button& previous)
+    : previous(previous)
+    , transform_mode(new TransformModeButton(previous))
+    , translate(new TranslateButton(*transform_mode))
+    , rotate(new RotateButton(*translate))
+    , scale(new ScaleButton(*rotate))
 {
 }
 

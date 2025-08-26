@@ -1,21 +1,19 @@
 #include "gx-ed-ui-menu-entity.hpp"
 #include "gx-ed-ui-manager.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
-#include <ImGuiFileDialog/ImGuiFileDialog.h>
-#include <filesystem>
+
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
-#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-selector.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
-#include <gearoenix/render/skybox/gx-rnd-sky-builder.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
-#include <gearoenix/render/skybox/gx-rnd-sky-skybox.hpp>
-#include <imgui/imgui.h>
-#include <imgui/misc/cpp/imgui_stdlib.h>
+
+#include <ImGui/imgui.h>
+#include <ImGui/misc/cpp/imgui_stdlib.h>
+#include <ImGuiFileDialog/ImGuiFileDialog.h>
+
+#include <filesystem>
 
 namespace {
 [[nodiscard]] bool is_valid_skybox_path(const std::string& path)
@@ -39,8 +37,7 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 
     const auto is_valid_path = is_valid_skybox_path(create_skybox_path);
 
-    auto& w = *core::ecs::World::get();
-    render::imgui::entity_name_text_input(w, create_skybox_entity_name);
+    render::imgui::entity_name_text_input(create_skybox_entity_name);
     {
         const auto _ = render::imgui::set_wrong_input_text_style(create_skybox_path.empty() || is_valid_path);
         ImGui::InputTextWithHint("Skybox Image Path", "Path to .hdr,.png,.jpg or gx-cube-texture", &create_skybox_path);
@@ -54,23 +51,16 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
     scene_selector->show<render::scene::Scene>();
 
     if (is_valid_path) {
-        if (ImGui::Button("Create")) {
-            const auto progress_bar_id = manager.get_window_overlay_progree_bar_manager()->add("Loading Skybox [" + create_skybox_path + "]...");
-            const auto scene_id = scene_selector->get_selection();
-            core::job::send_job_to_pool([this, scene_id, progress_bar_id, w = &w] {
-                manager.get_platform_application().get_base().get_render_engine()->get_skybox_manager()->build(
-                    create_skybox_entity_name,
+        if (const auto scene_entity = scene_selector->get_selection(); scene_entity && ImGui::Button("Create")) {
+            const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_path + "]...");
+            core::job::send_job_to_pool([this, scene_entity, progress_bar_id] {
+                render::skybox::Manager::get().build(
+                    std::string(create_skybox_entity_name),
+                    scene_entity,
                     platform::stream::Path::create_absolute(create_skybox_path),
-                    core::job::EndCaller([] {}),
-                    core::job::EndCallerShared<render::skybox::Builder>([this, scene_id, progress_bar_id, w](auto&& skybox_builder) {
-                        manager.get_window_overlay_progree_bar_manager()->remove(progress_bar_id);
-                        if (core::ecs::invalid_entity_id == scene_id) {
-                            return;
-                        }
-                        auto* const s = w->get_component<render::scene::Scene>(scene_id);
-                        auto* const sky = skybox_builder->get_skybox();
-                        s->add_skybox(skybox_builder->get_entity_id(), *sky);
-                        sky->set_scene_id(scene_id);
+                    core::job::EndCaller<core::ecs::EntityPtr>([progress_bar_id](auto&& skybox_entity) {
+                        WindowOverlayProgressBarManager::get().remove(progress_bar_id);
+                        skybox_entity->add_to_world();
                     }));
             });
         }
@@ -112,9 +102,8 @@ void gearoenix::editor::ui::MenuEntity::show_create_menu()
     }
 }
 
-gearoenix::editor::ui::MenuEntity::MenuEntity(Manager& manager)
-    : manager(manager)
-    , scene_selector(new render::imgui::EntitySelector(*manager.get_platform_application().get_base().get_render_engine()))
+gearoenix::editor::ui::MenuEntity::MenuEntity()
+    : scene_selector(std::make_unique<render::imgui::EntitySelector>())
 {
 }
 
@@ -133,4 +122,8 @@ void gearoenix::editor::ui::MenuEntity::update()
     }
 
     show_create_skybox_window();
+}
+void gearoenix::editor::ui::MenuEntity::renew()
+{
+    GX_TODO;
 }

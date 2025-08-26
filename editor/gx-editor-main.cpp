@@ -2,19 +2,38 @@
 #include "ui/gx-ed-ui-manager.hpp"
 #include "viewport/gx-ed-vp-viewport.hpp"
 
-void gearoenix::editor::Application::update()
+#include <gearoenix/platform/gx-plt-application.hpp>
+
+namespace {
+constexpr char default_caption[] = "Gearoenix Game Engine Editor [project: untitled, scene: gx-editor-default-scene]";
+}
+
+void gearoenix::editor::EditorApplication::update()
 {
     ui_manager->update();
     viewport->update();
 }
 
-gearoenix::editor::Application::Application(platform::Application& plt_app)
-    : core::Application(plt_app)
-    , ui_manager(new ui::Manager(plt_app))
-    , viewport(new viewport::Viewport(*this))
+gearoenix::editor::EditorApplication::EditorApplication()
+    : Singleton<EditorApplication>(this)
+    , ui_manager(new ui::Manager())
+    , viewport(new viewport::Viewport())
 {
+    platform::Application::get().set_caption(default_caption);
 }
 
-gearoenix::editor::Application::~Application() = default;
+gearoenix::editor::EditorApplication::~EditorApplication() = default;
 
-GEAROENIX_START(gearoenix::editor::Application)
+void gearoenix::editor::EditorApplication::renew()
+{
+    ui_manager->renew();
+    viewport->renew();
+    platform::Application::get().set_caption(default_caption);
+}
+
+void gearoenix::editor::EditorApplication::quit()
+{
+    platform::BaseApplication::get().close();
+}
+
+GEAROENIX_START(gearoenix::editor::EditorApplication)

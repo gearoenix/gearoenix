@@ -1,21 +1,15 @@
 #pragma once
-#include <gearoenix/core/ecs/gx-cr-ecs-types.hpp>
-
-namespace gearoenix::platform {
-struct Application;
-}
+#include <boost/container/flat_set.hpp>
+#include <gearoenix/core/ecs/gx-cr-ecs-entity-ptr.hpp>
 
 namespace gearoenix::editor::ui {
-struct Manager;
 struct MenuScene final {
 private:
-    platform::Application& platform_application;
-    Manager& manager;
-
-    core::ecs::entity_id_t active_scene = core::ecs::invalid_entity_id;
+    boost::container::flat_set<core::ecs::EntityPtr> active_scenes;
 
 public:
-    explicit MenuScene(Manager& manager);
+    MenuScene();
     void update();
+    void renew();
 };
 }
