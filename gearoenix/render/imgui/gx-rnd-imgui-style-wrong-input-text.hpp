@@ -9,9 +9,9 @@ struct WrongInputTextStyle;
 struct WrongInputTextStyle final {
     friend WrongInputTextStyle set_wrong_input_text_style(bool);
 
-private:
     const bool is_valid;
 
+private:
     explicit WrongInputTextStyle(const bool is_invalid)
         : is_valid(is_invalid)
     {

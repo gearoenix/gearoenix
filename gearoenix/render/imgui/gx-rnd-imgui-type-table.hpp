@@ -6,10 +6,10 @@ namespace gearoenix::render::imgui {
 template <typename Function>
 void table_scope(const char* const id, Function&& func)
 {
-    if (!ImGui::BeginTable(id, 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody)) {
+    if (!ImGui::BeginTable(id, 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_SizingFixedFit)) {
         return;
     }
-    ImGui::TableSetupColumn("##labels", ImGuiTableColumnFlags_WidthStretch, 0.5f);
+    ImGui::TableSetupColumn("##labels", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableSetupColumn("##inputs", ImGuiTableColumnFlags_WidthStretch, 0.5f);
     ImGui::TableNextColumn();
     ImGui::AlignTextToFramePadding();

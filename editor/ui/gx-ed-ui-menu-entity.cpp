@@ -1,11 +1,13 @@
 #include "gx-ed-ui-menu-entity.hpp"
 #include "gx-ed-ui-manager.hpp"
+#include "gx-ed-ui-menu-scene.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-selector.hpp>
+#include <gearoenix/render/imgui/gx-rnd-imgui-style-wrong-input-text.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 
@@ -37,7 +39,7 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 
     const auto is_valid_path = is_valid_skybox_path(create_skybox_path);
 
-    render::imgui::entity_name_text_input(create_skybox_entity_name);
+    (void)render::imgui::entity_name_text_input(create_skybox_entity_name);
     {
         const auto _ = render::imgui::set_wrong_input_text_style(create_skybox_path.empty() || is_valid_path);
         ImGui::InputTextWithHint("Skybox Image Path", "Path to .hdr,.png,.jpg or gx-cube-texture", &create_skybox_path);
@@ -111,6 +113,10 @@ gearoenix::editor::ui::MenuEntity::~MenuEntity() = default;
 
 void gearoenix::editor::ui::MenuEntity::update()
 {
+    if (!MenuScene::get().has_active_scene()) {
+        return;
+    }
+
     if (ImGui::BeginMenu("Entity")) {
         if (ImGui::BeginMenu("Create")) {
             show_create_menu();
@@ -123,6 +129,7 @@ void gearoenix::editor::ui::MenuEntity::update()
 
     show_create_skybox_window();
 }
+
 void gearoenix::editor::ui::MenuEntity::renew()
 {
     GX_TODO;

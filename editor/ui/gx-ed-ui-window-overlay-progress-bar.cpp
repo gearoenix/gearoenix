@@ -13,13 +13,14 @@ gearoenix::editor::ui::WindowOverlayProgressBar::WindowOverlayProgressBar(
 
 void gearoenix::editor::ui::WindowOverlayProgressBar::update() const
 {
-    bool always_show = true;
-    ImGui::OpenPopup("Progress Bar");
+    constexpr char progress_bar_id[] = "gearoenix::editor::ui::WindowOverlayProgressBar::update";
+    if (!ImGui::IsPopupOpen(progress_bar_id, ImGuiPopupFlags_AnyPopup)) {
+        ImGui::OpenPopup(progress_bar_id, ImGuiPopupFlags_NoReopen);
+    }
     const ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
     ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal(
-            "Progress Bar",
-            &always_show,
+            progress_bar_id, nullptr,
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
         const auto progress_bar_length = static_cast<float>(progress_bar_text.size()) * 10.0f;
         if (progress_indicator.has_value()) {
