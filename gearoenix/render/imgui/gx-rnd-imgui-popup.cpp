@@ -9,7 +9,10 @@ void gearoenix::render::imgui::show_sure_popup(const char* const name, bool& is_
         return;
     }
 
-    ImGui::OpenPopup(name);
+    if (!ImGui::IsPopupOpen(name, ImGuiPopupFlags_AnyPopup)) {
+        ImGui::OpenPopup(name, ImGuiPopupFlags_NoReopen);
+    }
+
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     if (!ImGui::BeginPopupModal(name, &is_open, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
         return;

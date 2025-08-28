@@ -24,10 +24,6 @@ void gearoenix::editor::ui::MenuBar::update()
         project_menu->update();
         scene_menu->update();
         entity_menu->update();
-        if (ImGui::BeginMenu("Audio")) {
-            if (ImGui::MenuItem("Settings", "Ctrl+Alt+A", false, false)) { }
-            ImGui::EndMenu();
-        }
         window_menu->update();
         if (ImGui::BeginMenu("Help")) {
             ImGui::EndMenu();
