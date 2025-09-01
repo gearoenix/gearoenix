@@ -92,7 +92,7 @@ endif ()
 set(GX_DEBUG_LIBS ${GX_DEBUG_LIBS} ${GX_COMMON_LIBS})
 set(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
-set(GX_SUBMODULES_DIR ${CMAKE_SOURCE_DIR}/gearoenix/submodules)
+set(GX_SUBMODULES_DIR ${CMAKE_SOURCE_DIR}/submodules)
 
 find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework)
 find_package(SDL2 CONFIG REQUIRED)

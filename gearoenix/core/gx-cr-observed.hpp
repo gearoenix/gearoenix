@@ -49,7 +49,7 @@ public:
     [[nodiscard]] id_t add_observer(listener_t&& f)
     {
         const auto id = ++last_id;
-        listeners.emplace(id, std::move(f));
+        listeners[id] = std::move(f);
         return id;
     }
 

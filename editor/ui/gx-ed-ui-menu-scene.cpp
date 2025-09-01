@@ -1,4 +1,5 @@
 #include "gx-ed-ui-menu-scene.hpp"
+#include "../gx-editor-main.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
@@ -68,10 +69,20 @@ void gearoenix::editor::ui::MenuScene::show_new_popup()
         is_new_popup_open = false;
         auto entity = render::scene::Manager::get().build(std::move(new_scene_name), new_scene_priority);
         entity->add_to_world();
+        set_current_scene(entity.get());
         active_scenes.emplace(std::move(entity));
     }
 
     ImGui::EndPopup();
+}
+
+void gearoenix::editor::ui::MenuScene::set_current_scene(core::ecs::Entity* const scene)
+{
+    if (current_scene == scene) {
+        return;
+    }
+    current_scene = scene;
+    Singleton<EditorApplication>::get().set_current_scene(scene);
 }
 
 gearoenix::editor::ui::MenuScene::MenuScene()
@@ -101,6 +112,13 @@ void gearoenix::editor::ui::MenuScene::update()
                 core::ecs::World::get().synchronised_system<render::scene::Scene>([&](const auto* const entity, auto* const) {
                     scenes.emplace(entity->get_ptr());
                 });
+                if (!current_scene || !scenes.contains(current_scene->get_ptr())) {
+                    if (scenes.empty()) {
+                        set_current_scene(nullptr);
+                    } else {
+                        set_current_scene(scenes.begin()->get());
+                    }
+                }
                 active_scenes = std::move(scenes);
             }
 
@@ -124,7 +142,16 @@ void gearoenix::editor::ui::MenuScene::update()
             }
 
             for (auto& e : to_remove) {
-                active_scenes.erase(e);
+                if (e.get() == current_scene) {
+                    active_scenes.erase(e);
+                    if (active_scenes.empty()) {
+                        set_current_scene(nullptr);
+                    } else {
+                        set_current_scene(active_scenes.begin()->get());
+                    }
+                } else {
+                    active_scenes.erase(e);
+                }
             }
 
             ImGui::EndMenu();
@@ -141,6 +168,7 @@ void gearoenix::editor::ui::MenuScene::update()
                 core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
                     WindowOverlayProgressBarManager::get().remove(progress_bar_id);
                     for (auto& e : entities) {
+                        set_current_scene(e.get());
                         active_scenes.emplace(std::move(e));
                     }
                 }));
@@ -154,6 +182,7 @@ void gearoenix::editor::ui::MenuScene::update()
 void gearoenix::editor::ui::MenuScene::renew()
 {
     active_scenes.clear();
+    set_current_scene(nullptr);
 }
 
 bool gearoenix::editor::ui::MenuScene::has_active_scene() const

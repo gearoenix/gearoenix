@@ -79,7 +79,7 @@ void gearoenix::core::ObjectStreamer::write(std::shared_ptr<Object>&& object)
             return;
         }
         write_stream = std::make_shared<platform::stream::Memory>();
-        objects.emplace(id, ObjectInfo { object, write_stream });
+        objects[id] = ObjectInfo { object, write_stream };
     }
     object->write(std::move(write_stream), self.lock());
 }

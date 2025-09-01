@@ -12,8 +12,8 @@ struct Position final : gearoenix::core::ecs::Component {
     double x;
     double y;
 
-    Position(const double x, const double y)
-        : Component(gearoenix::core::ecs::ComponentType::create_index(this), "position")
+    Position(gearoenix::core::ecs::Entity* const e, const double x, const double y)
+        : Component(e, gearoenix::core::ecs::ComponentType::create_index(this), "position")
         , x(x)
         , y(y)
     {
@@ -29,8 +29,8 @@ struct Speed final : gearoenix::core::ecs::Component {
     double x;
     double y;
 
-    Speed(const double x, const double y)
-        : Component(gearoenix::core::ecs::ComponentType::create_index(this), "speed")
+    Speed(gearoenix::core::ecs::Entity* const e, const double x, const double y)
+        : Component(e, gearoenix::core::ecs::ComponentType::create_index(this), "speed")
         , x(x)
         , y(y)
     {
@@ -196,18 +196,18 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     };
 
     e1 = Entity::construct("1", nullptr);
-    e1->add_component(Object::construct<Position>(2.0, 3.0));
-    e1->add_component(Object::construct<Speed>(4.0, 5.0));
+    e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
+    e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
 
     e2 = Entity::construct("2", e1.get());
-    e2->add_component(Object::construct<Position>(6.0, 7.0));
+    e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
 
     e3 = Entity::construct("3", e2.get());
-    e3->add_component(Object::construct<Speed>(10.0, 11.0));
-    e3->add_component(Object::construct<Position>(8.0, 9.));
+    e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
+    e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
 
     e4 = Entity::construct("4", e3.get());
-    e4->add_component(Object::construct<Speed>(12.0, 13.0));
+    e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
 
     e5 = Entity::construct("5", e4.get());
 
@@ -227,30 +227,30 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     w.delayed_pullout_entity(std::move(e1), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e1 = std::move(e);
-        e1->add_component(Object::construct<Position>(2.0, 3.0));
-        e1->add_component(Object::construct<Speed>(4.0, 5.0));
+        e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
+        e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e2), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e2 = std::move(e);
-        e2->add_component(Object::construct<Position>(6.0, 7.0));
+        e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e3), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e3 = std::move(e);
-        e3->add_component(Object::construct<Speed>(10.0, 11.0));
-        e3->add_component(Object::construct<Position>(8.0, 9.));
+        e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
+        e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e4), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e4 = std::move(e);
-        e4->add_component(Object::construct<Speed>(12.0, 13.0));
+        e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
     }));
 
     w.update();
@@ -262,18 +262,18 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     end_of_step();
 
     e1 = Entity::construct("1", nullptr);
-    e1->add_component(Object::construct<Position>(2.0, 3.0));
-    e1->add_component(Object::construct<Speed>(4.0, 5.0));
+    e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
+    e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
 
     e2 = Entity::construct("2", e1.get());
-    e2->add_component(Object::construct<Position>(6.0, 7.0));
+    e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
 
     e3 = Entity::construct("3", e2.get());
-    e3->add_component(Object::construct<Speed>(10.0, 11.0));
-    e3->add_component(Object::construct<Position>(8.0, 9.));
+    e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
+    e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
 
     e4 = Entity::construct("4", e3.get());
-    e4->add_component(Object::construct<Speed>(12.0, 13.0));
+    e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
 
     e5 = Entity::construct("5", e4.get());
 
@@ -285,20 +285,20 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     w.delayed_pullout_entity(std::move(e2), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e2 = std::move(e);
-        e2->add_component(Object::construct<Speed>(-1.0, -1.0));
+        e2->add_component(Object::construct<Speed>(e2.get(), -1.0, -1.0));
         ++progressed;
     }));
 
     w.delayed_pullout_entity(std::move(e4), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e4 = std::move(e);
-        e4->add_component(Object::construct<Position>(-1.0, -1.0));
+        e4->add_component(Object::construct<Position>(e4.get(), -1.0, -1.0));
         ++progressed;
     }));
 
     w.delayed_pullout_entity(std::move(e5), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e5 = std::move(e);
-        e5->add_component(Object::construct<Position>(-1.0, -1.0));
-        e5->add_component(Object::construct<Speed>(-1.0, -1.0));
+        e5->add_component(Object::construct<Position>(e5.get(), -1.0, -1.0));
+        e5->add_component(Object::construct<Speed>(e5.get(), -1.0, -1.0));
         ++progressed;
     }));
 

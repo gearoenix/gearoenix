@@ -1,5 +1,6 @@
 #pragma once
 #include "../render/gizmo/gx-rnd-gzm-manager.hpp"
+#include "gx-phs-engine.hpp"
 #include "gx-phs-transformation.hpp"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -15,7 +16,9 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 
     gearoenix::core::ecs::ComponentType::add<gearoenix::physics::Transformation>();
 
-    gearoenix::physics::Transformation transform("transform");
+    auto entity = gearoenix::core::ecs::Entity::construct("entity", nullptr);
+
+    gearoenix::physics::Transformation transform(entity.get(), "transform");
     constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
 
     auto glmm = glm::identity<glm::dmat4>();

@@ -71,7 +71,7 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
     auto return_value = worker->thread->get_id();
 
     const std::lock_guard _lg(workers_lock);
-    workers.emplace(return_value, std::move(worker));
+    workers[return_value] = std::move(worker);
 
     return return_value;
 }
@@ -109,7 +109,7 @@ void gearoenix::core::job::register_thread(std::thread::id thread_id, std::optio
     worker->thread = std::move(thread);
 
     const std::lock_guard _lg(workers_lock);
-    workers.emplace(thread_id, std::move(worker));
+    workers[thread_id] = std::move(worker);
 }
 
 void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, std::function<void()>&& job)

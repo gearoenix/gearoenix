@@ -210,14 +210,8 @@ void gearoenix::platform::BaseApplication::character_input(const char16_t ch)
 void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const double x, const double y)
 {
     const core::event::Point2D p({ x, y }, normalise_position(x, y));
-    touch_states.emplace(finger_id, p);
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::Touch,
-            core::event::touch::Data(
-                p,
-                finger_id,
-                core::event::touch::Action::Down)));
+    touch_states[finger_id] = p;
+    event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(p, finger_id, core::event::touch::Action::Down)));
 }
 
 void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, const double x, const double y)

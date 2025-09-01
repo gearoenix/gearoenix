@@ -69,11 +69,11 @@ void gearoenix::core::ecs::Entity::add_component(std::shared_ptr<Component>&& co
     const std::lock_guard _l(components_lock);
     for (const auto pt : all_parents) {
         GX_ASSERT_D(!all_types_to_components.contains(pt));
-        all_types_to_components.emplace(pt, component);
+        all_types_to_components[pt] = component;
     }
     const auto fti = component->get_object_final_type_index();
     GX_ASSERT_D(!all_types_to_components.contains(fti));
-    all_types_to_components.emplace(fti, std::move(component));
+    all_types_to_components[fti] = std::move(component);
 }
 
 void gearoenix::core::ecs::Entity::remove_component(const object_type_index_t ti)
@@ -113,7 +113,7 @@ gearoenix::core::ecs::Entity::Entity(std::string&& name)
 gearoenix::core::ecs::Entity::~Entity()
 {
     // Entity should have been deleted before here.
-    // If you get this assert you, it means you're deleting the entity in a wrong way.
+    // If you get this `assert`, it means you're deleting the entity wrongly.
     GX_ASSERT_D(archetype == nullptr || !archetype->contains(this));
 }
 
@@ -126,7 +126,7 @@ void gearoenix::core::ecs::Entity::set_parent(Entity* const p)
         parent->children.erase(object_id);
     }
     parent = p;
-    p->children.emplace(object_id, EntityPtr(std::static_pointer_cast<Entity>(object_self.lock())));
+    p->children[object_id] = EntityPtr(std::static_pointer_cast<Entity>(object_self.lock()));
 }
 
 void gearoenix::core::ecs::Entity::add_child(EntityPtr&& child)
@@ -138,12 +138,12 @@ void gearoenix::core::ecs::Entity::add_child(EntityPtr&& child)
         child->parent->children.erase(object_id);
     }
     child->parent = this;
-    children.emplace(child->object_id, std::move(child));
+    children[child->object_id] = std::move(child);
 }
 
 void gearoenix::core::ecs::Entity::add_to_world()
 {
-    World::get().delayed_add_entity(this);
+    World::get().delayed_add_entity(get_ptr());
     for (auto& c : children) {
         c.second->add_to_world();
     }
@@ -160,5 +160,7 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
 
 gearoenix::core::ecs::EntityPtr gearoenix::core::ecs::Entity::get_ptr() const
 {
-    return EntityPtr(cast_shared<Entity>(object_self.lock()));
+    auto ptr = cast_shared<Entity>(object_self.lock());
+    GX_ASSERT_D(ptr);
+    return EntityPtr(std::move(ptr));
 }

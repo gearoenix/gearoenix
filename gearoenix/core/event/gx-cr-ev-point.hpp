@@ -22,7 +22,7 @@ struct Point2D final {
     GX_GET_VAL_PRV(double, delta_previous_time, 0.0);
 
 public:
-    Point2D(const math::Vec2<double>& raw, const math::Vec2<double>& p)
+    explicit Point2D(const math::Vec2<double>& raw = {}, const math::Vec2<double>& p = {})
         : start_time(std::chrono::high_resolution_clock::now())
         , previous_time(start_time)
         , current_time(start_time)

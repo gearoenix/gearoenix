@@ -32,7 +32,7 @@ private:
 
     struct Action final {
         struct Add final {
-            Entity* entity;
+            EntityPtr entity;
         };
 
         struct Delete final {
@@ -59,9 +59,9 @@ public:
     World(const World&) = delete;
 
     /// You must know your context (state of the world), unless you want to end up having race
-    void add_entity(Entity*);
+    void add_entity(EntityPtr &&);
     /// Recommended way to add an entity, in case you do not know the context you're in.
-    void delayed_add_entity(Entity*);
+    void delayed_add_entity(EntityPtr &&);
 
     void delete_entity(std::shared_ptr<Entity>&&);
     void delayed_delete_entity(std::shared_ptr<Entity>&&);

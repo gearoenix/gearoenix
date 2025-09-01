@@ -7,6 +7,7 @@ namespace gearoenix::editor::ui {
 struct MenuScene final : core::Singleton<MenuScene> {
 private:
     boost::container::flat_set<core::ecs::EntityPtr> active_scenes;
+    core::ecs::Entity* current_scene = nullptr;
     bool is_gltf_popup_open = false;
 
     bool is_new_popup_open = false;
@@ -14,6 +15,7 @@ private:
     float new_scene_priority = 0.0f;
 
     void show_new_popup();
+    void set_current_scene(core::ecs::Entity* scene);
 
 public:
     MenuScene();
