@@ -1,5 +1,6 @@
 #include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/submodules/ImGui/imgui.h>
+
+#include <ImGui/imgui.h>
 
 struct GameApp final : gearoenix::core::Application {
 private:

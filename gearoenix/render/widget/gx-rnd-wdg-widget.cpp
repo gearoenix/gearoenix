@@ -214,7 +214,7 @@ void gearoenix::render::widget::Widget::hide()
 
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority)
 {
-    children.emplace(std::make_pair(priority, child->name), std::move(child));
+    children[std::make_pair(priority, child->name)] = std::move(child);
 }
 
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)

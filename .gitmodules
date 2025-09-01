@@ -1,21 +1,21 @@
-[submodule "gearoenix/submodules/ImGuiFileDialog"]
-	path = gearoenix/submodules/ImGuiFileDialog
+[submodule "submodules/ImGuiFileDialog"]
+	path = submodules/ImGuiFileDialog
 	url = https://github.com/aiekick/ImGuiFileDialog.git
-[submodule "gearoenix/submodules/ImGuizmo"]
-	path = gearoenix/submodules/ImGuizmo
+[submodule "submodules/ImGuizmo"]
+	path = submodules/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
-[submodule "gearoenix/submodules/ImGui"]
-	path = gearoenix/submodules/ImGui
+[submodule "submodules/ImGui"]
+	path = submodules/ImGui
 	url = https://github.com/ocornut/imgui.git
-[submodule "gearoenix/submodules/TinyGLTF"]
-	path = gearoenix/submodules/TinyGLTF
+[submodule "submodules/TinyGLTF"]
+	path = submodules/TinyGLTF
 	url = https://github.com/syoyo/tinygltf.git
-[submodule "gearoenix/submodules/stb"]
-	path = gearoenix/submodules/stb
+[submodule "submodules/stb"]
+	path = submodules/stb
 	url = https://github.com/nothings/stb.git
-[submodule "gearoenix/submodules/glTF-Sample-Assets"]
-	path = gearoenix/submodules/glTF-Sample-Assets
+[submodule "submodules/glTF-Sample-Assets"]
+	path = submodules/glTF-Sample-Assets
 	url = https://github.com/KhronosGroup/glTF-Sample-Assets.git
-[submodule "gearoenix/submodules/glm"]
-	path = gearoenix/submodules/glm
+[submodule "submodules/glm"]
+	path = submodules/glm
 	url = https://github.com/g-truc/glm.git

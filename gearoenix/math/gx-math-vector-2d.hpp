@@ -12,7 +12,7 @@ struct Vec2 final {
     Element x = static_cast<Element>(0);
     Element y = static_cast<Element>(0);
 
-    constexpr explicit Vec2()
+    constexpr Vec2()
         : x(static_cast<Element>(0))
         , y(static_cast<Element>(0))
     {

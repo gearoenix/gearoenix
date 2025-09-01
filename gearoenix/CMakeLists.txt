@@ -4,9 +4,6 @@ message(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}."
 
 file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
 
-list(FILTER GX_ENGINE_SUBMODULES_SRC INCLUDE REGEX ".*gearoenix/submodules/.*")
-list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*gearoenix/submodules/.*")
-
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_SRC})
 list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*-test\\.hpp$")
 list(FILTER GX_ENGINE_TEST_SRC INCLUDE REGEX ".*-test\\.hpp$")
@@ -15,8 +12,6 @@ source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_SRC})
 source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_TEST_SRC})
 
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_TEST_SRC} PARENT_SCOPE)
-
-set_source_files_properties(${GX_ENGINE_SUBMODULES_SRC} PROPERTIES COMPILE_FLAGS ${GX_NO_WARNING_FLAG})
 
 set(GX_IMGUI_PATH ${GX_SUBMODULES_DIR}/ImGui)
 add_library(ImGui STATIC

@@ -41,7 +41,7 @@ public:
     GameApp()
     {
         gearoenix::render::gltf::load(
-            GxPath::create_absolute("../../../../gearoenix/submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
+            GxPath::create_absolute("../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
             GxEndCaller<std::vector<GxEntityPtr>>([this](auto&& entities) {
                 scene_entity = std::move(entities[0]);
                 gltf_is_ready();

@@ -42,6 +42,7 @@ template <typename T>
 using GxEndCaller = gearoenix::core::job::EndCaller<T>;
 
 typedef gearoenix::core::Application GxCoreApp;
+typedef gearoenix::core::ecs::Entity GxEntity;
 typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
 typedef gearoenix::core::ecs::Component GxComp;
 typedef gearoenix::core::ecs::World GxWorld;
@@ -71,7 +72,7 @@ struct Speed final : GxComp {
 
     gearoenix::math::Vec3<double> value;
 
-    Speed();
+    explicit Speed(GxEntity* e);
     void update(const Position& p);
 };
 
@@ -81,12 +82,12 @@ struct Position final : GxComp {
 
     gearoenix::math::Vec3<double> value;
 
-    Position();
+    explicit Position(GxEntity* e);
     void update(double delta_time, const Speed& speed);
 };
 
-Speed::Speed()
-    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "speed")
+Speed::Speed(GxEntity* const e)
+    : GxComp(e, gearoenix::core::ecs::ComponentType::create_index(this), "speed")
     , value(
           speed_distribution(random_engine),
           speed_distribution(random_engine),
@@ -129,8 +130,8 @@ void Speed::update(const Position& p)
     }
 }
 
-Position::Position()
-    : GxComp(gearoenix::core::ecs::ComponentType::create_index(this), "position")
+Position::Position(GxEntity* const e)
+    : GxComp(e, gearoenix::core::ecs::ComponentType::create_index(this), "position")
     , value(
           space_distribution(random_engine),
           space_distribution(random_engine),
@@ -196,8 +197,8 @@ public:
             auto entity = GxModelManager::get().build(
                 "triangle" + std::to_string(model_index), scene_entity.get(),
                 { std::move(meshes[model_index]) }, true);
-            auto speed = Speed::construct<Speed>();
-            auto position = Position::construct<Position>();
+            auto speed = Speed::construct<Speed>(entity.get());
+            auto position = Position::construct<Position>(entity.get());
             auto* const trn = entity->get_component<GxTransform>();
             trn->set_local_position(position->value);
             trn->local_inner_scale(cube_size);
@@ -214,6 +215,7 @@ public:
                 trn->set_local_position({ 0.0f, 0.0f, 5.0f });
                 (void)GxConstraintManager::get().create_jet_controller(
                     entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+                (void)end;
             }));
 
         GxLightManager::get().build_shadow_caster_directional(
@@ -224,6 +226,7 @@ public:
                 l->get_shadow_transform()->local_look_at(
                     { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
                 l->colour = { 8.0f, 8.0f, 8.0f };
+                (void)end;
             }));
     }
 

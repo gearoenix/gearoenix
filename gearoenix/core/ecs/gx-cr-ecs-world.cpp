@@ -17,14 +17,16 @@ gearoenix::core::ecs::World::~World()
     GX_ASSERT_D(delayed_actions.empty());
 }
 
-void gearoenix::core::ecs::World::add_entity(Entity* const e)
+void gearoenix::core::ecs::World::add_entity(EntityPtr&& e)
 {
-    get_archetype(e)->add_entity(e);
+    get_archetype(e)->add_entity(e.get());
     const std::lock_guard _lg(entities_names_map_lock);
-    entities_names_map.emplace(e->get_object_name(), cast_shared<Entity>(e->get_object_self().lock()));
+    const auto ptr = cast_shared<Entity>(e->get_object_self().lock());
+    GX_ASSERT_D(ptr);
+    entities_names_map[e->get_object_name()] = ptr;
 }
 
-void gearoenix::core::ecs::World::delayed_add_entity(Entity* const e)
+void gearoenix::core::ecs::World::delayed_add_entity(EntityPtr&& e)
 {
     const std::lock_guard _lg(delayed_actions_lock);
     delayed_actions.push_back(Action { .variant = Action::Add { .entity = std::move(e) } });
@@ -70,7 +72,7 @@ gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(cons
     if (archetypes.end() == search) {
         bool is_ok = false;
         std::tie(search, is_ok) = archetypes.emplace(archetype_id, std::unique_ptr<Archetype>(new Archetype(archetype_id)));
-        GX_ASSERT_D("Insertion in archetype map was not successful");
+        GX_ASSERT_D(is_ok); // Insertion in the archetype map was not successful!
     }
     return search->second.get();
 }
@@ -83,7 +85,7 @@ std::optional<gearoenix::core::ecs::EntityPtr> gearoenix::core::ecs::World::get_
         return std::nullopt;
     }
     auto ptr = search->second.lock();
-    if (!ptr) {
+    if (nullptr == ptr) {
         return std::nullopt;
     }
     return std::make_optional(EntityPtr(std::move(ptr)));

@@ -10,7 +10,7 @@ from pathlib import Path
 
 script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
 
-submodules_dir = script_dir / 'gearoenix' / 'submodules'
+submodules_dir = script_dir / 'submodules'
 submodules_dir_str = str(submodules_dir)
 
 build_dir = script_dir / 'build'

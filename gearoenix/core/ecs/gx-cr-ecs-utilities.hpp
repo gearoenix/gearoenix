@@ -10,7 +10,7 @@ void find(const Entity& e, Entity::children_t& result)
         return;
     }
     if (const auto* const archetype = e.get_archetype(); (archetype && archetype->satisfy<Condition>()) || e.satisfy<Condition>()) {
-        result.emplace(e.get_object_id(), EntityPtr(cast_shared<Entity>(e.get_object_self().lock())));
+        result[e.get_object_id()] = EntityPtr(cast_shared<Entity>(e.get_object_self().lock()));
     }
     for (const auto& child : e.get_children() | std::views::values) {
         find<Condition>(*child.get(), result);

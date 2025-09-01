@@ -15,9 +15,9 @@ gearoenix::core::ecs::Archetype::components_indices_t gearoenix::core::ecs::Arch
     components_indices_t cis;
     for (const auto type_index : id) {
         const auto ti = static_cast<object_type_index_t>(type_index);
-        cis.emplace(ti, 0);
+        cis[ti] = 0;
         for (const auto& pts = Object::get_type_info(ti).get_all_parents(); const auto pt : pts) {
-            cis.emplace(static_cast<object_type_index_t>(pt), 0);
+            cis[static_cast<object_type_index_t>(pt)] = 0;
         }
     }
     std::uint32_t index = 0;

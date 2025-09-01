@@ -37,7 +37,7 @@ void gearoenix::core::allocator::Range::deallocate(const Range* const child)
         child_next->previous = child_previous;
         child_next->previous_key = new_key;
     }
-    ranges.emplace(new_key, new_range);
+    ranges[new_key] = new_range;
 }
 
 std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::int64_t size)
@@ -82,7 +82,7 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
     const auto new_key = new_size == 0 ? std::nullopt : std::make_optional(std::make_pair(new_size, found_offset + sz));
     if (new_key.has_value()) {
         result->next_key = new_key;
-        ranges.emplace(*new_key, std::make_pair(result.get(), result_next));
+        ranges[*new_key] = std::make_pair(result.get(), result_next);
     }
     if (nullptr != result_next) {
         result_next->previous_key = new_key;
