@@ -30,7 +30,6 @@ void initialise_default_font()
     auto& io = ImGui::GetIO();
     auto* const fonts = io.Fonts;
     io.FontDefault = fonts->AddFontFromMemoryTTF(content, static_cast<int>(read_bytes), 15);
-    fonts->Build();
 }
 
 void register_types()

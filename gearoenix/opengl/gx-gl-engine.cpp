@@ -17,6 +17,7 @@
 #include "gx-gl-texture.hpp"
 #include "material/gx-gl-mat-manager.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
+
 #include <ImGui/backends/imgui_impl_opengl3.h>
 #include <ImGui/imgui.h>
 
@@ -85,7 +86,6 @@ gearoenix::gl::Engine::~Engine()
     material_manager = nullptr;
     reflection_manager = nullptr;
     core::job::execute_current_thread_jobs();
-    ImGui_ImplOpenGL3_DestroyFontsTexture();
     ImGui_ImplOpenGL3_Shutdown();
 }
 
@@ -116,7 +116,6 @@ void gearoenix::gl::Engine::window_resized()
 
 void gearoenix::gl::Engine::upload_imgui_fonts()
 {
-    ImGui_ImplOpenGL3_CreateFontsTexture();
 }
 
 bool gearoenix::gl::Engine::is_supported()
