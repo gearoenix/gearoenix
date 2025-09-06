@@ -42,9 +42,9 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    auto io_imgui = ImGui::GetIO();
-    io_imgui.Fonts->AddFontDefault();
-    io_imgui.BackendPlatformName = RuntimeConfiguration::get().get_application_name().c_str();
+    auto& io = ImGui::GetIO();
+    io.Fonts->AddFontDefault();
+    io.BackendPlatformName = RuntimeConfiguration::get().get_application_name().c_str();
 }
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)

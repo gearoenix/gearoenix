@@ -5,9 +5,11 @@
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+#include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-selector.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-style-wrong-input-text.hpp>
+#include <gearoenix/render/imgui/gx-rnd-imgui-type-table.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 
@@ -24,9 +26,60 @@ namespace {
 }
 }
 
+void gearoenix::editor::ui::MenuEntity::show_create_camera_window()
+{
+    if (!is_create_camera_open) {
+        return;
+    }
+
+    constexpr char popup_id[] = "Create New Camera";
+
+    if (!ImGui::IsPopupOpen(popup_id, ImGuiPopupFlags_AnyPopup)) {
+        ImGui::OpenPopup(popup_id, ImGuiPopupFlags_NoReopen);
+    }
+
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    if (!ImGui::BeginPopupModal(popup_id, &is_create_camera_open, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+        return;
+    }
+
+    bool new_scene_valid_name = false;
+
+    render::imgui::table_scope("##gearoenix::editor::ui::MenuEntity::show_create_camera_window", [&] {
+        ImGui::Text("Camera Entity Name:");
+        ImGui::TableNextColumn();
+        new_scene_valid_name = render::imgui::entity_name_text_input(create_camera_entity_name, 200.0f).second;
+    });
+
+    const float window_width = ImGui::GetWindowSize().x;
+
+    constexpr auto button_width_ratio = 0.35f;
+    constexpr auto spacing_width_ratio = (1.0f - button_width_ratio * 2.0f) / 3.0f;
+    constexpr auto second_button_start_ratio = button_width_ratio + spacing_width_ratio * 2.0f;
+
+    ImGui::SetCursorPosX(spacing_width_ratio * window_width);
+    const auto button_width = window_width * button_width_ratio;
+    if (ImGui::Button("Cancel", ImVec2(button_width, 0.0f))) {
+        is_create_camera_open = false;
+    }
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(second_button_start_ratio * window_width);
+    if (new_scene_valid_name && ImGui::Button(popup_id, ImVec2(button_width, 0.0f))) {
+        is_create_camera_open = false;
+        render::camera::Manager::get().build(
+            std::move(create_camera_entity_name),
+            MenuScene::get().get_current_scene(),
+            core::job::EndCaller<core::ecs::EntityPtr>([](auto&& camera_entity) {
+                camera_entity->add_to_world();
+            }));
+    }
+
+    ImGui::EndPopup();
+}
+
 void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 {
-    constexpr auto key_file_browser = "gearoenix/editor/entity/create/skybox/file-browser";
+    constexpr char key_file_browser[] = "gearoenix/editor/entity/create/skybox/file-browser";
 
     if (!is_create_skybox_open) {
         return;
@@ -97,6 +150,9 @@ void gearoenix::editor::ui::MenuEntity::show_create_menu()
     }
 
     if (ImGui::BeginMenu("Render")) {
+        if (ImGui::MenuItem("Camera")) {
+            is_create_camera_open = true;
+        }
         if (ImGui::MenuItem("Skybox", "Ctrl+N,Ctrl+S")) {
             is_create_skybox_open = true;
         }
@@ -127,6 +183,7 @@ void gearoenix::editor::ui::MenuEntity::update()
         ImGui::EndMenu();
     }
 
+    show_create_camera_window();
     show_create_skybox_window();
 }
 

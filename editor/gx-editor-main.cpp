@@ -41,7 +41,7 @@ void gearoenix::editor::EditorApplication::quit()
 
 void gearoenix::editor::EditorApplication::set_current_scene(const core::ecs::Entity* const scene)
 {
-    current_scene_name = scene? scene->get_object_name(): "";
+    current_scene_name = scene ? scene->get_object_name() : "";
     update_caption();
 }
 

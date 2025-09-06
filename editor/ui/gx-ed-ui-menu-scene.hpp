@@ -2,12 +2,13 @@
 #include <boost/container/flat_set.hpp>
 #include <gearoenix/core/ecs/gx-cr-ecs-entity-ptr.hpp>
 #include <gearoenix/core/gx-cr-singleton.hpp>
+#include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
 
 namespace gearoenix::editor::ui {
 struct MenuScene final : core::Singleton<MenuScene> {
-private:
+    GX_GET_PTR_PRV(core::ecs::Entity, current_scene);
+
     boost::container::flat_set<core::ecs::EntityPtr> active_scenes;
-    core::ecs::Entity* current_scene = nullptr;
     bool is_gltf_popup_open = false;
 
     bool is_new_popup_open = false;

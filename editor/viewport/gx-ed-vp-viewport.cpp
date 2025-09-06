@@ -36,8 +36,19 @@ void gearoenix::editor::viewport::Viewport::update()
     GX_ASSERT_D(is_window_open);
 
     camera->update();
-    projection_button->update();
-    gizmo_buttons->update();
+
+    if (camera->is_active()) {
+        projection_button->update();
+        gizmo_buttons->update();
+    } else {
+        constexpr char msg[] = "No active camera in the scene";
+        const auto window_size = ImGui::GetWindowSize();
+        const auto text_size = ImGui::CalcTextSize(msg);
+        ImGui::SetCursorPos(ImVec2(
+            (window_size.x - text_size.x) * 0.5f,
+            (window_size.y - text_size.y) * 0.5f));
+        ImGui::TextUnformatted(msg);
+    }
 
     ImGui::End();
     ImGui::PopStyleVar();

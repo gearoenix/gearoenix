@@ -40,7 +40,7 @@ void gearoenix::editor::ui::MenuScene::show_new_popup()
 
     bool new_scene_valid_name = false;
 
-    render::imgui::table_scope("##gearoenix::core::ecs::Component", [&] {
+    render::imgui::table_scope("##gearoenix::editor::ui::MenuScene::show_new_popup", [&] {
         ImGui::Text("Scene Name:");
         ImGui::TableNextColumn();
         new_scene_valid_name = render::imgui::entity_name_text_input(new_scene_name, 200.0f).second;
@@ -166,11 +166,11 @@ void gearoenix::editor::ui::MenuScene::update()
             render::gltf::load(
                 platform::stream::Path::create_absolute(std::move(file_path_name)),
                 core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
-                    WindowOverlayProgressBarManager::get().remove(progress_bar_id);
                     for (auto& e : entities) {
                         set_current_scene(e.get());
                         active_scenes.emplace(std::move(e));
                     }
+                    WindowOverlayProgressBarManager::get().remove(progress_bar_id);
                 }));
         }
         is_gltf_popup_open = ImGuiFileDialog::Instance()->IsOpened();
