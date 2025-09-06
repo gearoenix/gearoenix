@@ -16,7 +16,8 @@ struct JetController final : core::event::Listener, Constraint {
     GX_GETSET_VAL_PRV(double, movement_speed, 10.0);
     GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
 
-    std::shared_ptr<Transformation> transformation;
+    GX_GETSET_CREF_PRV(std::shared_ptr<Transformation>, transformation);
+
     double rotate_x = 0.0;
     double rotate_z = 0.0;
     double move_forward_accumulated = 0.0;

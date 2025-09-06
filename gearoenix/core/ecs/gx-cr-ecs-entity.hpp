@@ -28,6 +28,7 @@ struct Entity final : Object {
 
     GX_GET_PTR_PRV(Entity, parent);
     GX_GET_PTR_PRV(Archetype, archetype);
+    GX_GETSET_VAL_PRV(bool, enabled, true);
 
     std::mutex components_lock;
     GX_GET_CREF_PRV(components_t, all_types_to_components);

@@ -32,6 +32,10 @@
 
 gearoenix::core::event::Listener::Response gearoenix::physics::constraint::JetController::on_event(const core::event::Data& d)
 {
+    if (!enabled) {
+        return Response::Continue;
+    }
+
     switch (d.get_source()) {
     case core::event::Id::ButtonMouse: {
         const auto& data = std::get<core::event::button::Mouse>(d.get_data());

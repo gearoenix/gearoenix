@@ -9,12 +9,15 @@ struct EntitySelector;
 namespace gearoenix::editor::ui {
 struct MenuEntity final {
 private:
+    bool is_create_camera_open = false;
+    std::string create_camera_entity_name;
     bool is_create_skybox_open = false;
     std::string create_skybox_entity_name;
     std::string create_skybox_path;
 
     std::unique_ptr<render::imgui::EntitySelector> scene_selector;
 
+    void show_create_camera_window();
     void show_create_skybox_window();
     void show_create_menu();
 
