@@ -1,11 +1,15 @@
 #include "gx-rnd-gzm-manager.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
+
 #include <boost/functional/hash.hpp>
+
 #include <imgui.h>
-#include <tuple>
+
 // Keep it after imgui
 #include <ImGuizmo/ImGuizmo.h>
+
+#include <tuple>
 
 gearoenix::render::gizmo::Manager::Manager()
     : Singleton(this)
