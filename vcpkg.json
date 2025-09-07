@@ -1,9 +1,14 @@
 {
-  "builtin-baseline": "0cb95c860ea83aafc1b24350510b30dec535989a",
+  "builtin-baseline": "b1e15efef6758eaa0beb0a8732cfa66f6a68a81d",
   "name": "gearoenix",
   "version": "0.1",
   "dependencies": [
-    "boost",
+    "boost-container",
+    "boost-container-hash",
+    "boost-core",
+    "boost-headers",
+    "boost-mp11",
+    "boost-test",
     "sdl2"
   ]
 }

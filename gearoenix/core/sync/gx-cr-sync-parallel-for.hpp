@@ -1,8 +1,13 @@
 #pragma once
+#include "../../platform/gx-plt-build-configuration.hpp"
 #include "gx-cr-sync-thread.hpp"
 #include <algorithm>
 #include <execution>
 #include <ranges>
+
+#if GX_PLATFORM_WEBASSEMBLY
+
+#endif
 
 namespace gearoenix::core::sync {
 // typedef const std::function<void(unsigned int, unsigned int)> parallel_for_t;
@@ -27,6 +32,8 @@ void parallel_for(Iter iter_first, Iter iter_end, const Fun& fun)
 {
     static const auto kernels_count = threads_count();
     static const auto indices = std::views::iota(0, kernels_count);
+
+    // std::execution::
 
     std::for_each(std::execution::par_unseq, indices.begin(), indices.end(), [&](auto const kernel_index) {
         Iter curr_iter = iter_first;

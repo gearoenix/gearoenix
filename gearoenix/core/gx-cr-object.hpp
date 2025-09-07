@@ -7,6 +7,7 @@
 #include <any>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+#include <boost/core/demangle.hpp>
 #include <functional>
 #include <memory>
 #include <type_traits>
