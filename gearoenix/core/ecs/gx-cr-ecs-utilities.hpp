@@ -2,6 +2,8 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-entity.hpp"
 
+#include <ranges>
+
 namespace gearoenix::core::ecs {
 template <typename Condition>
 void find(const Entity& e, Entity::children_t& result)

@@ -12,8 +12,13 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_sync_parallel_for)
             seen[j] = std::make_unique<std::atomic<int>>(0);
         }
         gearoenix::core::sync::parallel_for(seen, [](auto& s, auto) { ++*s; });
+        int index = 0;
         for (const auto& v : seen) {
             BOOST_CHECK(*v == 1);
+            if (*v != 1) {
+                GX_LOG_E("Index: " << index << " Value: " << *v);
+            }
+            ++index;
         }
     }
 }

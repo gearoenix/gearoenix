@@ -4,5 +4,8 @@
 std::int32_t gearoenix::core::sync::threads_count()
 {
     const auto count = static_cast<std::int32_t>(std::thread::hardware_concurrency());
+    if (4 > count) {
+        return 4;
+    }
     return count;
 }

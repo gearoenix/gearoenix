@@ -11,8 +11,12 @@ private:
 
 public:
     explicit Semaphore(int count = 0);
+
     Semaphore(Semaphore const&) = delete;
-    void operator=(Semaphore const&) = delete;
+    Semaphore(Semaphore&&) = delete;
+    Semaphore& operator=(Semaphore const&) = delete;
+    Semaphore& operator=(Semaphore&&) = delete;
+
     ~Semaphore() = default;
     void lock();
     void release();
