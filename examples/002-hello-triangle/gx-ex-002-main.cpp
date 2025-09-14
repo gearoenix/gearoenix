@@ -1,3 +1,5 @@
+#include "gearoenix/platform/gx-plt-file-chooser.hpp"
+
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
@@ -12,6 +14,8 @@
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
+
+#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 
 typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
 typedef gearoenix::physics::Transformation GxTran;
@@ -107,6 +111,8 @@ public:
         light->colour = { 10.0f, 10.0f, 10.0f };
 
         scene_entity->add_to_world();
+
+        gearoenix::platform::file_chooser_open([](auto&&, auto&&) { }, [] { }, "", "*.png");
     }
 };
 

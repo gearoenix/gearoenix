@@ -1,7 +1,8 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
-#include <imgui/imgui.h>
+
+#include <ImGui/imgui.h>
 
 namespace gearoenix::render::imgui {
 struct EntitySelector final {

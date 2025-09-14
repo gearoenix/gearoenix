@@ -4,7 +4,7 @@
 
 #include <boost/functional/hash.hpp>
 
-#include <imgui.h>
+#include <ImGui/imgui.h>
 
 // Keep it after imgui
 #include <ImGuizmo/ImGuizmo.h>

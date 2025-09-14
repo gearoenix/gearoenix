@@ -1,6 +1,7 @@
 #pragma once
 #include "gx-math-vector-2d.hpp"
-#include <imgui/imgui.h>
+
+#include <ImGui/imgui.h>
 
 namespace gearoenix {
 template <typename Element>

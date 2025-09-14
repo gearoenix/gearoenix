@@ -1,7 +1,8 @@
 #include "gx-rnd-cmr-exposure.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
-#include <imgui.h>
+
+#include <ImGui/imgui.h>
 
 void gearoenix::render::camera::Exposure::update()
 {

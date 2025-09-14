@@ -5,7 +5,7 @@
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #define GEAROENIX_START(ApplicationMainClass) GX_MAIN_ENTRY(                 \
     auto plt_app = new gearoenix::platform::Application(GX_MAIN_ENTRY_ARGS); \
-    plt_app->run(new ApplicationMainClass(*plt_app)))
+    plt_app->run(new ApplicationMainClass()))
 #else
 #define GEAROENIX_START(ApplicationMainClass) GX_MAIN_ENTRY(                               \
     auto plt_app = std::make_unique<gearoenix::platform::Application>(GX_MAIN_ENTRY_ARGS); \

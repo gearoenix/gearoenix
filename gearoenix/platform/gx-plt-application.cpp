@@ -7,6 +7,7 @@
 #include "../core/sync/gx-cr-sync-thread.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/imgui/gx-rnd-imgui-popup.hpp"
+#include "gx-plt-file-chooser.hpp"
 #include "gx-plt-runtime-configuration.hpp"
 #include "stream/gx-plt-stm-stream.hpp"
 
@@ -328,6 +329,7 @@ void gearoenix::platform::BaseApplication::update()
         running = !should_window_be_closed();
     }
 
+    file_chooser_update();
     core_application->update();
     audio_engine->update();
     render_engine->end_frame();
