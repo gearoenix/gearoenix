@@ -13,6 +13,37 @@ source_group(TREE ${GX_ENGINE_SRC_DIR} FILES ${GX_ENGINE_TEST_SRC})
 
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_TEST_SRC} PARENT_SCOPE)
 
+function(gx_common_target_config GX_CURRENT_TARGET)
+    if (GX_IN_WASM)
+        target_compile_options(${GX_CURRENT_TARGET} PUBLIC
+                -pthread
+                $<$<CONFIG:Release>:-O3>
+                $<$<CONFIG:Release>:-ffast-math>
+                $<$<CONFIG:Release>:-flto=full>
+                $<$<CONFIG:Debug>:-fdebug-compilation-dir=${CMAKE_SOURCE_DIR}>)
+        target_link_options(${GX_CURRENT_TARGET} PUBLIC
+                -pthread
+                -fwasm-exceptions
+                -sNO_EXIT_RUNTIME=1
+                -sALLOW_MEMORY_GROWTH=1
+                -sPTHREAD_POOL_SIZE="navigator.hardwareConcurrency*64"
+                -sMIN_WEBGL_VERSION=2
+                -sMAX_WEBGL_VERSION=2
+                -sALLOW_TABLE_GROWTH=1
+                -sEXPORTED_RUNTIME_METHODS=[ccall,HEAPU8]
+                -sEXPORTED_FUNCTIONS=[_main,_malloc,_free,_gearoenix_upload_file_return]
+                --preload-file=${CMAKE_SOURCE_DIR}/assets@/assets/
+                --shell-file=${CMAKE_SOURCE_DIR}/wasm/template.html
+                $<$<CONFIG:Release>:-O3>
+                $<$<CONFIG:Release>:-ffast-math>
+                $<$<CONFIG:Release>:-flto=full>
+                $<$<CONFIG:Debug>:-sASSERTIONS=1>
+                $<$<CONFIG:Debug>:-sGL_ASSERTIONS=1>
+                $<$<CONFIG:Debug>:-sSAFE_HEAP=1>
+                $<$<CONFIG:Debug>:-fdebug-compilation-dir=${CMAKE_SOURCE_DIR}>)
+    endif (GX_IN_WASM)
+endfunction(gx_common_target_config)
+
 set(GX_IMGUI_PATH ${GX_SUBMODULES_DIR}/ImGui)
 add_library(ImGui STATIC
         ${GX_IMGUI_PATH}/imgui.cpp
@@ -24,6 +55,7 @@ add_library(ImGui STATIC
         ${GX_IMGUI_PATH}/misc/cpp/imgui_stdlib.cpp)
 target_compile_options(ImGui PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGui PRIVATE ${GX_IMGUI_PATH})
+gx_common_target_config(ImGui)
 if(NOT GX_IN_WASM)
     target_sources(ImGui PRIVATE ${GX_IMGUI_PATH}/backends/imgui_impl_vulkan.cpp)
     target_compile_definitions(ImGui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
@@ -34,6 +66,7 @@ set(GX_IMGUI_FB_PATH ${GX_SUBMODULES_DIR}/ImGuiFileDialog)
 add_library(ImGuiFileDialog STATIC ${GX_IMGUI_FB_PATH}/ImGuiFileDialog.cpp)
 target_compile_options(ImGuiFileDialog PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGuiFileDialog PRIVATE ${GX_IMGUI_PATH})
+gx_common_target_config(ImGuiFileDialog)
 
 set(GX_IMGIZMO_PATH ${GX_SUBMODULES_DIR}/ImGuizmo)
 add_library(ImGuizmo STATIC
@@ -44,11 +77,13 @@ add_library(ImGuizmo STATIC
         ${GX_IMGIZMO_PATH}/ImSequencer.cpp)
 target_compile_options(ImGuizmo PRIVATE ${GX_NO_WARNING_FLAG})
 target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
+gx_common_target_config(ImGuizmo)
 
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
 target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL2::SDL2 Boost::headers)
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_IMGUI_PATH})
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
+gx_common_target_config(GearoenixGameEngine)
 
 foreach (GX_LIB ${GX_DEBUG_LIBS})
     target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})
@@ -111,30 +146,8 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)
     endif ()
 
-    if (GX_IN_WASM)
-        target_compile_options(${GX_CURRENT_TARGET} PRIVATE $<$<CONFIG:Release>:-Ofast> $<$<CONFIG:Release>:-flto=full>)
-        target_link_options(${GX_CURRENT_TARGET} PRIVATE
-                -pthread
-                -fwasm-exceptions
-                -s PROXY_TO_PTHREAD=1
-                -s OFFSCREENCANVAS_SUPPORT=1
-                -s NO_EXIT_RUNTIME=1
-                -s ALLOW_MEMORY_GROWTH=1
-                -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency
-                -s MIN_WEBGL_VERSION=2
-                -s MAX_WEBGL_VERSION=2
-                -s ALLOW_TABLE_GROWTH=1
-                --preload-file "${CMAKE_SOURCE_DIR}/assets@/assets/"
-                --shell-file "${CMAKE_SOURCE_DIR}/wasm/template.html"
-                $<$<CONFIG:Release>:-flto=full>
-                $<$<CONFIG:Debug>:-s> $<$<CONFIG:Debug>:ASSERTIONS=1>
-                $<$<CONFIG:Debug>:-s> $<$<CONFIG:Debug>:GL_ASSERTIONS=1>
-                $<$<CONFIG:Debug>:-s> $<$<CONFIG:Debug>:SAFE_HEAP=1>
-                $<$<CONFIG:Debug>:-s> $<$<CONFIG:Debug>:DEMANGLE_SUPPORT=1>
-                $<$<CONFIG:Debug>:-fdebug-compilation-dir='${CMAKE_SOURCE_DIR}'>
-        )
-        set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
-    endif (GX_IN_WASM)
+    gx_common_target_config(${GX_CURRENT_TARGET})
+    set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
 endfunction(gx_prepare_target)
 
 set(GX_ENGINE_SRC_DIR ${GX_ENGINE_SRC_DIR} PARENT_SCOPE)

@@ -51,8 +51,8 @@ try {
 
 if (-not $NoServer) {
     try {
-        Push-Location $ScriptDir
-        python "run-server.py"
+        Push-Location $ProjectRoot
+        python "wasm/run-server.py"
     } catch {
         throw "Failed to run the server: $($_.Exception.Message)"
     } finally {

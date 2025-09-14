@@ -5,8 +5,10 @@
       "name": "vcpkg",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/vcpkg/triplets"
+      }
     },
     {
       "name": "windows-debug",
@@ -65,9 +67,9 @@
       "inherits": "vcpkg",
       "binaryDir": "${sourceDir}/build/wasm/debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+        "VCPKG_TARGET_TRIPLET": "gearoenix-wasm32",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gearoenix-emscripten.cmake",
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -75,9 +77,9 @@
       "inherits": "vcpkg",
       "binaryDir": "${sourceDir}/build/wasm/release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+        "VCPKG_TARGET_TRIPLET": "gearoenix-wasm32",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gearoenix-emscripten.cmake",
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],

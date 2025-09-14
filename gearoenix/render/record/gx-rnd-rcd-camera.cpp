@@ -11,7 +11,14 @@
 #include "../reflection/gx-rnd-rfl-baked.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "gx-rnd-rcd-model.hpp"
+
+#if GX_PLATFORM_WEBASSEMBLY
+#define GX_PARALLEL_POLICY
+#else
 #include <execution>
+
+#define GX_PARALLEL_POLICY std::execution::par_unseq,
+#endif
 
 gearoenix::render::record::Camera::Camera()
     : threads_mvps(core::sync::threads_count())
@@ -63,9 +70,9 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     update_models(models.static_models_bvh);
     update_models(models.dynamic_models_bvh);
 
-    std::sort(std::execution::par_unseq, all_models.begin(), all_models.end(),
+    std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(),
         [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-    std::sort(std::execution::par_unseq, translucent_models.begin(), translucent_models.end(),
+    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(),
         [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
 
     all_models.insert(
