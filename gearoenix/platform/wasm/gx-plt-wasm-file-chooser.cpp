@@ -1,6 +1,5 @@
 #include "gx-plt-wasm-file-chooser.hpp"
 #if GX_PLATFORM_WEBASSEMBLY
-
 #include "../gx-plt-log.hpp"
 
 #include <emscripten.h>
@@ -73,7 +72,6 @@ void gearoenix::platform::wasm::open(const std::string& accept_types, const open
 
 void gearoenix::platform::wasm::save(const std::string& file_name, const std::string& mime_type, const std::string_view buffer)
 {
-    GX_LOG_D("download called");
     ::download(file_name.c_str(), mime_type.c_str(), buffer.data(), buffer.size());
 }
 

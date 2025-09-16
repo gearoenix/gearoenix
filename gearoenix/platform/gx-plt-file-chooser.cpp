@@ -1,4 +1,5 @@
 #include "gx-plt-file-chooser.hpp"
+#include "gx-plt-log.hpp"
 #include "wasm/gx-plt-wasm-file-chooser.hpp"
 
 #include <mutex>
@@ -13,18 +14,20 @@ struct OpenDialogData final {
 };
 
 std::mutex open_dialogs_lock;
+bool open_dialogs_running = false;
 std::queue<OpenDialogData> open_dialogs;
 
 #if GX_PLATFORM_WEBASSEMBLY
 void open_callback(const std::string& name, const std::string&, const std::string_view buffer, void* const)
 {
     const std::lock_guard _l(open_dialogs_lock);
-    if (buffer.empty()) {
+    if (!buffer.empty()) {
         open_dialogs.front().on_open(std::string(name), { buffer.begin(), buffer.end() });
     } else {
         open_dialogs.front().on_cancel();
     }
     open_dialogs.pop();
+    open_dialogs_running = false;
 }
 #else
 struct SaveDialogData final {
@@ -58,8 +61,9 @@ void gearoenix::platform::file_chooser_save(std::string&& name, std::string&& ti
 void gearoenix::platform::file_chooser_update()
 {
 #if GX_PLATFORM_WEBASSEMBLY
-    if (!open_dialogs.empty()) {
+    if (!open_dialogs.empty() && !open_dialogs_running) {
         const std::lock_guard _l(open_dialogs_lock);
+        open_dialogs_running = true;
         const auto& data = open_dialogs.front();
         wasm::open(data.filter, open_callback, nullptr);
     }
