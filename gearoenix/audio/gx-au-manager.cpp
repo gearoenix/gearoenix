@@ -12,9 +12,9 @@ gearoenix::audio::Manager::Manager()
 
 gearoenix::audio::Manager::~Manager() = default;
 
-std::uint64_t gearoenix::audio::Manager::create_audio(const std::string& asset_path, const std::string& name)
+std::uint64_t gearoenix::audio::Manager::create_audio(std::string&& asset_path, const std::string& name)
 {
-    return create_audio(platform::stream::Path::create_asset(asset_path), name);
+    return create_audio(platform::stream::Path::create_asset(std::move(asset_path)), name);
 }
 
 std::uint64_t gearoenix::audio::Manager::create_audio(const platform::stream::Path& asset_path, const std::string& name)

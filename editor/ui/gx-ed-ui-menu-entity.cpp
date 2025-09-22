@@ -4,27 +4,19 @@
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-selector.hpp>
-#include <gearoenix/render/imgui/gx-rnd-imgui-style-wrong-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-type-table.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
+#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 #include <ImGui/imgui.h>
-#include <ImGui/misc/cpp/imgui_stdlib.h>
-#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include <filesystem>
-
-namespace {
-[[nodiscard]] bool is_valid_skybox_path(const std::string& path)
-{
-    return std::filesystem::exists(path) && (path.ends_with(".hdr") || path.ends_with(".jpg") || path.ends_with(".png") || path.ends_with(".gx-cube-texture"));
-}
-}
 
 void gearoenix::editor::ui::MenuEntity::show_create_camera_window()
 {
@@ -79,8 +71,6 @@ void gearoenix::editor::ui::MenuEntity::show_create_camera_window()
 
 void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
 {
-    constexpr char key_file_browser[] = "gearoenix/editor/entity/create/skybox/file-browser";
-
     if (!is_create_skybox_open) {
         return;
     }
@@ -90,54 +80,39 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
         return;
     }
 
-    const auto is_valid_path = is_valid_skybox_path(create_skybox_path);
-
     (void)render::imgui::entity_name_text_input(create_skybox_entity_name);
-    {
-        const auto _ = render::imgui::set_wrong_input_text_style(create_skybox_path.empty() || is_valid_path);
-        ImGui::InputTextWithHint("Skybox Image Path", "Path to .hdr,.png,.jpg or gx-cube-texture", &create_skybox_path);
-        (void)_;
-        ImGui::SameLine();
-        if (ImGui::Button("Browse File")) {
-            ImGuiFileDialog::Instance()->OpenDialog(key_file_browser, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
-        }
+
+    if (ImGui::Button("Browse File")) {
+        platform::file_chooser_open([this](platform::stream::Path&& path, std::shared_ptr<platform::stream::Stream>&& stream) {
+            skybox_stream = std::move(stream);
+            create_skybox_file_path = std::move(path); }, [] {}, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
     }
 
     scene_selector->show<render::scene::Scene>();
 
-    if (is_valid_path) {
-        if (const auto scene_entity = scene_selector->get_selection(); scene_entity && ImGui::Button("Create")) {
-            const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_path + "]...");
-            core::job::send_job_to_pool([this, scene_entity, progress_bar_id] {
-                render::skybox::Manager::get().build(
-                    std::string(create_skybox_entity_name),
-                    scene_entity,
-                    platform::stream::Path::create_absolute(create_skybox_path),
-                    core::job::EndCaller<core::ecs::EntityPtr>([progress_bar_id](auto&& skybox_entity) {
-                        WindowOverlayProgressBarManager::get().remove(progress_bar_id);
-                        skybox_entity->add_to_world();
-                    }));
-            });
-        }
-        if (!create_skybox_path.ends_with(".gx-cube-texture")) {
-            ImGui::SameLine();
-            if (ImGui::Button("Create & Bake to cube map")) {
+    if (skybox_stream) {
+        if (const auto scene_entity = scene_selector->get_selection(); scene_entity) {
+            if (ImGui::Button("Create")) {
+                const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_file_path.get_raw_data() + "]...");
+                core::job::send_job_to_pool([this, scene_entity, progress_bar_id] {
+                    render::texture::Manager::get().create(
+                        create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
+                        core::job::EndCallerShared<render::texture::Texture>([this, progress_bar_id, scene_entity](std::shared_ptr<render::texture::Texture>&& txt) {
+                            render::skybox::Manager::get().build(std::string(create_skybox_entity_name), scene_entity, std::move(txt), core::job::EndCaller<core::ecs::EntityPtr>([progress_bar_id](auto&& skybox_entity) {
+                                WindowOverlayProgressBarManager::get().remove(progress_bar_id);
+                                skybox_entity->add_to_world();
+                            }));
+                        }));
+                });
             }
+            ImGui::SameLine();
         }
-        ImGui::SameLine();
     }
     if (ImGui::Button("Cancel")) {
         is_create_skybox_open = false;
     }
 
     ImGui::End();
-
-    if (ImGuiFileDialog::Instance()->Display(key_file_browser)) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            create_skybox_path = ImGuiFileDialog::Instance()->GetFilePathName();
-        }
-        ImGuiFileDialog::Instance()->Close();
-    }
 }
 
 void gearoenix::editor::ui::MenuEntity::show_create_menu()
@@ -161,7 +136,8 @@ void gearoenix::editor::ui::MenuEntity::show_create_menu()
 }
 
 gearoenix::editor::ui::MenuEntity::MenuEntity()
-    : scene_selector(std::make_unique<render::imgui::EntitySelector>())
+    : create_skybox_file_path(platform::stream::AbsolutePath(""))
+    , scene_selector(std::make_unique<render::imgui::EntitySelector>())
 {
 }
 

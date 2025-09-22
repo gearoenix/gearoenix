@@ -8,36 +8,22 @@
 #include "gx-gl-texture.hpp"
 #include <boost/mp11/algorithm.hpp>
 
-namespace {
-template <typename T>
-constexpr auto index_of_texture = boost::mp11::mp_find<gearoenix::render::skybox::Texture, std::shared_ptr<T>>::value;
-
-constexpr auto index_of_texture_2d = index_of_texture<gearoenix::render::texture::Texture2D>;
-constexpr auto index_of_texture_cube = index_of_texture<gearoenix::render::texture::TextureCube>;
-
-gearoenix::gl::Skybox::GlTexture convert(const gearoenix::render::skybox::Texture& texture)
-{
-    switch (texture.index()) {
-    case index_of_texture_2d:
-        return std::dynamic_pointer_cast<gearoenix::gl::Texture2D>(std::get<index_of_texture_2d>(texture));
-    case index_of_texture_cube:
-        return std::dynamic_pointer_cast<gearoenix::gl::TextureCube>(std::get<index_of_texture_cube>(texture));
-    default:
-        GX_UNEXPECTED;
-    }
-}
-}
-
 // void gearoenix::gl::Skybox::write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const
 // {
 //     GX_UNIMPLEMENTED;
 // }
 
-gearoenix::gl::Skybox::Skybox(core::ecs::Entity* const entity, render::skybox::Texture&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name)
+gearoenix::gl::Skybox::Skybox(core::ecs::Entity* const entity, std::shared_ptr<render::texture::Texture>&& texture, std::shared_ptr<Mesh>&& mesh, std::string&& name)
     : render::skybox::Skybox(entity, core::ecs::ComponentType::create_index(this), std::shared_ptr<render::mesh::Mesh>(mesh), std::move(texture), std::move(name))
-    , gl_texture(::convert(bound_texture))
     , gl_mesh(std::move(mesh))
 {
+    if (const auto t2d = std::dynamic_pointer_cast<Texture2D>(bound_texture); t2d) {
+        texture_object = t2d->get_object();
+    } else if (const auto tc = std::dynamic_pointer_cast<TextureCube>(bound_texture); tc) {
+        texture_object = tc->get_object();
+    } else {
+        GX_UNEXPECTED;
+    }
 }
 
 gearoenix::gl::Skybox::~Skybox() = default;
@@ -52,18 +38,6 @@ gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const
     return gl_mesh->get_cached_index_buffer();
 }
 
-gearoenix::gl::uint gearoenix::gl::Skybox::get_texture_object() const
-{
-    switch (gl_texture.index()) {
-    case index_of_texture_2d:
-        return std::get<index_of_texture_2d>(gl_texture)->get_object();
-    case index_of_texture_cube:
-        return std::get<index_of_texture_cube>(gl_texture)->get_object();
-    default:
-        GX_UNEXPECTED;
-    }
-}
-
 gearoenix::gl::SkyboxManager::SkyboxManager()
 {
     core::ecs::ComponentType::add<Skybox>();
@@ -74,7 +48,7 @@ gearoenix::gl::SkyboxManager::~SkyboxManager() = default;
 gearoenix::core::ecs::EntityPtr gearoenix::gl::SkyboxManager::build(
     std::string&& name,
     core::ecs::Entity* const parent,
-    render::skybox::Texture&& texture,
+    std::shared_ptr<render::texture::Texture>&& texture,
     std::shared_ptr<render::mesh::Mesh>&& mesh)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);

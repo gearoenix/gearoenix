@@ -26,7 +26,7 @@ struct Manager final : core::Singleton<Manager> {
     Manager();
     ~Manager() override;
 
-    [[nodiscard]] std::uint64_t create_audio(const std::string& asset_path, const std::string& name);
+    [[nodiscard]] std::uint64_t create_audio(std::string&& asset_path, const std::string& name);
     [[nodiscard]] std::uint64_t create_audio(const platform::stream::Path& asset_path, const std::string& name);
     [[nodiscard]] std::uint64_t create_audio(platform::stream::Stream& asset_stream, const std::string& name);
     [[nodiscard]] std::uint64_t create_audio_ogg(const std::vector<std::uint8_t>& ogg_data, const std::string& name);

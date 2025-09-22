@@ -1,14 +1,11 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/platform/gx-plt-file-chooser.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 
 #include <ImGui/imgui.h>
 
 struct GameApp final : gearoenix::core::Application {
 private:
-    bool show_demo_window = true;
-    bool show_hello_window = true;
-    bool show_file_browser_window = true;
-
     std::string opened_file_name = {};
     bool file_browser_canceled = false;
 
@@ -17,18 +14,16 @@ public:
 
     void update() override
     {
-        ImGui::ShowDemoWindow(&show_demo_window);
+        ImGui::ShowDemoWindow();
 
-        if (ImGui::Begin("Gearoenix File Browser Operations", &show_file_browser_window)) {
+        if (ImGui::Begin("Gearoenix File Browser Operations")) {
             ImGui::Text("This window contains a demo for showing how the file browser API can be used");
             ImGui::Text("The file browser API is implemented in Gearoenix and have a uniform API across all platforms.");
 
-            if (!opened_file_name.empty()) {
-                ImGui::Text("Opened file name: %s", opened_file_name.c_str());
-            }
-
             if (file_browser_canceled) {
                 ImGui::Text("File browser canceled");
+            } else if (!opened_file_name.empty()) {
+                ImGui::Text("Opened file name: %s", opened_file_name.c_str());
             }
 
             if (ImGui::Button("Save")) {
@@ -42,9 +37,11 @@ public:
                 opened_file_name.clear();
                 file_browser_canceled = false;
 
-                gearoenix::platform::file_chooser_open([this](auto&& name, auto&&) {
+                gearoenix::platform::file_chooser_open([this](auto&& path, auto&&) {
                     file_browser_canceled = false;
-                    opened_file_name = std::move(name); }, [this] { file_browser_canceled = true; }, "[Gearoenix Game Engine] Open Any File", ".*");
+                    opened_file_name = path.get_raw_data(); }, [this] {
+                    file_browser_canceled = true;
+                    opened_file_name.clear(); }, "[Gearoenix Game Engine] Open Any File", ".*");
             }
         } else {
             opened_file_name.clear();

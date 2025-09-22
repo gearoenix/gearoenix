@@ -58,7 +58,7 @@ void gearoenix::render::skybox::Manager::build(
 void gearoenix::render::skybox::Manager::build(
     std::string&& name,
     core::ecs::Entity* const parent,
-    Texture&& bound_texture,
+    std::shared_ptr<texture::Texture>&& bound_texture,
     core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
     material::Manager::get().get_unlit(

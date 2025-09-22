@@ -1,6 +1,12 @@
 #pragma once
+#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+
 #include <memory>
 #include <string>
+
+namespace gearoenix::platform::stream {
+struct Stream;
+}
 
 namespace gearoenix::render::imgui {
 struct EntitySelector;
@@ -13,7 +19,8 @@ private:
     std::string create_camera_entity_name;
     bool is_create_skybox_open = false;
     std::string create_skybox_entity_name;
-    std::string create_skybox_path;
+    std::shared_ptr<platform::stream::Stream> skybox_stream;
+    platform::stream::Path create_skybox_file_path;
 
     std::unique_ptr<render::imgui::EntitySelector> scene_selector;
 
