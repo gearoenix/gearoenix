@@ -185,15 +185,8 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
             }
         }
         glActiveTexture(GL_TEXTURE0 + skybox_texture_bind_index);
-        const auto& gl_sky = *static_cast<const Skybox*>(skybox.skybox);
-        const auto& gl_txt = gl_sky.get_gl_texture();
-        constexpr auto texture_2d_index = boost::mp11::mp_find<Skybox::GlTexture, std::shared_ptr<Texture2D>>::value;
-        constexpr auto texture_cube_index = boost::mp11::mp_find<Skybox::GlTexture, std::shared_ptr<TextureCube>>::value;
-        if (is_equirectangular) {
-            glBindTexture(GL_TEXTURE_2D, std::get<texture_2d_index>(gl_txt)->get_object());
-        } else {
-            glBindTexture(GL_TEXTURE_CUBE_MAP, std::get<texture_cube_index>(gl_txt)->get_object());
-        }
+        const auto& gl_sky = *core::cast_ptr<const Skybox>(skybox.skybox);
+        glBindTexture(is_equirectangular ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP, gl_sky.get_texture_object());
         glBindVertexArray(gl_sky.get_vertex_object());
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }

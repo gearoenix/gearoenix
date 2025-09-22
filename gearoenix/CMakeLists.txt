@@ -133,21 +133,18 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
     endif ()
     # In WASM, for now, we have different approach for tha assets.
-    if (NOT GX_IN_WASM)
-        add_custom_command(
-                TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory ${GX_ASSET_DIR})
+    if (GX_IN_WASM)
+        set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
+    else (GX_IN_WASM)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${GX_ASSET_DIR})
         file(GLOB GX_ASSET_FILES ${GX_MAIN_ASSETS_PATH}/*)
         foreach (GX_ASSET_FILE ${GX_ASSET_FILES})
-            add_custom_command(
-                    TARGET ${GX_CURRENT_TARGET} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_ASSET_FILE} ${GX_ASSET_DIR})
-        endforeach ()
+            add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_ASSET_FILE} ${GX_ASSET_DIR})
+        endforeach (GX_ASSET_FILE ${GX_ASSET_FILES})
         add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)
-    endif ()
+    endif (GX_IN_WASM)
 
     gx_common_target_config(${GX_CURRENT_TARGET})
-    set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
 endfunction(gx_prepare_target)
 
 set(GX_ENGINE_SRC_DIR ${GX_ENGINE_SRC_DIR} PARENT_SCOPE)

@@ -65,11 +65,10 @@ public:
     void create_2d_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c);
     void get_brdflut(core::job::EndCallerShared<Texture2D>&& c);
     void get_checker(core::job::EndCallerShared<Texture2D>&& c);
-    void create_2d_from_pixels(
-        std::string&& name,
-        std::vector<std::vector<std::uint8_t>>&& pixels,
-        const TextureInfo& info,
-        core::job::EndCallerShared<Texture2D>&& c);
+    [[nodiscard]] bool get_from_cache(const std::string& name, core::job::EndCallerShared<Texture>&& c, const TextureInfo& info);
+    [[nodiscard]] bool get_from_cache(const std::string& name, core::job::EndCallerShared<Texture2D>& c, const TextureInfo* info);
+    [[nodiscard]] bool get_from_cache(const std::string& name, core::job::EndCallerShared<TextureCube>& c, const TextureInfo* info);
+    void create_2d_from_pixels(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const TextureInfo& info, core::job::EndCallerShared<Texture2D>&& c);
     void create_2d_from_formatted(
         std::string&& name,
         const void* data,
@@ -86,6 +85,7 @@ public:
         const platform::stream::Path& path,
         const TextureInfo& info,
         core::job::EndCallerShared<Texture2D>&& c);
+    void create(const platform::stream::Path& path, platform::stream::Stream& stream, const TextureInfo& info, core::job::EndCallerShared<Texture>&& c);
     void create_cube_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<TextureCube>&& c);
     void create_cube_from_pixels(
         std::string&& name,

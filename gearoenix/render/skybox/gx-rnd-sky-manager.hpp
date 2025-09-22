@@ -2,15 +2,19 @@
 #include "../../core/ecs/gx-cr-ecs-entity-ptr.hpp"
 #include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include "gx-rnd-sky-types.hpp"
 #include <string>
 
 namespace gearoenix::platform::stream {
 struct Path;
+struct Stream;
 }
 
 namespace gearoenix::render::mesh {
 struct Mesh;
+}
+
+namespace gearoenix::render::texture {
+struct Texture;
 }
 
 namespace gearoenix::render::skybox {
@@ -24,7 +28,7 @@ public:
     [[nodiscard]] virtual core::ecs::EntityPtr build(
         std::string&& name,
         core::ecs::Entity* parent,
-        Texture&& bound_texture,
+        std::shared_ptr<texture::Texture>&& bound_texture,
         std::shared_ptr<mesh::Mesh>&& bound_mesh)
         = 0;
 
@@ -37,7 +41,7 @@ public:
     void build(
         std::string&& name,
         core::ecs::Entity* parent,
-        Texture&& bound_texture,
+        std::shared_ptr<texture::Texture>&& bound_texture,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 };
 }

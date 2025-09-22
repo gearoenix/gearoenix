@@ -8,7 +8,7 @@ typedef std::uint32_t object_id_t;
 constexpr auto invalid_object_id = static_cast<object_id_t>(-1);
 }
 
-/// For all types which are derived from @code gearoenix::core::ecs::Component @endcode or they have a derived class that is derived from Component.
+/// For all types which are derived from @code gearoenix::core::ecs::Component @endcode or they have a derived struct that is derived from Component.
 constexpr auto gearoenix_core_component_type_index_start = static_cast<gearoenix::core::object_type_index_t>(0);
 
 constexpr auto gearoenix_gl_camera_type_index = gearoenix_core_component_type_index_start + 1;

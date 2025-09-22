@@ -37,6 +37,7 @@ private:
         Function function;
         const std::thread::id context_thread;
         std::optional<Type> value = std::nullopt;
+        bool ignore_empty_value = false;
         GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const boost::stacktrace::stacktrace stack_trace;)
 
         explicit Caller(Function&& f)
@@ -53,12 +54,11 @@ private:
                     f();
                 });
             } else {
+                GX_ASSERT_D(ignore_empty_value || value.has_value());
                 if (value.has_value()) {
                     send_job(context_thread, [v = std::move(*value), f = std::move(function)]() mutable {
                         f(std::move(v));
                     });
-                } else {
-                    GX_LOG_F(typeid(EndCaller).name() << " is called without value.");
                 }
             }
         }
@@ -105,27 +105,25 @@ public:
         return *this;
     }
 
-#ifdef GX_DEBUG_MODE
-    ~EndCaller()
-    {
-        caller = nullptr;
-    }
-#else
     ~EndCaller() = default;
-#endif
 
     template <typename TT = T>
     std::enable_if_t<!std::is_same_v<void, TT>, void> set_return(Type&& v) const
     {
-        GX_ASSERT(!caller->value.has_value());
+        GX_ASSERT_D(!caller->value.has_value());
         caller->value = std::move(v);
     }
 
     template <typename TT = T>
     std::enable_if_t<!std::is_same_v<void, TT>, Type&> get_return() const
     {
-        GX_ASSERT(caller->value.has_value());
+        GX_ASSERT_D(caller->value.has_value());
         return *caller->value;
+    }
+
+    void set_ignore_empty_value(const bool ignore_empty_value) const
+    {
+        caller->ignore_empty_value = ignore_empty_value;
     }
 };
 
