@@ -21,12 +21,18 @@ struct OpenDialogData final {
     std::string filter;
 };
 
-std::mutex open_dialogs_lock;
-bool open_dialogs_running = false;
-std::queue<OpenDialogData> open_dialogs;
+struct SaveDialogData final {
+    std::string name;
+    std::string title;
+    std::string filter;
+    std::vector<char> content;
+};
 
-const std::string open_file_browser_key = "gearoenix_platform_open_file_chooser_key";
-const std::string save_file_browser_key = "gearoenix_platform_save_file_chooser_key";
+std::mutex dialogs_lock;
+bool dialogs_running = false;
+std::queue<std::variant<OpenDialogData, SaveDialogData>> dialogs;
+
+const std::string file_browser_key = "gearoenix_platform_file_chooser_key";
 
 #if GX_PLATFORM_WEBASSEMBLY
 void open_callback(const std::string& name, const std::string&, const std::string_view buffer, void* const)
@@ -40,23 +46,13 @@ void open_callback(const std::string& name, const std::string&, const std::strin
     open_dialogs.pop();
     open_dialogs_running = false;
 }
-#else
-struct SaveDialogData final {
-    std::string name;
-    std::string title;
-    std::string filter;
-    std::vector<char> content;
-};
-
-std::mutex save_dialogs_lock;
-std::vector<SaveDialogData> save_dialogs;
 #endif
 }
 
 void gearoenix::platform::file_chooser_open(std::function<void(stream::Path&&, std::shared_ptr<stream::Stream>&&)>&& on_open, std::function<void()>&& on_cancel, std::string&& title, std::string&& filter)
 {
-    const std::lock_guard _l(open_dialogs_lock);
-    open_dialogs.push({ std::move(on_open), std::move(on_cancel), std::move(title), std::move(filter) });
+    const std::lock_guard _l(dialogs_lock);
+    dialogs.emplace(OpenDialogData { std::move(on_open), std::move(on_cancel), std::move(title), std::move(filter) });
 }
 
 void gearoenix::platform::file_chooser_save(std::string&& name, std::string&& title, std::string&& filter, std::vector<char>&& content)
@@ -64,21 +60,27 @@ void gearoenix::platform::file_chooser_save(std::string&& name, std::string&& ti
 #if GX_PLATFORM_WEBASSEMBLY
     wasm::save(name, filter, { content.data(), content.size() });
 #else
-    const std::lock_guard _l(save_dialogs_lock);
-    save_dialogs.emplace_back(std::move(name), std::move(title), std::move(filter), std::move(content));
+    const std::lock_guard _l(dialogs_lock);
+    dialogs.emplace(SaveDialogData { std::move(name), std::move(title), std::move(filter), std::move(content) });
 #endif
 }
 
 void gearoenix::platform::file_chooser_update()
 {
-    if (!open_dialogs.empty() && !open_dialogs_running) {
-        const std::lock_guard _l(open_dialogs_lock);
-        open_dialogs_running = true;
-        const auto& data = open_dialogs.front();
+    if (!dialogs.empty() && !dialogs_running) {
+        const std::lock_guard _l(dialogs_lock);
+        dialogs_running = true;
+        const auto& data = dialogs.front();
+        if (std::holds_alternative<OpenDialogData>(data)) {
+            const auto& d = std::get<OpenDialogData>(data);
 #if GX_PLATFORM_WEBASSEMBLY
-        wasm::open(data.filter, open_callback, nullptr);
+            wasm::open(d.filter, open_callback, nullptr);
 #else
-        ImGuiFileDialog::Instance()->OpenDialog(open_file_browser_key, data.title, data.filter.c_str());
+            ImGuiFileDialog::Instance()->OpenDialog(file_browser_key, d.title, d.filter.c_str());
+        } else {
+            const auto& d = std::get<SaveDialogData>(data);
+            ImGuiFileDialog::Instance()->OpenDialog(file_browser_key, d.title, d.filter.c_str());
+        }
 #endif
     }
 
