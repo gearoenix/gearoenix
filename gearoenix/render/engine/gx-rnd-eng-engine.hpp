@@ -66,6 +66,8 @@ struct Manager;
 
 namespace gearoenix::render::engine {
 struct Engine : core::Singleton<Engine> {
+    using clock_t = std::chrono::steady_clock;
+
     GX_GET_CREF_PRT(std::unique_ptr<core::ecs::World>, world);
     GX_GET_CVAL_PRT(std::thread::id, jobs_thread_id);
     GX_GET_CVAL_PRT(Type, engine_type);
@@ -88,7 +90,7 @@ struct Engine : core::Singleton<Engine> {
     GX_GET_UPTR_PRT(font::Manager, font_manager);
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
-    GX_GET_CREF_PRT(std::chrono::time_point<std::chrono::high_resolution_clock>, last_frame_time);
+    GX_GET_CREF_PRT(std::chrono::time_point<clock_t>, last_frame_time);
 
     explicit Engine(Type engine_type);
 

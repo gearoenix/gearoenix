@@ -23,7 +23,7 @@ std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream
         return std::shared_ptr<Stream>(Asset::construct(path.get_raw_data()));
     }
     if (path.is_absolute()) {
-        return std::shared_ptr<Stream>(Local::open(path.get_raw_data()));
+        return std::shared_ptr<Stream>(Local::open(path.get_raw_data(), true));
     }
     return {};
 }

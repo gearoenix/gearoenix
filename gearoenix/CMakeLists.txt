@@ -26,7 +26,7 @@ function(gx_common_target_config GX_CURRENT_TARGET)
                 -fwasm-exceptions
                 -sNO_EXIT_RUNTIME=1
                 -sALLOW_MEMORY_GROWTH=1
-                -sPTHREAD_POOL_SIZE="navigator.hardwareConcurrency*64"
+                -sPTHREAD_POOL_SIZE="navigator.hardwareConcurrency*4"
                 -sMIN_WEBGL_VERSION=2
                 -sMAX_WEBGL_VERSION=2
                 -sALLOW_TABLE_GROWTH=1
@@ -129,20 +129,24 @@ function(gx_prepare_target GX_CURRENT_TARGET)
 
     if (GX_IN_ANDROID)
         set(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rm -rf "${GX_ASSET_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory "${GX_MAIN_ASSETS_PATH}" "${GX_ASSET_DIR}"
+                VERBATIM)
     else ()
         set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND rm -rf "${GX_ASSET_DIR}" VERBATIM)
     endif ()
-    # In WASM, for now, we have different approach for tha assets.
+
     if (GX_IN_WASM)
         set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
-    else (GX_IN_WASM)
-        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${GX_ASSET_DIR})
-        file(GLOB GX_ASSET_FILES ${GX_MAIN_ASSETS_PATH}/*)
-        foreach (GX_ASSET_FILE ${GX_ASSET_FILES})
-            add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GX_ASSET_FILE} ${GX_ASSET_DIR})
-        endforeach (GX_ASSET_FILE ${GX_ASSET_FILES})
-        add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)
+    elseif (WIN32)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND cmd /c mklink /J "${GX_ASSET_DIR}" "${GX_MAIN_ASSETS_PATH}" VERBATIM)
+    else ()
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink ${GX_MAIN_ASSETS_PATH} ${GX_ASSET_DIR} VERBATIM)
     endif (GX_IN_WASM)
+
+    add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)
 
     gx_common_target_config(${GX_CURRENT_TARGET})
 endfunction(gx_prepare_target)

@@ -50,9 +50,6 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
             }
             data->function_loader.unload();
             std::function<void()> task;
-            if (tasks.empty()) {
-                continue;
-            }
             {
                 const std::lock_guard _lg(tasks_lock);
                 if (tasks.empty()) {
@@ -68,7 +65,7 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
 
     pool_signals.push_back(&(worker->thread_data->signal));
 
-    auto return_value = worker->thread->get_id();
+    const auto return_value = worker->thread->get_id();
 
     const std::lock_guard _lg(workers_lock);
     workers[return_value] = std::move(worker);
@@ -81,17 +78,25 @@ WorkerData* io1_worker = nullptr;
 
 std::thread::id net1_thread_id;
 WorkerData* net1_worker = nullptr;
+
+bool initialised = false;
 }
 
 void gearoenix::core::job::initialise()
 {
+    if (initialised) {
+        return;
+    }
+    initialised = true;
+
     io1_thread_id = register_new_thread();
     net1_thread_id = register_new_thread();
 
     io1_worker = workers.find(io1_thread_id)->second.get();
     net1_worker = workers.find(net1_thread_id)->second.get();
 
-    for (auto i = 2; i < sync::threads_count(); ++i) {
+    const auto count = sync::threads_count() * 2;
+    for (auto i = 0; i < count; ++i) {
         (void)register_new_thread();
     }
 

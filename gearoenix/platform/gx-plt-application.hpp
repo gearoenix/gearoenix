@@ -7,9 +7,12 @@
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
 #include "gx-plt-touch.hpp"
+
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+
 #include <chrono>
+#include <functional>
 #include <memory>
 
 namespace gearoenix::audio {
