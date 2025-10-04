@@ -17,6 +17,7 @@ struct Memory final : Stream {
 
 public:
     Memory();
+    explicit Memory(std::vector<std::uint8_t>&& data);
     ~Memory() override;
 };
 }

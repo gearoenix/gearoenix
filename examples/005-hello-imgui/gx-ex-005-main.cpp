@@ -30,7 +30,7 @@ public:
                 opened_file_name.clear();
                 file_browser_canceled = false;
 
-                gearoenix::platform::file_chooser_save("gearoenix-hello.txt", "[Gearoenix Game Engine] Save a Text File", ".txt", { 'H', 'e', 'l', 'l', 'o', '!', '\0' });
+                gearoenix::platform::file_chooser_save("gearoenix-hello.txt", "[Gearoenix Game Engine] Save a Text File", ".txt", { 'H', 'e', 'l', 'l', 'o', '!', '\0' }, [] { });
             }
 
             if (ImGui::Button("Open")) {

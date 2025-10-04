@@ -119,9 +119,9 @@ fi
 if [[ "$NO_SERVER" != "true" ]]
 then
   # Run from the script directory so relative paths (like logo) resolve
-  pushd "$SCRIPT_DIR" >/dev/null
+  pushd "$PROJECT_ROOT" >/dev/null
   trap 'popd >/dev/null || true' RETURN
-  if ! "$PYTHON" "run-server.py"
+  if ! "$PYTHON" "wasm/run-server.py"
   then
     echo "error: Failed to run the server" >&2
     exit 1

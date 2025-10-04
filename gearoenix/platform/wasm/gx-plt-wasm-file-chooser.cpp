@@ -60,7 +60,7 @@ EM_JS(void, download, (char const* filename, char const* mime_type, void const* 
 extern "C" {
 EMSCRIPTEN_KEEPALIVE int gearoenix_upload_file_return(char const* const filename, char const* const mime_type, const char* const buffer, const size_t buffer_size, const gearoenix::platform::wasm::open_callback callback, void* const callback_data)
 {
-    callback(filename, mime_type, !buffer || buffer_size == 0 ? std::string_view() : std::string_view { buffer, buffer_size }, callback_data);
+    callback(filename, mime_type, !buffer || buffer_size == 0 ? std::vector<std::uint8_t> {} : std::vector<std::uint8_t> { buffer, buffer + buffer_size }, callback_data);
     return 1;
 }
 }
@@ -70,7 +70,7 @@ void gearoenix::platform::wasm::open(const std::string& accept_types, const open
     ::upload(accept_types.c_str(), callback, callback_data);
 }
 
-void gearoenix::platform::wasm::save(const std::string& file_name, const std::string& mime_type, const std::string_view buffer)
+void gearoenix::platform::wasm::save(const std::string& file_name, const std::string& mime_type, std::vector<std::uint8_t>&& buffer)
 {
     ::download(file_name.c_str(), mime_type.c_str(), buffer.data(), buffer.size());
 }

@@ -25,3 +25,17 @@
 #include <gearoenix/math/gx-math-quaternion-test.hpp>
 #include <gearoenix/physics/accelerator/gx-phs-acc-bvh-test.hpp>
 #include <gearoenix/physics/gx-phs-transformation-test.hpp>
+
+struct GlobalFixture final {
+    GlobalFixture()
+    {
+        gearoenix::core::job::initialise();
+    }
+
+    ~GlobalFixture()
+    {
+        gearoenix::core::job::terminate();
+    }
+};
+
+BOOST_TEST_GLOBAL_FIXTURE(GlobalFixture);

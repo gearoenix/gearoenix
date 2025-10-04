@@ -2,9 +2,9 @@
 #include <functional>
 
 namespace gearoenix::core::sync {
-typedef const std::function<void(unsigned int, unsigned int)> parallel_for_t;
+typedef const std::function<void(unsigned int /*kernel_index*/, unsigned int /*kernels_count*/)> parallel_for_t;
 
-void parallel(parallel_for_t* fun);
+void parallel(const parallel_for_t& fun);
 
 template <typename Iter>
 [[nodiscard]] bool advance(Iter& curr_iter, const Iter& iter_end, const auto n)
@@ -31,7 +31,7 @@ void parallel_for(const Iter& iter_first, const Iter& iter_end, const Fun& fun)
             fun(*curr_iter, kernel_index);
         } while (advance(curr_iter, iter_end, kernels_count));
     };
-    parallel(&f);
+    parallel(f);
 }
 
 template <typename Container, typename Fun>
@@ -57,7 +57,7 @@ void parallel_for_i(const Iter& iter_first, const Iter& iter_end, const Fun& fun
             index += kernels_count;
         } while (advance(curr_iter, iter_end, kernels_count));
     };
-    parallel(&f);
+    parallel(f);
 }
 
 template <typename Container, typename Fun>

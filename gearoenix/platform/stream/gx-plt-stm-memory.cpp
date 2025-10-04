@@ -4,6 +4,11 @@
 
 gearoenix::platform::stream::Memory::Memory() = default;
 
+gearoenix::platform::stream::Memory::Memory(std::vector<std::uint8_t>&& data)
+    : mem_data(std::move(data))
+{
+}
+
 gearoenix::platform::stream::Memory::~Memory() = default;
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::read(void* d, const stream_size_t length)

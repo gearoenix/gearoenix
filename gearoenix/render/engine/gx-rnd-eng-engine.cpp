@@ -42,7 +42,7 @@ gearoenix::render::engine::Engine::Engine(const Type engine_type)
     , physics_engine(new physics::Engine())
     , font_manager(new font::Manager())
     , gizmo_manager(new gizmo::Manager())
-    , last_frame_time(std::chrono::high_resolution_clock::now())
+    , last_frame_time(clock_t::now())
 {
     core::job::register_current_thread();
 }
@@ -101,9 +101,10 @@ gearoenix::render::engine::Engine::~Engine()
 
 void gearoenix::render::engine::Engine::start_frame()
 {
-    const std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+    const auto now = clock_t::now();
     const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
     delta_time = delta_time_duration.count();
+    GX_ASSERT_D(delta_time > 0.0);
     ImGui::GetIO().DeltaTime = static_cast<float>(delta_time);
     last_frame_time = now;
     previous_frame_number = frame_number_from_start % frames_count;
