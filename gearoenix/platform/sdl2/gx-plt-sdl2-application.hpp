@@ -1,8 +1,10 @@
 #pragma once
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#if GX_PLATFORM_INTERFACE_SDL2
+
 #include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-application.hpp"
+
 #include <SDL2/SDL.h>
 
 namespace gearoenix::platform {
@@ -10,7 +12,7 @@ struct Application final : core::Singleton<Application> {
     GX_GET_VAL_PRV(SDL_Window*, window, nullptr);
     GX_GET_REF_PRV(BaseApplication, base);
 
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
     GX_GET_VAL_PRV(int, gl_major, 0);
     GX_GET_VAL_PRV(int, gl_minor, 0);
     GX_GET_VAL_PRV(int, gl_samples, 0);
@@ -24,7 +26,7 @@ struct Application final : core::Singleton<Application> {
     void initialize_mouse();
     [[nodiscard]] bool create_window(std::uint32_t flags);
 
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
     [[nodiscard]] bool create_gl_window(int mj, int mn, std::uint32_t flags);
     [[nodiscard]] bool create_gl_sample_window(int samples, std::uint32_t flags);
     [[nodiscard]] bool create_gl_depth_window(int depth, std::uint32_t flags);
@@ -40,7 +42,7 @@ public:
     void set_caption(const std::string&);
     void set_window_fullscreen(bool b);
 
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
     [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const;
     void create_vulkan_surface(void* vulkan_instance, void* vulkan_data_ptr) const;
 #endif

@@ -1,6 +1,7 @@
 #include "gx-gl-context.hpp"
-#include "gx-gl-constants.hpp"
+#if GX_RENDER_OPENGL_ENABLED
 #include "gx-gl-loader.hpp"
+#include "gx-gl-constants.hpp"
 
 void gearoenix::gl::ctx::set_framebuffer(const uint framebuffer_object)
 {
@@ -31,3 +32,4 @@ void gearoenix::gl::ctx::set_viewport_scissor_clip(const math::Vec4<sizei>& view
         static_cast<sint>(current_viewport_clip.x), static_cast<sint>(current_viewport_clip.y),
         current_viewport_clip.z, current_viewport_clip.w);
 }
+#endif

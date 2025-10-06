@@ -9,6 +9,7 @@
     "boost-headers",
     "boost-mp11",
     "boost-test",
-    "sdl2"
+    "sdl2",
+    "tbb"
   ]
 }

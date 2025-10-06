@@ -1,6 +1,6 @@
 #pragma once
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_MACOS
+#if GX_PLATFORM_INTERFACE_APPKIT
 #include "../gx-plt-application.hpp"
 #import "gx-plt-mac-app-delegate.hpp"
 #import "gx-plt-mac-view-controller.hpp"

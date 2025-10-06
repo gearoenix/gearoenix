@@ -1,5 +1,5 @@
 #include "gx-plt-sdl2-key.hpp"
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#if GX_PLATFORM_INTERFACE_SDL2
 #include "../gx-plt-log.hpp"
 #include <SDL2/SDL_mouse.h>
 #include <boost/container/flat_map.hpp>

@@ -1,5 +1,5 @@
 #include "gx-plt-mac-app-delegate.hpp"
-#ifdef GX_PLATFORM_MACOS
+#if GX_PLATFORM_INTERFACE_APPKIT
 #import "../gx-plt-runtime-configuration.hpp"
 #import "gx-plt-mac-application.hpp"
 

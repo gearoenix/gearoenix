@@ -1,5 +1,5 @@
 #include "gx-plt-mac-application.hpp"
-#ifdef GX_PLATFORM_MACOS
+#if GX_PLATFORM_INTERFACE_APPKIT
 #import "gx-plt-mac-app-delegate.hpp"
 #import <Cocoa/Cocoa.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#if GX_PLATFORM_INTERFACE_SDL2
 #include "../gx-plt-key.hpp"
 #include <SDL2/SDL_keycode.h>
 
