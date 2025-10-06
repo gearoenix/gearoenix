@@ -1,6 +1,6 @@
 #pragma once
 #include "../gx-plt-build-configuration.hpp"
-#ifdef GX_PLATFORM_MACOS
+#if GX_PLATFORM_INTERFACE_APPKIT
 #import "../gx-plt-key.hpp"
 
 namespace gearoenix::platform {

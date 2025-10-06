@@ -1,12 +1,16 @@
 #include "gx-plt-sdl2-application.hpp"
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#if GX_PLATFORM_INTERFACE_SDL2
+
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
 #include "gx-plt-sdl2-key.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../opengl/gx-gl-loader.hpp"
 #endif
+
 #include <SDL2/SDL_vulkan.h>
+
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #include <emscripten.h>
 #endif
@@ -61,7 +65,7 @@ void gearoenix::platform::Application::initialize_window()
         core_flags |= SDL_WINDOW_RESIZABLE;
     }
     const auto available_engines = render::engine::Engine::get_available_engines();
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
     if (available_engines.contains(render::engine::Type::Vulkan)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN;
         if (create_window(flags)) {
@@ -70,7 +74,7 @@ void gearoenix::platform::Application::initialize_window()
         }
     }
 #endif
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
@@ -79,12 +83,13 @@ void gearoenix::platform::Application::initialize_window()
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
         // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif
         SDL_GL_SetSwapInterval(1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        // if (create_gl_window(3, 2, flags)) return;
+        if (create_gl_window(3, 2, flags))
+            return;
         if (create_gl_window(3, 1, flags))
             return;
         if (create_gl_window(3, 0, flags))
@@ -103,6 +108,8 @@ void gearoenix::platform::Application::initialize_window()
         if (create_gl_window(4, 0, flags))
             return;
         if (create_gl_window(3, 3, flags))
+            return;
+        if (create_gl_window(3, 2, flags))
             return;
     }
 #endif

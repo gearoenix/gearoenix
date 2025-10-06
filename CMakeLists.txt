@@ -53,8 +53,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
         set(GEAROENIX_EXE_TARGET "WIN32")
     endif ()
 elseif (APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x objective-c++")
+    set(GX_IN_APPLE TRUE)
     if (CMAKE_SYSTEM_NAME MATCHES "iOS")
         set(GX_IN_IOS TRUE)
     else ()
@@ -94,6 +93,8 @@ find_package(boost_included_unit_test_framework CONFIG REQUIRED)
 find_package(boost_mp11 CONFIG REQUIRED)
 
 find_package(SDL2 CONFIG REQUIRED)
+
+find_package(TBB CONFIG REQUIRED)
 
 if(NOT GX_IN_WASM)
     find_package(Vulkan REQUIRED)

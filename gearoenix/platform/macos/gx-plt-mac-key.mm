@@ -1,5 +1,5 @@
 #include "gx-plt-mac-key.hpp"
-#ifdef GX_PLATFORM_MACOS
+#if GX_PLATFORM_INTERFACE_APPKIT
 #import <array>
 
 gearoenix::platform::key::Id gearoenix::platform::convert_key(const unsigned short key_code)

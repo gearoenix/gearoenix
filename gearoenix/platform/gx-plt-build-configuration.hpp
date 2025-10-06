@@ -15,7 +15,7 @@
 
 #define GX_PLATFORM_LINUX true
 #define GX_PLATFORM_INTERFACE_SDL2 true
-#ifndef GX_PLATFORM_INTERFACE_SDL2
+#if !GX_PLATFORM_INTERFACE_SDL2
 #define GX_PLATFORM_INTERFACE_X11 true
 #endif
 #define GX_PLATFORM_DESKTOP true
@@ -28,13 +28,18 @@
 #define NOMINMAX true
 #define GX_PLATFORM_WINDOWS true
 #define GX_PLATFORM_INTERFACE_SDL2 true
-#ifndef GX_PLATFORM_INTERFACE_SDL2
+#if !GX_PLATFORM_INTERFACE_SDL2
 #define GX_PLATFORM_INTERFACE_WIN32 true
 #endif
 #define GX_PLATFORM_DESKTOP true
 
 #elif defined(__APPLE__)
 
+#define GX_PLATFORM_APPLE true
+#define GX_PLATFORM_INTERFACE_SDL2 true
+#if !GX_PLATFORM_INTERFACE_SDL2
+#define GX_PLATFORM_INTERFACE_APPKIT true
+#endif
 #include "TargetConditionals.h"
 #if TARGET_OS_IPHONE
 #define GX_PLATFORM_IOS true

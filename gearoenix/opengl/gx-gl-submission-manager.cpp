@@ -1,5 +1,5 @@
 #include "gx-gl-submission-manager.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/macro/gx-cr-mcr-profiler.hpp"
 #include "../physics/animation/gx-phs-anm-armature.hpp"
@@ -28,7 +28,9 @@
 #include "shader/gx-gl-shd-radiance.hpp"
 #include "shader/gx-gl-shd-ssao-resolve.hpp"
 #include "shader/gx-gl-shd-unlit.hpp"
+
 #include <ImGui/backends/imgui_impl_opengl3.h>
+
 #include <algorithm>
 #include <ranges>
 

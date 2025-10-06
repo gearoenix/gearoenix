@@ -20,6 +20,9 @@
 #define GX_PARALLEL_POLICY std::execution::par_unseq,
 #endif
 
+#include <tbb/parallel_sort.h>
+#define GX_PARALLEL_SORT tbb::parallel_sort
+
 gearoenix::render::record::Camera::Camera()
     : threads_mvps(core::sync::threads_count())
 {
@@ -70,9 +73,9 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     update_models(models.static_models_bvh);
     update_models(models.dynamic_models_bvh);
 
-    std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(),
+    GX_PARALLEL_SORT(all_models.begin(), all_models.end(),
         [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(),
+    GX_PARALLEL_SORT(translucent_models.begin(), translucent_models.end(),
         [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
 
     all_models.insert(

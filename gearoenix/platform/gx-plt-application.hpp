@@ -94,15 +94,15 @@ private:
 };
 }
 
-#if defined(GX_PLATFORM_INTERFACE_ANDROID)
+#if GX_PLATFORM_INTERFACE_ANDROID
 #include "android/gx-plt-and-application.hpp"
-#elif defined(GX_PLATFORM_INTERFACE_WIN32)
+#elif GX_PLATFORM_INTERFACE_WIN32
 #include "win32/gx-plt-win-application.hpp"
-#elif defined(GX_PLATFORM_INTERFACE_X11)
+#elif GX_PLATFORM_INTERFACE_X11
 #include "x11/gx-plt-x11-application.hpp"
-#elif defined(GX_PLATFORM_MACOS)
+#elif GX_PLATFORM_INTERFACE_APPKIT
 #include "macos/gx-plt-mac-application.hpp"
-#elif defined(GX_PLATFORM_INTERFACE_SDL2)
+#elif GX_PLATFORM_INTERFACE_SDL2
 #include "sdl2/gx-plt-sdl2-application.hpp"
 #else
 #error "Unspecified platform application interface."

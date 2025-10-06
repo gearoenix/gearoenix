@@ -63,6 +63,32 @@
       }
     },
     {
+      "name": "macos-debug",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/macos/debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "macos-release",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/macos/release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "wasm-debug",
       "inherits": "vcpkg",
       "binaryDir": "${sourceDir}/build/wasm/debug",
@@ -119,6 +145,24 @@
         "rhs": "Linux"
       },
       "configurePreset": "linux-release"
+    },
+    {
+      "name": "macos-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "configurePreset": "macos-debug"
+    },
+    {
+      "name": "macos-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "configurePreset": "macos-release"
     },
     {
       "name": "wasm-debug",
