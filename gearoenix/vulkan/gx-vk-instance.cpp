@@ -187,10 +187,10 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
     instance_extensions_set.insert(VK_KHR_SURFACE_EXTENSION_NAME);
     instance_extensions_set.insert(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     if (app != nullptr) {
-        auto sdl2_extensions = app->get_vulkan_extensions();
+        auto sdl_extensions = app->get_vulkan_extensions();
         instance_extensions_set.insert(
-            std::make_move_iterator(sdl2_extensions.begin()),
-            std::make_move_iterator(sdl2_extensions.end()));
+            std::make_move_iterator(sdl_extensions.begin()),
+            std::make_move_iterator(sdl_extensions.end()));
     }
 #ifdef GX_VULKAN_INSTANCE_DEBUG
     instance_extensions_set.insert(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);

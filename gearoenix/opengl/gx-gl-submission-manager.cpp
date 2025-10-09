@@ -499,7 +499,7 @@ void gearoenix::gl::submission::Manager::update()
 
     render_imgui();
 
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#ifdef GX_PLATFORM_INTERFACE_SDL
     SDL_GL_SwapWindow(platform::Application::get().get_window());
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
     (void)e.get_platform_application().get_gl_context()->swap(); // TODO handle the other states

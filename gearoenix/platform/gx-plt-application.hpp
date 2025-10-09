@@ -102,8 +102,8 @@ private:
 #include "x11/gx-plt-x11-application.hpp"
 #elif GX_PLATFORM_INTERFACE_APPKIT
 #include "macos/gx-plt-mac-application.hpp"
-#elif GX_PLATFORM_INTERFACE_SDL2
-#include "sdl2/gx-plt-sdl2-application.hpp"
+#elif GX_PLATFORM_INTERFACE_SDL
+#include "sdl/gx-plt-sdl-application.hpp"
 #else
 #error "Unspecified platform application interface."
 #endif

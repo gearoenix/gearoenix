@@ -1,11 +1,13 @@
 #include "gx-gl-loader.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
+#include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include "gx-gl-constants.hpp"
+
 #include <boost/container/flat_set.hpp>
 
-#ifdef GX_PLATFORM_INTERFACE_SDL2
-#include <SDL2/SDL.h>
+#ifdef GX_PLATFORM_INTERFACE_SDL
+#include <SDL3/SDL.h>
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
 #include <EGL/egl.h>
 #else
@@ -27,9 +29,9 @@ bool gearoenix::gl::load_library()
     if (is_loaded)
         return true;
 
-#ifdef GX_PLATFORM_INTERFACE_SDL2
-    if (SDL_GL_LoadLibrary(nullptr) != 0) {
-        GX_LOG_D("Failed to load OpenGL shared library through SDL2 library loader.");
+#ifdef GX_PLATFORM_INTERFACE_SDL
+    if (!SDL_GL_LoadLibrary(nullptr)) {
+        GX_LOG_D("Failed to load OpenGL shared library through SDL library loader.");
         return false;
     }
 #define GX_GL_FUNCTION_LOAD_UNCHECKED(name) gl##name = reinterpret_cast<name##Fnp>(SDL_GL_GetProcAddress(GX_STRINGIFY(gl##name)))
@@ -40,14 +42,14 @@ bool gearoenix::gl::load_library()
 #endif
 
 #define GX_GL_FUNCTION_LOAD_CHECK(name)                                  \
-    if (nullptr == gl##name) {                                           \
-        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
-        return false;                                                    \
-    }
+if (nullptr == gl##name) {                                           \
+GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
+return false;                                                    \
+}
 
 #define GX_GL_FUNCTION_LOAD(name)        \
-    GX_GL_FUNCTION_LOAD_UNCHECKED(name); \
-    GX_GL_FUNCTION_LOAD_CHECK(name)
+GX_GL_FUNCTION_LOAD_UNCHECKED(name); \
+GX_GL_FUNCTION_LOAD_CHECK(name)
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
     GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_UNCHECKED);
@@ -59,15 +61,20 @@ bool gearoenix::gl::load_library()
     }
 #endif
 
-    const char* const extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-    if (nullptr == extensions)
+    sint num_ext = 0;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &num_ext);
+    GX_LOG_D("Number of OpenGL extensions: " << num_ext);
+    if (num_ext <= 0) {
         return false;
-    std::istringstream iss_extentions(extensions);
-    std::string str_ext;
-    while (iss_extentions >> str_ext) {
-        GX_LOG_D(str_ext);
-        gearoenix_gl_extensions.emplace(str_ext);
     }
+
+    for (sint i = 0; i < num_ext; ++i) {
+        const auto* const ext = reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, static_cast<uint>(i)));
+        GX_ASSERT_D(ext != nullptr);
+        GX_LOG_D("OpenGL extension [" << i << "] " << ext);
+        gearoenix_gl_extensions.emplace(ext);
+    }
+
     is_loaded = true;
     return true;
 }
@@ -76,7 +83,7 @@ void gearoenix::gl::unload_library()
 {
     is_loaded = false;
 
-#ifdef GX_PLATFORM_INTERFACE_SDL2
+#ifdef GX_PLATFORM_INTERFACE_SDL
     SDL_GL_UnloadLibrary();
 #endif
 

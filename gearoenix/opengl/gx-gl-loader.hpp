@@ -64,6 +64,7 @@ typedef void(GX_GL_APIENTRY GetProgramInfoLogFnp)(uint program, sizei buf_size, 
 typedef void(GX_GL_APIENTRY GetShaderivFnp)(uint shader, enumerated pname, sint* params);
 typedef void(GX_GL_APIENTRY GetShaderInfoLogFnp)(uint shader, sizei bufSize, sizei* length, char* info);
 typedef const ubyte*(GX_GL_APIENTRY GetStringFnp)(enumerated name);
+typedef const ubyte*(GX_GL_APIENTRY GetStringiFnp)(enumerated name, uint index);
 typedef sint(GX_GL_APIENTRY GetUniformLocationFnp)(uint program, const char* name);
 typedef void(GX_GL_APIENTRY LinkProgramFnp)(uint program);
 typedef void(GX_GL_APIENTRY ReadBufferFnp)(enumerated src);
@@ -146,6 +147,7 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(GetShaderiv);             \
     gx_gl_function_map_arg(GetShaderInfoLog);        \
     gx_gl_function_map_arg(GetString);               \
+    gx_gl_function_map_arg(GetStringi);              \
     gx_gl_function_map_arg(GetUniformLocation);      \
     gx_gl_function_map_arg(LinkProgram);             \
     gx_gl_function_map_arg(ReadBuffer);              \

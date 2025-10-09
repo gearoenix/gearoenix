@@ -14,13 +14,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
 {
     // Vertex Shader -----------------------------------------------------------------------------------
     std::stringstream vs;
-    vs << "#version 300 es\n";
-    vs << "\n";
-    vs << "#define gx_pi 3.141592653589793238\n";
-    vs << "\n";
-    vs << "precision highp float;\n";
-    vs << "precision highp int;\n";
-    vs << "\n";
+    vs << get_common_shader_starter();
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION << ") in vec3 position;\n";
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_NORMAL << ") in vec3 normal;\n";
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_TANGENT << ") in vec4 tangent;\n";
@@ -68,16 +62,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     set_vertex_shader(vs.str());
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "#define gx_pi 3.141592653589793238\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp int;\n";
-    fs << "precision highp sampler2D;\n";
-    fs << "precision highp samplerCube;\n";
-    fs << "precision highp sampler2DShadow;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec4 camera_position_reserved;\n";
     fs << "uniform vec4 albedo_factor;\n";
     fs << "uniform vec4 normal_metallic_factor;\n";

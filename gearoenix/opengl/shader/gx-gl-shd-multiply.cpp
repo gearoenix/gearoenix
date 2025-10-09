@@ -2,43 +2,36 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace {
-constexpr auto vertex_shader_src = "\
-#version 300 es\n\
-\n\
-precision highp float;\n\
-\n\
-layout(location = 0) in vec2 position;\n\
-\n\
-out vec2 out_uv;\n\
-\n\
-void main() {\n\
-    gl_Position = vec4(position, 0.0, 1.0);\n\
-    out_uv = position* 0.5 + 0.5;\n\
-}";
+constexpr char vertex_shader_body[] = R"SHADER(
+layout(location = 0) in vec2 position;
 
-constexpr auto fragment_shader_src = "\
-#version 300 es\n\
-\n\
-precision highp float;\n\
-precision highp sampler2D;\n\
-\n\
-uniform vec4 value_mip_index;\n\
-uniform sampler2D source_texture;\n\
-\n\
-in vec2 out_uv;\n\
-\n\
-layout(location = 0) out vec4 frag_colour;\n\
-\n\
-void main() {\n\
-    frag_colour = textureLod(source_texture, out_uv, value_mip_index.w);\n\
-    frag_colour.xyz *= value_mip_index.xyz;\n\
-}";
+out vec2 out_uv;
+
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    out_uv = position* 0.5 + 0.5;
+}
+)SHADER";
+
+constexpr char fragment_shader_body[] = R"SHADER(
+uniform vec4 value_mip_index;
+uniform sampler2D source_texture;
+
+in vec2 out_uv;
+
+layout(location = 0) out vec4 frag_colour;
+
+void main() {
+    frag_colour = textureLod(source_texture, out_uv, value_mip_index.w);
+    frag_colour.xyz *= value_mip_index.xyz;
+}
+)SHADER";
 }
 
 gearoenix::gl::shader::Multiply::Multiply()
 {
-    set_vertex_shader(vertex_shader_src);
-    set_fragment_shader(fragment_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
+    set_fragment_shader(get_common_shader_starter() + fragment_shader_body);
 
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;

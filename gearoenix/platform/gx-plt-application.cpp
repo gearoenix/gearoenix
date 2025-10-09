@@ -36,6 +36,34 @@ void initialise_default_font()
 void register_types()
 {
 }
+
+void platform_set_ime_data(ImGuiContext*, ImGuiViewport* viewport, ImGuiPlatformImeData* const data)
+{
+    if (!data->WantVisible && !data->WantTextInput) {
+        gearoenix::platform::Application::get().stop_keyboard_capture();
+    }
+    if (data->WantVisible)
+    {
+        gearoenix::platform::Application::get().set_text_input_area(
+            static_cast<int>(data->InputPos.x),
+            static_cast<int>(data->InputPos.y),
+            1,
+            static_cast<int>(data->InputLineHeight));
+    }
+    if (data->WantVisible || data->WantTextInput) {
+        gearoenix::platform::Application::get().start_keyboard_capture();
+    }
+}
+
+const char* get_clipboard_text(ImGuiContext*)
+{
+    return gearoenix::platform::Application::get().get_clipboard();
+}
+
+void set_clipboard_text(ImGuiContext* const, const char* text)
+{
+    gearoenix::platform::Application::get().set_clipboard(text);
+}
 }
 
 void gearoenix::platform::BaseApplication::initialise_imgui()
@@ -46,6 +74,14 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     auto& io = ImGui::GetIO();
     io.Fonts->AddFontDefault();
     io.BackendPlatformName = RuntimeConfiguration::get().get_application_name().c_str();
+
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    platform_io.Platform_SetClipboardTextFn = set_clipboard_text;
+    platform_io.Platform_GetClipboardTextFn = get_clipboard_text;
+    platform_io.Platform_SetImeDataFn = platform_set_ime_data;
+    platform_io.Platform_OpenInShellFn = [](ImGuiContext*, const char* const url) {
+        return !Application::get().open_url(url);
+    };
 }
 
 gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)

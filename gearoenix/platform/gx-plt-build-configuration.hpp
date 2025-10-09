@@ -3,19 +3,19 @@
 #ifdef ANDROID
 
 #define GX_PLATFORM_ANDROID true
-// #define GX_PLATFORM_INTERFACE_SDL2 true
+// #define GX_PLATFORM_INTERFACE_SDL true
 #define GX_PLATFORM_INTERFACE_ANDROID true
 
 #elif defined(__EMSCRIPTEN__)
 
 #define GX_PLATFORM_WEBASSEMBLY true
-#define GX_PLATFORM_INTERFACE_SDL2 true
+#define GX_PLATFORM_INTERFACE_SDL true
 
 #elif defined(__unix__)
 
 #define GX_PLATFORM_LINUX true
-#define GX_PLATFORM_INTERFACE_SDL2 true
-#if !GX_PLATFORM_INTERFACE_SDL2
+#define GX_PLATFORM_INTERFACE_SDL true
+#if !GX_PLATFORM_INTERFACE_SDL
 #define GX_PLATFORM_INTERFACE_X11 true
 #endif
 #define GX_PLATFORM_DESKTOP true
@@ -27,8 +27,8 @@
 #endif
 #define NOMINMAX true
 #define GX_PLATFORM_WINDOWS true
-#define GX_PLATFORM_INTERFACE_SDL2 true
-#if !GX_PLATFORM_INTERFACE_SDL2
+#define GX_PLATFORM_INTERFACE_SDL true
+#if !GX_PLATFORM_INTERFACE_SDL
 #define GX_PLATFORM_INTERFACE_WIN32 true
 #endif
 #define GX_PLATFORM_DESKTOP true
@@ -36,8 +36,8 @@
 #elif defined(__APPLE__)
 
 #define GX_PLATFORM_APPLE true
-#define GX_PLATFORM_INTERFACE_SDL2 true
-#if !GX_PLATFORM_INTERFACE_SDL2
+#define GX_PLATFORM_INTERFACE_SDL true
+#if !GX_PLATFORM_INTERFACE_SDL
 #define GX_PLATFORM_INTERFACE_APPKIT true
 #endif
 #include "TargetConditionals.h"

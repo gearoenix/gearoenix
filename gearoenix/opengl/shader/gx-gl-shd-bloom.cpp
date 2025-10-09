@@ -2,33 +2,26 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace {
-constexpr auto vertex_shader_src = "\
-#version 300 es\n\
-\n\
-precision highp float;\n\
-\n\
-layout(location = 0) in vec2 position;\n\
-\n\
-out vec2 out_uv;\n\
-\n\
-void main() {\n\
-    gl_Position = vec4(position, 0.0, 1.0);\n\
-    out_uv = position * 0.5 + 0.5;\n\
-}";
+constexpr auto vertex_shader_body = R"SHADER(
+layout(location = 0) in vec2 position;
+
+out vec2 out_uv;
+
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    out_uv = position * 0.5 + 0.5;
+}
+)SHADER";
 }
 
 gearoenix::gl::shader::BloomPrefilter::BloomPrefilter()
 {
     // Vertex Shader -----------------------------------------------------------------------------------
-    set_vertex_shader(vertex_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
 
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp int;\n";
-    fs << "precision highp sampler2D;\n";
+    fs << get_common_shader_starter();
     fs << "\n";
     fs << "uniform vec2 texel_size;\n";
     fs << "uniform vec4 scatter_clamp_max_threshold_threshold_knee;\n";
@@ -87,19 +80,11 @@ void gearoenix::gl::shader::BloomPrefilter::bind(uint& current_shader) const
 
 gearoenix::gl::shader::BloomHorizontal::BloomHorizontal()
 {
-    set_vertex_shader(vertex_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
 
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "#define gx_pi 3.141592653589793238\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp int;\n";
-    fs << "precision highp sampler2D;\n";
-    fs << "precision highp samplerCube;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec3 texel_size_mip_index;\n";
     fs << "\n";
     fs << "uniform sampler2D source_texture;\n";
@@ -139,19 +124,11 @@ void gearoenix::gl::shader::BloomHorizontal::bind(uint& current_shader) const
 
 gearoenix::gl::shader::BloomVertical::BloomVertical()
 {
-    set_vertex_shader(vertex_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
 
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "#define gx_pi 3.141592653589793238\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp int;\n";
-    fs << "precision highp sampler2D;\n";
-    fs << "precision highp samplerCube;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec3 texel_size_mip_index;\n";
     fs << "\n";
     fs << "uniform sampler2D source_texture;\n";
@@ -187,19 +164,11 @@ void gearoenix::gl::shader::BloomVertical::bind(uint& current_shader) const
 
 gearoenix::gl::shader::BloomUpsampler::BloomUpsampler()
 {
-    set_vertex_shader(vertex_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
 
     // Fragment Shader ---------------------------------------------------------------------------------
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "#define gx_pi 3.141592653589793238\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp int;\n";
-    fs << "precision highp sampler2D;\n";
-    fs << "precision highp samplerCube;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec2 scatter_src_mip_index;\n";
     fs << "\n";
     fs << "uniform sampler2D source_texture;\n";

@@ -2,58 +2,37 @@
 #ifdef GX_RENDER_OPENGL_ENABLED
 
 namespace {
-constexpr auto vertex_shader_src = "\
-#version 300 es\n\
-\n\
-#define gx_pi 3.141592653589793238\n\
-\n\
-precision highp float;\n\
-precision highp int;\n\
-precision highp sampler2D;\n\
-precision highp samplerCube;\n\
-\n\
-uniform mat4 vp;\n\
-uniform vec4 camera_position_box_scale;\n\
-\n\
-layout(location = 0) in vec3 position;\n\
-\n\
-out vec3 out_uv;\n\
-\n\
-void main() {\n\
-    out_uv = position;\n\
-    gl_Position = vp * vec4((position * camera_position_box_scale.w) + camera_position_box_scale.xyz, 1.0);\n\
-}\n";
+constexpr auto vertex_shader_body = R"SHADER(
+uniform mat4 vp;
+uniform vec4 camera_position_box_scale;
 
-constexpr auto fragment_shader_src = "\
-#version 300 es\n\
-\n\
-#extension GL_OES_texture_float: enable\n\
-#extension GL_OES_texture_float_linear: enable\n\
-#extension OES_texture_float: enable\n\
-#extension OES_texture_float_linear: enable\n\
-\n\
-#define gx_pi 3.141592653589793238\n\
-\n\
-precision highp float;\n\
-precision highp int;\n\
-precision highp sampler2D;\n\
-precision highp samplerCube;\n\
-\n\
-uniform samplerCube albedo;\n\
-\n\
-in vec3 out_uv;\n\
-\n\
-out vec4 frag_colour;\n\
-\n\
-void main() {\n\
-    frag_colour = texture(albedo, normalize(out_uv));\n\
-}\n";
+layout(location = 0) in vec3 position;
+
+out vec3 out_uv;
+
+void main() {
+    out_uv = position;
+    gl_Position = vp * vec4((position * camera_position_box_scale.w) + camera_position_box_scale.xyz, 1.0);
+}
+)SHADER";
+
+constexpr auto fragment_shader_body = R"SHADER(
+uniform samplerCube albedo;
+
+in vec3 out_uv;
+
+out vec4 frag_colour;
+
+void main() {
+    frag_colour = texture(albedo, normalize(out_uv));
+}
+)SHADER";
 }
 
 gearoenix::gl::shader::SkyboxCube::SkyboxCube()
 {
-    set_vertex_shader(vertex_shader_src);
-    set_fragment_shader(fragment_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
+    set_fragment_shader(get_common_shader_starter() + fragment_shader_body);
     link();
     GX_GL_SHADER_SET_TEXTURE_INDEX_STARTING;
     GX_GL_THIS_GET_UNIFORM(vp);
