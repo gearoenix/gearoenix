@@ -8,8 +8,7 @@ gearoenix::gl::shader::Unlit::Unlit(
     const bool has_albedo)
 {
     std::stringstream vs;
-    vs << "#version 300 es\n";
-    vs << "precision highp float;\n";
+    vs << get_common_shader_starter();
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION << ") in vec3 position;\n";
     if (has_albedo) {
         vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_UV << ") in vec2 uv;\n";
@@ -30,9 +29,9 @@ gearoenix::gl::shader::Unlit::Unlit(
     vs << "    gl_Position = mvp * vec4(position, 1.0);\n";
     vs << "}\n";
     set_vertex_shader(vs.str());
+
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "precision highp float;\n";
+    fs << get_common_shader_starter();
     if (has_albedo) {
         fs << "uniform sampler2D albedo;\n";
         fs << "in vec2 out_uv;\n";

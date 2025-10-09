@@ -100,6 +100,9 @@ public:
     /// returns GX_SHADER_UNIFORM_FAILED when uniform not found.
     [[nodiscard]] sint get_uniform_location(const std::string& name) const;
     virtual void bind(uint& current_shader) const;
+    static void set_profile(bool is_es, int major, int minor);
+    [[nodiscard]] static const std::string& get_shader_version();
+    [[nodiscard]] static const std::string& get_common_shader_starter();
 };
 
 struct ShaderCombination {

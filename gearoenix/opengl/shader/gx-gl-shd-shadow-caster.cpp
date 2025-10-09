@@ -7,10 +7,7 @@ gearoenix::gl::shader::ShadowCaster::ShadowCaster(const std::uint32_t bones_coun
     : mvp_count(static_cast<sizei>(bones_count + 1))
 {
     std::stringstream vs;
-    vs << "#version 300 es\n";
-    vs << "\n";
-    vs << "precision highp float;\n";
-    vs << "\n";
+    vs << get_common_shader_starter();
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_POSITION << ") in vec3 position;\n";
     vs << "layout(location = " << GEAROENIX_GL_VERTEX_BUFFER_ATTRIBUTE_INDEX_UV << ") in vec2 uv;\n";
     if (mvp_count < 2) {
@@ -40,10 +37,7 @@ gearoenix::gl::shader::ShadowCaster::ShadowCaster(const std::uint32_t bones_coun
     vs << "}\n";
     set_vertex_shader(vs.str());
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec2 alpha_factor_alpha_cutoff;\n";
     fs << "\n";
     fs << "uniform sampler2D albedo;\n";
@@ -70,8 +64,9 @@ gearoenix::gl::shader::ShadowCaster::~ShadowCaster() = default;
 
 void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const
 {
-    if (shader_program == current_shader)
+    if (shader_program == current_shader) {
         return;
+    }
     Shader::bind(current_shader);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }

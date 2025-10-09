@@ -92,9 +92,7 @@ find_package(boost_headers CONFIG REQUIRED)
 find_package(boost_included_unit_test_framework CONFIG REQUIRED)
 find_package(boost_mp11 CONFIG REQUIRED)
 
-find_package(SDL2 CONFIG REQUIRED)
-
-find_package(TBB CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
 
 if(NOT GX_IN_WASM)
     find_package(Vulkan REQUIRED)

@@ -16,10 +16,17 @@
 #include "gx-gl-submission-manager.hpp"
 #include "gx-gl-texture.hpp"
 #include "material/gx-gl-mat-manager.hpp"
+#include "shader/gx-gl-shader.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
 
 #include <ImGui/backends/imgui_impl_opengl3.h>
 #include <ImGui/imgui.h>
+
+namespace {
+bool is_es_profile_activated = false;
+int profile_major_version = 0;
+int profile_minor_version = 0;
+}
 
 gearoenix::gl::Engine::Engine()
     : render::engine::Engine(render::engine::Type::OpenGL)
@@ -34,8 +41,11 @@ gearoenix::gl::Engine::Engine()
     GX_LOG_D("OpenGL Version: " << glGetString(GL_VERSION));
     GX_LOG_D("OpenGL Shading Language Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION));
 
+    // We need to do it again in case the other necessary things inside this function were missing before here.
+    shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
+
     GX_GL_CHECK_D;
-    ImGui_ImplOpenGL3_Init("#version 300 es");
+    ImGui_ImplOpenGL3_Init(shader::Shader::get_shader_version().c_str());
     glGetError();
     GX_GL_CHECK_D;
 
@@ -51,7 +61,12 @@ gearoenix::gl::Engine::Engine()
     specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);
     specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT;
     specification.is_raytracing_supported = false;
-    specification.is_float_texture_supported = extension_exists("GL_OES_texture_float") && extension_exists("GL_OES_texture_float_linear") && extension_exists("GL_OES_texture_half_float") && extension_exists("GL_OES_texture_half_float_linear");
+    specification.is_float_texture_supported = // ------------------------------------
+        !is_es_profile_activated || ( // ---------------------------------------------
+            extension_exists("GL_OES_texture_float") && // ----------------
+            extension_exists("GL_OES_texture_float_linear") && // ---------
+            extension_exists("GL_OES_texture_half_float") && // -----------
+            extension_exists("GL_OES_texture_half_float_linear"));
     specification.is_deferred_supported = false;
 
     scene_manager = std::make_unique<SceneManager>();
@@ -129,6 +144,40 @@ std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct()
         return {};
     }
     return std::make_unique<Engine>();
+}
+
+void gearoenix::gl::Engine::set_es_profile()
+{
+    is_es_profile_activated = true;
+    shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
+}
+
+bool gearoenix::gl::Engine::is_es_profile()
+{
+    return is_es_profile_activated;
+}
+
+void gearoenix::gl::Engine::set_core_profile()
+{
+    is_es_profile_activated = false;
+    shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
+}
+
+bool gearoenix::gl::Engine::is_core_profile()
+{
+    return !is_es_profile_activated;
+}
+
+void gearoenix::gl::Engine::set_gl_version(const int major, const int minor)
+{
+    profile_major_version = major;
+    profile_minor_version = minor;
+    shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
+}
+
+std::pair<int, int> gearoenix::gl::Engine::get_gl_version()
+{
+    return { profile_major_version, profile_minor_version };
 }
 
 #endif

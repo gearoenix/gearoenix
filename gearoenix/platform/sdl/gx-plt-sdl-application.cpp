@@ -1,15 +1,16 @@
-#include "gx-plt-sdl2-application.hpp"
-#if GX_PLATFORM_INTERFACE_SDL2
+#include "gx-plt-sdl-application.hpp"
+#if GX_PLATFORM_INTERFACE_SDL
 
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../gx-plt-runtime-configuration.hpp"
-#include "gx-plt-sdl2-key.hpp"
+#include "gx-plt-sdl-key.hpp"
 
 #if GX_RENDER_OPENGL_ENABLED
+#include "../../opengl/gx-gl-engine.hpp"
 #include "../../opengl/gx-gl-loader.hpp"
 #endif
 
-#include <SDL2/SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 
 #ifdef GX_PLATFORM_WEBASSEMBLY
 #include <emscripten.h>
@@ -31,7 +32,7 @@ void gearoenix::platform::Application::initialize_sdl()
     if (sdl_initialized)
         return;
     sdl_initialized = true;
-    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) {
+    if (!SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO)) {
         GX_LOG_F("SDL_Init error: " << SDL_GetError());
     }
 }
@@ -39,8 +40,7 @@ void gearoenix::platform::Application::initialize_sdl()
 void gearoenix::platform::Application::initialize_screen()
 {
     SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1");
-    SDL_DisplayMode display_mode;
-    SDL_GetCurrentDisplayMode(0, &display_mode);
+    const auto& display_mode = *SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
     base.screen_size = math::Vec2(display_mode.w, display_mode.h);
     const auto& config = RuntimeConfiguration::get();
     if (config.get_fullscreen()) {
@@ -53,14 +53,9 @@ void gearoenix::platform::Application::initialize_screen()
 
 void gearoenix::platform::Application::initialize_window()
 {
-    std::uint32_t core_flags = SDL_WINDOW_SHOWN;
-#if !GX_PLATFORM_WEBASSEMBLY
-    core_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-#endif
+    std::uint32_t core_flags = 0;
     if (const auto& config = RuntimeConfiguration::get(); config.get_fullscreen()) {
-        core_flags |= SDL_WINDOW_FULLSCREEN;
-        core_flags |= SDL_WINDOW_BORDERLESS;
-        core_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        core_flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
     } else {
         core_flags |= SDL_WINDOW_RESIZABLE;
     }
@@ -69,14 +64,14 @@ void gearoenix::platform::Application::initialize_window()
     if (available_engines.contains(render::engine::Type::Vulkan)) {
         std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN;
         if (create_window(flags)) {
-            GX_LOG_D("Gearoenix SDL2 window has been created by Vulkan setting.");
+            GX_LOG_D("Gearoenix SDL window has been created by Vulkan setting.");
             return;
         }
     }
 #endif
 #if GX_RENDER_OPENGL_ENABLED
     if (available_engines.contains(render::engine::Type::OpenGL)) {
-        std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
+        const std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -84,10 +79,11 @@ void gearoenix::platform::Application::initialize_window()
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 #if GX_DEBUG_MODE
-        // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif
         SDL_GL_SetSwapInterval(1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        gl::Engine::set_es_profile();
         if (create_gl_window(3, 2, flags))
             return;
         if (create_gl_window(3, 1, flags))
@@ -97,6 +93,7 @@ void gearoenix::platform::Application::initialize_window()
         if (create_gl_window(2, 0, flags))
             return;
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        gl::Engine::set_core_profile();
         if (create_gl_window(4, 4, flags))
             return;
         if (create_gl_window(4, 3, flags))
@@ -118,20 +115,21 @@ void gearoenix::platform::Application::initialize_window()
 
 void gearoenix::platform::Application::initialize_mouse()
 {
-    int x, y;
+    float x, y;
     SDL_GetMouseState(&x, &y);
     base.initialize_mouse_position(x, y);
 }
 
 bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
-    const auto& config = RuntimeConfiguration::get();
-    window = SDL_CreateWindow(
-        config.get_application_name().c_str(),
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        config.get_window_width(), config.get_window_height(),
-        flags);
-    return window != nullptr;
+    const auto& c = RuntimeConfiguration::get();
+    window = SDL_CreateWindow(c.get_application_name().c_str(), c.get_window_width(), c.get_window_height(), flags);
+    if (!window) {
+        GX_LOG_D("A SDL windows creation attempt failed: " << SDL_GetError());
+        return false;
+    }
+    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    return true;
 }
 
 #ifdef GX_RENDER_OPENGL_ENABLED
@@ -139,6 +137,7 @@ bool gearoenix::platform::Application::create_gl_window(const int mj, const int 
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, mj);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, mn);
+    gl::Engine::set_gl_version(mj, mn);
     if (create_gl_sample_window(0, flags)) {
         gl_major = mj;
         gl_minor = mn;
@@ -183,51 +182,44 @@ void gearoenix::platform::Application::fetch_events()
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         switch (e.type) {
-        case SDL_TEXTINPUT:
+        case SDL_EVENT_TEXT_INPUT:
             base.character_input(e.text.text[0]);
             break;
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             base.set_window_is_going_to_be_closed(true);
             break;
-        case SDL_APP_WILLENTERBACKGROUND:
+        case SDL_EVENT_WILL_ENTER_BACKGROUND:
             break;
-        case SDL_KEYDOWN:
-            base.keyboard_key(convert_sdl_key(e.key.keysym.sym), key::Action::Press);
+        case SDL_EVENT_KEY_DOWN:
+            base.keyboard_key(convert_sdl_key(e.key.scancode), key::Action::Press);
             break;
-        case SDL_KEYUP:
-            base.keyboard_key(convert_sdl_key(e.key.keysym.sym), key::Action::Release);
+        case SDL_EVENT_KEY_UP:
+            base.keyboard_key(convert_sdl_key(e.key.scancode), key::Action::Release);
             break;
-        case SDL_FINGERDOWN: {
-            break;
-        }
-        case SDL_FINGERUP: {
+        case SDL_EVENT_FINGER_DOWN: {
             break;
         }
-        case SDL_FINGERMOTION: {
+        case SDL_EVENT_FINGER_UP: {
             break;
         }
-        case SDL_MOUSEWHEEL:
+        case SDL_EVENT_FINGER_MOTION: {
+            break;
+        }
+        case SDL_EVENT_MOUSE_WHEEL:
             base.mouse_wheel(e.wheel.y);
             break;
-        case SDL_MOUSEMOTION:
+        case SDL_EVENT_MOUSE_MOTION:
             base.update_mouse_position(e.motion.x, e.motion.y);
             break;
-        case SDL_MOUSEBUTTONUP:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
             base.mouse_key(convert_sdl_mouse_key(e.button.button), key::Action::Release);
             break;
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
             base.mouse_key(convert_sdl_mouse_key(e.button.button), key::Action::Press);
             break;
-        case SDL_WINDOWEVENT:
-            switch (e.window.event) {
-            case SDL_WINDOWEVENT_RESIZED:
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-                base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
-                break;
-            default:
-                GX_LOG_D("Unhandled windows event: " << static_cast<int>(e.window.event));
-                break;
-            }
+        case SDL_EVENT_WINDOW_RESIZED:
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+            base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
             break;
         default:
             GX_LOG_D("Unhandled event " << e.type);
@@ -252,7 +244,7 @@ gearoenix::platform::Application::~Application()
     base.terminate();
 #ifdef GX_RENDER_OPENGL_ENABLED
     if (nullptr != gl_context) {
-        SDL_GL_DeleteContext(gl_context);
+        SDL_GL_DestroyContext(gl_context);
     }
 #endif
     SDL_DestroyWindow(window);
@@ -285,8 +277,49 @@ void gearoenix::platform::Application::set_caption(const std::string& s)
 
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
-    SDL_SetWindowFullscreen(window, b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+    SDL_SetWindowFullscreen(window, b);
     RuntimeConfiguration::get().set_fullscreen(b);
+}
+
+void gearoenix::platform::Application::start_keyboard_capture()
+{
+    if (SDL_TextInputActive(window)) { return; }
+    if (SDL_StartTextInput(window)) { return; }
+    GX_LOG_E("Failed to start keyboard capture: " << SDL_GetError());
+}
+
+void gearoenix::platform::Application::set_text_input_area(int x, int y, int w, int h)
+{
+    const SDL_Rect rect { .x = x, .y = y, .w = w, .h = h};
+    if (SDL_SetTextInputArea(window, &rect, 0)) { return; }
+    GX_LOG_E("Failed to set text input area: " << SDL_GetError());
+}
+
+void gearoenix::platform::Application::stop_keyboard_capture()
+{
+    if (SDL_StopTextInput(window)) { return; }
+    GX_LOG_E("Failed to stop keyboard capture: " << SDL_GetError());
+}
+
+const char* gearoenix::platform::Application::get_clipboard()
+{
+    if (current_clipboard) {
+        SDL_free(current_clipboard);
+    }
+    current_clipboard = SDL_GetClipboardText();
+    return current_clipboard;
+}
+
+void gearoenix::platform::Application::set_clipboard(const char* const clipboard)
+{
+    if (!clipboard) {return;}
+    if (SDL_SetClipboardText(clipboard)) { return; }
+    GX_LOG_E("Failed to set clipboard: " << SDL_GetError());
+}
+
+bool gearoenix::platform::Application::open_url(const char* const url)
+{
+    return SDL_OpenURL(url);
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED

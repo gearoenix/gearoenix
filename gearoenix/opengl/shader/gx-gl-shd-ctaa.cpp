@@ -1,34 +1,26 @@
 #include "gx-gl-shd-ctaa.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 
-constexpr static auto vertex_shader_src = "\
-#version 300 es\n\
-\n\
-precision highp float;\n\
-\n\
-layout(location = 0) in vec2 position;\n\
-\n\
-out vec2 out_uv;\n\
-\n\
-void main() {\n\
-    gl_Position = vec4(position, 0.0, 1.0);\n\
-    out_uv = position * 0.5 + 0.5;\n\
-}\n";
+constexpr static auto vertex_shader_body = R"SHADER(
+layout(location = 0) in vec2 position;
+
+out vec2 out_uv;
+
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    out_uv = position * 0.5 + 0.5;
+}
+)SHADER";
 
 gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(const std::uint32_t colour_tuning_index)
 {
     const bool is_gamma_correction_index = colour_tuning_index == render::camera::ColourTuning::gamma_correction_index;
     const bool is_colour_scale_index = colour_tuning_index == render::camera::ColourTuning::multiply_index;
 
-    set_vertex_shader(vertex_shader_src);
+    set_vertex_shader(get_common_shader_starter() + vertex_shader_body);
+
     std::stringstream fs;
-    fs << "#version 300 es\n";
-    fs << "\n";
-    fs << "#define gx_pi 3.141592653589793238\n";
-    fs << "\n";
-    fs << "precision highp float;\n";
-    fs << "precision highp sampler2D;\n";
-    fs << "\n";
+    fs << get_common_shader_starter();
     fs << "uniform vec2 screen_space_uv;\n";
     if (is_gamma_correction_index) {
         fs << "uniform vec3 gamma_exponent;\n";

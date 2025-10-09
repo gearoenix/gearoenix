@@ -4,6 +4,30 @@
 #include "../gx-gl-check.hpp"
 #include "../gx-gl-engine.hpp"
 
+namespace {
+std::string shader_version;
+std::string shader_common_starter;
+
+constexpr char shader_common_constants[] = R"SHADER(
+#define gx_pi 3.141592653589793238
+)SHADER";
+
+constexpr auto optional_shader_extensions = std::array {
+    "GL_OES_texture_float",
+    "GL_OES_texture_float_linear",
+    "OES_texture_float",
+    "OES_texture_float_linear",
+};
+
+constexpr char shader_common_precisions[] = R"SHADER(
+precision highp float;
+precision highp int;
+precision highp sampler2D;
+precision highp samplerCube;
+precision highp sampler2DShadow;
+)SHADER";
+}
+
 void gearoenix::gl::shader::Shader::run()
 {
     link();
@@ -70,8 +94,7 @@ gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const s
     glGetShaderInfoLog(shader_obj, static_cast<sizei>(sts_size), nullptr, &(info_log[0]));
     if (!success) {
         info_log[sts_size - 1] = '\n';
-        GX_LOG_F("Error compiling shader. Info: " << info_log << ", shader source: \n"
-                                                  << shd);
+        GX_LOG_F("Error compiling shader. Info: " << info_log << ", shader source: \n" << shd);
     } else if (!info_log.empty()) {
         info_log[sts_size - 1] = '\n';
         GX_LOG_D("Shader compiler log is: " << info_log);
@@ -147,6 +170,47 @@ void gearoenix::gl::shader::Shader::bind(uint& current_shader) const
 {
     glUseProgram(shader_program);
     current_shader = shader_program;
+}
+
+void gearoenix::gl::shader::Shader::set_profile(const bool is_es, const int major, const int minor)
+{
+    shader_version.clear();
+    shader_version += "#version ";
+    shader_version += std::to_string(major);
+#if GX_PLATFORM_WEBASSEMBLY
+    shader_version += '0';
+#else
+    shader_version += std::to_string(minor);
+#endif
+    shader_version += "0 ";
+    shader_version += is_es ? "es" : "core";
+
+    shader_common_starter.clear();
+    shader_common_starter += shader_version;
+    shader_common_starter += "\n";
+
+    for (const auto& ext : optional_shader_extensions) {
+        if (extension_exists(ext) ) {
+            shader_common_starter += "#extension ";
+            shader_common_starter += ext;
+            shader_common_starter += " : enable\n";
+        } else {
+            GX_LOG_D("Shader extension " << ext << " is not supported.");
+        }
+    }
+
+    shader_common_starter += is_es ? shader_common_precisions: "";
+    shader_common_starter += shader_common_constants;
+}
+
+const std::string& gearoenix::gl::shader::Shader::get_shader_version()
+{
+    return shader_version;
+}
+
+const std::string& gearoenix::gl::shader::Shader::get_common_shader_starter()
+{
+    return shader_common_starter;
 }
 
 #endif

@@ -25,6 +25,12 @@ public:
     void upload_imgui_fonts() override;
     [[nodiscard]] static bool is_supported();
     [[nodiscard]] static std::unique_ptr<Engine> construct();
+    static void set_es_profile();
+    [[nodiscard]] static bool is_es_profile();
+    static void set_core_profile();
+    [[nodiscard]] static bool is_core_profile();
+    static void set_gl_version(int major, int minor);
+    [[nodiscard]] static std::pair<int, int> get_gl_version();
 };
 }
 
