@@ -1,5 +1,4 @@
 #include "gx-ed-vp-camera.hpp"
-#include "../gx-editor-main.hpp"
 #include "editor/ui/gx-ed-ui-menu-scene.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-entity.hpp>
@@ -7,16 +6,15 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-camera.hpp>
-#include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 void gearoenix::editor::viewport::Camera::update_camera()
 {
+    camera = nullptr;
+    transformation = nullptr;
+
     const auto* const scene_entity = ui::MenuScene::get().get_current_scene();
     if (!scene_entity) {
         return;

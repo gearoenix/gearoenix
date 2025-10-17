@@ -10,9 +10,9 @@
 #include <gearoenix/render/gx-rnd-runtime-configuration.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-popup.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-styles.hpp>
+#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 
 #include <ImGui/imgui.h>
-#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 namespace {
 constexpr char save_file_chooser[] = "gearoenix::editor::ui::MenuProject::save";
@@ -28,7 +28,7 @@ void gearoenix::editor::ui::MenuWorld::show_new_popup()
 {
     static constexpr char name[] = "Start a new project?";
     static constexpr char body[] = "Are you sure you want to start a new project?\nYou will loose your current unsaved work!";
-    static const std::function<void()> fun = [] {
+    static const std::function fun = [] {
         core::Singleton<EditorApplication>::get().renew();
     };
 
@@ -82,8 +82,17 @@ void gearoenix::editor::ui::MenuWorld::update()
         }
 
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
-            is_file_chooser_open = true;
-            ImGuiFileDialog::Instance()->OpenDialog(open_file_chooser, open_file_chooser_title, file_chooser_filter, { .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField });
+            platform::file_chooser_open(
+                [/*this*/](auto&&, auto&& /*stream*/) {
+                    // const auto progress_bar_id = WindowOverlayProgressBarManager::get().add(std::string("Running Process [") + save_file_chooser_title + "]");
+                    // core::ecs::World::get().read(
+                    //     stream, core::job::EndCaller([this, progress_bar_id] {
+                    //         manager.get_window_overlay_progress_bar_manager()->remove(progress_bar_id);
+                    //     }));
+                },
+                []{},
+                open_file_chooser_title,
+                file_chooser_filter);
         }
 
         if (!recent_save_files.empty() && ImGui::BeginMenu("Open Recent")) {
@@ -93,8 +102,7 @@ void gearoenix::editor::ui::MenuWorld::update()
         if (has_active_save_file && ImGui::MenuItem("Save", "Ctrl+S", false)) { }
 
         if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false)) {
-            is_file_chooser_save = true;
-            ImGuiFileDialog::Instance()->OpenDialog(save_file_chooser, save_file_chooser_title, file_chooser_filter);
+            platform::file_chooser_save("TODO", save_file_chooser_title, file_chooser_filter, {}, []{});
         }
 
         if (ImGui::MenuItem("Settings", "Ctrl+Alt+P")) {
@@ -106,40 +114,6 @@ void gearoenix::editor::ui::MenuWorld::update()
         }
 
         ImGui::EndMenu();
-    }
-
-    if (is_file_chooser_save) {
-        if (ImGuiFileDialog::Instance()->Display(save_file_chooser)) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                const auto progress_bar_id = WindowOverlayProgressBarManager::get().add(std::string("Running Process [") + save_file_chooser_title + "]");
-                const std::shared_ptr<platform::stream::Stream> stream(platform::stream::Local::open(ImGuiFileDialog::Instance()->GetFilePathName(), true));
-                GX_TODO;
-                // core::ecs::World::get()->write(
-                //     stream, core::job::EndCaller([this, progress_bar_id] {
-                //         manager.get_window_overlay_progress_bar_manager()->remove(progress_bar_id);
-                //     }));
-                is_file_chooser_save = false;
-            }
-            ImGuiFileDialog::Instance()->Close();
-        }
-        is_file_chooser_save = ImGuiFileDialog::Instance()->IsOpened();
-    }
-
-    if (is_file_chooser_open) {
-        if (ImGuiFileDialog::Instance()->Display(open_file_chooser)) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                const auto progress_bar_id = WindowOverlayProgressBarManager::get().add(std::string("Running Process [") + open_file_chooser_title + "]");
-                const std::shared_ptr<platform::stream::Stream> stream(platform::stream::Local::open(ImGuiFileDialog::Instance()->GetFilePathName()));
-                GX_TODO;
-                // core::ecs::World::get().read(
-                //     stream, core::job::EndCaller([this, progress_bar_id] {
-                //         manager.get_window_overlay_progress_bar_manager()->remove(progress_bar_id);
-                //     }));
-                is_file_chooser_open = false;
-            }
-            ImGuiFileDialog::Instance()->Close();
-        }
-        is_file_chooser_open = ImGuiFileDialog::Instance()->IsOpened();
     }
 
     show_new_popup();

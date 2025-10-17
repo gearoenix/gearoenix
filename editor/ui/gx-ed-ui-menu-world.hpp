@@ -8,8 +8,6 @@ private:
     bool is_new_popup_open = false;
     bool is_settings_open = false;
     bool is_quit_popup_open = false;
-    bool is_file_chooser_open = false;
-    bool is_file_chooser_save = false;
     bool has_active_save_file = false;
     std::set<std::string> recent_save_files;
 
