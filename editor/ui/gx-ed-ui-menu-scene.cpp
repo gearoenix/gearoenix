@@ -4,7 +4,7 @@
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
-#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 #include <gearoenix/render/gltf/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-type-table.hpp>
@@ -12,14 +12,8 @@
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 #include <ImGui/imgui.h>
-#include <ImGuiFileDialog/ImGuiFileDialog.h>
 
 #include <format>
-
-namespace {
-constexpr auto key_gltf_file_chooser = "key_gltf_file_chooser";
-constexpr auto filter_gltf_file = ".glb,.gltf";
-}
 
 void gearoenix::editor::ui::MenuScene::show_new_popup()
 {
@@ -100,8 +94,23 @@ void gearoenix::editor::ui::MenuScene::update()
             is_new_popup_open = true;
         }
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false)) {
-            ImGuiFileDialog::Instance()->OpenDialog(key_gltf_file_chooser, "Import GLTF file", filter_gltf_file);
-            is_gltf_popup_open = true;
+            platform::file_chooser_open(
+                [this]<typename Stream>(auto&&, Stream&& stream) {
+                    const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
+                    render::gltf::load(
+                        std::forward<Stream>(stream),
+                        core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
+                            for (auto& e : entities) {
+                                set_current_scene(e.get());
+                                e->add_to_world();
+                                active_scenes.emplace(std::move(e));
+                            }
+                            WindowOverlayProgressBarManager::get().remove(progress_bar_id);
+                        }));
+                },
+                [] {},
+                "Import GLTF file",
+                ".glb" /*because of webassembly support we cant have gltf*/);
         }
         if (ImGui::BeginMenu("Scenes")) {
             ImGui::Text("Active scenes: %zu", static_cast<std::size_t>(active_scenes.size()));
@@ -157,24 +166,6 @@ void gearoenix::editor::ui::MenuScene::update()
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
-    }
-
-    if (is_gltf_popup_open && ImGuiFileDialog::Instance()->Display(key_gltf_file_chooser)) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
-            auto file_path_name = ImGuiFileDialog::Instance()->GetFilePathName();
-            render::gltf::load(
-                platform::stream::Path::create_absolute(std::move(file_path_name)),
-                core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
-                    for (auto& e : entities) {
-                        set_current_scene(e.get());
-                        active_scenes.emplace(std::move(e));
-                    }
-                    WindowOverlayProgressBarManager::get().remove(progress_bar_id);
-                }));
-        }
-        is_gltf_popup_open = ImGuiFileDialog::Instance()->IsOpened();
-        ImGuiFileDialog::Instance()->Close();
     }
 
     show_new_popup();

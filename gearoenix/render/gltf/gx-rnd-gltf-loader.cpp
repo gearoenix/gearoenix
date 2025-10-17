@@ -38,6 +38,18 @@ void load_scenes(
     ctx->textures.load(std::move(textures_ready));
 }
 
+void read_gltf(const std::shared_ptr<Context>& ctx, platform::stream::Stream& stream)
+{
+    std::string err, warn;
+    const auto file_data = stream.get_file_content();
+    if (!ctx->context.LoadBinaryFromMemory(&ctx->data, &err, &warn, file_data.data(), static_cast<unsigned int>(file_data.size())) || !err.empty()) {
+        GX_LOG_F("Error in GLTF loader: " << err);
+    }
+    if (!warn.empty()) {
+        GX_LOG_E("Warning in GLTF loader: " << warn);
+    }
+}
+
 void read_gltf(const std::shared_ptr<Context>& ctx, const platform::stream::Path& file)
 {
     std::string err, warn;
@@ -48,10 +60,7 @@ void read_gltf(const std::shared_ptr<Context>& ctx, const platform::stream::Path
     } else if (raw_path.ends_with(".glb")) {
         const auto stream = platform::stream::Stream::open(file);
         GX_ASSERT(nullptr != stream);
-        const auto file_data = stream->get_file_content();
-        if (!ctx->context.LoadBinaryFromMemory(&ctx->data, &err, &warn, file_data.data(), static_cast<unsigned int>(file_data.size())) || !err.empty()) {
-            GX_LOG_F("Error in GLTF loader: " << err);
-        }
+        read_gltf(ctx, *stream);
     } else {
         GX_LOG_F("Error in GLTF loader: Unknown file type: " << raw_path);
     }
@@ -62,10 +71,19 @@ void read_gltf(const std::shared_ptr<Context>& ctx, const platform::stream::Path
 
 void load(const platform::stream::Path& file, core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback)
 {
-    core::job::send_job_to_pool([file = file, scene_entities_end_callback] {
+    core::job::send_job_to_pool([file = file, end = std::move(scene_entities_end_callback)] {
         const auto context = std::make_shared<Context>();
         read_gltf(context, file);
-        load_scenes(context, scene_entities_end_callback);
+        load_scenes(context, end);
+    });
+}
+
+void load(std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback)
+{
+    core::job::send_job_to_pool([stream = std::move(stream), end = std::move(scene_entities_end_callback)] {
+        const auto context = std::make_shared<Context>();
+        read_gltf(context, *stream);
+        load_scenes(context, end);
     });
 }
 }
