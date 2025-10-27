@@ -28,7 +28,7 @@ void gearoenix::editor::ui::MenuWorld::show_new_popup()
 {
     static constexpr char name[] = "Start a new project?";
     static constexpr char body[] = "Are you sure you want to start a new project?\nYou will loose your current unsaved work!";
-    static const std::function fun = [] {
+    static const std::function<void()> fun = [] {
         core::Singleton<EditorApplication>::get().renew();
     };
 
@@ -83,7 +83,7 @@ void gearoenix::editor::ui::MenuWorld::update()
 
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
             platform::file_chooser_open(
-                [/*this*/](auto&&, auto&& /*stream*/) {
+                [/*this*/](platform::stream::Path&&, std::shared_ptr<platform::stream::Stream>&& /*stream*/) {
                     // const auto progress_bar_id = WindowOverlayProgressBarManager::get().add(std::string("Running Process [") + save_file_chooser_title + "]");
                     // core::ecs::World::get().read(
                     //     stream, core::job::EndCaller([this, progress_bar_id] {
