@@ -80,5 +80,5 @@ jobs:
         run: |
           cmake --fresh --preset windows-debug -G "Visual Studio 17 2022"
           cmake --build --preset windows-debug
-          Set-Location -Path build/windows/debug/tests
+          Set-Location -Path build/windows/debug/tests/Debug
           .\GearoenixGameEngineTests.exe
