@@ -74,11 +74,11 @@ jobs:
           vs-prerelease: true
       - name: Release Build
         run: |
-          cmake --fresh --preset windows-release
+          cmake --fresh --preset windows-release -G "Visual Studio 17 2022"
           cmake --build --preset windows-release
       - name: Building Debug and Tests
         run: |
-          cmake --fresh --preset windows-debug
+          cmake --fresh --preset windows-debug -G "Visual Studio 17 2022"
           cmake --build --preset windows-debug
           Set-Location -Path build/windows/debug/tests
           .\GearoenixGameEngineTests.exe
