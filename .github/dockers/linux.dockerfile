@@ -4,7 +4,12 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update || true
 RUN apt-get dist-upgrade -y
-RUN apt-get install build-essential automake autoconf perl python3 ninja-build libboost-dev zip unzip curl tar xz-utils bash git cmake clang-20 libsdl3-dev libdrm-dev libgbm-dev -y
+RUN apt-get install build-essential automake autoconf libtool perl-modules perl python3 ninja-build libboost-dev zip \
+    unzip curl tar xz-utils bash git cmake clang-20 libsdl3-dev libdrm-dev libgbm-dev libltdl-dev libunwind-dev \
+    pkg-config python3-pip ca-certificates patch rsync ccache libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev \
+    libxext-dev libxfixes-dev libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev libdbus-1-dev \
+    libudev-dev libasound2-dev pipewire-audio-client-libraries libpulse-dev libicu-dev libbz2-dev liblzma-dev \
+    libssl-dev -y
 ENV CC="/usr/bin/clang-20"
 ENV CXX="/usr/bin/clang++-20"
 ENV CMAKE_BUILD_PARALLEL_LEVEL=32

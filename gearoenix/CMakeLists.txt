@@ -131,7 +131,10 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm -rf "${GX_ASSET_DIR}" VERBATIM)
     endif ()
 
-    add_custom_command(TARGET ${GX_CURRENT_TARGET} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${GX_MAIN_ASSETS_PATH}" VERBATIM)
+    add_custom_command(TARGET ${GX_CURRENT_TARGET} PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${GX_MAIN_ASSETS_PATH}"
+            COMMAND ${CMAKE_COMMAND} -E echo "[Gearoenix]" > "${GX_MAIN_ASSETS_PATH}/gearoenix-placeholder.txt"
+            VERBATIM)
 
     if (GX_IN_WASM)
         set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
