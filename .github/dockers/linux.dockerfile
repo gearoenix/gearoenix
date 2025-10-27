@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update || true
 RUN apt-get dist-upgrade -y
-RUN apt-get install zip unzip curl tar xz-utils bash git cmake clang-20 libsdl3-dev libdrm-dev libgbm-dev -y
+RUN apt-get install build-essential automake autoconf perl python3 ninja-build libboost-dev zip unzip curl tar xz-utils bash git cmake clang-20 libsdl3-dev libdrm-dev libgbm-dev -y
 ENV CC="/usr/bin/clang-20"
 ENV CXX="/usr/bin/clang++-20"
 ENV CMAKE_BUILD_PARALLEL_LEVEL=32

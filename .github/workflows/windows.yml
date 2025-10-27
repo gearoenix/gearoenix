@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: windows-2022
     defaults:
       run:
@@ -19,6 +20,8 @@ jobs:
         with:
           path: |
             cmake/
+            vcpkg/
+            ninja/
           key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
@@ -32,6 +35,22 @@ jobs:
           Write-Host "CMake Path: $NewPath"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+      - name: Install vcpkg
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+          cd ..
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\vcpkg"
+          Add-Content -Path "$Env:GITHUB_ENV" -Value "VCPKG_ROOT=$Env:GITHUB_WORKSPACE\vcpkg"
+      - name: Install Ninja
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          Invoke-WebRequest "https://github.com/ninja-build/ninja/releases/download/v1.13.1/ninja-win.zip" -OutFile "ninja.zip"
+          Expand-Archive "ninja.zip" -DestinationPath "ninja"
+          Remove-Item -Path "ninja.zip"
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\ninja"
       - name: Install VC Redist
         run: |
           Invoke-WebRequest "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.exe"

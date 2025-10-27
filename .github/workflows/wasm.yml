@@ -7,6 +7,7 @@ on:
     
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     container:
       image: noroozpour/gearoenix:linux-0.1
@@ -14,29 +15,18 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup cache
-        uses: actions/cache@v3
-        id: cache
-        with:
-          path: |
-            build-webassembly/
-          key: ${{ runner.os }}-webassembly-gearoenix-${{ hashFiles('.github/workflows/wasm.yml') }}
+      - uses: actions/checkout@v5
       - name: Echos
         run: |
-          echo $HOME
-          echo "SHELL=$SHELL"
-          echo "SHELL=$0"
-          echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
-          echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
-          echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
-          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-          echo "VULKAN_SDK=/root/vulkan-sdk/x86_64" >> $GITHUB_ENV
-          echo "/root/vulkan-sdk/x86_64/bin" >> $GITHUB_PATH
+          echo "CC=$CC"
+          echo "CXX=$CXX"
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$CMAKE_BUILD_PARALLEL_LEVEL"
+          echo "LLVM_PROFILE_FILE=$LLVM_PROFILE_FILE"
+          echo "VULKAN_SDK=$VULKAN_SDK"
+          echo "EMSDK=$EMSDK"
+          echo "VCPKG_ROOT=$VCPKG_ROOT"
+          echo "PATH=$PATH"
       - name: Building Release
         run: |
-          mkdir -p build-webassembly &&
-          cd build-webassembly &&
-          source "/root/emsdk/emsdk_env.sh" &&
-          emcmake cmake -DCMAKE_BUILD_TYPE=MinRelSize -DGX_TEST_ENABLED=OFF .. &&
-          cmake --build . --config MinRelSize
+          source "$EMSDK/emsdk_env.sh" &&
+          python3 wasm/build.py --no-server
