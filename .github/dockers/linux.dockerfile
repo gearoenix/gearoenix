@@ -9,7 +9,9 @@ RUN apt-get install build-essential automake autoconf libtool perl-modules perl 
     pkg-config python3-pip ca-certificates patch rsync ccache libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev \
     libxext-dev libxfixes-dev libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev libdbus-1-dev \
     libudev-dev libasound2-dev pipewire-audio-client-libraries libpulse-dev libicu-dev libbz2-dev liblzma-dev \
-    libssl-dev libzstd-dev liblz4-dev zlib1g-dev uuid-dev libcap-dev libmount-dev meson -y
+    libssl-dev libzstd-dev liblz4-dev zlib1g-dev uuid-dev libcap-dev libmount-dev meson libsystemd-dev valgrind \
+    libcryptsetup-dev linux-libc-dev linux-libc-dev libqrencode-dev python3-jinja2 -y
+
 ENV CC="/usr/bin/clang-20"
 ENV CXX="/usr/bin/clang++-20"
 ENV CMAKE_BUILD_PARALLEL_LEVEL=32
