@@ -6,6 +6,7 @@
 #include <gearoenix/platform/gx-plt-file-chooser.hpp>
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-stream.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-runtime-configuration.hpp>
