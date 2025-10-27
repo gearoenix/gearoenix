@@ -8,7 +8,7 @@
     void gearoenix::platform::main_entry()                     \
     {                                                          \
         auto plt_app = new gearoenix::platform::Application(); \
-        plt_app->run(new ApplicationMainClass()));             \
+        plt_app->run(new ApplicationMainClass());              \
     }                                                          \
     static_assert(true, "")
 #else

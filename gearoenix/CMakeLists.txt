@@ -2,7 +2,11 @@ set(GX_ENGINE_SRC_DIR ${CMAKE_SOURCE_DIR}/gearoenix)
 
 message(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}.")
 
-file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp" "*.mm")
+if (GX_IN_APPLE)
+    file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp" "*.mm")
+else ()
+    file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
+endif ()
 
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_SRC})
 list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*-test\\.hpp$")

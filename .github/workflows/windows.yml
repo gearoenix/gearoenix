@@ -24,9 +24,8 @@ jobs:
         with:
           path: |
             cmake/
-            vcpkg/
             ninja/
-          key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml', 'vcpkg.json') }}
+          key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
@@ -40,7 +39,6 @@ jobs:
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
       - name: Install vcpkg
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
