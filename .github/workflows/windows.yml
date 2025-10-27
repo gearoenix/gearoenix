@@ -68,16 +68,16 @@ jobs:
         run: |
           Write-Host "Path: $Env:Path"
           Write-Host "CMake thread option: $Env:CMAKE_BUILD_PARALLEL_LEVEL"
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-prerelease: true
       - name: Release Build
         run: |
-          . 'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1' -Arc amd64
-          Set-Location -Path $Env:GITHUB_WORKSPACE
           cmake --fresh --preset windows-release
           cmake --build --preset windows-release
       - name: Building Debug and Tests
         run: |
-          . 'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1' -Arc amd64
-          Set-Location -Path $Env:GITHUB_WORKSPACE
           cmake --fresh --preset windows-debug
           cmake --build --preset windows-debug
           Set-Location -Path build/windows/debug/tests
