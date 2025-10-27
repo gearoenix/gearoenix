@@ -15,15 +15,11 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v5
-      - name: Setup cache
-        uses: actions/cache@v4
-        id: cache
+      - name: Checkout code
+        uses: actions/checkout@v5
         with:
-          path: |
-            build/linux/release
-            build/linux/debug
-          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
+          submodules: recursive
+          fetch-depth: 0
       - name: Echos
         run: |
           echo "CC=$CC"

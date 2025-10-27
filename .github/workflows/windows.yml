@@ -13,7 +13,11 @@ jobs:
       run:
         shell: powershell
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: Setup cache
         uses: actions/cache@v4
         id: cache
@@ -22,7 +26,7 @@ jobs:
             cmake/
             vcpkg/
             ninja/
-          key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
+          key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml', 'vcpkg.json') }}
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
