@@ -94,7 +94,8 @@ gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const s
     glGetShaderInfoLog(shader_obj, static_cast<sizei>(sts_size), nullptr, &(info_log[0]));
     if (!success) {
         info_log[sts_size - 1] = '\n';
-        GX_LOG_F("Error compiling shader. Info: " << info_log << ", shader source: \n" << shd);
+        GX_LOG_F("Error compiling shader. Info: " << info_log << ", shader source: \n"
+                                                  << shd);
     } else if (!info_log.empty()) {
         info_log[sts_size - 1] = '\n';
         GX_LOG_D("Shader compiler log is: " << info_log);
@@ -180,7 +181,7 @@ void gearoenix::gl::shader::Shader::set_profile(const bool is_es, const int majo
 #if GX_PLATFORM_WEBASSEMBLY
     shader_version += '0';
 #else
-    shader_version += std::to_string(minor);
+    shader_version += is_es ? "0" : std::to_string(minor);
 #endif
     shader_version += "0 ";
     shader_version += is_es ? "es" : "core";
@@ -190,7 +191,7 @@ void gearoenix::gl::shader::Shader::set_profile(const bool is_es, const int majo
     shader_common_starter += "\n";
 
     for (const auto& ext : optional_shader_extensions) {
-        if (extension_exists(ext) ) {
+        if (extension_exists(ext)) {
             shader_common_starter += "#extension ";
             shader_common_starter += ext;
             shader_common_starter += " : enable\n";
@@ -199,7 +200,7 @@ void gearoenix::gl::shader::Shader::set_profile(const bool is_es, const int majo
         }
     }
 
-    shader_common_starter += is_es ? shader_common_precisions: "";
+    shader_common_starter += is_es ? shader_common_precisions : "";
     shader_common_starter += shader_common_constants;
 }
 

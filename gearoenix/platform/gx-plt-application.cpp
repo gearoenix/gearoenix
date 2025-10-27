@@ -37,13 +37,12 @@ void register_types()
 {
 }
 
-void platform_set_ime_data(ImGuiContext*, ImGuiViewport* viewport, ImGuiPlatformImeData* const data)
+void platform_set_ime_data(ImGuiContext*, ImGuiViewport*, ImGuiPlatformImeData* const data)
 {
     if (!data->WantVisible && !data->WantTextInput) {
         gearoenix::platform::Application::get().stop_keyboard_capture();
     }
-    if (data->WantVisible)
-    {
+    if (data->WantVisible) {
         gearoenix::platform::Application::get().set_text_input_area(
             static_cast<int>(data->InputPos.x),
             static_cast<int>(data->InputPos.y),
@@ -84,9 +83,8 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     };
 }
 
-gearoenix::platform::BaseApplication::BaseApplication(GX_MAIN_ENTRY_ARGS_DEF)
+gearoenix::platform::BaseApplication::BaseApplication()
     : Singleton(this)
-    , arguments(GX_MAIN_ENTRY_ARGS)
     , event_engine(new core::event::Engine())
     , should_window_be_closed([this] {
         static constexpr char name[] = "Quit Gearoenix application?";

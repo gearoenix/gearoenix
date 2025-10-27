@@ -1,7 +1,7 @@
 #include "gx-gl-context.hpp"
 #if GX_RENDER_OPENGL_ENABLED
-#include "gx-gl-loader.hpp"
 #include "gx-gl-constants.hpp"
+#include "gx-gl-loader.hpp"
 
 void gearoenix::gl::ctx::set_framebuffer(const uint framebuffer_object)
 {

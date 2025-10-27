@@ -3,6 +3,7 @@
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
+#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-stream.hpp>
@@ -10,7 +11,6 @@
 #include <gearoenix/render/gx-rnd-runtime-configuration.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-popup.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-styles.hpp>
-#include <gearoenix/platform/gx-plt-file-chooser.hpp>
 
 #include <ImGui/imgui.h>
 
@@ -90,7 +90,7 @@ void gearoenix::editor::ui::MenuWorld::update()
                     //         manager.get_window_overlay_progress_bar_manager()->remove(progress_bar_id);
                     //     }));
                 },
-                []{},
+                [] {},
                 open_file_chooser_title,
                 file_chooser_filter);
         }
@@ -102,7 +102,7 @@ void gearoenix::editor::ui::MenuWorld::update()
         if (has_active_save_file && ImGui::MenuItem("Save", "Ctrl+S", false)) { }
 
         if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false)) {
-            platform::file_chooser_save("TODO", save_file_chooser_title, file_chooser_filter, {}, []{});
+            platform::file_chooser_save("TODO", save_file_chooser_title, file_chooser_filter, {}, [] { });
         }
 
         if (ImGui::MenuItem("Settings", "Ctrl+Alt+P")) {

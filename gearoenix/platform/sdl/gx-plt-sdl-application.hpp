@@ -36,7 +36,7 @@ struct Application final : core::Singleton<Application> {
     void fetch_events();
 
 public:
-    explicit Application(GX_MAIN_ENTRY_ARGS_DEF);
+    Application();
     ~Application() override;
     void run(core::Application* = nullptr);
     void loop();
@@ -47,7 +47,7 @@ public:
     void stop_keyboard_capture();
     [[nodiscard]] const char* get_clipboard();
     void set_clipboard(const char*);
-    [[nodiscard]] bool open_url(const char *url);
+    [[nodiscard]] bool open_url(const char* url);
 
 #if GX_RENDER_VULKAN_ENABLED
     [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const;

@@ -12,25 +12,23 @@ jobs:
       run:
         shell: powershell
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Setup cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache
         with:
           path: |
-            build-release/
-            build-debug/
             cmake/
           key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3-windows-x86_64.zip" -OutFile "cmake.zip"
+          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v4.1.2/cmake-4.1.2-windows-x86_64.zip" -OutFile "cmake.zip"
           Expand-Archive "cmake.zip" -DestinationPath "cmake"
           Remove-Item -Path "cmake.zip"
       - name: Setup CMake
         run: |
-          $NewPath = (Get-Location).Path + "\cmake\cmake-3.29.3-windows-x86_64\bin"
+          $NewPath = (Get-Location).Path + "\cmake\cmake-4.1.2-windows-x86_64\bin"
           Write-Host "CMake Path: $NewPath"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
@@ -51,16 +49,11 @@ jobs:
           Write-Host "CMake thread option: $Env:CMAKE_BUILD_PARALLEL_LEVEL"
       - name: Release Build
         run: |
-          New-Item -ItemType Directory -Force -Path build-release
-          Set-Location -Path build-release
-          cmake ..
-          cmake --build . --config Release
+          cmake --fresh --preset windows-release
+          cmake --build --preset windows-release
       - name: Building Debug and Tests
         run: |
-          New-Item -ItemType Directory -Force -Path build-debug
-          Set-Location -Path build-debug
-          cmake ..
-          cmake --build . --config Debug
-          Set-Location -Path tests
-          Set-Location -Path Debug
+          cmake --fresh --preset windows-debug
+          cmake --build --preset windows-debug
+          Set-Location -Path build/windows/debug/tests
           .\GearoenixGameEngineTests.exe

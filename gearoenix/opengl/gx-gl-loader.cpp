@@ -42,14 +42,14 @@ bool gearoenix::gl::load_library()
 #endif
 
 #define GX_GL_FUNCTION_LOAD_CHECK(name)                                  \
-if (nullptr == gl##name) {                                           \
-GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
-return false;                                                    \
-}
+    if (nullptr == gl##name) {                                           \
+        GX_LOG_D(GX_STRINGIFY(gl##name) " function pointer not found."); \
+        return false;                                                    \
+    }
 
 #define GX_GL_FUNCTION_LOAD(name)        \
-GX_GL_FUNCTION_LOAD_UNCHECKED(name); \
-GX_GL_FUNCTION_LOAD_CHECK(name)
+    GX_GL_FUNCTION_LOAD_UNCHECKED(name); \
+    GX_GL_FUNCTION_LOAD_CHECK(name)
 
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
     GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_UNCHECKED);
