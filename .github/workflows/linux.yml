@@ -40,7 +40,7 @@ jobs:
           cmake --build --preset linux-debug &&
           cd build/linux/debug/tests &&
           ctest &&
-          llvm-profdata-20 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
+          llvm-profdata-20 merge -sparse gearoenix.profraw -o gearoenix.profdata &&
           llvm-cov-20 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
       - uses: codecov/codecov-action@v5
         with:

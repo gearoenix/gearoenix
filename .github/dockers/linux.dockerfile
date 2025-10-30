@@ -15,7 +15,7 @@ RUN apt-get install build-essential automake autoconf libtool perl-modules perl 
 ENV CC="/usr/bin/clang-20"
 ENV CXX="/usr/bin/clang++-20"
 ENV CMAKE_BUILD_PARALLEL_LEVEL=32
-ENV LLVM_PROFILE_FILE="'gearoenix.profraw'"
+ENV LLVM_PROFILE_FILE=gearoenix.profraw
 
 RUN curl -L https://vulkan.lunarg.com/sdk/download/latest/linux/vulkan-sdk.tar.gz --output /root/vulkan-sdk.tar.gz && \
     mkdir -p /root/vulkan-sdk && \
