@@ -10,7 +10,7 @@
 #include "gx-vk-surface.hpp"
 #include "sync/gx-vk-sync-semaphore.hpp"
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_DEBUG_SWAPCHAIN
 #endif
 

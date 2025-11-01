@@ -28,7 +28,7 @@ private:
     std::set<std::pair<std::intptr_t /*end-offset*/, std::intptr_t /*size*/>> end_map { { Size, Size } };
 
 public:
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
     StaticBlock()
     {
         std::memset(memory.data(), 0, memory.size());

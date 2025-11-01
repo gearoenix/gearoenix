@@ -36,7 +36,7 @@
 //     // check for transmission change base on engine_angular_velocity_rpm
 //     //
 //     std::uint32_t torque_index = 0;
-// #ifdef GX_DEBUG_MODE
+// #if GX_DEBUG_MODE
 //     if (engine_angular_velocity_rpm > torque_rpm_diagram_points.back().first || engine_angular_velocity_rpm < 0.0) {
 //         GXLOGF("Unexpected engine_angular_velocity_rpm (" << engine_angular_velocity_rpm << ") value.")
 //     }

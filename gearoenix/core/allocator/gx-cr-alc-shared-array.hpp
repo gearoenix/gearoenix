@@ -22,9 +22,9 @@ private:
 
     SharedArray()
     {
-#if GX_DEBUG_MODE
-        std::memset(gx_core_shared_array_objects.data(), 0, gx_core_shared_array_objects.size());
-#endif
+        if constexpr (GX_DEBUG_MODE) {
+            std::memset(gx_core_shared_array_objects.data(), 0, gx_core_shared_array_objects.size());
+        }
         for (std::int64_t i = S * gx_core_shared_array_element_size; i > 0;) {
             i -= gx_core_shared_array_element_size;
             gx_core_shared_array_free_pointers.push_back(reinterpret_cast<T*>(&gx_core_shared_array_objects[i]));
@@ -43,9 +43,9 @@ public:
         void operator()(T* const o)
         {
             o->~T();
-#if GX_DEBUG_MODE
-            std::memset(reinterpret_cast<std::uint8_t*>(o), 0, gx_core_shared_array_element_size);
-#endif
+            if constexpr (GX_DEBUG_MODE) {
+                std::memset(reinterpret_cast<std::uint8_t*>(o), 0, gx_core_shared_array_element_size);
+            }
             const std::lock_guard<std::mutex> _lg(allocator->gx_core_shared_array_lock);
             allocator->gx_core_shared_array_free_pointers.push_back(o);
         }
@@ -71,12 +71,12 @@ public:
             gx_core_shared_array_free_pointers.pop_back();
             return result;
         }();
-#if GX_DEBUG_MODE
-        const auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
-        for (std::int64_t i = 0; i < gx_core_shared_array_element_size; ++i) {
-            GX_ASSERT(bs[i] == 0);
+        if constexpr (GX_DEBUG_MODE) {
+            const auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
+            for (std::int64_t i = 0; i < gx_core_shared_array_element_size; ++i) {
+                GX_ASSERT(bs[i] == 0);
+            }
         }
-#endif
         return std::shared_ptr<T>(new (ptr) T(std::forward<Args>(args)...), StdDeleter(weak_self.lock()));
     }
 };

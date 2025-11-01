@@ -7,7 +7,7 @@
 #include "../gx-vk-loader.hpp"
 #include <memory>
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_VULKAN_DEVICE_DEBUG_MODE
 #endif
 

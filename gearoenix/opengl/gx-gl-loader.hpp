@@ -190,7 +190,7 @@ GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_DECL);
 void unload_library();
 [[nodiscard]] bool extension_exists(const std::string& ext_name);
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 void GX_GL_APIENTRY_TYPE debug_callback(enumerated source, enumerated t, uint id, enumerated severity, sizei length, const char* message, const void* userParam);
 #endif
 }

@@ -35,7 +35,7 @@
     }                                                                                          \
     static_assert(true, "")
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_ASSERT_D(x) GX_ASSERT(x)
 #define GX_COMPLAIN_D(x, msg) GX_COMPLAIN(x, msg)
 #define GX_CHECK_NOT_EQUAL_D(x, y) GX_CHECK_NOT_EQUAL(x, y)

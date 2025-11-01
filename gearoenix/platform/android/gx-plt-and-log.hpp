@@ -25,7 +25,7 @@
         __android_log_print(ANDROID_LOG_INFO, GX_APPLICATION_NAME, "%s", GX_PLT_LOG_STR_VAR.c_str()); \
     }                                                                                                 \
     static_assert(true, "")
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 
 #define GX_LOG_D(s)                                                                                    \
     {                                                                                                  \

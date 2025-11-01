@@ -43,7 +43,7 @@
 //
 // void gearoenix::render::camera::ArcController::values_updated()
 //{
-// #ifdef GX_DEBUG_MODE
+// #if GX_DEBUG_MODE
 //     const auto up_len = up.square_length() - 1;
 //     if (GX_IS_NOT_ZERO(up_len))
 //         GX_UNEXPECTED

@@ -13,7 +13,7 @@ gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter)
     if (FAILED(D3D12CreateDevice(
             adapter->get_adapter().Get(), Adapter::MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&device))))
         GX_LOG_F("Can not create device.");
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3d_info_queue;
     if (SUCCEEDED(device.As(&d3d_info_queue))) {
         d3d_info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);

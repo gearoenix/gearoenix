@@ -4,7 +4,7 @@
 #include "gx-gl-constants.hpp"
 #include "gx-gl-loader.hpp"
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_GL_LABELING_ENABLED true
 #endif
 

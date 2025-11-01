@@ -138,11 +138,11 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
     msg << " userdata " << pUserData;
     const auto msg_str = msg.str();
     if (is_error) {
-#ifdef GX_DEBUG_MODE
-        GX_LOG_F(msg_str);
-#else
-        GX_LOG_E(msg_str);
-#endif
+        if constexpr (GX_DEBUG_MODE) {
+            GX_LOG_F(msg_str);
+        } else {
+            GX_LOG_E(msg_str);
+        }
     } else {
         GX_LOG_D(msg_str);
     }

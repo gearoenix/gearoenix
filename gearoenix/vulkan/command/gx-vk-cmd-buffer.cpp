@@ -12,7 +12,7 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-cmd-pool.hpp"
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_VK_CMD_BUFF_DEBUG
 #endif
 

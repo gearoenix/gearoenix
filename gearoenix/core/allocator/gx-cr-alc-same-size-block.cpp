@@ -14,35 +14,38 @@ gearoenix::core::allocator::SameSizeBlock::SameSizeBlock(
 
 gearoenix::core::allocator::SameSizeBlock::~SameSizeBlock()
 {
-#ifdef GX_DEBUG_MODE
-    for (const auto& block : blocks)
-        for (const auto byte : block)
-            GX_ASSERT_D(0 == byte); // You have undeleted objects
-#endif
+    if constexpr (GX_DEBUG_MODE) {
+        for (const auto& block : blocks) {
+            for (const auto byte : block) {
+                GX_ASSERT_D(0 == byte); // You have undeleted objects
+            }
+        }
+    }
 }
 
 unsigned char* gearoenix::core::allocator::SameSizeBlock::alloc()
 {
-    const std::lock_guard<std::mutex> _lg(this_lock);
+    const std::lock_guard _lg(this_lock);
     if (free_pointers.empty()) {
         blocks.emplace_back(block_bytes_count);
         auto& new_block = blocks.back();
-#ifdef GX_DEBUG_MODE
-        std::memset(new_block.data(), 0, block_bytes_count);
-#endif
-        for (std::int64_t i = 0, ptr = 0; i < objects_count_in_each_block; ++i, ptr += object_size)
+        if constexpr (GX_DEBUG_MODE) {
+            std::memset(new_block.data(), 0, block_bytes_count);
+        }
+        for (std::int64_t i = 0, ptr = 0; i < objects_count_in_each_block; ++i, ptr += object_size) {
             free_pointers.push(&new_block[ptr]);
+        }
     }
-    auto result = free_pointers.top();
+    const auto result = free_pointers.top();
     free_pointers.pop();
     return result;
 }
 
 void gearoenix::core::allocator::SameSizeBlock::free(unsigned char* const p)
 {
-    const std::lock_guard<std::mutex> _lg(this_lock);
-#ifdef GX_DEBUG_MODE
-    std::memset(p, 0, object_size);
-#endif
+    const std::lock_guard _lg(this_lock);
+    if constexpr (GX_DEBUG_MODE) {
+        std::memset(p, 0, object_size);
+    }
     free_pointers.push(p);
 }

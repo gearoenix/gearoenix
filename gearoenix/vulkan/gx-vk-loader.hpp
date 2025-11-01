@@ -11,7 +11,7 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_USE_DEBUG_EXTENSIONS
 #endif
 

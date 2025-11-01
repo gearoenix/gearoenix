@@ -3,7 +3,7 @@
 #ifdef GX_RENDER_METAL_ENABLED
 #include <simd/simd.h>
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GEAROENIX_METAL_RESOURCE_NAMING
 #endif
 

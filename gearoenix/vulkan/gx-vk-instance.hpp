@@ -8,7 +8,7 @@
 #include <optional>
 #include <set>
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_VULKAN_INSTANCE_DEBUG
 #endif
 

@@ -9,7 +9,7 @@
 #include <cmath>
 #include <string>
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 // #define GX_DEBUG_FONT_IMAGE_CREATION
 #endif
 
@@ -54,16 +54,12 @@ void gearoenix::render::font::Font::compute_text_widths(
     const double text_height,
     std::vector<double>& widths) const
 {
-#ifdef GX_DEBUG_MODE
-    if (text.empty()) {
-        GX_UNEXPECTED;
-    }
-    for (const auto c : text) {
-        if (c == static_cast<int>('\n')) {
-            GX_UNEXPECTED;
+    if constexpr (GX_DEBUG_MODE) {
+        GX_ASSERT_D(!text.empty());
+        for (const auto c : text) {
+            GX_ASSERT_D(c != static_cast<int>('\n'));
         }
     }
-#endif
     const auto txt_scale = text_height / static_cast<double>(fnt_height);
     widths.clear();
     double total_width;

@@ -23,7 +23,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager(engine::Engine& e)
     info.DescriptorPool = e.get_descriptor_manager().get_imgui()->get_vulkan_data();
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(e.get_swapchain().get_image_views().size());
     info.ImageCount = info.MinImageCount;
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
     info.CheckVkResultFn = +[](const VkResult result) {
         GX_VK_CHK(result);
     };

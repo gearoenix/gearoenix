@@ -9,7 +9,7 @@
 
 gearoenix::d3d::Adapter::Adapter()
 {
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
     Microsoft::WRL::ComPtr<ID3D12Debug> debug_controller;
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug_controller)))) {
         debug_controller->EnableDebugLayer();

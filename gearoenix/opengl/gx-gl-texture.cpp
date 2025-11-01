@@ -10,7 +10,7 @@
 #include "gx-gl-target.hpp"
 #include <vector>
 
-#ifdef GX_DEBUG_MODE
+#if GX_DEBUG_MODE
 #define GX_DEBUG_TEXTURE_WRITE false
 #endif
 
