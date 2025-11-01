@@ -45,4 +45,4 @@ void gearoenix::editor::EditorApplication::set_current_scene(const core::ecs::En
     update_caption();
 }
 
-GEAROENIX_START(gearoenix::editor::EditorApplication)
+GEAROENIX_START(gearoenix::editor::EditorApplication);

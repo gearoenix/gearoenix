@@ -3,7 +3,6 @@
 #include "../core/gx-cr-singleton.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../math/gx-math-vector-2d.hpp"
-#include "gx-plt-arguments.hpp"
 #include "gx-plt-build-configuration.hpp"
 #include "gx-plt-key.hpp"
 #include "gx-plt-touch.hpp"
@@ -38,7 +37,6 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
 
     typedef boost::container::flat_map<FingerId, core::event::Point2D> TouchStateMap;
 
-    GX_GET_CREF_PRV(Arguments, arguments);
     GX_GET_VAL_PRV(bool, running, true);
     GX_GET_CREF_PRV(math::Vec2<int>, screen_size);
     GX_GET_VAL_PRV(bool, window_resizing, false);
@@ -65,7 +63,7 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
     void initialise_imgui();
 
 public:
-    explicit BaseApplication(GX_MAIN_ENTRY_ARGS_DEF);
+    BaseApplication();
     ~BaseApplication() override;
     void initialize_window_position(int x, int y);
     void initialize_window_size(int w, int h);

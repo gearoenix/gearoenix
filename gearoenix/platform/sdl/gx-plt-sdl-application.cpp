@@ -228,9 +228,8 @@ void gearoenix::platform::Application::fetch_events()
     }
 }
 
-gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF)
+gearoenix::platform::Application::Application()
     : Singleton(this)
-    , base(GX_MAIN_ENTRY_ARGS)
 {
     initialize_sdl();
     initialize_screen();
@@ -283,21 +282,29 @@ void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 
 void gearoenix::platform::Application::start_keyboard_capture()
 {
-    if (SDL_TextInputActive(window)) { return; }
-    if (SDL_StartTextInput(window)) { return; }
+    if (SDL_TextInputActive(window)) {
+        return;
+    }
+    if (SDL_StartTextInput(window)) {
+        return;
+    }
     GX_LOG_E("Failed to start keyboard capture: " << SDL_GetError());
 }
 
 void gearoenix::platform::Application::set_text_input_area(int x, int y, int w, int h)
 {
-    const SDL_Rect rect { .x = x, .y = y, .w = w, .h = h};
-    if (SDL_SetTextInputArea(window, &rect, 0)) { return; }
+    const SDL_Rect rect { .x = x, .y = y, .w = w, .h = h };
+    if (SDL_SetTextInputArea(window, &rect, 0)) {
+        return;
+    }
     GX_LOG_E("Failed to set text input area: " << SDL_GetError());
 }
 
 void gearoenix::platform::Application::stop_keyboard_capture()
 {
-    if (SDL_StopTextInput(window)) { return; }
+    if (SDL_StopTextInput(window)) {
+        return;
+    }
     GX_LOG_E("Failed to stop keyboard capture: " << SDL_GetError());
 }
 
@@ -312,8 +319,12 @@ const char* gearoenix::platform::Application::get_clipboard()
 
 void gearoenix::platform::Application::set_clipboard(const char* const clipboard)
 {
-    if (!clipboard) {return;}
-    if (SDL_SetClipboardText(clipboard)) { return; }
+    if (!clipboard) {
+        return;
+    }
+    if (SDL_SetClipboardText(clipboard)) {
+        return;
+    }
     GX_LOG_E("Failed to set clipboard: " << SDL_GetError());
 }
 

@@ -1,6 +1,7 @@
 #include "gx-gl-shd-gbuffers-filler.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
+#include "../gx-gl-constants.hpp"
 #include "../gx-gl-engine.hpp"
 
 namespace {
@@ -58,12 +59,14 @@ in vec3 out_btg;
 in vec2 out_uv;
 )SHADER"
 
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC) ") out vec4 frag_out_albedo_metallic;\n"
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH) ") out vec4 frag_out_position_depth;\n"
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO) ") out vec4 frag_out_normal_ao;\n"
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS) ") out vec4 frag_out_emission_roughness;\n"
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE) ") out vec3 frag_out_irradiance;\n"
-"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE) ") out vec3 frag_out_radiance;\n"
+                                      // clang-format off
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC) ") out vec4 frag_out_albedo_metallic;\n"
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH) ") out vec4 frag_out_position_depth;\n"
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO) ") out vec4 frag_out_normal_ao;\n"
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS) ") out vec4 frag_out_emission_roughness;\n"
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_IRRADIANCE) ") out vec3 frag_out_irradiance;\n"
+"layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_RADIANCE) ") out vec3 frag_out_radiance;\n"
+// clang-fromat on
 
 R"SHADER(
 

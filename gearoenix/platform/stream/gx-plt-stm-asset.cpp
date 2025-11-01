@@ -1,5 +1,6 @@
 #include "gx-plt-stm-asset.hpp"
 #include "../gx-plt-application.hpp"
+#include "../gx-plt-arguments.hpp"
 
 #ifdef GX_PLATFORM_IOS
 #include "../../core/gx-cr-string.hpp"
@@ -30,7 +31,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
         file_path = core::String::join_path(path, file_name);
     }
 #else
-    const std::string file_path = Application::get().get_base().get_arguments().get_process_directory() + file_name;
+    const std::string file_path = Arguments::get().get_process_directory() + file_name;
 #endif
     asset->file.open(file_path, std::ios::binary | std::ios::in);
     if (!asset->file.is_open()) {

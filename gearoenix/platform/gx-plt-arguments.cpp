@@ -2,7 +2,8 @@
 #include "../core/gx-cr-string.hpp"
 #include "gx-plt-log.hpp"
 
-std::string gearoenix::platform::Arguments::extract_process_directory(const std::string& s)
+namespace {
+[[nodiscard]] std::string extract_process_directory(const std::string& s)
 {
 #ifdef GX_PLATFORM_DESKTOP
 #ifdef GX_PLATFORM_WINDOWS
@@ -22,27 +23,23 @@ std::string gearoenix::platform::Arguments::extract_process_directory(const std:
 #endif
 }
 
-gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF)
+[[nodiscard]] bool is_key(const std::string& s)
 {
-#ifdef GX_PLATFORM_INTERFACE_WIN32
-    int argc = 0;
-    auto* const w_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    if (nullptr == w_argv) {
-        GX_LOG_F("Can not fetch arguments.");
-    }
-    std::vector<std::string> s_argv(argc);
-    std::vector<const char*> argv(argc);
-    for (int i = 0; i < argc; ++i) {
-        s_argv[i] = core::String::to_string(std::wstring(w_argv[i]));
-        argv[i] = s_argv[i].c_str();
-    }
-    LocalFree(w_argv);
-#elif defined(GX_PLATFORM_INTERFACE_ANDROID)
-    // TODO:
-    const int argc = 1;
-    const std::vector<const char*> argv { "temporary" };
-#endif
+    return s.size() > 2 && s[0] == '-' && s[1] == '-';
+}
 
+gearoenix::platform::Arguments instance;
+}
+
+gearoenix::platform::Arguments::Arguments() = default;
+
+gearoenix::platform::Arguments& gearoenix::platform::Arguments::get()
+{
+    return instance;
+}
+
+void gearoenix::platform::Arguments::parse(const int argc, const char* const* const argv)
+{
     process_name = argv[0];
     process_directory = extract_process_directory(process_name);
     tokens.resize(argc - 1);
@@ -76,14 +73,9 @@ gearoenix::platform::Arguments::Arguments(GX_MAIN_ENTRY_ARGS_DEF)
     GX_LOG_D("Parsing of arguments has been finished.");
 }
 
-bool gearoenix::platform::Arguments::is_key(const std::string& s)
+bool gearoenix::platform::Arguments::get_value(const std::string& key, std::string& value, const bool necessary) const
 {
-    return s[0] == '-' && s[1] == '-';
-}
-
-bool gearoenix::platform::Arguments::get_value(const std::string& key, std::string& value, bool necessary) const
-{
-    auto range = map.equal_range(key);
+    const auto range = map.equal_range(key);
     int count = 0;
     for (auto i = range.first; i != range.second; ++i, ++count) {
         if (i->second.has_value()) {
@@ -94,13 +86,14 @@ bool gearoenix::platform::Arguments::get_value(const std::string& key, std::stri
     }
     if (count < 1 && necessary) {
         GX_LOG_F("The '" << key << "' key is needed and must have value.");
-    } else if (count > 1) {
+    }
+    if (count > 1) {
         GX_LOG_F("The '" << key << "' key is needed only once.");
     }
     return false;
 }
 
-bool gearoenix::platform::Arguments::get_value(const std::string& key, int& value, bool necessary) const
+bool gearoenix::platform::Arguments::get_value(const std::string& key, int& value, const bool necessary) const
 {
     std::string v;
     if (!get_value(key, v, necessary)) {

@@ -1,4 +1,4 @@
-name: 'Ubuntu-24.04  '
+name: 'Ubuntu-25.10  '
 on:
   push:
     branches: [ master ]
@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build, Test, and Coverage
     runs-on: ubuntu-latest
     container:
       image: noroozpour/gearoenix:linux-0.1
@@ -14,48 +15,38 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup cache
-        uses: actions/cache@v3
-        id: cache
+      - name: Checkout code
+        uses: actions/checkout@v5
         with:
-          path: |
-            build-release/
-            build-debug/
-          key: ${{ runner.os }}-linux-gearoenix-${{ hashFiles('.github/workflows/linux.yml') }}
+          submodules: recursive
+          fetch-depth: 0
       - name: Echos
         run: |
-          echo "SHELL=$SHELL"
-          echo "SHELL=$0"
-          echo "CC=/usr/bin/clang-18" >> $GITHUB_ENV
-          echo "CXX=/usr/bin/clang++-18" >> $GITHUB_ENV
-          echo "CMAKE_BUILD_PARALLEL_LEVEL=32" >> $GITHUB_ENV
-          echo "LLVM_PROFILE_FILE=\"gearoenix.profraw\"" >> $GITHUB_ENV
-          echo "VULKAN_SDK=/root/vulkan-sdk/x86_64" >> $GITHUB_ENV
-          echo "/root/vulkan-sdk/x86_64/bin" >> $GITHUB_PATH
+          echo "CC=$CC"
+          echo "CXX=$CXX"
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$CMAKE_BUILD_PARALLEL_LEVEL"
+          echo "LLVM_PROFILE_FILE=$LLVM_PROFILE_FILE"
+          echo "VULKAN_SDK=$VULKAN_SDK"
+          echo "EMSDK=$EMSDK"
+          echo "VCPKG_ROOT=$VCPKG_ROOT"
+          echo "PATH=$PATH"
       - name: Building Release
         run: |
-          mkdir -p build-release &&
-          pwd &&
-          cd build-release &&
-          cmake .. -DCMAKE_BUILD_TYPE=Release &&
-          cmake --build . --config Release
+          cmake --fresh --preset linux-release &&
+          cmake --build --preset linux-release
       - name: Building debug, tests and coverage
         run: |
-          mkdir -p build-debug &&
-          pwd &&
-          cd build-debug &&
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DGX_COVERAGE_ENABLED=ON &&
-          cmake --build . --config Debug &&
-          cd tests &&
+          cmake --fresh --preset linux-debug -DGX_COVERAGE_ENABLED=ON &&
+          cmake --build --preset linux-debug &&
+          cd build/linux/debug/tests &&
           ctest &&
-          llvm-profdata-18 merge -sparse $LLVM_PROFILE_FILE -o gearoenix.profdata &&
-          llvm-cov-18 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
-      - uses: codecov/codecov-action@v3
+          llvm-profdata-20 merge -sparse gearoenix.profraw -o gearoenix.profdata &&
+          llvm-cov-20 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: build-debug/tests/coverage.txt
-          flags: unittests
+          files: build/linux/debug/tests/coverage.txt
+          flags: unittests,linux
           name: gearoenix-test-coverage
           fail_ci_if_error: true
           verbose: true

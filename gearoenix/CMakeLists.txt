@@ -2,7 +2,11 @@ set(GX_ENGINE_SRC_DIR ${CMAKE_SOURCE_DIR}/gearoenix)
 
 message(STATUS "Gearoenix game engine source directory is ${GX_ENGINE_SRC_DIR}.")
 
-file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp" "*.mm")
+if (GX_IN_APPLE)
+    file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp" "*.mm")
+else ()
+    file(GLOB_RECURSE GX_ENGINE_SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
+endif ()
 
 set(GX_ENGINE_TEST_SRC ${GX_ENGINE_SRC})
 list(FILTER GX_ENGINE_SRC EXCLUDE REGEX ".*-test\\.hpp$")
@@ -82,7 +86,7 @@ target_include_directories(ImGuizmo PRIVATE ${GX_IMGUI_PATH})
 gx_common_target_config(ImGuizmo)
 
 add_library(GearoenixGameEngine STATIC ${GX_ENGINE_SRC})
-target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL3::SDL3-static Boost::headers)
+target_link_libraries(GearoenixGameEngine PUBLIC ImGui ImGuiFileDialog ImGuizmo SDL3::SDL3 Boost::headers)
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_IMGUI_PATH})
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
 gx_common_target_config(GearoenixGameEngine)
@@ -114,15 +118,6 @@ function(gx_prepare_target GX_CURRENT_TARGET)
     endif ()
     target_include_directories(${GX_CURRENT_TARGET} PRIVATE ${CMAKE_SOURCE_DIR})
 
-    if (GX_IN_APPLE)
-        # gx_metal_prepare_target(${GX_CURRENT_TARGET})
-        # target_link_libraries(${GX_CURRENT_TARGET} "-framework Metal -framework MetalKit")
-        # if (GX_IN_IOS)
-        #     target_link_libraries(${GX_CURRENT_TARGET} "-framework UIKit")
-        # else (GX_IN_IOS)
-        #     target_link_libraries(${GX_CURRENT_TARGET} "-framework Cocoa")
-        # endif (GX_IN_IOS)
-    endif (GX_IN_APPLE)
     target_link_libraries(${GX_CURRENT_TARGET} PRIVATE GearoenixGameEngine)
 
     if (GX_IN_ANDROID)
@@ -133,15 +128,23 @@ function(gx_prepare_target GX_CURRENT_TARGET)
                 VERBATIM)
     else ()
         set(GX_ASSET_DIR $<TARGET_FILE_DIR:${GX_CURRENT_TARGET}>/assets)
-        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND rm -rf "${GX_ASSET_DIR}" VERBATIM)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E rm -rf "${GX_ASSET_DIR}" VERBATIM)
     endif ()
+
+    add_custom_command(TARGET ${GX_CURRENT_TARGET} PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${GX_MAIN_ASSETS_PATH}"
+            COMMAND ${CMAKE_COMMAND} -E echo "[Gearoenix]" > "${GX_MAIN_ASSETS_PATH}/gearoenix-placeholder.txt"
+            VERBATIM)
 
     if (GX_IN_WASM)
         set_target_properties(${GX_CURRENT_TARGET} PROPERTIES SUFFIX ".html")
     elseif (WIN32)
-        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND cmd /c mklink /J "${GX_ASSET_DIR}" "${GX_MAIN_ASSETS_PATH}" VERBATIM)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
+                COMMAND powershell.exe -NoProfile -ExecutionPolicy Bypass -Command
+                "New-Item -ItemType Junction -Path '${GX_ASSET_DIR}' -Target '${GX_MAIN_ASSETS_PATH}' -Force" VERBATIM)
     else ()
-        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink ${GX_MAIN_ASSETS_PATH} ${GX_ASSET_DIR} VERBATIM)
+        add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E create_symlink ${GX_MAIN_ASSETS_PATH} ${GX_ASSET_DIR} VERBATIM)
     endif (GX_IN_WASM)
 
     add_dependencies(${GX_CURRENT_TARGET} GearoenixAssets)

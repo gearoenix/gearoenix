@@ -7,33 +7,52 @@ on:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: windows-2022
     defaults:
       run:
         shell: powershell
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: Setup cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache
         with:
           path: |
-            build-release/
-            build-debug/
             cmake/
+            ninja/
           key: ${{ runner.os }}-windows-gearoenix-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3-windows-x86_64.zip" -OutFile "cmake.zip"
+          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v4.1.2/cmake-4.1.2-windows-x86_64.zip" -OutFile "cmake.zip"
           Expand-Archive "cmake.zip" -DestinationPath "cmake"
           Remove-Item -Path "cmake.zip"
       - name: Setup CMake
         run: |
-          $NewPath = (Get-Location).Path + "\cmake\cmake-3.29.3-windows-x86_64\bin"
+          $NewPath = (Get-Location).Path + "\cmake\cmake-4.1.2-windows-x86_64\bin"
           Write-Host "CMake Path: $NewPath"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+          cd ..
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\vcpkg"
+          Add-Content -Path "$Env:GITHUB_ENV" -Value "VCPKG_ROOT=$Env:GITHUB_WORKSPACE\vcpkg"
+      - name: Install Ninja
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          Invoke-WebRequest "https://github.com/ninja-build/ninja/releases/download/v1.13.1/ninja-win.zip" -OutFile "ninja.zip"
+          Expand-Archive "ninja.zip" -DestinationPath "ninja"
+          Remove-Item -Path "ninja.zip"
+          Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\ninja"
       - name: Install VC Redist
         run: |
           Invoke-WebRequest "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.exe"
@@ -49,18 +68,17 @@ jobs:
         run: |
           Write-Host "Path: $Env:Path"
           Write-Host "CMake thread option: $Env:CMAKE_BUILD_PARALLEL_LEVEL"
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-prerelease: true
       - name: Release Build
         run: |
-          New-Item -ItemType Directory -Force -Path build-release
-          Set-Location -Path build-release
-          cmake ..
-          cmake --build . --config Release
+          cmake --fresh --preset windows-release -G "Visual Studio 17 2022"
+          cmake --build --preset windows-release
       - name: Building Debug and Tests
         run: |
-          New-Item -ItemType Directory -Force -Path build-debug
-          Set-Location -Path build-debug
-          cmake ..
-          cmake --build . --config Debug
-          Set-Location -Path tests
-          Set-Location -Path Debug
+          cmake --fresh --preset windows-debug -G "Visual Studio 17 2022"
+          cmake --build --preset windows-debug
+          Set-Location -Path build/windows/debug/tests/Debug
           .\GearoenixGameEngineTests.exe

@@ -1,0 +1,6 @@
+set(GX_SRC_DIR ${GX_EXAMPLES_SRC_DIR}/006-hello-skybox)
+set(GX_SRC ${GX_SRC_DIR}/gx-ex-006-main.cpp)
+
+if (GX_ENABLE_EXAMPLE_006_HELLO_SKYBOX OR NOT GX_IN_ANDROID)
+    gx_prepare_target(GearoenixExample006HelloSkybox SOURCES ${GX_SRC})
+endif ()

@@ -5,6 +5,8 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
 #include <gearoenix/platform/gx-plt-file-chooser.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-stream.hpp>
 #include <gearoenix/render/gltf/gx-rnd-gltf-loader.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-entity-name-input-text.hpp>
 #include <gearoenix/render/imgui/gx-rnd-imgui-type-table.hpp>
@@ -95,10 +97,10 @@ void gearoenix::editor::ui::MenuScene::update()
         }
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false)) {
             platform::file_chooser_open(
-                [this]<typename Stream>(auto&&, Stream&& stream) {
+                [this](platform::stream::Path&&, std::shared_ptr<platform::stream::Stream>&& stream) {
                     const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
                     render::gltf::load(
-                        std::forward<Stream>(stream),
+                        std::move(stream),
                         core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
                             for (auto& e : entities) {
                                 set_current_scene(e.get());

@@ -1,6 +1,6 @@
 #pragma once
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "gx-plt-main-entry.hpp"
+
 #include <map>
 #include <optional>
 #include <string>
@@ -16,11 +16,10 @@ struct Arguments {
     GX_GET_CREF_PRV(Map, map);
     GX_GET_VAL_PRV(bool, has_tokens, false);
 
-    [[nodiscard]] static std::string extract_process_directory(const std::string& s);
-
 public:
-    Arguments(GX_MAIN_ENTRY_ARGS_DEF);
-    [[nodiscard]] static bool is_key(const std::string& s);
+    Arguments();
+    [[nodiscard]] static Arguments& get();
+    void parse(int argc, const char* const* argv);
     [[nodiscard]] bool get_value(const std::string& key, std::string& value, bool necessary = false) const;
     [[nodiscard]] bool get_value(const std::string& key, int& value, bool necessary = false) const;
 };
