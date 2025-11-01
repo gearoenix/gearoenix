@@ -5,6 +5,7 @@
 #include "../gx-rnd-build-configuration.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
+
 #include <array>
 #include <map>
 #include <memory>

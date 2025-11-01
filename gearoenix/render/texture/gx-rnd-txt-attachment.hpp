@@ -43,5 +43,6 @@ struct Attachment final {
     void write(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const;
     static void read(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<Attachment>&& end);
     static void read(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<std::vector<Attachment>>&& end);
+    [[nodiscard]] bool shallow_equal(const Attachment& o) const;
 };
 }

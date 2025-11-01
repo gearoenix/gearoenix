@@ -136,3 +136,26 @@ void gearoenix::render::texture::Attachment::read(
         }
     });
 }
+
+bool gearoenix::render::texture::Attachment::shallow_equal(const Attachment& o) const
+{
+    if (mipmap_level != o.mipmap_level || var.index() != o.var.index()) {
+        return false;
+    }
+    switch (static_cast<decltype(ATTACHMENT_2D_VARIANT_INDEX)>(var.index())) {
+    case ATTACHMENT_2D_VARIANT_INDEX: {
+        const auto& a = std::get<ATTACHMENT_2D_VARIANT_INDEX>(var);
+        const auto& b = std::get<ATTACHMENT_2D_VARIANT_INDEX>(o.var);
+        return a.txt->get_info() == b.txt->get_info();
+    }
+    case ATTACHMENT_CUBE_VARIANT_INDEX: {
+        const auto& a = std::get<ATTACHMENT_CUBE_VARIANT_INDEX>(var);
+        const auto& b = std::get<ATTACHMENT_CUBE_VARIANT_INDEX>(o.var);
+        return a.txt->get_info() == b.txt->get_info() && a.face == b.face;
+    }
+    default: {
+        GX_UNEXPECTED;
+    }
+    }
+    return true;
+}

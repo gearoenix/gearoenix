@@ -7,10 +7,13 @@
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-txt-image.hpp"
+#include "gx-rnd-txt-target.hpp"
 #include "gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-txt-texture-cube.hpp"
-#include <array>
+
 #include <boost/mp11/algorithm.hpp>
+
+#include <ranges>
 
 #ifdef main
 #undef main
@@ -519,6 +522,12 @@ void gearoenix::render::texture::Manager::create_target(
         const std::lock_guard _lg(targets_lock);
         if (const auto search = targets.find(name); targets.end() != search) {
             if (auto r = search->second.lock(); nullptr != r) {
+                if constexpr (GX_DEBUG_MODE) {
+                    GX_ASSERT_D(attachments.size() == r->get_attachments().size());
+                    for (std::size_t i = 0; i < attachments.size(); ++i) {
+                        GX_ASSERT_D(attachments[i].shallow_equal(r->get_attachments()[i]));
+                    }
+                }
                 c.set_return(std::move(r));
                 GX_LOG_D("Target " << name << " successfully cached.");
                 return;
