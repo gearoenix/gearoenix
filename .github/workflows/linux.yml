@@ -36,7 +36,7 @@ jobs:
           cmake --build --preset linux-release
       - name: Building debug, tests and coverage
         run: |
-          cmake --fresh --preset linux-debug &&
+          cmake --fresh --preset linux-debug -DGX_COVERAGE_ENABLED=ON &&
           cmake --build --preset linux-debug &&
           cd build/linux/debug/tests &&
           ctest &&
