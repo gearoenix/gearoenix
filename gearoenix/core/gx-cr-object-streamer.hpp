@@ -31,9 +31,10 @@ struct ObjectStreamer final {
     };
 
 private:
-    std::weak_ptr<ObjectStreamer> self;
+    std::weak_ptr<ObjectStreamer> weak_self;
     std::mutex lock;
     std::map<id_t, ObjectInfo> objects;
+    std::optional<job::EndCaller<>> write_callback;
     const std::shared_ptr<platform::stream::Stream> stream;
     const bool is_reading;
 
@@ -43,12 +44,11 @@ private:
 public:
     ObjectStreamer(const ObjectStreamer&) = delete;
     ~ObjectStreamer();
-    [[nodiscard]] static std::shared_ptr<ObjectStreamer> construct(
-        std::shared_ptr<platform::stream::Stream>&& stream,
-        std::optional<job::EndCaller<>>&& read_callback = std::nullopt);
-    // it will send to other thread
+    [[nodiscard]] static std::shared_ptr<ObjectStreamer> construct_writer(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end);
+    [[nodiscard]] static std::shared_ptr<ObjectStreamer> construct_reader(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end);
+
+    /// It will spawn a new job in another thread
     void write(std::shared_ptr<Object>&& object);
-    void write(platform::stream::Stream& stream);
     void read(id_t, std::function<void(const std::shared_ptr<Object>&)>&&);
 };
 }

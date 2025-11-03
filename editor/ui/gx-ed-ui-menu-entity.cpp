@@ -93,13 +93,13 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
     if (skybox_stream) {
         if (const auto scene_entity = scene_selector->get_selection(); scene_entity) {
             if (ImGui::Button("Create")) {
-                const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_file_path.get_raw_data() + "]...");
-                core::job::send_job_to_pool([this, scene_entity, progress_bar_id] {
+                auto progress_bar = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_file_path.get_raw_data() + "]...");
+                core::job::send_job_to_pool([this, scene_entity, progress_bar = std::move(progress_bar)]() mutable noexcept -> void {
                     render::texture::Manager::get().create(
                         create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
-                        core::job::EndCallerShared<render::texture::Texture>([this, progress_bar_id, scene_entity](std::shared_ptr<render::texture::Texture>&& txt) {
-                            render::skybox::Manager::get().build(std::string(create_skybox_entity_name), scene_entity, std::move(txt), core::job::EndCaller<core::ecs::EntityPtr>([progress_bar_id](auto&& skybox_entity) {
-                                WindowOverlayProgressBarManager::get().remove(progress_bar_id);
+                        core::job::EndCallerShared<render::texture::Texture>([this, progress_bar = std::move(progress_bar), scene_entity](std::shared_ptr<render::texture::Texture>&& txt) mutable {
+                            render::skybox::Manager::get().build(std::string(create_skybox_entity_name), scene_entity, std::move(txt), core::job::EndCaller<core::ecs::EntityPtr>([progress_bar = std::move(progress_bar)](auto&& skybox_entity) {
+                                (void)progress_bar;
                                 skybox_entity->add_to_world();
                             }));
                         }));

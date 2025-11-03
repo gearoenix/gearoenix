@@ -23,7 +23,7 @@ void gearoenix::core::ObjectStreamer::initialise(std::optional<job::EndCaller<>>
             const auto id = stream->read<id_t>();
             std::shared_ptr<platform::stream::Stream> as = std::make_shared<platform::stream::Memory>();
             stream->read(*as);
-            job::send_job_to_pool([this, self = self.lock(), id, as = std::move(as), end = end]() mutable -> void {
+            job::send_job_to_pool([this, self = weak_self.lock(), id, as = std::move(as), end = end]() mutable -> void {
                 job::EndCallerShared<Object> obj_end([this, self, id, end = std::move(end)](std::shared_ptr<Object>&& asset) mutable -> void {
                     const std::lock_guard _lg(lock);
                     auto* const info = &objects[id];
@@ -59,12 +59,20 @@ gearoenix::core::ObjectStreamer::~ObjectStreamer()
     stream->write_fail_debug(shared_asset_map_offset);
 }
 
-std::shared_ptr<gearoenix::core::ObjectStreamer> gearoenix::core::ObjectStreamer::construct(
-    std::shared_ptr<platform::stream::Stream>&& stream, std::optional<job::EndCaller<>>&& read_callback)
+std::shared_ptr<gearoenix::core::ObjectStreamer> gearoenix::core::ObjectStreamer::construct_writer(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end)
 {
-    auto result = std::shared_ptr<ObjectStreamer>(new ObjectStreamer(std::move(stream), read_callback.has_value()));
-    result->self = result;
-    result->initialise(std::move(read_callback));
+    auto result = std::shared_ptr<ObjectStreamer>(new ObjectStreamer(std::move(stream), false));
+    result->weak_self = result;
+    result->write_callback = std::move(end);
+    result->initialise(std::nullopt);
+    return result;
+}
+
+std::shared_ptr<gearoenix::core::ObjectStreamer> gearoenix::core::ObjectStreamer::construct_reader(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end)
+{
+    auto result = std::shared_ptr<ObjectStreamer>(new ObjectStreamer(std::move(stream), true));
+    result->weak_self = result;
+    result->initialise(std::move(end));
     return result;
 }
 
@@ -75,13 +83,14 @@ void gearoenix::core::ObjectStreamer::write(std::shared_ptr<Object>&& object)
     std::shared_ptr<platform::stream::Stream> write_stream;
     {
         const std::lock_guard _lg(lock);
-        if (const auto search = objects.find(id); objects.end() != search) {
+        if (objects.contains(id)) {
             return;
         }
         write_stream = std::make_shared<platform::stream::Memory>();
         objects[id] = ObjectInfo { object, write_stream };
     }
-    object->write(std::move(write_stream), self.lock());
+    GX_ASSERT_D(!weak_self.expired());
+    object->write(std::move(write_stream), weak_self.lock());
 }
 
 void gearoenix::core::ObjectStreamer::read(const id_t id, std::function<void(const std::shared_ptr<Object>&)>&& fun)

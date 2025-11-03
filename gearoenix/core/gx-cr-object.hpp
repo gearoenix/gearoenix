@@ -99,7 +99,7 @@ struct Object {
     Object(object_type_index_t final_type_index, std::string&& name);
     Object(object_type_index_t final_type_index, object_id_t id, std::string&& name);
 
-    /// Implementor must call the parent and then in the end callback write their own
+    /// Implementor must call the parent and then in the end-callback write their own
     virtual void write(
         std::shared_ptr<platform::stream::Stream>&& stream,
         std::shared_ptr<ObjectStreamer>&& object_streamer,

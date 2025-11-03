@@ -1,7 +1,9 @@
 #include "gx-cr-ecs-world.hpp"
 #include "../../platform/stream/gx-plt-stm-memory.hpp"
+#include "../gx-cr-object-streamer.hpp"
 #include "../gx-cr-string.hpp"
 #include "gx-cr-ecs-entity.hpp"
+
 #include <ImGui/imgui.h>
 #include <boost/mp11/algorithm.hpp>
 
@@ -102,6 +104,8 @@ void gearoenix::core::ecs::World::update()
     constexpr auto add_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Add>::value;
     constexpr auto delete_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Delete>::value;
     constexpr auto pullout_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::PullOut>::value;
+    constexpr auto read_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Read>::value;
+    constexpr auto write_entity_index = boost::mp11::mp_find<decltype(Action::variant), Action::Write>::value;
 
     for (auto& [variant] : actions) {
         switch (variant.index()) {
@@ -114,6 +118,16 @@ void gearoenix::core::ecs::World::update()
         case pullout_entity_index: {
             auto&& [e] = std::move(std::get<pullout_entity_index>(std::move(variant)));
             pullout_entity(std::move(e));
+            break;
+        }
+        case read_entity_index: {
+            auto&& [s, end] = std::move(std::get<read_entity_index>(std::move(variant)));
+            read(std::move(s), std::move(end));
+            break;
+        }
+        case write_entity_index: {
+            auto&& [s, end] = std::move(std::get<write_entity_index>(std::move(variant)));
+            write(std::move(s), std::move(end));
             break;
         }
         default:
@@ -176,4 +190,57 @@ void gearoenix::core::ecs::World::clear()
     }
     GX_ASSERT_D(tries < max_tries);
     archetypes.clear();
+}
+
+void gearoenix::core::ecs::World::write(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end)
+{
+    if (std::scoped_lock _(delayed_actions_lock, resolvers_lock); !delayed_actions.empty() || !resolvers.empty()) {
+        delayed_actions.push_back(Action { .variant = Action::Write { .stream = std::move(stream), .end_caller = std::move(end) } });
+        return;
+    }
+
+    const std::shared_ptr<platform::stream::Stream> objects_stream = std::make_shared<platform::stream::Memory>();
+    const auto object_streamer = ObjectStreamer::construct_writer(std::shared_ptr(objects_stream), job::EndCaller([stream, objects_stream, end = std::move(end)] -> void {
+        stream->write(*objects_stream);
+        (void)end;
+    }));
+
+    const auto archs_streams = std::make_shared<std::vector<std::shared_ptr<platform::stream::Stream>>>();
+    const job::EndCaller archs_end([stream, object_streamer, archs_streams] -> void {
+        for (const auto& arch_stream : *archs_streams) {
+            stream->write(*arch_stream);
+        }
+        (void)object_streamer;
+    });
+
+    stream->write_fail_debug(static_cast<std::uint32_t>(archetypes.size()));
+    for (const auto& [id, arch] : archetypes) {
+        id.write(*stream);
+        std::shared_ptr<platform::stream::Stream> arch_stream = std::make_shared<platform::stream::Memory>();
+        archs_streams->push_back(arch_stream);
+        arch->write(std::move(arch_stream), std::shared_ptr(object_streamer), job::EndCaller(archs_end));
+    }
+}
+
+void gearoenix::core::ecs::World::read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end)
+{
+    const auto archetypes_count = stream->read<std::uint32_t>();
+    std::vector<component_index_set_t> archs_ids;
+    std::vector<std::shared_ptr<platform::stream::Stream>> archs_streams;
+    for (auto archetype_index = decltype(archetypes_count) { 0 }; archetype_index < archetypes_count; ++archetype_index) {
+        archs_ids.emplace_back(*stream);
+    }
+    for (auto archetype_index = decltype(archetypes_count) { 0 }; archetype_index < archetypes_count; ++archetype_index) {
+        std::shared_ptr<platform::stream::Stream> arch_stream = std::make_shared<platform::stream::Memory>();
+        stream->read(*arch_stream);
+        archs_streams.emplace_back(std::move(arch_stream));
+    }
+    std::shared_ptr<platform::stream::Stream> objects_stream = std::make_shared<platform::stream::Memory>();
+    stream->read(*objects_stream);
+    const auto object_streamer = std::make_shared<std::shared_ptr<ObjectStreamer>>();
+    *object_streamer = ObjectStreamer::construct_reader(std::move(objects_stream), job::EndCaller([end = std::move(end), archs_streams = std::move(archs_streams), object_streamer]() mutable {
+        for (auto& arch_stream : archs_streams) {
+            Archetype::read(std::move(arch_stream), std::shared_ptr(*object_streamer), job::EndCaller(end));
+        }
+    }));
 }

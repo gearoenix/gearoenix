@@ -43,7 +43,17 @@ private:
             job::EndCaller<EntityPtr> end_caller;
         };
 
-        std::variant<Add, Delete, PullOut> variant;
+        struct Read final {
+            std::shared_ptr<platform::stream::Stream> stream;
+            job::EndCaller<> end_caller;
+        };
+
+        struct Write final {
+            std::shared_ptr<platform::stream::Stream> stream;
+            job::EndCaller<> end_caller;
+        };
+
+        std::variant<Add, Delete, PullOut, Read, Write> variant;
     };
 
     std::mutex delayed_actions_lock;
@@ -74,7 +84,7 @@ public:
 
     [[nodiscard]] std::optional<EntityPtr> get_entity(const std::string& name);
 
-    /// Highly optimized way of system execution
+    /// Highly optimised way of system execution
     template <typename Condition, typename F>
     void parallel_system(const F& fun)
     {
@@ -105,5 +115,13 @@ public:
     void show_debug_gui() const;
     void resolve(resolver_t&& r);
     void clear();
+
+    /// @code write@endcode process will not start right away, it will be executed as a delayed action, and in a job
+    /// because the code waits for the time that there is no any delayed action or unresolved process.
+    void write(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end);
+
+    /// @code read@endcode process will not start right away, it will be executed as a delayed action, and in a job
+    /// because the code waits for the time that there is no any delayed action or unresolved process.
+    void read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end);
 };
 }

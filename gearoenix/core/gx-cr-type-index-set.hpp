@@ -1,5 +1,7 @@
 #pragma once
 #include "../math/gx-math-numeric.hpp"
+#include "../platform/stream/gx-plt-stm-stream.hpp"
+
 #include <array>
 #include <cstdint>
 #include <initializer_list>
@@ -21,11 +23,16 @@ private:
 public:
     constexpr TypeIndexSet() = default;
 
-    constexpr explicit TypeIndexSet(const std::initializer_list<element_t> il)
+    constexpr TypeIndexSet(const std::initializer_list<element_t> il)
     {
         for (const auto i : il) {
             add(i);
         }
+    }
+
+    explicit TypeIndexSet(platform::stream::Stream& s)
+    {
+        read(s);
     }
 
     constexpr bool operator==(const TypeIndexSet& other) const = default;
@@ -237,6 +244,20 @@ public:
             }
         }
         return result;
+    }
+
+    void write(platform::stream::Stream& s) const
+    {
+        for (const auto b : bits) {
+            s.write_fail_debug(b);
+        }
+    }
+
+    void read(platform::stream::Stream& s)
+    {
+        for (auto& b : bits) {
+            s.read(b);
+        }
     }
 };
 }

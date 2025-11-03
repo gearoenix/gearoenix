@@ -74,6 +74,9 @@ gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::write(const void* const data, const stream_size_t length)
 {
+    if (0 == length) {
+        return 0;
+    }
     const auto before = static_cast<stream_size_t>(file.tellp());
     file.write(static_cast<const char*>(data), static_cast<std::streamsize>(length));
     const auto result = static_cast<stream_size_t>(file.tellp()) - before;

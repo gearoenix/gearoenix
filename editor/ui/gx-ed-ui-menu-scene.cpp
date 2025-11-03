@@ -98,16 +98,16 @@ void gearoenix::editor::ui::MenuScene::update()
         if (ImGui::MenuItem("Import", "Alt+S,Alt+I", false)) {
             platform::file_chooser_open(
                 [this](platform::stream::Path&&, std::shared_ptr<platform::stream::Stream>&& stream) {
-                    const auto progress_bar_id = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
+                    auto progress_bar = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
                     render::gltf::load(
                         std::move(stream),
-                        core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar_id](auto&& entities) {
+                        core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar = std::move(progress_bar)](auto&& entities) {
                             for (auto& e : entities) {
                                 set_current_scene(e.get());
                                 e->add_to_world();
                                 active_scenes.emplace(std::move(e));
                             }
-                            WindowOverlayProgressBarManager::get().remove(progress_bar_id);
+                            (void)progress_bar;
                         }));
                 },
                 [] {},

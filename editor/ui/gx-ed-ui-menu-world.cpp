@@ -6,6 +6,7 @@
 #include <gearoenix/platform/gx-plt-file-chooser.hpp>
 #include <gearoenix/platform/gx-plt-runtime-configuration.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
+#include <gearoenix/platform/stream/gx-plt-stm-memory.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-stream.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
@@ -16,13 +17,23 @@
 #include <ImGui/imgui.h>
 
 namespace {
-constexpr char save_file_chooser[] = "gearoenix::editor::ui::MenuProject::save";
 constexpr char save_file_chooser_title[] = "Saving a Gearoenix World File";
-
-constexpr char open_file_chooser[] = "gearoenix::editor::ui::MenuProject::open";
 constexpr char open_file_chooser_title[] = "Opening a Gearoenix World File";
 
 constexpr char file_chooser_filter[] = ".gx-world";
+
+void save_world()
+{
+    auto progress_bar = gearoenix::editor::ui::WindowOverlayProgressBarManager::get().add("Saving World...");
+    gearoenix::core::job::send_job_to_pool([progress_bar = std::move(progress_bar)]() mutable noexcept -> void {
+        std::shared_ptr<gearoenix::platform::stream::Stream> stream = std::make_shared<gearoenix::platform::stream::Memory>();
+        gearoenix::core::ecs::World::get().write(
+            std::shared_ptr(stream),
+            gearoenix::core::job::EndCaller([progress_bar = std::move(progress_bar), stream] {
+                gearoenix::platform::file_chooser_save("untitled", "untitled", "*.gx3d-world", stream->get_file_content(), [] { });
+            }));
+    });
+}
 }
 
 void gearoenix::editor::ui::MenuWorld::show_new_popup()

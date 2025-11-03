@@ -128,5 +128,7 @@ public:
     Archetype(const Archetype&) = delete;
     Archetype(Archetype&&) = delete;
     ~Archetype();
+    void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&);
+    static void read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&);
 };
 }

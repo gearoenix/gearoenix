@@ -1,4 +1,5 @@
 #include "gx-cr-ecs-archetype.hpp"
+#include "../gx-cr-object-streamer.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 
 gearoenix::core::ecs::Archetype::id_t gearoenix::core::ecs::Archetype::create_id(const Entity* entity)
@@ -85,4 +86,27 @@ bool gearoenix::core::ecs::Archetype::contains(Entity* const e) const
 gearoenix::core::ecs::Archetype::~Archetype()
 {
     GX_ASSERT_D(entities.empty());
+}
+
+void gearoenix::core::ecs::Archetype::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&)
+{
+    stream->write_fail_debug(static_cast<std::uint32_t>(entities.size()));
+    for (const auto* const e : entities) {
+        auto p = e->get_object_self().lock();
+        GX_ASSERT_D(p);
+        stream->write_fail_debug(p->get_object_id());
+        object_streamer->write(std::move(p));
+    }
+}
+
+void gearoenix::core::ecs::Archetype::read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end)
+{
+    const auto entity_count = stream->read<std::uint32_t>();
+    for (auto i = decltype(entity_count) { 0 }; i < entity_count; ++i) {
+        const auto object_id = stream->read<object_id_t>();
+        object_streamer->read(object_id, [end](const std::shared_ptr<Object>& e) {
+            dynamic_cast<Entity*>(e.get())->add_to_world();
+            (void)end;
+        });
+    }
 }
