@@ -38,9 +38,11 @@ void gearoenix::platform::stream::Stream::read(std::string& s)
 
 void gearoenix::platform::stream::Stream::read(Stream& s)
 {
+    const auto p = s.tell();
     std::vector<std::uint8_t> data;
     read(data);
     GX_ASSERT(data.size() == s.write(data.data(), data.size()));
+    s.seek(p);
 }
 
 std::vector<std::uint8_t> gearoenix::platform::stream::Stream::get_file_content()

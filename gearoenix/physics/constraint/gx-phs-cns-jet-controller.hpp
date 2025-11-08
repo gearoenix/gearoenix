@@ -8,6 +8,8 @@ struct Transformation;
 
 namespace gearoenix::physics::constraint {
 struct JetController final : core::event::Listener, Constraint {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 8;
     constexpr static auto object_type_index = gearoenix_physics_constraint_jet_controller_type_index;
     constexpr static std::array all_parent_object_type_indices { Constraint::object_type_index };
@@ -29,12 +31,11 @@ struct JetController final : core::event::Listener, Constraint {
     bool rotate_right = false;
     bool rotate = false;
 
-    // void write_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) const override;
-    // void update_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) override;
     [[nodiscard]] Response on_event(const core::event::Data& event_data) override;
 
-public:
     JetController(core::ecs::Entity* entity, std::shared_ptr<Transformation>&&, std::string&& name);
+
+public:
     ~JetController() override;
     void update() override;
     void clear_transforms();

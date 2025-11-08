@@ -30,6 +30,8 @@ public:
 };
 
 struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = Baked::max_count;
     constexpr static auto object_type_index = gearoenix_gl_reflection_baked_type_index;
     constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
@@ -40,6 +42,8 @@ struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
 };
 
 struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     typedef std::array<std::shared_ptr<Target>, 6> GlCubeTarget;
     typedef std::array<boost::container::static_vector<std::shared_ptr<Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTarget;
     typedef std::array<uint, 6> GlCubeTargetV;
@@ -62,13 +66,14 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
 
     void initialise_gl();
 
-public:
     RuntimeReflection(
         core::ecs::Entity* entity,
         const math::Aabb3<double>& receive_box,
         const math::Aabb3<double>& exclude_box,
         const math::Aabb3<double>& include_box,
         std::string&& name);
+
+public:
     static void construct(
         core::ecs::Entity* entity,
         const math::Aabb3<double>& receive_box,

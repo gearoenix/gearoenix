@@ -108,7 +108,8 @@ void gearoenix::platform::file_chooser_update()
                 d.on_open(std::move(path), std::move(stream));
             } else {
                 const auto& d = std::get<SaveDialogData>(data);
-                stream->write(d.content);
+                [[maybe_unused]] const auto count = stream->write(d.content.data(), d.content.size());
+                GX_ASSERT_D(count == d.content.size());
             }
             dialogs_running = false;
         }

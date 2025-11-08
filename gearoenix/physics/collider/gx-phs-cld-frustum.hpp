@@ -4,6 +4,8 @@
 
 namespace gearoenix::physics::collider {
 struct Frustum final : Collider {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 16;
     constexpr static auto object_type_index = gearoenix_physics_collider_frustum_type_index;
     constexpr static std::array all_parent_object_type_indices { Collider::object_type_index };
@@ -22,12 +24,11 @@ struct Frustum final : Collider {
 
     GX_GET_CREF_PRV(math::Frustum<double>, frustum);
 
-    // void write_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) const override;
-    // void update_in_io_context(std::shared_ptr<platform::stream::Stream> &&, core::job::EndCaller<> &&) override;
     void update_surrounding_box() override;
 
-public:
     Frustum(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points);
+
+public:
     /// For the arrangement of point go to the math::Frustum constructor
     void update(const std::array<math::Vec3<double>, 8>& points);
     [[nodiscard]] bool check_intersection(const math::Aabb3<double>& box) const override;

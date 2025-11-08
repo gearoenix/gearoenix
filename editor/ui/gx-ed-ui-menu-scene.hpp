@@ -22,6 +22,7 @@ public:
     ~MenuScene() override;
     void update();
     void renew();
+    void add_active_scene(core::ecs::EntityPtr&&);
     [[nodiscard]] bool has_active_scene() const;
 };
 }

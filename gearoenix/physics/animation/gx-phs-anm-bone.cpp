@@ -3,22 +3,23 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../gx-phs-transformation.hpp"
 
-void gearoenix::physics::animation::Bone::write(platform::stream::Stream& s) const
+void gearoenix::physics::animation::Bone::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end_caller)
 {
-    s.write_fail_debug(static_cast<std::uint32_t>(scale_samples.size()));
+    Component::write(std::shared_ptr(stream), std::move(object_streamer), std::move(end_caller));
+    stream->write_fail_debug(static_cast<std::uint32_t>(scale_samples.size()));
     for (const auto& [t, key] : scale_samples) {
-        s.write_fail_debug(t);
-        key.write(s);
+        stream->write_fail_debug(t);
+        key.write(*stream);
     }
-    s.write_fail_debug(static_cast<std::uint32_t>(rotation_samples.size()));
+    stream->write_fail_debug(static_cast<std::uint32_t>(rotation_samples.size()));
     for (const auto& [t, key] : rotation_samples) {
-        s.write_fail_debug(t);
-        key.write(s);
+        stream->write_fail_debug(t);
+        key.write(*stream);
     }
-    s.write_fail_debug(static_cast<std::uint32_t>(translation_samples.size()));
+    stream->write_fail_debug(static_cast<std::uint32_t>(translation_samples.size()));
     for (const auto& [t, key] : translation_samples) {
-        s.write_fail_debug(t);
-        key.write(s);
+        stream->write_fail_debug(t);
+        key.write(*stream);
     }
 }
 
@@ -80,9 +81,9 @@ gearoenix::physics::animation::Bone::~Bone() = default;
 gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Bone::build(std::string&& name, core::ecs::Entity* const parent)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
-    auto transform = construct<Transformation>(entity.get(), entity->get_object_name() + "-transformation");
+    auto transform = Object::construct<Transformation>(entity.get(), entity->get_object_name() + "-transformation");
     entity->add_component(std::shared_ptr(transform));
-    entity->add_component(construct<Bone>(entity.get(), std::move(transform), entity->get_object_name() + "-bone"));
+    entity->add_component(Object::construct<Bone>(entity.get(), std::move(transform), entity->get_object_name() + "-bone"));
     return entity;
 }
 

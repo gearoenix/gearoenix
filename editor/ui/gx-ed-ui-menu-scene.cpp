@@ -178,6 +178,17 @@ void gearoenix::editor::ui::MenuScene::renew()
     set_current_scene(nullptr);
 }
 
+void gearoenix::editor::ui::MenuScene::add_active_scene(core::ecs::EntityPtr&& e)
+{
+    if (e->get_parent()) {
+        return;
+    }
+    if (!e->get_component<render::scene::Scene>()) {
+        return;
+    }
+    active_scenes.emplace(std::move(e));
+}
+
 bool gearoenix::editor::ui::MenuScene::has_active_scene() const
 {
     return !active_scenes.empty();

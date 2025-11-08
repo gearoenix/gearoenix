@@ -13,6 +13,8 @@ struct Manager;
 typedef boost::container::flat_map<double, Keyframe<math::Vec3<double>>> Vec3KeyFrameMap;
 typedef boost::container::flat_map<double, Keyframe<math::Quat<double>>> QuatKeyFrameMap;
 struct Bone final : core::ecs::Component {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 1024;
     constexpr static auto object_type_index = gearoenix_physics_animation_bone_type_index;
 
@@ -26,11 +28,12 @@ struct Bone final : core::ecs::Component {
     GX_GET_REF_PRV(Vec3KeyFrameMap, translation_samples);
     GX_GETSET_VAL_PRV(std::uint32_t, index_in_armature, static_cast<std::uint32_t>(-1));
 
-    void write(platform::stream::Stream&) const override;
+    void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end_caller) override;
     void read(platform::stream::Stream&, core::job::EndCaller<>&&);
 
-public:
     Bone(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, std::string&& name);
+
+public:
     ~Bone() override;
     [[nodiscard]] static core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent);
     void set_inverse_bind_matrix(const math::Mat4x4<double>& m);

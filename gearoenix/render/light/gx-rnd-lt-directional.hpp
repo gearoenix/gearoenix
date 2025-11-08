@@ -22,6 +22,8 @@ struct Texture2D;
 
 namespace gearoenix::render::light {
 struct Directional final : Light {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 16;
     constexpr static auto object_type_index = gearoenix_render_light_directional_type_index;
     constexpr static std::array all_parent_object_type_indices { Light::object_type_index };
@@ -29,12 +31,15 @@ struct Directional final : Light {
 
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
-public:
     Directional(core::ecs::Entity* entity, std::string&& name);
+
+public:
     ~Directional() override;
 };
 
 struct ShadowCasterDirectional : Light {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 16;
     constexpr static auto object_type_index = gearoenix_render_light_shadow_caster_directional_type_index;
     constexpr static std::array all_parent_object_type_indices { Light::object_type_index };

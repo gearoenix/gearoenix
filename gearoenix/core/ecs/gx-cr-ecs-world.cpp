@@ -222,7 +222,7 @@ void gearoenix::core::ecs::World::write(std::shared_ptr<platform::stream::Stream
     }
 }
 
-void gearoenix::core::ecs::World::read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end)
+void gearoenix::core::ecs::World::read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<std::vector<EntityPtr>>&& end)
 {
     const auto archetypes_count = stream->read<std::uint32_t>();
     std::vector<component_index_set_t> archs_ids;
@@ -237,10 +237,8 @@ void gearoenix::core::ecs::World::read(std::shared_ptr<platform::stream::Stream>
     }
     std::shared_ptr<platform::stream::Stream> objects_stream = std::make_shared<platform::stream::Memory>();
     stream->read(*objects_stream);
-    const auto object_streamer = std::make_shared<std::shared_ptr<ObjectStreamer>>();
-    *object_streamer = ObjectStreamer::construct_reader(std::move(objects_stream), job::EndCaller([end = std::move(end), archs_streams = std::move(archs_streams), object_streamer]() mutable {
-        for (auto& arch_stream : archs_streams) {
-            Archetype::read(std::move(arch_stream), std::shared_ptr(*object_streamer), job::EndCaller(end));
-        }
-    }));
+    const auto object_streamer = ObjectStreamer::construct_reader(std::move(objects_stream));
+    for (auto& arch_stream : archs_streams) {
+        Archetype::read(std::move(arch_stream), std::shared_ptr(object_streamer), job::EndCaller(end));
+    }
 }

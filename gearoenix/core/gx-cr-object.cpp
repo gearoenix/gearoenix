@@ -46,10 +46,7 @@ gearoenix::core::Object::Object(const object_type_index_t final_type_index, cons
     GX_ASSERT_D(check_object_type_registration_state(final_type_index));
 }
 
-void gearoenix::core::Object::write(
-    std::shared_ptr<platform::stream::Stream>&&,
-    std::shared_ptr<ObjectStreamer>&&,
-    job::EndCaller<>&&)
+void gearoenix::core::Object::write(std::shared_ptr<platform::stream::Stream>&&, std::shared_ptr<ObjectStreamer>&&, job::EndCaller<>&&)
 {
     GX_UNEXPECTED; // your type must implement this function.
 }
@@ -174,13 +171,13 @@ void gearoenix::core::Object::read(
     stream->read(name);
     const auto& info = get_type_info(fti);
     const auto& constructor = info.get_construct_stream();
-    constructor(id, std::move(name), std::move(stream_context), std::move(end_callback));
+    constructor(id, std::move(name), std::move(stream), std::move(stream_context), std::move(end_callback));
 }
 
-void gearoenix::core::Object::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& stream_context)
+void gearoenix::core::Object::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer)
 {
     stream->write_fail_debug(object_final_type_index);
     stream->write_fail_debug(object_id);
     stream->write_fail_debug(object_name);
-    write(std::move(stream), std::move(stream_context), job::EndCaller([] { }));
+    write(std::move(stream), std::move(object_streamer), job::EndCaller([] { }));
 }

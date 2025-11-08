@@ -83,10 +83,7 @@ bool gearoenix::core::ecs::Archetype::contains(Entity* const e) const
     return entities.contains(e);
 }
 
-gearoenix::core::ecs::Archetype::~Archetype()
-{
-    GX_ASSERT_D(entities.empty());
-}
+gearoenix::core::ecs::Archetype::~Archetype() = default;
 
 void gearoenix::core::ecs::Archetype::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&)
 {
@@ -99,13 +96,19 @@ void gearoenix::core::ecs::Archetype::write(std::shared_ptr<platform::stream::St
     }
 }
 
-void gearoenix::core::ecs::Archetype::read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end)
+void gearoenix::core::ecs::Archetype::read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<std::vector<EntityPtr>>&& end)
 {
+    end.set_return({});
     const auto entity_count = stream->read<std::uint32_t>();
     for (auto i = decltype(entity_count) { 0 }; i < entity_count; ++i) {
         const auto object_id = stream->read<object_id_t>();
         object_streamer->read(object_id, [end](const std::shared_ptr<Object>& e) {
-            dynamic_cast<Entity*>(e.get())->add_to_world();
+            auto* const entity = cast_ptr<Entity>(e.get());
+            if (entity->get_parent()) {
+                return;
+            }
+            entity->add_to_world();
+            end.get_return().push_back(entity->get_ptr());
             (void)end;
         });
     }

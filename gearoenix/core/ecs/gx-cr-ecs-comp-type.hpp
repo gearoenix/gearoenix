@@ -78,7 +78,7 @@ public:
         return create_index<T>();
     }
 
-    /// Specify `ComponentDerivedType` for those types that don't have any root in component but, they have a derived structs that have.
+    /// Specify `ComponentDerivedType` for those types that don't have any root in a component, but they have a derived struct that has.
     template <typename T, typename ComponentDerivedType = T>
     static void add()
     {

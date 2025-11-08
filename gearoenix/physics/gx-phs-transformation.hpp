@@ -8,6 +8,8 @@
 
 namespace gearoenix::physics {
 struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     struct Rotation final {
         friend struct Transformation;
 
@@ -48,11 +50,9 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
     GX_GET_CREF_PRV(math::Vec3<double>, scale);
     GX_GET_VAL_PRV(bool, changed, true);
 
-    // void write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const override;
-    // void update_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) override;
+    explicit Transformation(core::ecs::Entity* entity, std::string&& name);
 
 public:
-    explicit Transformation(core::ecs::Entity* entity, std::string&& name);
     ~Transformation() override;
     void set_local_matrix(const math::Mat4x4<double>&);
     [[nodiscard]] math::Vec3<double> get_global_position() const;

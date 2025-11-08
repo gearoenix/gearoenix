@@ -14,6 +14,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
     gearoenix::core::ecs::World world;
     {
+        gearoenix::core::Object::register_type<gearoenix::physics::Transformation>();
+
         const auto gizo_manager = std::make_unique<gearoenix::render::gizmo::Manager>();
         (void)gizo_manager; // We need this to be available.
 
@@ -21,7 +23,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 
         auto entity = gearoenix::core::ecs::Entity::construct("entity", nullptr);
 
-        gearoenix::physics::Transformation transform(entity.get(), "transform");
+        auto transform = gearoenix::core::Object::construct<gearoenix::physics::Transformation>(entity.get(), "transform");
         constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
 
         auto glmm = glm::identity<glm::dmat4>();
@@ -40,11 +42,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
                 const auto z = dis(re);
                 const auto d = dis(re);
 
-                transform.local_inner_rotate(d, gearoenix::math::Vec3(x, y, z).normalised());
+                transform->local_inner_rotate(d, gearoenix::math::Vec3(x, y, z).normalised());
                 glmm = glm::rotate(glm::identity<glm::dmat4>(), d, glm::normalize(glm::dvec3(x, y, z))) * glmm;
             }
 
-            auto gxq = transform.get_rotation().get_quat();
+            auto gxq = transform->get_rotation().get_quat();
             auto glmq = glm::quat_cast(glmm);
 
             if (!gxq.safe_equal(gearoenix::math::Quat(glmq.x, glmq.y, glmq.z, glmq.w))) {
@@ -70,11 +72,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
                 }
             }
 
-            transform.set_local_matrix(local);
+            transform->set_local_matrix(local);
 
-            const auto gxt = transform.get_local_position();
-            const auto gxs = transform.get_scale();
-            const auto gxq = transform.get_rotation().get_quat();
+            const auto gxt = transform->get_local_position();
+            const auto gxs = transform->get_scale();
+            const auto gxq = transform->get_rotation().get_quat();
 
             BOOST_TEST_CHECK(gxt.equal({ tran.x, tran.y, tran.z }));
             BOOST_TEST_CHECK(gxs.equal({ scale.x, scale.y, scale.z }));

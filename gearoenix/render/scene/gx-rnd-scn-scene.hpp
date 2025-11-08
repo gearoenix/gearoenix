@@ -18,6 +18,10 @@ struct Scene : core::ecs::Component {
     GX_GET_REFC_PRT(std::string, shadow_reflection_probe_render_pass_name);
 
     Scene(core::ecs::Entity* entity, core::object_type_index_t final_type_index, double layer, std::string&& name);
+    Scene(core::object_type_index_t final_type_index, core::object_id_t id, std::string&& name);
+
+    static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
+    void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end_caller) override;
 
 public:
     ~Scene() override;

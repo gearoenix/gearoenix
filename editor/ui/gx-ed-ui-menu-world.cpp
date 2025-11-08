@@ -1,5 +1,7 @@
 #include "gx-ed-ui-menu-world.hpp"
+
 #include "editor/gx-editor-main.hpp"
+#include "gx-ed-ui-menu-scene.hpp"
 #include "gx-ed-ui-window-overlay-progress-bar.hpp"
 
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
@@ -17,9 +19,6 @@
 #include <ImGui/imgui.h>
 
 namespace {
-constexpr char save_file_chooser_title[] = "Saving a Gearoenix World File";
-constexpr char open_file_chooser_title[] = "Opening a Gearoenix World File";
-
 constexpr char file_chooser_filter[] = ".gx-world";
 
 void save_world()
@@ -30,9 +29,21 @@ void save_world()
         gearoenix::core::ecs::World::get().write(
             std::shared_ptr(stream),
             gearoenix::core::job::EndCaller([progress_bar = std::move(progress_bar), stream] {
-                gearoenix::platform::file_chooser_save("untitled", "untitled", "*.gx3d-world", stream->get_file_content(), [] { });
+                gearoenix::platform::file_chooser_save("world", "Save the World", file_chooser_filter, stream->get_file_content(), [] { });
             }));
     });
+}
+
+void open_world()
+{
+    gearoenix::platform::file_chooser_open([](gearoenix::platform::stream::Path&& path, std::shared_ptr<gearoenix::platform::stream::Stream>&& stream) {
+        gearoenix::core::ecs::World::get().clear();
+        auto progress_bar = gearoenix::editor::ui::WindowOverlayProgressBarManager::get().add("Opening World...");
+        gearoenix::core::ecs::World::read(std::move(stream), gearoenix::core::job::EndCaller<std::vector<gearoenix::core::ecs::EntityPtr>>([progress_bar = std::move(progress_bar)](auto&& entities) {
+            for (auto& e : entities) {
+                gearoenix::editor::ui::MenuScene::get().add_active_scene(std::move(e));
+            }
+        })); }, [] {}, "Open the World", file_chooser_filter);
 }
 }
 
@@ -94,17 +105,7 @@ void gearoenix::editor::ui::MenuWorld::update()
         }
 
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
-            platform::file_chooser_open(
-                [/*this*/](platform::stream::Path&&, std::shared_ptr<platform::stream::Stream>&& /*stream*/) {
-                    // const auto progress_bar_id = WindowOverlayProgressBarManager::get().add(std::string("Running Process [") + save_file_chooser_title + "]");
-                    // core::ecs::World::get().read(
-                    //     stream, core::job::EndCaller([this, progress_bar_id] {
-                    //         manager.get_window_overlay_progress_bar_manager()->remove(progress_bar_id);
-                    //     }));
-                },
-                [] {},
-                open_file_chooser_title,
-                file_chooser_filter);
+            open_world();
         }
 
         if (!recent_save_files.empty() && ImGui::BeginMenu("Open Recent")) {
@@ -114,7 +115,7 @@ void gearoenix::editor::ui::MenuWorld::update()
         if (has_active_save_file && ImGui::MenuItem("Save", "Ctrl+S", false)) { }
 
         if (ImGui::MenuItem("Save As..", "Ctrl+Shift+S", false)) {
-            platform::file_chooser_save("TODO", save_file_chooser_title, file_chooser_filter, {}, [] { });
+            save_world();
         }
 
         if (ImGui::MenuItem("Settings", "Ctrl+Alt+P")) {

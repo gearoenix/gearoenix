@@ -3,6 +3,7 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
+#include "../gx-cr-object-streamer.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../macro/gx-cr-mcr-stringifier.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
@@ -22,17 +23,23 @@ gearoenix::core::ecs::Component::Component(Entity* const entity, const object_ty
     GX_ASSERT_D(ComponentType::check(final_type_index));
 }
 
-void gearoenix::core::ecs::Component::write(platform::stream::Stream& s) const
+void gearoenix::core::ecs::Component::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&)
 {
-    s.write_fail_debug(enabled);
-    s.write_fail_debug(entity->get_object_id());
+    stream->write_fail_debug(enabled);
+    GX_ASSERT_D(entity);
+    stream->write_fail_debug(entity->get_object_id());
+    object_streamer->write(entity->get_object_self().lock());
 }
 
-void gearoenix::core::ecs::Component::read(platform::stream::Stream& s)
+void gearoenix::core::ecs::Component::read(std::shared_ptr<Component>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end)
 {
-    enabled = s.read<bool>();
-    const auto entity_id = s.read<object_id_t>();
-    GX_TODO; // Fetch the entity from an object stream.
+    self->enabled = stream->read<bool>();
+    const auto entity_id = stream->read<object_id_t>();
+    // Don't capture the end here because, if the call is from an entity, you will enter a loop of dependency
+    // The entity depends on the component to end and the component depends on the entity to end.
+    object_streamer->read(entity_id, [self = std::move(self)](const std::shared_ptr<Object>& e) {
+        self->set_entity(cast_ptr<Entity>(e.get()));
+    });
 }
 
 gearoenix::core::ecs::Component::~Component() = default;

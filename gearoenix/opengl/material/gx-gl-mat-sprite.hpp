@@ -11,6 +11,8 @@ struct UnlitCombination;
 
 namespace gearoenix::gl::material {
 struct Sprite final : render::material::Sprite, Material {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = render::material::Sprite::max_count;
     constexpr static auto object_type_index = gearoenix_gl_material_sprite_type_index;
     constexpr static std::array all_parent_object_type_indices { render::material::Material::object_type_index, render::material::Sprite::object_type_index, gl::material::Material::object_type_index };
@@ -20,8 +22,9 @@ struct Sprite final : render::material::Sprite, Material {
     GX_GET_REFC_PRV(std::shared_ptr<shader::ShadowCasterCombination>, shadow_caster_combination);
     GX_GET_REFC_PRV(std::shared_ptr<shader::UnlitCombination>, unlit_combination);
 
-public:
     explicit Sprite(std::string&& name);
+
+public:
     static void construct(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c);
     ~Sprite() override;
     void shadow(const Mesh&, const render::record::Camera&, const render::record::CameraModel&, uint& current_shader) override;

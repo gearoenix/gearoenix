@@ -4,10 +4,12 @@
 #include "gx-cr-object-type-indices.hpp"
 #include "job/gx-cr-job-end-caller.hpp"
 #include "macro/gx-cr-mcr-getter-setter.hpp"
-#include <any>
+
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/core/demangle.hpp>
+
+#include <any>
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -25,9 +27,16 @@ struct ObjectStreamer;
 typedef boost::container::flat_set<object_type_index_t> ObjectTypeIndexSet;
 
 template <typename T>
-concept ObjectTypeHasReadConstructor = requires(object_id_t id, std::string&& name, std::shared_ptr<ObjectStreamer>&& sc, job::EndCallerShared<Object>&& c) {
-    { T::construct(id, std::move(name), std::move(sc), std::move(c)) } -> std::same_as<void>;
+concept ObjectTypeHasRead = requires(std::shared_ptr<T>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& os, job::EndCaller<>&& end) {
+    { T::read(std::move(self), std::move(stream), std::move(os), std::move(end)) } -> std::same_as<void>;
+} && requires(object_id_t id, std::string&& name) {
+    T { id, std::move(name) };
 };
+
+#define GEAROENIX_OBJECT_STRUCT_DEF        \
+    friend struct gearoenix::core::Object; \
+    template <typename T, std::int64_t S>  \
+    friend struct gearoenix::core::allocator::SharedArray
 
 struct Object {
     friend struct ObjectStreamer;
@@ -38,7 +47,7 @@ struct Object {
     template <typename T>
     using ObjectAllocator = std::shared_ptr<allocator::SharedArray<T, T::max_count>>;
 
-    typedef std::function<void(object_id_t, std::string&&, std::shared_ptr<ObjectStreamer>&&, job::EndCallerShared<Object>&&)> ObjectStreamConstructor;
+    typedef std::function<void(object_id_t, std::string&&, std::shared_ptr<platform::stream::Stream>&&, std::shared_ptr<ObjectStreamer>&&, job::EndCallerShared<Object>&&)> ObjectStreamConstructor;
 
     struct ObjectTypeInfo final {
         GX_GET_CREF_PRV(std::string, name);
@@ -99,11 +108,11 @@ struct Object {
     Object(object_type_index_t final_type_index, std::string&& name);
     Object(object_type_index_t final_type_index, object_id_t id, std::string&& name);
 
-    /// Implementor must call the parent and then in the end-callback write their own
-    virtual void write(
-        std::shared_ptr<platform::stream::Stream>&& stream,
-        std::shared_ptr<ObjectStreamer>&& object_streamer,
-        job::EndCaller<>&& end_caller);
+    /// The serialisation function for all Object-inherited types.
+    ///
+    /// @note Implementor must call the parent and then in the end-callback write their own
+    /// @note This function must only be called inside @code Object::write@endcode
+    virtual void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end_caller);
 
 private:
     /// This function should only be called in the ObjectStreamer.
@@ -160,10 +169,13 @@ public:
                 [](
                     [[maybe_unused]] const object_id_t id,
                     [[maybe_unused]] std::string&& name,
-                    [[maybe_unused]] std::shared_ptr<ObjectStreamer>&& s,
-                    [[maybe_unused]] job::EndCallerShared<Object>&& e) {
-                    if constexpr (ObjectTypeHasReadConstructor<T> && std::is_final_v<T>) {
-                        T::construct(id, std::move(name), std::move(s), std::move(e));
+                    [[maybe_unused]] std::shared_ptr<platform::stream::Stream>&& stream,
+                    [[maybe_unused]] std::shared_ptr<ObjectStreamer>&& object_streamer,
+                    [[maybe_unused]] job::EndCallerShared<Object>&& end) {
+                    if constexpr (ObjectTypeHasRead<T> && std::is_final_v<T>) {
+                        auto self = Object::construct<T>(id, std::move(name));
+                        end.set_return(self);
+                        T::read(std::move(self), std::move(stream), std::move(object_streamer), job::EndCaller([e = std::move(end)] { }));
                     } else {
                         GX_LOG_F("Type [" << create_type_name<T>() << "] does not provide read constructor.");
                     }

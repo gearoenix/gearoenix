@@ -15,8 +15,6 @@ void gearoenix::core::ecs::Entity::write(
         components.emplace(ci.second);
     }
 
-    s->write_fail_debug(object_name);
-
     s->write_fail_debug(static_cast<std::uint32_t>(components.size()));
     for (const auto& c : components) {
         s->write_fail_debug(c->get_object_id());
@@ -63,7 +61,7 @@ void gearoenix::core::ecs::Entity::show_debug_gui()
 void gearoenix::core::ecs::Entity::add_component(std::shared_ptr<Component>&& component)
 {
     // We should not be inside the world when we do this function
-    GX_ASSERT_D(nullptr == archetype || all_types_to_components.empty());
+    GX_ASSERT_D(nullptr == archetype);
     component->set_entity(this);
     const auto& all_parents = component->get_all_parent_types();
     const std::lock_guard _l(components_lock);
@@ -110,6 +108,31 @@ gearoenix::core::ecs::Entity::Entity(std::string&& name)
 {
 }
 
+gearoenix::core::ecs::Entity::Entity(const object_id_t id, std::string&& name)
+    : Object(gearoenix_core_ecs_entity_type_index, id, std::move(name))
+{
+}
+
+void gearoenix::core::ecs::Entity::read(std::shared_ptr<Entity>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end)
+{
+    const auto components_count = stream->read<std::uint32_t>();
+    for (auto component_index = decltype(components_count) { 0 }; component_index < components_count; ++component_index) {
+        const auto component_id = stream->read<object_id_t>();
+        object_streamer->read(component_id, [self, end](const std::shared_ptr<Object>& c) {
+            self->add_component(cast_shared<Component>(std::shared_ptr(c)));
+            (void)end;
+        });
+    }
+    const auto children_count = stream->read<std::uint32_t>();
+    for (auto child_index = decltype(children_count) { 0 }; child_index < children_count; ++child_index) {
+        const auto child_id = stream->read<object_id_t>();
+        object_streamer->read(child_id, [self, end](const std::shared_ptr<Object>& c) {
+            cast_ptr<Entity>(c.get())->set_parent(self.get());
+            (void)end;
+        });
+    }
+}
+
 gearoenix::core::ecs::Entity::~Entity()
 {
     // Entity should have been deleted before here.
@@ -126,7 +149,7 @@ void gearoenix::core::ecs::Entity::set_parent(Entity* const p)
         parent->children.erase(object_id);
     }
     parent = p;
-    p->children[object_id] = EntityPtr(std::static_pointer_cast<Entity>(object_self.lock()));
+    p->children[object_id] = EntityPtr(cast_shared<Entity>(object_self.lock()));
 }
 
 void gearoenix::core::ecs::Entity::add_child(EntityPtr&& child)

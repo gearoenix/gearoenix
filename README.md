@@ -19,11 +19,11 @@ The `examples/` folder contains code demonstrating Gearoenix's functionalities.
 These demos showcase Gearoenix running in WebAssembly, but keep in mind that web data is not specifically optimized for this purpose.
 
 
-[Example 009 Dear ImGui Usage](https://gearoenix.com/engine/webassembly-samples/005-hello-imgui/GearoenixExample005HelloImGui.html)
+[Example 004 Dear ImGui Usage](https://gearoenix.com/engine/webassembly-samples/005-hello-imgui/GearoenixExample005HelloImGui.html)
 
-[Example 009 Baked Reflection Probes](https://gearoenix.com/engine/webassembly-samples/009-baked-reflection-probe/GearoenixExample009BakedReflectionProbe.html)
+[Example 008 Baked Reflection Probes](https://gearoenix.com/engine/webassembly-samples/009-baked-reflection-probe/GearoenixExample009BakedReflectionProbe.html)
 
-[Example 010 Lighting](https://gearoenix.com/engine/webassembly-samples/010-lighting/GearoenixExample010Lighting.html)
+[Example 009 Lighting](https://gearoenix.com/engine/webassembly-samples/010-lighting/GearoenixExample010Lighting.html)
 
 ## Features
 
@@ -73,10 +73,11 @@ rasterization and ray tracing render modes.
 
 ## Build Process
 
- - `git clone --recurse-submodules --shallow-submodules --depth=1 --branch=master https://github.com/gearoenix/gearoenix.git`
+ - Have vcpkg installed and have `VCPKG_ROOT` environment variable set.
+ - `git clone --recursive https://github.com/gearoenix/gearoenix.git`
  - `cd gearoenix`
- - `cmake --preset release .`
- - `cmake --build --preset release .`
+ - `cmake --preset windows-release .`
+ - `cmake --build --preset windows-release .`
 
 ## Licensing
 

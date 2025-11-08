@@ -17,6 +17,8 @@ struct Mesh;
 struct Scene;
 
 struct Model final : render::model::Model {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     typedef core::static_flat_set<std::shared_ptr<Mesh>, render::model::max_meshes_count_per_model> gl_meshes_set_t;
 
     constexpr static auto object_type_index = gearoenix_gl_model_type_index;
@@ -25,8 +27,9 @@ struct Model final : render::model::Model {
 
     GX_GET_CREF_PRV(gl_meshes_set_t, gl_meshes);
 
-public:
     Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
+
+public:
     ~Model() override;
     void render_shadow(
         const render::record::Camera& camera,

@@ -15,6 +15,8 @@ struct Manager;
 struct Bone;
 
 struct Animation : core::Object {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto max_count = 16;
     constexpr static auto object_type_index = gearoenix_physics_animation_type_index;
 
@@ -26,6 +28,8 @@ struct Animation : core::Object {
 };
 
 struct ArmatureAnimation final : Animation {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto object_type_index = gearoenix_physics_animation_armature_animation_type_index;
     constexpr static std::array all_parent_object_type_indices { Animation::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Animation::object_type_index };
@@ -34,6 +38,7 @@ struct ArmatureAnimation final : Animation {
     const std::shared_ptr<Bone> root_bone;
 
     ArmatureAnimation(std::string&& name, std::shared_ptr<Bone>&& root_bone);
+
     ~ArmatureAnimation() override;
     void animate(double time) override;
     static void animate(const Bone& bone, double time);
@@ -43,6 +48,8 @@ struct ArmatureAnimation final : Animation {
 };
 
 struct SpriteAnimation final : Animation {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     constexpr static auto object_type_index = gearoenix_physics_animation_sprite_animation_type_index;
     constexpr static std::array all_parent_object_type_indices { Animation::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Animation::object_type_index };
@@ -65,7 +72,10 @@ struct SpriteAnimation final : Animation {
 };
 
 struct AnimationPlayer final : core::ecs::Component {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     friend struct Manager;
+
     constexpr static auto max_count = 16;
     constexpr static auto object_type_index = gearoenix_physics_animation_player_type_index;
 
@@ -77,10 +87,11 @@ struct AnimationPlayer final : core::ecs::Component {
     GX_GET_VAL_PRV(double, loop_length_time, loop_end_time - loop_start_time);
     GX_GET_REFC_PRV(std::shared_ptr<Animation>, animation);
 
+    AnimationPlayer(core::ecs::Entity* entity, std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time);
+
     void show_debug_gui() override;
 
 public:
-    AnimationPlayer(core::ecs::Entity* entity, std::shared_ptr<Animation>&& animation, std::string&& name, double starting_time);
     ~AnimationPlayer() override;
     void update_time(double delta_time);
     void set_loop_start_time(double t);

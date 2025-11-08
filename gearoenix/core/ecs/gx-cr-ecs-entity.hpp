@@ -16,6 +16,8 @@ struct Archetype;
 struct Component;
 
 struct Entity final : Object {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
     friend struct World;
     friend struct Archetype;
 
@@ -70,8 +72,13 @@ struct Entity final : Object {
         }
     };
 
-public:
     explicit Entity(std::string&& name);
+    Entity(object_id_t id, std::string&& name);
+    static void read(
+        std::shared_ptr<Entity>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
+        std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end);
+
+public:
     [[nodiscard]] static EntityPtr construct(std::string&& name, Entity* parent);
     ~Entity() override;
     void set_parent(Entity* p);

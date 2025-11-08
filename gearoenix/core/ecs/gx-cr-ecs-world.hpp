@@ -45,7 +45,7 @@ private:
 
         struct Read final {
             std::shared_ptr<platform::stream::Stream> stream;
-            job::EndCaller<> end_caller;
+            job::EndCaller<std::vector<EntityPtr>> end_caller;
         };
 
         struct Write final {
@@ -122,6 +122,8 @@ public:
 
     /// @code read@endcode process will not start right away, it will be executed as a delayed action, and in a job
     /// because the code waits for the time that there is no any delayed action or unresolved process.
-    void read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<>&& end);
+    /// @param stream input stream
+    /// @param end gives all the root entities in the loaded world.
+    static void read(std::shared_ptr<platform::stream::Stream>&& stream, job::EndCaller<std::vector<EntityPtr>>&& end);
 };
 }
