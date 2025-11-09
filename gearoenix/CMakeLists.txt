@@ -121,6 +121,7 @@ function(gx_prepare_target GX_CURRENT_TARGET)
     target_link_libraries(${GX_CURRENT_TARGET} PRIVATE GearoenixGameEngine)
 
     if (GX_IN_ANDROID)
+        target_link_options(${GX_CURRENT_TARGET} PUBLIC "-u SDL_main")
         set(GX_ASSET_DIR ${CMAKE_SOURCE_DIR}/android/app/src/main/assets)
         add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E rm -rf "${GX_ASSET_DIR}"
@@ -142,7 +143,7 @@ function(gx_prepare_target GX_CURRENT_TARGET)
         add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
                 COMMAND powershell.exe -NoProfile -ExecutionPolicy Bypass -Command
                 "New-Item -ItemType Junction -Path '${GX_ASSET_DIR}' -Target '${GX_MAIN_ASSETS_PATH}' -Force" VERBATIM)
-    else ()
+    elseif (NOT GX_IN_ANDROID)
         add_custom_command(TARGET ${GX_CURRENT_TARGET} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E create_symlink ${GX_MAIN_ASSETS_PATH} ${GX_ASSET_DIR} VERBATIM)
     endif (GX_IN_WASM)

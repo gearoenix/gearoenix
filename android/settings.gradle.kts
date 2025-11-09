@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Gearoenix Demo"
-include ':app'
+include(":app")

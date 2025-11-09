@@ -1,17 +1,18 @@
 #pragma once
 #include "../gx-plt-build-configuration.hpp"
 #include "gx-plt-stm-stream.hpp"
-#include <memory>
 #include <string>
 #include <vector>
 
 #if defined(GX_PLATFORM_DESKTOP) || defined(GX_PLATFORM_IOS) || defined(GX_PLATFORM_WEBASSEMBLY)
-#define GX_USE_STD_FILE
+#define GX_USE_STD_FILE true
 #endif
 
-#ifdef GX_USE_STD_FILE
+#if GX_PLATFORM_INTERFACE_SDL
+#include <SDL3/SDL_iostream.h>
+#elif GX_USE_STD_FILE
 #include <fstream>
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #else
 #error "Unknown file implementation!"
@@ -24,10 +25,11 @@ struct Application;
 namespace gearoenix::platform::stream {
 struct Asset final : Stream {
 private:
-#ifdef GX_USE_STD_FILE
+#if GX_PLATFORM_INTERFACE_SDL
+    SDL_IOStream* file = nullptr;
+#elif GX_USE_STD_FILE
     std::ifstream file;
-#elif defined(GX_PLATFORM_ANDROID)
-    const platform::Application* platform_application = nullptr;
+#elif GX_PLATFORM_ANDROID
     AAsset* file = nullptr;
 #else
 #error "File usage is not specified!"
@@ -37,7 +39,7 @@ private:
 
 public:
     ~Asset() override;
-    /// It will return null if file does not exist
+    /// It will return null if the file does not exist.
     [[nodiscard]] static Asset* construct(const std::string& name);
     [[nodiscard]] stream_size_t read(void* data, stream_size_t length) override;
     [[nodiscard]] stream_size_t write(const void* data, stream_size_t length) override;

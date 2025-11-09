@@ -26,5 +26,9 @@ struct Application : Singleton<Application> {
     Application();
     ~Application() override;
     virtual void update();
+    [[nodiscard]] static std::string& get_organization_url_ref();
+    [[nodiscard]] static const std::string& get_organization_url();
+    [[nodiscard]] static std::string& get_application_name_ref();
+    [[nodiscard]] static const std::string& get_application_name();
 };
 }

@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+    <!-- Touchscreen support -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <!-- Game controller support -->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.gamepad" android:required="false" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
+
+    <!-- External mouse input events -->
+    <uses-feature android:name="android.hardware.type.pc" android:required="false" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:label="@string/AppName"
@@ -11,14 +22,26 @@
         android:theme="@style/AppTheme">
         <activity android:name="com.geareonix.engine.MainActivity"
             android:label="@string/ActivityName"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:alwaysRetainTaskState="true"
+            android:configChanges="layoutDirection|locale|grammaticalGender|fontScale|fontWeightAdjustment|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:screenOrientation="sensorLandscape"
             android:exported="true"
             android:theme="@style/AppTheme">
-            <meta-data android:name="android.app.lib_name" android:value="main"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Let Android know that we can handle some USB devices and should receive this event -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <!-- Drop file event -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
     </application>

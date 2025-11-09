@@ -18,7 +18,7 @@ void gearoenix::render::imgui::show_sure_popup(const char* const name, bool& is_
         return;
     }
     warning_text([&] {
-        ImGui::Text(body_text);
+        ImGui::Text("%s", body_text);
     });
     const float window_width = ImGui::GetWindowSize().x;
 

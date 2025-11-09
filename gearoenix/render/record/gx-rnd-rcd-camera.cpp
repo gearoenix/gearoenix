@@ -12,7 +12,7 @@
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "gx-rnd-rcd-model.hpp"
 
-#if GX_PLATFORM_WEBASSEMBLY || GX_PLATFORM_APPLE
+#if GX_PLATFORM_WEBASSEMBLY || GX_PLATFORM_APPLE || GX_PLATFORM_ANDROID
 #define GX_PARALLEL_POLICY
 #else
 #include <execution>

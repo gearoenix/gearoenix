@@ -3,8 +3,8 @@
 #ifdef ANDROID
 
 #define GX_PLATFORM_ANDROID true
-// #define GX_PLATFORM_INTERFACE_SDL true
-#define GX_PLATFORM_INTERFACE_ANDROID true
+#define GX_PLATFORM_INTERFACE_SDL true
+// #define GX_PLATFORM_INTERFACE_ANDROID true
 
 #elif defined(__EMSCRIPTEN__)
 

@@ -1,23 +1,39 @@
 #include "gx-plt-stm-local.hpp"
+#include "../../core/gx-cr-application.hpp"
 #include "../gx-plt-application.hpp"
 
-#ifdef GX_PLATFORM_IOS
+#if GX_PLATFORM_INTERFACE_SDL
+#include <SDL3/SDL_system.h>
+#elif GX_PLATFORM_IOS
 #include "../../core/gx-cr-string.hpp"
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
 #endif
 
 namespace {
 std::string create_path(const std::string& name)
 {
-#ifdef GX_PLATFORM_IOS
+#if GX_PLATFORM_INTERFACE_SDL
+    const auto* const path_ptr = SDL_GetPrefPath(
+        gearoenix::core::Application::get_organization_url().c_str(),
+        gearoenix::core::Application::get_application_name().c_str());
+    if (!path_ptr) {
+        GX_LOG_F("Can not get SDL write path, error: " << SDL_GetError());
+    }
+    const std::string path(path_ptr);
+    GX_ASSERT_D(!path.empty());
+    if (path.back() != '/') {
+        return path + '/' + name;
+    }
+    return path + name;
+#elif GX_PLATFORM_IOS
     (void)app;
     @autoreleasepool {
         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString* path = [paths objectAtIndex:0];
         return gearoenix::core::String::join_path(path, name);
     }
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
     return std::string(app.get_android_application()->activity->internalDataPath) + "/" + name;
 #else
     return name;

@@ -2,29 +2,39 @@
 #include "../gx-plt-application.hpp"
 #include "../gx-plt-arguments.hpp"
 
-#ifdef GX_PLATFORM_IOS
+#if GX_PLATFORM_INTERFACE_SDL
+#include <SDL3/SDL_system.h>
+#elif GX_PLATFORM_IOS
 #include "../../core/gx-cr-string.hpp"
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
 #endif
 
 gearoenix::platform::stream::Asset::Asset() = default;
 
-#ifdef GX_PLATFORM_ANDROID
 gearoenix::platform::stream::Asset::~Asset()
+#if GX_PLATFORM_INTERFACE_SDL
+{
+    [[maybe_unused]] const auto ok = SDL_CloseIO(file);
+    GX_ASSERT_D(ok);
+}
+#elif GX_PLATFORM_ANDROID
 {
     AAsset_close(file);
 }
 #else
-gearoenix::platform::stream::Asset::~Asset() = default;
+ = default;
 #endif
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(const std::string& name)
 {
     const std::string file_name = "assets/" + name;
     auto* const asset = new Asset();
-#ifdef GX_USE_STD_FILE
-#ifdef GX_PLATFORM_IOS
+#if GX_PLATFORM_INTERFACE_SDL
+    asset->file = SDL_IOFromFile(name.c_str(), "rb");
+    GX_ASSERT_D(asset->file);
+#elif GX_USE_STD_FILE
+#if GX_PLATFORM_IOS
     std::string file_path;
     @autoreleasepool {
         NSString* path = [[NSBundle mainBundle] resourcePath];
@@ -39,13 +49,9 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
         delete asset;
         return nullptr;
     }
-#elif defined(GX_PLATFORM_ANDROID)
-    asset->platform_application = &platform_application;
-    asset->file = AAssetManager_open(platform_application.get_android_application()->activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
-    if (asset->file == nullptr) {
-        GX_LOG_D("Asset not found! " << name);
-        return nullptr;
-    }
+#elif GX_PLATFORM_ANDROID
+    asset->file = AAssetManager_open(SDL_GetAndroidActivity().activity->assetManager, name.c_str(), AASSET_MODE_BUFFER);
+    GX_ASSERT_D(asset->file);
 #else
 #error "Unexpected file interface!"
 #endif
@@ -54,9 +60,11 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::read(void* data, const stream_size_t length)
 {
-#ifdef GX_PLATFORM_ANDROID
+#if GX_PLATFORM_INTERFACE_SDL
+    const auto result = SDL_ReadIO(file, data, static_cast<int>(length));
+#elif GX_PLATFORM_ANDROID
     const auto result = static_cast<stream_size_t>(AAsset_read(file, data, static_cast<stream_size_t>(length)));
-#elif defined(GX_USE_STD_FILE)
+#elif GX_USE_STD_FILE
     file.read(static_cast<char*>(data), static_cast<std::streamsize>(length));
     auto result = static_cast<stream_size_t>(file.gcount());
 #else
@@ -78,9 +86,11 @@ void gearoenix::platform::stream::Asset::flush()
 
 void gearoenix::platform::stream::Asset::seek(const stream_size_t offset)
 {
-#if defined(GX_USE_STD_FILE)
+#if GX_PLATFORM_INTERFACE_SDL
+    SDL_SeekIO(file, static_cast<Sint64>(offset), SDL_IO_SEEK_SET);
+#elif GX_USE_STD_FILE
     file.seekg(static_cast<std::streamoff>(offset), std::ios::beg);
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
     AAsset_seek(file, static_cast<off_t>(offset), SEEK_SET);
 #else
 #error "Unexpected file interface"
@@ -89,9 +99,11 @@ void gearoenix::platform::stream::Asset::seek(const stream_size_t offset)
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::tell()
 {
-#if defined(GX_USE_STD_FILE)
+#if GX_PLATFORM_INTERFACE_SDL
+    return SDL_TellIO(file);
+#elif GX_USE_STD_FILE
     return static_cast<stream_size_t>(file.tellg());
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
     return (stream_size_t)AAsset_seek(file, 0, SEEK_CUR);
 #else
 #error "Unexpected file interface"
@@ -100,13 +112,15 @@ gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Asset::size()
 {
-#ifdef GX_USE_STD_FILE
+#if GX_PLATFORM_INTERFACE_SDL
+    return SDL_GetIOSize(file);
+#elif GX_USE_STD_FILE
     const auto c = file.tellg();
     file.seekg(0, std::ios::end);
     const auto s = static_cast<stream_size_t>(file.tellg());
     file.seekg(c);
     return s;
-#elif defined(GX_PLATFORM_ANDROID)
+#elif GX_PLATFORM_ANDROID
     return static_cast<stream_size_t>(AAsset_getLength64(file));
 #else
 #error "Unexpected file interface"
