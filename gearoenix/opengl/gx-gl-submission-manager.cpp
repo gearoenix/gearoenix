@@ -428,7 +428,7 @@ void gearoenix::gl::submission::Manager::render_imgui()
     ctx::set_viewport_scissor_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    glGetError();
+    ignore_gl_errors();
     pop_debug_group();
 }
 

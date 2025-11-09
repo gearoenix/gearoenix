@@ -33,8 +33,8 @@ gearoenix::gl::Engine::Engine()
     , Singleton<Engine>(this)
     , shader_manager(new shader::Manager())
 {
-    while (GL_NO_ERROR != glGetError()) { /*ignoring some error that caused by others*/
-    }
+    // Ignore all the errors outside the engine.
+    ignore_gl_errors();
 
     GX_LOG_D("OpenGL Vendor: " << glGetString(GL_VENDOR));
     GX_LOG_D("OpenGL Render: " << glGetString(GL_RENDERER));
@@ -46,7 +46,7 @@ gearoenix::gl::Engine::Engine()
 
     GX_GL_CHECK_D;
     ImGui_ImplOpenGL3_Init(shader::Shader::get_shader_version().c_str());
-    glGetError();
+    ignore_gl_errors();
     GX_GL_CHECK_D;
 
     frames_count = GEAROENIX_GL_FRAMES_COUNT;

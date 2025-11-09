@@ -4,6 +4,13 @@
 #include "gx-gl-constants.hpp"
 #include "gx-gl-loader.hpp"
 
+#if GX_GL_CHECK_ENABLED
+void gearoenix::gl::ignore_gl_errors()
+{
+    while (GL_NO_ERROR != glGetError());
+}
+#endif
+
 bool gearoenix::gl::check_for_error()
 {
     switch (glGetError()) {

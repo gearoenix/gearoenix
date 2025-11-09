@@ -28,11 +28,20 @@ gearoenix::platform::stream::Asset::~Asset()
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(const std::string& name)
 {
+#if GX_PLATFORM_ANDROID
+    const std::string& file_name = name;
+#else
     const std::string file_name = "assets/" + name;
+#endif
+
     auto* const asset = new Asset();
 #if GX_PLATFORM_INTERFACE_SDL
-    asset->file = SDL_IOFromFile(name.c_str(), "rb");
-    GX_ASSERT_D(asset->file);
+    asset->file = SDL_IOFromFile(file_name.c_str(), "rb");
+    if(!asset->file) {
+        GX_LOG_D("Can not find/open assets file: " << file_name << " error: " << SDL_GetError());
+        delete asset;
+        return nullptr;
+    }
 #elif GX_USE_STD_FILE
 #if GX_PLATFORM_IOS
     std::string file_path;

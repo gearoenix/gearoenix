@@ -1,11 +1,11 @@
 #pragma once
 #include "../core/gx-cr-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "gx-gl-constants.hpp"
 #include "gx-gl-loader.hpp"
 
 #if GX_DEBUG_MODE
-#define GX_GL_LABELING_ENABLED true
+#define GX_GL_LABELING_ENABLED !GX_PLATFORM_ANDROID
 #endif
 
 namespace gearoenix::gl {
@@ -61,6 +61,7 @@ inline void pop_debug_group()
 #define set_buffer_label(value, name) static_assert(true, "")
 #define set_vertex_array_label(value, name) static_assert(true, "")
 #define set_texture_label(value, name) static_assert(true, "")
+#define set_framebuffer_label(value, name) static_assert(true, "")
 #define push_debug_group(name) static_assert(true, "")
 #define pop_debug_group() static_assert(true, "")
 #endif

@@ -6,6 +6,8 @@
 
 #include <boost/container/flat_set.hpp>
 
+#include <string_view>
+
 #ifdef GX_PLATFORM_INTERFACE_SDL
 #include <SDL3/SDL.h>
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
@@ -124,10 +126,16 @@ void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
     const void* const /*userParam*/)
 {
     const auto* const srv = severity_to_string(severity);
-    if (nullptr == srv)
+    if (nullptr == srv) {
         return;
-    GX_LOG_E(
-        "source: " << source << ", type: " << t << ", id: " << id << ", severity: " << srv << ", length: " << length << ", message: " << message);
+    }
+
+    if (std::string_view(message).contains("Performance:glScissor::Submission has been flushed")) {
+        // This is cause by something out of the engine.
+        return;
+    }
+
+    GX_LOG_E("source: " << source << ", type: " << t << ", id: " << id << ", severity: " << srv << ", length: " << length << ", message: " << message);
 }
 #endif
 
