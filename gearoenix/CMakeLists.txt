@@ -91,6 +91,11 @@ target_include_directories(GearoenixGameEngine PUBLIC ${GX_IMGUI_PATH})
 target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
 gx_common_target_config(GearoenixGameEngine)
 
+target_link_libraries(GearoenixGameEngine PUBLIC unofficial::enet::enet)
+target_link_libraries(GearoenixGameEngine PUBLIC unofficial-sodium::sodium)
+target_include_directories(GearoenixGameEngine PUBLIC ${SQLITE_MODERN_CPP_INCLUDE_DIRS})
+target_link_libraries(GearoenixGameEngine PUBLIC unofficial::sqlite3::sqlite3)
+
 foreach (GX_LIB ${GX_DEBUG_LIBS})
     target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})
 endforeach ()

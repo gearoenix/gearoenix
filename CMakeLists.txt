@@ -92,6 +92,14 @@ find_package(boost_mp11 CONFIG REQUIRED)
 
 find_package(SDL3 CONFIG REQUIRED)
 
+find_package(unofficial-enet CONFIG REQUIRED)
+
+find_package(unofficial-sodium CONFIG REQUIRED)
+
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+
+find_path(SQLITE_MODERN_CPP_INCLUDE_DIRS "sqlite_modern_cpp.h")
+
 if(NOT GX_IN_WASM)
     find_package(Vulkan REQUIRED)
 endif()

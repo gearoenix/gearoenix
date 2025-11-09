@@ -1,6 +1,8 @@
 #pragma once
 #include "gx-plt-stm-stream.hpp"
+
 #include <fstream>
+#include <string_view>
 
 namespace gearoenix::platform::stream {
 struct Local final : Stream {
@@ -19,5 +21,7 @@ public:
     [[nodiscard]] stream_size_t size() override;
     void flush() override;
     [[nodiscard]] static bool exist(const std::string& name);
+    [[nodiscard]] static std::string create_path(std::string_view name);
+    [[nodiscard]] static std::fstream create_file(std::string_view name, bool writable);
 };
 }

@@ -9,6 +9,10 @@
     "boost-headers",
     "boost-mp11",
     "boost-test",
-    "sdl3"
+    "sdl3",
+    "libsodium",
+    "enet",
+    "sqlite3",
+    "sqlite-modern-cpp"
   ]
 }

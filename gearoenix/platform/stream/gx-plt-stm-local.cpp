@@ -11,47 +11,9 @@
 #endif
 
 namespace {
-std::string create_path(const std::string& name)
-{
-#if GX_PLATFORM_INTERFACE_SDL
-    const auto* const path_ptr = SDL_GetPrefPath(
-        gearoenix::core::Application::get_organization_url().c_str(),
-        gearoenix::core::Application::get_application_name().c_str());
-    if (!path_ptr) {
-        GX_LOG_F("Can not get SDL write path, error: " << SDL_GetError());
-    }
-    const std::string path(path_ptr);
-    GX_ASSERT_D(!path.empty());
-    if (path.back() != '/') {
-        return path + '/' + name;
-    }
-    return path + name;
-#elif GX_PLATFORM_IOS
-    (void)app;
-    @autoreleasepool {
-        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString* path = [paths objectAtIndex:0];
-        return gearoenix::core::String::join_path(path, name);
-    }
-#elif GX_PLATFORM_ANDROID
-    return std::string(app.get_android_application()->activity->internalDataPath) + "/" + name;
-#else
-    return name;
-#endif
-}
-
 std::ios::openmode create_open_mode(const bool writable)
 {
     return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
-}
-
-[[nodiscard]] std::fstream create_file(const std::string& name, const bool writable)
-{
-    std::fstream file(create_path(name), create_open_mode(writable));
-    if ((!file.is_open() || !file.good()) && writable) {
-        file.open(create_path(name), create_open_mode(writable) | std::ios::trunc);
-    }
-    return file;
 }
 }
 
@@ -116,6 +78,45 @@ bool gearoenix::platform::stream::Local::exist(const std::string& name)
 {
     const std::ifstream f(create_path(name));
     return f.is_open() && f.good();
+}
+
+std::string gearoenix::platform::stream::Local::create_path(const std::string_view name)
+{
+#if GX_PLATFORM_INTERFACE_SDL
+    const auto* const path_ptr = SDL_GetPrefPath(
+        core::Application::get_organization_url().c_str(),
+        core::Application::get_application_name().c_str());
+    if (!path_ptr) {
+        GX_LOG_F("Can not get SDL write path, error: " << SDL_GetError());
+    }
+    std::string path(path_ptr);
+    GX_ASSERT_D(!path.empty());
+    if (path.back() != '/') {
+        path += '/';
+    }
+    path.append(name);
+    return path;
+#elif GX_PLATFORM_IOS
+    (void)app;
+    @autoreleasepool {
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString* path = [paths objectAtIndex:0];
+        return gearoenix::core::String::join_path(path, name);
+    }
+#elif GX_PLATFORM_ANDROID
+    return std::string(app.get_android_application()->activity->internalDataPath) + "/" + name;
+#else
+    return name;
+#endif
+}
+
+std::fstream gearoenix::platform::stream::Local::create_file(const std::string_view name, const bool writable)
+{
+    std::fstream file(create_path(name), create_open_mode(writable));
+    if ((!file.is_open() || !file.good()) && writable) {
+        file.open(create_path(name), create_open_mode(writable) | std::ios::trunc);
+    }
+    return file;
 }
 
 gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::size()
