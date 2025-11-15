@@ -26,6 +26,10 @@ namespace gearoenix::core::event {
 struct Engine;
 }
 
+namespace gearoenix::net {
+struct Manager;
+}
+
 namespace gearoenix::render::engine {
 struct Engine;
 }
@@ -55,6 +59,7 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
     GX_GET_UPTR_PRV(audio::Engine, audio_engine);
     GX_GET_UPTR_PRV(core::event::Engine, event_engine);
     GX_GET_UPTR_PRV(core::Application, core_application);
+    GX_GET_UPTR_PRV(net::Manager, net_manager);
     GX_GET_CREF_PRV(TouchStateMap, touch_states);
     GX_GETSET_CREF_PRV(std::function<bool()>, should_window_be_closed);
     GX_GET_CREF_PRV(boost::container::flat_set<platform::key::Id>, pressed_keyboard_buttons);

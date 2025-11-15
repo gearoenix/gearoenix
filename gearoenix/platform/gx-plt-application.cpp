@@ -5,6 +5,7 @@
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
 #include "../core/sync/gx-cr-sync-thread.hpp"
+#include "../net/gx-net-manager.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/imgui/gx-rnd-imgui-popup.hpp"
 #include "gx-plt-file-chooser.hpp"
@@ -86,6 +87,7 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
 gearoenix::platform::BaseApplication::BaseApplication()
     : Singleton(this)
     , event_engine(new core::event::Engine())
+    , net_manager(new net::Manager())
     , should_window_be_closed([this] {
         static constexpr char name[] = "Quit Gearoenix application?";
         static constexpr char body[] = "Are you sure you want to quit this Gearoenix instance?\nYou will loose your current unsaved progress in your game or work!";
