@@ -18,7 +18,7 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
         };
         return enet_host_create(&address, cc, 1, 0, 0);
     }())
-    , thread([this] {
+    , thread(new std::thread([this] {
         if (!host) {
             GX_LOG_E("Failed to create ENet host on port " << port);
             return;
@@ -141,7 +141,7 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
             self.reset();
             enet_host_flush(host);
         }
-    })
+    }))
 {
 }
 
@@ -160,9 +160,11 @@ std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(
 gearoenix::net::Server::~Server()
 {
     running = false;
-    thread.join();
-    enet_host_destroy(host);
-    GX_LOG_D("ENet server stopped");
+    core::job::send_job_to_pool([t = thread, h = host] {
+        t->join();
+        enet_host_destroy(h);
+        GX_LOG_D("ENet server stopped");
+    });
 }
 
 void gearoenix::net::Server::broadcast(const std::span<const std::byte> data) const

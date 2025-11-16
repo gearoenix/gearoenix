@@ -20,7 +20,7 @@ struct Client final {
 
     const std::function<void()> disconnection_callback;
     const std::function<void(std::vector<std::byte>&&)> receive_callback;
-    std::thread thread;
+    const std::shared_ptr<std::thread> thread;
     std::atomic<bool> running;
     std::mutex data_lock;
     std::vector<std::byte> data;

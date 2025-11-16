@@ -24,7 +24,7 @@ private:
     const new_client_callback_t new_client_callback;
     ENetHost* const host;
     std::atomic<bool> running;
-    std::thread thread;
+    const std::shared_ptr<std::thread> thread;
     std::mutex clients_lock;
     std::map<ENetPeer*, std::weak_ptr<ServerClient>> clients;
     std::weak_ptr<Server> weak_self;

@@ -1,9 +1,11 @@
 #include "gx-net-client.hpp"
-
+#include "../core/job/gx-cr-job-manager.hpp"
 #include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../platform/gx-plt-log.hpp"
 
 #include <enet/enet.h>
+
+#include <optional>
 
 gearoenix::net::Client::Client(
     std::string&& addr,
@@ -15,7 +17,7 @@ gearoenix::net::Client::Client(
     , port(p)
     , disconnection_callback(std::move(disconnect_c))
     , receive_callback(std::move(data_c))
-    , thread([this, connection_callback = std::make_optional(std::move(connection_c))]() mutable {
+    , thread(new std::thread([this, connection_callback = std::make_optional(std::move(connection_c))]() mutable {
         auto self = weak_self.lock();
         while (!self) {
             std::this_thread::yield();
@@ -49,7 +51,7 @@ gearoenix::net::Client::Client(
             return;
         }
 
-        auto local_data = decltype(data){};
+        auto local_data = decltype(data) {};
         while (running) {
             {
                 std::lock_guard _(data_lock);
@@ -111,7 +113,7 @@ gearoenix::net::Client::Client(
 
         enet_peer_disconnect_now(peer, 0);
         enet_host_destroy(host);
-    })
+    }))
 {
 }
 
@@ -137,7 +139,7 @@ void gearoenix::net::Client::construct(
 gearoenix::net::Client::~Client()
 {
     running = false;
-    thread.join();
+    core::job::send_job_to_pool([t = thread] { t->join(); });
 }
 
 void gearoenix::net::Client::send(const std::span<const std::byte> d)
