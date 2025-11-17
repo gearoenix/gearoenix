@@ -44,8 +44,8 @@ private:
     ServerClient(ENetPeer* peer, std::shared_ptr<Server>&& server);
 
 public:
-    std::function<void(std::vector<std::byte>&&)> received_callback;
-    std::function<void()> disconnected_callback;
+    std::function<void(std::vector<std::byte>&&)> received_callback = [](auto&&){};
+    std::function<void()> disconnected_callback = []{};
 
     ~ServerClient();
     [[nodiscard]] bool send(std::span<const std::byte> data) const;

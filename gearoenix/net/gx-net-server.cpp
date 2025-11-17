@@ -16,13 +16,32 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
             .host = ENET_HOST_ANY,
             .port = p,
         };
-        return enet_host_create(&address, cc, 1, 0, 0);
+        auto* const h = enet_host_create(&address, cc, 1, 0, 0);
+        return h;
     }())
-    , thread(new std::thread([this] {
-        if (!host) {
-            GX_LOG_E("Failed to create ENet host on port " << port);
-            return;
-        }
+{
+}
+
+std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(
+    const std::uint16_t port, const std::uint64_t max_clients, new_client_callback_t&& on_connect)
+{
+    std::shared_ptr<Server> server(new Server(port, max_clients, std::move(on_connect)));
+    if (!server->host) {
+        GX_LOG_E("Failed to create ENet host on port " << port);
+        return nullptr;
+    }
+    server->running = false;
+    server->weak_self = server;
+    server->create_thread();
+    while (!server->running) {
+        std::this_thread::yield();
+    }
+    return server;
+}
+
+void gearoenix::net::Server::create_thread()
+{
+    thread = std::make_shared<std::thread>([this] {
         enet_host_compress_with_range_coder(host);
 
         auto self = weak_self.lock();
@@ -30,19 +49,17 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
             std::this_thread::yield();
             self = weak_self.lock();
         }
-        running = true;
 
         auto weak = std::weak_ptr(self);
         self.reset();
 
         ENetEvent event;
-        while (true) {
+
+        running = true;
+        while (running) {
             self = weak.lock();
             if (!self) {
-                return;
-            }
-
-            if (!running) {
+                terminate();
                 return;
             }
 
@@ -54,6 +71,7 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
 
             if (service_result < 0) {
                 GX_LOG_E("ENet service error, service_result: " << service_result);
+                terminate();
                 return;
             }
 
@@ -61,7 +79,7 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
             case ENET_EVENT_TYPE_CONNECT: {
                 if (!event.peer) {
                     GX_LOG_E("ENet client peer is null");
-                    return;
+                    continue;
                 }
 
                 auto new_client = std::shared_ptr<ServerClient>(new ServerClient(event.peer, std::move(self)));
@@ -141,30 +159,25 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
             self.reset();
             enet_host_flush(host);
         }
-    }))
-{
+    });
 }
 
-std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(
-    const std::uint16_t port, const std::uint64_t max_clients, new_client_callback_t&& on_connect)
-{
-    std::shared_ptr<Server> server(new Server(port, max_clients, std::move(on_connect)));
-    server->running = false;
-    server->weak_self = server;
-    while (!server->running) {
-        std::this_thread::yield();
-    }
-    return server;
-}
-
-gearoenix::net::Server::~Server()
+void gearoenix::net::Server::terminate()
 {
     running = false;
     core::job::send_job_to_pool([t = thread, h = host] {
         t->join();
-        enet_host_destroy(h);
+        if (h) {
+            enet_host_destroy(h);
+        }
         GX_LOG_D("ENet server stopped");
     });
+    thread.reset();
+}
+
+gearoenix::net::Server::~Server()
+{
+    terminate();
 }
 
 void gearoenix::net::Server::broadcast(const std::span<const std::byte> data) const

@@ -24,13 +24,15 @@ private:
     const new_client_callback_t new_client_callback;
     ENetHost* const host;
     std::atomic<bool> running;
-    const std::shared_ptr<std::thread> thread;
+    std::shared_ptr<std::thread> thread;
     std::mutex clients_lock;
     std::map<ENetPeer*, std::weak_ptr<ServerClient>> clients;
     std::weak_ptr<Server> weak_self;
 
     Server(std::uint16_t p, std::uint64_t cc, new_client_callback_t&& on_connect);
     [[nodiscard]] static std::shared_ptr<Server> construct(std::uint16_t port, std::uint64_t max_clients, new_client_callback_t&& on_connect);
+    void create_thread();
+    void terminate();
 
 public:
     Server(const Server&) = delete;
