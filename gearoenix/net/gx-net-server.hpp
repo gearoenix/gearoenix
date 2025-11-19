@@ -46,6 +46,5 @@ public:
     /// Thread-safe, can be called from any thread
     /// @param data Data to broadcast
     void broadcast(std::span<const std::byte> data) const;
-
 };
 }

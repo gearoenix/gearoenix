@@ -11,7 +11,7 @@ struct Client;
 struct Server;
 struct ServerClient;
 
-struct Manager final: core::Singleton<Manager> {
+struct Manager final : core::Singleton<Manager> {
     Manager();
     ~Manager() override;
 

@@ -7,7 +7,8 @@
 #if GX_GL_CHECK_ENABLED
 void gearoenix::gl::ignore_gl_errors()
 {
-    while (GL_NO_ERROR != glGetError());
+    while (GL_NO_ERROR != glGetError())
+        ;
 }
 #endif
 

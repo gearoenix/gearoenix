@@ -31,7 +31,7 @@ void gearoenix::core::ecs::Component::write(std::shared_ptr<platform::stream::St
     object_streamer->write(entity->get_object_self().lock());
 }
 
-void gearoenix::core::ecs::Component::read(std::shared_ptr<Component>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end)
+void gearoenix::core::ecs::Component::read(std::shared_ptr<Component>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&&)
 {
     self->enabled = stream->read<bool>();
     const auto entity_id = stream->read<object_id_t>();

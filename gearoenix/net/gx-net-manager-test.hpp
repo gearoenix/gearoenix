@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
             };
 
             c->received_callback = [&, client_index](std::vector<std::byte>&& data) {
-                BOOST_TEST(clients_messages[client_index] == reinterpret_cast<const char*>(data.data()));
+                BOOST_TEST(clients_messages[client_index] == std::string(reinterpret_cast<const char*>(data.data()), data.size()));
                 receive_sem.release();
             };
 
@@ -66,7 +66,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
             disconnect_sem.release();
         },
         [&](std::vector<std::byte>&& data) {
-            BOOST_TEST(server_messages[0] == reinterpret_cast<const char*>(data.data()));
+            const auto msg = std::string(reinterpret_cast<const char*>(data.data()), data.size());
+            BOOST_TEST(server_messages[0] == msg);
             receive_sem.release();
         },
         [&](std::shared_ptr<GxClient>&& client) {
@@ -89,7 +90,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
             BOOST_TEST(false);
         },
         [&](std::vector<std::byte>&& data) {
-            BOOST_TEST(server_messages[1] == reinterpret_cast<const char*>(data.data()));
+            const auto msg = std::string(reinterpret_cast<const char*>(data.data()), data.size());
+            BOOST_TEST(server_messages[1] == msg);
             receive_sem.release();
         },
         [&](std::shared_ptr<GxClient>&& client) {

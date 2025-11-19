@@ -1,9 +1,9 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../platform/gx-plt-build-configuration.hpp"
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/macro/gx-cr-mcr-assert.hpp"
+#include "../platform/gx-plt-build-configuration.hpp"
 
 #define GX_GL_CHECK_ENABLED GX_DEBUG_MODE && !GX_PLATFORM_ANDROID
 

@@ -51,15 +51,14 @@ void gearoenix::net::Server::create_thread()
         }
 
         auto weak = std::weak_ptr(self);
-        self.reset();
 
         ENetEvent event;
 
         running = true;
         while (running) {
+            self.reset();
             self = weak.lock();
             if (!self) {
-                terminate();
                 return;
             }
 
@@ -79,7 +78,7 @@ void gearoenix::net::Server::create_thread()
             case ENET_EVENT_TYPE_CONNECT: {
                 if (!event.peer) {
                     GX_LOG_E("ENet client peer is null");
-                    continue;
+                    break;
                 }
 
                 auto new_client = std::shared_ptr<ServerClient>(new ServerClient(event.peer, std::move(self)));
@@ -121,8 +120,7 @@ void gearoenix::net::Server::create_thread()
                             reinterpret_cast<const std::byte*>(packet->data),
                             reinterpret_cast<const std::byte*>(packet->data) + packet->dataLength);
 
-                            client->received_callback(std::move(data));
-
+                        client->received_callback(std::move(data));
                     }
                     enet_packet_destroy(packet);
                 });
@@ -155,9 +153,8 @@ void gearoenix::net::Server::create_thread()
                 GX_LOG_D("Unknown ENet event type: " << event.type);
                 break;
             }
-
-            self.reset();
-            enet_host_flush(host);
+            // Enable the following if you see any latency issue in the future.
+            // enet_host_flush(host);
         }
     });
 }

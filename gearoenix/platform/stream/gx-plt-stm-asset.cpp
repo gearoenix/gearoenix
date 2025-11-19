@@ -23,7 +23,7 @@ gearoenix::platform::stream::Asset::~Asset()
     AAsset_close(file);
 }
 #else
- = default;
+    = default;
 #endif
 
 gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construct(const std::string& name)
@@ -37,7 +37,7 @@ gearoenix::platform::stream::Asset* gearoenix::platform::stream::Asset::construc
     auto* const asset = new Asset();
 #if GX_PLATFORM_INTERFACE_SDL
     asset->file = SDL_IOFromFile(file_name.c_str(), "rb");
-    if(!asset->file) {
+    if (!asset->file) {
         GX_LOG_D("Can not find/open assets file: " << file_name << " error: " << SDL_GetError());
         delete asset;
         return nullptr;

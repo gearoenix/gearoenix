@@ -5,6 +5,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <span>
 #include <string>
 #include <thread>
@@ -18,8 +19,8 @@ struct Client final {
     GX_GET_CVAL_PRV(std::uint16_t, port);
     GX_GET_CREF_PRV(std::weak_ptr<Client>, weak_self);
 
-    const std::function<void()> disconnection_callback;
-    const std::function<void(std::vector<std::byte>&&)> receive_callback;
+    std::function<void()> disconnection_callback;
+    std::function<void(std::vector<std::byte>&&)> receive_callback;
     const std::shared_ptr<std::thread> thread;
     std::atomic<bool> running;
     std::mutex data_lock;

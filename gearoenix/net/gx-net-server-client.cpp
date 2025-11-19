@@ -1,6 +1,6 @@
 #include "gx-net-server-client.hpp"
-#include "gx-net-server.hpp"
 #include "../platform/gx-plt-log.hpp"
+#include "gx-net-server.hpp"
 
 gearoenix::net::ServerClient::ServerClient(ENetPeer* const peer, std::shared_ptr<Server>&& server)
     : peer(peer)

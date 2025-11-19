@@ -23,22 +23,38 @@ gearoenix::net::Client::Client(
             std::this_thread::yield();
             self = weak_self.lock();
         }
+        auto weak = std::weak_ptr(self);
         running = true;
+
+        std::function<void()> terminate = [&] {
+            if (connection_callback.has_value()) {
+                (*connection_callback)(nullptr);
+            }
+            if (self) {
+                disconnection_callback();
+                disconnection_callback = [] { };
+                receive_callback = [](auto&&) { };
+                self.reset();
+            }
+        };
 
         auto* const host = enet_host_create(nullptr, 1, 1, 0, 0);
         if (!host) {
             GX_LOG_D("ENet client connection failed.");
-            (*connection_callback)(nullptr);
+            terminate();
             return;
         }
+        terminate = [h = host, t = std::move(terminate)] {
+            enet_host_destroy(h);
+            t();
+        };
 
         enet_host_compress_with_range_coder(host);
 
         ENetAddress enet_address;
         if (enet_address_set_host(&enet_address, address.c_str()) != 0) {
             GX_LOG_D("Failed to resolve host address: " << address << " port: " << port);
-            enet_host_destroy(host);
-            (*connection_callback)(nullptr);
+            terminate();
             return;
         }
 
@@ -46,13 +62,31 @@ gearoenix::net::Client::Client(
         auto* const peer = enet_host_connect(host, &enet_address, 1, 0);
         if (!peer) {
             GX_LOG_D("Failed to initiate connection peer: " << address << " port: " << port);
-            enet_host_destroy(host);
-            (*connection_callback)(nullptr);
+            terminate();
             return;
         }
+        terminate = [p = peer, t = std::move(terminate)] {
+            enet_peer_disconnect_now(p, 0);
+            t();
+        };
 
         auto local_data = decltype(data) {};
-        while (running) {
+        while (true) {
+            if (!connection_callback.has_value()) {
+                // as long as we are waiting for connection, we shouldn't release self.
+                self.reset(); // freeing if no other keeps it
+                self = weak.lock(); // we need a live pointer.
+                if (!self) {
+                    terminate();
+                    return;
+                }
+            }
+
+            if (!running) {
+                terminate();
+                return;
+            }
+
             {
                 std::lock_guard _(data_lock);
                 std::swap(local_data, data);
@@ -63,9 +97,7 @@ gearoenix::net::Client::Client(
                 GX_ASSERT_D(enet_packet);
                 if (0 != enet_peer_send(peer, 0, enet_packet)) {
                     GX_LOG_E("Failed to send the data: " << address << " port: " << port);
-                    disconnection_callback();
-                    enet_peer_disconnect_now(peer, 0);
-                    enet_host_destroy(host);
+                    terminate();
                     return;
                 }
                 local_data.clear();
@@ -84,20 +116,19 @@ gearoenix::net::Client::Client(
                     break;
 
                 case ENET_EVENT_TYPE_DISCONNECT:
-                    disconnection_callback();
-                    enet_peer_disconnect_now(peer, 0);
-                    enet_host_destroy(host);
+                    terminate();
                     return;
 
                 case ENET_EVENT_TYPE_RECEIVE:
                     if (event.packet) {
+                        GX_ASSERT_D(!connection_callback.has_value());
                         std::vector received_data(
                             reinterpret_cast<const std::byte*>(event.packet->data),
                             reinterpret_cast<const std::byte*>(event.packet->data) + event.packet->dataLength);
                         enet_packet_destroy(event.packet);
                         receive_callback(std::move(received_data));
                     }
-                    GX_ASSERT_D(event.packet);
+                    GX_ASSERT_D(event.packet); // just to check if it is possible
                     break;
 
                 case ENET_EVENT_TYPE_NONE:
@@ -111,8 +142,7 @@ gearoenix::net::Client::Client(
             enet_host_flush(host);
         }
 
-        enet_peer_disconnect_now(peer, 0);
-        enet_host_destroy(host);
+        terminate();
     }))
 {
 }
