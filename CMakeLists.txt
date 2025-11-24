@@ -1,8 +1,17 @@
 cmake_minimum_required(VERSION 3.18.1 FATAL_ERROR)
-project(Gearoenix)
+project(Gearoenix LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (APPLE)
+    enable_language(OBJCXX)
+
+    set(CMAKE_OBJCXX_STANDARD 23)
+    set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+    set(CMAKE_OBJCXX_EXTENSIONS OFF)
+endif ()
 
 set(PROJECT_DESCRIPTION "A cross-platform C++ game engine.")
 

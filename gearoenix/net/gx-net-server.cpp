@@ -140,6 +140,8 @@ void gearoenix::net::Server::create_thread()
                     }();
                     if (client) {
                         client->disconnected_callback();
+                        client->disconnected_callback = [] {};
+                        client->received_callback = [](auto&&) {};
                     }
                 });
                 break;
