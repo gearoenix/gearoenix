@@ -95,15 +95,15 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     return result;
 }
 
-gearoenix::render::engine::Engine::~Engine()
-{
-}
+gearoenix::render::engine::Engine::~Engine() = default;
 
 void gearoenix::render::engine::Engine::start_frame()
 {
+    if (const auto diff = minimum_frame_time - std::chrono::duration<double>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
+        std::this_thread::sleep_for(std::chrono::duration<double>(diff));
+    }
     const auto now = clock_t::now();
-    const std::chrono::duration<double> delta_time_duration = now - last_frame_time;
-    delta_time = delta_time_duration.count();
+    delta_time = std::chrono::duration<double>(now - last_frame_time).count();
     GX_ASSERT_D(delta_time > 0.0);
     ImGui::GetIO().DeltaTime = static_cast<float>(delta_time);
     last_frame_time = now;
@@ -112,6 +112,18 @@ void gearoenix::render::engine::Engine::start_frame()
     frame_number = frame_number_from_start % frames_count;
     next_frame_number = (frame_number_from_start + 1) % frames_count;
     core::ecs::World::get().update();
+
+    if constexpr (GX_DEBUG_MODE) {
+        static double time_lapsed = 0.0;
+        static double counter = 0.0;
+        ++counter;
+        time_lapsed += delta_time;
+        if (time_lapsed >= 5.0) {
+            GX_LOG_D("Frame Per Second: " << (counter / time_lapsed));
+            time_lapsed = 0.0;
+            counter = 0.0;
+        }
+    }
 }
 
 void gearoenix::render::engine::Engine::end_frame()

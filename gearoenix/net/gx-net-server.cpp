@@ -4,8 +4,11 @@
 #include "gx-net-server-client.hpp"
 
 #include <algorithm>
-#include <bit>
-#include <optional>
+
+namespace {
+std::unordered_map<std::uint32_t, std::uint8_t> yellow_list;
+std::unordered_map<std::uint32_t, std::chrono::steady_clock::time_point> black_list;
+}
 
 gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, new_client_callback_t&& on_connect)
     : port(p)
@@ -20,6 +23,15 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
         return h;
     }())
 {
+    static bool not_initialized = true;
+    if (not_initialized) {
+        not_initialized = false;
+
+        yellow_list.reserve(1 << 16);
+        black_list.reserve(1 << 16);
+    }
+
+    clients.reserve(max_clients);
 }
 
 std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(
@@ -74,6 +86,16 @@ void gearoenix::net::Server::create_thread()
                 return;
             }
 
+            // blacklist handling
+            if (event.peer) {
+                if (const auto search = black_list.find(event.peer->address.host); search != black_list.end()) {
+                    if (std::chrono::steady_clock::now() - search->second < std::chrono::seconds(180)) {
+                        continue;
+                    }
+                    black_list.erase(search);
+                }
+            }
+
             switch (event.type) {
             case ENET_EVENT_TYPE_CONNECT: {
                 if (!event.peer) {
@@ -82,11 +104,7 @@ void gearoenix::net::Server::create_thread()
                 }
 
                 auto new_client = std::shared_ptr<ServerClient>(new ServerClient(event.peer, std::move(self)));
-
-                {
-                    const std::lock_guard _(clients_lock);
-                    clients[new_client->peer] = new_client;
-                }
+                clients[new_client->peer] = new_client;
 
                 // I can't send it to Job Manager.
                 // I have to make sure of the precedence of client initialisation and the packet receiving.
@@ -96,53 +114,46 @@ void gearoenix::net::Server::create_thread()
             }
 
             case ENET_EVENT_TYPE_RECEIVE: {
-                core::job::send_job_to_pool([this, self = std::move(self), packet = event.packet, peer = event.peer] {
-                    if (!packet) {
-                        GX_LOG_E("Packet received with null");
-                        return;
-                    }
-                    const auto client = [&] {
-                        const std::lock_guard _(clients_lock);
-                        if (const auto it = clients.find(peer); it != clients.end()) {
-                            auto c = it->second.lock();
-                            if (!c) {
-                                GX_LOG_E("Client deleted during the packet receiving");
-                                clients.erase(it);
-                            }
-                            return c;
-                        }
-                        GX_LOG_E("Received packet from a client that is not inside the clients map!");
-                        return std::shared_ptr<ServerClient> {};
-                    }();
-                    if (client) {
-                        std::vector<std::byte> data;
-                        data.assign(
-                            reinterpret_cast<const std::byte*>(packet->data),
-                            reinterpret_cast<const std::byte*>(packet->data) + packet->dataLength);
+                if (!event.packet) {
+                   GX_LOG_E("Packet received with null");
+                   break;
+                }
+                const auto search = clients.find(event.peer);
+                if (clients.end() == search) {
+                    GX_LOG_E("Received packet from a client that is not inside the clients map!");
+                    break;
+                }
+                auto c = search->second.lock();
+                if (!c) {
+                    GX_LOG_E("Client deleted during the packet receiving");
+                    clients.erase(search);
+                    break;
+                }
+                core::job::send_job_to_pool([packet = event.packet, c = std::move(c)] {
+                    std::vector<std::uint8_t> data;
+                    data.assign(
+                        reinterpret_cast<const std::uint8_t*>(packet->data),
+                        reinterpret_cast<const std::uint8_t*>(packet->data) + packet->dataLength);
 
-                        client->received_callback(std::move(data));
-                    }
+                    c->received_callback(std::move(data));
                     enet_packet_destroy(packet);
                 });
                 break;
             }
 
             case ENET_EVENT_TYPE_DISCONNECT: {
-                core::job::send_job_to_pool([this, self = std::move(self), peer = event.peer] {
-                    const auto client = [&] {
-                        const std::lock_guard _(clients_lock);
-                        if (const auto it = clients.find(peer); it != clients.end()) {
-                            auto c = it->second.lock();
-                            clients.erase(it);
-                            return c;
-                        }
-                        return std::shared_ptr<ServerClient> {};
-                    }();
-                    if (client) {
-                        client->disconnected_callback();
-                        client->disconnected_callback = [] {};
-                        client->received_callback = [](auto&&) {};
-                    }
+                const auto search = clients.find(event.peer);
+                if (clients.end() == search) {
+                    break;
+                }
+                auto c = search->second.lock();
+                if (!c) {
+                    clients.erase(search);
+                    break;
+                }
+                core::job::send_job_to_pool([c = std::move(c)] {
+                    c->disconnected_callback();
+                    c->clean();
                 });
                 break;
             }
@@ -192,4 +203,14 @@ void gearoenix::net::Server::broadcast(const std::span<const std::byte> data) co
     }
 
     enet_host_broadcast(host, 0, packet);
+}
+
+void gearoenix::net::Server::bad_client(ServerClient& c)
+{
+    c.disconnected_callback();
+    if (2 < ++yellow_list[c.peer->address.host]) {
+        black_list[c.peer->address.host] = std::chrono::steady_clock::now();
+    }
+    clients.erase(c.peer);
+    c.clean();
 }

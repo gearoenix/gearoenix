@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
                 disconnect_sem.release();
             };
 
-            c->received_callback = [&, client_index](std::vector<std::byte>&& data) {
+            c->received_callback = [&, client_index](std::vector<std::uint8_t>&& data) {
                 BOOST_TEST(clients_messages[client_index] == std::string(reinterpret_cast<const char*>(data.data()), data.size()));
                 receive_sem.release();
             };
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
             client0_disconnected_from_server = true;
             disconnect_sem.release();
         },
-        [&](std::vector<std::byte>&& data) {
+        [&](std::vector<std::uint8_t>&& data) {
             const auto msg = std::string(reinterpret_cast<const char*>(data.data()), data.size());
             BOOST_TEST(server_messages[0] == msg);
             receive_sem.release();
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
             // This client will close by client side.
             BOOST_TEST(false);
         },
-        [&](std::vector<std::byte>&& data) {
+        [&](std::vector<std::uint8_t>&& data) {
             const auto msg = std::string(reinterpret_cast<const char*>(data.data()), data.size());
             BOOST_TEST(server_messages[1] == msg);
             receive_sem.release();
@@ -115,12 +115,16 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
 
     for (auto i = decltype(clients)::size_type { 0 }; i < clients.size(); ++i) {
         BOOST_TEST(clients[i]);
-        clients[i]->send(std::as_bytes(std::span(clients_messages[i])));
+        std::vector<std::uint8_t> d(clients_messages[i].size(), 0);
+        std::memcpy(d.data(), clients_messages[i].data(), clients_messages[i].size());
+        clients[i]->send(std::move(d));
     }
 
     for (auto i = decltype(server_clients)::size_type { 0 }; i < server_clients.size(); ++i) {
         BOOST_TEST(server_clients[i]);
-        BOOST_TEST(server_clients[i]->send(std::as_bytes(std::span(server_messages[i]))));
+        std::vector<std::uint8_t> d(server_messages[i].size(), 0);
+        std::memcpy(d.data(), server_messages[i].data(), server_messages[i].size());
+        BOOST_TEST(server_clients[i]->send(std::move(d)));
     }
 
     for (const auto& c : server_clients) {

@@ -16,8 +16,6 @@ void register_thread(std::thread::id thread_id, std::optional<std::thread>&& thr
 
 void send_job(std::thread::id receiver_thread_id, std::function<void()>&& job);
 void send_job_to_pool(std::function<void()>&& job);
-void send_job_io1(std::function<void()>&& job);
-void send_job_net1(std::function<void()>&& job);
 
 void execute_current_thread_jobs();
 

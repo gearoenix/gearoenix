@@ -92,12 +92,13 @@ set(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
 set(GX_SUBMODULES_DIR ${CMAKE_SOURCE_DIR}/submodules)
 
-find_package(boost_container CONFIG REQUIRED)
-find_package(boost_container_hash CONFIG REQUIRED)
-find_package(boost_core CONFIG REQUIRED)
-find_package(boost_headers CONFIG REQUIRED)
-find_package(boost_included_unit_test_framework CONFIG REQUIRED)
-find_package(boost_mp11 CONFIG REQUIRED)
+#find_package(boost_container CONFIG REQUIRED)
+#find_package(boost_container_hash CONFIG REQUIRED)
+#find_package(boost_core CONFIG REQUIRED)
+#find_package(boost_headers CONFIG REQUIRED)
+#find_package(boost_included_unit_test_framework CONFIG REQUIRED)
+#find_package(boost_mp11 CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED COMPONENTS lockfree mp11 included_unit_test_framework headers core container container_hash)
 
 find_package(SDL3 CONFIG REQUIRED)
 

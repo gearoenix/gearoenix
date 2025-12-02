@@ -20,18 +20,10 @@ constexpr double click_distance_threshold = 0.1;
 
 void initialise_default_font()
 {
-    const auto font = gearoenix::platform::stream::Stream::open(
-        gearoenix::platform::stream::Path::create_asset("default-font.ttf"));
-    if (nullptr == font) {
-        return;
-    }
-    const auto content_sz = font->size();
-    auto* const content = new char[content_sz];
-    const auto read_bytes = font->read(content, content_sz);
-    GX_ASSERT_D(content_sz == read_bytes);
+    const auto [content, read_bytes] = gearoenix::platform::BaseApplication::get_default_font_data();
     auto& io = ImGui::GetIO();
     auto* const fonts = io.Fonts;
-    io.FontDefault = fonts->AddFontFromMemoryTTF(content, static_cast<int>(read_bytes), 15);
+    io.FontDefault = fonts->AddFontFromMemoryTTF(content, read_bytes, 15);
 }
 
 void register_types()
@@ -369,6 +361,19 @@ void gearoenix::platform::BaseApplication::update()
     core_application->update();
     audio_engine->update();
     render_engine->end_frame();
+}
+
+std::pair<void*, int> gearoenix::platform::BaseApplication::get_default_font_data()
+{
+    const auto font = stream::Stream::open(stream::Path::create_asset("default-font.ttf"));
+    if (nullptr == font) {
+        return {nullptr, 0};
+    }
+    const auto content_sz = font->size();
+    auto* const content = new std::uint8_t[content_sz];
+    const auto read_bytes = font->read(content, content_sz);
+    GX_ASSERT_D(content_sz == read_bytes);
+    return { content, static_cast<int>(read_bytes) };
 }
 
 double gearoenix::platform::BaseApplication::normalise_x(const double x) const

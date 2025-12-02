@@ -90,6 +90,15 @@ public:
     void terminate();
     void update();
 
+    /// Load default fond data in memory
+    ///
+    /// This function loads the default font if presented in the `assets` folder
+    ///
+    /// @return If the default font file isn't in the `assets` folder,
+    ///         it will return null otherwise a loaded font data.
+    ///         The second return value is the size of the loaded data.
+    [[nodiscard]] static std::pair<void*, int> get_default_font_data();
+
 private:
     [[nodiscard]] double normalise_x(double x) const;
     [[nodiscard]] double normalise_y(double y) const;

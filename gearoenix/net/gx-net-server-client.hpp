@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <span>
@@ -8,6 +9,8 @@
 #include <enet/enet.h>
 
 namespace gearoenix::net {
+using uniform_ip_t = std::array<std::uint8_t, 16>;
+
 struct Server;
 
 /// Represents a single client connection managed by a Server instance.
@@ -44,10 +47,14 @@ private:
     ServerClient(ENetPeer* peer, std::shared_ptr<Server>&& server);
 
 public:
-    std::function<void(std::vector<std::byte>&&)> received_callback = [](auto&&) { };
+    std::function<void(std::vector<std::uint8_t>&&)> received_callback = [](auto&&) { };
     std::function<void()> disconnected_callback = [] { };
 
     ~ServerClient();
-    [[nodiscard]] bool send(std::span<const std::byte> data) const;
+    [[nodiscard]] bool send(std::span<const std::uint8_t> data) const;
+    [[nodiscard]] uniform_ip_t get_ip() const;
+
+    /// This function only sets the state of the client to the initialised mode.
+    void clean();
 };
 }

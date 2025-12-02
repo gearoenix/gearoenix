@@ -8,6 +8,7 @@ struct FunctionLoader final {
 private:
     std::mutex load_functions_lock;
     std::vector<std::function<void()>> load_functions;
+    std::vector<std::function<void()>> unload_functions;
 
 public:
     FunctionLoader();

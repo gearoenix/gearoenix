@@ -13,7 +13,7 @@ gearoenix::net::ServerClient::~ServerClient()
     enet_peer_disconnect(peer, 0);
 }
 
-bool gearoenix::net::ServerClient::send(const std::span<const std::byte> data) const
+bool gearoenix::net::ServerClient::send(const std::span<const std::uint8_t> data) const
 {
     if (data.empty()) {
         return false;
@@ -26,4 +26,24 @@ bool gearoenix::net::ServerClient::send(const std::span<const std::byte> data) c
     }
 
     return enet_peer_send(peer, 0, packet) == 0;
+}
+
+gearoenix::net::uniform_ip_t gearoenix::net::ServerClient::get_ip() const
+{
+    uniform_ip_t ip{};
+
+    const auto ipv4 = peer->address.host;
+
+    ip[0] = (ipv4 >> 24) & 0xFF;
+    ip[1] = (ipv4 >> 16) & 0xFF;
+    ip[2] = (ipv4 >> 8) & 0xFF;
+    ip[3] = ipv4 & 0xFF;
+
+    return ip;
+}
+
+void gearoenix::net::ServerClient::clean()
+{
+    disconnected_callback = []{};
+    received_callback = [](auto&&) {};
 }

@@ -29,7 +29,7 @@ struct Manager final : core::Singleton<Manager> {
         std::string&& address,
         std::uint16_t port,
         std::function<void()>&& disconnection_callback,
-        std::function<void(std::vector<std::byte>&&)>&& data_callback,
+        std::function<void(std::vector<std::uint8_t>&&)>&& data_callback,
         std::function<void(std::shared_ptr<Client>&&)>&& connection_callback) const;
 
     /// Constructs and configures a server for network communication.

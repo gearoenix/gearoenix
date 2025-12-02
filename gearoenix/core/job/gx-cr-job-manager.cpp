@@ -3,7 +3,10 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "../sync/gx-cr-sync-semaphore.hpp"
 #include "../sync/gx-cr-sync-thread.hpp"
+
 #include <boost/container/flat_map.hpp>
+#include <boost/lockfree/queue.hpp>
+
 #include <optional>
 #include <queue>
 #include <ranges>
@@ -39,7 +42,7 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
 {
     auto worker = std::make_unique<WorkerData>();
     worker->thread_data.emplace();
-    worker->thread = std::thread([data = worker.get()] {
+    worker->thread.emplace([data = worker.get()] {
         data->thread_data->state = ThreadState::Working;
         while (ThreadState::Working == data->thread_data->state) {
             if (tasks.empty() && data->function_loader.empty()) {
@@ -63,21 +66,14 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
         data->thread_data->state = ThreadState::Terminated;
     });
 
-    pool_signals.push_back(&(worker->thread_data->signal));
-
     const auto return_value = worker->thread->get_id();
 
     const std::lock_guard _lg(workers_lock);
+    pool_signals.push_back(&(worker->thread_data->signal));
     workers[return_value] = std::move(worker);
 
     return return_value;
 }
-
-std::thread::id io1_thread_id;
-WorkerData* io1_worker = nullptr;
-
-std::thread::id net1_thread_id;
-WorkerData* net1_worker = nullptr;
 
 bool initialised = false;
 }
@@ -88,12 +84,6 @@ void gearoenix::core::job::initialise()
         return;
     }
     initialised = true;
-
-    io1_thread_id = register_new_thread();
-    net1_thread_id = register_new_thread();
-
-    io1_worker = workers.find(io1_thread_id)->second.get();
-    net1_worker = workers.find(net1_thread_id)->second.get();
 
     const auto count = sync::threads_count() * 2;
     for (auto i = 0; i < count; ++i) {
@@ -108,7 +98,7 @@ void gearoenix::core::job::register_current_thread()
     register_thread(std::this_thread::get_id());
 }
 
-void gearoenix::core::job::register_thread(std::thread::id thread_id, std::optional<std::thread>&& thread)
+void gearoenix::core::job::register_thread(const std::thread::id thread_id, std::optional<std::thread>&& thread)
 {
     auto worker = std::make_unique<WorkerData>();
     worker->thread = std::move(thread);
@@ -144,26 +134,6 @@ void gearoenix::core::job::send_job_to_pool(std::function<void()>&& job)
     }
     for (auto* const s : pool_signals) {
         s->release();
-    }
-}
-
-void gearoenix::core::job::send_job_io1(std::function<void()>&& job)
-{
-    if (std::this_thread::get_id() == io1_thread_id) {
-        job();
-    } else {
-        io1_worker->function_loader.load(std::move(job));
-        io1_worker->thread_data->signal.release();
-    }
-}
-
-void gearoenix::core::job::send_job_net1(std::function<void()>&& job)
-{
-    if (std::this_thread::get_id() == net1_thread_id) {
-        job();
-    } else {
-        net1_worker->function_loader.load(std::move(job));
-        net1_worker->thread_data->signal.release();
     }
 }
 

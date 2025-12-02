@@ -16,7 +16,7 @@ void gearoenix::core::sync::Semaphore::lock()
 
 void gearoenix::core::sync::Semaphore::release()
 {
-    std::lock_guard _lock(m);
+    const std::lock_guard _(m);
     ++count;
-    c.notify_all();
+    c.notify_one();
 }

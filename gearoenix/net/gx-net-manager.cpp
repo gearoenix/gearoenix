@@ -20,7 +20,7 @@ void gearoenix::net::Manager::construct_client(
     std::string&& address,
     const std::uint16_t port,
     std::function<void()>&& disconnection_callback,
-    std::function<void(std::vector<std::byte>&&)>&& data_callback,
+    std::function<void(std::vector<std::uint8_t>&&)>&& data_callback,
     std::function<void(std::shared_ptr<Client>&&)>&& connection_callback) const
 {
     Client::construct(std::move(address), port, std::move(disconnection_callback), std::move(data_callback), std::move(connection_callback));

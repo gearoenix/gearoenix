@@ -20,14 +20,14 @@ void gearoenix::core::FunctionLoader::load(std::function<void()>&& fun)
 void gearoenix::core::FunctionLoader::unload()
 {
     while (!load_functions.empty()) {
-        std::vector<std::function<void()>> functions;
         {
             const std::lock_guard _lg(load_functions_lock);
-            std::swap(load_functions, functions);
+            std::swap(load_functions, unload_functions);
         }
-        for (const auto& f : functions) {
+        for (const auto& f : unload_functions) {
             f();
         }
+        unload_functions.clear();
     }
 }
 

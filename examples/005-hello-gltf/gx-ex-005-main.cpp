@@ -1,6 +1,7 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
@@ -20,6 +21,7 @@ typedef gearoenix::core::ecs::Entity GxEntity;
 typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
 typedef gearoenix::core::Object GxObject;
 typedef gearoenix::physics::constraint::Manager GxConstraintManager;
+typedef gearoenix::physics::constraint::JetController GxConstraintJet;
 typedef gearoenix::physics::Transformation GxTransform;
 typedef gearoenix::platform::stream::Path GxPath;
 typedef gearoenix::render::camera::Camera GxCamera;
@@ -92,10 +94,10 @@ public:
 
     void set_camera(const GxEntity* const e)
     {
-        (void)GxConstraintManager::get().create_jet_controller(
+        [[maybe_unused]] auto entity = GxConstraintManager::get().create_jet_controller(
             e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(),
             scene_entities[0].get());
-
+        entity->get_component<GxConstraintJet>()->set_movement_speed(3.0);
         scene_entities[0]->add_to_world();
     }
 
