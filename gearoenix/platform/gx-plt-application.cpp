@@ -21,6 +21,9 @@ constexpr double click_distance_threshold = 0.1;
 void initialise_default_font()
 {
     const auto [content, read_bytes] = gearoenix::platform::BaseApplication::get_default_font_data();
+    if (nullptr == content || read_bytes < 1) {
+        return;
+    }
     auto& io = ImGui::GetIO();
     auto* const fonts = io.Fonts;
     io.FontDefault = fonts->AddFontFromMemoryTTF(content, read_bytes, 15);
