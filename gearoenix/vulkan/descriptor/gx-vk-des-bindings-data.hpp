@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_RENDER_DESCRIPTOR_BINDINGS_DATA_HPP
-#define GEAROENIX_RENDER_DESCRIPTOR_BINDINGS_DATA_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <map>
@@ -25,7 +24,6 @@ struct BindingsData final {
 
     GX_GET_REFC_PRV(std::shared_ptr<SetLayout>, layout);
 
-private:
     const device::Logical& logical_device;
     const std::vector<VkDescriptorPoolSize> pool_sizes;
     std::map<std::variant<std::uint64_t, std::thread::id>, std::weak_ptr<PoolManager>> pools;
@@ -40,5 +38,4 @@ public:
 };
 }
 
-#endif
 #endif

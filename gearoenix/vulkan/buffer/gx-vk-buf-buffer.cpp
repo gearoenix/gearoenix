@@ -1,5 +1,5 @@
 #include "gx-vk-buf-buffer.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"

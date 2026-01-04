@@ -1,8 +1,9 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -21,7 +22,7 @@ struct Semaphore final {
     GX_GETSET_VAL_PRV(VkPipelineStageFlags, pipeline_stage, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
 
 public:
-    Semaphore(Semaphore&&);
+    Semaphore(Semaphore&&) noexcept;
     Semaphore(const Semaphore&) = delete;
     Semaphore& operator=(Semaphore&&) = delete;
     Semaphore& operator=(const Semaphore&) = delete;

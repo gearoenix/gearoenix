@@ -1,5 +1,5 @@
 #include "gx-vk-shd-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-shd-module.hpp"
 
 gearoenix::vulkan::shader::Manager::Manager(const engine::Engine& e)

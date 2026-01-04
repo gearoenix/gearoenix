@@ -1,5 +1,5 @@
 #include "gx-vk-mdl-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-mdl-builder.hpp"
 

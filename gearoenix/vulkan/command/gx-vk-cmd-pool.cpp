@@ -1,11 +1,11 @@
 #include "gx-vk-cmd-pool.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::command::Pool::Pool(Pool&& o)
+gearoenix::vulkan::command::Pool::Pool(Pool&& o) noexcept
     : logical_device(o.logical_device)
     , vulkan_data(o.vulkan_data)
 {

@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_COMMAND_POOL_HPP
-#define GEAROENIX_VULKAN_COMMAND_POOL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
@@ -15,7 +14,7 @@ struct Pool final {
     GX_GET_VAL_PRV(VkCommandPool, vulkan_data, nullptr);
 
 public:
-    Pool(Pool&&);
+    Pool(Pool&&) noexcept;
     Pool(const Pool&) = delete;
     explicit Pool(const device::Logical& logical_device);
     ~Pool();
@@ -23,5 +22,4 @@ public:
     Pool& operator=(const Pool&) = delete;
 };
 }
-#endif
 #endif

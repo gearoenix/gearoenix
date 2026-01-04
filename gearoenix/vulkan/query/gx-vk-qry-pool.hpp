@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_QUERY_POOL_HPP
-#define GEAROENIX_VULKAN_QUERY_POOL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <cstdint>
@@ -21,7 +20,6 @@ struct Pool final {
     GX_GET_CRRF_PRV(device::Logical, logical_device);
     GX_GET_VAL_PRV(VkQueryPool, vulkan_data, nullptr);
 
-private:
     std::mutex indices_lock;
     std::uint32_t latest_id = 0;
     std::map<VkQueryType, std::map<std::uint64_t /*id*/, std::uint32_t>> indices;
@@ -40,5 +38,4 @@ public:
 };
 }
 
-#endif
 #endif

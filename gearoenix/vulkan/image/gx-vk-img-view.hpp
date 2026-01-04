@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_IMAGE_VIEW_HPP
-#define GEAROENIX_VULKAN_IMAGE_VIEW_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-img-image.hpp"
@@ -24,5 +23,4 @@ public:
     [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr);
 };
 }
-#endif
 #endif

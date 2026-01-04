@@ -1,5 +1,5 @@
 #include "gx-vk-des-pool-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../platform/gx-plt-log.hpp"
 #include "gx-vk-des-pool.hpp"
 #include "gx-vk-des-set-layout.hpp"

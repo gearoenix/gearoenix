@@ -1,5 +1,5 @@
 #include "gx-vk-buf-uniform.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-buf-buffer.hpp"

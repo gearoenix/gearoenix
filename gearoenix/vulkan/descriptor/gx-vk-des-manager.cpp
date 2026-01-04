@@ -1,5 +1,5 @@
 #include "gx-vk-des-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-des-bindings-data.hpp"
 #include "gx-vk-des-pool.hpp"
 #include "gx-vk-des-set.hpp"

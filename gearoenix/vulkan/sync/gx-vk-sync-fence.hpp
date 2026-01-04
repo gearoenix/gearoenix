@@ -1,8 +1,9 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -24,12 +25,12 @@ public:
     Fence(Fence&&) = delete;
     Fence& operator=(const Fence&) = delete;
     Fence& operator=(Fence&&) = delete;
+
     explicit Fence(const device::Logical& logical_device, bool signaled = false);
     ~Fence();
     void wait();
     void reset();
-    [[nodiscard]] static std::vector<std::shared_ptr<Fence>> create_frame_based(
-        const engine::Engine& e, bool signaled = false);
+    [[nodiscard]] static std::vector<std::shared_ptr<Fence>> create_frame_based(const engine::Engine& e, bool signaled = false);
 };
 }
 #endif

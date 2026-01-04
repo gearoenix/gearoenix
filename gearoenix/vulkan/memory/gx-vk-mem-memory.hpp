@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_MEMORY_MEMORY_HPP
-#define GEAROENIX_VULKAN_MEMORY_MEMORY_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-mem-place.hpp"
@@ -26,7 +25,6 @@ struct Memory final {
     GX_GET_CVAL_PRV(std::uint32_t, type_index);
     GX_GET_VAL_PRV(VkDeviceMemory, vulkan_data, nullptr);
 
-private:
     Memory(
         const engine::Engine& e,
         std::shared_ptr<Memory> parent,
@@ -47,5 +45,4 @@ public:
     [[nodiscard]] std::shared_ptr<Memory> allocate(std::uint64_t size);
 };
 }
-#endif
 #endif

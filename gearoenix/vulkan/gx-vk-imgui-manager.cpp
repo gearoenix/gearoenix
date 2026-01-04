@@ -1,5 +1,5 @@
 #include "gx-vk-imgui-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "descriptor/gx-vk-des-pool.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"

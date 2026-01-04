@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_MESH_ACCEL_MANAGER_HPP
-#define GEAROENIX_VULKAN_MESH_ACCEL_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../render/mesh/gx-rnd-msh-manager.hpp"
 #include "../gx-vk-loader.hpp"
 
@@ -111,5 +110,4 @@ public:
 };
 }
 
-#endif
 #endif

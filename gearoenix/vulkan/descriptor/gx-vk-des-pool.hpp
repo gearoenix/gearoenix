@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
-#define GEAROENIX_RENDER_DESCRIPTOR_POOL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
@@ -21,7 +20,6 @@ struct Pool final {
     GX_GET_CRRF_PRV(device::Logical, logical_device);
     GX_GET_VAL_PRV(VkDescriptorPool, vulkan_data, nullptr);
 
-private:
     Pool(
         const device::Logical& logical_device,
         const VkDescriptorPoolSize* pool_sizes,
@@ -37,5 +35,4 @@ public:
     ~Pool();
 };
 }
-#endif
 #endif

@@ -1,11 +1,11 @@
-#ifndef GEAROENIX_RENDER_DESCRIPTOR_POOL_MANAGER_HPP
-#define GEAROENIX_RENDER_DESCRIPTOR_POOL_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../gx-vk-loader.hpp"
 #include <memory>
 #include <set>
 #include <vector>
+#include <mutex>
 
 namespace gearoenix::vulkan::device {
 struct Logical;
@@ -39,5 +39,4 @@ public:
 };
 }
 
-#endif
 #endif

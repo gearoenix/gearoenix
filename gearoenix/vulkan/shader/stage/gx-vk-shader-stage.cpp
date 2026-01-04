@@ -1,5 +1,5 @@
 #include "gx-vk-shader-stage.hpp"
-#ifdef USE_VULKAN
+#if GX_ENABLE
 #include "../../../core/gx-cr-static.hpp"
 #include "../../../render/gx-rnd-engine.hpp"
 #include "../../../render/shader/stage/gx-rnd-shd-stg-stage.hpp"

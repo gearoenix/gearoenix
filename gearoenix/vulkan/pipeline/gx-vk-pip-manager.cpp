@@ -1,5 +1,5 @@
 #include "gx-vk-pip-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../device/gx-vk-dev-logical.hpp"

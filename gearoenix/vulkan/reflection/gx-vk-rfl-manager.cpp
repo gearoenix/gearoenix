@@ -1,5 +1,5 @@
 #include "gx-vk-rfl-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
 
 std::shared_ptr<gearoenix::render::reflection::Builder> gearoenix::vulkan::reflection::Manager::build_baked(

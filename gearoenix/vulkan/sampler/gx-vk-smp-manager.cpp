@@ -1,5 +1,5 @@
 #include "gx-vk-smp-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-smp-sampler.hpp"
 
 gearoenix::vulkan::sampler::Manager::Manager(std::shared_ptr<device::Logical> logical_device)

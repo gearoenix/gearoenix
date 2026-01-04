@@ -1,6 +1,6 @@
 #pragma once
 #include "../../core/gx-cr-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/sync/gx-cr-job-end-caller.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
@@ -15,7 +15,8 @@ struct View;
 
 namespace gearoenix::vulkan::texture {
 struct TextureCube final : public render::texture::TextureCube {
-    GX_GET_REFC_PRV(std::shared_ptr<image::View>, view)
+    GX_GET_REFC_PRV(std::shared_ptr<image::View>, view);
+
 public:
     TextureCube(
         core::Id id,

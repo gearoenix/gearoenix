@@ -1,4 +1,4 @@
 #include "gx-vk-cmr-camera.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 
 #endif

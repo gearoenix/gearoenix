@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
-#define GEAROENIX_RENDER_DESCRIPTOR_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include <map>
@@ -22,7 +21,6 @@ struct Pool;
 struct Manager final {
     GX_GET_UPTR_PRV(Pool, imgui);
 
-private:
     const device::Logical& logical_device;
     std::map<std::vector<std::uint8_t>, std::unique_ptr<BindingsData>> bindings_data;
 
@@ -41,5 +39,4 @@ public:
 };
 }
 
-#endif
 #endif

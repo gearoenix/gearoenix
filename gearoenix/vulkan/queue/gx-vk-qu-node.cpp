@@ -1,5 +1,5 @@
 #include "gx-vk-qu-node.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"

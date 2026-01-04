@@ -1,5 +1,5 @@
 #include "gx-vk-msh-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"

@@ -1,143 +1,65 @@
 #include "gx-vk-instance.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-vk-check.hpp"
+#include "../core/gx-cr-application.hpp"
+
 #include <set>
 #include <sstream>
 #include <vector>
 
 namespace gearoenix::vulkan {
-#ifdef GX_VULKAN_INSTANCE_DEBUG
-static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
-    VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
-    uint64_t object, std::uinptr_t location, int32_t messageCode,
-    const char* pLayerPrefix, const char* pMessage, void* pUserData)
+#if GX_VULKAN_INSTANCE_DEBUG
+static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(
+    const VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    const VkDebugUtilsMessageTypeFlagsEXT types,
+    const VkDebugUtilsMessengerCallbackDataEXT* const callback_data,
+    void* const)
 {
-    std::stringstream msg;
+    thread_local std::stringstream msg;
+    msg.clear();
+    msg.str(std::string());
+
     msg << "Vulkan ";
-    bool is_error = false;
-    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT)) {
-        msg << "Information ";
+    if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+        msg << "Verbose";
+    } else if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+        msg << "Info";
+    } else if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        msg << "Warning";
+    } else {
+        msg << "Error";
     }
-    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT)) {
-        is_error = true;
-        msg << "Warning ";
+    msg << " |";
+    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
+        msg << " General";
     }
-    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)) {
-        is_error = true;
-        msg << "Performance ";
+    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
+        msg << " Validation";
     }
-    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT)) {
-        is_error = true;
-        msg << "Error ";
+    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+        msg << " Performance";
     }
-    if (flags & static_cast<decltype(flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT)) {
-        msg << "Debug ";
+    if (callback_data->pMessageIdName != nullptr) {
+        msg << " |" << callback_data->pMessageIdName << "(" << callback_data->messageIdNumber << ")";
     }
-    msg << "Message: object_type: ";
-    switch (objectType) {
-    case VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_MAX_ENUM_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_MAX_ENUM_EXT";
-        break;
-    case VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT:
-        msg << "VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT";
-        break;
-    default:
-        msg << "UNKNOWN_TYPE(" << objectType << ")";
+    if (callback_data->pMessage != nullptr) {
+        msg << " | " << callback_data->pMessage;
     }
-    msg << " object: " << object;
-    msg << " location: " << location;
-    msg << " message-code: " << messageCode;
-    msg << " layer-prefix " << pLayerPrefix;
-    msg << " pMessage " << pMessage;
-    msg << " userdata " << pUserData;
+    if (callback_data->objectCount > 0) {
+        msg << " | Objects:";
+        for (std::uint32_t i = 0; i < callback_data->objectCount; ++i) {
+            const auto& info = callback_data->pObjects[i];
+            msg << " (" << info.objectHandle << ":" << info.objectType;
+            if (info.pObjectName != nullptr) {
+                msg << "-" << info.pObjectName;
+            }
+            msg << ")";
+        }
+    }
     const auto msg_str = msg.str();
-    if (is_error) {
+    if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
         if constexpr (GX_DEBUG_MODE) {
             GX_LOG_F(msg_str);
         } else {
@@ -152,8 +74,8 @@ static VkBool32 VKAPI_PTR implVkDebugReportCallbackEXT(
 
 static std::uint32_t find_api_version()
 {
-    const std::uint32_t min_version = VK_MAKE_VERSION(1u, 0u, 0u);
-    std::uint32_t result;
+    constexpr auto min_version = VK_MAKE_VERSION(1u, 4u, 0u);
+    std::uint32_t result = 0;
     if (nullptr != vkEnumerateInstanceVersion) {
         GX_VK_CHK(vkEnumerateInstanceVersion(&result));
     }
@@ -163,37 +85,32 @@ static std::uint32_t find_api_version()
 }
 }
 
-gearoenix::vulkan::Instance::Instance(Instance&& o)
-    : vulkan_data(o.vulkan_data)
-    , report_callback(o.report_callback)
-{
-    o.vulkan_data = nullptr;
-    o.report_callback = nullptr;
-}
+gearoenix::vulkan::Instance::Instance() : Singleton(this) {}
 
-std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct(
-    const platform::Application* app)
+std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct()
 {
-    Instance instance;
+    std::unique_ptr<Instance> instance(new Instance());
+
     VkApplicationInfo app_info;
     GX_SET_ZERO(app_info);
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.apiVersion = find_api_version();
     app_info.applicationVersion = VK_MAKE_VERSION(1u, 0u, 0u);
     app_info.engineVersion = VK_MAKE_VERSION(1u, 0u, 0u);
-    app_info.pApplicationName = app == nullptr ? GX_APPLICATION_NAME : app->get_base().get_configuration().get_application_name().c_str();
+    app_info.pApplicationName = core::Application::get_application_name().c_str();
     app_info.pEngineName = GX_ENGINE_NAME;
+
     std::set<std::string> instance_extensions_set;
     instance_extensions_set.insert(VK_KHR_SURFACE_EXTENSION_NAME);
     instance_extensions_set.insert(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-    if (app != nullptr) {
-        auto sdl_extensions = app->get_vulkan_extensions();
-        instance_extensions_set.insert(
-            std::make_move_iterator(sdl_extensions.begin()),
-            std::make_move_iterator(sdl_extensions.end()));
-    }
-#ifdef GX_VULKAN_INSTANCE_DEBUG
-    instance_extensions_set.insert(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    auto sdl_extensions = platform::Application::get().get_vulkan_extensions();
+    instance_extensions_set.insert(
+        std::make_move_iterator(sdl_extensions.begin()),
+        std::make_move_iterator(sdl_extensions.end()));
+
+#if GX_VULKAN_INSTANCE_DEBUG
+    instance_extensions_set.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
     std::uint32_t layers_count = 0;
     vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
     std::vector<VkLayerProperties> properties(static_cast<std::uint64_t>(layers_count));
@@ -210,10 +127,6 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
         }
     };
     insert_layer("VK_LAYER_KHRONOS_validation");
-    // insert_layer("VK_LAYER_LUNARG_monitor");
-    // insert_layer("VK_LAYER_RENDERDOC_Capture");
-    // insert_layer("VK_LAYER_NV_nomad_release_public_2021_1_1");
-    // insert_layer("VK_LAYER_NV_GPU_Trace_release_public_2021_1_1");
     for (const char* const layer_name : instance_layers) {
         GX_LOG_D("Instance layer: " << layer_name);
     }
@@ -221,46 +134,59 @@ std::optional<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construc
         GX_LOG_D("extension: " << s);
     }
 #endif
+
     std::vector<const char*> instance_extensions;
+    instance_extensions.reserve(instance_extensions_set.size());
     for (const auto& s : instance_extensions_set) {
         instance_extensions.push_back(s.c_str());
     }
+
+#if GX_VULKAN_INSTANCE_DEBUG
+    VkDebugUtilsMessengerCreateInfoEXT debug_info;
+    GX_SET_ZERO(debug_info);
+    debug_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    debug_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    debug_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    debug_info.pfnUserCallback = impl_vk_debug_utils_callback;
+    debug_info.pUserData = nullptr;
+#endif
+
     VkInstanceCreateInfo instance_create_info;
     GX_SET_ZERO(instance_create_info);
     instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_create_info.pApplicationInfo = &app_info;
     instance_create_info.enabledExtensionCount = static_cast<std::uint32_t>(instance_extensions.size());
     instance_create_info.ppEnabledExtensionNames = instance_extensions.data();
-#ifdef GX_VULKAN_INSTANCE_DEBUG
+#if GX_VULKAN_INSTANCE_DEBUG
     instance_create_info.enabledLayerCount = static_cast<uint32_t>(instance_layers.size());
     instance_create_info.ppEnabledLayerNames = instance_layers.data();
+    instance_create_info.pNext = &debug_info;
 #endif
-    const auto create_result = vkCreateInstance(&instance_create_info, nullptr, &instance.vulkan_data);
-    if (VK_SUCCESS != create_result || nullptr == instance.vulkan_data) {
-        return std::nullopt;
+
+    if (const auto create_result = vkCreateInstance(&instance_create_info, nullptr, &instance->vulkan_data); VK_SUCCESS != create_result || nullptr == instance->vulkan_data) {
+        return nullptr;
     }
-    // Loading instance functions
-    Loader::load(instance.vulkan_data);
-#ifdef GX_VULKAN_INSTANCE_DEBUG
-    VkDebugReportCallbackCreateInfoEXT dbg_info;
-    GX_SET_ZERO(dbg_info);
-    dbg_info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-    dbg_info.flags = static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_DEBUG_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_INFORMATION_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) | static_cast<decltype(dbg_info.flags)>(VK_DEBUG_REPORT_ERROR_BIT_EXT);
-    dbg_info.pfnCallback = implVkDebugReportCallbackEXT;
-    GX_VK_CHK(vkCreateDebugReportCallbackEXT(instance.vulkan_data, &dbg_info, nullptr, &instance.report_callback));
+
+    Loader::load(instance->vulkan_data);
+
+#if GX_VULKAN_INSTANCE_DEBUG
+    GX_VK_CHK(vkCreateDebugUtilsMessengerEXT(instance->vulkan_data, &debug_info, nullptr, &instance->debug_messenger));
 #endif
+
     return instance;
 }
 
 gearoenix::vulkan::Instance::~Instance()
 {
     if (nullptr != vulkan_data) {
-#ifdef GX_VULKAN_INSTANCE_DEBUG
-        if (nullptr != report_callback) {
-            vkDestroyDebugReportCallbackEXT(vulkan_data, report_callback, nullptr);
-            report_callback = nullptr;
+
+#if GX_VULKAN_INSTANCE_DEBUG
+        if (nullptr != debug_messenger) {
+            vkDestroyDebugUtilsMessengerEXT(vulkan_data, debug_messenger, nullptr);
+            debug_messenger = nullptr;
         }
 #endif
+        
         vkDestroyInstance(vulkan_data, nullptr);
         vulkan_data = nullptr;
     }

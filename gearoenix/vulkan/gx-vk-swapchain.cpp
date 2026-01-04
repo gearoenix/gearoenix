@@ -1,5 +1,5 @@
 #include "gx-vk-swapchain.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "device/gx-vk-dev-logical.hpp"

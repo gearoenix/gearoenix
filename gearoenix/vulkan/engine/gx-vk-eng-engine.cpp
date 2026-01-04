@@ -1,9 +1,13 @@
 #include "gx-vk-eng-engine.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-vk-cmr-manager.hpp"
 #include "../gx-vk-imgui-manager.hpp"
+#include "../gx-vk-instance.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../gx-vk-surface.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
 #include "../queue/gx-vk-qu-graph.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
@@ -24,33 +28,36 @@ void gearoenix::vulkan::engine::Engine::window_resized()
     GX_UNIMPLEMENTED;
 }
 
-gearoenix::vulkan::engine::Engine::Engine(platform::Application& platform_application)
-    : render::engine::Engine(render::engine::Type::Vulkan, platform_application)
-    , instance(*Instance::construct(&platform_application))
-    , surface(instance, platform_application)
-    , physical_device(surface)
-    , logical_device(physical_device)
-    , swapchain(*this)
-    , memory_manager(*this)
-    , command_manager(*this)
-    , descriptor_manager(logical_device)
-    , pipeline_manager(*this)
-    , buffer_manager(memory_manager, *this)
-    , depth_stencil(image::View::create_depth_stencil(memory_manager))
-    , render_pass(swapchain)
-    , graphed_queue(new queue::Graph(*this))
-    , imgui_manager(new ImGuiManager(*this))
-    , vulkan_mesh_manager(new mesh::Manager(*this))
+gearoenix::vulkan::engine::Engine::Engine()
+    : render::engine::Engine(render::engine::Type::Vulkan)
+    , Singleton<Engine>(this)
+    , instance(Instance::construct())
+    , surface(new Surface())
+    , physical_device(new device::Physical())
+    , logical_device(new device::Logical())
+    , swapchain()
+    , memory_manager()
+    , command_manager()
+    , descriptor_manager()
+    , bindless_descriptor_manager()
+    , pipeline_manager()
+    , buffer_manager()
+    , depth_stencil(image::View::create_depth_stencil())
+    , render_pass()
+    , graphed_queue(new queue::Graph())
+    , imgui_manager(new ImGuiManager())
+    , vulkan_mesh_manager(new mesh::Manager())
 {
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vulkan_mesh_manager);
-    camera_manager = std::make_unique<camera::Manager>(*this);
-    reflection_manager = std::make_unique<reflection::Manager>(*this);
+    camera_manager = std::make_unique<camera::Manager>();
+    reflection_manager = std::make_unique<reflection::Manager>();
     initialize_frame();
 }
 
 gearoenix::vulkan::engine::Engine::~Engine()
 {
     world = nullptr;
+    bindless_descriptor_manager = nullptr;
     logical_device.wait_to_finish();
     imgui_manager = nullptr;
     frames.clear();
@@ -59,10 +66,10 @@ gearoenix::vulkan::engine::Engine::~Engine()
 void gearoenix::vulkan::engine::Engine::start_frame()
 {
     render::engine::Engine::start_frame();
-    if (!swapchain_image_is_valid && !platform_application.get_base().get_window_resizing()) {
+    if (!swapchain_image_is_valid && !platform::BaseApplication::get().get_window_resizing()) {
         logical_device.wait_to_finish();
         frames.clear();
-        depth_stencil = image::View::create_depth_stencil(memory_manager);
+        depth_stencil = image::View::create_depth_stencil();
         swapchain.initialize();
         initialize_frame();
         swapchain_image_is_valid = true;
@@ -70,8 +77,7 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     }
     imgui_manager->start_frame();
     if (swapchain_image_is_valid) {
-        const auto next_image = swapchain.get_next_image_index(graphed_queue->get_present_semaphore());
-        if (next_image.has_value()) {
+        if (const auto next_image = swapchain.get_next_image_index(graphed_queue->get_present_semaphore()); next_image.has_value()) {
             swapchain_image_index = *next_image;
             graphed_queue->start_frame();
         } else {
@@ -113,14 +119,17 @@ const gearoenix::vulkan::Framebuffer& gearoenix::vulkan::engine::Engine::get_cur
 
 bool gearoenix::vulkan::engine::Engine::is_supported()
 {
-    if (!Loader::load())
+    if (!Loader::load()) {
         return false;
-    auto instance_result = Instance::construct(nullptr);
-    if (!instance_result.has_value())
+    }
+
+    const auto instance_result = Instance::construct();
+    if (!instance_result.has_value()) {
         return false;
-    auto& instance = instance_result.value();
+    }
+
+    const auto& instance = instance_result.value();
     const auto gpus = device::Physical::get_available_devices(instance.get_vulkan_data());
     return !gpus.empty();
 }
-
 #endif

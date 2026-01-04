@@ -1,5 +1,5 @@
 #include "gx-vk-txt-target.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/asset/gx-cr-asset-manager.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-txt-2d.hpp"

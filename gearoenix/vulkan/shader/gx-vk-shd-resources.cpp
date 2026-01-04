@@ -1,5 +1,5 @@
 #include "gx-vk-shd-resources.hpp"
-#ifdef USE_VULKAN
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-static.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-sub-buffer.hpp"

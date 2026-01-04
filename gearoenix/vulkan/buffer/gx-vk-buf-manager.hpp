@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
-#define GEAROENIX_VULKAN_BUFFER_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-job-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../gx-vk-loader.hpp"
 #include <memory>
 
@@ -62,18 +61,17 @@ public:
         const std::string& name,
         const void* data,
         std::uint64_t size,
-        const core::job::EndCaller& end = GX_DEFAULT_IGNORED_END_CALLER);
+        const core::job::EndCaller<>& end);
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(
         const std::string& name,
         const std::vector<T>& data,
-        const core::job::EndCaller& end = GX_DEFAULT_IGNORED_END_CALLER)
+        const core::job::EndCaller<>& end)
     {
         return create(name, data.data(), data.size() * sizeof(T), end);
     }
 };
 }
 
-#endif
 #endif

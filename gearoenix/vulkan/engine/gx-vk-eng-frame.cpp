@@ -1,5 +1,5 @@
 #include "gx-vk-eng-frame.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-swapchain.hpp"
 

@@ -1,9 +1,8 @@
-#ifndef GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
-#define GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-job-end-caller.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include <tuple>
 #include <vector>
 
@@ -31,5 +30,4 @@ public:
 };
 }
 
-#endif
 #endif

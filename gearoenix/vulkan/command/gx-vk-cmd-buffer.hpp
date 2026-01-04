@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
-#define GEAROENIX_VULKAN_COMMAND_BUFFER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-cmd-type.hpp"
@@ -57,5 +56,4 @@ public:
     [[nodiscard]] const VkCommandBuffer* get_vulkan_data_ptr() const;
 };
 }
-#endif
 #endif

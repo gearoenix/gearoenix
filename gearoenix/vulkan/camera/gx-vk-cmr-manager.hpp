@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_CAMERA_MANAGER_HPP
-#define GEAROENIX_VULKAN_CAMERA_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-manager.hpp"
 
 namespace gearoenix::vulkan::engine {
@@ -22,5 +21,4 @@ public:
 };
 }
 
-#endif
 #endif
