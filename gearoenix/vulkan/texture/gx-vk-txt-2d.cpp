@@ -1,25 +1,21 @@
 #include "gx-vk-txt-2d.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-image.hpp"
-#include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 
 gearoenix::vulkan::texture::Texture2D::Texture2D(
-    const core::Id id,
-    std::string name,
-    engine::Engine* const e,
+    std::string&& name,
     const std::vector<std::vector<std::uint8_t>>& data,
     const render::texture::TextureInfo& info,
     const std::uint64_t img_width,
     const std::uint64_t img_height,
-    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
-    : render::texture::Texture2D(id, std::move(name), info.format, info.sampler_info, e)
+    const core::job::EndCaller<>& call)
+    : render::texture::Texture2D(std::move(name), info)
     , view(new image::View(std::make_shared<image::Image>(
           static_cast<std::uint32_t>(img_width), static_cast<std::uint32_t>(img_height), 1u,
           static_cast<std::uint32_t>(compute_mipmaps_count(img_width, img_height)), 1u,

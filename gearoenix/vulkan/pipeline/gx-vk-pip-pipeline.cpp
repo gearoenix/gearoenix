@@ -8,9 +8,9 @@
 #include "gx-vk-pip-layout.hpp"
 
 gearoenix::vulkan::pipeline::Pipeline::Pipeline(
-    std::shared_ptr<Layout> layout,
-    std::shared_ptr<Cache> cache,
-    VkPipeline vulkan_data)
+    std::shared_ptr<Layout>&& layout,
+    std::shared_ptr<Cache>&& cache,
+    const VkPipeline vulkan_data)
     : layout(std::move(layout))
     , cache(std::move(cache))
     , vulkan_data(vulkan_data)
@@ -19,13 +19,12 @@ gearoenix::vulkan::pipeline::Pipeline::Pipeline(
 
 gearoenix::vulkan::pipeline::Pipeline::~Pipeline()
 {
-    vkDestroyPipeline(
-        layout->get_des_set_layout()->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroyPipeline(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Pipeline::construct_ray_tracing(
-    std::shared_ptr<Layout> layout,
-    std::shared_ptr<Cache> cache,
+    std::shared_ptr<Layout>&& layout,
+    std::shared_ptr<Cache>&& cache,
     const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
     const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info)
 {
@@ -39,9 +38,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     info.maxPipelineRayRecursionDepth = 2; // Ray depth
     info.layout = layout->get_vulkan_data();
     VkPipeline vulkan_data = nullptr;
-    GX_VK_CHK(vkCreateRayTracingPipelinesKHR(
-        layout->get_des_set_layout()->get_logical_device().get_vulkan_data(),
-        nullptr, cache->get_vulkan_data(), 1, &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateRayTracingPipelinesKHR(device::Logical::get().get_vulkan_data(), nullptr, cache->get_vulkan_data(), 1, &info, nullptr, &vulkan_data));
     return std::shared_ptr<Pipeline>(new Pipeline(std::move(layout), std::move(cache), vulkan_data));
 }
 

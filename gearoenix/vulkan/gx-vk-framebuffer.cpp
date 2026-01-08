@@ -7,52 +7,44 @@
 #include "gx-vk-render-pass.hpp"
 #include "image/gx-vk-img-view.hpp"
 
-gearoenix::vulkan::Framebuffer::Framebuffer(Framebuffer&& o)
-    : view(o.view)
-    , depth(o.depth)
-    , render_pass(o.render_pass)
-    , vulkan_data(o.vulkan_data)
-    , clear_colors(std::move(o.clear_colors))
-{
-    o.vulkan_data = nullptr;
-}
-
 gearoenix::vulkan::Framebuffer::Framebuffer(
-    const image::View* const v,
-    const image::View* const d,
-    const RenderPass* const rp)
-    : view(v)
-    , depth(d)
-    , render_pass(rp)
+    std::shared_ptr<image::View>&& v,
+    std::shared_ptr<image::View>&& d,
+    std::shared_ptr<RenderPass>&& rp)
+    : view(std::move(v))
+    , depth(std::move(d))
+    , render_pass(std::move(rp))
     , clear_colors {
         VkClearValue { .color = { 0.2f, 0.2f, 0.2f, 1.0f } },
         VkClearValue { .color = { 0.0f, 0.0f, 0.0f, 0.0f } }
     }
+    , vulkan_data([this] {
+        auto vk = decltype(vulkan_data){nullptr};
+        const auto& img = view->get_image();
+        const VkImageView attachments[2] {
+            view->get_vulkan_data(),
+            depth->get_vulkan_data(),
+        };
+
+        VkFramebufferCreateInfo info;
+        GX_SET_ZERO(info);
+        info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        info.renderPass = render_pass->get_vulkan_data();
+        info.layers = 1;
+        info.attachmentCount = 2;
+        info.pAttachments = attachments;
+        info.width = img->get_image_width();
+        info.height = img->get_image_height();
+        GX_VK_CHK(vkCreateFramebuffer(device::Logical::get().get_vulkan_data(), &info, nullptr, &vk));
+
+        return vk;
+    }())
 {
-    const auto& img = view->get_image();
-    const auto& logical_device = img.get_logical_device();
-    const VkImageView attachments[2] {
-        view->get_vulkan_data(),
-        depth->get_vulkan_data(),
-    };
-    VkFramebufferCreateInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    info.renderPass = render_pass->get_vulkan_data();
-    info.layers = 1;
-    info.attachmentCount = 2;
-    info.pAttachments = attachments;
-    info.width = img.get_image_width();
-    info.height = img.get_image_height();
-    GX_VK_CHK(vkCreateFramebuffer(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::Framebuffer::~Framebuffer()
 {
-    if (nullptr != vulkan_data) {
-        vkDestroyFramebuffer(view->get_image().get_logical_device()->get_vulkan_data(), vulkan_data, nullptr);
-        vulkan_data = nullptr;
-    }
+    vkDestroyFramebuffer(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif

@@ -85,7 +85,7 @@ static std::uint32_t find_api_version()
 }
 }
 
-gearoenix::vulkan::Instance::Instance() : Singleton(this) {}
+gearoenix::vulkan::Instance::Instance() : Singleton(this), api_version(find_api_version()) {}
 
 std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct()
 {

@@ -3,6 +3,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <memory>
 
 namespace gearoenix::vulkan::buffer {
@@ -24,7 +25,6 @@ struct Manager;
 
 namespace gearoenix::vulkan::image {
 struct Image final {
-    GX_GET_CPTR_PRV(device::Logical, logical_device);
     GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory);
     GX_GET_VAL_PRV(std::uint32_t, image_width, 0);
     GX_GET_VAL_PRV(std::uint32_t, image_height, 0);
@@ -36,14 +36,14 @@ struct Image final {
     GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0);
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
 
-private:
     void terminate();
 
 public:
+    Image(Image&&) = delete;
     Image(const Image&) = delete;
-    Image(Image&&);
+    Image& operator=(Image&&) = delete;
+    Image& operator=(const Image&) = delete;
     Image(
-        const device::Logical* logical_device,
         std::uint32_t image_width,
         std::uint32_t image_height,
         std::uint32_t image_depth,
@@ -61,11 +61,8 @@ public:
         std::uint32_t array_layers,
         VkFormat format,
         VkImageCreateFlags flags,
-        VkImageUsageFlags usage,
-        memory::Manager& memory_manager);
+        VkImageUsageFlags usage);
     ~Image();
-    Image& operator=(const Image&) = delete;
-    Image& operator=(Image&&);
     //    void transit(command::Buffer& cmd, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) ;
     //    void transit_for_writing(command::Buffer& cmd) ;
     //    void copy_from_buffer(command::Buffer& cmd, const buffer::Buffer& buf) ;

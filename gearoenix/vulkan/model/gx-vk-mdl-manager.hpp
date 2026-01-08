@@ -4,7 +4,7 @@
 #include "../../render/model/gx-rnd-mdl-manager.hpp"
 
 namespace gearoenix::vulkan::model {
-struct Manager final : render::model::Manager {
+struct Manager final : render::model::Manager, core::Singleton<Manager> {
 
     Manager();
     ~Manager() override;

@@ -6,11 +6,7 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::descriptor::Pool::Pool(
-    const device::Logical& logical_device,
-    const VkDescriptorPoolSize* pool_sizes,
-    const std::uint32_t count)
-    : logical_device(logical_device)
+gearoenix::vulkan::descriptor::Pool::Pool(const VkDescriptorPoolSize* pool_sizes, const std::uint32_t count)
 {
     VkDescriptorPoolCreateInfo info;
     GX_SET_ZERO(info);
@@ -19,11 +15,10 @@ gearoenix::vulkan::descriptor::Pool::Pool(
     info.pPoolSizes = pool_sizes;
     info.maxSets = 1000 * count;
     info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    GX_VK_CHK(vkCreateDescriptorPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateDescriptorPool(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create_imgui(
-    const device::Logical& logical_device)
+gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create_imgui()
 {
     const VkDescriptorPoolSize pool_sizes[] = {
         { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -38,12 +33,12 @@ gearoenix::vulkan::descriptor::Pool* gearoenix::vulkan::descriptor::Pool::create
         { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
         { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
     };
-    return new Pool(logical_device, pool_sizes, GX_COUNT_OF(pool_sizes));
+    return new Pool(pool_sizes, std::size(pool_sizes));
 }
 
 gearoenix::vulkan::descriptor::Pool::~Pool()
 {
-    vkDestroyDescriptorPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroyDescriptorPool(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 #endif

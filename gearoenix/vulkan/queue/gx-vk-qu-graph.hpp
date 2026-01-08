@@ -4,9 +4,8 @@
 #include "gx-vk-qu-node-label.hpp"
 #include "gx-vk-qu-node.hpp"
 #include "gx-vk-qu-queue.hpp"
-#include <atomic>
+
 #include <boost/container/flat_set.hpp>
-#include <string>
 
 namespace gearoenix::vulkan::sync {
 struct Fence;
@@ -40,7 +39,6 @@ struct Graph final {
     GX_GET_CREF_PRV(NodeMap, nodes);
     GX_GET_CREF_PRV(std::vector<SubmitData>, submit_data);
 
-private:
     void update_traversing_level();
     void clear_submit_data();
     void update_submit_data(Node& node);
@@ -48,7 +46,7 @@ private:
     void submit();
 
 public:
-    explicit Graph(engine::Engine&);
+    explicit Graph();
     ~Graph();
     [[nodiscard]] std::vector<std::shared_ptr<command::Buffer>> place_node_between(
         NodeLabel provider_node_label,
@@ -61,7 +59,7 @@ public:
         NodeLabel consumer_node_label,
         VkPipelineStageFlags wait_stage);
     void start_frame();
-    [[nodiscard]] bool present(Swapchain& swapchain, std::uint32_t image_index);
+    [[nodiscard]] bool present(std::uint32_t image_index);
     [[nodiscard]] const sync::Semaphore& get_present_semaphore();
 };
 }

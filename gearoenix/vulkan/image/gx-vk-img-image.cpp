@@ -7,34 +7,18 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
 #include "../gx-vk-check.hpp"
 
 void gearoenix::vulkan::image::Image::terminate()
 {
     if (nullptr != allocated_memory && vulkan_data != nullptr) {
-        vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }
 
-gearoenix::vulkan::image::Image::Image(Image&& o)
-    : logical_device(o.logical_device)
-    , allocated_memory(std::move(o.allocated_memory))
-    , image_width(o.image_width)
-    , image_height(o.image_height)
-    , image_depth(o.image_depth)
-    , mipmap_level(o.mipmap_level)
-    , array_layers(o.array_layers)
-    , format(o.format)
-    , flags(o.flags)
-    , usage(o.usage)
-    , vulkan_data(o.vulkan_data)
-{
-    o.vulkan_data = nullptr;
-}
-
 gearoenix::vulkan::image::Image::Image(
-    const device::Logical* const logical_device,
     const std::uint32_t image_width,
     const std::uint32_t image_height,
     const std::uint32_t image_depth,
@@ -43,9 +27,8 @@ gearoenix::vulkan::image::Image::Image(
     const VkFormat format,
     const VkImageCreateFlags flags,
     const VkImageUsageFlags usage,
-    VkImage vulkan_data)
-    : logical_device(logical_device)
-    , image_width(image_width)
+    const VkImage vulkan_data)
+    : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
     , mipmap_level(mipmap_level)
@@ -65,10 +48,8 @@ gearoenix::vulkan::image::Image::Image(
     const std::uint32_t array_layers,
     const VkFormat format,
     const VkImageCreateFlags flags,
-    const VkImageUsageFlags usage,
-    memory::Manager& mem_mgr)
-    : logical_device(&mem_mgr.get_e().get_logical_device())
-    , image_width(image_width)
+    const VkImageUsageFlags usage)
+    : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
     , mipmap_level(mipmap_level)
@@ -77,6 +58,8 @@ gearoenix::vulkan::image::Image::Image(
     , flags(flags)
     , usage(usage)
 {
+    auto& logical_device = device::Logical::get();
+
     VkImageCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -92,16 +75,12 @@ gearoenix::vulkan::image::Image::Image(
     info.usage = usage;
     info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    GX_VK_CHK(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateImage(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
     VkMemoryRequirements mem_req;
     GX_SET_ZERO(mem_req);
-    vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
-    allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
-    GX_VK_CHK(vkBindImageMemory(
-        logical_device->get_vulkan_data(),
-        vulkan_data,
-        allocated_memory->get_vulkan_data(),
-        allocated_memory->get_allocator()->get_offset()));
+    vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
+    allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size), mem_req.memoryTypeBits, memory::Place::Gpu);
+    GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
 }
 
 gearoenix::vulkan::image::Image::~Image()
@@ -109,23 +88,6 @@ gearoenix::vulkan::image::Image::~Image()
     terminate();
 }
 
-gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Image&& o)
-{
-    terminate();
-    logical_device = o.logical_device;
-    allocated_memory = std::move(o.allocated_memory);
-    image_width = o.image_width;
-    image_height = o.image_height;
-    image_depth = o.image_depth;
-    mipmap_level = o.mipmap_level;
-    array_layers = o.array_layers;
-    format = o.format;
-    flags = o.flags;
-    usage = o.usage;
-    vulkan_data = o.vulkan_data;
-    o.vulkan_data = nullptr;
-    return *this;
-}
 //
 // void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
 //{

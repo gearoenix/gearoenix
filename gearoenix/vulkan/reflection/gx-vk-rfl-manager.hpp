@@ -3,35 +3,29 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-manager.hpp"
 
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
-
 namespace gearoenix::vulkan::reflection {
-struct Manager final : public render::reflection::Manager {
+struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
 private:
-    engine::Engine& vk_e;
-
-    std::shared_ptr<render::reflection::Builder> build_baked(
-        const std::string& name,
-        const std::shared_ptr<render::texture::TextureCube>& irradiance,
-        const std::shared_ptr<render::texture::TextureCube>& radiance,
-        const math::Aabb3<double>& include_box,
-        const core::job::EndCaller& end_callback) override;
-    std::shared_ptr<render::reflection::Builder> build_runtime(
-        const std::string& name,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::uint64_t_t environment_resolution,
-        std::uint64_t irradiance_resolution,
-        std::uint64_t radiance_resolution,
-        const core::job::EndCaller& end_callback) override;
     void update() override;
 
 public:
-    explicit Manager(engine::Engine& e);
+    Manager();
     ~Manager() override;
+    [[nodiscard]] core::ecs::EntityPtr build_baked(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        std::shared_ptr<render::texture::TextureCube>&& irradiance,
+        std::shared_ptr<render::texture::TextureCube>&& radiance,
+        const math::Aabb3<double>& include_box) override;
+    void build_runtime(
+        std::string&& name, core::ecs::Entity* parent,
+        const math::Aabb3<double>& receive_box,
+        const math::Aabb3<double>& exclude_box,
+        const math::Aabb3<double>& include_box,
+        std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution,
+        std::uint32_t radiance_resolution,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 };
 }
 #endif

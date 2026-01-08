@@ -7,20 +7,20 @@
 
 namespace gearoenix::vulkan::image {
 struct View final {
-    GX_GET_CREF_PRV(Image, image);
+    GX_GET_UCPTR_PRV(Image, image);
     GX_GET_VAL_PRV(VkImageView, vulkan_data, nullptr);
 
-private:
     void terminate();
 
 public:
-    explicit View(Image&& img);
-    View(View&&);
+    explicit View(std::unique_ptr<Image>&& img);
+    View(View&&) = delete;
     View(const View&) = delete;
-    ~View();
-    View& operator=(View&&);
+    View& operator=(View&&) = delete;
     View& operator=(const View&) = delete;
-    [[nodiscard]] static View create_depth_stencil(memory::Manager& mem_mgr);
+    ~View();
+
+    [[nodiscard]] static View create_depth_stencil();
 };
 }
 #endif

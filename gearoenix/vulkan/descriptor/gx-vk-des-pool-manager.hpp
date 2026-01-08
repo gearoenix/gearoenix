@@ -7,10 +7,6 @@
 #include <vector>
 #include <mutex>
 
-namespace gearoenix::vulkan::device {
-struct Logical;
-}
-
 namespace gearoenix::vulkan::descriptor {
 struct Pool;
 struct Set;
@@ -22,16 +18,13 @@ struct PoolManager final {
 
 private:
     std::mutex this_lock;
-    const device::Logical& logical_device;
     std::vector<std::unique_ptr<Pool>> pools;
     std::set<Pool*> free_pools;
     std::weak_ptr<PoolManager> self;
 
-    explicit PoolManager(const device::Logical& logical_device);
-    [[nodiscard]] static std::shared_ptr<PoolManager> construct(const device::Logical& logical_device);
-    [[nodiscard]] std::shared_ptr<Set> create_set(
-        const std::vector<VkDescriptorPoolSize>& pool_sizes,
-        const SetLayout& layout);
+    PoolManager();
+    [[nodiscard]] static std::shared_ptr<PoolManager> construct();
+    [[nodiscard]] std::shared_ptr<Set> create_set(const std::vector<VkDescriptorPoolSize>& pool_sizes, const SetLayout& layout);
     void pool_freed(Pool*);
 
 public:

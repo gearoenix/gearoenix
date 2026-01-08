@@ -11,10 +11,6 @@ namespace gearoenix::vulkan::buffer {
 struct Buffer;
 }
 
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
-
 namespace gearoenix::vulkan::mesh {
 struct Manager;
 struct Mesh final : render::mesh::Mesh {
@@ -30,12 +26,8 @@ struct Mesh final : render::mesh::Mesh {
 
 public:
     Mesh(
-        engine::Engine& e,
-        const std::string& name,
-        const render::Vertices& vertices,
-        const std::vector<std::uint32_t>& indices,
-        math::Aabb3<double>&& occlusion_box,
-        const core::job::EndCaller<>& end);
+        const std::string& name, const render::Vertices& vertices, const std::vector<std::uint32_t>& indices,
+        math::Aabb3<double>&& occlusion_box, const core::job::EndCaller<>& end);
     ~Mesh() override;
     [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const;
 };

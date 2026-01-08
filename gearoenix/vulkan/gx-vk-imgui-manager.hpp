@@ -8,16 +8,11 @@ namespace gearoenix::vulkan::command {
 struct Buffer;
 }
 
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
-
 namespace gearoenix::vulkan {
 struct ImGuiManager final {
-    constexpr static const auto* const NODE_NAME = "ui";
+    constexpr static char NODE_NAME[] = "ui";
 
 private:
-    engine::Engine& e;
     const std::vector<std::shared_ptr<command::Buffer>> cmds;
 
 public:
@@ -26,7 +21,7 @@ public:
     ImGuiManager& operator=(ImGuiManager&&) = delete;
     ImGuiManager& operator=(const ImGuiManager&&) = delete;
 
-    explicit ImGuiManager(engine::Engine& e);
+    ImGuiManager();
     ~ImGuiManager();
 
     void upload_fonts();

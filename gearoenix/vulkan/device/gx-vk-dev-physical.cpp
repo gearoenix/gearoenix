@@ -359,9 +359,9 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
     GX_LOG_F("Could not find the requested memory type.");
 }
 
-std::uint64_t gearoenix::vulkan::device::Physical::align_size(const std::uint64_t size) const
+std::int64_t gearoenix::vulkan::device::Physical::align_size(const std::int64_t size) const
 {
-    return math::Numeric::align(size, static_cast<std::uint64_t>(max_memory_alignment));
+    return math::Numeric::align(size, static_cast<std::int64_t>(max_memory_alignment));
 }
 
 VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const

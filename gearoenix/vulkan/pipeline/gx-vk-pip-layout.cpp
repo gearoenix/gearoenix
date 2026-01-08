@@ -5,19 +5,26 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::pipeline::Layout::Layout(std::shared_ptr<descriptor::SetLayout> _des_set_lay)
-    : des_set_layout(std::move(_des_set_lay))
+#include <ranges>
+
+gearoenix::vulkan::pipeline::Layout::Layout(std::vector<std::shared_ptr<descriptor::SetLayout>>&& layouts)
+    : des_set_layouts(std::move(layouts))
 {
+    const auto sets =
+            des_set_layouts
+            | std::views::transform([](const auto& l) { return l->get_vulkan_data(); })
+            | std::ranges::to<std::vector<VkDescriptorSetLayout>>();
+
     VkPipelineLayoutCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    info.setLayoutCount = 1;
-    info.pSetLayouts = des_set_layout->get_vulkan_data_ptr();
-    GX_VK_CHK(vkCreatePipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), &info, nullptr, &vulkan_data));
+    info.setLayoutCount = sets.size();
+    info.pSetLayouts = sets.data();
+    GX_VK_CHK(vkCreatePipelineLayout(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::pipeline::Layout::~Layout()
 {
-    vkDestroyPipelineLayout(des_set_layout->get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroyPipelineLayout(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 #endif

@@ -63,7 +63,7 @@ public:
     ~Physical() override;
 
     [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, std::uint32_t mem_properties) const;
-    [[nodiscard]] std::uint64_t align_size(std::uint64_t size) const;
+    [[nodiscard]] std::int64_t align_size(std::int64_t size) const;
 
     /// It's going to fetch new information about the surface every time.
     ///

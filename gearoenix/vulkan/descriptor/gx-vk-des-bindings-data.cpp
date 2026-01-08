@@ -22,17 +22,13 @@ std::vector<VkDescriptorPoolSize> gearoenix::vulkan::descriptor::BindingsData::c
     return result;
 }
 
-gearoenix::vulkan::descriptor::BindingsData::BindingsData(
-    const device::Logical& logical_device,
-    const std::vector<VkDescriptorSetLayoutBinding>& data)
-    : logical_device(logical_device)
-    , layout(new SetLayout(logical_device, data))
+gearoenix::vulkan::descriptor::BindingsData::BindingsData(const std::vector<VkDescriptorSetLayoutBinding>& data)
+    : layout(new SetLayout(data))
     , pool_sizes(create_pool_sizes(data))
 {
 }
 
-std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::BindingsData::create_set(
-    const std::optional<std::uint64_t> kernel_index)
+std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descriptor::BindingsData::create_set(const std::optional<std::uint64_t> kernel_index)
 {
     std::variant<std::uint64_t, std::thread::id> ti;
     if (kernel_index.has_value())
@@ -41,7 +37,7 @@ std::shared_ptr<gearoenix::vulkan::descriptor::Set> gearoenix::vulkan::descripto
         ti = std::this_thread::get_id();
     std::shared_ptr<PoolManager> pool = pools[ti].lock();
     if (nullptr == pool) {
-        pool = PoolManager::construct(logical_device);
+        pool = PoolManager::construct();
         pools[ti] = pool;
     }
     return pool->create_set(pool_sizes, *layout);

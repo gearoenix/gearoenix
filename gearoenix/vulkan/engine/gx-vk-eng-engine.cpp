@@ -3,16 +3,20 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-vk-cmr-manager.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../gx-vk-instance.hpp"
-#include "../device/gx-vk-dev-physical.hpp"
-#include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-surface.hpp"
+#include "../gx-vk-swapchain.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
 #include "../queue/gx-vk-qu-graph.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
+#include "../descriptor/gx-vk-des-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-eng-frame.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
@@ -35,11 +39,10 @@ gearoenix::vulkan::engine::Engine::Engine()
     , surface(new Surface())
     , physical_device(new device::Physical())
     , logical_device(new device::Logical())
-    , swapchain()
-    , memory_manager()
-    , command_manager()
-    , descriptor_manager()
-    , bindless_descriptor_manager()
+    , swapchain(new Swapchain())
+    , memory_manager(new memory::Manager())
+    , command_manager(new command::Manager())
+    , descriptor_manager(new descriptor::Manager())
     , pipeline_manager()
     , buffer_manager()
     , depth_stencil(image::View::create_depth_stencil())
@@ -48,6 +51,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , imgui_manager(new ImGuiManager())
     , vulkan_mesh_manager(new mesh::Manager())
 {
+    frames_count = swapchain->get_image_views().size();
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vulkan_mesh_manager);
     camera_manager = std::make_unique<camera::Manager>();
     reflection_manager = std::make_unique<reflection::Manager>();

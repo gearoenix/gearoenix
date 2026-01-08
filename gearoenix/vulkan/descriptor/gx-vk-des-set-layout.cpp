@@ -6,11 +6,9 @@
 #include "../gx-vk-check.hpp"
 
 gearoenix::vulkan::descriptor::SetLayout::SetLayout(
-    const device::Logical& logical_device,
     const std::vector<VkDescriptorSetLayoutBinding>& data,
     const VkDescriptorSetLayoutCreateFlags flags,
     const std::vector<VkDescriptorBindingFlags>& binding_flags)
-    : logical_device(logical_device)
 {
     VkDescriptorSetLayoutBindingFlagsCreateInfo binding_flags_info;
     GX_SET_ZERO(binding_flags_info);
@@ -30,12 +28,12 @@ gearoenix::vulkan::descriptor::SetLayout::SetLayout(
         info.pNext = &binding_flags_info;
     }
 
-    GX_VK_CHK(vkCreateDescriptorSetLayout(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateDescriptorSetLayout(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::descriptor::SetLayout::~SetLayout()
 {
-    vkDestroyDescriptorSetLayout(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroyDescriptorSetLayout(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 VkDescriptorSetLayout* gearoenix::vulkan::descriptor::SetLayout::get_vulkan_data_ptr()

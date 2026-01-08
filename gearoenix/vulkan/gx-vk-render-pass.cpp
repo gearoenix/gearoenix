@@ -1,6 +1,5 @@
 #include "gx-vk-render-pass.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../core/macro/gx-cr-mcr-counter.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
@@ -10,8 +9,8 @@
 gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw)
     : swapchain(std::move(sw))
 {
-    const auto& d = swapchain.get_logical_device();
-    const auto& p = d.get_physical_device();
+    const auto& d = device::Logical::get();
+    const auto& p = device::Physical::get();
 
     VkAttachmentDescription attachment_descriptions[2];
     GX_SET_ZERO(attachment_descriptions);
@@ -70,11 +69,11 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw)
     VkRenderPassCreateInfo render_pass_create_info;
     GX_SET_ZERO(render_pass_create_info);
     render_pass_create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    render_pass_create_info.attachmentCount = GX_COUNT_OF(attachment_descriptions);
+    render_pass_create_info.attachmentCount = std::size(attachment_descriptions);
     render_pass_create_info.pAttachments = attachment_descriptions;
     render_pass_create_info.subpassCount = 1;
     render_pass_create_info.pSubpasses = &subpass_description;
-    render_pass_create_info.dependencyCount = GX_COUNT_OF(dependencies);
+    render_pass_create_info.dependencyCount = std::size(dependencies);
     render_pass_create_info.pDependencies = dependencies;
 
     GX_VK_CHK(vkCreateRenderPass(d.get_vulkan_data(), &render_pass_create_info, nullptr, &vulkan_data));
@@ -82,8 +81,9 @@ gearoenix::vulkan::RenderPass::RenderPass(const Swapchain& sw)
 
 gearoenix::vulkan::RenderPass::~RenderPass()
 {
-    if (nullptr != vulkan_data)
-        vkDestroyRenderPass(swapchain.get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
+    if (nullptr != vulkan_data) {
+        vkDestroyRenderPass(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
+    }
 }
 
 #endif

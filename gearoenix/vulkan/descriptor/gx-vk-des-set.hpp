@@ -3,6 +3,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <memory>
 
 namespace gearoenix::vulkan::descriptor {
@@ -14,7 +15,6 @@ struct Set final {
 
     GX_GET_VAL_PRV(VkDescriptorSet, vulkan_data, nullptr);
 
-private:
     Pool* const pool;
     const std::shared_ptr<PoolManager> pool_manager;
 

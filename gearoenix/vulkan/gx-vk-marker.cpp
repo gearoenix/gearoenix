@@ -3,8 +3,10 @@
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 
-void gearoenix::vulkan::mark(const std::string& n, const std::uint64_t o, const VkObjectType t, const device::Logical& dev)
+void gearoenix::vulkan::mark(const std::string& n, const std::uint64_t o, const VkObjectType t)
 {
+    const auto& dev = device::Logical::get();
+
     if (nullptr == vkSetDebugUtilsObjectNameEXT) {
         return;
     }

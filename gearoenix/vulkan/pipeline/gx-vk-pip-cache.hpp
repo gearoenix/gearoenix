@@ -4,18 +4,14 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
-namespace gearoenix::vulkan::device {
-struct Logical;
-}
-
 namespace gearoenix::vulkan::pipeline {
 struct Cache final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device);
     GX_GET_VAL_PRV(VkPipelineCache, vulkan_data, nullptr);
 
 public:
+    Cache();
+    Cache(Cache&&) = delete;
     Cache(const Cache&) = delete;
-    explicit Cache(const device::Logical& logical_device);
     ~Cache();
 };
 }

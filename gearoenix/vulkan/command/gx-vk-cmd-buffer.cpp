@@ -13,11 +13,11 @@
 #include "gx-vk-cmd-pool.hpp"
 
 #if GX_DEBUG_MODE
-#define GX_VK_CMD_BUFF_DEBUG
+#define GX_VK_CMD_BUFF_DEBUG true
 #endif
 
-gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t)
-    : pool(pool)
+gearoenix::vulkan::command::Buffer::Buffer(std::shared_ptr<Pool>&& p, const Type t)
+    : pool(std::move(p))
     , type(t)
 {
     VkCommandBufferAllocateInfo info;
@@ -26,10 +26,10 @@ gearoenix::vulkan::command::Buffer::Buffer(Pool* const pool, const Type t)
     info.commandPool = pool->get_vulkan_data();
     info.level = t == Type::Primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
     info.commandBufferCount = 1;
-    GX_VK_CHK(vkAllocateCommandBuffers(pool->get_logical_device().get_vulkan_data(), &info, &vulkan_data));
+    GX_VK_CHK(vkAllocateCommandBuffers(device::Logical::get().get_vulkan_data(), &info, &vulkan_data));
 }
 
-gearoenix::vulkan::command::Buffer::Buffer(command::Buffer&& o)
+gearoenix::vulkan::command::Buffer::Buffer(Buffer&& o) noexcept
     : pool(o.pool)
     , type(o.type)
     , vulkan_data(o.vulkan_data)
@@ -41,8 +41,7 @@ gearoenix::vulkan::command::Buffer::~Buffer()
 {
     if (nullptr != vulkan_data) {
         vkFreeCommandBuffers(
-            pool->get_logical_device().get_vulkan_data(),
-            pool->get_vulkan_data(), 1, &vulkan_data);
+            device::Logical::get().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data);
         vulkan_data = nullptr;
     }
 }
@@ -58,20 +57,17 @@ void gearoenix::vulkan::command::Buffer::begin()
 
 void gearoenix::vulkan::command::Buffer::end()
 {
+    GX_ASSERT_D(has_record);
     GX_VK_CHK(vkEndCommandBuffer(vulkan_data));
+    has_record = false;
 }
 
-void gearoenix::vulkan::command::Buffer::copy(
-    buffer::Buffer& src,
-    buffer::Buffer& des,
-    const std::vector<VkBufferCopy>& info)
+void gearoenix::vulkan::command::Buffer::copy(const buffer::Buffer& src, const buffer::Buffer& des, const std::vector<VkBufferCopy>& info)
 {
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), des.get_vulkan_data(), static_cast<std::uint32_t>(info.size()), info.data());
 }
 
-void gearoenix::vulkan::command::Buffer::copy(
-    buffer::Buffer& src,
-    buffer::Buffer& dst)
+void gearoenix::vulkan::command::Buffer::copy(const buffer::Buffer& src, const buffer::Buffer& dst)
 {
     VkBufferCopy info;
     const auto& src_alc = *src.get_allocator();
@@ -107,8 +103,8 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     info.renderPass = render_pass.get_vulkan_data();
     info.framebuffer = framebuffer.get_vulkan_data();
-    info.renderArea.extent.width = img.get_image_width();
-    info.renderArea.extent.height = img.get_image_height();
+    info.renderArea.extent.width = img->get_image_width();
+    info.renderArea.extent.height = img->get_image_height();
     info.clearValueCount = 2;
     info.pClearValues = framebuffer.get_clear_colors().data();
     vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
@@ -162,7 +158,7 @@ void gearoenix::vulkan::command::Buffer::end_render_pass()
 //     Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
 // }
 
-void gearoenix::vulkan::command::Buffer::draw_indices(VkDeviceSize count)
+void gearoenix::vulkan::command::Buffer::draw_indices(const VkDeviceSize count)
 {
     vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
 }

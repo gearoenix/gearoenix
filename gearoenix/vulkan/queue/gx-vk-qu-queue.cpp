@@ -4,34 +4,30 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
-#include "../sync/gx-vk-sync-semaphore.hpp"
+
 #include <boost/container/flat_map.hpp>
 #include <mutex>
 #include <thread>
 
-gearoenix::vulkan::queue::Queue::Queue(engine::Engine& e)
-    : e(e)
+gearoenix::vulkan::queue::Queue::Queue()
 {
     static std::mutex queue_index_lock;
     static std::uint32_t latest_queue_index = 0;
     static boost::container::flat_map<std::thread::id, std::uint32_t> thread_queue_index_map {};
-    std::lock_guard<std::mutex> _lg(queue_index_lock);
+    const std::lock_guard _lg(queue_index_lock);
     uint32_t queue_index = 0;
-    if (auto queue_index_search = thread_queue_index_map.find(std::this_thread::get_id()); thread_queue_index_map.end() != queue_index_search) {
+    if (const auto queue_index_search = thread_queue_index_map.find(std::this_thread::get_id()); thread_queue_index_map.end() != queue_index_search) {
         queue_index = queue_index_search->second;
     } else {
         queue_index = latest_queue_index;
         ++latest_queue_index;
         thread_queue_index_map.emplace(std::this_thread::get_id(), queue_index);
     }
-    vkGetDeviceQueue(
-        e.get_logical_device().get_vulkan_data(),
-        e.get_physical_device().get_graphics_queue_node_index(),
-        queue_index,
-        &vulkan_data);
+    vkGetDeviceQueue(device::Logical::get().get_vulkan_data(), device::Physical::get().get_graphics_queue_node_index(), queue_index, &vulkan_data);
 }
 
 gearoenix::vulkan::queue::Queue::~Queue() = default;
@@ -54,7 +50,7 @@ void gearoenix::vulkan::queue::Queue::submit(
     const VkCommandBuffer* const commands,
     const std::uint64_t signal_semaphores_count,
     const VkSemaphore* const signal_semaphores,
-    VkFence fence)
+    const VkFence fence)
 {
     VkSubmitInfo info;
     GX_SET_ZERO(info);

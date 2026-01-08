@@ -3,6 +3,7 @@
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "device/gx-vk-dev-logical.hpp"
+#include <utility>
 #include "device/gx-vk-dev-physical.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
@@ -11,12 +12,11 @@
 #include "sync/gx-vk-sync-semaphore.hpp"
 
 #if GX_DEBUG_MODE
-#define GX_DEBUG_SWAPCHAIN
+#define GX_DEBUG_SWAPCHAIN true
 #endif
 
-gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e)
-    : e(e)
-    , logical_device(e.get_logical_device())
+gearoenix::vulkan::Swapchain::Swapchain()
+    : Singleton(this)
     , format {}
 {
     initialize();
@@ -24,14 +24,14 @@ gearoenix::vulkan::Swapchain::Swapchain(const engine::Engine& e)
 
 gearoenix::vulkan::Swapchain::~Swapchain()
 {
-    vkDestroySwapchainKHR(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+    vkDestroySwapchainKHR(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore)
 {
     std::uint32_t image_index = 0;
     const VkResult result = vkAcquireNextImageKHR(
-        logical_device.get_vulkan_data(), vulkan_data,
+        device::Logical::get().get_vulkan_data(), vulkan_data,
         std::numeric_limits<std::uint64_t>::max(),
         semaphore.get_vulkan_data(), nullptr, &image_index);
     switch (result) {
@@ -48,31 +48,47 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
 void gearoenix::vulkan::Swapchain::initialize()
 {
     image_views.clear();
-    const auto& physical_device = logical_device.get_physical_device();
-    const auto& surface = physical_device.get_surface();
+    const auto& physical_device = device::Physical::get();
+    const auto& logical_device = device::Logical::get();
+    const auto& surface = Surface::get();
     const auto caps = physical_device.get_surface_capabilities();
     const auto& formats = physical_device.get_surface_formats();
     const auto old_swapchain = vulkan_data;
-    std::uint32_t chosen_format_index;
-    for (chosen_format_index = 0; chosen_format_index < formats.size(); ++chosen_format_index) {
-        if (formats[chosen_format_index].format == VK_FORMAT_R8G8B8A8_UNORM)
-            break;
-    }
+
+    auto chosen_format_index = [&] {
+        constexpr std::array acceptable_formats {
+            std::pair { VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
+            std::pair { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
+            std::pair { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
+            std::pair { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR },
+        };
+        for (const auto& acceptable_format : acceptable_formats) {
+            for (std::uint32_t i = 0; i < formats.size(); ++i) {
+                if (formats[i].format == acceptable_format.first && formats[i].colorSpace == acceptable_format.second) {
+                    return i;
+                }
+            }
+        }
+        return std::numeric_limits<std::uint32_t>::max();
+    }();
+
     if (chosen_format_index >= formats.size()) {
-        GX_LOG_D("VK_FORMAT_R8G8B8A8_UNORM not found in the surface.");
+        GX_LOG_D("The required format not found in the surface.");
         chosen_format_index = 0;
     }
+
     format = formats[chosen_format_index];
-    std::uint32_t swapchain_images_count = caps.maxImageCount > 2 ? 3 : 2;
+    std::uint32_t swapchain_images_count = caps.maxImageCount > 2 ? 4 : 2;
     if ((caps.maxImageCount > 0) && (swapchain_images_count > caps.maxImageCount)) {
         swapchain_images_count = caps.maxImageCount;
     }
     std::uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
     vkGetPhysicalDeviceFormatProperties(physical_device.get_vulkan_data(), format.format, &format_props);
-    if (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) {
+    if ((format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
+
     VkSwapchainCreateInfoKHR info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -80,10 +96,11 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.minImageCount = swapchain_images_count;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    if (caps.currentExtent.width != static_cast<decltype(caps.currentExtent.width)>(-1) && caps.currentExtent.width != 0 && caps.currentExtent.height != static_cast<decltype(caps.currentExtent.height)>(-1) && caps.currentExtent.height != 0) {
+    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 &&
+        caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
         info.imageExtent = caps.currentExtent;
     } else {
-        const auto window_size = e.get_platform_application().get_base().get_window_size();
+        const auto window_size = platform::BaseApplication::get().get_window_size();
         info.imageExtent.width = static_cast<decltype(caps.currentExtent.width)>(window_size.x);
         info.imageExtent.height = static_cast<decltype(caps.currentExtent.height)>(window_size.y);
     }
@@ -102,10 +119,12 @@ void gearoenix::vulkan::Swapchain::initialize()
         info.compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
     } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != 0) {
         info.compositeAlpha = VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR;
-    } else if ((caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR) != 0) {
-        info.compositeAlpha = VK_COMPOSITE_ALPHA_FLAG_BITS_MAX_ENUM_KHR;
     } else {
-        GX_LOG_F("Error composite is unknown.");
+        const auto fallback = static_cast<VkCompositeAlphaFlagBitsKHR>(caps.supportedCompositeAlpha & ~(caps.supportedCompositeAlpha - 1));
+        if (fallback == 0) {
+            GX_LOG_F("Error composite is unknown.");
+        }
+        info.compositeAlpha = fallback;
     }
     GX_VK_CHK(vkCreateSwapchainKHR(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
     std::uint32_t count = 0;
@@ -114,9 +133,16 @@ void gearoenix::vulkan::Swapchain::initialize()
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
     image_views.reserve(static_cast<std::uint64_t>(count));
     for (uint32_t i = 0; i < count; ++i) {
-        image_views.emplace_back(image::Image(
-            &logical_device, info.imageExtent.width, info.imageExtent.height, 1, 1, 1,
-            info.imageFormat, 0, info.imageUsage, images[i]));
+        image_views.emplace_back(std::make_unique<image::View>(std::make_unique<image::Image>(
+            static_cast<std::uint32_t>(info.imageExtent.width),
+            static_cast<std::uint32_t>(info.imageExtent.height),
+            static_cast<std::uint32_t>(1),
+            static_cast<std::uint32_t>(1),
+            static_cast<std::uint32_t>(1),
+            info.imageFormat,
+            static_cast<VkImageCreateFlags>(0),
+            info.imageUsage,
+            images[i])));
     }
     if (nullptr != old_swapchain) {
         vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);

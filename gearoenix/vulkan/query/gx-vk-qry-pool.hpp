@@ -3,13 +3,10 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <cstdint>
 #include <map>
 #include <mutex>
-
-namespace gearoenix::vulkan::device {
-struct Logical;
-}
 
 namespace gearoenix::vulkan::command {
 struct Buffer;
@@ -17,7 +14,6 @@ struct Buffer;
 
 namespace gearoenix::vulkan::query {
 struct Pool final {
-    GX_GET_CRRF_PRV(device::Logical, logical_device);
     GX_GET_VAL_PRV(VkQueryPool, vulkan_data, nullptr);
 
     std::mutex indices_lock;
@@ -27,7 +23,7 @@ struct Pool final {
     [[nodiscard]] std::uint32_t register_request(VkQueryType, std::uint64_t id);
 
 public:
-    Pool(const device::Logical& logical_device, VkQueryType, std::uint32_t = 1);
+    explicit Pool(VkQueryType, std::uint32_t = 1);
     ~Pool();
     Pool(Pool&&) = delete;
     Pool(const Pool&) = delete;

@@ -22,11 +22,7 @@ struct Frame final {
     Frame& operator=(Frame&&) = delete;
     Frame& operator=(const Frame&) = delete;
 
-    Frame(
-        const Swapchain&,
-        const image::View&,
-        const RenderPass&,
-        unsigned int);
+    Frame(const Swapchain&,const image::View&,const RenderPass&,unsigned int);
     ~Frame();
 };
 }

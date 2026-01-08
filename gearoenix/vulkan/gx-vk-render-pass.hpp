@@ -13,7 +13,7 @@ struct RenderPass final {
 
 public:
     RenderPass(const RenderPass&) = delete;
-    explicit RenderPass(const Swapchain& swapchain);
+    explicit RenderPass(const Swapchain& sw);
     ~RenderPass();
 };
 }

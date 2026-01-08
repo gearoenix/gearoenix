@@ -3,20 +3,11 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
-#include <map>
-#include <memory>
-#include <vector>
 
-namespace gearoenix::vulkan {
-struct Swapchain;
-}
+#include <vector>
 
 namespace gearoenix::vulkan::command {
 struct Buffer;
-}
-
-namespace gearoenix::vulkan::engine {
-struct Engine;
 }
 
 namespace gearoenix::vulkan::sync {
@@ -26,7 +17,6 @@ struct Semaphore;
 
 namespace gearoenix::vulkan::queue {
 struct Queue final {
-    GX_GET_RRF_PRV(engine::Engine, e);
     GX_GET_VAL_PRV(VkQueue, vulkan_data, nullptr);
 
 public:
@@ -35,7 +25,7 @@ public:
     Queue& operator=(Queue&&) = delete;
     Queue& operator=(const Queue&) = delete;
     /// It must be created in the same thread that it is going to be used.
-    explicit Queue(engine::Engine& e);
+    Queue();
     ~Queue();
     void submit(command::Buffer&, sync::Fence& fence);
     void submit(

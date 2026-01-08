@@ -3,6 +3,7 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../shader/gx-vk-shd-manager.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
@@ -101,14 +102,16 @@ void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing()
     }
 }
 
-gearoenix::vulkan::pipeline::Manager::Manager(const engine::Engine& e)
-    : cache(new Cache(e.get_logical_device()))
-    , shader_manager(new shader::Manager(e))
+gearoenix::vulkan::pipeline::Manager::Manager()
+    : Singleton(this)
+    , cache(new Cache())
+    , shader_manager(new shader::Manager())
 {
-    if (e.get_physical_device().get_rtx_supported())
+    if (device::Physical::get().get_rtx_supported()) {
         initialize_ray_tracing();
-    else
+    } else {
         GX_UNIMPLEMENTED;
+    }
 }
 
 gearoenix::vulkan::pipeline::Manager::~Manager() = default;
@@ -117,7 +120,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     const std::shared_ptr<descriptor::SetLayout>& des_set_layout)
 {
     return Pipeline::construct_ray_tracing(
-        std::make_shared<Layout>(des_set_layout), cache, stages_create_info, shader_group_create_info);
+        std::make_shared<Layout>(std::vector{des_set_layout}), std::shared_ptr(cache), stages_create_info, shader_group_create_info);
 }
 
 #endif

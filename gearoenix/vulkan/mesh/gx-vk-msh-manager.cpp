@@ -17,23 +17,26 @@
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../shader/gx-vk-shd-bindings.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 #include "gx-vk-msh-mesh.hpp"
+
 #include <memory>
 
-constexpr static const std::uint64_t default_init_mesh_descriptor_count = 200;
-constexpr static const std::uint64_t default_init_material_descriptor_count = 100;
-constexpr static const std::uint64_t default_init_2d_texture_descriptor_count = 500;
-constexpr static const std::uint64_t default_init_cube_texture_descriptor_count = 10;
+namespace {
+constexpr std::uint64_t default_init_mesh_descriptor_count = 200;
+constexpr std::uint64_t default_init_material_descriptor_count = 100;
+constexpr std::uint64_t default_init_2d_texture_descriptor_count = 500;
+constexpr std::uint64_t default_init_cube_texture_descriptor_count = 10;
+}
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
-    std::string&& name,
-    const std::uint64_t vertices_count,
-    const std::uint64_t indices_count,
-    core::job::EndCaller&& c,
-    std::shared_ptr<Mesh>&& result)
+    std::string&& name, const std::uint64_t vertices_count, const std::uint64_t indices_count,
+    core::job::EndCaller<>&& c, std::shared_ptr<Mesh>&& result)
 {
-    auto& dev = vk_e.get_logical_device();
-    auto& cmd_mgr = vk_e.get_command_manager();
+    auto& dev = device::Logical::get();
+    auto& cmd_mgr = command::Manager::get();
     const auto vk_dev = dev.get_vulkan_data();
 
     const auto [vba, iba] = result->get_buffers_address();
@@ -74,7 +77,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
-    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(bsz_info.accelerationStructureSize)));
+    result->accel_buff = std::move(buffer::Manager::get().create_static(static_cast<std::uint64_t>(bsz_info.accelerationStructureSize)));
     GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff);
 
     VkAccelerationStructureCreateInfoKHR asc_info;
@@ -86,20 +89,19 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
     asc_info.offset = result->accel_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data));
-    GX_VK_MARK(name + "-blas-temp", result->vulkan_data, vk_e.get_logical_device());
+    GX_VK_MARK(name + "-blas-temp", result->vulkan_data);
 
     bge_info.dstAccelerationStructure = result->vulkan_data;
 
-    auto scratch_buf = vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(bsz_info.buildScratchSize));
+    auto scratch_buf = buffer::Manager::get().create_static(static_cast<std::uint64_t>(bsz_info.buildScratchSize));
     GX_CHECK_NOT_EQUAL_D(nullptr, scratch_buf);
     const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
 
-    std::shared_ptr<query::Pool> query_pool(new query::Pool(
-        dev, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR));
+    auto query_pool = std::make_shared<query::Pool>(dev, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
-    GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data(), vk_e.get_logical_device());
+    GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data());
     cmd->begin();
     const auto* const rng_info_p = &rng_info;
     const auto* const* const rng_info_pp = &rng_info_p;
@@ -109,7 +111,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         { VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
     query_pool->issue_acceleration_structure_compacted_size(*cmd, result->vulkan_data);
     cmd->end();
-    std::shared_ptr<sync::Fence> fence(new sync::Fence(dev));
+    auto fence = std::make_shared<sync::Fence>(dev);
     waiter_queue->submit(*cmd, *fence);
     waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
@@ -118,17 +120,14 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
 }
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
-    std::string&& name,
-    std::shared_ptr<sync::Fence>&& fence,
-    core::job::EndCaller&& c,
-    std::shared_ptr<Mesh>&& result,
-    std::shared_ptr<query::Pool>&& query_pool)
+    std::string&& name,std::shared_ptr<sync::Fence>&& fence,core::job::EndCaller<>&& c,
+    std::shared_ptr<Mesh>&& result,std::shared_ptr<query::Pool>&& query_pool)
 {
     VkAccelerationStructureKHR old_accel = result->vulkan_data;
     auto old_accel_buff = std::move(result->accel_buff);
 
-    auto& dev = vk_e.get_logical_device();
-    auto& cmd_mgr = vk_e.get_command_manager();
+    auto& dev = device::Logical::get();
+    auto& cmd_mgr = command::Manager::get();
     const auto vk_dev = dev.get_vulkan_data();
 
     fence->wait();
@@ -136,7 +135,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 
     const auto compact_size = query_pool->get_acceleration_structure_compacted_size();
 
-    result->accel_buff = std::move(vk_e.get_buffer_manager().create_static(static_cast<std::uint64_t>(compact_size)));
+    result->accel_buff = std::move(buffer::Manager::get().create_static(static_cast<std::uint64_t>(compact_size)));
     GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff);
 
     VkAccelerationStructureCreateInfoKHR asc_info;
@@ -148,11 +147,12 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     asc_info.offset = result->accel_buff->get_allocator()->get_offset();
 
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data));
-    GX_VK_MARK(name + "-blas", result->vulkan_data, vk_e.get_logical_device());
+    GX_VK_MARK(name + "-blas", result->vulkan_data);
 
     auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
-    GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data(), vk_e.get_logical_device());
+    GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data());
     cmd->begin();
+
     VkCopyAccelerationStructureInfoKHR copy_info;
     GX_SET_ZERO(copy_info);
     copy_info.sType = VK_STRUCTURE_TYPE_COPY_ACCELERATION_STRUCTURE_INFO_KHR;
@@ -180,32 +180,30 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
 }
 
 void gearoenix::vulkan::mesh::Manager::create_accel_after_blas_copy(
-    [[maybe_unused]] core::job::EndCaller&& c,
-    std::shared_ptr<Mesh>&& result)
+    [[maybe_unused]] core::job::EndCaller<>&& c, std::shared_ptr<Mesh>&& result)
 {
     result->initialize_blas();
 }
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager::build(
-    std::string&& name,
-    render::Vertices&& vertices,
-    std::vector<std::uint32_t>&& indices,
-    math::Aabb3<double>&& occlusion_box,
-    const core::job::EndCaller& end_callback)
-{
-    std::shared_ptr<std::shared_ptr<Mesh>> result(new std::shared_ptr<Mesh>());
-    core::job::EndCaller end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable -> void {
-        waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable {
-            create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(*result));
-        });
-    });
-    *result = std::make_shared<Mesh>(vk_e, name, vertices, indices, std::move(occlusion_box), end);
-    return *result;
-}
+// std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::vulkan::mesh::Manager::build(
+//     std::string&& name,
+//     render::Vertices&& vertices,
+//     std::vector<std::uint32_t>&& indices,
+//     math::Aabb3<double>&& occlusion_box,
+//     const core::job::EndCaller<>& end_callback)
+// {
+//     std::shared_ptr<std::shared_ptr<Mesh>> result(new std::shared_ptr<Mesh>());
+//     core::job::EndCaller end([this, name = name, c = end_callback, vertices_count = core::count(vertices), indices_count = indices.size(), result]() mutable -> void {
+//         waiter->push([this, name = std::move(name), c = std::move(c), vertices_count, indices_count, result]() mutable {
+//             create_accel_after_vertices_ready(std::move(name), vertices_count, indices_count, std::move(c), std::move(*result));
+//         });
+//     });
+//     *result = std::make_shared<Mesh>(name, vertices, indices, std::move(occlusion_box), end);
+//     return *result;
+// }
 
-gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e)
-    : render::mesh::Manager(e)
-    , vk_e(e)
+gearoenix::vulkan::mesh::Manager::Manager()
+    : Singleton<Manager>(this)
     , waiter(new core::sync::WorkWaiter())
     , descriptor_bindings(GX_VK_BIND_RAY_MAX)
     , mesh_descriptor_write_info(default_init_mesh_descriptor_count)
@@ -213,7 +211,7 @@ gearoenix::vulkan::mesh::Manager::Manager(engine::Engine& e)
     , index_descriptor_write_info(default_init_mesh_descriptor_count)
 {
     waiter->push([this] {
-        waiter_queue = std::make_unique<queue::Queue>(vk_e);
+        waiter_queue = std::make_unique<queue::Queue>();
     });
 
     GX_SET_VECTOR_ZERO(mesh_descriptor_write_info);

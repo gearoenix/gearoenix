@@ -12,9 +12,7 @@ void gearoenix::vulkan::camera::Manager::update()
     render::camera::Manager::update();
 }
 
-gearoenix::vulkan::camera::Manager::Manager(engine::Engine& e)
-    : render::camera::Manager(e)
-    , vk_e(e)
+gearoenix::vulkan::camera::Manager::Manager()
 {
 }
 

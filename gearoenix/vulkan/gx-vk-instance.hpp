@@ -6,14 +6,13 @@
 #include "../core/gx-cr-singleton.hpp"
 #include "gx-vk-loader.hpp"
 
-#include <optional>
-
 #if GX_DEBUG_MODE
 #define GX_VULKAN_INSTANCE_DEBUG true
 #endif
 
 namespace gearoenix::vulkan {
 struct Instance final : core::Singleton<Instance> {
+    GX_GET_CVAL_PRV(std::uint32_t, api_version);
     GX_GET_VAL_PRV(VkInstance, vulkan_data, nullptr);
 
 #if GX_VULKAN_INSTANCE_DEBUG

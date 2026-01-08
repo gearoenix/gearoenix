@@ -21,35 +21,29 @@ std::uint32_t gearoenix::vulkan::query::Pool::register_request(const VkQueryType
     return latest_id++;
 }
 
-gearoenix::vulkan::query::Pool::Pool(
-    const device::Logical& logical_device,
-    const VkQueryType t,
-    const std::uint32_t c)
-    : logical_device(logical_device)
+gearoenix::vulkan::query::Pool::Pool(const VkQueryType t, const std::uint32_t c)
 {
     VkQueryPoolCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
     info.queryCount = c;
     info.queryType = t;
-    GX_VK_CHK(vkCreateQueryPool(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateQueryPool(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
 gearoenix::vulkan::query::Pool::~Pool()
 {
     if (nullptr != vulkan_data) {
-        vkDestroyQueryPool(logical_device.get_vulkan_data(), vulkan_data, nullptr);
+        vkDestroyQueryPool(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
         vulkan_data = nullptr;
     }
 }
 
 void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size(
-    command::Buffer& cmd,
-    VkAccelerationStructureKHR accel,
-    const std::uint64_t issue_id)
+    command::Buffer& cmd, const VkAccelerationStructureKHR accel, const std::uint64_t id)
 {
-    constexpr static const auto query_type = VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR;
-    const auto qi = register_request(query_type, issue_id);
+    constexpr auto query_type = VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR;
+    const auto qi = register_request(query_type, id);
     vkCmdResetQueryPool(cmd.get_vulkan_data(), vulkan_data, qi, 1);
     vkCmdWriteAccelerationStructuresPropertiesKHR(cmd.get_vulkan_data(), 1, &accel, query_type, vulkan_data, qi);
 }
@@ -58,7 +52,7 @@ VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacte
 {
     VkDeviceSize result = 0;
     GX_VK_CHK(vkGetQueryPoolResults(
-        logical_device.get_vulkan_data(), vulkan_data,
+        device::Logical::get().get_vulkan_data(), vulkan_data,
         indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1,
         sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT));
     return result;

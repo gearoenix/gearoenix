@@ -47,9 +47,7 @@ struct Fence;
 
 namespace gearoenix::vulkan::mesh {
 struct Mesh;
-struct Manager final : public render::mesh::Manager {
-    GX_GET_RRF_PRT(engine::Engine, vk_e);
-
+struct Manager final : render::mesh::Manager, core::Singleton<Manager> {
 private:
     struct MeshData final {
         VkAccelerationStructureInstanceKHR instance;
@@ -82,29 +80,26 @@ private:
         std::string&& name,
         std::uint64_t vertices_count,
         std::uint64_t indices_count,
-        core::job::EndCaller&& c,
+        core::job::EndCaller<>&& c,
         std::shared_ptr<Mesh>&& result);
 
     void create_accel_after_query_ready(
         std::string&& name,
         std::shared_ptr<sync::Fence>&& fence,
-        core::job::EndCaller&& c,
+        core::job::EndCaller<>&& c,
         std::shared_ptr<Mesh>&& result,
         std::shared_ptr<query::Pool>&& query_pool);
 
-    void create_accel_after_blas_copy(
-        core::job::EndCaller&& c,
-        std::shared_ptr<Mesh>&& result);
-
-    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
-        std::string&& name,
-        render::Vertices&& vertices,
-        std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        const core::job::EndCaller& end_callback) override;
+    void create_accel_after_blas_copy(core::job::EndCaller<>&& c, std::shared_ptr<Mesh>&& result);
+    void build(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<double>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback) override;
+    void build(std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, core::job::EndCallerShared<render::mesh::Mesh>&& end_callback) override;
 
 public:
-    explicit Manager(engine::Engine& e);
+    Manager();
+    Manager(Manager&&) = delete;
+    Manager(const Manager&) = delete;
+    Manager& operator=(Manager&&) = delete;
+    Manager& operator=(const Manager&) = delete;
     ~Manager() override;
     void update();
 };
