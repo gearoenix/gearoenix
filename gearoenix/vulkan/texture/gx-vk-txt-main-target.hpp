@@ -1,6 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 
 namespace gearoenix::vulkan {
@@ -29,8 +29,7 @@ struct Semaphore;
 }
 
 namespace gearoenix::vulkan::texture {
-struct MainTarget final : public render::texture::Target {
-public:
+struct MainTarget final : render::texture::Target {
     struct Frame {
         std::shared_ptr<Framebuffer> framebuffer;
         std::shared_ptr<sync::Fence> wait_fence;
@@ -43,18 +42,19 @@ public:
             std::shared_ptr<sync::Semaphore> start_semaphore,
             std::shared_ptr<sync::Semaphore> end_semaphore);
     };
-    GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain)
-    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil)
-    GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass)
-    GX_GET_CREF_PRV(std::vector<Frame>, frames)
-    GX_GET_PTR_PRV(Frame, current_frame)
+
+    GX_GET_CREF_PRV(std::shared_ptr<Swapchain>, swapchain);
+    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil);
+    GX_GET_CREF_PRV(std::shared_ptr<RenderPass>, render_pass);
+    GX_GET_CREF_PRV(std::vector<Frame>, frames);
+    GX_GET_PTR_PRV(Frame, current_frame);
 
     MainTarget(const MainTarget& o);
 
 public:
     MainTarget(memory::Manager& memory_manager, engine::Engine* e);
     ~MainTarget() override;
-    [[nodiscard]] render::texture::Target* clone() const override;
+    [[nodiscard]] Target* clone() const override;
     void update();
     void present();
 };

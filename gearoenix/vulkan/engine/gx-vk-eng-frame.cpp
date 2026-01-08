@@ -1,14 +1,11 @@
 #include "gx-vk-eng-frame.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-swapchain.hpp"
 
 gearoenix::vulkan::engine::Frame::Frame(
-    const Swapchain& swapchain,
-    const image::View& depth_stencil,
-    const RenderPass& render_pass,
-    const unsigned int frame_index)
-    : framebuffer(new Framebuffer(&swapchain.get_image_views()[frame_index], &depth_stencil, &render_pass))
+    const Swapchain& swapchain, const image::View& depth_stencil, const RenderPass& render_pass, const unsigned int frame_index)
+    : framebuffer(new Framebuffer(swapchain.get_image_views()[frame_index].get(), &depth_stencil, &render_pass))
 {
 }
 

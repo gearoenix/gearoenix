@@ -20,7 +20,7 @@ private:
     Semaphore semaphore;
     FunctionLoader function_loader;
     std::thread thread;
-    State state = State::Working;
+    std::atomic<State> state = State::Working;
 
     void wait_loop();
 
