@@ -22,6 +22,7 @@ public:
         const core::job::EndCaller<>& call);
     ~Texture2D() override;
     [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format);
+
 };
 }
 #endif

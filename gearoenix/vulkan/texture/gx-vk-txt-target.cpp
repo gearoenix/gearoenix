@@ -1,104 +1,113 @@
 #include "gx-vk-txt-target.hpp"
-#if GX_RENDER_VULKAN_ENABLED
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
+#ifdef GX_RENDER_VULKAN_ENABLED
+#include "../image/gx-vk-img-view.hpp"
 #include "gx-vk-txt-2d.hpp"
+#include "gx-vk-txt-3d.hpp"
 #include "gx-vk-txt-cube.hpp"
 
-// MSVC does not support trivial copy constructor
-gearoenix::vulkan::texture::Target::Target(const Target& o)
-    : render::texture::Target(o)
-    , render_pass(o.render_pass)
-    , start_semaphore(o.start_semaphore)
-    , end_semaphore(o.end_semaphore)
-    , framebuffer(o.framebuffer)
+gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
+    : render::texture::Target(std::move(in_name), std::move(attachments))
 {
 }
 
-gearoenix::vulkan::texture::Target::Target(
-    const core::Id id,
-    const std::vector<render::texture::AttachmentInfo>& infos,
-    engine::Engine* const e,
-    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
-    : render::texture::Target(id, e)
+void gearoenix::vulkan::texture::Target::construct(
+    std::string&& name,
+    std::vector<render::texture::Attachment>&& attachments,
+    core::job::EndCallerShared<render::texture::Target>&& end_callback)
 {
-    GX_CHECK_NOT_EQUAL_D(infos.size(), 0)
-    clipping_width = infos[0].img_width;
-    clipping_height = infos[0].img_height;
-    attachments.reserve(infos.size());
-    for (const auto& info : infos) {
-        decltype(std::declval<render::texture::Attachment>().txt) txt;
-        decltype(std::declval<render::texture::Attachment>().var) var;
-
-        if (info.txt.has_value()) {
-            txt = info.txt.value();
-            switch (info.texture_info.texture_type) {
-            case render::texture::Type::Texture2D: {
-                var = render::texture::Attachment2D {
-                    .txt = std::dynamic_pointer_cast<Texture2D>(txt),
-                };
-                break;
-            }
-            case render::texture::Type::TextureCube: {
-                GX_CHECK_EQUAL_D(info.img_width, info.img_height)
-                var = render::texture::AttachmentCube {
-                    .txt = std::dynamic_pointer_cast<TextureCube>(txt),
-                    .face = info.face.value(),
-                };
-                break;
-            }
-            default:
-                GX_UNIMPLEMENTED
-            }
+    std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
+    GX_ASSERT_D(!self->attachments.empty());
+    self->gapi_attachments.reserve(self->attachments.size());
+    for (const auto& a : self->attachments) {
+        self->gapi_attachments.emplace_back();
+        auto& ga = self->gapi_attachments.back();
+        if (a.var.index() == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+            const auto& a2d = std::get<render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX>(a.var);
+            auto texture = std::dynamic_pointer_cast<Texture2D>(a2d.txt);
+            auto& view = *texture->get_view();
+            ga.view = view.get_vulkan_data();
+            ga.extent = view.get_extent();
+            ga.layout = view.get_layout();
+            ga.texture = std::move(texture);
+        } else if (a.var.index() == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+            const auto& acb = std::get<render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX>(a.var);
+            auto texture = std::dynamic_pointer_cast<TextureCube>(acb.txt);
+            auto& view = *texture->get_view();
+            ga.view = view.get_vulkan_data();
+            ga.extent = view.get_extent();
+            ga.layout = view.get_layout();
+            ga.texture = std::move(texture);
         } else {
-            const auto txt_id = core::asset::Manager::create_id();
-            switch (info.texture_info.texture_type) {
-            case render::texture::Type::Texture2D: {
-                auto t = std::make_shared<Texture2D>(
-                    txt_id, std::string("target-") + std::to_string(target_id) + "-2d-" + std::to_string(txt_id),
-                    e, std::vector<std::vector<std::uint8_t>> {}, info.texture_info,
-                    static_cast<std::uint64_t>(info.img_width), static_cast<std::uint64_t>(info.img_height), call);
-                txt = t;
-                var = render::texture::Attachment2D {
-                    .txt = std::move(t),
-                };
-                break;
-            }
-            case render::texture::Type::TextureCube: {
-                GX_CHECK_EQUAL_D(info.img_width, info.img_height)
-                auto t = std::make_shared<TextureCube>(
-                    txt_id, std::string("target-") + std::to_string(target_id) + "-cube-" + std::to_string(txt_id),
-                    e, std::vector<std::vector<std::vector<std::uint8_t>>> {},
-                    info.texture_info, static_cast<std::uint64_t>(info.img_width), call);
-                txt = t;
-                var = render::texture::AttachmentCube {
-                    .txt = std::move(t),
-                    .face = info.face.value(),
-                };
-                break;
-            }
-            default:
-                GX_UNIMPLEMENTED
-            }
+            GX_UNEXPECTED;
         }
-
-        attachments.push_back(render::texture::Attachment {
-            .txt = std::move(txt),
-            .img_width = info.img_width,
-            .img_height = info.img_height,
-            .img_depth = 0,
-            .mipmap_level = info.mipmap_level,
-            .usage = info.usage,
-            .var = std::move(var),
-        });
+        if (format_is_depth(format)) {
+            gla.binding_index = GL_DEPTH_ATTACHMENT;
+        } else {
+            gla.binding_index = current_binding_point;
+            binding_points.push_back(current_binding_point);
+            ++current_binding_point;
+        }
     }
+    end_callback.set_return(self);
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [self = std::move(self), name = std::move(name), binding_points = std::move(binding_points), end_callback = std::move(end_callback)] {
+        glGenFramebuffers(1, &self->framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, self->framebuffer);
+        GX_GL_CHECK_D;
+        for (auto& a : self->gl_attachments) {
+            switch (a.texture.index()) {
+            case GlAttachment::VARIANT_2D_INDEX:
+                a.texture_object = std::get<GlAttachment::VARIANT_2D_INDEX>(a.texture)->get_object();
+                break;
+            case GlAttachment::VARIANT_CUBE_INDEX:
+                a.texture_object = std::get<GlAttachment::VARIANT_CUBE_INDEX>(a.texture)->get_object();
+                break;
+            default:
+                GX_UNEXPECTED;
+            }
+            glFramebufferTexture2D(GL_FRAMEBUFFER, a.binding_index, a.target, a.texture_object, a.mipmap_level);
+            GX_GL_CHECK_D;
+        }
+        glDrawBuffers(static_cast<sizei>(binding_points.size()), binding_points.data());
+        glReadBuffer(GL_NONE);
+        GX_GL_CHECK_D;
+        switch (const auto framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
+        case GL_FRAMEBUFFER_UNDEFINED:
+            GX_LOG_F("Target is the default framebuffer, but the default framebuffer does not exist.");
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            GX_LOG_F("One of the framebuffer attachment points are framebuffer incomplete.");
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            GX_LOG_F("Framebuffer does not have at least one image attached to it");
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            GX_LOG_F("Depth and stencil attachments, if present, are not the same renderbuffer, "
+                     "or if the combination of internal formats of the attached images violates "
+                     "an implementation-dependent set of restrictions.");
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            GX_LOG_F("Incomplete/unsupported dimensions");
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            GX_LOG_F("Value of GL_RENDERBUFFER_SAMPLES is not the same for all attached "
+                     "renderbuffers or, if the attached images are a mix of renderbuffers and "
+                     "textures, the value of GL_RENDERBUFFER_SAMPLES is not zero. ");
+        case GL_FRAMEBUFFER_COMPLETE:
+            break;
+        default:
+            GX_LOG_F("Unknown framebuffer error: " << framebuffer_status);
+        }
+        set_framebuffer_label(self->framebuffer, name);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    });
 }
 
-gearoenix::vulkan::texture::Target::~Target() = default;
-
-gearoenix::vulkan::texture::Target* gearoenix::vulkan::texture::Target::clone() const
+gearoenix::gl::Target::~Target()
 {
-    return new Target(*this);
+    attachments.clear();
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [f = framebuffer] {
+        glDeleteFramebuffers(1, &f);
+    });
+}
+
+void gearoenix::gl::Target::bind() const
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
 #endif
