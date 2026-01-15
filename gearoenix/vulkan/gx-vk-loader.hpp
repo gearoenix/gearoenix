@@ -227,6 +227,8 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRenderPass);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdNextSubpass);                               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRenderPass);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRendering);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRendering);                              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdExecuteCommands);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteAccelerationStructuresPropertiesKHR);  \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
