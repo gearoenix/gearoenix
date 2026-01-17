@@ -1,7 +1,6 @@
-#ifndef GEAROENIX_VULKAN_ENGINE_FRAME_HPP
-#define GEAROENIX_VULKAN_ENGINE_FRAME_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include <memory>
 
 namespace gearoenix::vulkan::image {
@@ -23,14 +22,9 @@ struct Frame final {
     Frame& operator=(Frame&&) = delete;
     Frame& operator=(const Frame&) = delete;
 
-    Frame(
-        const Swapchain&,
-        const image::View&,
-        const RenderPass&,
-        unsigned int);
+    Frame(std::shared_ptr<image::View>&& view, std::shared_ptr<image::View>&& depth, std::shared_ptr<RenderPass>&& render_pass);
     ~Frame();
 };
 }
 
-#endif
 #endif

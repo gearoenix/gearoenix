@@ -1,7 +1,7 @@
 #pragma once
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../platform/gx-plt-log.hpp"
 #include "gx-vk-loader.hpp"
 #include <string>

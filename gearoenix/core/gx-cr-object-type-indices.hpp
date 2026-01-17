@@ -11,14 +11,14 @@ constexpr auto invalid_object_id = static_cast<object_id_t>(-1);
 /// For all types which are derived from @code gearoenix::core::ecs::Component @endcode or they have a derived struct that is derived from Component.
 constexpr auto gearoenix_core_component_type_index_start = static_cast<gearoenix::core::object_type_index_t>(0);
 
-constexpr auto gearoenix_gl_camera_type_index = gearoenix_core_component_type_index_start + 1;
-constexpr auto gearoenix_gl_light_shadow_caster_directional_type_index = gearoenix_core_component_type_index_start + 2;
-constexpr auto gearoenix_gl_model_type_index = gearoenix_core_component_type_index_start + 3;
-constexpr auto gearoenix_gl_reflection_probe_type_index = gearoenix_core_component_type_index_start + 4;
-constexpr auto gearoenix_gl_reflection_baked_type_index = gearoenix_core_component_type_index_start + 5;
-constexpr auto gearoenix_gl_reflection_runtime_type_index = gearoenix_core_component_type_index_start + 6;
-constexpr auto gearoenix_gl_scene_type_index = gearoenix_core_component_type_index_start + 7;
-constexpr auto gearoenix_gl_skybox_type_index = gearoenix_core_component_type_index_start + 8;
+constexpr auto gearoenix_gapi_camera_type_index = gearoenix_core_component_type_index_start + 1;
+constexpr auto gearoenix_gapi_light_shadow_caster_directional_type_index = gearoenix_core_component_type_index_start + 2;
+constexpr auto gearoenix_gapi_model_type_index = gearoenix_core_component_type_index_start + 3;
+constexpr auto gearoenix_gapi_reflection_probe_type_index = gearoenix_core_component_type_index_start + 4;
+constexpr auto gearoenix_gapi_reflection_baked_type_index = gearoenix_core_component_type_index_start + 5;
+constexpr auto gearoenix_gapi_reflection_runtime_type_index = gearoenix_core_component_type_index_start + 6;
+constexpr auto gearoenix_gapi_scene_type_index = gearoenix_core_component_type_index_start + 7;
+constexpr auto gearoenix_gapi_skybox_type_index = gearoenix_core_component_type_index_start + 8;
 constexpr auto gearoenix_physics_animation_bone_type_index = gearoenix_core_component_type_index_start + 9;
 constexpr auto gearoenix_physics_animation_armature_type_index = gearoenix_core_component_type_index_start + 10;
 constexpr auto gearoenix_physics_animation_player_type_index = gearoenix_core_component_type_index_start + 11;
@@ -46,10 +46,10 @@ constexpr auto gearoenix_last_component_type_index = gearoenix_core_component_ty
 constexpr auto gearoenix_object_type_index_start = static_cast<gearoenix::core::object_type_index_t>(128);
 
 constexpr auto gearoenix_core_ecs_entity_type_index = gearoenix_object_type_index_start + 1;
-constexpr auto gearoenix_gl_material_type_index = gearoenix_object_type_index_start + 2;
-constexpr auto gearoenix_gl_material_pbr_type_index = gearoenix_object_type_index_start + 3;
-constexpr auto gearoenix_gl_material_sprite_type_index = gearoenix_object_type_index_start + 4;
-constexpr auto gearoenix_gl_material_unlit_type_index = gearoenix_object_type_index_start + 5;
+constexpr auto gearoenix_gapi_material_type_index = gearoenix_object_type_index_start + 2;
+constexpr auto gearoenix_gapi_material_pbr_type_index = gearoenix_object_type_index_start + 3;
+constexpr auto gearoenix_gapi_material_sprite_type_index = gearoenix_object_type_index_start + 4;
+constexpr auto gearoenix_gapi_material_unlit_type_index = gearoenix_object_type_index_start + 5;
 constexpr auto gearoenix_physics_animation_type_index = gearoenix_object_type_index_start + 6;
 constexpr auto gearoenix_physics_animation_armature_animation_type_index = gearoenix_object_type_index_start + 7;
 constexpr auto gearoenix_physics_animation_sprite_animation_type_index = gearoenix_object_type_index_start + 8;
