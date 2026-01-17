@@ -7,7 +7,6 @@
 #include "device/gx-vk-dev-physical.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
-#include "gx-vk-instance.hpp"
 #include "gx-vk-surface.hpp"
 #include "sync/gx-vk-sync-semaphore.hpp"
 

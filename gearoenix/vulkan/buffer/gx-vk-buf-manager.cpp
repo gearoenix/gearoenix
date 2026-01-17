@@ -10,7 +10,6 @@
 #include "../gx-vk-swapchain.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
-#include "glm/glm/gtc/constants.hpp"
 #include "gx-vk-buf-buffer.hpp"
 #include "gx-vk-buf-uniform.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
@@ -70,17 +69,17 @@ gearoenix::vulkan::buffer::Manager::Manager()
 
 gearoenix::vulkan::buffer::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::uint64_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::int64_t size)
 {
     return gpu_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::uint64_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::int64_t size)
 {
     return upload_root_buffer->allocate(size);
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::uint64_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::int64_t size)
 {
     std::vector<std::shared_ptr<Buffer>> cpus(each_frame_upload_source.size());
     for (std::uint64_t fi = 0; fi < each_frame_upload_source.size(); ++fi) {
@@ -91,7 +90,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::M
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
-    const std::string& name, const void* const data, const std::uint64_t size, const core::job::EndCaller<>& end)
+    const std::string& name, const void* const data, const std::int64_t size, const core::job::EndCaller<>& end)
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu) {

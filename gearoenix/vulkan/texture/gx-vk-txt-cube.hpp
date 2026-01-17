@@ -10,7 +10,10 @@ struct View;
 
 namespace gearoenix::vulkan::texture {
 struct TextureCube final : render::texture::TextureCube {
+    using mips_t = std::array<std::vector<std::shared_ptr<image::View>>, 6>;
+
     GX_GET_REFC_PRV(std::shared_ptr<image::View>, view);
+    GX_GET_REFC_PRV(mips_t, mips);
 
 public:
     TextureCube(const render::texture::TextureInfo& info, std::string&& name);

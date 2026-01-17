@@ -6,21 +6,12 @@
 
 #include <memory>
 
-namespace gearoenix::vulkan::buffer {
-struct Buffer;
-}
-
 namespace gearoenix::vulkan::command {
 struct Buffer;
 }
 
-namespace gearoenix::vulkan::device {
-struct Logical;
-}
-
 namespace gearoenix::vulkan::memory {
 struct Memory;
-struct Manager;
 }
 
 namespace gearoenix::vulkan::image {
@@ -29,14 +20,13 @@ struct Image final {
     GX_GET_VAL_PRV(std::uint32_t, image_width, 0);
     GX_GET_VAL_PRV(std::uint32_t, image_height, 0);
     GX_GET_VAL_PRV(std::uint32_t, image_depth, 0);
-    GX_GET_VAL_PRV(std::uint32_t, mipmap_level, 0);
+    GX_GET_VAL_PRV(VkImageType, image_type, VK_IMAGE_TYPE_MAX_ENUM);
+    GX_GET_VAL_PRV(std::uint32_t, mipmap_levels, 0);
     GX_GET_VAL_PRV(std::uint32_t, array_layers, 0);
     GX_GET_VAL_PRV(VkFormat, format, VK_FORMAT_UNDEFINED);
     GX_GET_VAL_PRV(VkImageCreateFlags, flags, 0);
     GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0);
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
-
-    void terminate();
 
 public:
     Image(Image&&) = delete;
@@ -47,7 +37,8 @@ public:
         std::uint32_t image_width,
         std::uint32_t image_height,
         std::uint32_t image_depth,
-        std::uint32_t mipmap_level,
+        VkImageType image_type,
+        std::uint32_t mipmap_levels,
         std::uint32_t array_layers,
         VkFormat format,
         VkImageCreateFlags flags,
@@ -57,7 +48,8 @@ public:
         std::uint32_t image_width,
         std::uint32_t image_height,
         std::uint32_t image_depth,
-        std::uint32_t mipmap_level,
+        VkImageType image_type,
+        std::uint32_t mipmap_levels,
         std::uint32_t array_layers,
         VkFormat format,
         VkImageCreateFlags flags,

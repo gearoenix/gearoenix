@@ -32,6 +32,11 @@ struct Logical;
 
 namespace gearoenix::vulkan::image {
 struct View;
+struct Manager;
+}
+
+namespace gearoenix::vulkan::texture {
+struct Manager;
 }
 
 namespace gearoenix::vulkan::memory {
@@ -64,10 +69,12 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_UPTR_PRV(descriptor::Bindless, bindless_descriptor_manager);
     GX_GET_UPTR_PRV(pipeline::Manager, pipeline_manager);
     GX_GET_UPTR_PRV(buffer::Manager, buffer_manager);
-    GX_GET_UPTR_PRV(image::View, depth_stencil);
-    GX_GET_UPTR_PRV(RenderPass, render_pass);
+    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil);
+    GX_GET_REFC_PRV(std::shared_ptr<RenderPass>, render_pass);
     GX_GET_UPTR_PRV(queue::Graph, graphed_queue);
     GX_GET_UPTR_PRV(ImGuiManager, imgui_manager);
+    GX_GET_UPTR_PRV(image::Manager, vk_image_manager);
+    GX_GET_PTRC_PRV(texture::Manager, vk_texture_manager);
     GX_GET_PTRC_PRV(mesh::Manager, vk_mesh_manager);
     GX_GET_CREF_PRV(std::vector<std::unique_ptr<Frame>>, frames);
     GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0);

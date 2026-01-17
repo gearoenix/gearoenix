@@ -13,24 +13,22 @@ gearoenix::vulkan::command::Manager::~Manager() = default;
 gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type buffer_type, const std::optional<std::uint64_t> thread_index)
 {
     const std::lock_guard _lg(this_lock);
-    Pool* pool = nullptr;
+    std::shared_ptr<Pool> pool;
     if (thread_index.has_value()) {
         auto search = indexed_pools.find(*thread_index);
         if (indexed_pools.end() == search) {
-            indexed_pools.emplace(*thread_index, Pool());
-            search = indexed_pools.find(*thread_index);
+            search = indexed_pools.emplace(*thread_index, std::make_shared<Pool>()).first;
         }
-        pool = &(search->second);
+        pool = search->second;
     } else {
         const auto id = std::this_thread::get_id();
         auto search = threads_pools.find(id);
         if (threads_pools.end() == search) {
-            threads_pools.emplace(id, Pool());
-            search = threads_pools.find(id);
+            search = threads_pools.emplace(id, std::make_shared<Pool>()).first;
         }
-        pool = &(search->second);
+        pool = search->second;
     }
-    return { pool, buffer_type };
+    return Buffer(std::move(pool), buffer_type);
 }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::command::Manager::create_frame_based()

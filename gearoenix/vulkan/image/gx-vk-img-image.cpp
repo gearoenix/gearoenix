@@ -10,19 +10,12 @@
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../gx-vk-check.hpp"
 
-void gearoenix::vulkan::image::Image::terminate()
-{
-    if (nullptr != allocated_memory && vulkan_data != nullptr) {
-        vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-        vulkan_data = nullptr;
-    }
-}
-
 gearoenix::vulkan::image::Image::Image(
     const std::uint32_t image_width,
     const std::uint32_t image_height,
     const std::uint32_t image_depth,
-    const std::uint32_t mipmap_level,
+    const VkImageType image_type,
+    const std::uint32_t mipmap_levels,
     const std::uint32_t array_layers,
     const VkFormat format,
     const VkImageCreateFlags flags,
@@ -31,7 +24,8 @@ gearoenix::vulkan::image::Image::Image(
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
-    , mipmap_level(mipmap_level)
+    , image_type(image_type)
+    , mipmap_levels(mipmap_levels)
     , array_layers(array_layers)
     , format(format)
     , flags(flags)
@@ -44,7 +38,8 @@ gearoenix::vulkan::image::Image::Image(
     const std::uint32_t image_width,
     const std::uint32_t image_height,
     const std::uint32_t image_depth,
-    const std::uint32_t mipmap_level,
+    const VkImageType image_type,
+    const std::uint32_t mipmap_levels,
     const std::uint32_t array_layers,
     const VkFormat format,
     const VkImageCreateFlags flags,
@@ -52,7 +47,8 @@ gearoenix::vulkan::image::Image::Image(
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
-    , mipmap_level(mipmap_level)
+    , image_type(image_type)
+    , mipmap_levels(mipmap_levels)
     , array_layers(array_layers)
     , format(format)
     , flags(flags)
@@ -63,12 +59,12 @@ gearoenix::vulkan::image::Image::Image(
     VkImageCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    info.imageType = image_depth <= 1 ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_3D;
+    info.imageType = image_type;
     info.format = format;
     info.extent.width = image_width;
     info.extent.height = image_height;
     info.extent.depth = image_depth;
-    info.mipLevels = mipmap_level;
+    info.mipLevels = mipmap_levels;
     info.arrayLayers = array_layers;
     info.samples = VK_SAMPLE_COUNT_1_BIT;
     info.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -76,16 +72,19 @@ gearoenix::vulkan::image::Image::Image(
     info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     GX_VK_CHK(vkCreateImage(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+
     VkMemoryRequirements mem_req;
     GX_SET_ZERO(mem_req);
     vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
+
     allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size), mem_req.memoryTypeBits, memory::Place::Gpu);
+    GX_ASSERT_D(allocated_memory != nullptr);
     GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
 }
 
 gearoenix::vulkan::image::Image::~Image()
 {
-    terminate();
+    vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
 //

@@ -18,7 +18,7 @@ namespace gearoenix::vulkan {
 struct Swapchain final : core::Singleton<Swapchain> {
     GX_GET_CREF_PRV(VkSurfaceFormatKHR, format);
     GX_GET_VAL_PRV(VkSwapchainKHR, vulkan_data, nullptr);
-    GX_GET_CREF_PRV(std::vector<std::unique_ptr<image::View>>, image_views);
+    GX_GET_CREF_PRV(std::vector<std::shared_ptr<image::View>>, image_views);
 
 public:
     Swapchain();
@@ -26,9 +26,9 @@ public:
     Swapchain(const Swapchain&) = delete;
     Swapchain& operator=(Swapchain&&) = delete;
     Swapchain& operator=(const Swapchain&) = delete;
-    ~Swapchain();
+    ~Swapchain() override;
 
-    /// If the frame is valid it returns true otherwise false
+    /// If the frame is valid, it returns true otherwise false.
     [[nodiscard]] std::optional<std::uint32_t> get_next_image_index(const sync::Semaphore& semaphore);
     void initialize();
     [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const;

@@ -20,8 +20,6 @@ gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope()
 gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
     : render::texture::Target(std::move(in_name), std::move(attachments))
 {
-    GX_SET_ZERO(rendering_info);
-    rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
 }
 
 void gearoenix::vulkan::texture::Target::construct(
@@ -31,7 +29,7 @@ void gearoenix::vulkan::texture::Target::construct(
 {
     std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
     self->update_rendering_info();
-    end_callback.set_return(self);
+    end_callback.set_return(std::move(self));
 }
 
 gearoenix::vulkan::texture::Target::~Target() = default;
@@ -47,6 +45,9 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
 {
     GX_ASSERT_D(!attachments.empty());
 
+    GX_SET_ZERO(rendering_info);
+    rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+
     color_attachments.clear();
     color_attachments.reserve(attachments.size());
 
@@ -61,7 +62,18 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
         const auto att_conv = [&] <std::size_t I, typename Tex> () {
             const auto& at = std::get<I>(a.var);
             auto texture = std::dynamic_pointer_cast<Tex>(at.txt);
-            auto& view = *texture->get_view();
+            GX_ASSERT_D(nullptr != texture);
+
+            const auto& view = *[&] {
+                if constexpr (I == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+                    GX_ASSERT_D(texture->get_mips().size() > a.mipmap_level);
+                    return texture->get_mips()[a.mipmap_level].get();
+                } else if constexpr (I == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+                    GX_ASSERT_D(texture->get_mips()[static_cast<std::size_t>(at.face)].size() > a.mipmap_level);
+                    return texture->get_mips()[static_cast<std::size_t>(at.face)][a.mipmap_level].get();
+                }
+                GX_UNEXPECTED;
+            }();
 
             VkRenderingAttachmentInfo attachment_info;
             GX_SET_ZERO(attachment_info);
@@ -85,9 +97,9 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
 
             GX_ASSERT_D(0 != info.get_width() && 0 != info.get_height());
             GX_ASSERT_D((rendering_info.renderArea.extent.width == 0 && rendering_info.renderArea.extent.height == 0)
-                || (rendering_info.renderArea.extent.width == info.get_width() && rendering_info.renderArea.extent.height == info.get_height()));
-            rendering_info.renderArea.extent.width = info.get_width();
-            rendering_info.renderArea.extent.height = info.get_height();
+                || (rendering_info.renderArea.extent.width == view.get_extent().width && rendering_info.renderArea.extent.height == view.get_extent().height));
+            rendering_info.renderArea.extent.width = view.get_extent().width;
+            rendering_info.renderArea.extent.height = view.get_extent().height;
 
             ga.texture = std::move(texture);
         };

@@ -27,11 +27,11 @@ struct Manager final : core::Singleton<Manager> {
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer);
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer);
     GX_GET_UPTR_PRV(queue::Queue, uploader_queue);
+    GX_GET_UCPTR_PRV(core::sync::WorkWaiter, uploader);
 
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
-    std::unique_ptr<core::sync::WorkWaiter> uploader;
 
     [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const;
     [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const;
@@ -44,12 +44,12 @@ public:
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    ~Manager();
+    ~Manager() override;
 
-    [[nodiscard]] std::shared_ptr<Buffer> create_static(std::uint64_t size);
-    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::uint64_t size);
-    [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::uint64_t size);
-    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::uint64_t size, const core::job::EndCaller<>& end);
+    [[nodiscard]] std::shared_ptr<Buffer> create_static(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, const core::job::EndCaller<>& end);
 
     template <typename T>
     [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const std::vector<T>& data, const core::job::EndCaller<>& end)

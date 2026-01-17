@@ -4,8 +4,8 @@
 #include "../gx-vk-swapchain.hpp"
 
 gearoenix::vulkan::engine::Frame::Frame(
-    const Swapchain& swapchain, const image::View& depth_stencil, const RenderPass& render_pass, const unsigned int frame_index)
-    : framebuffer(new Framebuffer(swapchain.get_image_views()[frame_index].get(), &depth_stencil, &render_pass))
+    std::shared_ptr<image::View>&& view, std::shared_ptr<image::View>&& depth, std::shared_ptr<RenderPass>&& render_pass)
+    : framebuffer(new Framebuffer(std::move(view), std::move(depth), std::move(render_pass)))
 {
 }
 

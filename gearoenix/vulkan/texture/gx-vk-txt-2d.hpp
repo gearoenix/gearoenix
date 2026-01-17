@@ -11,18 +11,12 @@ struct View;
 namespace gearoenix::vulkan::texture {
 struct Texture2D final : render::texture::Texture2D {
     GX_GET_REFC_PRV(std::shared_ptr<image::View>, view);
+    GX_GET_REFC_PRV(std::vector<std::shared_ptr<image::View>>, mips);
 
 public:
-    Texture2D(
-        std::string name,
-        const std::vector<std::vector<std::uint8_t>>& data,
-        const render::texture::TextureInfo& info,
-        std::uint64_t img_width,
-        std::uint64_t img_height,
-        const core::job::EndCaller<>& call);
+    Texture2D(const render::texture::TextureInfo& info, std::string &&name);
     ~Texture2D() override;
-    [[nodiscard]] static VkFormat convert(render::texture::TextureFormat format);
-
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
 };
 }
 #endif
