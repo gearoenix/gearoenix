@@ -40,11 +40,11 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
         info.usage |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         info.usage |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
         info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        info.usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         if (physical_device.get_rtx_supported()) {
             info.usage |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
             info.usage |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR;
             info.usage |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR;
-            info.usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         }
     }
     VkBuffer vulkan_data;
