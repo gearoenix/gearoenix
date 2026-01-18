@@ -20,23 +20,23 @@ layout(set = 0, binding = 3) uniform textureCube textures_cube[];
 layout(set = 0, binding = 4) uniform sampler samplers[];
 
 // ========== Set 1: Dynamic Per-Frame Storage Buffers ==========
-layout(set = 1, binding = 0) readonly buffer SceneBuffer {
+layout(set = 0, binding = 5) readonly buffer SceneBuffer {
     GxShaderDataScene scenes[];
 };
 
-layout(set = 1, binding = 1) readonly buffer CameraBuffer {
+layout(set = 0, binding = 6) readonly buffer CameraBuffer {
     GxShaderDataCamera cameras[];
 };
 
-layout(set = 1, binding = 2) readonly buffer ModelBuffer {
+layout(set = 0, binding = 7) readonly buffer ModelBuffer {
     GxShaderDataModel models[];
 };
 
-layout(set = 1, binding = 3) readonly buffer MaterialBuffer {
+layout(set = 0, binding = 8) readonly buffer MaterialBuffer {
     GxShaderDataMaterial materials[];
 };
 
-layout(set = 1, binding = 4) readonly buffer LightBuffer {
+layout(set = 0, binding = 9) readonly buffer LightBuffer {
     GxShaderDataLight lights[];
 };
 

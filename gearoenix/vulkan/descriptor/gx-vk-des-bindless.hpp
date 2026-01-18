@@ -24,14 +24,9 @@ struct Bindless final: core::Singleton<Bindless> {
     static constexpr std::uint32_t max_samplers = 32;
 
 private:
-    VkDescriptorSetLayout static_set_layout = VK_NULL_HANDLE;
-    VkDescriptorSetLayout dynamic_set_layout = VK_NULL_HANDLE;
-    
-    VkDescriptorPool static_descriptor_pool = VK_NULL_HANDLE;
-    VkDescriptorPool dynamic_descriptor_pool = VK_NULL_HANDLE;
-    
-    VkDescriptorSet static_descriptor_set = VK_NULL_HANDLE;
-    std::array<VkDescriptorSet, frames_in_flight> dynamic_descriptor_sets = { VK_NULL_HANDLE };
+    VkDescriptorSetLayout descriptor_set_layout = VK_NULL_HANDLE;
+    VkDescriptorPool descriptor_pool = VK_NULL_HANDLE;
+    VkDescriptorSet descriptor_set = VK_NULL_HANDLE;
     
     std::vector<std::uint32_t> free_1d_image_indices = { };
     std::vector<std::uint32_t> free_2d_image_indices = { };
@@ -52,22 +47,20 @@ private:
 
 public:
     Bindless(
-        const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& scenes_buffers,
-        const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& cameras_buffers,
-        const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& models_buffers,
-        const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& materials_buffers,
-        const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& lights_buffers);
-    ~Bindless();
+        const buffer::Buffer& scenes_buffer,
+        const buffer::Buffer& cameras_buffer,
+        const buffer::Buffer& models_buffer,
+        const buffer::Buffer& materials_buffer,
+        const buffer::Buffer& lights_buffer);
+    ~Bindless() override;
 
     Bindless(Bindless&&) = delete;
     Bindless(const Bindless&) = delete;
     Bindless& operator=(Bindless&&) = delete;
     Bindless& operator=(const Bindless&) = delete;
 
-    [[nodiscard]] VkDescriptorSetLayout get_static_set_layout() const;
-    [[nodiscard]] VkDescriptorSetLayout get_dynamic_set_layout() const;
-    [[nodiscard]] VkDescriptorSet get_static_descriptor_set() const;
-    [[nodiscard]] VkDescriptorSet get_dynamic_descriptor_set(std::uint32_t frame_index) const;
+    [[nodiscard]] VkDescriptorSetLayout get_descriptor_set_layout() const;
+    [[nodiscard]] VkDescriptorSet get_descriptor_set() const;
 
     [[nodiscard]] std::uint32_t allocate_1d_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     [[nodiscard]] std::uint32_t allocate_2d_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
