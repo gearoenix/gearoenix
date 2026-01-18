@@ -1,11 +1,13 @@
 #include "gx-vk-des-bindless.hpp"
 #if GX_RENDER_VULKAN_ENABLED
+#include "../../core/job/gx-cr-job-manager.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
-
-#include <array>
 
 namespace {
 constexpr VkDescriptorBindingFlags gx_binding_flags =
@@ -22,8 +24,14 @@ constexpr std::array gx_static_binding_flags {
 };
 }
 
-gearoenix::vulkan::descriptor::Bindless::Bindless()
-    : image_1d_infos(max_1d_images)
+gearoenix::vulkan::descriptor::Bindless::Bindless(
+    const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& scenes_buffers,
+    const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& cameras_buffers,
+    const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& models_buffers,
+    const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& materials_buffers,
+    const std::array<std::shared_ptr<buffer::Buffer>, frames_in_flight>& lights_buffers)
+    : Singleton(this)
+    , image_1d_infos(max_1d_images)
     , image_2d_infos(max_2d_images)
     , image_3d_infos(max_3d_images)
     , image_cube_infos(max_cube_images)
@@ -38,7 +46,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     const auto vk_dev = device::Logical::get().get_vulkan_data();
 
     // ========== Static Descriptor Set Layout (Bindless Textures & Samplers) ==========
-    std::array<VkDescriptorSetLayoutBinding, gx_static_binding_flags.size()> static_bindings;
+    std::array<VkDescriptorSetLayoutBinding, gx_static_binding_flags.size()> static_bindings {};
     GX_SET_ZERO(static_bindings);
 
     static_bindings[0].binding = 0;
@@ -83,7 +91,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     GX_VK_CHK(vkCreateDescriptorSetLayout(vk_dev, &static_layout_info, nullptr, &static_set_layout));
 
     // ========== Dynamic Descriptor Set Layout (Per-Frame Storage Buffers) ==========
-    std::array<VkDescriptorSetLayoutBinding, 5> dynamic_bindings;
+    std::array<VkDescriptorSetLayoutBinding, 5> dynamic_bindings {};
     GX_SET_ZERO(dynamic_bindings);
 
     dynamic_bindings[0].binding = 0;
@@ -120,7 +128,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     GX_VK_CHK(vkCreateDescriptorSetLayout(vk_dev, &dynamic_layout_info, nullptr, &dynamic_set_layout));
 
     // ========== Static Descriptor Pool ==========
-    std::array<VkDescriptorPoolSize, gx_static_binding_flags.size()> static_pool_sizes;
+    std::array<VkDescriptorPoolSize, gx_static_binding_flags.size()> static_pool_sizes{};
     GX_SET_ZERO(static_pool_sizes);
     
     static_pool_sizes[0].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -149,7 +157,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     GX_VK_CHK(vkCreateDescriptorPool(vk_dev, &static_pool_info, nullptr, &static_descriptor_pool));
 
     // ========== Dynamic Descriptor Pool ==========
-    std::array<VkDescriptorPoolSize, 1> dynamic_pool_sizes;
+    std::array<VkDescriptorPoolSize, 1> dynamic_pool_sizes{};
     GX_SET_ZERO(dynamic_pool_sizes);
     
     dynamic_pool_sizes[0].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -175,7 +183,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     GX_VK_CHK(vkAllocateDescriptorSets(vk_dev, &static_allocate_info, &static_descriptor_set));
 
     // ========== Allocate Dynamic Descriptor Sets (Per Frame) ==========
-    std::array<VkDescriptorSetLayout, frames_in_flight> dynamic_layouts;
+    std::array<VkDescriptorSetLayout, frames_in_flight> dynamic_layouts{};
     for (auto& layout : dynamic_layouts) {
         layout = dynamic_set_layout;
     }
@@ -218,6 +226,47 @@ gearoenix::vulkan::descriptor::Bindless::Bindless()
     for (std::uint32_t i = max_samplers; i > 0;) {
         --i;
         free_sampler_indices.push_back(i);
+    }
+
+    // ========== Initialize Per-Frame Buffer Descriptors ==========
+    std::array<VkDescriptorBufferInfo, dynamic_bindings.size()> buffer_infos{};
+    std::memset(buffer_infos.data(), 0, sizeof(VkDescriptorBufferInfo) * buffer_infos.size());
+
+    std::array<VkWriteDescriptorSet, dynamic_bindings.size()> writes{};
+    std::memset(writes.data(), 0, sizeof(VkWriteDescriptorSet) * writes.size());
+
+    for (std::uint32_t frame_idx = 0; frame_idx < frames_in_flight; ++frame_idx) {
+        GX_ASSERT_D(scenes_buffers[frame_idx]);
+        GX_ASSERT_D(cameras_buffers[frame_idx]);
+        GX_ASSERT_D(models_buffers[frame_idx]);
+        GX_ASSERT_D(materials_buffers[frame_idx]);
+        GX_ASSERT_D(lights_buffers[frame_idx]);
+        
+        const std::array buffers = {
+            scenes_buffers[frame_idx].get(),
+            cameras_buffers[frame_idx].get(),
+            models_buffers[frame_idx].get(),
+            materials_buffers[frame_idx].get(),
+            lights_buffers[frame_idx].get()
+        };
+        
+        for (std::uint32_t i = 0; i < dynamic_bindings.size(); ++i) {
+            const auto& buff = *buffers[i];
+            const auto& allocator = *buff.get_allocator();
+            buffer_infos[i].buffer = buff.get_vulkan_data();
+            buffer_infos[i].offset = static_cast<VkDeviceSize>(allocator.get_offset());
+            buffer_infos[i].range = static_cast<VkDeviceSize>(allocator.get_size());
+            
+            writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            writes[i].dstSet = dynamic_descriptor_sets[frame_idx];
+            writes[i].dstBinding = i;
+            writes[i].dstArrayElement = 0;
+            writes[i].descriptorCount = 1;
+            writes[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            writes[i].pBufferInfo = &buffer_infos[i];
+        }
+
+        vkUpdateDescriptorSets(vk_dev, static_cast<std::uint32_t>(writes.size()), writes.data(), 0, nullptr);
     }
 }
 
@@ -271,7 +320,7 @@ VkDescriptorSet gearoenix::vulkan::descriptor::Bindless::get_dynamic_descriptor_
     return dynamic_descriptor_sets[frame_index];
 }
 
-void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::uint32_t binding, const std::uint32_t index, const VkDescriptorImageInfo& info)
+void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::uint32_t binding, const std::uint32_t index, const VkDescriptorImageInfo& info) const
 {
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
@@ -282,11 +331,14 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
     write.descriptorCount = 1;
     write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
     write.pImageInfo = &info;
-    vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
+    
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write]() {
+        vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
+    });
 }
 
-void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const VkDescriptorImageInfo& info)
-{
+void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const VkDescriptorImageInfo& info) const
+{   
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -296,15 +348,17 @@ void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std
     write.descriptorCount = 1;
     write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     write.pImageInfo = &info;
-    vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
+
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write]() {
+        vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
+    });
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const VkImageView view, const VkImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const VkImageView view, const VkImageLayout layout)
 {
+    GX_ASSERT_D(view != VK_NULL_HANDLE);
     const std::lock_guard _lg(allocation_lock);
-    if (free_1d_image_indices.empty()) {
-        return std::nullopt;
-    }
+    GX_ASSERT_D(!free_1d_image_indices.empty());
     const auto index = free_1d_image_indices.back();
     free_1d_image_indices.pop_back();
 
@@ -315,12 +369,11 @@ std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_1
     return index;
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const VkImageView view, const VkImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const VkImageView view, const VkImageLayout layout)
 {
+    GX_ASSERT_D(view != VK_NULL_HANDLE);
     const std::lock_guard _lg(allocation_lock);
-    if (free_2d_image_indices.empty()) {
-        return std::nullopt;
-    }
+    GX_ASSERT_D(!free_2d_image_indices.empty());
     const auto index = free_2d_image_indices.back();
     free_2d_image_indices.pop_back();
 
@@ -331,12 +384,11 @@ std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_2
     return index;
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const VkImageView view, const VkImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const VkImageView view, const VkImageLayout layout)
 {
+    GX_ASSERT_D(view != VK_NULL_HANDLE);
     const std::lock_guard _lg(allocation_lock);
-    if (free_3d_image_indices.empty()) {
-        return std::nullopt;
-    }
+    GX_ASSERT_D(!free_3d_image_indices.empty());
     const auto index = free_3d_image_indices.back();
     free_3d_image_indices.pop_back();
 
@@ -347,12 +399,11 @@ std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_3
     return index;
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const VkImageView view, const VkImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const VkImageView view, const VkImageLayout layout)
 {
+    GX_ASSERT_D(view != VK_NULL_HANDLE);
     const std::lock_guard _lg(allocation_lock);
-    if (free_cube_image_indices.empty()) {
-        return std::nullopt;
-    }
+    GX_ASSERT_D(!free_cube_image_indices.empty());
     const auto index = free_cube_image_indices.back();
     free_cube_image_indices.pop_back();
 
@@ -363,12 +414,11 @@ std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_c
     return index;
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_sampler(const VkSampler sampler)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_sampler(const VkSampler sampler)
 {
+    GX_ASSERT_D(sampler != VK_NULL_HANDLE);
     const std::lock_guard _lg(allocation_lock);
-    if (free_sampler_indices.empty()) {
-        return std::nullopt;
-    }
+    GX_ASSERT_D(!free_sampler_indices.empty());
     const auto index = free_sampler_indices.back();
     free_sampler_indices.pop_back();
 
@@ -381,130 +431,81 @@ std::optional<std::uint32_t> gearoenix::vulkan::descriptor::Bindless::allocate_s
 void gearoenix::vulkan::descriptor::Bindless::free_1d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    if (index >= image_1d_infos.size()) {
-        return;
-    }
+    GX_ASSERT_D(index < image_1d_infos.size());
 
     auto& tracked_info = image_1d_infos[index];
-    if (tracked_info.imageView == VK_NULL_HANDLE) {
-        return;
-    }
+    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
 
     tracked_info = {};
+    
+    // Write null descriptor to avoid undefined behavior
+    write_image_descriptor(0, index, tracked_info);
+    
     free_1d_image_indices.push_back(index);
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_2d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    if (index >= image_2d_infos.size()) {
-        return;
-    }
+    GX_ASSERT_D(index < image_2d_infos.size());
 
     auto& tracked_info = image_2d_infos[index];
-    if (tracked_info.imageView == VK_NULL_HANDLE) {
-        return;
-    }
+    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
 
     tracked_info = {};
+    
+    // Write null descriptor to avoid undefined behavior
+    write_image_descriptor(1, index, tracked_info);
+    
     free_2d_image_indices.push_back(index);
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_3d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    if (index >= image_3d_infos.size()) {
-        return;
-    }
+    GX_ASSERT_D(index < image_3d_infos.size());
 
     auto& tracked_info = image_3d_infos[index];
-    if (tracked_info.imageView == VK_NULL_HANDLE) {
-        return;
-    }
+    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
 
     tracked_info = {};
+    
+    // Write null descriptor to avoid undefined behavior
+    write_image_descriptor(2, index, tracked_info);
+    
     free_3d_image_indices.push_back(index);
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_cube_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    if (index >= image_cube_infos.size()) {
-        return;
-    }
+    GX_ASSERT_D(index < image_cube_infos.size());
 
     auto& tracked_info = image_cube_infos[index];
-    if (tracked_info.imageView == VK_NULL_HANDLE) {
-        return;
-    }
+    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
 
     tracked_info = {};
+    
+    // Write null descriptor to avoid undefined behavior
+    write_image_descriptor(3, index, tracked_info);
+    
     free_cube_image_indices.push_back(index);
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    if (index >= sampler_infos.size()) {
-        return;
-    }
+    GX_ASSERT_D(index < sampler_infos.size());
 
     auto& tracked_info = sampler_infos[index];
-    if (tracked_info.sampler == VK_NULL_HANDLE) {
-        return;
-    }
+    GX_ASSERT_D(tracked_info.sampler != VK_NULL_HANDLE);
 
     tracked_info = {};
+    
+    // Write null descriptor to avoid undefined behavior
+    write_sampler_descriptor(index, tracked_info);
+    
     free_sampler_indices.push_back(index);
-}
-
-void gearoenix::vulkan::descriptor::Bindless::update_dynamic_buffers(
-    const std::uint32_t frame_index,
-    const VkBuffer scenes_buffer,
-    const VkBuffer cameras_buffer,
-    const VkBuffer models_buffer,
-    const VkBuffer materials_buffer,
-    const VkBuffer lights_buffer)
-{
-    GX_ASSERT_D(frame_index < frames_in_flight);
-
-    VkDescriptorBufferInfo buffer_infos[5];
-    GX_SET_ZERO(buffer_infos);
-
-    buffer_infos[0].buffer = scenes_buffer;
-    buffer_infos[0].offset = 0;
-    buffer_infos[0].range = VK_WHOLE_SIZE;
-
-    buffer_infos[1].buffer = cameras_buffer;
-    buffer_infos[1].offset = 0;
-    buffer_infos[1].range = VK_WHOLE_SIZE;
-
-    buffer_infos[2].buffer = models_buffer;
-    buffer_infos[2].offset = 0;
-    buffer_infos[2].range = VK_WHOLE_SIZE;
-
-    buffer_infos[3].buffer = materials_buffer;
-    buffer_infos[3].offset = 0;
-    buffer_infos[3].range = VK_WHOLE_SIZE;
-
-    buffer_infos[4].buffer = lights_buffer;
-    buffer_infos[4].offset = 0;
-    buffer_infos[4].range = VK_WHOLE_SIZE;
-
-    VkWriteDescriptorSet writes[5];
-    GX_SET_ZERO(writes);
-
-    for (std::uint32_t i = 0; i < 5; ++i) {
-        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writes[i].dstSet = dynamic_descriptor_sets[frame_index];
-        writes[i].dstBinding = i;
-        writes[i].dstArrayElement = 0;
-        writes[i].descriptorCount = 1;
-        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        writes[i].pBufferInfo = &buffer_infos[i];
-    }
-
-    vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 5, writes, 0, nullptr);
 }
 
 #endif

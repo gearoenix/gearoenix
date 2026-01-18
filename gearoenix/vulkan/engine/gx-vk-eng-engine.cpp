@@ -1,31 +1,30 @@
 #include "gx-vk-eng-engine.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../camera/gx-vk-cmr-manager.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
+#include "../gx-vk-check.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
 #include "../gx-vk-swapchain.hpp"
+#include "../image/gx-vk-img-manager.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
-#include "../queue/gx-vk-qu-graph.hpp"
-#include "../reflection/gx-vk-rfl-manager.hpp"
-#include "../descriptor/gx-vk-des-manager.hpp"
-#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
-#include "../descriptor/gx-vk-des-bindless.hpp"
-#include "../sync/gx-vk-sync-fence.hpp"
+#include "../queue/gx-vk-qu-graph.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
-#include "gx-vk-eng-frame.hpp"
-#include "../image/gx-vk-img-manager.hpp"
-#include "../texture/gx-vk-txt-manager.hpp"
-#include "../command/gx-vk-cmd-manager.hpp"
+#include "../reflection/gx-vk-rfl-manager.hpp"
+#include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
-#include "../gx-vk-check.hpp"
+#include "../texture/gx-vk-txt-manager.hpp"
+#include "gx-vk-eng-frame.hpp"
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
@@ -51,7 +50,6 @@ gearoenix::vulkan::engine::Engine::Engine()
     , swapchain(new Swapchain())
     , memory_manager(new memory::Manager())
     , command_manager(new command::Manager())
-    , descriptor_manager(new descriptor::Manager())
     , pipeline_manager()
     , buffer_manager()
     , render_queue(new queue::Queue())
@@ -65,6 +63,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     texture_manager = std::unique_ptr<render::texture::Manager>(vk_texture_manager);
     camera_manager = std::make_unique<camera::Manager>();
     reflection_manager = std::make_unique<reflection::Manager>();
+    bindless_descriptor_manager = std::make_unique<descriptor::Bindless>();
     initialize_frame();
 }
 
@@ -139,7 +138,6 @@ bool gearoenix::vulkan::engine::Engine::present()
 
 void gearoenix::vulkan::engine::Engine::submit()
 {
-
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()

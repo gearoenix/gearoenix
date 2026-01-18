@@ -1,0 +1,48 @@
+#version 460
+#extension GL_EXT_nonuniform_qualifier : require
+
+#include "gx-vk-shd-common.glslh"
+
+// ========== Set 0: Static Bindless Resources ==========
+// 1D Images
+layout(set = 0, binding = 0) uniform texture1D textures_1d[];
+
+// 2D Images
+layout(set = 0, binding = 1) uniform texture2D textures_2d[];
+
+// 3D Images
+layout(set = 0, binding = 2) uniform texture3D textures_3d[];
+
+// Cube Images
+layout(set = 0, binding = 3) uniform textureCube textures_cube[];
+
+// Samplers
+layout(set = 0, binding = 4) uniform sampler samplers[];
+
+// ========== Set 1: Dynamic Per-Frame Storage Buffers ==========
+layout(set = 1, binding = 0) readonly buffer SceneBuffer {
+    GxShaderDataScene scenes[];
+};
+
+layout(set = 1, binding = 1) readonly buffer CameraBuffer {
+    GxShaderDataCamera cameras[];
+};
+
+layout(set = 1, binding = 2) readonly buffer ModelBuffer {
+    GxShaderDataModel models[];
+};
+
+layout(set = 1, binding = 3) readonly buffer MaterialBuffer {
+    GxShaderDataMaterial materials[];
+};
+
+layout(set = 1, binding = 4) readonly buffer LightBuffer {
+    GxShaderDataLight lights[];
+};
+
+// ========== Push Constants ==========
+layout(push_constant) uniform PushConstants {
+    uint scene_index;
+    uint camera_index;
+    uint model_index;
+} pc;

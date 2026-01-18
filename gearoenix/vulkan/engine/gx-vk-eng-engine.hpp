@@ -19,7 +19,6 @@ struct Manager;
 }
 
 namespace gearoenix::vulkan::descriptor {
-struct Manager;
 struct Bindless;
 }
 
@@ -64,7 +63,6 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_UPTR_PRV(Swapchain, swapchain);
     GX_GET_UPTR_PRV(memory::Manager, memory_manager);
     GX_GET_UPTR_PRV(command::Manager, command_manager);
-    GX_GET_UPTR_PRV(descriptor::Manager, descriptor_manager);
     GX_GET_UPTR_PRV(descriptor::Bindless, bindless_descriptor_manager);
     GX_GET_UPTR_PRV(pipeline::Manager, pipeline_manager);
     GX_GET_UPTR_PRV(buffer::Manager, buffer_manager);

@@ -1,0 +1,30 @@
+struct GxShaderDataScene
+{
+    vec4 ambient_light;
+};
+
+struct GxShaderDataCamera {
+    mat4 view_projection;
+    vec3 position;
+};
+
+struct GxShaderDataModel {
+    mat4 transform;
+    uint material_index;
+};
+
+struct GxShaderDataMaterial {
+    vec4 base_color;
+    uint albedo_texture_index;
+    uint normal_texture_index;
+    uint metallic_roughness_texture_index;
+    uint sampler_index;
+    float metallic;
+    float roughness;
+};
+
+struct GxShaderDataLight {
+    vec4 position;
+    vec4 color;
+    float intensity;
+};
