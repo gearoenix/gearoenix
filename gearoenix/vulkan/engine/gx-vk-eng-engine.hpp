@@ -4,10 +4,8 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 
 namespace gearoenix::vulkan {
-struct Framebuffer;
 struct ImGuiManager;
 struct Instance;
-struct RenderPass;
 struct Surface;
 struct Swapchain;
 }
@@ -53,6 +51,7 @@ struct Manager;
 
 namespace gearoenix::vulkan::queue {
 struct Graph;
+struct Queue;
 }
 
 namespace gearoenix::vulkan::engine {
@@ -69,9 +68,8 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_UPTR_PRV(descriptor::Bindless, bindless_descriptor_manager);
     GX_GET_UPTR_PRV(pipeline::Manager, pipeline_manager);
     GX_GET_UPTR_PRV(buffer::Manager, buffer_manager);
-    GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil);
-    GX_GET_REFC_PRV(std::shared_ptr<RenderPass>, render_pass);
-    GX_GET_UPTR_PRV(queue::Graph, graphed_queue);
+    // GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil);
+    // GX_GET_UPTR_PRV(queue::Graph, graphed_queue);
     GX_GET_UPTR_PRV(ImGuiManager, imgui_manager);
     GX_GET_UPTR_PRV(image::Manager, vk_image_manager);
     GX_GET_PTRC_PRV(texture::Manager, vk_texture_manager);
@@ -79,6 +77,7 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_CREF_PRV(std::vector<std::unique_ptr<Frame>>, frames);
     GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0);
     GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true);
+    GX_GET_UPTR_PRV(queue::Queue, render_queue);
     //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
     //    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
@@ -99,9 +98,11 @@ public:
     void end_frame() override;
     void upload_imgui_fonts() override;
 
+    [[nodiscard]] bool present();
+    void submit();
+
     [[nodiscard]] Frame& get_current_frame();
     [[nodiscard]] const Frame& get_current_frame() const;
-    [[nodiscard]] const Framebuffer& get_current_framebuffer() const;
     [[nodiscard]] static bool is_supported();
 };
 }

@@ -18,17 +18,21 @@
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
+#include "../queue/gx-vk-qu-queue.hpp"
 #include "gx-vk-eng-frame.hpp"
 #include "../image/gx-vk-img-manager.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
+#include "../sync/gx-vk-sync-semaphore.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../gx-vk-check.hpp"
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain->get_image_views().size());
     frames.reserve(static_cast<std::uint64_t>(frames_count));
     for (auto frame_index = decltype(frames_count) { 0 }; frame_index < frames_count; ++frame_index) {
-        frames.emplace_back(new Frame(swapchain->get_image_views()[frame_index], depth_stencil, render_pass));
+        frames.emplace_back(new Frame(swapchain->get_image_views()[frame_index]));
     }
 }
 
@@ -50,9 +54,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , descriptor_manager(new descriptor::Manager())
     , pipeline_manager()
     , buffer_manager()
-    , depth_stencil(image::View::create_depth_stencil())
-    , render_pass()
-    , graphed_queue(new queue::Graph())
+    , render_queue(new queue::Queue())
     , imgui_manager(new ImGuiManager())
     , vk_image_manager(new image::Manager())
     , vk_texture_manager(new texture::Manager())
@@ -81,7 +83,7 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     if (!swapchain_image_is_valid && !platform::BaseApplication::get().get_window_resizing()) {
         logical_device->wait_to_finish();
         frames.clear();
-        depth_stencil = image::View::create_depth_stencil();
+        // depth_stencil = image::View::create_depth_stencil();
         swapchain->initialize();
         initialize_frame();
         swapchain_image_is_valid = true;
@@ -89,9 +91,9 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     }
     imgui_manager->start_frame();
     if (swapchain_image_is_valid) {
-        if (const auto next_image = swapchain->get_next_image_index(graphed_queue->get_present_semaphore()); next_image.has_value()) {
-            swapchain_image_index = *next_image;
-            graphed_queue->start_frame();
+        if (const auto next_image = swapchain->get_next_image_index(*frames[frame_number]->present_semaphore); next_image.has_value()) {
+            swapchain_image_index = *next_image; // TODO: better to log these numbers and see how it behaves
+            // graphed_queue->start_frame();
         } else {
             swapchain_image_is_valid = false;
         }
@@ -105,13 +107,39 @@ void gearoenix::vulkan::engine::Engine::end_frame()
     if (swapchain_image_is_valid) {
         vk_mesh_manager->update();
         imgui_manager->update();
-        swapchain_image_is_valid = graphed_queue->present(swapchain_image_index);
+        submit();
+        swapchain_image_is_valid = present();
     }
 }
 
 void gearoenix::vulkan::engine::Engine::upload_imgui_fonts()
 {
     imgui_manager->upload_fonts();
+}
+
+bool gearoenix::vulkan::engine::Engine::present()
+{
+    VkPresentInfoKHR info;
+    GX_SET_ZERO(info);
+    info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    info.waitSemaphoreCount = 1;
+    info.pWaitSemaphores = frames[frame_number]->end_semaphore->get_vulkan_data_ptr();
+    info.swapchainCount = 1;
+    info.pSwapchains = Swapchain::get().get_vulkan_data_ptr();
+    info.pImageIndices = &swapchain_image_index;
+    const auto present_result = vkQueuePresentKHR(render_queue->get_vulkan_data(), &info);
+    if (VK_ERROR_OUT_OF_DATE_KHR == present_result) {
+        return false;
+    }
+    if (VK_SUCCESS != present_result) {
+        GX_LOG_F("Presentation failed with result: " << result_to_string(present_result));
+    }
+    return true;
+}
+
+void gearoenix::vulkan::engine::Engine::submit()
+{
+
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()
@@ -122,11 +150,6 @@ gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current
 const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const
 {
     return *frames[swapchain_image_index];
-}
-
-const gearoenix::vulkan::Framebuffer& gearoenix::vulkan::engine::Engine::get_current_framebuffer() const
-{
-    return *frames[swapchain_image_index]->framebuffer;
 }
 
 bool gearoenix::vulkan::engine::Engine::is_supported()

@@ -93,7 +93,7 @@ private:
     void window_resized() override;
 
 public:
-    explicit CameraManager();
+    CameraManager();
     ~CameraManager() override;
 };
 }

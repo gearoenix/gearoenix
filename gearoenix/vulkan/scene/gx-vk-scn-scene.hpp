@@ -1,11 +1,11 @@
 #pragma once
-#include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
-#include "../render/scene/gx-rnd-scn-manager.hpp"
-#include "../render/scene/gx-rnd-scn-scene.hpp"
-#include "gx-gl-types.hpp"
+#include "../../render/gx-rnd-build-configuration.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../render/scene/gx-rnd-scn-scene.hpp"
 
-namespace gearoenix::gl {
+struct ShaderDataScene;
+
+namespace gearoenix::vulkan::scene {
 struct Scene final : render::scene::Scene {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
@@ -13,8 +13,11 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
+
 private:
-    Scene(core::ecs::Entity* entity, std::string&& name, double layer);
+    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
+
+    Scene(core::ecs::Entity* e, std::string&& name, double layer);
     Scene(core::object_id_t id, std::string&& name);
     static void read(
         std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
@@ -27,12 +30,5 @@ public:
     void render_reflection_probes(uint& current_shader) const;
     void render_forward(uint& current_shader);
 };
-
-struct SceneManager final : render::scene::Manager {
-    SceneManager();
-    ~SceneManager() override;
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
-};
 }
-
 #endif

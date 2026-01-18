@@ -7,23 +7,29 @@ namespace gearoenix::vulkan::image {
 struct View;
 }
 
+namespace gearoenix::vulkan::sync {
+struct Semaphore;
+}
+
 namespace gearoenix::vulkan {
-struct Framebuffer;
 struct Swapchain;
-struct RenderPass;
 }
 
 namespace gearoenix::vulkan::engine {
 struct Frame final {
-    const std::unique_ptr<Framebuffer> framebuffer;
+    const std::shared_ptr<image::View> view;
+    const std::shared_ptr<sync::Semaphore> present_semaphore;
+    const std::shared_ptr<sync::Semaphore> end_semaphore;
+
 
     Frame(Frame&&) = delete;
     Frame(const Frame&) = delete;
     Frame& operator=(Frame&&) = delete;
     Frame& operator=(const Frame&) = delete;
 
-    Frame(std::shared_ptr<image::View>&& view, std::shared_ptr<image::View>&& depth, std::shared_ptr<RenderPass>&& render_pass);
+    Frame(std::shared_ptr<image::View>&& view);
     ~Frame();
+    [[nodiscard]] bool present();
 };
 }
 

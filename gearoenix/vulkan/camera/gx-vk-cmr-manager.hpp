@@ -4,14 +4,14 @@
 #include "../../render/camera/gx-rnd-cmr-manager.hpp"
 
 namespace gearoenix::vulkan::camera {
-struct Manager final : render::camera::Manager {
-private:
-    std::shared_ptr<render::camera::Builder> build(const std::string& name);
-    void update() override;
-
-public:
-    explicit Manager();
+struct Manager final : render::camera::Manager, core::Singleton<Manager> {
+    Manager();
     ~Manager() override;
+    void build(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void window_resized() override;
 };
 }
 
