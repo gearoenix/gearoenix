@@ -10,7 +10,7 @@ gearoenix::vulkan::command::Manager::Manager()
 
 gearoenix::vulkan::command::Manager::~Manager() = default;
 
-gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(const Type buffer_type, const std::optional<std::uint64_t> thread_index)
+std::shared_ptr<gearoenix::vulkan::command::Buffer> gearoenix::vulkan::command::Manager::create(const Type buffer_type, const std::optional<std::uint64_t> thread_index)
 {
     const std::lock_guard _lg(this_lock);
     std::shared_ptr<Pool> pool;
@@ -28,16 +28,7 @@ gearoenix::vulkan::command::Buffer gearoenix::vulkan::command::Manager::create(c
         }
         pool = search->second;
     }
-    return Buffer(std::move(pool), buffer_type);
-}
-
-std::vector<std::shared_ptr<gearoenix::vulkan::command::Buffer>> gearoenix::vulkan::command::Manager::create_frame_based()
-{
-    std::vector<std::shared_ptr<Buffer>> result(Swapchain::get().get_image_views().size());
-    for (auto& c : result) {
-        c = std::make_shared<Buffer>(std::move(create(Type::Primary)));
-    }
-    return result;
+    return std::make_shared<Buffer>(std::move(pool), buffer_type);
 }
 
 #endif

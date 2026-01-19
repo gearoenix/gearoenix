@@ -3,23 +3,26 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include <memory>
 
+namespace gearoenix::vulkan::command {
+struct Buffer;
+}
+
 namespace gearoenix::vulkan::image {
 struct View;
 }
 
 namespace gearoenix::vulkan::sync {
+    struct Fence;
 struct Semaphore;
-}
-
-namespace gearoenix::vulkan {
-struct Swapchain;
 }
 
 namespace gearoenix::vulkan::engine {
 struct Frame final {
     const std::shared_ptr<image::View> view;
+    const std::shared_ptr<sync::Fence> render_fence;
     const std::shared_ptr<sync::Semaphore> present_semaphore;
     const std::shared_ptr<sync::Semaphore> end_semaphore;
+    const std::shared_ptr<command::Buffer> cmd;
 
 
     Frame(Frame&&) = delete;
@@ -27,7 +30,7 @@ struct Frame final {
     Frame& operator=(Frame&&) = delete;
     Frame& operator=(const Frame&) = delete;
 
-    Frame(std::shared_ptr<image::View>&& view);
+    explicit Frame(std::shared_ptr<image::View>&& view);
     ~Frame();
     [[nodiscard]] bool present();
 };

@@ -3,6 +3,7 @@
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
@@ -12,7 +13,6 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-buf-buffer.hpp"
 #include "gx-vk-buf-uniform.hpp"
-#include "../command/gx-vk-cmd-manager.hpp"
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer() const
 {
@@ -40,7 +40,7 @@ std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulka
     std::vector<std::shared_ptr<Buffer>> result;
     const auto frames_count = Swapchain::get().get_image_views().size();
     result.reserve(frames_count);
-    for (auto i = decltype(frames_count){0}; i < frames_count; ++i) {
+    for (auto i = decltype(frames_count) { 0 }; i < frames_count; ++i) {
         result.push_back(std::move(upload_root_buffer->allocate(dyn_sz)));
     }
     return result;
@@ -102,7 +102,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     }
     cpu->write(data, size);
     uploader->push([this, name, cpu = std::move(cpu), gpu, end = end]() mutable {
-        auto cmd = std::make_shared<command::Buffer>(command::Manager::get().create(command::Type::Primary));
+        auto cmd = command::Manager::get().create();
         GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data());
         cmd->begin();
         cmd->copy(*cpu, *gpu);
@@ -114,6 +114,44 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
         });
     });
     return gpu;
+}
+
+void gearoenix::vulkan::buffer::Manager::upload_dynamics(command::Buffer& cmd)
+{
+    const auto vk_cmd = cmd.get_vulkan_data();
+
+    const auto frame_number = Singleton<engine::Engine>::get().get_frame_number();
+    const auto& src = *each_frame_upload_source[frame_number];
+    const auto& dst = *each_frame_upload_destination;
+
+    const auto& src_alloc = *src.get_allocator();
+    const auto& dst_alloc = *dst.get_allocator();
+
+    VkBufferCopy region { };
+    region.srcOffset = static_cast<VkDeviceSize>(src_alloc.get_offset());
+    region.dstOffset = static_cast<VkDeviceSize>(dst_alloc.get_offset());
+    region.size = static_cast<VkDeviceSize>(src_alloc.get_size());
+
+    vkCmdCopyBuffer(vk_cmd, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &region);
+
+    VkBufferMemoryBarrier2 barrier { };
+    barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
+    barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+    barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
+    barrier.dstStageMask = VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+    barrier.dstAccessMask = VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_2_UNIFORM_READ_BIT | VK_ACCESS_2_SHADER_STORAGE_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT;
+    barrier.buffer = dst.get_vulkan_data();
+    barrier.offset = region.dstOffset;
+    barrier.size = region.size;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    VkDependencyInfo dep { };
+    dep.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dep.bufferMemoryBarrierCount = 1;
+    dep.pBufferMemoryBarriers = &barrier;
+
+    vkCmdPipelineBarrier2(cmd.get_vulkan_data(), &dep);
 }
 
 #endif

@@ -4,6 +4,7 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
+#include "../buffer/gx-vk-buf-uniform.hpp"
 #include "../camera/gx-vk-cmr-manager.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../descriptor/gx-vk-des-bindless.hpp"
@@ -15,12 +16,15 @@
 #include "../gx-vk-surface.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-manager.hpp"
+#include "../light/gx-vk-lt-manager.hpp"
+#include "../material/gx-vk-mat-manager.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../mesh/gx-vk-msh-manager.hpp"
+#include "../model/gx-vk-mdl-manager.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
-#include "../queue/gx-vk-qu-graph.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
+#include "../scene/gx-vk-scn-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
@@ -29,9 +33,8 @@
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     frames_count = static_cast<decltype(frames_count)>(swapchain->get_image_views().size());
-    frames.reserve(static_cast<std::uint64_t>(frames_count));
     for (auto frame_index = decltype(frames_count) { 0 }; frame_index < frames_count; ++frame_index) {
-        frames.emplace_back(new Frame(swapchain->get_image_views()[frame_index]));
+        frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain->get_image_views()[frame_index]));
     }
 }
 
@@ -50,20 +53,35 @@ gearoenix::vulkan::engine::Engine::Engine()
     , swapchain(new Swapchain())
     , memory_manager(new memory::Manager())
     , command_manager(new command::Manager())
-    , pipeline_manager()
-    , buffer_manager()
-    , render_queue(new queue::Queue())
+    , pipeline_manager(new pipeline::Manager())
+    , buffer_manager(new buffer::Manager())
     , imgui_manager(new ImGuiManager())
-    , vk_image_manager(new image::Manager())
+    , image_manager(new image::Manager())
     , vk_texture_manager(new texture::Manager())
     , vk_mesh_manager(new mesh::Manager())
+    , vk_material_manager(new material::Manager())
+    , vk_model_manager(new model::Manager())
+    , vk_light_manager(new light::Manager())
+    , vk_camera_manager(new camera::Manager())
+    , vk_scene_manager(new scene::Manager())
+    , render_queue(new queue::Queue())
 {
     frames_count = swapchain->get_image_views().size();
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vk_mesh_manager);
     texture_manager = std::unique_ptr<render::texture::Manager>(vk_texture_manager);
-    camera_manager = std::make_unique<camera::Manager>();
+    material_manager = std::unique_ptr<material::Manager>(vk_material_manager);
+    model_manager = std::unique_ptr<render::model::Manager>(vk_model_manager);
+    camera_manager = std::unique_ptr<camera::Manager>(vk_camera_manager);
+    light_manager = std::unique_ptr<light::Manager>(vk_light_manager);
+    scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
     reflection_manager = std::make_unique<reflection::Manager>();
-    bindless_descriptor_manager = std::make_unique<descriptor::Bindless>();
+
+    bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
+        *scene::Manager::get_uniform_buffer().get_gpu(),
+        *camera::Manager::get_uniform_buffer().get_gpu(),
+        *model::Manager::get_uniform_buffer().get_gpu(),
+        *material::Manager::get_uniform_buffer().get_gpu(),
+        *light::Manager::get_uniform_buffer().get_gpu());
     initialize_frame();
 }
 
@@ -73,15 +91,17 @@ gearoenix::vulkan::engine::Engine::~Engine()
     bindless_descriptor_manager = nullptr;
     logical_device->wait_to_finish();
     imgui_manager = nullptr;
-    frames.clear();
+    frames = {};
 }
 
 void gearoenix::vulkan::engine::Engine::start_frame()
 {
     render::engine::Engine::start_frame();
-    if (!swapchain_image_is_valid && !platform::BaseApplication::get().get_window_resizing()) {
+    if (swapchain_image_is_valid) {
+        frames[frame_number]->render_fence->wait();
+    } else if (!platform::BaseApplication::get().get_window_resizing()) {
         logical_device->wait_to_finish();
-        frames.clear();
+        frames = {};
         // depth_stencil = image::View::create_depth_stencil();
         swapchain->initialize();
         initialize_frame();
@@ -90,9 +110,10 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     }
     imgui_manager->start_frame();
     if (swapchain_image_is_valid) {
-        if (const auto next_image = swapchain->get_next_image_index(*frames[frame_number]->present_semaphore); next_image.has_value()) {
-            swapchain_image_index = *next_image; // TODO: better to log these numbers and see how it behaves
-            // graphed_queue->start_frame();
+        const auto& frame_data = *frames[frame_number];
+        if (const auto next_image = swapchain->get_next_image_index(*frame_data.present_semaphore); next_image.has_value()) {
+            swapchain_image_index = *next_image;
+            frame_data.render_fence->reset();
         } else {
             swapchain_image_is_valid = false;
         }
@@ -138,6 +159,12 @@ bool gearoenix::vulkan::engine::Engine::present()
 
 void gearoenix::vulkan::engine::Engine::submit()
 {
+    auto& frame = *frames[frame_number];
+    auto& cmd = *frame.cmd;
+    cmd.begin();
+    buffer_manager->upload_dynamics(cmd);
+    bindless_descriptor_manager->bind(cmd);
+    cmd.end();
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()

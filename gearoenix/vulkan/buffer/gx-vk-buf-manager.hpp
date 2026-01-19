@@ -12,6 +12,10 @@ namespace gearoenix::core::sync {
 struct WorkWaiter;
 }
 
+namespace gearoenix::vulkan::command {
+struct Buffer;
+}
+
 namespace gearoenix::vulkan::image {
 struct Image;
 }
@@ -56,6 +60,8 @@ public:
     {
         return create(name, data.data(), data.size() * sizeof(T), end);
     }
+
+    void upload_dynamics(command::Buffer& cmd);
 };
 }
 

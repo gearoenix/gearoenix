@@ -8,7 +8,7 @@
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glsl"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "gx-vk-scn-scene.hpp"
 
 #include <boost/container/flat_set.hpp>
@@ -16,7 +16,7 @@
 #include <atomic>
 
 namespace {
-std::vector<GxShaderDataScene> shader_data_scenes;
+std::vector<GxShaderDataScene> shader_datas;
 std::atomic<std::uint32_t> shader_data_last_index = 0;
 std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
 boost::container::flat_set<std::pair<double, gearoenix::render::scene::Scene*>> scenes;
@@ -26,7 +26,7 @@ gearoenix::vulkan::scene::Manager::Manager(): Singleton<Manager>(this)
 {
     core::ecs::ComponentType::add<Scene>();
 
-    shader_data_scenes.resize(Scene::max_count);
+    shader_datas.resize(Scene::max_count);
     uniform_buffer = buffer::Manager::get().create_uniform(sizeof(GxShaderDataScene) * Scene::max_count);
 }
 
@@ -43,7 +43,7 @@ std::pair<GxShaderDataScene*, std::uint32_t> gearoenix::vulkan::scene::Manager::
 {
     const auto index = shader_data_last_index.fetch_add(1, std::memory_order_relaxed);
     GX_ASSERT_D(index < Scene::max_count);
-    return {&shader_data_scenes[index], index};
+    return {&shader_datas[index], index};
 }
 
 void gearoenix::vulkan::scene::Manager::update() const
@@ -52,7 +52,7 @@ void gearoenix::vulkan::scene::Manager::update() const
 
     render::scene::Manager::update();
 
-    uniform_buffer->update(shader_data_scenes.data());
+    uniform_buffer->update(shader_datas.data());
 }
 
 void gearoenix::vulkan::scene::Manager::submit(command::Buffer& cmd)
@@ -127,6 +127,11 @@ void gearoenix::vulkan::scene::Manager::render_forward(command::Buffer& cmd)
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     pop_debug_group();
+}
+
+const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::scene::Manager::get_uniform_buffer()
+{
+    return *uniform_buffer;
 }
 
 #endif

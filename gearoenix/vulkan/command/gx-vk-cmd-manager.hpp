@@ -27,8 +27,7 @@ public:
     Manager& operator=(const Manager&) = delete;
     ~Manager() override;
 
-    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::uint64_t> thread_index = std::nullopt);
-    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based();
+    [[nodiscard]] std::shared_ptr<Buffer> create(Type buffer_type = Type::Primary, std::optional<std::uint64_t> thread_index = std::nullopt);
 };
 }
 #endif

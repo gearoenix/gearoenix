@@ -6,11 +6,8 @@
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../descriptor/gx-vk-des-bindings-data.hpp"
-#include "../descriptor/gx-vk-des-set.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-framebuffer.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../query/gx-vk-qry-pool.hpp"
@@ -77,7 +74,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
         &bge_info, &rng_info.primitiveCount, &bsz_info);
 
-    result->accel_buff = std::move(buffer::Manager::get().create_static(static_cast<std::uint64_t>(bsz_info.accelerationStructureSize)));
+    result->accel_buff = std::move(buffer::Manager::get().create_static(static_cast<std::int64_t>(bsz_info.accelerationStructureSize)));
     GX_CHECK_NOT_EQUAL_D(nullptr, result->accel_buff);
 
     VkAccelerationStructureCreateInfoKHR asc_info;
@@ -93,14 +90,14 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
 
     bge_info.dstAccelerationStructure = result->vulkan_data;
 
-    auto scratch_buf = buffer::Manager::get().create_static(static_cast<std::uint64_t>(bsz_info.buildScratchSize));
+    auto scratch_buf = buffer::Manager::get().create_static(static_cast<std::int64_t>(bsz_info.buildScratchSize));
     GX_CHECK_NOT_EQUAL_D(nullptr, scratch_buf);
     const auto scratch_address = scratch_buf->get_device_address();
     bge_info.scratchData.deviceAddress = scratch_address;
 
-    auto query_pool = std::make_shared<query::Pool>(dev, VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
+    auto query_pool = std::make_shared<query::Pool>(VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR);
 
-    auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
+    auto cmd = cmd_mgr.create();
     GX_VK_MARK(name + "-blas-temp-cmd", cmd->get_vulkan_data());
     cmd->begin();
     const auto* const rng_info_p = &rng_info;
@@ -111,7 +108,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_vertices_ready(
         { VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR });
     query_pool->issue_acceleration_structure_compacted_size(*cmd, result->vulkan_data);
     cmd->end();
-    auto fence = std::make_shared<sync::Fence>(dev);
+    auto fence = std::make_shared<sync::Fence>();
     waiter_queue->submit(*cmd, *fence);
     waiter->push([this, name = std::move(name), cmd = std::move(cmd), fence = std::move(fence), c = std::move(c), result = std::move(result), query_pool = std::move(query_pool)]() mutable {
         create_accel_after_query_ready(std::move(name), std::move(fence), std::move(c), std::move(result), std::move(query_pool));
@@ -149,7 +146,7 @@ void gearoenix::vulkan::mesh::Manager::create_accel_after_query_ready(
     GX_VK_CHK(vkCreateAccelerationStructureKHR(vk_dev, &asc_info, nullptr, &result->vulkan_data));
     GX_VK_MARK(name + "-blas", result->vulkan_data);
 
-    auto cmd = std::make_shared<command::Buffer>(std::move(cmd_mgr.create(command::Type::Primary)));
+    auto cmd = cmd_mgr.create();
     GX_VK_MARK(name + "-blas-cmd", cmd->get_vulkan_data());
     cmd->begin();
 

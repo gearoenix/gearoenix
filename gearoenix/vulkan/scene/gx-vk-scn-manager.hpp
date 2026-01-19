@@ -7,6 +7,10 @@
 
 struct GxShaderDataScene;
 
+namespace gearoenix::vulkan::buffer {
+struct Uniform;
+}
+
 namespace gearoenix::vulkan::command {
 struct Buffer;
 }
@@ -20,6 +24,7 @@ struct Manager final : render::scene::Manager, core::Singleton<Manager> {
     void update() const override;
     void submit(command::Buffer& cmd);
     void render_forward(command::Buffer& cmd);
+    [[nodiscard]] static const buffer::Uniform& get_uniform_buffer();
 };
 }
 #endif

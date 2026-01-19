@@ -4,11 +4,16 @@
 #include "../core/gx-cr-singleton.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
-#include "image/gx-vk-img-view.hpp"
+#include "gx-vk-build-configuration.hpp"
 
 #include <optional>
 #include <vector>
 #include <memory>
+#include <array>
+
+namespace gearoenix::vulkan::image {
+struct View;
+}
 
 namespace gearoenix::vulkan::sync {
 struct Semaphore;
@@ -16,9 +21,11 @@ struct Semaphore;
 
 namespace gearoenix::vulkan {
 struct Swapchain final : core::Singleton<Swapchain> {
+    using views_t = std::array<std::shared_ptr<image::View>, frames_in_flight>;
+
     GX_GET_CREF_PRV(VkSurfaceFormatKHR, format);
     GX_GET_VAL_PRV(VkSwapchainKHR, vulkan_data, nullptr);
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<image::View>>, image_views);
+    GX_GET_CREF_PRV(views_t, image_views);
 
 public:
     Swapchain();

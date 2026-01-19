@@ -23,18 +23,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     const buffer::Buffer& materials_buffer,
     const buffer::Buffer& lights_buffer)
     : Singleton(this)
-    , image_1d_infos(max_1d_images)
-    , image_2d_infos(max_2d_images)
-    , image_3d_infos(max_3d_images)
-    , image_cube_infos(max_cube_images)
-    , sampler_infos(max_samplers)
 {
-    std::memset(image_1d_infos.data(), 0, sizeof(VkDescriptorImageInfo) * image_1d_infos.size());
-    std::memset(image_2d_infos.data(), 0, sizeof(VkDescriptorImageInfo) * image_2d_infos.size());
-    std::memset(image_3d_infos.data(), 0, sizeof(VkDescriptorImageInfo) * image_3d_infos.size());
-    std::memset(image_cube_infos.data(), 0, sizeof(VkDescriptorImageInfo) * image_cube_infos.size());
-    std::memset(sampler_infos.data(), 0, sizeof(VkDescriptorImageInfo) * sampler_infos.size());
-
     const auto vk_dev = device::Logical::get().get_vulkan_data();
 
     // ========== Descriptor Set Layout (Bindless Textures, Samplers & Buffers) ==========
@@ -121,6 +110,23 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     layout_info.pNext = &binding_flags_info;
 
     GX_VK_CHK(vkCreateDescriptorSetLayout(vk_dev, &layout_info, nullptr, &descriptor_set_layout));
+
+    // ========== Pipeline Layout ==========
+    VkPushConstantRange push_constant_range;
+    GX_SET_ZERO(push_constant_range);
+    push_constant_range.stageFlags = VK_SHADER_STAGE_ALL;
+    push_constant_range.offset = 0;
+    push_constant_range.size = sizeof(BindlessPushConstants);
+
+    VkPipelineLayoutCreateInfo pipeline_layout_info;
+    GX_SET_ZERO(pipeline_layout_info);
+    pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipeline_layout_info.setLayoutCount = 1;
+    pipeline_layout_info.pSetLayouts = &descriptor_set_layout;
+    pipeline_layout_info.pushConstantRangeCount = 1;
+    pipeline_layout_info.pPushConstantRanges = &push_constant_range;
+
+    GX_VK_CHK(vkCreatePipelineLayout(vk_dev, &pipeline_layout_info, nullptr, &pipeline_layout));
 
     // ========== Descriptor Pool ==========
     std::array<VkDescriptorPoolSize, 6> pool_sizes{};
@@ -235,21 +241,17 @@ gearoenix::vulkan::descriptor::Bindless::~Bindless()
 
     vkFreeDescriptorSets(vk_dev, descriptor_pool, 1, &descriptor_set);
     vkDestroyDescriptorPool(vk_dev, descriptor_pool, nullptr);
+    vkDestroyPipelineLayout(vk_dev, pipeline_layout, nullptr);
     vkDestroyDescriptorSetLayout(vk_dev, descriptor_set_layout, nullptr);
 }
 
-VkDescriptorSetLayout gearoenix::vulkan::descriptor::Bindless::get_descriptor_set_layout() const
+void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::uint32_t binding, const std::uint32_t index, const VkImageView view, const VkImageLayout layout) const
 {
-    return descriptor_set_layout;
-}
-
-VkDescriptorSet gearoenix::vulkan::descriptor::Bindless::get_descriptor_set() const
-{
-    return descriptor_set;
-}
-
-void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::uint32_t binding, const std::uint32_t index, const VkDescriptorImageInfo& info) const
-{
+    VkDescriptorImageInfo info;
+    GX_SET_ZERO(info);
+    info.imageView = view;
+    info.imageLayout = layout;
+    
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -258,15 +260,19 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
     write.dstArrayElement = index;
     write.descriptorCount = 1;
     write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    write.pImageInfo = &info;
     
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write]() {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info]() mutable {
+        write.pImageInfo = &info;
         vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
     });
 }
 
-void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const VkDescriptorImageInfo& info) const
+void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const VkSampler sampler) const
 {   
+    VkDescriptorImageInfo info;
+    GX_SET_ZERO(info);
+    info.sampler = sampler;
+    
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -275,9 +281,9 @@ void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std
     write.dstArrayElement = index;
     write.descriptorCount = 1;
     write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-    write.pImageInfo = &info;
 
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write]() {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info]() mutable {
+        write.pImageInfo = &info;
         vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
     });
 }
@@ -290,10 +296,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const V
     const auto index = free_1d_image_indices.back();
     free_1d_image_indices.pop_back();
 
-    auto& info = image_1d_infos[index];
-    info.imageView = view;
-    info.imageLayout = layout;
-    write_image_descriptor(0, index, info);
+    write_image_descriptor(0, index, view, layout);
     return index;
 }
 
@@ -305,10 +308,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const V
     const auto index = free_2d_image_indices.back();
     free_2d_image_indices.pop_back();
 
-    auto& info = image_2d_infos[index];
-    info.imageView = view;
-    info.imageLayout = layout;
-    write_image_descriptor(1, index, info);
+    write_image_descriptor(1, index, view, layout);
     return index;
 }
 
@@ -320,10 +320,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const V
     const auto index = free_3d_image_indices.back();
     free_3d_image_indices.pop_back();
 
-    auto& info = image_3d_infos[index];
-    info.imageView = view;
-    info.imageLayout = layout;
-    write_image_descriptor(2, index, info);
+    write_image_descriptor(2, index, view, layout);
     return index;
 }
 
@@ -335,10 +332,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const
     const auto index = free_cube_image_indices.back();
     free_cube_image_indices.pop_back();
 
-    auto& info = image_cube_infos[index];
-    info.imageView = view;
-    info.imageLayout = layout;
-    write_image_descriptor(3, index, info);
+    write_image_descriptor(3, index, view, layout);
     return index;
 }
 
@@ -350,24 +344,17 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_sampler(const Vk
     const auto index = free_sampler_indices.back();
     free_sampler_indices.pop_back();
 
-    auto& info = sampler_infos[index];
-    info.sampler = sampler;
-    write_sampler_descriptor(index, info);
+    write_sampler_descriptor(index, sampler);
     return index;
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_1d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    GX_ASSERT_D(index < image_1d_infos.size());
-
-    auto& tracked_info = image_1d_infos[index];
-    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
-
-    tracked_info = {};
+    GX_ASSERT_D(index < max_1d_images);
     
     // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(0, index, tracked_info);
+    write_image_descriptor(0, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
     
     free_1d_image_indices.push_back(index);
 }
@@ -375,15 +362,10 @@ void gearoenix::vulkan::descriptor::Bindless::free_1d_image(const std::uint32_t 
 void gearoenix::vulkan::descriptor::Bindless::free_2d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    GX_ASSERT_D(index < image_2d_infos.size());
-
-    auto& tracked_info = image_2d_infos[index];
-    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
-
-    tracked_info = {};
+    GX_ASSERT_D(index < max_2d_images);
     
     // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(1, index, tracked_info);
+    write_image_descriptor(1, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
     
     free_2d_image_indices.push_back(index);
 }
@@ -391,15 +373,10 @@ void gearoenix::vulkan::descriptor::Bindless::free_2d_image(const std::uint32_t 
 void gearoenix::vulkan::descriptor::Bindless::free_3d_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    GX_ASSERT_D(index < image_3d_infos.size());
-
-    auto& tracked_info = image_3d_infos[index];
-    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
-
-    tracked_info = {};
+    GX_ASSERT_D(index < max_3d_images);
     
     // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(2, index, tracked_info);
+    write_image_descriptor(2, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
     
     free_3d_image_indices.push_back(index);
 }
@@ -407,15 +384,10 @@ void gearoenix::vulkan::descriptor::Bindless::free_3d_image(const std::uint32_t 
 void gearoenix::vulkan::descriptor::Bindless::free_cube_image(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    GX_ASSERT_D(index < image_cube_infos.size());
-
-    auto& tracked_info = image_cube_infos[index];
-    GX_ASSERT_D(tracked_info.imageView != VK_NULL_HANDLE);
-
-    tracked_info = {};
+    GX_ASSERT_D(index < max_cube_images);
     
     // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(3, index, tracked_info);
+    write_image_descriptor(3, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
     
     free_cube_image_indices.push_back(index);
 }
@@ -423,17 +395,17 @@ void gearoenix::vulkan::descriptor::Bindless::free_cube_image(const std::uint32_
 void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t index)
 {
     const std::lock_guard _lg(allocation_lock);
-    GX_ASSERT_D(index < sampler_infos.size());
-
-    auto& tracked_info = sampler_infos[index];
-    GX_ASSERT_D(tracked_info.sampler != VK_NULL_HANDLE);
-
-    tracked_info = {};
+    GX_ASSERT_D(index < max_samplers);
     
     // Write a null descriptor to avoid undefined behaviour
-    write_sampler_descriptor(index, tracked_info);
+    write_sampler_descriptor(index, VK_NULL_HANDLE);
     
     free_sampler_indices.push_back(index);
+}
+
+void gearoenix::vulkan::descriptor::Bindless::bind(const VkCommandBuffer cmd) const
+{
+    vkCmdBindDescriptorSets(cmd,VK_PIPELINE_BIND_POINT_GRAPHICS,pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
 }
 
 #endif
