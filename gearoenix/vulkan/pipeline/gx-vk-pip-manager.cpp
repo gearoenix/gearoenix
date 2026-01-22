@@ -1,14 +1,12 @@
 #include "gx-vk-pip-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
-#include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../shader/gx-vk-shd-manager.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
 #include "gx-vk-pip-cache.hpp"
-#include "gx-vk-pip-layout.hpp"
 #include "gx-vk-pip-pipeline.hpp"
 
 static const char* const default_stage_entry = "main";
@@ -119,8 +117,7 @@ gearoenix::vulkan::pipeline::Manager::~Manager() = default;
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(
     const std::shared_ptr<descriptor::SetLayout>& des_set_layout)
 {
-    return Pipeline::construct_ray_tracing(
-        std::make_shared<Layout>(std::vector{des_set_layout}), std::shared_ptr(cache), stages_create_info, shader_group_create_info);
+    GX_UNIMPLEMENTED;
 }
 
 #endif

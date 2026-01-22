@@ -4,7 +4,7 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::shader::Module::Module(const std::span<std::uint8_t> file_content)
+gearoenix::vulkan::shader::Module::Module(const std::span<const std::uint8_t> file_content)
 {
     VkShaderModuleCreateInfo info;
     GX_SET_ZERO(info);

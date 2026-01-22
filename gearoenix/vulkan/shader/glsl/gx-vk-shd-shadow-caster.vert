@@ -7,9 +7,6 @@
 // ========== Specialization Constants ==========
 layout(constant_id = 0) const bool GX_SPEC_HAS_BONES = false;
 
-// ========== Vertex Shader ==========
-#ifdef VERTEX_SHADER
-
 layout(location = 0) in vec3 in_position;
 layout(location = 3) in vec2 in_uv;
 layout(location = 4) in vec4 in_bones_weight;
@@ -36,29 +33,3 @@ void main() {
         gl_Position = cjm.mvp * vec4(in_position, 1.0);
     }
 }
-
-#endif // VERTEX_SHADER
-
-// ========== Fragment Shader ==========
-#ifdef FRAGMENT_SHADER
-
-layout(location = 0) in vec2 in_uv;
-
-void main() {
-    GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[model.material_index];
-
-    // Sample albedo for alpha testing
-    float alpha = texture(
-        sampler2D(textures_2d[nonuniformEXT(material.albedo_texture_index)], samplers[nonuniformEXT(material.albedo_sampler_index)]),
-        in_uv).a * material.albedo_factor.a;
-
-    // Alpha test - discard fragments below cutoff
-    if (alpha <= material.alpha_cutoff_occlusion_strength_reserved.x) {
-        discard;
-    }
-
-    // Depth is written automatically - no color output needed for shadow maps
-}
-
-#endif // FRAGMENT_SHADER

@@ -16,7 +16,7 @@ public:
     Module(const Module&) = delete;
     Module& operator=(Module&&) = delete;
     Module& operator=(const Module&) = delete;
-    explicit Module(std::span<std::uint8_t> file_content);
+    explicit Module(std::span<const std::uint8_t> file_content);
     ~Module();
 };
 }

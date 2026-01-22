@@ -20,7 +20,7 @@ std::shared_ptr<gearoenix::vulkan::shader::Module> gearoenix::vulkan::shader::Ma
     const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(file_address));
     GX_ASSERT_D(stream);
     const auto file_content = stream->get_file_content();
-    auto result = std::make_shared<Module>(file_content);
+    auto result = std::make_shared<Module>(std::span{file_content.data(), file_content.size()});
     search = result;
     return result;
 }

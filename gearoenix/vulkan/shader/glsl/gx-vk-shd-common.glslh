@@ -1,4 +1,18 @@
-#pragma once
+#ifndef GX_VK_SHD_COMMON_GLSLH
+#define GX_VK_SHD_COMMON_GLSLH
+
+#ifdef __cplusplus
+
+#include "../../../math/gx-math-matrix-4d.hpp"
+
+using vec2 = gearoenix::math::Vec2<float>;
+using vec3 = gearoenix::math::Vec3<float>;
+using vec4 = gearoenix::math::Vec4<float>;
+using mat4 = gearoenix::math::Mat4x4<float>;
+using uint = std::uint32_t;
+
+#endif
+
 
 #ifndef GX_PI
 #define GX_PI 3.141592653589793238
@@ -11,6 +25,16 @@
 #ifndef GX_INVALID_INDEX16
 #define GX_INVALID_INDEX16 0xFFFF
 #endif
+
+struct hitPayload
+{
+    vec3 hitValue;
+    uint seed;
+    int depth;
+    vec3 rayOrigin;
+    vec3 rayDirection;
+    vec3 weight;
+};
 
 struct GxShaderDataScene
 {
@@ -129,3 +153,5 @@ struct GxShaderDataBone {
     mat4 m;
     mat4 inv_transpose_m;
 };
+
+#endif

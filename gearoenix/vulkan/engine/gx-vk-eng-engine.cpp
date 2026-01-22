@@ -126,7 +126,6 @@ void gearoenix::vulkan::engine::Engine::end_frame()
     imgui_manager->end_frame();
     if (swapchain_image_is_valid) {
         vk_mesh_manager->update();
-        imgui_manager->update();
         submit();
         swapchain_image_is_valid = present();
     }
@@ -166,6 +165,7 @@ void gearoenix::vulkan::engine::Engine::submit()
     buffer_manager->upload_dynamics(vk_cmd);
     bindless_descriptor_manager->bind(vk_cmd);
     vk_scene_manager->submit(vk_cmd);
+    imgui_manager->update();
     cmd.end();
     render_queue->submit(cmd, *frame.render_fence); // TODO: make sure it is the way, maybe I need to call the other function.
 }

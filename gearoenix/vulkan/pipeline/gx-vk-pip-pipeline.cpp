@@ -1,11 +1,10 @@
 #include "gx-vk-pip-pipeline.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
-#include "../descriptor/gx-vk-des-set-layout.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "gx-vk-pip-cache.hpp"
-#include "gx-vk-pip-layout.hpp"
 
 gearoenix::vulkan::pipeline::Pipeline::Pipeline(
     std::shared_ptr<Layout>&& layout,
@@ -36,7 +35,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     info.groupCount = static_cast<uint32_t>(shader_group_create_info.size());
     info.pGroups = shader_group_create_info.data();
     info.maxPipelineRayRecursionDepth = 2; // Ray depth
-    info.layout = layout->get_vulkan_data();
+    info.layout = descriptor::Bindless::get().get_pipeline_layout();
     VkPipeline vulkan_data = nullptr;
     GX_VK_CHK(vkCreateRayTracingPipelinesKHR(device::Logical::get().get_vulkan_data(), nullptr, cache->get_vulkan_data(), 1, &info, nullptr, &vulkan_data));
     return std::shared_ptr<Pipeline>(new Pipeline(std::move(layout), std::move(cache), vulkan_data));

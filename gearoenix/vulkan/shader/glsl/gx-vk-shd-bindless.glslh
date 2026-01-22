@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GX_VK_SHD_BINDLESS_GLSLH
+#define GX_VK_SHD_BINDLESS_GLSLH
 
 #include "gx-vk-shd-common.glslh"
 
@@ -69,3 +70,5 @@ layout(push_constant) uniform PushConstants {
     uint model_index;
     uint camera_model_index;
 } pc;
+
+#endif

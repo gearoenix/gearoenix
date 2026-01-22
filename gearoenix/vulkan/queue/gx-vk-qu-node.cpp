@@ -8,7 +8,7 @@
 gearoenix::vulkan::queue::Node::Node(const NodeLabel node_label, const VkPipelineStageFlags stage)
     : node_label(node_label)
     , stage(stage)
-    , frame_commands(command::Manager::get().create_frame_based())
+    , frame_commands()
 {
 }
 

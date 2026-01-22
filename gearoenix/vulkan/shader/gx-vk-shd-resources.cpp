@@ -4,7 +4,6 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
-#include "../descriptor/gx-vk-des-set.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
