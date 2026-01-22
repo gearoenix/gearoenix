@@ -35,8 +35,14 @@ void gearoenix::vulkan::texture::Target::construct(
 gearoenix::vulkan::texture::Target::~Target() = default;
 
 
-gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const VkCommandBuffer cb) const
+gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const VkCommandBuffer cb, const VkAttachmentLoadOp load_colours, const VkAttachmentLoadOp load_depth)
 {
+    for (auto& ca : color_attachments) {
+        ca.loadOp = load_colours;
+    }
+    if (depth_attachment.has_value()) {
+        depth_attachment->loadOp = load_depth;
+    }
     vkCmdBeginRendering(cb, &rendering_info);
     return RenderingScope(cb);
 }

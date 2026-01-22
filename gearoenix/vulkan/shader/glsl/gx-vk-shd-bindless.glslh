@@ -1,9 +1,8 @@
-#version 460
-#extension GL_EXT_nonuniform_qualifier : require
+#pragma once
 
 #include "gx-vk-shd-common.glslh"
 
-// ========== Set 0: Static Bindless Resources ==========
+// ========== Static Bindless Resources ==========
 // 1D Images
 layout(set = 0, binding = 0) uniform texture1D textures_1d[];
 
@@ -16,28 +15,51 @@ layout(set = 0, binding = 2) uniform texture3D textures_3d[];
 // Cube Images
 layout(set = 0, binding = 3) uniform textureCube textures_cube[];
 
-// Samplers
-layout(set = 0, binding = 4) uniform sampler samplers[];
+// Immutable samplers
+layout(set = 0, binding = 4) uniform sampler samplers[32];
 
-// ========== Set 1: Dynamic Per-Frame Storage Buffers ==========
-layout(set = 0, binding = 5) readonly buffer SceneBuffer {
+// Immutable shadow comparison sampler
+layout(set = 0, binding = 5) uniform sampler shadow_sampler_cmp;
+
+// ========== Storage Buffers ==========
+layout(set = 0, binding = 6) readonly buffer SceneBuffer {
     GxShaderDataScene scenes[];
 };
 
-layout(set = 0, binding = 6) readonly buffer CameraBuffer {
+layout(set = 0, binding = 7) readonly buffer CameraBuffer {
     GxShaderDataCamera cameras[];
 };
 
-layout(set = 0, binding = 7) readonly buffer ModelBuffer {
+layout(set = 0, binding = 8) readonly buffer ModelBuffer {
     GxShaderDataModel models[];
 };
 
-layout(set = 0, binding = 8) readonly buffer MaterialBuffer {
+layout(set = 0, binding = 9) readonly buffer MaterialBuffer {
     GxShaderDataMaterial materials[];
 };
 
-layout(set = 0, binding = 9) readonly buffer LightBuffer {
-    GxShaderDataLight lights[];
+layout(set = 0, binding = 10) readonly buffer PointLightBuffer {
+    GxShaderDataPointLight point_lights[];
+};
+
+layout(set = 0, binding = 11) readonly buffer DirectionalLightBuffer {
+    GxShaderDataDirectionalLight directional_lights[];
+};
+
+layout(set = 0, binding = 12) readonly buffer ShadowCasterDirectionalLightBuffer {
+    GxShaderDataShadowCasterDirectionalLight shadow_caster_directional_lights[];
+};
+
+layout(set = 0, binding = 13) readonly buffer BoneBuffer {
+    GxShaderDataBone bones[];
+};
+
+layout(set = 0, binding = 14) readonly buffer ReflectionProbeBuffer {
+    GxShaderDataReflectionProbe reflection_probes[];
+};
+
+layout(set = 0, binding = 15) readonly buffer CameraJointModelBuffer {
+    GxShaderDataCameraJointModel cameras_joint_models[];
 };
 
 // ========== Push Constants ==========
@@ -45,4 +67,5 @@ layout(push_constant) uniform PushConstants {
     uint scene_index;
     uint camera_index;
     uint model_index;
+    uint camera_model_index;
 } pc;

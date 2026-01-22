@@ -8,16 +8,16 @@ gearoenix::vulkan::camera::Target::Target(const render::camera::Target& rt)
         if (rt.is_default()) {
             const auto& [main, targets] = rt.get_default();
             Default d{};
-            d.main = std::dynamic_pointer_cast<Target>(main);
+            d.main = std::dynamic_pointer_cast<texture::Target>(main);
             for (std::uint32_t ti = 0; ti < targets.size(); ++ti) {
                 for (std::uint32_t mi = 0; mi < targets[ti].size(); ++mi) {
-                    d.targets[ti][mi] = std::dynamic_pointer_cast<Target>(targets[ti][mi]);
+                    d.targets[ti][mi] = std::dynamic_pointer_cast<texture::Target>(targets[ti][mi]);
                 }
             }
             return target_t{ std::move(d) };
         }
         if (rt.is_customised()) {
-            return target_t { Customised { .target = std::dynamic_pointer_cast<Target>(rt.get_customised().target) } };
+            return target_t { Customised { .target = std::dynamic_pointer_cast<texture::Target>(rt.get_customised().target) } };
         }
         GX_UNEXPECTED;
     }())

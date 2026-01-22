@@ -161,10 +161,13 @@ void gearoenix::vulkan::engine::Engine::submit()
 {
     auto& frame = *frames[frame_number];
     auto& cmd = *frame.cmd;
+    const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
-    buffer_manager->upload_dynamics(cmd);
-    bindless_descriptor_manager->bind(cmd);
+    buffer_manager->upload_dynamics(vk_cmd);
+    bindless_descriptor_manager->bind(vk_cmd);
+    vk_scene_manager->submit(vk_cmd);
     cmd.end();
+    render_queue->submit(cmd, *frame.render_fence); // TODO: make sure it is the way, maybe I need to call the other function.
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()

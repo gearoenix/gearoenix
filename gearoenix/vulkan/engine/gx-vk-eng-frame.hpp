@@ -32,7 +32,6 @@ struct Frame final {
 
     explicit Frame(std::shared_ptr<image::View>&& view);
     ~Frame();
-    [[nodiscard]] bool present();
 };
 }
 

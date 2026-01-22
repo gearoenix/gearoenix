@@ -19,9 +19,4 @@ gearoenix::vulkan::engine::Frame::Frame(std::shared_ptr<image::View>&& view)
 
 gearoenix::vulkan::engine::Frame::~Frame() = default;
 
-bool gearoenix::vulkan::engine::Frame::present()
-{
-
-}
-
 #endif

@@ -2,6 +2,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/scene/gx-rnd-scn-scene.hpp"
+#include "../gx-vk-loader.hpp"
 
 struct ShaderDataScene;
 
@@ -26,9 +27,9 @@ private:
 public:
     ~Scene() override;
     void update() override;
-    void render_shadows(uint& current_shader);
-    void render_reflection_probes(uint& current_shader) const;
-    void render_forward(uint& current_shader);
+    void render_shadows(VkCommandBuffer vk_cmd);
+    void render_reflection_probes(VkCommandBuffer vk_cmd) const;
+    void render_forward(VkCommandBuffer vk_cmd);
 };
 }
 #endif

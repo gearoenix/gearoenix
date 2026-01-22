@@ -43,7 +43,7 @@ public:
         std::string&& name, std::vector<render::texture::Attachment>&& attachments,
         core::job::EndCallerShared<render::texture::Target>&& end_callback);
     ~Target() override;
-    [[nodiscard]] RenderingScope create_rendering_scope(VkCommandBuffer cb) const;
+    [[nodiscard]] RenderingScope create_rendering_scope(VkCommandBuffer cb, VkAttachmentLoadOp load_colours = VK_ATTACHMENT_LOAD_OP_CLEAR, VkAttachmentLoadOp load_depth = VK_ATTACHMENT_LOAD_OP_CLEAR);
     void update_rendering_info();
 };
 }

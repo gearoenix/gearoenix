@@ -7,16 +7,21 @@
 #include <array>
 #include <variant>
 
+
+namespace gearoenix::vulkan::texture {
+struct Target;
+}
+
 namespace gearoenix::vulkan::camera {
 struct Target final {
     struct Customised final {
-        std::shared_ptr<Target> target;
+        std::shared_ptr<texture::Target> target;
         // TODO: we can cache some in here and in default later if it can improve performance
     };
 
     struct Default final {
-        std::shared_ptr<Target> main;
-        std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 4> targets;
+        std::shared_ptr<texture::Target> main;
+        std::array<std::array<std::shared_ptr<texture::Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
         // TODO: maybe I need to cache more things here for better performance
     };
 

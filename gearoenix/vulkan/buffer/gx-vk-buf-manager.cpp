@@ -116,10 +116,8 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return gpu;
 }
 
-void gearoenix::vulkan::buffer::Manager::upload_dynamics(command::Buffer& cmd)
+void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer vk_cmd)
 {
-    const auto vk_cmd = cmd.get_vulkan_data();
-
     const auto frame_number = Singleton<engine::Engine>::get().get_frame_number();
     const auto& src = *each_frame_upload_source[frame_number];
     const auto& dst = *each_frame_upload_destination;
@@ -151,7 +149,7 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(command::Buffer& cmd)
     dep.bufferMemoryBarrierCount = 1;
     dep.pBufferMemoryBarriers = &barrier;
 
-    vkCmdPipelineBarrier2(cmd.get_vulkan_data(), &dep);
+    vkCmdPipelineBarrier2(vk_cmd, &dep);
 }
 
 #endif

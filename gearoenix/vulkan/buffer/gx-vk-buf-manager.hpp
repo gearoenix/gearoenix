@@ -61,7 +61,7 @@ public:
         return create(name, data.data(), data.size() * sizeof(T), end);
     }
 
-    void upload_dynamics(command::Buffer& cmd);
+    void upload_dynamics(VkCommandBuffer vk_cmd);
 };
 }
 

@@ -2,6 +2,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/scene/gx-rnd-scn-manager.hpp"
+#include "../gx-vk-loader.hpp"
 
 #include <vector>
 
@@ -22,8 +23,8 @@ struct Manager final : render::scene::Manager, core::Singleton<Manager> {
     [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
     [[nodiscard]] static std::pair<GxShaderDataScene*, std::uint32_t> get_shader_data();
     void update() const override;
-    void submit(command::Buffer& cmd);
-    void render_forward(command::Buffer& cmd);
+    void submit(VkCommandBuffer vk_cmd);
+    void render_forward(VkCommandBuffer vk_cmd);
     [[nodiscard]] static const buffer::Uniform& get_uniform_buffer();
 };
 }

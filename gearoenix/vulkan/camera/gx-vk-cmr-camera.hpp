@@ -4,6 +4,7 @@
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "gx-vk-cmr-target.hpp"
+#include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::pipeline {
 struct BloomPrefilter;
@@ -48,11 +49,11 @@ struct Camera final : render::camera::Camera {
 public:
     static void construct(core::ecs::Entity* entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
     ~Camera() override;
-    void render_shadow(const render::record::Camera&, uint& current_shader) const;
-    void render_forward(const scene::Scene& scene, const render::record::Camera&, uint& current_shader) const;
-    void render_forward_skyboxes(const scene::Scene& scene, const render::record::Camera&, uint& current_shader) const;
-    void render_bloom(const scene::Scene& scene, const render::record::Camera&, uint& current_shader) const;
-    void render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera&, uint& current_shader) const;
+    void render_shadow(const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_forward(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_forward_skyboxes(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_bloom(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
 };
 }
 #endif

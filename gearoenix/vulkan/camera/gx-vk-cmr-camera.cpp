@@ -1,12 +1,14 @@
 #include "gx-vk-cmr-camera.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../texture/gx-vk-txt-target.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-marker.hpp"
+#include "../texture/gx-vk-txt-target.hpp"
+#include "../scene/gx-vk-scn-scene.hpp"
 
 void gearoenix::vulkan::camera::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
 {
-    gapi_target.target = Target::Customised { .target = std::dynamic_pointer_cast<Target>(t) };
+    gapi_target.target = Target::Customised { .target = std::dynamic_pointer_cast<texture::Target>(t) };
     render::camera::Camera::set_customised_target(std::move(t));
 }
 
@@ -47,7 +49,7 @@ void gearoenix::vulkan::camera::Camera::construct(core::ecs::Entity* const entit
 
 gearoenix::vulkan::camera::Camera::~Camera() = default;
 
-void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, uint& current_shader) const
+void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const VkCommandBuffer cmd) const
 {
     // push_debug_group(render_pass_name);
     // ctx::set_framebuffer(gapi_target.get_customised().target->get_framebuffer());
@@ -61,50 +63,27 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
     // pop_debug_group();
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(const scene::Scene& scene, const render::record::Camera& cmr, uint& current_shader) const
+void gearoenix::vulkan::camera::Camera::render_forward(const scene::Scene& scene, const render::record::Camera& cmr, const VkCommandBuffer cmd) const
 {
-#if GX_GL_LABELING_ENABLED
-    static std::string debug_group;
-    debug_group.clear();
-    debug_group += "render-forward-camera for scene: ";
-    debug_group += scene.get_object_name();
-    debug_group += ", and for camera: ";
-    debug_group += object_name;
-#endif
-
-    // push_debug_group(debug_group);
-    // GX_GL_CHECK_D;
-    // if (target.is_customised()) {
-    //     ctx::set_framebuffer(gl_target.get_customised().target->get_framebuffer());
-    // } else {
-    //     ctx::set_framebuffer(gl_target.get_default().main->get_framebuffer());
-    // }
-    // ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    // render_forward_skyboxes(scene, cmr, current_shader);
-    // GX_GL_CHECK_D;
-    // glEnable(GL_BLEND); /// TODO: take it into a context and material must decide
-    // // Rendering forward pbr
-    // for (auto& distance_model_data : cmr.all_models) {
-    //     auto& camera_model = distance_model_data.second;
-    //     auto& model = *core::cast_ptr<Model>(camera_model.model->model);
-    //     model.render_forward(scene, cmr, camera_model, current_shader);
-    //     GX_GL_CHECK_D;
-    // }
-    // glDisable(GL_BLEND); /// TODO: take it into a context and material must decide
-    // pop_debug_group();
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
+    const auto render_scope = [&] {
+        if (target.is_customised()) {
+            return gapi_target.get_customised().target->create_rendering_scope(cmd);
+        }
+        return gapi_target.get_default().main->create_rendering_scope(cmd);
+    }();
+    // TODO: change viewport and scissor if needed.
+    render_forward_skyboxes(scene, cmr, cmd); // TODO: because of some legacy stuff I have to render skybox before all objects but later it cam be improved and it can be rendered after all opaque objects.
+    for (auto& distance_model_data : cmr.all_models) {
+        auto& camera_model = distance_model_data.second;
+        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
+        model.render_forward(scene, cmr, camera_model, cmd);
+    }
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const scene::Scene& scene, const render::record::Camera& cmr, uint& current_shader) const
+void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const scene::Scene& scene, const render::record::Camera& cmr, const VkCommandBuffer cmd) const
 {
-    static std::string debug_group;
-    debug_group.clear();
-    debug_group += "render-skyboxes for scene: ";
-    debug_group += scene.get_object_name();
-    debug_group += ", and for camera: ";
-    debug_group += object_name;
-
-    // push_debug_group(debug_group);
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
     // glDepthMask(GL_FALSE);
     // // Rendering skyboxes
     // const math::Vec4 camera_pos_scale = { math::Vec3<float>(cmr.transform->get_global_position()), cmr.skybox_scale };
@@ -137,10 +116,9 @@ void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const scene::Sce
     //     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     // }
     // glDepthMask(GL_TRUE);
-    // pop_debug_group();
 }
 
-void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const render::record::Camera& record_cam, uint& current_shader) const
+void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const render::record::Camera& record_cam, const VkCommandBuffer cmd) const
 {
     if (!bloom_data.has_value()) {
         return;
@@ -287,7 +265,7 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
     // pop_debug_group();
 }
 
-void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera& rc, uint& current_shader) const
+void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera& rc, const VkCommandBuffer cmd) const
 {
     // GX_GL_CHECK_D;
 
