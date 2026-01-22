@@ -136,8 +136,7 @@ void main() {
         discard;
     }
 
-    // Metallic-Roughness (B = metallic, G = roughness in glTF spec)
-    vec2 mtr = texture(sampler2D(textures_2d[nonuniformEXT(material.metallic_roughness_texture_index)], samplers[nonuniformEXT(material.metallic_roughness_sampler_index)]), in_uv).bg;
+    vec2 mtr = texture(sampler2D(textures_2d[nonuniformEXT(material.metallic_roughness_texture_index)], samplers[nonuniformEXT(material.metallic_roughness_sampler_index)]), in_uv).xy;
     mtr *= vec2(material.normal_metallic_factor.w, material.emission_roughness_factor.w);
     float metallic = clamp(mtr.x, 0.0001, 0.9999);
     float roughness = clamp(mtr.y * mtr.y, 0.0001, 0.9999); // Perceptual roughness squared
@@ -171,7 +170,7 @@ void main() {
     float normal_dot_view = max(dot(nrm, view), 0.0001);
     vec3 fresnel = fresnel_schlick(normal_dot_view, f0, f90);
 
-    vec3 illumination = vec3(0.0);
+    vec3 illumination = vec3(0.0001);
 
     // ========== Point Lights ==========
     for (uint i = model.point_light_begin_index; i < model.point_light_end_index; ++i) {
@@ -252,10 +251,10 @@ void main() {
         vec2(normal_dot_view, roughness)).rg;
 
     // Ambient diffuse (reduced by fresnel and metallic for energy conservation)
-    vec3 ambient = irr * alb.rgb * (vec3(f90) - fresnel) * (f90 - metallic);
+    vec3 ambient = irr * alb.rgb * (vec3(1.0) - fresnel) * (1.0 - metallic);
 
     // Ambient specular (using split-sum approximation)
-    ambient += rad * ((fresnel * brdf.x) + (f90 * brdf.y));
+    ambient += rad * ((f0 * brdf.x) + brdf.y);
 
     // Apply ambient occlusion
     ambient *= ao;
