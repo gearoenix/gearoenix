@@ -6,8 +6,6 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../gx-vk-check.hpp"
-#include "../gx-vk-framebuffer.hpp"
-#include "../gx-vk-render-pass.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-cmd-pool.hpp"
@@ -95,21 +93,6 @@ void gearoenix::vulkan::command::Buffer::barrier(
     vkCmdPipelineBarrier(vulkan_data, src_state.second, des_state.second, 0, 0, nullptr, 1, &info, 0, nullptr);
 }
 
-void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, const Framebuffer& framebuffer)
-{
-    const auto& img = framebuffer.get_depth()->get_image();
-    VkRenderPassBeginInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    info.renderPass = render_pass.get_vulkan_data();
-    info.framebuffer = framebuffer.get_vulkan_data();
-    info.renderArea.extent.width = img->get_image_width();
-    info.renderArea.extent.height = img->get_image_height();
-    info.clearValueCount = 2;
-    info.pClearValues = framebuffer.get_clear_colors().data();
-    vkCmdBeginRenderPass(vulkan_data, &info, VK_SUBPASS_CONTENTS_INLINE);
-}
-
 // void gearoenix::vulkan::command::Buffer::begin_render_pass_with_info(
 //     const VkRenderPassBeginInfo& render_pass_begin_info)
 //{
@@ -127,11 +110,6 @@ void gearoenix::vulkan::command::Buffer::begin(const RenderPass& render_pass, co
 //     Loader::vkCmdSetScissor(vulkan_data, 0, 1, &scissor);
 // }
 //
-
-void gearoenix::vulkan::command::Buffer::end_render_pass()
-{
-    vkCmdEndRenderPass(vulkan_data);
-}
 
 // void gearoenix::vulkan::command::Buffer::bind_pipeline(VkPipeline pip)
 //{

@@ -1,6 +1,5 @@
 #include "gx-vk-imgui-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "descriptor/gx-vk-des-pool.hpp"
 #include "device/gx-vk-dev-physical.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
@@ -11,9 +10,7 @@
 #include "queue/gx-vk-qu-queue.hpp"
 #include "sync/gx-vk-sync-fence.hpp"
 #include "pipeline/gx-vk-pip-manager.hpp"
-#include "descriptor/gx-vk-des-manager.hpp"
 #include "gx-vk-swapchain.hpp"
-#include "gx-vk-render-pass.hpp"
 #include "command/gx-vk-cmd-manager.hpp"
 
 #include <imgui/backends/imgui_impl_vulkan.h>

@@ -43,8 +43,6 @@ public:
         buffer::Buffer& buff,
         std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
         std::pair<VkAccessFlags, VkPipelineStageFlags> des_state);
-    void begin(const RenderPass& render_pass, const Framebuffer& framebuffer);
-    void end_render_pass();
     void set(const Viewport& viewport);
     void set(const Scissor& scissor);
     void bind(Pipeline pip);

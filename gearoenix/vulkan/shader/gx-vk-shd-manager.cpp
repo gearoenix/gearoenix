@@ -16,7 +16,7 @@ std::shared_ptr<gearoenix::vulkan::shader::Module> gearoenix::vulkan::shader::Ma
     if (auto result = search.lock(); nullptr != result) {
         return result;
     }
-    const auto file_address = "shaders/vkr-shaders/gx-vk-shd-" + shader_name + ".spv";
+    const auto file_address = "vulkan/shader/" + shader_name + ".spv";
     const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(file_address));
     GX_ASSERT_D(stream);
     const auto file_content = stream->get_file_content();
