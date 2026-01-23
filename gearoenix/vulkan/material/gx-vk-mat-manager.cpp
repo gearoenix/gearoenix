@@ -6,7 +6,7 @@
 #include <atomic>
 
 namespace {
-std::vector<GxShaderDataScene> shader_datas;
+std::vector<GxShaderDataMaterial> shader_datas;
 std::atomic<std::uint32_t> shader_data_last_index = 0;
 std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
 }

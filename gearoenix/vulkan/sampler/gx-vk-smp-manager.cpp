@@ -9,7 +9,7 @@ gearoenix::vulkan::sampler::Manager::Manager()
 
 gearoenix::vulkan::sampler::Manager::~Manager() = default;
 
-const std::shared_ptr<gearoenix::vulkan::sampler::Sampler>& gearoenix::vulkan::sampler::Manager::get(const render::texture::SamplerInfo& info)
+const std::shared_ptr<gearoenix::vulkan::sampler::Sampler>& gearoenix::vulkan::sampler::Manager::get_sampler(const render::texture::SamplerInfo& info)
 {
     const std::lock_guard l(samplers_lock);
     auto& smp = samplers[info];

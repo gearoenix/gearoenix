@@ -8,10 +8,16 @@ namespace gearoenix::vulkan::image {
 struct View;
 }
 
+namespace gearoenix::vulkan::sampler {
+struct Sampler;
+}
+
 namespace gearoenix::vulkan::texture {
 struct Texture2D final : render::texture::Texture2D {
     GX_GET_REFC_PRV(std::shared_ptr<image::View>, view);
+    GX_GET_CVAL_PRV(std::uint32_t, view_index);
     GX_GET_REFC_PRV(std::vector<std::shared_ptr<image::View>>, mips);
+    GX_GET_CVAL_PRV(std::uint32_t, sampler_index);
 
 public:
     Texture2D(const render::texture::TextureInfo& info, std::string &&name);

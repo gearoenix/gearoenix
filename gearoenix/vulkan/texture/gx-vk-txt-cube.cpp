@@ -5,7 +5,9 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
+#include "../sampler/gx-vk-smp-sampler.hpp"
 #include "gx-vk-txt-2d.hpp"
 #include "gx-vk-txt-util.hpp"
 
@@ -20,6 +22,7 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::Text
         VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
             (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT: VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
+    , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
     , mips([this] {
         std::array<std::vector<std::shared_ptr<image::View>>, 6> result;
         const auto mip_count = view->get_image()->get_mipmap_levels();
@@ -31,6 +34,7 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::Text
         }
         return result;
     }())
+    , sampler_index(sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index())
 {
 }
 
