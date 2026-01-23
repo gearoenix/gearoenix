@@ -18,8 +18,7 @@ struct BindlessPushConstants final {
     std::uint32_t scene_index = 0;
     std::uint32_t camera_index = 0;
     std::uint32_t model_index = 0;
-    std::uint32_t material_index = 0;
-    std::uint32_t light_index = 0;
+    std::uint32_t camera_model_index = 0;
 };
 
 struct Bindless final : core::Singleton<Bindless> {
@@ -29,11 +28,13 @@ struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_cube_images = 32;
     static constexpr std::uint32_t max_images = max_1d_images + max_2d_images + max_3d_images + max_cube_images;
     static constexpr std::uint32_t max_samplers = 32;
+    static constexpr std::uint32_t max_shadow_samplers = 1;
 
     GX_GET_VAL_PRV(VkDescriptorSetLayout, descriptor_set_layout, VK_NULL_HANDLE);
     GX_GET_VAL_PRV(VkDescriptorPool, descriptor_pool, VK_NULL_HANDLE);
     GX_GET_VAL_PRV(VkDescriptorSet, descriptor_set, VK_NULL_HANDLE);
     GX_GET_VAL_PRV(VkPipelineLayout, pipeline_layout, VK_NULL_HANDLE);
+    GX_GET_VAL_PRV(VkSampler, shadow_sampler, VK_NULL_HANDLE);
 
     std::vector<std::uint32_t> free_1d_image_indices = { };
     std::vector<std::uint32_t> free_2d_image_indices = { };
@@ -52,7 +53,12 @@ public:
         const buffer::Buffer& cameras_buffer,
         const buffer::Buffer& models_buffer,
         const buffer::Buffer& materials_buffer,
-        const buffer::Buffer& lights_buffer);
+        const buffer::Buffer& point_lights_buffer,
+        const buffer::Buffer& directional_lights_buffer,
+        const buffer::Buffer& shadow_caster_directional_lights_buffer,
+        const buffer::Buffer& bones_buffer,
+        const buffer::Buffer& reflection_probes_buffer,
+        const buffer::Buffer& cameras_joint_models_buffer);
     ~Bindless() override;
 
     Bindless(Bindless&&) = delete;

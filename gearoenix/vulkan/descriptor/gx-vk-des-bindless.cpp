@@ -21,13 +21,18 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     const buffer::Buffer& cameras_buffer,
     const buffer::Buffer& models_buffer,
     const buffer::Buffer& materials_buffer,
-    const buffer::Buffer& lights_buffer)
+    const buffer::Buffer& point_lights_buffer,
+    const buffer::Buffer& directional_lights_buffer,
+    const buffer::Buffer& shadow_caster_directional_lights_buffer,
+    const buffer::Buffer& bones_buffer,
+    const buffer::Buffer& reflection_probes_buffer,
+    const buffer::Buffer& cameras_joint_models_buffer)
     : Singleton(this)
 {
     const auto vk_dev = device::Logical::get().get_vulkan_data();
 
     // ========== Descriptor Set Layout (Bindless Textures, Samplers & Buffers) ==========
-    std::array<VkDescriptorSetLayoutBinding, 10> bindings {};
+    std::array<VkDescriptorSetLayoutBinding, 16> bindings {};
     GX_SET_ZERO(bindings);
 
     // Bindless texture bindings
@@ -51,17 +56,19 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     bindings[3].descriptorCount = max_cube_images;
     bindings[3].stageFlags = VK_SHADER_STAGE_ALL;
 
+    // Immutable samplers
     bindings[4].binding = 4;
     bindings[4].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     bindings[4].descriptorCount = max_samplers;
     bindings[4].stageFlags = VK_SHADER_STAGE_ALL;
 
-    // Storage buffer bindings
+    // Shadow comparison sampler
     bindings[5].binding = 5;
-    bindings[5].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    bindings[5].descriptorCount = 1;
+    bindings[5].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+    bindings[5].descriptorCount = max_shadow_samplers;
     bindings[5].stageFlags = VK_SHADER_STAGE_ALL;
 
+    // Storage buffer bindings
     bindings[6].binding = 6;
     bindings[6].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     bindings[6].descriptorCount = 1;
@@ -82,17 +89,53 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     bindings[9].descriptorCount = 1;
     bindings[9].stageFlags = VK_SHADER_STAGE_ALL;
 
-    std::array<VkDescriptorBindingFlags, 10> binding_flags {
+    bindings[10].binding = 10;
+    bindings[10].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[10].descriptorCount = 1;
+    bindings[10].stageFlags = VK_SHADER_STAGE_ALL;
+
+    bindings[11].binding = 11;
+    bindings[11].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[11].descriptorCount = 1;
+    bindings[11].stageFlags = VK_SHADER_STAGE_ALL;
+
+    bindings[12].binding = 12;
+    bindings[12].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[12].descriptorCount = 1;
+    bindings[12].stageFlags = VK_SHADER_STAGE_ALL;
+
+    bindings[13].binding = 13;
+    bindings[13].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[13].descriptorCount = 1;
+    bindings[13].stageFlags = VK_SHADER_STAGE_ALL;
+
+    bindings[14].binding = 14;
+    bindings[14].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[14].descriptorCount = 1;
+    bindings[14].stageFlags = VK_SHADER_STAGE_ALL;
+
+    bindings[15].binding = 15;
+    bindings[15].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    bindings[15].descriptorCount = 1;
+    bindings[15].stageFlags = VK_SHADER_STAGE_ALL;
+
+    std::array<VkDescriptorBindingFlags, 16> binding_flags {
         gx_binding_flags, // 1D images
         gx_binding_flags, // 2D images
         gx_binding_flags, // 3D images
         gx_binding_flags, // Cube images
         gx_binding_flags, // Samplers
+        0, // shadow comparison sampler
         0, // scenes buffer
         0, // cameras buffer
         0, // models buffer
         0, // materials buffer
-        0  // lights buffer
+        0, // point lights buffer
+        0, // directional lights buffer
+        0, // shadow caster directional lights buffer
+        0, // bones buffer
+        0, // reflection probes buffer
+        0  // cameras joint models buffer
     };
 
     VkDescriptorSetLayoutBindingFlagsCreateInfo binding_flags_info;
@@ -129,26 +172,17 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     GX_VK_CHK(vkCreatePipelineLayout(vk_dev, &pipeline_layout_info, nullptr, &pipeline_layout));
 
     // ========== Descriptor Pool ==========
-    std::array<VkDescriptorPoolSize, 6> pool_sizes{};
+    std::array<VkDescriptorPoolSize, 3> pool_sizes{};
     GX_SET_ZERO(pool_sizes);
-    
+
     pool_sizes[0].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    pool_sizes[0].descriptorCount = max_1d_images;
+    pool_sizes[0].descriptorCount = max_images;
 
-    pool_sizes[1].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    pool_sizes[1].descriptorCount = max_2d_images;
+    pool_sizes[1].type = VK_DESCRIPTOR_TYPE_SAMPLER;
+    pool_sizes[1].descriptorCount = max_samplers + max_shadow_samplers;
 
-    pool_sizes[2].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    pool_sizes[2].descriptorCount = max_3d_images;
-
-    pool_sizes[3].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    pool_sizes[3].descriptorCount = max_cube_images;
-    
-    pool_sizes[4].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-    pool_sizes[4].descriptorCount = max_samplers;
-
-    pool_sizes[5].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    pool_sizes[5].descriptorCount = 5; // 5 storage buffers
+    pool_sizes[2].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    pool_sizes[2].descriptorCount = 10;
 
     VkDescriptorPoolCreateInfo pool_info;
     GX_SET_ZERO(pool_info);
@@ -201,31 +235,36 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         free_sampler_indices.push_back(i);
     }
 
-    // ========== Initialize Buffer Descriptors ==========    
+    // ========== Initialize Buffer Descriptors ==========
     const std::array buffers = {
         &scenes_buffer,
         &cameras_buffer,
         &models_buffer,
         &materials_buffer,
-        &lights_buffer
+        &point_lights_buffer,
+        &directional_lights_buffer,
+        &shadow_caster_directional_lights_buffer,
+        &bones_buffer,
+        &reflection_probes_buffer,
+        &cameras_joint_models_buffer
     };
 
-    std::array<VkDescriptorBufferInfo, 5> buffer_infos{};
+    std::array<VkDescriptorBufferInfo, 10> buffer_infos{};
     std::memset(buffer_infos.data(), 0, sizeof(VkDescriptorBufferInfo) * buffer_infos.size());
 
-    std::array<VkWriteDescriptorSet, 5> writes{};
+    std::array<VkWriteDescriptorSet, 10> writes{};
     std::memset(writes.data(), 0, sizeof(VkWriteDescriptorSet) * writes.size());
-    
+
     for (std::uint32_t i = 0; i < buffers.size(); ++i) {
         const auto& buff = *buffers[i];
         const auto& allocator = *buff.get_allocator();
         buffer_infos[i].buffer = buff.get_vulkan_data();
         buffer_infos[i].offset = static_cast<VkDeviceSize>(allocator.get_offset());
         buffer_infos[i].range = static_cast<VkDeviceSize>(allocator.get_size());
-        
+
         writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writes[i].dstSet = descriptor_set;
-        writes[i].dstBinding = 5 + i; // Buffers start at binding 5
+        writes[i].dstBinding = 6 + i; // Buffers start at binding 6
         writes[i].dstArrayElement = 0;
         writes[i].descriptorCount = 1;
         writes[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -233,12 +272,46 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     }
 
     vkUpdateDescriptorSets(vk_dev, static_cast<std::uint32_t>(writes.size()), writes.data(), 0, nullptr);
+
+    // ========== Create Shadow Comparison Sampler ==========
+    VkSamplerCreateInfo shadow_sampler_info;
+    GX_SET_ZERO(shadow_sampler_info);
+    shadow_sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    shadow_sampler_info.magFilter = VK_FILTER_LINEAR;
+    shadow_sampler_info.minFilter = VK_FILTER_LINEAR;
+    shadow_sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    shadow_sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    shadow_sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    shadow_sampler_info.anisotropyEnable = VK_FALSE;
+    shadow_sampler_info.compareEnable = VK_TRUE;
+    shadow_sampler_info.compareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    shadow_sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    shadow_sampler_info.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
+    GX_VK_CHK(vkCreateSampler(vk_dev, &shadow_sampler_info, nullptr, &shadow_sampler));
+
+    VkDescriptorImageInfo shadow_sampler_descriptor_info;
+    GX_SET_ZERO(shadow_sampler_descriptor_info);
+    shadow_sampler_descriptor_info.sampler = shadow_sampler;
+
+    VkWriteDescriptorSet shadow_sampler_write;
+    GX_SET_ZERO(shadow_sampler_write);
+    shadow_sampler_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    shadow_sampler_write.dstSet = descriptor_set;
+    shadow_sampler_write.dstBinding = 5;
+    shadow_sampler_write.dstArrayElement = 0;
+    shadow_sampler_write.descriptorCount = 1;
+    shadow_sampler_write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+    shadow_sampler_write.pImageInfo = &shadow_sampler_descriptor_info;
+
+    vkUpdateDescriptorSets(vk_dev, 1, &shadow_sampler_write, 0, nullptr);
 }
 
 gearoenix::vulkan::descriptor::Bindless::~Bindless()
 {
     const auto vk_dev = device::Logical::get().get_vulkan_data();
 
+    vkDestroySampler(vk_dev, shadow_sampler, nullptr);
     vkFreeDescriptorSets(vk_dev, descriptor_pool, 1, &descriptor_set);
     vkDestroyDescriptorPool(vk_dev, descriptor_pool, nullptr);
     vkDestroyPipelineLayout(vk_dev, pipeline_layout, nullptr);
