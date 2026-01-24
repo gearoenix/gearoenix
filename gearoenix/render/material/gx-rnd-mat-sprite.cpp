@@ -25,3 +25,18 @@ void gearoenix::render::material::Sprite::set_albedo(std::shared_ptr<texture::Te
 {
     albedo = std::move(t);
 }
+
+void gearoenix::render::material::Sprite::set_albedo_factor(const math::Vec4<float>& v)
+{
+    albedo_factor = v;
+}
+
+void gearoenix::render::material::Sprite::set_uv_transform(const math::Vec4<float>& v)
+{
+    uv_transform = v;
+}
+
+void gearoenix::render::material::Sprite::set_alpha_cutoff(const float v)
+{
+    alpha_cutoff = v;
+}

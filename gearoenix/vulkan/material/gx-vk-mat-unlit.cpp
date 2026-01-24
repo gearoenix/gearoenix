@@ -6,6 +6,7 @@
 #include "gx-vk-mat-manager.hpp"
 
 namespace {
+std::atomic not_initialised = true;
 gearoenix::vulkan::pipeline::Pipeline* forward_pipeline = nullptr;
 VkPipeline vk_forward_pipeline = nullptr;
 gearoenix::vulkan::pipeline::Pipeline* shadow_pipeline = nullptr;
@@ -20,11 +21,8 @@ gearoenix::vulkan::material::Unlit::Unlit(std::string&& name)
     : render::material::Unlit(object_type_index, std::move(name))
     , shader_data(core::Singleton<Manager>::get().get_uniform_holder())
 {
-    auto& sd = *shader_data.ptr();
-    sd.emission_roughness_factor = { 1.0f, 1.0f, 0.0f, 0.0f };
-
-    if (forward_pipeline == nullptr) {
-        auto& pip_mgr = pipeline::Manager::get();
+    if (not_initialised.exchange(false, std::memory_order_relaxed)) {
+        const auto& pip_mgr = pipeline::Manager::get();
 
         shadow_pipeline = pip_mgr.get_pbr_shadow_pipeline().get();
         forward_pipeline = pip_mgr.get_unlit_forward_pipeline().get();
@@ -36,13 +34,18 @@ gearoenix::vulkan::material::Unlit::Unlit(std::string&& name)
         vk_skinned_shadow_pipeline = skinned_shadow_pipeline->get_vulkan_data();
         vk_skinned_forward_pipeline = skinned_forward_pipeline->get_vulkan_data();
     }
+    auto& sd = *shader_data.ptr();
+    sd.emission_roughness_factor = uv_transform;
+    sd.albedo_factor = albedo_factor;
+    sd.alpha_cutoff_occlusion_strength_reserved.x = alpha_cutoff;
 }
 
 void gearoenix::vulkan::material::Unlit::construct(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c)
 {
-    const auto result = Object::construct<Unlit>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Unlit>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::vulkan::material::Unlit::~Unlit() = default;

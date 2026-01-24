@@ -6,6 +6,7 @@
 #include "gx-vk-mat-manager.hpp"
 
 namespace {
+std::atomic not_initialised = true;
 gearoenix::vulkan::pipeline::Pipeline* forward_pipeline = nullptr;
 VkPipeline vk_forward_pipeline = nullptr;
 gearoenix::vulkan::pipeline::Pipeline* shadow_pipeline = nullptr;
@@ -20,8 +21,8 @@ gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
     : render::material::Pbr(object_type_index, std::move(name))
     , shader_data(core::Singleton<Manager>::get().get_uniform_holder())
 {
-    if (forward_pipeline == nullptr) {
-        auto& pip_mgr = pipeline::Manager::get();
+    if (not_initialised.exchange(false, std::memory_order_relaxed)) {
+        const auto& pip_mgr = pipeline::Manager::get();
 
         shadow_pipeline = pip_mgr.get_pbr_shadow_pipeline().get();
         forward_pipeline = pip_mgr.get_pbr_forward_pipeline().get();
@@ -33,13 +34,19 @@ gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
         vk_skinned_shadow_pipeline = skinned_shadow_pipeline->get_vulkan_data();
         vk_skinned_forward_pipeline = skinned_forward_pipeline->get_vulkan_data();
     }
+    auto& sd = *shader_data.ptr();
+    sd.albedo_factor = albedo_factor;
+    sd.emission_roughness_factor = emission_roughness_factor;
+    sd.normal_metallic_factor = normal_metallic_factor;
+    sd.alpha_cutoff_occlusion_strength_reserved = alpha_cutoff_occlusion_strength_reserved_reserved;
 }
 
 void gearoenix::vulkan::material::Pbr::construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c)
 {
-    const auto result = Object::construct<Pbr>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Pbr>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::vulkan::material::Pbr::~Pbr() = default;

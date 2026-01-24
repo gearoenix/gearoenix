@@ -18,9 +18,10 @@ gearoenix::gl::material::Sprite::Sprite(std::string&& name)
 
 void gearoenix::gl::material::Sprite::construct(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c)
 {
-    const auto result = Object::construct<Sprite>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Sprite>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::gl::material::Sprite::~Sprite() = default;
