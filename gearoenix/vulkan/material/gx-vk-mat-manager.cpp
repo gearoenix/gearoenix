@@ -19,7 +19,7 @@ void gearoenix::vulkan::material::Manager::construct_pbr(std::string&& name, cor
 
 void gearoenix::vulkan::material::Manager::construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c)
 {
-    GX_UNIMPLEMENTED;
+    Unlit::construct(std::move(name), std::move(c));
 }
 
 void gearoenix::vulkan::material::Manager::construct_sprite(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c)

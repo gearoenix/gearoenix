@@ -374,6 +374,45 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     skinned_shadow_create_info.pVertexInputState = &skinned_vertex_input_info;
 
     pbr_skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), skinned_shadow_create_info);
+
+    // ========== Unlit Forward Pipelines ==========
+    unlit_vert_sm = shader_manager->get("forward-unlit.vert");
+    unlit_frag_sm = shader_manager->get("forward-unlit.frag");
+
+    VkPipelineShaderStageCreateInfo unlit_vert_stage;
+    GX_SET_ZERO(unlit_vert_stage);
+    unlit_vert_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    unlit_vert_stage.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    unlit_vert_stage.module = unlit_vert_sm->get_vulkan_data();
+    unlit_vert_stage.pName = default_stage_entry;
+
+    VkPipelineShaderStageCreateInfo unlit_frag_stage;
+    GX_SET_ZERO(unlit_frag_stage);
+    unlit_frag_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    unlit_frag_stage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    unlit_frag_stage.module = unlit_frag_sm->get_vulkan_data();
+    unlit_frag_stage.pName = default_stage_entry;
+
+    const std::array unlit_forward_stages = { unlit_vert_stage, unlit_frag_stage };
+
+    VkGraphicsPipelineCreateInfo unlit_forward_create_info = forward_create_info;
+    unlit_forward_create_info.stageCount = static_cast<std::uint32_t>(unlit_forward_stages.size());
+    unlit_forward_create_info.pStages = unlit_forward_stages.data();
+
+    unlit_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), unlit_forward_create_info);
+
+    // Skinned unlit forward pipeline
+    VkPipelineShaderStageCreateInfo unlit_skinned_vert_stage = unlit_vert_stage;
+    unlit_skinned_vert_stage.pSpecializationInfo = &spec_info;
+
+    const std::array unlit_skinned_forward_stages = { unlit_skinned_vert_stage, unlit_frag_stage };
+
+    VkGraphicsPipelineCreateInfo unlit_skinned_forward_create_info = forward_create_info;
+    unlit_skinned_forward_create_info.stageCount = static_cast<std::uint32_t>(unlit_skinned_forward_stages.size());
+    unlit_skinned_forward_create_info.pStages = unlit_skinned_forward_stages.data();
+    unlit_skinned_forward_create_info.pVertexInputState = &skinned_vertex_input_info;
+
+    unlit_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), unlit_skinned_forward_create_info);
 }
 
 gearoenix::vulkan::pipeline::Manager::Manager()
