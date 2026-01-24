@@ -1,9 +1,12 @@
 #include "gx-vk-pip-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../render/gx-rnd-vertex.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-swapchain.hpp"
 #include "../shader/gx-vk-shd-manager.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
 #include "gx-vk-pip-cache.hpp"
@@ -11,7 +14,7 @@
 
 static const char* const default_stage_entry = "main";
 
-void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing()
+void gearoenix::vulkan::pipeline::Manager::initialise_ray_tracing()
 {
     ray_gen_sm = shader_manager->get("camera.rgen");
     close_hit_sm = shader_manager->get("pbr.rchit");
@@ -100,15 +103,288 @@ void gearoenix::vulkan::pipeline::Manager::initialize_ray_tracing()
     }
 }
 
+void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
+{
+    pbr_vert_sm = shader_manager->get("pbr.vert");
+    pbr_frag_sm = shader_manager->get("pbr.frag");
+
+    const auto& physical_device = device::Physical::get();
+    const auto& bindless = descriptor::Bindless::get();
+    const auto depth_format = physical_device.get_supported_depth_format();
+    const auto color_format = Swapchain::get().get_format().format;
+
+    // ========== Shader stages ==========
+    VkPipelineShaderStageCreateInfo vert_stage;
+    GX_SET_ZERO(vert_stage);
+    vert_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vert_stage.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vert_stage.module = pbr_vert_sm->get_vulkan_data();
+    vert_stage.pName = default_stage_entry;
+
+    VkPipelineShaderStageCreateInfo frag_stage;
+    GX_SET_ZERO(frag_stage);
+    frag_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    frag_stage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    frag_stage.module = pbr_frag_sm->get_vulkan_data();
+    frag_stage.pName = default_stage_entry;
+
+    const std::array forward_stages = { vert_stage, frag_stage };
+
+    // ========== Vertex input ==========
+    VkVertexInputBindingDescription vertex_binding;
+    GX_SET_ZERO(vertex_binding);
+    vertex_binding.binding = 0;
+    vertex_binding.stride = sizeof(render::PbrVertex);
+    vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes{};
+    GX_SET_ZERO(vertex_attributes);
+
+    // position: vec3
+    vertex_attributes[0].binding = 0;
+    vertex_attributes[0].location = 0;
+    vertex_attributes[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    vertex_attributes[0].offset = offsetof(render::PbrVertex, position);
+
+    // normal: vec3
+    vertex_attributes[1].binding = 0;
+    vertex_attributes[1].location = 1;
+    vertex_attributes[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+    vertex_attributes[1].offset = offsetof(render::PbrVertex, normal);
+
+    // tangent: vec4
+    vertex_attributes[2].binding = 0;
+    vertex_attributes[2].location = 2;
+    vertex_attributes[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    vertex_attributes[2].offset = offsetof(render::PbrVertex, tangent);
+
+    // uv: vec2
+    vertex_attributes[3].binding = 0;
+    vertex_attributes[3].location = 3;
+    vertex_attributes[3].format = VK_FORMAT_R32G32_SFLOAT;
+    vertex_attributes[3].offset = offsetof(render::PbrVertex, uv);
+
+    VkPipelineVertexInputStateCreateInfo vertex_input_info;
+    GX_SET_ZERO(vertex_input_info);
+    vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input_info.vertexBindingDescriptionCount = 1;
+    vertex_input_info.pVertexBindingDescriptions = &vertex_binding;
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(vertex_attributes.size());
+    vertex_input_info.pVertexAttributeDescriptions = vertex_attributes.data();
+
+    // ========== Input assembly ==========
+    VkPipelineInputAssemblyStateCreateInfo input_assembly;
+    GX_SET_ZERO(input_assembly);
+    input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+    // ========== Dynamic state (viewport & scissor) ==========
+    constexpr std::array dynamic_states = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+    VkPipelineDynamicStateCreateInfo dynamic_state;
+    GX_SET_ZERO(dynamic_state);
+    dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state.dynamicStateCount = static_cast<std::uint32_t>(dynamic_states.size());
+    dynamic_state.pDynamicStates = dynamic_states.data();
+
+    // ========== Viewport state (dynamic, so counts only) ==========
+    VkPipelineViewportStateCreateInfo viewport_state;
+    GX_SET_ZERO(viewport_state);
+    viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_state.viewportCount = 1;
+    viewport_state.scissorCount = 1;
+
+    // ========== Rasterization ==========
+    VkPipelineRasterizationStateCreateInfo rasterization;
+    GX_SET_ZERO(rasterization);
+    rasterization.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterization.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterization.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterization.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterization.lineWidth = 1.0f;
+
+    // ========== Multisampling ==========
+    VkPipelineMultisampleStateCreateInfo multisample;
+    GX_SET_ZERO(multisample);
+    multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisample.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+    // ========== Depth/stencil ==========
+    VkPipelineDepthStencilStateCreateInfo depth_stencil;
+    GX_SET_ZERO(depth_stencil);
+    depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depth_stencil.depthTestEnable = VK_TRUE;
+    depth_stencil.depthWriteEnable = VK_TRUE;
+    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+
+    // ========== Color blending (forward) ==========
+    VkPipelineColorBlendAttachmentState color_blend_attachment;
+    GX_SET_ZERO(color_blend_attachment);
+    color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    VkPipelineColorBlendStateCreateInfo color_blend;
+    GX_SET_ZERO(color_blend);
+    color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blend.attachmentCount = 1;
+    color_blend.pAttachments = &color_blend_attachment;
+
+    // ========== Dynamic rendering (forward) ==========
+    VkPipelineRenderingCreateInfo rendering_info;
+    GX_SET_ZERO(rendering_info);
+    rendering_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    rendering_info.colorAttachmentCount = 1;
+    rendering_info.pColorAttachmentFormats = &color_format;
+    rendering_info.depthAttachmentFormat = depth_format;
+
+    // ========== Forward pipeline ==========
+    VkGraphicsPipelineCreateInfo forward_create_info;
+    GX_SET_ZERO(forward_create_info);
+    forward_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    forward_create_info.pNext = &rendering_info;
+    forward_create_info.stageCount = static_cast<std::uint32_t>(forward_stages.size());
+    forward_create_info.pStages = forward_stages.data();
+    forward_create_info.pVertexInputState = &vertex_input_info;
+    forward_create_info.pInputAssemblyState = &input_assembly;
+    forward_create_info.pViewportState = &viewport_state;
+    forward_create_info.pRasterizationState = &rasterization;
+    forward_create_info.pMultisampleState = &multisample;
+    forward_create_info.pDepthStencilState = &depth_stencil;
+    forward_create_info.pColorBlendState = &color_blend;
+    forward_create_info.pDynamicState = &dynamic_state;
+    forward_create_info.layout = bindless.get_pipeline_layout();
+
+    pbr_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), forward_create_info);
+
+    // ========== Shadow pipeline (depth-only, vertex shader only) ==========
+    VkPipelineColorBlendStateCreateInfo shadow_color_blend;
+    GX_SET_ZERO(shadow_color_blend);
+    shadow_color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+
+    VkPipelineRenderingCreateInfo shadow_rendering_info;
+    GX_SET_ZERO(shadow_rendering_info);
+    shadow_rendering_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    shadow_rendering_info.depthAttachmentFormat = depth_format;
+
+    VkGraphicsPipelineCreateInfo shadow_create_info;
+    GX_SET_ZERO(shadow_create_info);
+    shadow_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    shadow_create_info.pNext = &shadow_rendering_info;
+    shadow_create_info.stageCount = 1;
+    shadow_create_info.pStages = &vert_stage;
+    shadow_create_info.pVertexInputState = &vertex_input_info;
+    shadow_create_info.pInputAssemblyState = &input_assembly;
+    shadow_create_info.pViewportState = &viewport_state;
+    shadow_create_info.pRasterizationState = &rasterization;
+    shadow_create_info.pMultisampleState = &multisample;
+    shadow_create_info.pDepthStencilState = &depth_stencil;
+    shadow_create_info.pColorBlendState = &shadow_color_blend;
+    shadow_create_info.pDynamicState = &dynamic_state;
+    shadow_create_info.layout = bindless.get_pipeline_layout();
+
+    pbr_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), shadow_create_info);
+
+    // ========== Skinned vertex pipelines ==========
+    const VkBool32 spec_has_bones = VK_TRUE;
+
+    VkSpecializationMapEntry spec_map_entry;
+    GX_SET_ZERO(spec_map_entry);
+    spec_map_entry.constantID = 0;
+    spec_map_entry.offset = 0;
+    spec_map_entry.size = sizeof(VkBool32);
+
+    VkSpecializationInfo spec_info;
+    GX_SET_ZERO(spec_info);
+    spec_info.mapEntryCount = 1;
+    spec_info.pMapEntries = &spec_map_entry;
+    spec_info.dataSize = sizeof(VkBool32);
+    spec_info.pData = &spec_has_bones;
+
+    VkPipelineShaderStageCreateInfo skinned_vert_stage = vert_stage;
+    skinned_vert_stage.pSpecializationInfo = &spec_info;
+
+    VkPipelineShaderStageCreateInfo skinned_frag_stage = frag_stage;
+
+    const std::array skinned_forward_stages = { skinned_vert_stage, skinned_frag_stage };
+
+    // Skinned vertex input
+    VkVertexInputBindingDescription skinned_vertex_binding;
+    GX_SET_ZERO(skinned_vertex_binding);
+    skinned_vertex_binding.binding = 0;
+    skinned_vertex_binding.stride = sizeof(render::PbrVertexAnimated);
+    skinned_vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    std::array<VkVertexInputAttributeDescription, 6> skinned_vertex_attributes{};
+    GX_SET_ZERO(skinned_vertex_attributes);
+
+    // position: vec3
+    skinned_vertex_attributes[0].binding = 0;
+    skinned_vertex_attributes[0].location = 0;
+    skinned_vertex_attributes[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    skinned_vertex_attributes[0].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, position);
+
+    // normal: vec3
+    skinned_vertex_attributes[1].binding = 0;
+    skinned_vertex_attributes[1].location = 1;
+    skinned_vertex_attributes[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+    skinned_vertex_attributes[1].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, normal);
+
+    // tangent: vec4
+    skinned_vertex_attributes[2].binding = 0;
+    skinned_vertex_attributes[2].location = 2;
+    skinned_vertex_attributes[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    skinned_vertex_attributes[2].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, tangent);
+
+    // uv: vec2
+    skinned_vertex_attributes[3].binding = 0;
+    skinned_vertex_attributes[3].location = 3;
+    skinned_vertex_attributes[3].format = VK_FORMAT_R32G32_SFLOAT;
+    skinned_vertex_attributes[3].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, uv);
+
+    // bone_weights: vec4
+    skinned_vertex_attributes[4].binding = 0;
+    skinned_vertex_attributes[4].location = 4;
+    skinned_vertex_attributes[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    skinned_vertex_attributes[4].offset = offsetof(render::PbrVertexAnimated, bone_weights);
+
+    // bone_indices: vec4
+    skinned_vertex_attributes[5].binding = 0;
+    skinned_vertex_attributes[5].location = 5;
+    skinned_vertex_attributes[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    skinned_vertex_attributes[5].offset = offsetof(render::PbrVertexAnimated, bone_indices);
+
+    VkPipelineVertexInputStateCreateInfo skinned_vertex_input_info;
+    GX_SET_ZERO(skinned_vertex_input_info);
+    skinned_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    skinned_vertex_input_info.vertexBindingDescriptionCount = 1;
+    skinned_vertex_input_info.pVertexBindingDescriptions = &skinned_vertex_binding;
+    skinned_vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(skinned_vertex_attributes.size());
+    skinned_vertex_input_info.pVertexAttributeDescriptions = skinned_vertex_attributes.data();
+
+    // Skinned forward pipeline
+    VkGraphicsPipelineCreateInfo skinned_forward_create_info = forward_create_info;
+    skinned_forward_create_info.stageCount = static_cast<std::uint32_t>(skinned_forward_stages.size());
+    skinned_forward_create_info.pStages = skinned_forward_stages.data();
+    skinned_forward_create_info.pVertexInputState = &skinned_vertex_input_info;
+
+    pbr_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), skinned_forward_create_info);
+
+    // Skinned shadow pipeline
+    VkGraphicsPipelineCreateInfo skinned_shadow_create_info = shadow_create_info;
+    skinned_shadow_create_info.pStages = &skinned_vert_stage;
+    skinned_shadow_create_info.pVertexInputState = &skinned_vertex_input_info;
+
+    pbr_skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), skinned_shadow_create_info);
+}
+
 gearoenix::vulkan::pipeline::Manager::Manager()
     : Singleton(this)
     , cache(new Cache())
     , shader_manager(new shader::Manager())
 {
     if (device::Physical::get().get_rtx_supported()) {
-        initialize_ray_tracing();
+        initialise_ray_tracing();
     } else {
-        GX_UNIMPLEMENTED;
+        initialise_rasterizer();
     }
 }
 

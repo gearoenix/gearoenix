@@ -109,3 +109,23 @@ void gearoenix::render::material::Pbr::set_brdflut(std::shared_ptr<texture::Text
 {
     brdflut = std::move(o);
 }
+
+void gearoenix::render::material::Pbr::set_albedo_factor(const math::Vec4<float>& v)
+{
+    albedo_factor = v;
+}
+
+void gearoenix::render::material::Pbr::set_emission_roughness_factor(const math::Vec4<float>& v)
+{
+    emission_roughness_factor = v;
+}
+
+void gearoenix::render::material::Pbr::set_normal_metallic_factor(const math::Vec4<float>& v)
+{
+    normal_metallic_factor = v;
+}
+
+void gearoenix::render::material::Pbr::set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>& v)
+{
+    alpha_cutoff_occlusion_strength_reserved_reserved = v;
+}

@@ -35,7 +35,15 @@ struct Manager final : core::Singleton<Manager> {
     std::vector<VkPipelineShaderStageCreateInfo> stages_create_info;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> shader_group_create_info;
 
-    void initialize_ray_tracing();
+    std::shared_ptr<shader::Module> pbr_vert_sm;
+    std::shared_ptr<shader::Module> pbr_frag_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_forward_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_shadow_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_forward_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_shadow_pipeline);
+
+    void initialise_ray_tracing();
+    void initialise_rasterizer();
 
 public:
     Manager(Manager&&) = delete;

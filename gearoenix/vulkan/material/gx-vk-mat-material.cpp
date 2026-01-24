@@ -4,14 +4,23 @@
 
 gearoenix::vulkan::material::Material::~Material() = default;
 
-void gearoenix::vulkan::material::Material::bind_forward(pipeline::Pipeline*& pipeline)
+void gearoenix::vulkan::material::Material::bind_forward(const VkCommandBuffer, const bool, VkPipeline&)
 {
-    GX_UNIMPLEMENTED;
+    GX_UNIMPLEMENTED; // needs to be implemented by the child type
 }
 
-void gearoenix::vulkan::material::Material::bind_shadow(pipeline::Pipeline*& pipeline)
+void gearoenix::vulkan::material::Material::bind_shadow(const VkCommandBuffer, const bool, VkPipeline&)
 {
-    GX_UNIMPLEMENTED;
+    GX_UNIMPLEMENTED; // needs to be implemented by the child type
+}
+
+void gearoenix::vulkan::material::Material::bind_graphics(const VkPipeline pipeline, const VkCommandBuffer cmd, VkPipeline& current_bound_pipeline)
+{
+    if (current_bound_pipeline == pipeline) {
+        return;
+    }
+    current_bound_pipeline = pipeline;
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }
 
 #endif

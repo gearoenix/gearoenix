@@ -10,10 +10,10 @@ struct Pbr : Material {
     constexpr static std::array all_parent_object_type_indices { Material::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Material::object_type_index };
 
-    GX_GET_REF_PRT(math::Vec4<float>, albedo_factor);
-    GX_GET_REF_PRT(math::Vec4<float>, emission_roughness_factor);
-    GX_GET_REF_PRT(math::Vec4<float>, normal_metallic_factor);
-    GX_GET_REF_PRT(math::Vec4<float>, alpha_cutoff_occlusion_strength_reserved_reserved);
+    GX_GET_CREF_PRT(math::Vec4<float>, albedo_factor);
+    GX_GET_CREF_PRT(math::Vec4<float>, emission_roughness_factor);
+    GX_GET_CREF_PRT(math::Vec4<float>, normal_metallic_factor);
+    GX_GET_CREF_PRT(math::Vec4<float>, alpha_cutoff_occlusion_strength_reserved_reserved);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, albedo);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, normal);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, emission);
@@ -33,5 +33,9 @@ public:
     virtual void set_metallic_roughness(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_occlusion(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_brdflut(std::shared_ptr<texture::Texture2D>&&);
+    virtual void set_albedo_factor(const math::Vec4<float>&);
+    virtual void set_emission_roughness_factor(const math::Vec4<float>&);
+    virtual void set_normal_metallic_factor(const math::Vec4<float>&);
+    virtual void set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>&);
 };
 }

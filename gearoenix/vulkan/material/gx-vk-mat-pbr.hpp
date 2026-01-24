@@ -3,6 +3,8 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/material/gx-rnd-mat-pbr.hpp"
 #include "gx-vk-mat-material.hpp"
+#include "../descriptor/gx-vk-des-uniform-holder.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
 
 namespace gearoenix::vulkan::buffer {
 struct Uniform;
@@ -17,23 +19,13 @@ struct Pbr final : render::material::Pbr, Material {
     constexpr static std::array all_parent_object_type_indices { render::material::Material::object_type_index, render::material::Pbr::object_type_index, material::Material::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::material::Pbr::object_type_index, material::Material::object_type_index };
 
-    GX_GET_VAL_PRV(std::uint32_t, albedo_texture_index, static_cast<std::uint32_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, albedo_sampler_index, static_cast<std::uint32_t>(-1));
+    const descriptor::UniformHolder<GxShaderDataMaterial>::PtrHolder shader_data;
 
-    GX_GET_VAL_PRV(std::uint32_t, normal_texture_index, static_cast<std::uint32_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, normal_sampler_index, static_cast<std::uint32_t>(-1));
-
-    GX_GET_VAL_PRV(std::uint32_t, emission_texture_index, static_cast<std::uint32_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, emission_sampler_index, static_cast<std::uint32_t>(-1));
-
-    GX_GET_VAL_PRV(std::uint32_t, metallic_roughness_texture_index, static_cast<std::uint32_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, metallic_roughness_sampler_index, static_cast<std::uint32_t>(-1));
-
-    GX_GET_VAL_PRV(std::uint32_t, occlusion_texture_index, static_cast<std::uint32_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, occlusion_sampler_index, static_cast<std::uint32_t>(-1));
+private:
+    explicit Pbr(std::string&& name);
 
 public:
-    explicit Pbr(std::string&& name);
+    static void construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c);
     ~Pbr() override;
     void show_debug_gui() override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
@@ -41,8 +33,12 @@ public:
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_occlusion(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void bind_forward(pipeline::Pipeline*& pipeline) override;
-    void bind_shadow(pipeline::Pipeline*& pipeline) override;
+    void bind_forward(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline) override;
+    void bind_shadow(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline) override;
+    void set_albedo_factor(const math::Vec4<float>&) override;
+    void set_emission_roughness_factor(const math::Vec4<float>&) override;
+    void set_normal_metallic_factor(const math::Vec4<float>&) override;
+    void set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>&) override;
 };
 }
 #endif
