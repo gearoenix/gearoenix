@@ -29,9 +29,10 @@ gearoenix::gl::material::Pbr::Pbr(std::string&& name)
 
 void gearoenix::gl::material::Pbr::construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c)
 {
-    const auto result = Object::construct<Pbr>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Pbr>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::gl::material::Pbr::~Pbr() = default;

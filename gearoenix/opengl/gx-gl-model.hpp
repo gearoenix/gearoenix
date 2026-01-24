@@ -1,7 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/ecs/gx-cr-ecs-component.hpp"
 #include "../render/model/gx-rnd-mdl-manager.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "gx-gl-types.hpp"
