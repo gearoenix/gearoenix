@@ -162,6 +162,8 @@ void gearoenix::vulkan::engine::Engine::submit()
     auto& cmd = *frame.cmd;
     const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
+    // TODO: update all the uniforms
+    vk_scene_manager->update_uniforms();
     buffer_manager->upload_dynamics(vk_cmd);
     bindless_descriptor_manager->bind(vk_cmd);
     vk_scene_manager->submit(vk_cmd);

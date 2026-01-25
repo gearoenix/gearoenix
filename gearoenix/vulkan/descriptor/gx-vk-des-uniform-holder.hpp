@@ -5,6 +5,7 @@
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
 
 #include <vector>
 #include <mutex>

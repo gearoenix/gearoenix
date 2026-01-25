@@ -12,7 +12,15 @@
 #include "gx-vk-pip-cache.hpp"
 #include "gx-vk-pip-pipeline.hpp"
 
-static const char* const default_stage_entry = "main";
+namespace {
+constexpr char default_stage_entry[] = "main";
+}
+
+// TODO: Separate ray tracing and rasterisation pipeline initialisation into distinct struct.
+// TODO: Use specialisation constants to split monolithic shaders (e.g. unlit) into dedicated pipeline
+//       variants per feature (alpha blending, UV transform, albedo source) instead of a single
+//       uber-shader that handles all combinations at runtime.
+// TODO: Pipeline creation must be based on demand, instead of creating all of them.
 
 void gearoenix::vulkan::pipeline::Manager::initialise_ray_tracing()
 {
@@ -430,7 +438,7 @@ gearoenix::vulkan::pipeline::Manager::Manager()
 gearoenix::vulkan::pipeline::Manager::~Manager() = default;
 
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(
-    const std::shared_ptr<descriptor::SetLayout>& des_set_layout)
+    const std::shared_ptr<descriptor::SetLayout>&)
 {
     GX_UNIMPLEMENTED;
 }

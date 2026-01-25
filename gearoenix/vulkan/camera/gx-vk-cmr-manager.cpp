@@ -5,14 +5,12 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
+#include "../../render/record/gx-rnd-rcd-camera.hpp"
 
-namespace {
-std::vector<GxShaderDataScene> shader_datas;
-std::atomic<std::uint32_t> shader_data_last_index = 0;
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
-}
-
-gearoenix::vulkan::camera::Manager::Manager() : Singleton<Manager>(this)
+gearoenix::vulkan::camera::Manager::Manager()
+    : Singleton<Manager>(this)
+    , camera_uniform_indexer(Camera::max_count)
+    , cameras_joint_models_uniform_indexer(render::record::Camera::cameras_joint_models_max_count)
 {
 }
 
@@ -36,9 +34,10 @@ void gearoenix::vulkan::camera::Manager::window_resized()
 {
     render::camera::Manager::window_resized();
 }
-
-const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::camera::Manager::get_uniform_buffer()
+void gearoenix::vulkan::camera::Manager::update()
 {
-    return *uniform_buffer;
+    camera_uniform_indexer.reset();
+    cameras_joint_models_uniform_indexer.reset();
+    render::camera::Manager::update();
 }
 #endif

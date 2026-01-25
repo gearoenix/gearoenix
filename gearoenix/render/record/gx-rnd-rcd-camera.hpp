@@ -43,6 +43,8 @@ struct Bloom final {
 };
 
 struct Camera final {
+    static constexpr auto cameras_joint_models_max_count = 1024 * 32;
+
     math::Vec4<float> viewport_clip;
     /// This field is used for scaling the skybox to the far end and at the same time preventing clipping
     float skybox_scale = 1.0f;

@@ -3,6 +3,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/scene/gx-rnd-scn-manager.hpp"
 #include "../gx-vk-loader.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 #include <vector>
 
@@ -26,6 +27,7 @@ struct Manager final : render::scene::Manager, core::Singleton<Manager> {
     void submit(VkCommandBuffer vk_cmd);
     void render_forward(VkCommandBuffer vk_cmd);
     [[nodiscard]] static const buffer::Uniform& get_uniform_buffer();
+    void update_uniforms();
 };
 }
 #endif
