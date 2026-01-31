@@ -1,5 +1,5 @@
 #include "gx-vk-loader.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../platform/gx-plt-library.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include <memory>
@@ -23,7 +23,7 @@ bool gearoenix::vulkan::Loader::load()
     if (is_loaded())
         return true;
     vulkan_lib = std::unique_ptr<platform::Library>(platform::Library::construct(
-#ifdef GX_PLATFORM_WINDOWS
+#if GX_PLATFORM_WINDOWS
         "vulkan-1.dll"
 #else
         "libvulkan.so"

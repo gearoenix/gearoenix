@@ -14,6 +14,7 @@ struct Scene : core::ecs::Component {
     GX_GET_REF_PRT(math::Vec4<float>, ssao_settings);
     GX_GETSET_VAL_PRT(double, layer, 0.0);
     GX_GET_REF_PRT(record::Scene, record);
+    GX_GET_REFC_PRT(std::string, forward_render_pass_name);
     GX_GET_REFC_PRT(std::string, shadow_render_pass_name);
     GX_GET_REFC_PRT(std::string, shadow_reflection_probe_render_pass_name);
 

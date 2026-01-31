@@ -43,6 +43,8 @@ struct Bloom final {
 };
 
 struct Camera final {
+    static constexpr auto cameras_joint_models_max_count = 1024 * 32;
+
     math::Vec4<float> viewport_clip;
     /// This field is used for scaling the skybox to the far end and at the same time preventing clipping
     float skybox_scale = 1.0f;
@@ -53,7 +55,7 @@ struct Camera final {
     physics::Transformation* transform = nullptr;
     physics::collider::Collider* collider = nullptr;
     std::vector<std::pair<double, CameraModel>> translucent_models;
-    std::vector<std::pair<double, CameraModel>> all_models;
+    std::vector<std::pair<double, CameraModel>> opaque_models;
     std::vector<math::Mat4x4<float>> mvps;
     std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
 

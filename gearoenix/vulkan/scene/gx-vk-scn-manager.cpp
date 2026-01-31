@@ -1,0 +1,116 @@
+#include "gx-vk-scn-manager.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../platform/gx-plt-application.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-marker.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
+#include "gx-vk-scn-scene.hpp"
+
+#include <boost/container/flat_set.hpp>
+
+namespace {
+boost::container::flat_set<std::pair<double, gearoenix::render::scene::Scene*>> scenes;
+}
+
+gearoenix::vulkan::scene::Manager::Manager()
+    : Singleton<Manager>(this)
+    , shader_data(Scene::max_count)
+{
+    core::ecs::ComponentType::add<Scene>();
+}
+
+gearoenix::vulkan::scene::Manager::~Manager() = default;
+
+gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::string&& name, double layer) const
+{
+    auto entity = render::scene::Manager::build(std::move(name), layer);
+    entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));
+    return entity;
+}
+
+void gearoenix::vulkan::scene::Manager::update()
+{
+    shader_data.reset();
+    scenes.clear();
+
+    render::scene::Manager::update();
+
+    core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, Scene* const scene) -> void {
+        if (!scene->get_enabled()) {
+            return;
+        }
+        scenes.emplace(scene->get_layer(), scene);
+        scene->after_record();
+    });
+}
+
+void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
+{
+
+    // TODO: render shadows
+    // TODO: render reflection probes
+
+    if (render::engine::Engine::get().get_specification().is_deferred_supported) {
+        // render_with_deferred();
+        GX_UNIMPLEMENTED;
+    } else {
+        render_forward(vk_cmd);
+    }
+
+}
+
+void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_cmd)
+{
+    {
+        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 0.0f, "render-forward");
+
+        for (const auto& scene : scenes) {
+            scene.second->render_forward(vk_cmd);
+        }
+    }
+
+    const auto& base_os_app = platform::BaseApplication::get();
+    const auto& window_size = base_os_app.get_window_size();
+
+    {
+        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
+        // ctx::set_framebuffer(0);
+        // ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), 0, math::Vec2<sizei>(window_size) });
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // const auto screen_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+        // if (screen_ratio < back_buffer_aspect_ratio) {
+        //     const auto screen_height = static_cast<sizei>(static_cast<float>(window_size.x) / back_buffer_aspect_ratio + 0.1f);
+        //     const auto screen_y = (static_cast<sizei>(window_size.y) - screen_height) / 2;
+        //     ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(window_size.x), screen_height });
+        // } else {
+        //     const auto screen_width = static_cast<sizei>(static_cast<float>(window_size.y) * back_buffer_aspect_ratio + 0.1f);
+        //     const auto screen_x = (static_cast<sizei>(window_size.x) - screen_width) / 2;
+        //     ctx::set_viewport_scissor_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
+        // }
+        //
+        // glEnable(GL_BLEND);
+        // glDisable(GL_DEPTH_TEST);
+        // final_shader->bind(current_shader);
+        // glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+        // for (auto* const scene : scenes | std::views::values) {
+        //     const auto& record_cameras = scene->get_record().cameras;
+        //     for (auto& camera_index : record_cameras.mains | std::views::values) {
+        //         auto& camera = *core::cast_ptr<Camera>(record_cameras.cameras[camera_index].camera);
+        //         glBindTexture(GL_TEXTURE_2D, camera.get_gl_target().get_default().colour_attachments[1]);
+        //         glBindVertexArray(screen_vertex_object);
+        //         glDrawArrays(GL_TRIANGLES, 0, 3);
+        //     }
+        // }
+        // glDisable(GL_BLEND);
+        // glEnable(GL_DEPTH_TEST);
+    }
+}
+
+void gearoenix::vulkan::scene::Manager::update_uniforms()
+{
+}
+#endif

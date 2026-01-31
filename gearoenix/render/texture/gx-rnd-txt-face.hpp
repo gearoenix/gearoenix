@@ -4,12 +4,12 @@
 
 namespace gearoenix::render::texture {
 enum struct Face : std::uint8_t {
-    PositiveX = 1,
-    NegativeX = 2,
-    PositiveY = 3,
-    NegativeY = 4,
-    PositiveZ = 5,
-    NegativeZ = 6,
+    PositiveX = 0,
+    NegativeX = 1,
+    PositiveY = 2,
+    NegativeY = 3,
+    PositiveZ = 4,
+    NegativeZ = 5,
 };
 
 constexpr Face FACES[6] = {

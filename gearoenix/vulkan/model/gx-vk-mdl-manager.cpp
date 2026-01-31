@@ -1,23 +1,26 @@
 #include "gx-vk-mdl-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "gx-vk-mdl-builder.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
 
-std::shared_ptr<gearoenix::render::model::Builder> gearoenix::vulkan::model::Manager::build(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Mesh>&& mesh,
-    const core::job::EndCaller& c,
-    const bool is_transformable)
-{
-    return std::shared_ptr<Builder>(new Builder(vk_e, name, std::move(mesh), is_transformable));
+#include <atomic>
+
+namespace {
+std::vector<GxShaderDataModel> shader_datas;
+std::atomic<std::uint32_t> shader_data_last_index = 0;
+std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
 }
 
-gearoenix::vulkan::model::Manager::Manager(engine::Engine& e)
-    : render::model::Manager(e)
-    , vk_e(e)
+gearoenix::vulkan::model::Manager::Manager()
+    : Singleton<Manager>(this)
 {
 }
 
 gearoenix::vulkan::model::Manager::~Manager() = default;
+
+const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::model::Manager::get_uniform_buffer()
+{
+    return *uniform_buffer;
+}
 
 #endif

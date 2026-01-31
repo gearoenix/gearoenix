@@ -1,26 +1,25 @@
-#ifndef GEAROENIX_VULKAN_CAMERA_MANAGER_HPP
-#define GEAROENIX_VULKAN_CAMERA_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-manager.hpp"
-
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::camera {
-struct Manager final : public render::camera::Manager {
+struct Manager final : render::camera::Manager, core::Singleton<Manager> {
 private:
-    engine::Engine& vk_e;
-
-    std::shared_ptr<render::camera::Builder> build(const std::string& name) override;
-    void update() override;
+    descriptor::UniformIndexer<GxShaderDataCamera> camera_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataCameraJointModel> cameras_joint_models_uniform_indexer;
 
 public:
-    explicit Manager(engine::Engine& e);
+    Manager();
     ~Manager() override;
+    void build(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void window_resized() override;
+    void update() override;
 };
 }
 
-#endif
 #endif
