@@ -39,12 +39,12 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*()
+        [[nodiscard]] constexpr reference operator*() const
         {
             return ref.array[index];
         }
 
-        [[nodiscard]] constexpr pointer operator->()
+        [[nodiscard]] constexpr pointer operator->() const
         {
             return &ref.array[index];
         }
@@ -68,7 +68,7 @@ public:
 
     constexpr void clear()
     {
-        for (auto i = 0; i < index; ++i) {
+        for (auto i = decltype(index){0}; i < index; ++i) {
             array[i].~T();
         }
         index = 0;
@@ -90,7 +90,7 @@ public:
         return index == 0;
     }
 
-    [[nodiscard]] constexpr std::uintptr_t max_size()
+    [[nodiscard]] constexpr std::uintptr_t max_size() const
     {
         return array.size();
     }

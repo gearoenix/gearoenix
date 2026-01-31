@@ -1,11 +1,17 @@
 #include "gx-vk-cmr-camera.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../../physics/gx-phs-transformation.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../texture/gx-vk-txt-target.hpp"
+#include "../model/gx-vk-mdl-model.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
+#include "../texture/gx-vk-txt-target.hpp"
 
+#include <ranges>
+
+struct GxShaderDataCameraJointModel;
 void gearoenix::vulkan::camera::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
 {
     gapi_target.target = Target::Customised { .target = std::dynamic_pointer_cast<texture::Target>(t) };
@@ -72,9 +78,13 @@ void gearoenix::vulkan::camera::Camera::render_forward(const scene::Scene& scene
         }
         return gapi_target.get_default().main->create_rendering_scope(cmd);
     }();
-    // TODO: change viewport and scissor if needed.
-    render_forward_skyboxes(scene, cmr, cmd); // TODO: because of some legacy stuff I have to render skybox before all objects but later it cam be improved and it can be rendered after all opaque objects.
-    for (auto& distance_model_data : cmr.all_models) {
+    for (auto& distance_model_data : cmr.opaque_models) {
+        auto& camera_model = distance_model_data.second;
+        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
+        model.render_forward(scene, cmr, camera_model, cmd);
+    }
+    render_forward_skyboxes(scene, cmr, cmd);
+    for (auto& distance_model_data : cmr.translucent_models) {
         auto& camera_model = distance_model_data.second;
         auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
         model.render_forward(scene, cmr, camera_model, cmd);
@@ -300,5 +310,54 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(c
     // glDrawArrays(GL_TRIANGLES, 0, 3);
     // pop_debug_group();
     // GX_GL_CHECK_D;
+}
+
+void gearoenix::vulkan::camera::Camera::after_record(const render::record::Camera& rc)
+{
+    cameras_joint_model_indices.clear();
+
+    {
+        const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
+        camera_uniform_index = index;
+        ptr->position_reserved = {math::Vec3<float>(rc.transform->get_local_position()), 1.0f};
+        ptr->view_projection = view_projection;
+    }
+
+    for (const auto& mvp: rc.mvps) {
+        const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataCameraJointModel>::get().get_next();
+        ptr->mvp = mvp;
+        cameras_joint_model_indices.push_back(index);
+    }
+
+    vk_rec_opaque_models.clear();
+    for (const auto [model, first_mvp_index, mvps_count] : rc.opaque_models | std::views::values) {
+        vk_rec_opaque_models.push_back(RecVkModel {
+            .model = model,
+            .first_mvp_index = cameras_joint_model_indices[first_mvp_index],
+            .mvps_count = mvps_count,
+        });
+    }
+
+    vk_rec_translucent_models.clear();
+    for (const auto [model, first_mvp_index, mvps_count] : rc.translucent_models | std::views::values) {
+        vk_rec_translucent_models.push_back(RecVkModel {
+            .model = model,
+            .first_mvp_index = cameras_joint_model_indices[first_mvp_index],
+            .mvps_count = mvps_count,
+        });
+    }
+
+    for (auto& distance_model_data : rc.opaque_models) {
+        auto& camera_model = distance_model_data.second;
+        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
+        model.after_record();
+    }
+
+    for (auto& distance_model_data : rc.translucent_models) {
+        auto& camera_model = distance_model_data.second;
+        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
+        model.after_record();
+    }
+
 }
 #endif

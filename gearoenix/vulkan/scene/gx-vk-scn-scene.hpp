@@ -14,9 +14,7 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
-
-private:
-    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
+    GX_GET_VAL_PRV(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
 
     Scene(core::ecs::Entity* e, std::string&& name, double layer);
     Scene(core::object_id_t id, std::string&& name);
@@ -30,6 +28,7 @@ public:
     void render_shadows(VkCommandBuffer vk_cmd);
     void render_reflection_probes(VkCommandBuffer vk_cmd) const;
     void render_forward(VkCommandBuffer vk_cmd);
+    void after_record();
 };
 }
 #endif

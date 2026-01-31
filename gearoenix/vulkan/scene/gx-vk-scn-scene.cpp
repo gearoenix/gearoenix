@@ -5,8 +5,14 @@
 #include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "gx-vk-scn-manager.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
+#include "../texture/gx-vk-txt-manager.hpp"
+#include "../texture/gx-vk-txt-2d.hpp"
 
 #include <ranges>
+
+namespace {
+gearoenix::vulkan::texture::Texture2D *brdflut = nullptr;
+}
 
 gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const double layer)
     : render::scene::Scene(e, core::ecs::ComponentType::create_index(this), layer, std::move(name))
@@ -30,9 +36,6 @@ gearoenix::vulkan::scene::Scene::~Scene() = default;
 void gearoenix::vulkan::scene::Scene::update()
 {
     render::scene::Scene::update();
-    const auto [ptr, index] = Manager::get_shader_data();
-    shader_data_index = index;
-    // TODO: update the data in the ptr
 }
 
 void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd)
@@ -63,6 +66,22 @@ void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cm
         cam.render_forward(*this, camera, vk_cmd);
         cam.render_bloom(*this, camera, vk_cmd);
         cam.render_colour_correction_anti_aliasing(*this, camera, vk_cmd);
+    }
+}
+
+void gearoenix::vulkan::scene::Scene::after_record()
+{
+    const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataScene>::get().get_next();
+    shader_data_index = index;
+    ptr->ambient_light = math::Vec4(0.001f); // TODO: Temporary later, render module must provide it.
+    GX_ASSERT_D(brdflut);
+    ptr->brdflut_texture_index = brdflut->get_view_index();
+    ptr->brdflut_sampler_index = brdflut->get_sampler_index();
+
+    const auto& cameras = record.cameras;
+    for (auto cam_i = 0; cam_i < cameras.last_camera_index; ++cam_i) {
+        const auto& cam = cameras.cameras[cam_i];
+        cam.mvps
     }
 }
 

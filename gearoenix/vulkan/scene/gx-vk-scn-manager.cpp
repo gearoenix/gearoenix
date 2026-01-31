@@ -5,7 +5,6 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
-#include "../buffer/gx-vk-buf-uniform.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
@@ -13,21 +12,15 @@
 
 #include <boost/container/flat_set.hpp>
 
-#include <atomic>
-
 namespace {
-std::vector<GxShaderDataScene> shader_datas;
-std::atomic<std::uint32_t> shader_data_last_index = 0;
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
 boost::container::flat_set<std::pair<double, gearoenix::render::scene::Scene*>> scenes;
 }
 
-gearoenix::vulkan::scene::Manager::Manager(): Singleton<Manager>(this)
+gearoenix::vulkan::scene::Manager::Manager()
+    : Singleton<Manager>(this)
+    , shader_data(Scene::max_count)
 {
     core::ecs::ComponentType::add<Scene>();
-
-    shader_datas.resize(Scene::max_count);
-    uniform_buffer = buffer::Manager::get().create_uniform(sizeof(GxShaderDataScene) * Scene::max_count);
 }
 
 gearoenix::vulkan::scene::Manager::~Manager() = default;
@@ -39,31 +32,24 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::st
     return entity;
 }
 
-std::pair<GxShaderDataScene*, std::uint32_t> gearoenix::vulkan::scene::Manager::get_shader_data()
+void gearoenix::vulkan::scene::Manager::update()
 {
-    const auto index = shader_data_last_index.fetch_add(1, std::memory_order_relaxed);
-    GX_ASSERT_D(index < Scene::max_count);
-    return {&shader_datas[index], index};
-}
-
-void gearoenix::vulkan::scene::Manager::update() const
-{
-    shader_data_last_index.store(0, std::memory_order_relaxed);
+    shader_data.reset();
+    scenes.clear();
 
     render::scene::Manager::update();
 
-    uniform_buffer->update(shader_datas.data());
-}
-
-void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
-{
-    scenes.clear();
-    core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, auto* const scene) -> void {
+    core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, Scene* const scene) -> void {
         if (!scene->get_enabled()) {
             return;
         }
         scenes.emplace(scene->get_layer(), scene);
+        scene->after_record();
     });
+}
+
+void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
+{
 
     // TODO: render shadows
     // TODO: render reflection probes
@@ -124,9 +110,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
     }
 }
 
-const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::scene::Manager::get_uniform_buffer()
+void gearoenix::vulkan::scene::Manager::update_uniforms()
 {
-    return *uniform_buffer;
 }
-
 #endif

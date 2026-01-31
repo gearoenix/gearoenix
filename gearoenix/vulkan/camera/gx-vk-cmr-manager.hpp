@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-manager.hpp"
-#include "../descriptor/gx-vk-des-uniform-holder.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::camera {
