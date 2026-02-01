@@ -1,26 +1,25 @@
 #include "gx-vk-lt-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
-
-#include <atomic>
-
-namespace {
-std::vector<GxShaderDataScene> shader_datas;
-std::atomic<std::uint32_t> shader_data_last_index = 0;
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
-}
+#include "../../render/light/gx-rnd-lt-directional.hpp"
+#include "../../render/light/gx-rnd-lt-point.hpp"
 
 gearoenix::vulkan::light::Manager::Manager()
     : Singleton<Manager>(this)
+    , directionals_uniform_indexer(render::light::Directional::max_count)
+    , points_uniform_indexer(render::light::Point::max_count)
+    , directional_shadow_casters_uniform_indexer(render::light::ShadowCasterDirectional::max_count)
 {
 }
 
 gearoenix::vulkan::light::Manager::~Manager() = default;
 
-const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::light::Manager::get_uniform_buffer()
+void gearoenix::vulkan::light::Manager::update()
 {
-    return *uniform_buffer;
+    directionals_uniform_indexer.reset();
+    points_uniform_indexer.reset();
+    directional_shadow_casters_uniform_indexer.reset();
+    render::light::Manager::update();
 }
 
 #endif

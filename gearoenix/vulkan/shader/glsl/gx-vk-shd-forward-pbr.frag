@@ -70,7 +70,7 @@ void main() {
     GxShaderDataScene scene = scenes[pc.scene_index];
     GxShaderDataCamera camera = cameras[pc.camera_index];
     GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[model.material_index];
+    GxShaderDataMaterial material = materials[pc.material_index];
 
     // Albedo
     vec4 alb = texture(sampler2D(textures_2d[nonuniformEXT(material.albedo_texture_index)], samplers[nonuniformEXT(material.albedo_sampler_index)]), in_uv) * material.albedo_factor;

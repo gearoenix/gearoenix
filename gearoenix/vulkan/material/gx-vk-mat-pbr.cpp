@@ -19,7 +19,6 @@ VkPipeline vk_skinned_shadow_pipeline = nullptr;
 
 gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
     : render::material::Pbr(object_type_index, std::move(name))
-    , shader_data(core::Singleton<Manager>::get().get_uniform_holder())
 {
     if (not_initialised.exchange(false, std::memory_order_relaxed)) {
         const auto& pip_mgr = pipeline::Manager::get();
@@ -34,7 +33,7 @@ gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
         vk_skinned_shadow_pipeline = skinned_shadow_pipeline->get_vulkan_data();
         vk_skinned_forward_pipeline = skinned_forward_pipeline->get_vulkan_data();
     }
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.albedo_factor = albedo_factor;
     sd.emission_roughness_factor = emission_roughness_factor;
     sd.normal_metallic_factor = normal_metallic_factor;
@@ -60,7 +59,7 @@ void gearoenix::vulkan::material::Pbr::set_albedo(std::shared_ptr<render::textur
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.albedo_texture_index = t.get_view_index();
     sd.albedo_sampler_index = t.get_sampler_index();
 
@@ -71,7 +70,7 @@ void gearoenix::vulkan::material::Pbr::set_normal(std::shared_ptr<render::textur
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.normal_texture_index = t.get_view_index();
     sd.normal_sampler_index = t.get_sampler_index();
 
@@ -82,7 +81,7 @@ void gearoenix::vulkan::material::Pbr::set_emission(std::shared_ptr<render::text
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.emission_texture_index = t.get_view_index();
     sd.emission_sampler_index = t.get_sampler_index();
 
@@ -93,7 +92,7 @@ void gearoenix::vulkan::material::Pbr::set_metallic_roughness(std::shared_ptr<re
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.metallic_roughness_texture_index = t.get_view_index();
     sd.metallic_roughness_sampler_index = t.get_sampler_index();
 
@@ -104,7 +103,7 @@ void gearoenix::vulkan::material::Pbr::set_occlusion(std::shared_ptr<render::tex
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.occlusion_texture_index = t.get_view_index();
     sd.occlusion_sampler_index = t.get_sampler_index();
 
@@ -124,28 +123,28 @@ void gearoenix::vulkan::material::Pbr::bind_shadow(const VkCommandBuffer cmd, co
 void gearoenix::vulkan::material::Pbr::set_albedo_factor(const math::Vec4<float>& v)
 {
     render::material::Pbr::set_albedo_factor(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.albedo_factor = v;
 }
 
 void gearoenix::vulkan::material::Pbr::set_emission_roughness_factor(const math::Vec4<float>& v)
 {
     render::material::Pbr::set_emission_roughness_factor(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.emission_roughness_factor = v;
 }
 
 void gearoenix::vulkan::material::Pbr::set_normal_metallic_factor(const math::Vec4<float>& v)
 {
     render::material::Pbr::set_normal_metallic_factor(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.normal_metallic_factor = v;
 }
 
 void gearoenix::vulkan::material::Pbr::set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>& v)
 {
     render::material::Pbr::set_alpha_cutoff_occlusion_strength_reserved_reserved(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.alpha_cutoff_occlusion_strength_reserved = v;
 }
 

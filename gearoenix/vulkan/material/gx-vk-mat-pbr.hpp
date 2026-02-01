@@ -3,8 +3,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/material/gx-rnd-mat-pbr.hpp"
 #include "gx-vk-mat-material.hpp"
-#include "../descriptor/gx-vk-des-uniform-holder.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
 
 namespace gearoenix::vulkan::buffer {
 struct Uniform;
@@ -18,8 +16,6 @@ struct Pbr final : render::material::Pbr, Material {
     constexpr static auto object_type_index = gearoenix_gapi_material_pbr_type_index;
     constexpr static std::array all_parent_object_type_indices { render::material::Material::object_type_index, render::material::Pbr::object_type_index, material::Material::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::material::Pbr::object_type_index, material::Material::object_type_index };
-
-    const descriptor::UniformHolder<GxShaderDataMaterial>::PtrHolder shader_data;
 
 private:
     explicit Pbr(std::string&& name);

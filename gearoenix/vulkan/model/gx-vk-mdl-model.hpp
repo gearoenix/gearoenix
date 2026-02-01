@@ -30,6 +30,7 @@ struct Model final : render::model::Model {
     constexpr static std::array immediate_parent_object_type_indices { render::model::Model::object_type_index };
 
     GX_GET_CREF_PRV(gapi_meshes_set_t, gapi_meshes);
+    GX_GET_VAL_PRV(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
 
     Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
 
@@ -37,6 +38,7 @@ public:
     ~Model() override;
     void render_shadow(const render::record::Camera& camera, const render::record::CameraModel& camera_model, VkCommandBuffer cmd);
     void render_forward(const scene::Scene& scene, const render::record::Camera& camera, const render::record::CameraModel& camera_model, VkCommandBuffer cmd);
+    void after_record(const render::record::CameraModel& rec_cam_mdl);
 };
 }
 #endif

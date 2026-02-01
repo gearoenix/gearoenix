@@ -6,7 +6,7 @@
 
 gearoenix::vulkan::material::Manager::Manager()
     : Singleton<Manager>(this)
-    , UniformHolder(Pbr::max_count + Unlit::max_count + Sprite::max_count)
+    , uniform_indexer(Pbr::max_count + Unlit::max_count + Sprite::max_count)
 {
 }
 

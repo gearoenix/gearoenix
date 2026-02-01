@@ -128,8 +128,12 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame; in start_frame of Engine, we prepare everything for user interaction.
+    // Don't mistake the following with the actual start of a frame.
+    // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
+    physics_engine->start_frame();
+
     camera_manager->update();
+    light_manager->update();
     reflection_manager->update();
     scene_manager->update();
     physics_engine->end_frame();

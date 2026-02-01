@@ -1,6 +1,13 @@
 #include "gx-vk-mat-material.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../platform/gx-plt-log.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
+
+gearoenix::vulkan::material::Material::Material()
+    : shader_data(uniform_indexer_t::get().get_next())
+{
+}
 
 gearoenix::vulkan::material::Material::~Material() = default;
 

@@ -2,14 +2,15 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/material/gx-rnd-mat-manager.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
-#include "../descriptor/gx-vk-des-uniform-holder.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::buffer {
 struct Uniform;
 }
 
 namespace gearoenix::vulkan::material {
+using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataMaterial, descriptor::IndexingPolicy::Allocator>;
+
 /// Vulkan backend's material manager.
 ///
 /// For a new material addition to Vulkan backend:
@@ -24,7 +25,11 @@ namespace gearoenix::vulkan::material {
 ///   5- Implement corresponding code in this material module like gearoenix::vulkan::material::Pbr and add the corresponding construct function here.
 ///   6- Most of the time OpenGL backend has the most updated implementation of the materials, so look there for further detail of the implementation of the shader and cpp codes
 ///      and apply those logics in here based on the current material implementations (like Pbr).
-struct Manager final : render::material::Manager, core::Singleton<Manager>, descriptor::UniformHolder<GxShaderDataMaterial> {
+struct Manager final : render::material::Manager, core::Singleton<Manager> {
+private:
+    uniform_indexer_t uniform_indexer;
+
+public:
     Manager();
     ~Manager() override;
     void construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;

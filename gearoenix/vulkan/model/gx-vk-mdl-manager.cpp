@@ -1,26 +1,14 @@
 #include "gx-vk-mdl-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../engine/gx-vk-eng-engine.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
-
-#include <atomic>
-
-namespace {
-std::vector<GxShaderDataModel> shader_datas;
-std::atomic<std::uint32_t> shader_data_last_index = 0;
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> uniform_buffer;
-}
+#include "../../physics/animation/gx-phs-anm-bone.hpp"
 
 gearoenix::vulkan::model::Manager::Manager()
     : Singleton<Manager>(this)
+    , model_uniform_indexer(render::model::Model::max_count)
+    , bone_uniform_indexer(physics::animation::Bone::max_count)
 {
 }
 
 gearoenix::vulkan::model::Manager::~Manager() = default;
-
-const gearoenix::vulkan::buffer::Uniform& gearoenix::vulkan::model::Manager::get_uniform_buffer()
-{
-    return *uniform_buffer;
-}
 
 #endif

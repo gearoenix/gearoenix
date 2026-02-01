@@ -2,6 +2,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/light/gx-rnd-lt-manager.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::buffer {
 struct Uniform;
@@ -9,10 +10,15 @@ struct Uniform;
 
 namespace gearoenix::vulkan::light {
 struct Manager final : render::light::Manager, core::Singleton<Manager> {
+private:
+    descriptor::UniformIndexer<GxShaderDataDirectionalLight> directionals_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataDirectionalLight> points_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataDirectionalLight> directional_shadow_casters_uniform_indexer;
 
+public:
     Manager();
     ~Manager() override;
-    [[nodiscard]] static const buffer::Uniform& get_uniform_buffer();
+    void update() override;
 };
 }
 #endif

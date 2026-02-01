@@ -350,13 +350,13 @@ void gearoenix::vulkan::camera::Camera::after_record(const render::record::Camer
     for (auto& distance_model_data : rc.opaque_models) {
         auto& camera_model = distance_model_data.second;
         auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.after_record();
+        model.after_record(*camera_model.model);
     }
 
     for (auto& distance_model_data : rc.translucent_models) {
         auto& camera_model = distance_model_data.second;
         auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.after_record();
+        model.after_record(*camera_model.model);
     }
 
 }

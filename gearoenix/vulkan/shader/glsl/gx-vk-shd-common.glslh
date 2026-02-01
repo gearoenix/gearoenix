@@ -66,8 +66,6 @@ struct GxShaderDataModel {
     mat4 m;
     mat4 inv_transpose_m;
 
-    uint material_index;
-
     uint bones_begin_index;
     uint bones_end_index;
 
@@ -84,6 +82,7 @@ struct GxShaderDataModel {
 
     uint _padding0;
     uint _padding1;
+    uint _padding2;
 };
 
 struct GxShaderDataReflectionProbe {

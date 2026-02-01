@@ -68,6 +68,7 @@ layout(push_constant) uniform PushConstants {
     uint scene_index;
     uint camera_index;
     uint model_index;
+    uint material_index;
     uint camera_model_index;
 } pc;
 

@@ -21,9 +21,8 @@ VkPipeline vk_skinned_shadow_pipeline = nullptr;
 
 gearoenix::vulkan::material::Sprite::Sprite(std::string&& name)
     : render::material::Sprite(object_type_index, std::move(name))
-    , shader_data(core::Singleton<Manager>::get().get_uniform_holder())
 {
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.emission_roughness_factor = uv_transform;
     sd.albedo_factor = albedo_factor;
     sd.alpha_cutoff_occlusion_strength_reserved.x = alpha_cutoff;
@@ -57,7 +56,7 @@ void gearoenix::vulkan::material::Sprite::set_albedo(std::shared_ptr<render::tex
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.albedo_texture_index = t.get_view_index();
     sd.albedo_sampler_index = t.get_sampler_index();
 
@@ -67,21 +66,21 @@ void gearoenix::vulkan::material::Sprite::set_albedo(std::shared_ptr<render::tex
 void gearoenix::vulkan::material::Sprite::set_albedo_factor(const math::Vec4<float>& v)
 {
     render::material::Sprite::set_albedo_factor(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.albedo_factor = v;
 }
 
 void gearoenix::vulkan::material::Sprite::set_uv_transform(const math::Vec4<float>& v)
 {
     render::material::Sprite::set_uv_transform(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.emission_roughness_factor = v;
 }
 
 void gearoenix::vulkan::material::Sprite::set_alpha_cutoff(const float v)
 {
     render::material::Sprite::set_alpha_cutoff(v);
-    auto& sd = *shader_data.ptr();
+    auto& sd = *shader_data.get_ptr();
     sd.alpha_cutoff_occlusion_strength_reserved.x = v;
 }
 
