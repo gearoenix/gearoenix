@@ -9,6 +9,10 @@
 
 struct GxShaderDataMaterial;
 
+namespace gearoenix::vulkan::pipeline {
+struct PushConstants;
+}
+
 namespace gearoenix::vulkan::material {
 struct Material {
     constexpr static auto max_count = 8;
@@ -26,10 +30,9 @@ public:
     Material(const Material&) = delete;
 
     virtual ~Material();
-    virtual void bind_forward(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline);
-    virtual void bind_shadow(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline);
-
-    void bind_graphics(VkPipeline pipeline, VkCommandBuffer cmd, VkPipeline& current_bound_pipeline);
+    virtual void bind_forward(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    virtual void bind_shadow(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    void bind_graphics(VkPipeline pipeline, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
 };
 }
 

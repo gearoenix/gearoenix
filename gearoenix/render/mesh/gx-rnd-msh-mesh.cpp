@@ -3,8 +3,9 @@
 #include "../material/gx-rnd-mat-material.hpp"
 
 gearoenix::render::mesh::Mesh::Mesh(
-    std::shared_ptr<Buffer>&& buffer, std::shared_ptr<material::Material>&& material)
-    : buffer(std::move(buffer))
+    std::string&& name, std::shared_ptr<Buffer>&& buffer, std::shared_ptr<material::Material>&& material)
+    : Object(gearoenix_render_mesh_type_index, std::move(name))
+    , buffer(std::move(buffer))
     , bound_material(std::move(material))
 {
 }

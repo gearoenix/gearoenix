@@ -14,6 +14,10 @@ namespace gearoenix::vulkan::mesh {
 struct Mesh;
 }
 
+namespace gearoenix::vulkan::pipeline {
+struct PushConstants;
+}
+
 namespace gearoenix::vulkan::scene {
 struct Scene;
 }
@@ -36,8 +40,19 @@ struct Model final : render::model::Model {
 
 public:
     ~Model() override;
-    void render_shadow(const render::record::Camera& camera, const render::record::CameraModel& camera_model, VkCommandBuffer cmd);
-    void render_forward(const scene::Scene& scene, const render::record::Camera& camera, const render::record::CameraModel& camera_model, VkCommandBuffer cmd);
+    void render_shadow(
+        const render::record::Camera& camera,
+        const render::record::CameraModel& camera_model,
+        VkCommandBuffer cmd,
+        pipeline::PushConstants& pc,
+        VkPipeline& current_bound_pipeline);
+    void render_forward(
+        const scene::Scene& scene,
+        const render::record::Camera& camera,
+        const render::record::CameraModel& camera_model,
+        VkCommandBuffer cmd,
+        pipeline::PushConstants& pc,
+        VkPipeline& current_bound_pipeline);
     void after_record(const render::record::CameraModel& rec_cam_mdl);
 };
 }

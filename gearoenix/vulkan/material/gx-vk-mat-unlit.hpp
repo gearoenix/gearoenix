@@ -23,8 +23,8 @@ public:
     void set_albedo_factor(const math::Vec4<float>&) override;
     void set_uv_transform(const math::Vec4<float>&) override;
     void set_alpha_cutoff(float) override;
-    void bind_forward(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline) override;
-    void bind_shadow(VkCommandBuffer cmd, bool skinned, VkPipeline& current_bound_pipeline) override;
+    void bind_forward(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) override;
+    void bind_shadow(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) override;
 };
 }
 #endif

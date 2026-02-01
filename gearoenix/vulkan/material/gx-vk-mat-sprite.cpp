@@ -84,14 +84,14 @@ void gearoenix::vulkan::material::Sprite::set_alpha_cutoff(const float v)
     sd.alpha_cutoff_occlusion_strength_reserved.x = v;
 }
 
-void gearoenix::vulkan::material::Sprite::bind_forward(const VkCommandBuffer cmd, const bool skinned, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Sprite::bind_forward(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
-    bind_graphics(skinned ? vk_skinned_forward_pipeline : vk_forward_pipeline, cmd, current_bound_pipeline);
+    bind_graphics(skinned ? vk_skinned_forward_pipeline : vk_forward_pipeline, cmd, pc, current_bound_pipeline);
 }
 
-void gearoenix::vulkan::material::Sprite::bind_shadow(const VkCommandBuffer cmd, const bool skinned, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Sprite::bind_shadow(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
-    bind_graphics(skinned ? vk_skinned_shadow_pipeline : vk_shadow_pipeline, cmd, current_bound_pipeline);
+    bind_graphics(skinned ? vk_skinned_shadow_pipeline : vk_shadow_pipeline, cmd, pc, current_bound_pipeline);
 }
 
 #endif

@@ -57,5 +57,6 @@ constexpr auto gearoenix_render_material_type_index = gearoenix_object_type_inde
 constexpr auto gearoenix_render_material_pbr_type_index = gearoenix_object_type_index_start + 10;
 constexpr auto gearoenix_render_material_sprite_type_index = gearoenix_object_type_index_start + 11;
 constexpr auto gearoenix_render_material_unlit_type_index = gearoenix_object_type_index_start + 12;
+constexpr auto gearoenix_render_mesh_type_index = gearoenix_object_type_index_start + 13;
 
 constexpr auto gearoenix_last_object_type_index = gearoenix_core_component_type_index_start + 13;

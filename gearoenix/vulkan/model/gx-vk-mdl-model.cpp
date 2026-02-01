@@ -8,6 +8,7 @@
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../material/gx-vk-mat-manager.hpp"
+#include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
@@ -24,19 +25,32 @@ gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model:
 
 gearoenix::vulkan::model::Model::~Model() = default;
 
-void gearoenix::vulkan::model::Model::render_shadow(const render::record::Camera& camera, const render::record::CameraModel& camera_model, const VkCommandBuffer cmd)
+void gearoenix::vulkan::model::Model::render_shadow(
+    const render::record::Camera& camera,
+    const render::record::CameraModel& camera_model,
+    const VkCommandBuffer cmd,
+    pipeline::PushConstants& pc,
+    VkPipeline& current_bound_pipeline)
 {
+    const auto skinned = camera_model.model->bones_count > 0;
     for (const auto& msh : gapi_meshes) {
-        msh->get_gapi_material()->bind_shadow(cmd);
-        msh->draw(*msh, camera, camera_model, cmd);
+        msh->get_gapi_material()->bind_shadow(cmd, skinned, pc, current_bound_pipeline);
+        msh->draw(*msh, camera, camera_model, cmd, skinned, pc);
     }
 }
 
-void gearoenix::vulkan::model::Model::render_forward(const scene::Scene& scene, const render::record::Camera& camera, const render::record::CameraModel& camera_model, const VkCommandBuffer cmd)
+void gearoenix::vulkan::model::Model::render_forward(
+    const scene::Scene& scene,
+    const render::record::Camera& camera,
+    const render::record::CameraModel& camera_model,
+    const VkCommandBuffer cmd,
+    pipeline::PushConstants& pc,
+    VkPipeline& current_bound_pipeline)
 {
+    const auto skinned = camera_model.model->bones_count > 0;
     for (const auto& msh : gapi_meshes) {
-        msh->get_gapi_material()->bind_forward(cmd);
-        msh->draw(*msh, camera, camera_model, cmd);
+        msh->get_gapi_material()->bind_forward(cmd, skinned, pc, current_bound_pipeline);
+        msh->draw(*msh, camera, camera_model, cmd, skinned, pc);
     }
 }
 
@@ -45,34 +59,35 @@ void gearoenix::vulkan::model::Model::after_record(const render::record::CameraM
     const auto& rec_mdl = *rec_cam_mdl.model;
     const auto& trn = *rec_mdl.transform;
 
-    const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataModel>::get().get_next();
-    shader_data_index = index;
+    auto shader_data = descriptor::UniformIndexer<GxShaderDataModel>::get().get_next();
+    shader_data_index = shader_data.get_index();
+    auto& sd = *shader_data.get_ptr();
 
-    // Model matrices
-    ptr->m = math::Mat4x4<float>(trn.get_global_matrix());
-    ptr->inv_transpose_m = math::Mat4x4<float>(trn.get_transposed_inverted_global_matrix());
+    sd.m = math::Mat4x4<float>(trn.get_global_matrix());
+    sd.inv_transpose_m = math::Mat4x4<float>(trn.get_transposed_inverted_global_matrix());
 
     auto& bone_indexer = descriptor::UniformIndexer<GxShaderDataBone>::get();
-    ptr->bones_begin_index = bone_indexer.get_current_index();
+    sd.bones_begin_index = bone_indexer.get_current_index();
     for (const auto& all_bones = rec_mdl.armature->get_all_bones(); const auto* const b : all_bones) {
-        const auto [bone_ptr, _] = bone_indexer.get_next();
-        bone_ptr->m = math::Mat4x4<float>(b->get_global_matrix());
-        bone_ptr->inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
+        auto bone_sd = bone_indexer.get_next();
+        auto& [m, inv_transpose_m] = *bone_sd.get_ptr();
+        m = math::Mat4x4<float>(b->get_global_matrix());
+        inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
     }
-    ptr->bones_end_index = bone_indexer.get_current_index();
-    if (ptr->bones_begin_index != ptr->bones_end_index) {
-        ++ptr->bones_begin_index;
+    sd.bones_end_index = bone_indexer.get_current_index();
+    if (sd.bones_begin_index != sd.bones_end_index) {
+        ++sd.bones_begin_index;
     }
 
-    ptr->point_light_begin_index = 0;
-    ptr->point_light_end_index = 0;
+    sd.point_light_begin_index = 0;
+    sd.point_light_end_index = 0;
 
-    ptr->directional_light_begin_index = 0;
-    ptr->directional_light_end_index = 0;
+    sd.directional_light_begin_index = 0;
+    sd.directional_light_end_index = 0;
 
-    ptr->shadow_caster_directional_light_begin_index = 0;
-    ptr->shadow_caster_directional_light_end_index = 0;
+    sd.shadow_caster_directional_light_begin_index = 0;
+    sd.shadow_caster_directional_light_end_index = 0;
 
-    ptr->reflection_probe_index = 0;
+    sd.reflection_probe_index = 0;
 }
 #endif
