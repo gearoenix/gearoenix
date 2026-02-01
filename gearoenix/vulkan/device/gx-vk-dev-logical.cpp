@@ -8,6 +8,8 @@
 #include <array>
 #include <limits>
 
+#include <vulkan/vulkan_beta.h>
+
 gearoenix::vulkan::device::Logical::Logical()
     : Singleton(this)
 {
@@ -136,6 +138,9 @@ gearoenix::vulkan::device::Logical::Logical()
 
     std::vector<const char*> device_extensions;
     device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    if (physical.get_supported_extensions().contains(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+        device_extensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+    }
     if (physical.get_rtx_supported()) {
         device_extensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
         device_extensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);

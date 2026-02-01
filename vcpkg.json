@@ -1,5 +1,5 @@
 {
-  "builtin-baseline": "b1e15efef6758eaa0beb0a8732cfa66f6a68a81d",
+  "builtin-baseline": "6d7bf7ef2193e2d1c5798a5ff8811d533104c861",
   "name": "gearoenix",
   "version": "0.1",
   "dependencies": [
@@ -10,7 +10,10 @@
     "boost-mp11",
     "boost-test",
     "boost-lockfree",
-    "sdl3",
+    {
+      "name": "sdl3",
+      "features": ["vulkan"]
+    },
     "libsodium",
     "enet",
     "sqlite3",

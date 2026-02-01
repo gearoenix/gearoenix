@@ -103,6 +103,7 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
     std::set<std::string> instance_extensions_set;
     instance_extensions_set.insert(VK_KHR_SURFACE_EXTENSION_NAME);
     instance_extensions_set.insert(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    instance_extensions_set.insert(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     auto sdl_extensions = platform::Application::get().get_vulkan_extensions();
     instance_extensions_set.insert(
         std::make_move_iterator(sdl_extensions.begin()),
@@ -154,6 +155,7 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
     VkInstanceCreateInfo instance_create_info;
     GX_SET_ZERO(instance_create_info);
     instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    instance_create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
     instance_create_info.pApplicationInfo = &app_info;
     instance_create_info.enabledExtensionCount = static_cast<std::uint32_t>(instance_extensions.size());
     instance_create_info.ppEnabledExtensionNames = instance_extensions.data();
