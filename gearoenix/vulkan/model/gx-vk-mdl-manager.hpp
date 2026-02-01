@@ -6,9 +6,8 @@
 
 namespace gearoenix::vulkan::model {
 struct Manager final : render::model::Manager, core::Singleton<Manager> {
-private:
-    descriptor::UniformIndexer<GxShaderDataModel> model_uniform_indexer;
-    descriptor::UniformIndexer<GxShaderDataBone> bone_uniform_indexer;
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataModel>, model_uniform_indexer);
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataBone>, bone_uniform_indexer);
 
 public:
     Manager();

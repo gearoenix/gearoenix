@@ -24,6 +24,7 @@
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
 #include "../scene/gx-vk-scn-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
@@ -57,6 +58,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , buffer_manager(new buffer::Manager())
     , imgui_manager(new ImGuiManager())
     , image_manager(new image::Manager())
+    , sampler_manager(new sampler::Manager())
     , vk_texture_manager(new texture::Manager())
     , vk_mesh_manager(new mesh::Manager())
     , vk_material_manager(new material::Manager())
@@ -64,6 +66,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_light_manager(new light::Manager())
     , vk_camera_manager(new camera::Manager())
     , vk_scene_manager(new scene::Manager())
+    , vk_reflection_manager(new reflection::Manager())
     , render_queue(new queue::Queue())
 {
     frames_count = swapchain->get_image_views().size();
@@ -74,14 +77,19 @@ gearoenix::vulkan::engine::Engine::Engine()
     camera_manager = std::unique_ptr<camera::Manager>(vk_camera_manager);
     light_manager = std::unique_ptr<light::Manager>(vk_light_manager);
     scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
-    reflection_manager = std::make_unique<reflection::Manager>();
+    reflection_manager = std::unique_ptr<reflection::Manager>(vk_reflection_manager);
 
     bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
-        *scene::Manager::get_uniform_buffer().get_gpu(),
-        *camera::Manager::get_uniform_buffer().get_gpu(),
-        *model::Manager::get_uniform_buffer().get_gpu(),
-        *material::Manager::get_uniform_buffer().get_gpu(),
-        *light::Manager::get_uniform_buffer().get_gpu());
+        vk_scene_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_camera_manager->get_camera_uniform_indexer().get_gpu_buffer(),
+        vk_model_manager->get_model_uniform_indexer().get_gpu_buffer(),
+        vk_material_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_points_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_directionals_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_directional_shadow_casters_uniform_indexer().get_gpu_buffer(),
+        vk_model_manager->get_bone_uniform_indexer().get_gpu_buffer(),
+        vk_reflection_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_gpu_buffer());
     initialize_frame();
 }
 
@@ -125,7 +133,6 @@ void gearoenix::vulkan::engine::Engine::end_frame()
     render::engine::Engine::end_frame();
     imgui_manager->end_frame();
     if (swapchain_image_is_valid) {
-        vk_mesh_manager->update();
         submit();
         swapchain_image_is_valid = present();
     }
@@ -158,12 +165,10 @@ bool gearoenix::vulkan::engine::Engine::present()
 
 void gearoenix::vulkan::engine::Engine::submit()
 {
-    auto& frame = *frames[frame_number];
+    const auto& frame = *frames[frame_number];
     auto& cmd = *frame.cmd;
     const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
-    // TODO: update all the uniforms
-    vk_scene_manager->update_uniforms();
     buffer_manager->upload_dynamics(vk_cmd);
     bindless_descriptor_manager->bind(vk_cmd);
     vk_scene_manager->submit(vk_cmd);

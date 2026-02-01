@@ -4,21 +4,20 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "gx-vk-scn-scene.hpp"
 
 #include <boost/container/flat_set.hpp>
+#include <ranges>
 
 namespace {
-boost::container::flat_set<std::pair<double, gearoenix::render::scene::Scene*>> scenes;
+boost::container::flat_set<std::pair<double, gearoenix::vulkan::scene::Scene*>> scenes;
 }
 
 gearoenix::vulkan::scene::Manager::Manager()
     : Singleton<Manager>(this)
-    , shader_data(Scene::max_count)
+    , uniform_indexer(Scene::max_count)
 {
     core::ecs::ComponentType::add<Scene>();
 }
@@ -34,7 +33,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::st
 
 void gearoenix::vulkan::scene::Manager::update()
 {
-    shader_data.reset();
+    uniform_indexer.reset();
     scenes.clear();
 
     render::scene::Manager::update();
@@ -50,7 +49,6 @@ void gearoenix::vulkan::scene::Manager::update()
 
 void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
 {
-
     // TODO: render shadows
     // TODO: render reflection probes
 
@@ -60,16 +58,15 @@ void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
     } else {
         render_forward(vk_cmd);
     }
-
 }
 
 void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_cmd)
 {
     {
-        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 0.0f, "render-forward");
-
-        for (const auto& scene : scenes) {
-            scene.second->render_forward(vk_cmd);
+        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
+        VkPipeline current_bound_pipeline = nullptr;
+        for (const auto& scene : scenes | std::views::values) {
+            scene->render_forward(vk_cmd, current_bound_pipeline);
         }
     }
 
@@ -77,7 +74,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
     const auto& window_size = base_os_app.get_window_size();
 
     {
-        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
+        // GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
         // ctx::set_framebuffer(0);
         // ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), 0, math::Vec2<sizei>(window_size) });
         // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -108,9 +105,5 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
         // glDisable(GL_BLEND);
         // glEnable(GL_DEPTH_TEST);
     }
-}
-
-void gearoenix::vulkan::scene::Manager::update_uniforms()
-{
 }
 #endif

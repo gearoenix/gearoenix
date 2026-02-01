@@ -25,9 +25,9 @@ struct Scene final : render::scene::Scene {
 public:
     ~Scene() override;
     void update() override;
-    void render_shadows(VkCommandBuffer vk_cmd);
-    void render_reflection_probes(VkCommandBuffer vk_cmd) const;
-    void render_forward(VkCommandBuffer vk_cmd);
+    void render_shadows(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
+    void render_reflection_probes(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline) const;
+    void render_forward(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
     void after_record();
 };
 }

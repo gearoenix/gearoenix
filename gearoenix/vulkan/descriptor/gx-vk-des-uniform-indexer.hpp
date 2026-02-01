@@ -132,6 +132,11 @@ public:
         static_assert(IsAtomic || IsDefault);
         return 0;
     }
+
+    [[nodiscard]] buffer::Buffer& get_gpu_buffer() const
+    {
+        return *uniform_buffer->get_gpu();
+    }
 };
 }
 

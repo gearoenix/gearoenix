@@ -18,7 +18,7 @@ struct Manager final : core::Singleton<Manager> {
     ~Manager() override;
 
     /// Uploads image data from multiple buffers <(Array or Face)<Mip>> to the image
-    void upload(std::shared_ptr<Image>&& img, std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs, bool generate_mipmaps, core::job::EndCaller<>&& end);
+    static void upload(std::shared_ptr<Image>&& img, std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs, bool generate_mipmaps, core::job::EndCaller<>&& end);
 };
 }
 #endif

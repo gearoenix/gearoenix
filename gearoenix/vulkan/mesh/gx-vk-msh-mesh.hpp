@@ -3,9 +3,19 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../render/mesh/gx-rnd-msh-mesh.hpp"
+#include "../gx-vk-loader.hpp"
+
+namespace gearoenix::render::record {
+struct Camera;
+struct CameraModel;
+}
 
 namespace gearoenix::vulkan::material {
 struct Material;
+}
+
+namespace gearoenix::vulkan::pipeline {
+struct PushConstants;
 }
 
 namespace gearoenix::vulkan::mesh {
@@ -23,6 +33,8 @@ public:
         const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
     ~Mesh() override;
     Mesh(const Mesh&) = delete;
+
+    void draw(VkCommandBuffer cmd, pipeline::PushConstants& pc) const;
 };
 }
 

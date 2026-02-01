@@ -26,8 +26,7 @@ using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataMaterial, descr
 ///   6- Most of the time OpenGL backend has the most updated implementation of the materials, so look there for further detail of the implementation of the shader and cpp codes
 ///      and apply those logics in here based on the current material implementations (like Pbr).
 struct Manager final : render::material::Manager, core::Singleton<Manager> {
-private:
-    uniform_indexer_t uniform_indexer;
+    GX_GET_CREF_PRV(uniform_indexer_t, uniform_indexer);
 
 public:
     Manager();

@@ -8,7 +8,7 @@ layout(location = 0) in vec2 in_uv;
 
 void main() {
     GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[model.material_index];
+    GxShaderDataMaterial material = materials[pc.material_index];
 
     // Sample albedo for alpha testing
     float alpha = texture(

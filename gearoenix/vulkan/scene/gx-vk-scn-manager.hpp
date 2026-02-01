@@ -19,16 +19,15 @@ struct Buffer;
 
 namespace gearoenix::vulkan::scene {
 struct Manager final : render::scene::Manager, core::Singleton<Manager> {
-private:
-    descriptor::UniformIndexer<GxShaderDataScene> shader_data;
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataScene>, uniform_indexer);
 
+public:
     Manager();
     ~Manager() override;
     [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
     void update() override;
     void submit(VkCommandBuffer vk_cmd);
     void render_forward(VkCommandBuffer vk_cmd);
-    void update_uniforms();
 };
 }
 #endif

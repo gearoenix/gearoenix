@@ -10,10 +10,9 @@ struct Uniform;
 
 namespace gearoenix::vulkan::light {
 struct Manager final : render::light::Manager, core::Singleton<Manager> {
-private:
-    descriptor::UniformIndexer<GxShaderDataDirectionalLight> directionals_uniform_indexer;
-    descriptor::UniformIndexer<GxShaderDataDirectionalLight> points_uniform_indexer;
-    descriptor::UniformIndexer<GxShaderDataDirectionalLight> directional_shadow_casters_uniform_indexer;
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataDirectionalLight>, directionals_uniform_indexer);
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataPointLight>, points_uniform_indexer);
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight>, directional_shadow_casters_uniform_indexer);
 
 public:
     Manager();

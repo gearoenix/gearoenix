@@ -21,6 +21,8 @@ struct Target final : render::texture::Target {
 
     public:
         explicit RenderingScope(VkCommandBuffer cb);
+        RenderingScope(RenderingScope&&) = delete;
+        RenderingScope(const RenderingScope&) = delete;
         ~RenderingScope();
     };
 

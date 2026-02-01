@@ -2,6 +2,8 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
+#include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-model.hpp"
@@ -10,8 +12,7 @@
 #include "../material/gx-vk-mat-manager.hpp"
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
-#include "../../physics/animation/gx-phs-anm-armature.hpp"
-#include "../../physics/animation/gx-phs-anm-bone.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
 
 gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable)
     : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
@@ -26,31 +27,30 @@ gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model:
 gearoenix::vulkan::model::Model::~Model() = default;
 
 void gearoenix::vulkan::model::Model::render_shadow(
-    const render::record::Camera& camera,
     const render::record::CameraModel& camera_model,
     const VkCommandBuffer cmd,
     pipeline::PushConstants& pc,
     VkPipeline& current_bound_pipeline)
 {
+    pc.model_index = shader_data_index;
     const auto skinned = camera_model.model->bones_count > 0;
     for (const auto& msh : gapi_meshes) {
         msh->get_gapi_material()->bind_shadow(cmd, skinned, pc, current_bound_pipeline);
-        msh->draw(*msh, camera, camera_model, cmd, skinned, pc);
+        msh->draw(cmd, pc);
     }
 }
 
 void gearoenix::vulkan::model::Model::render_forward(
-    const scene::Scene& scene,
-    const render::record::Camera& camera,
     const render::record::CameraModel& camera_model,
     const VkCommandBuffer cmd,
     pipeline::PushConstants& pc,
     VkPipeline& current_bound_pipeline)
 {
+    pc.model_index = shader_data_index;
     const auto skinned = camera_model.model->bones_count > 0;
     for (const auto& msh : gapi_meshes) {
         msh->get_gapi_material()->bind_forward(cmd, skinned, pc, current_bound_pipeline);
-        msh->draw(*msh, camera, camera_model, cmd, skinned, pc);
+        msh->draw(cmd, pc);
     }
 }
 

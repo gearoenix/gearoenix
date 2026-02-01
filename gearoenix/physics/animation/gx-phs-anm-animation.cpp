@@ -154,7 +154,7 @@ void gearoenix::physics::animation::SpriteAnimation::animate(const double time)
     GX_ASSERT_D(time <= 1.0);
     const auto pos = static_cast<std::uint32_t>(count * time);
     const math::Vec2 v(static_cast<double>(pos % aspect.x), static_cast<double>(pos / aspect.y));
-    sprite->get_uv_transform() = math::Vec4<float>(uv_scale, uv_scale * v);
+    sprite->set_uv_transform(math::Vec4<float>(uv_scale, uv_scale * v));
 }
 
 void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()

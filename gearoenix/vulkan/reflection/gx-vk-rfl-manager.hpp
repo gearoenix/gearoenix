@@ -2,10 +2,12 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-manager.hpp"
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::reflection {
 struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
-private:
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataReflectionProbe>, uniform_indexer);
+
     void update() override;
 
 public:

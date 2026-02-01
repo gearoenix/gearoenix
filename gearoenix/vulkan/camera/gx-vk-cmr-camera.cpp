@@ -6,6 +6,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../model/gx-vk-mdl-model.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
 
@@ -69,31 +70,35 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
     // pop_debug_group();
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(const scene::Scene& scene, const render::record::Camera& cmr, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_forward(
+    const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
+
+    pc.camera_index = shader_data_index;
+
     const auto render_scope = [&] {
         if (target.is_customised()) {
             return gapi_target.get_customised().target->create_rendering_scope(cmd);
         }
         return gapi_target.get_default().main->create_rendering_scope(cmd);
     }();
-    for (auto& distance_model_data : cmr.opaque_models) {
-        auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.render_forward(scene, cmr, camera_model, cmd);
-    }
-    render_forward_skyboxes(scene, cmr, cmd);
-    for (auto& distance_model_data : cmr.translucent_models) {
-        auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.render_forward(scene, cmr, camera_model, cmd);
-    }
+
+    const auto render_models = [&](auto& models) {
+        for (const auto& camera_model : models | std::views::values) {
+            pc.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
+            core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, cmd, pc, current_bound_pipeline);
+        }
+    };
+
+    render_models(cmr.opaque_models);
+    // render_forward_skyboxes(cmr, cmd); // TODO
+    render_models(cmr.translucent_models);
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const scene::Scene& scene, const render::record::Camera& cmr, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const render::record::Camera& cmr, const VkCommandBuffer cmd) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
     // glDepthMask(GL_FALSE);
     // // Rendering skyboxes
     // const math::Vec4 camera_pos_scale = { math::Vec3<float>(cmr.transform->get_global_position()), cmr.skybox_scale };
@@ -317,47 +322,25 @@ void gearoenix::vulkan::camera::Camera::after_record(const render::record::Camer
     cameras_joint_model_indices.clear();
 
     {
-        const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
-        camera_uniform_index = index;
-        ptr->position_reserved = {math::Vec3<float>(rc.transform->get_local_position()), 1.0f};
-        ptr->view_projection = view_projection;
+        auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
+        shader_data_index = sd.get_index();
+        auto& [vp, position_reserved] = *sd.get_ptr();
+        position_reserved = {math::Vec3<float>(rc.transform->get_local_position()), 1.0f};
+        vp = view_projection;
     }
 
     for (const auto& mvp: rc.mvps) {
-        const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataCameraJointModel>::get().get_next();
-        ptr->mvp = mvp;
-        cameras_joint_model_indices.push_back(index);
+        auto sd = descriptor::UniformIndexer<GxShaderDataCameraJointModel>::get().get_next();
+        sd.get_ptr()->mvp = mvp;
+        cameras_joint_model_indices.push_back(sd.get_index());
     }
 
-    vk_rec_opaque_models.clear();
-    for (const auto [model, first_mvp_index, mvps_count] : rc.opaque_models | std::views::values) {
-        vk_rec_opaque_models.push_back(RecVkModel {
-            .model = model,
-            .first_mvp_index = cameras_joint_model_indices[first_mvp_index],
-            .mvps_count = mvps_count,
-        });
+    for (const auto& camera_model : rc.opaque_models | std::views::values) {
+        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(camera_model);
     }
 
-    vk_rec_translucent_models.clear();
-    for (const auto [model, first_mvp_index, mvps_count] : rc.translucent_models | std::views::values) {
-        vk_rec_translucent_models.push_back(RecVkModel {
-            .model = model,
-            .first_mvp_index = cameras_joint_model_indices[first_mvp_index],
-            .mvps_count = mvps_count,
-        });
+    for (const auto& camera_model : rc.translucent_models | std::views::values) {
+        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(camera_model);
     }
-
-    for (auto& distance_model_data : rc.opaque_models) {
-        auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.after_record(*camera_model.model);
-    }
-
-    for (auto& distance_model_data : rc.translucent_models) {
-        auto& camera_model = distance_model_data.second;
-        auto& model = *core::cast_ptr<model::Model>(camera_model.model->model);
-        model.after_record(*camera_model.model);
-    }
-
 }
 #endif

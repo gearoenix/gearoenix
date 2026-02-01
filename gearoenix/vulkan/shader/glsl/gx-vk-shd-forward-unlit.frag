@@ -10,7 +10,7 @@ layout(location = 0) out vec4 frag_out;
 
 void main() {
     GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[model.material_index];
+    GxShaderDataMaterial material = materials[pc.material_index];
 
     // Sample albedo texture and multiply by factor
     vec4 colour = texture(

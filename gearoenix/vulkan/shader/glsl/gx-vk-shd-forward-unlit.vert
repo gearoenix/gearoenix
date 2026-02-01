@@ -17,7 +17,7 @@ layout(location = 0) out vec2 out_uv;
 void main() {
     GxShaderDataModel model = models[pc.model_index];
     GxShaderDataCamera camera = cameras[pc.camera_index];
-    GxShaderDataMaterial material = materials[model.material_index];
+    GxShaderDataMaterial material = materials[pc.material_index];
 
     // uv_transform stored in emission_roughness_factor: xy = scale, zw = offset
     out_uv = in_uv * material.emission_roughness_factor.xy + material.emission_roughness_factor.zw;

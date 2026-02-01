@@ -69,6 +69,14 @@ struct Graph;
 struct Queue;
 }
 
+namespace gearoenix::vulkan::reflection {
+struct Manager;
+}
+
+namespace gearoenix::vulkan::sampler {
+struct Manager;
+}
+
 namespace gearoenix::vulkan::scene {
 struct Manager;
 }
@@ -92,10 +100,9 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_UPTR_PRV(descriptor::Bindless, bindless_descriptor_manager);
     GX_GET_UPTR_PRV(pipeline::Manager, pipeline_manager);
     GX_GET_UPTR_PRV(buffer::Manager, buffer_manager);
-    // GX_GET_CREF_PRV(std::shared_ptr<image::View>, depth_stencil);
-    // GX_GET_UPTR_PRV(queue::Graph, graphed_queue);
     GX_GET_UPTR_PRV(ImGuiManager, imgui_manager);
     GX_GET_UPTR_PRV(image::Manager, image_manager);
+    GX_GET_UPTR_PRV(sampler::Manager, sampler_manager);
     GX_GET_PTRC_PRV(texture::Manager, vk_texture_manager);
     GX_GET_PTRC_PRV(mesh::Manager, vk_mesh_manager);
     GX_GET_PTRC_PRV(material::Manager, vk_material_manager);
@@ -103,15 +110,11 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_PTRC_PRV(light::Manager, vk_light_manager);
     GX_GET_PTRC_PRV(camera::Manager, vk_camera_manager);
     GX_GET_PTRC_PRV(scene::Manager, vk_scene_manager);
+    GX_GET_PTRC_PRV(reflection::Manager, vk_reflection_manager);
     GX_GET_CREF_PRV(frames_t, frames);
     GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0);
     GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true);
     GX_GET_UPTR_PRV(queue::Queue, render_queue);
-    //    GX_GET_CREF_PRV(std::shared_ptr<sampler::Manager>, sampler_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<image::Manager>, image_manager)
-    //    GX_GET_CREF_PRV(std::shared_ptr<texture::MainTarget>, vulkan_main_render_target)
-    //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, upload_command_buffers)
-    //    GX_GET_CREF_PRV(std::vector<std::shared_ptr<sync::Semaphore>>, upload_semaphore)
 
     void initialize_frame();
     void window_resized() override;

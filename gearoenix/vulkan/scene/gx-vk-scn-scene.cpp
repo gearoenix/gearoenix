@@ -7,6 +7,7 @@
 #include "../camera/gx-vk-cmr-camera.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
 
 #include <ranges>
 
@@ -38,7 +39,7 @@ void gearoenix::vulkan::scene::Scene::update()
     render::scene::Scene::update();
 }
 
-void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd)
+void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
@@ -47,41 +48,50 @@ void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cm
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBuffer vk_cmd) const
+void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
+
+    pipeline::PushConstants pc;
+    pc.scene_index = shader_data_index;
+
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
-        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(*this, camera, vk_cmd);
+        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(camera, vk_cmd, pc, current_bound_pipeline);
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cmd)
+void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
 {
-    render_reflection_probes(vk_cmd);
+    // render_reflection_probes(vk_cmd);
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
+
+    pipeline::PushConstants pc;
+    pc.scene_index = shader_data_index;
+
     for (const auto camera_index : record.cameras.mains | std::views::values) {
-        auto& camera = record.cameras.cameras[camera_index];
-        auto& cam = *core::cast_ptr<camera::Camera>(camera.camera);
-        cam.render_forward(*this, camera, vk_cmd);
-        cam.render_bloom(*this, camera, vk_cmd);
-        cam.render_colour_correction_anti_aliasing(*this, camera, vk_cmd);
+        auto& rc = record.cameras.cameras[camera_index];
+        auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
+        cam.render_forward(rc, vk_cmd, pc, current_bound_pipeline);
+        // cam.render_bloom(*this, camera, vk_cmd); // TODO
+        // cam.render_colour_correction_anti_aliasing(*this, camera, vk_cmd); // TODO
     }
 }
 
 void gearoenix::vulkan::scene::Scene::after_record()
 {
-    const auto [ptr, index] = descriptor::UniformIndexer<GxShaderDataScene>::get().get_next();
-    shader_data_index = index;
-    ptr->ambient_light = math::Vec4(0.001f); // TODO: Temporary later, render module must provide it.
+    auto sd = descriptor::UniformIndexer<GxShaderDataScene>::get().get_next();
+    shader_data_index = sd.get_index();
+    auto& ref = *sd.get_ptr();
+    ref.ambient_light = math::Vec4(0.001f); // TODO: Temporary later, render module must provide it.
     GX_ASSERT_D(brdflut);
-    ptr->brdflut_texture_index = brdflut->get_view_index();
-    ptr->brdflut_sampler_index = brdflut->get_sampler_index();
+    ref.brdflut_texture_index = brdflut->get_view_index();
+    ref.brdflut_sampler_index = brdflut->get_sampler_index();
 
     const auto& cameras = record.cameras;
     for (auto cam_i = 0; cam_i < cameras.last_camera_index; ++cam_i) {
-        const auto& cam = cameras.cameras[cam_i];
-        cam.mvps
+        auto& rc = cameras.cameras[cam_i];
+        core::cast_ptr<camera::Camera>(rc.camera)->after_record(rc);
     }
 }
 

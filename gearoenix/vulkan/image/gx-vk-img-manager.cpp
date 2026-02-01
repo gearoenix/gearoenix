@@ -20,11 +20,14 @@ gearoenix::vulkan::image::Manager::Manager()
 gearoenix::vulkan::image::Manager::~Manager() = default;
 
 void gearoenix::vulkan::image::Manager::upload(
-    std::shared_ptr<Image>&& img, std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs, const bool generate_mipmaps, core::job::EndCaller<>&& end)
+    std::shared_ptr<Image>&& img,
+    std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs,
+    const bool generate_mipmaps,
+    core::job::EndCaller<>&& end)
 {
     // No depth upload, obviously!
     buffer::Manager::get().get_uploader()->push([img, buffs = std::move(buffs), end, generate_mipmaps]() mutable {
-        auto cmd = std::make_shared<command::Buffer>(command::Manager::get().create(command::Type::Primary));
+        auto cmd = command::Manager::get().create(command::Type::Primary);
         cmd->begin();
 
         const auto mip_levels = img->get_mipmap_levels();

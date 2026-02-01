@@ -6,9 +6,8 @@
 
 namespace gearoenix::vulkan::camera {
 struct Manager final : render::camera::Manager, core::Singleton<Manager> {
-private:
-    descriptor::UniformIndexer<GxShaderDataCamera> camera_uniform_indexer;
-    descriptor::UniformIndexer<GxShaderDataCameraJointModel> cameras_joint_models_uniform_indexer;
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCamera>, camera_uniform_indexer);
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCameraJointModel>, cameras_joint_models_uniform_indexer);
 
 public:
     Manager();

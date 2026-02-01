@@ -31,6 +31,7 @@ protected:
         = 0;
 
     virtual void build(
+        std::string&& name,
         std::shared_ptr<Buffer>&& buffer,
         std::shared_ptr<material::Material>&& material,
         core::job::EndCallerShared<Mesh>&& end_callback)
