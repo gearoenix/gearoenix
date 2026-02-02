@@ -72,16 +72,9 @@ gearoenix::vulkan::device::Logical::Logical()
     VkPhysicalDeviceVulkan13Features enabled_v13_features;
     GX_SET_ZERO(enabled_v13_features);
     enabled_v13_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-    const bool dynamic_rendering_supported = supported_v13_features.dynamicRendering == VK_TRUE || supported_dynamic_features.dynamicRendering == VK_TRUE;
-    if (!dynamic_rendering_supported) {
-        GX_LOG_F("Dynamic rendering must be supported by the selected physical device.");
-    }
+    // Dynamic rendering must be supported by the selected physical device.
+    GX_ASSERT_D(supported_v13_features.dynamicRendering == VK_TRUE || supported_dynamic_features.dynamicRendering == VK_TRUE);
     enabled_v13_features.dynamicRendering = VK_TRUE;
-
-    VkPhysicalDeviceDynamicRenderingFeatures enabled_dynamic_features;
-    GX_SET_ZERO(enabled_dynamic_features);
-    enabled_dynamic_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
-    enabled_dynamic_features.dynamicRendering = VK_TRUE;
 
     VkPhysicalDeviceShaderClockFeaturesKHR enabled_shader_clock_features;
     GX_SET_ZERO(enabled_shader_clock_features);
@@ -122,12 +115,10 @@ gearoenix::vulkan::device::Logical::Logical()
         enabled_acceleration_structure_features.accelerationStructure = VK_TRUE;
         enabled_acceleration_structure_features.pNext = &enabled_ray_tracing_pipeline_features;
 
-        enabled_dynamic_features.pNext = &enabled_acceleration_structure_features;
+        enabled_v13_features.pNext = &enabled_acceleration_structure_features;
     } else {
-        enabled_dynamic_features.pNext = nullptr;
+        enabled_v13_features.pNext = nullptr;
     }
-
-    enabled_v13_features.pNext = &enabled_dynamic_features;
     enabled_v12_features.pNext = &enabled_v13_features;
 
     VkPhysicalDeviceFeatures2 device_features2;
@@ -153,7 +144,7 @@ gearoenix::vulkan::device::Logical::Logical()
         device_extensions.push_back(VK_KHR_SHADER_CLOCK_EXTENSION_NAME);
     }
 
-    constexpr std::array queue_priorities { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    constexpr std::array queue_priorities { 1.0f }; // Some devices only support one queue!
 
     std::set<std::uint32_t> queue_index_set;
     queue_index_set.insert(physical.get_graphics_queue_node_index());

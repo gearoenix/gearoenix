@@ -113,8 +113,8 @@ void gearoenix::vulkan::pipeline::Manager::initialise_ray_tracing()
 
 void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
 {
-    pbr_vert_sm = shader_manager->get("pbr.vert");
-    pbr_frag_sm = shader_manager->get("pbr.frag");
+    pbr_vert_sm = shader_manager->get("forward-pbr.vert");
+    pbr_frag_sm = shader_manager->get("forward-pbr.frag");
 
     const auto& physical_device = device::Physical::get();
     const auto& bindless = descriptor::Bindless::get();

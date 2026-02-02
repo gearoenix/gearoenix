@@ -14,25 +14,18 @@
 #include <thread>
 
 gearoenix::vulkan::queue::Queue::Queue()
+    : Singleton(this)
+    , vulkan_data([&] {
+        VkQueue q = nullptr;
+        vkGetDeviceQueue(device::Logical::get().get_vulkan_data(), device::Physical::get().get_graphics_queue_node_index(), 0, &q);
+        return q;
+    }())
 {
-    static std::mutex queue_index_lock;
-    static std::uint32_t latest_queue_index = 0;
-    static boost::container::flat_map<std::thread::id, std::uint32_t> thread_queue_index_map {};
-    const std::lock_guard _lg(queue_index_lock);
-    uint32_t queue_index = 0;
-    if (const auto queue_index_search = thread_queue_index_map.find(std::this_thread::get_id()); thread_queue_index_map.end() != queue_index_search) {
-        queue_index = queue_index_search->second;
-    } else {
-        queue_index = latest_queue_index;
-        ++latest_queue_index;
-        thread_queue_index_map.emplace(std::this_thread::get_id(), queue_index);
-    }
-    vkGetDeviceQueue(device::Logical::get().get_vulkan_data(), device::Physical::get().get_graphics_queue_node_index(), queue_index, &vulkan_data);
 }
 
 gearoenix::vulkan::queue::Queue::~Queue() = default;
 
-void gearoenix::vulkan::queue::Queue::submit(command::Buffer& cmd, sync::Fence& fence)
+void gearoenix::vulkan::queue::Queue::submit(const command::Buffer& cmd, const sync::Fence& fence)
 {
     VkSubmitInfo info;
     GX_SET_ZERO(info);

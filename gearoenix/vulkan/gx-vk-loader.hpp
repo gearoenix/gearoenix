@@ -245,14 +245,6 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetSwapchainImagesKHR);                        \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAcquireNextImageKHR);                          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueuePresentKHR);                              \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPropertiesKHR);        \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPlanePropertiesKHR);   \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneSupportedDisplaysKHR);          \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayModePropertiesKHR);                  \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayModeKHR);                         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneCapabilitiesKHR);               \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayPlaneSurfaceKHR);                 \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSharedSwapchainsKHR);                    \
     GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                    \
     GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
     GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                 \
