@@ -7,6 +7,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../gx-vk-check.hpp"
 
 namespace {
@@ -159,7 +160,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     GX_SET_ZERO(push_constant_range);
     push_constant_range.stageFlags = VK_SHADER_STAGE_ALL;
     push_constant_range.offset = 0;
-    push_constant_range.size = sizeof(BindlessPushConstants);
+    push_constant_range.size = sizeof(pipeline::PushConstants);
 
     VkPipelineLayoutCreateInfo pipeline_layout_info;
     GX_SET_ZERO(pipeline_layout_info);

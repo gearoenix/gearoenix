@@ -24,59 +24,41 @@ gearoenix::vulkan::device::Logical::Logical()
 
     VkPhysicalDeviceFeatures enabled_features;
     GX_SET_ZERO(enabled_features);
-    if (supported_features.samplerAnisotropy != VK_TRUE) {
-        GX_LOG_F("Sampler anisotropy is required but not supported by the selected physical device.");
-    }
+    GX_ASSERT(supported_features.samplerAnisotropy == VK_TRUE);
     enabled_features.samplerAnisotropy = VK_TRUE;
-    if (supported_features.shaderInt64 != VK_TRUE) {
-        GX_LOG_F("shaderInt64 is required but not supported by the selected physical device.");
-    }
+    GX_ASSERT(supported_features.shaderInt64 == VK_TRUE);
     enabled_features.shaderInt64 = VK_TRUE;
 
     VkPhysicalDeviceVulkan12Features enabled_v12_features;
     GX_SET_ZERO(enabled_v12_features);
     enabled_v12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-    if (supported_v12_features.descriptorIndexing != VK_TRUE) {
-        GX_LOG_F("Descriptor indexing must be supported in Vulkan 1.2 features.");
-    }
+    GX_ASSERT(supported_v12_features.descriptorIndexing == VK_TRUE);
     enabled_v12_features.descriptorIndexing = VK_TRUE;
-    if (supported_v12_features.runtimeDescriptorArray != VK_TRUE) {
-        GX_LOG_F("runtimeDescriptorArray is required for bindless descriptors.");
-    }
+    GX_ASSERT(supported_v12_features.runtimeDescriptorArray == VK_TRUE);
     enabled_v12_features.runtimeDescriptorArray = VK_TRUE;
-    if (supported_v12_features.descriptorBindingPartiallyBound != VK_TRUE) {
-        GX_LOG_F("descriptorBindingPartiallyBound is required for bindless descriptors.");
-    }
+    GX_ASSERT(supported_v12_features.descriptorBindingPartiallyBound == VK_TRUE);
     enabled_v12_features.descriptorBindingPartiallyBound = VK_TRUE;
-    if (supported_v12_features.descriptorBindingSampledImageUpdateAfterBind != VK_TRUE) {
-        GX_LOG_F("descriptorBindingSampledImageUpdateAfterBind is required for bindless descriptors.");
-    }
+    GX_ASSERT(supported_v12_features.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE);
     enabled_v12_features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
-    if (supported_v12_features.descriptorBindingVariableDescriptorCount != VK_TRUE) {
-        GX_LOG_F("descriptorBindingVariableDescriptorCount is required for bindless descriptors.");
-    }
+    GX_ASSERT(supported_v12_features.descriptorBindingVariableDescriptorCount == VK_TRUE);
     enabled_v12_features.descriptorBindingVariableDescriptorCount = VK_TRUE;
-    if (supported_v12_features.shaderSampledImageArrayNonUniformIndexing != VK_TRUE) {
-        GX_LOG_F("shaderSampledImageArrayNonUniformIndexing is required for bindless descriptors.");
-    }
+    GX_ASSERT(supported_v12_features.shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
     enabled_v12_features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
-    if (supported_v12_features.bufferDeviceAddress != VK_TRUE) {
-        GX_LOG_F("bufferDeviceAddress is required by the engine.");
-    }
+    GX_ASSERT(supported_v12_features.descriptorBindingUpdateUnusedWhilePending == VK_TRUE);
+    enabled_v12_features.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+    GX_ASSERT(supported_v12_features.bufferDeviceAddress == VK_TRUE);
     enabled_v12_features.bufferDeviceAddress = VK_TRUE;
-    if (supported_v12_features.scalarBlockLayout != VK_TRUE) {
-        GX_LOG_F("scalarBlockLayout is required by the engine.");
-    }
+    GX_ASSERT(supported_v12_features.scalarBlockLayout == VK_TRUE);
     enabled_v12_features.scalarBlockLayout = VK_TRUE;
 
     VkPhysicalDeviceVulkan13Features enabled_v13_features;
     GX_SET_ZERO(enabled_v13_features);
     enabled_v13_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
     // Dynamic rendering must be supported by the selected physical device.
-    GX_ASSERT_D(supported_v13_features.dynamicRendering == VK_TRUE || supported_dynamic_features.dynamicRendering == VK_TRUE);
+    GX_ASSERT(supported_v13_features.dynamicRendering == VK_TRUE || supported_dynamic_features.dynamicRendering == VK_TRUE);
     enabled_v13_features.dynamicRendering = VK_TRUE;
     // shaderDemoteToHelperInvocation is required but not supported by the selected physical device.
-    GX_ASSERT_D(supported_v13_features.shaderDemoteToHelperInvocation == VK_TRUE);
+    GX_ASSERT(supported_v13_features.shaderDemoteToHelperInvocation == VK_TRUE);
     enabled_v13_features.shaderDemoteToHelperInvocation = VK_TRUE;
 
     VkPhysicalDeviceShaderClockFeaturesKHR enabled_shader_clock_features;
@@ -96,15 +78,9 @@ gearoenix::vulkan::device::Logical::Logical()
     enabled_ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 
     if (physical.get_rtx_supported()) {
-        if (supported_shader_clock_features.shaderSubgroupClock != VK_TRUE) {
-            GX_LOG_F("shaderSubgroupClock is required for the ray tracing path.");
-        }
-        if (supported_ray_query_features.rayQuery != VK_TRUE) {
-            GX_LOG_F("rayQuery is required for the ray tracing path.");
-        }
-        if (supported_rt_pipeline_features.rayTracingPipeline != VK_TRUE) {
-            GX_LOG_F("rayTracingPipeline must be supported when RTX is enabled.");
-        }
+        GX_ASSERT(supported_shader_clock_features.shaderSubgroupClock == VK_TRUE);
+        GX_ASSERT(supported_ray_query_features.rayQuery == VK_TRUE);
+        GX_ASSERT(supported_rt_pipeline_features.rayTracingPipeline == VK_TRUE);
 
         enabled_shader_clock_features.shaderSubgroupClock = VK_TRUE;
 

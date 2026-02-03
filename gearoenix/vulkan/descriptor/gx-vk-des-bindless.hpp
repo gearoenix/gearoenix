@@ -14,13 +14,6 @@ struct Buffer;
 }
 
 namespace gearoenix::vulkan::descriptor {
-struct BindlessPushConstants final {
-    std::uint32_t scene_index = 0;
-    std::uint32_t camera_index = 0;
-    std::uint32_t model_index = 0;
-    std::uint32_t camera_model_index = 0;
-};
-
 struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_1d_images = 8;
     static constexpr std::uint32_t max_2d_images = 8192;

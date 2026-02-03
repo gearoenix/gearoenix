@@ -121,22 +121,21 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     const auto depth_format = physical_device.get_supported_depth_format();
     const auto color_format = Swapchain::get().get_format().format;
 
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages{};
+    GX_SET_ZERO(stages);
+
     // ========== Shader stages ==========
-    VkPipelineShaderStageCreateInfo vert_stage;
-    GX_SET_ZERO(vert_stage);
+    auto& vert_stage = stages[0];
     vert_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vert_stage.stage = VK_SHADER_STAGE_VERTEX_BIT;
     vert_stage.module = pbr_vert_sm->get_vulkan_data();
     vert_stage.pName = default_stage_entry;
 
-    VkPipelineShaderStageCreateInfo frag_stage;
-    GX_SET_ZERO(frag_stage);
+    auto& frag_stage = stages[1];
     frag_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     frag_stage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     frag_stage.module = pbr_frag_sm->get_vulkan_data();
     frag_stage.pName = default_stage_entry;
-
-    const std::array forward_stages = { vert_stage, frag_stage };
 
     // ========== Vertex input ==========
     VkVertexInputBindingDescription vertex_binding;
@@ -145,7 +144,10 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     vertex_binding.stride = sizeof(render::PbrVertex);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes{};
+    // Non-skinned pipelines need 6 attributes: locations 0-3 for actual data,
+    // and dummy locations 4-5 for bone_weights/bone_indices that shaders declare
+    // but won't use when GX_SPEC_HAS_BONES is false.
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes{};
     GX_SET_ZERO(vertex_attributes);
 
     // position: vec3
@@ -171,6 +173,18 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     vertex_attributes[3].location = 3;
     vertex_attributes[3].format = VK_FORMAT_R32G32_SFLOAT;
     vertex_attributes[3].offset = offsetof(render::PbrVertex, uv);
+
+    // bone_weights: vec4 (dummy, shader won't use when GX_SPEC_HAS_BONES is false)
+    vertex_attributes[4].binding = 0;
+    vertex_attributes[4].location = 4;
+    vertex_attributes[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    vertex_attributes[4].offset = 0;
+
+    // bone_indices: vec4 (dummy, shader won't use when GX_SPEC_HAS_BONES is false)
+    vertex_attributes[5].binding = 0;
+    vertex_attributes[5].location = 5;
+    vertex_attributes[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    vertex_attributes[5].offset = 0;
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info;
     GX_SET_ZERO(vertex_input_info);
@@ -245,59 +259,68 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     rendering_info.depthAttachmentFormat = depth_format;
 
     // ========== Forward pipeline ==========
-    VkGraphicsPipelineCreateInfo forward_create_info;
-    GX_SET_ZERO(forward_create_info);
-    forward_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    forward_create_info.pNext = &rendering_info;
-    forward_create_info.stageCount = static_cast<std::uint32_t>(forward_stages.size());
-    forward_create_info.pStages = forward_stages.data();
-    forward_create_info.pVertexInputState = &vertex_input_info;
-    forward_create_info.pInputAssemblyState = &input_assembly;
-    forward_create_info.pViewportState = &viewport_state;
-    forward_create_info.pRasterizationState = &rasterization;
-    forward_create_info.pMultisampleState = &multisample;
-    forward_create_info.pDepthStencilState = &depth_stencil;
-    forward_create_info.pColorBlendState = &color_blend;
-    forward_create_info.pDynamicState = &dynamic_state;
-    forward_create_info.layout = bindless.get_pipeline_layout();
+    VkGraphicsPipelineCreateInfo create_info;
+    GX_SET_ZERO(create_info);
+    create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    create_info.pNext = &rendering_info;
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
+    create_info.pStages = stages.data();
+    create_info.pVertexInputState = &vertex_input_info;
+    create_info.pInputAssemblyState = &input_assembly;
+    create_info.pViewportState = &viewport_state;
+    create_info.pRasterizationState = &rasterization;
+    create_info.pMultisampleState = &multisample;
+    create_info.pDepthStencilState = &depth_stencil;
+    create_info.pColorBlendState = &color_blend;
+    create_info.pDynamicState = &dynamic_state;
+    create_info.layout = bindless.get_pipeline_layout();
 
-    pbr_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), forward_create_info);
+    pbr_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
     // ========== Shadow pipeline (depth-only, vertex shader only) ==========
-    VkPipelineColorBlendStateCreateInfo shadow_color_blend;
-    GX_SET_ZERO(shadow_color_blend);
-    shadow_color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    // Reuse rendering_info and color_blend, modifying only what differs
+    rendering_info.colorAttachmentCount = 0;
+    rendering_info.pColorAttachmentFormats = nullptr;
 
-    VkPipelineRenderingCreateInfo shadow_rendering_info;
-    GX_SET_ZERO(shadow_rendering_info);
-    shadow_rendering_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
-    shadow_rendering_info.depthAttachmentFormat = depth_format;
+    color_blend.attachmentCount = 0;
+    color_blend.pAttachments = nullptr;
 
-    VkGraphicsPipelineCreateInfo shadow_create_info;
-    GX_SET_ZERO(shadow_create_info);
-    shadow_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    shadow_create_info.pNext = &shadow_rendering_info;
-    shadow_create_info.stageCount = 1;
-    shadow_create_info.pStages = &vert_stage;
-    shadow_create_info.pVertexInputState = &vertex_input_info;
-    shadow_create_info.pInputAssemblyState = &input_assembly;
-    shadow_create_info.pViewportState = &viewport_state;
-    shadow_create_info.pRasterizationState = &rasterization;
-    shadow_create_info.pMultisampleState = &multisample;
-    shadow_create_info.pDepthStencilState = &depth_stencil;
-    shadow_create_info.pColorBlendState = &shadow_color_blend;
-    shadow_create_info.pDynamicState = &dynamic_state;
-    shadow_create_info.layout = bindless.get_pipeline_layout();
+    create_info.stageCount = 1;
 
-    pbr_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), shadow_create_info);
+    pbr_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
-    // ========== Skinned vertex pipelines ==========
-    const VkBool32 spec_has_bones = VK_TRUE;
+    // ========== Unlit Forward Pipeline (non-skinned) ==========
+    unlit_vert_sm = shader_manager->get("forward-unlit.vert");
+    unlit_frag_sm = shader_manager->get("forward-unlit.frag");
+
+    // Reuse vert_stage and frag_stage, only updating module
+    vert_stage.module = unlit_vert_sm->get_vulkan_data();
+    frag_stage.module = unlit_frag_sm->get_vulkan_data();
+
+    // Restore forward pipeline settings
+    rendering_info.colorAttachmentCount = 1;
+    rendering_info.pColorAttachmentFormats = &color_format;
+
+    color_blend.attachmentCount = 1;
+    color_blend.pAttachments = &color_blend_attachment;
+
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
+
+    unlit_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
+
+    // ========== Skinned pipelines ==========
+    // Update vertex_attributes for skinned: set proper bone offsets (locations 4-5)
+    vertex_attributes[4].offset = offsetof(render::PbrVertexAnimated, bone_weights);
+    vertex_attributes[5].offset = offsetof(render::PbrVertexAnimated, bone_indices);
+
+    // Update binding stride for skinned vertex data
+    vertex_binding.stride = sizeof(render::PbrVertexAnimated);
+
+    constexpr VkBool32 spec_has_bones = VK_TRUE;
 
     VkSpecializationMapEntry spec_map_entry;
     GX_SET_ZERO(spec_map_entry);
     spec_map_entry.constantID = 0;
-    spec_map_entry.offset = 0;
     spec_map_entry.size = sizeof(VkBool32);
 
     VkSpecializationInfo spec_info;
@@ -307,120 +330,40 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     spec_info.dataSize = sizeof(VkBool32);
     spec_info.pData = &spec_has_bones;
 
-    VkPipelineShaderStageCreateInfo skinned_vert_stage = vert_stage;
-    skinned_vert_stage.pSpecializationInfo = &spec_info;
+    // Skinned PBR forward pipeline - reuse vert_stage with PBR shaders
+    vert_stage.module = pbr_vert_sm->get_vulkan_data();
+    frag_stage.module = pbr_frag_sm->get_vulkan_data();
+    vert_stage.pSpecializationInfo = &spec_info;
 
-    VkPipelineShaderStageCreateInfo skinned_frag_stage = frag_stage;
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
 
-    const std::array skinned_forward_stages = { skinned_vert_stage, skinned_frag_stage };
+    pbr_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
-    // Skinned vertex input
-    VkVertexInputBindingDescription skinned_vertex_binding;
-    GX_SET_ZERO(skinned_vertex_binding);
-    skinned_vertex_binding.binding = 0;
-    skinned_vertex_binding.stride = sizeof(render::PbrVertexAnimated);
-    skinned_vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    // Skinned PBR shadow pipeline
+    rendering_info.colorAttachmentCount = 0;
+    rendering_info.pColorAttachmentFormats = nullptr;
 
-    std::array<VkVertexInputAttributeDescription, 6> skinned_vertex_attributes{};
-    GX_SET_ZERO(skinned_vertex_attributes);
+    color_blend.attachmentCount = 0;
+    color_blend.pAttachments = nullptr;
 
-    // position: vec3
-    skinned_vertex_attributes[0].binding = 0;
-    skinned_vertex_attributes[0].location = 0;
-    skinned_vertex_attributes[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-    skinned_vertex_attributes[0].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, position);
+    create_info.stageCount = 1;
 
-    // normal: vec3
-    skinned_vertex_attributes[1].binding = 0;
-    skinned_vertex_attributes[1].location = 1;
-    skinned_vertex_attributes[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-    skinned_vertex_attributes[1].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, normal);
+    pbr_skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
-    // tangent: vec4
-    skinned_vertex_attributes[2].binding = 0;
-    skinned_vertex_attributes[2].location = 2;
-    skinned_vertex_attributes[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    skinned_vertex_attributes[2].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, tangent);
+    // Skinned unlit forward pipeline - reuse vert_stage with unlit shaders
+    vert_stage.module = unlit_vert_sm->get_vulkan_data();
+    frag_stage.module = unlit_frag_sm->get_vulkan_data();
 
-    // uv: vec2
-    skinned_vertex_attributes[3].binding = 0;
-    skinned_vertex_attributes[3].location = 3;
-    skinned_vertex_attributes[3].format = VK_FORMAT_R32G32_SFLOAT;
-    skinned_vertex_attributes[3].offset = offsetof(render::PbrVertexAnimated, base) + offsetof(render::PbrVertex, uv);
+    // Restore forward pipeline settings
+    rendering_info.colorAttachmentCount = 1;
+    rendering_info.pColorAttachmentFormats = &color_format;
 
-    // bone_weights: vec4
-    skinned_vertex_attributes[4].binding = 0;
-    skinned_vertex_attributes[4].location = 4;
-    skinned_vertex_attributes[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    skinned_vertex_attributes[4].offset = offsetof(render::PbrVertexAnimated, bone_weights);
+    color_blend.attachmentCount = 1;
+    color_blend.pAttachments = &color_blend_attachment;
 
-    // bone_indices: vec4
-    skinned_vertex_attributes[5].binding = 0;
-    skinned_vertex_attributes[5].location = 5;
-    skinned_vertex_attributes[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    skinned_vertex_attributes[5].offset = offsetof(render::PbrVertexAnimated, bone_indices);
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
 
-    VkPipelineVertexInputStateCreateInfo skinned_vertex_input_info;
-    GX_SET_ZERO(skinned_vertex_input_info);
-    skinned_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    skinned_vertex_input_info.vertexBindingDescriptionCount = 1;
-    skinned_vertex_input_info.pVertexBindingDescriptions = &skinned_vertex_binding;
-    skinned_vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(skinned_vertex_attributes.size());
-    skinned_vertex_input_info.pVertexAttributeDescriptions = skinned_vertex_attributes.data();
-
-    // Skinned forward pipeline
-    VkGraphicsPipelineCreateInfo skinned_forward_create_info = forward_create_info;
-    skinned_forward_create_info.stageCount = static_cast<std::uint32_t>(skinned_forward_stages.size());
-    skinned_forward_create_info.pStages = skinned_forward_stages.data();
-    skinned_forward_create_info.pVertexInputState = &skinned_vertex_input_info;
-
-    pbr_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), skinned_forward_create_info);
-
-    // Skinned shadow pipeline
-    VkGraphicsPipelineCreateInfo skinned_shadow_create_info = shadow_create_info;
-    skinned_shadow_create_info.pStages = &skinned_vert_stage;
-    skinned_shadow_create_info.pVertexInputState = &skinned_vertex_input_info;
-
-    pbr_skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), skinned_shadow_create_info);
-
-    // ========== Unlit Forward Pipelines ==========
-    unlit_vert_sm = shader_manager->get("forward-unlit.vert");
-    unlit_frag_sm = shader_manager->get("forward-unlit.frag");
-
-    VkPipelineShaderStageCreateInfo unlit_vert_stage;
-    GX_SET_ZERO(unlit_vert_stage);
-    unlit_vert_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    unlit_vert_stage.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    unlit_vert_stage.module = unlit_vert_sm->get_vulkan_data();
-    unlit_vert_stage.pName = default_stage_entry;
-
-    VkPipelineShaderStageCreateInfo unlit_frag_stage;
-    GX_SET_ZERO(unlit_frag_stage);
-    unlit_frag_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    unlit_frag_stage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    unlit_frag_stage.module = unlit_frag_sm->get_vulkan_data();
-    unlit_frag_stage.pName = default_stage_entry;
-
-    const std::array unlit_forward_stages = { unlit_vert_stage, unlit_frag_stage };
-
-    VkGraphicsPipelineCreateInfo unlit_forward_create_info = forward_create_info;
-    unlit_forward_create_info.stageCount = static_cast<std::uint32_t>(unlit_forward_stages.size());
-    unlit_forward_create_info.pStages = unlit_forward_stages.data();
-
-    unlit_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), unlit_forward_create_info);
-
-    // Skinned unlit forward pipeline
-    VkPipelineShaderStageCreateInfo unlit_skinned_vert_stage = unlit_vert_stage;
-    unlit_skinned_vert_stage.pSpecializationInfo = &spec_info;
-
-    const std::array unlit_skinned_forward_stages = { unlit_skinned_vert_stage, unlit_frag_stage };
-
-    VkGraphicsPipelineCreateInfo unlit_skinned_forward_create_info = forward_create_info;
-    unlit_skinned_forward_create_info.stageCount = static_cast<std::uint32_t>(unlit_skinned_forward_stages.size());
-    unlit_skinned_forward_create_info.pStages = unlit_skinned_forward_stages.data();
-    unlit_skinned_forward_create_info.pVertexInputState = &skinned_vertex_input_info;
-
-    unlit_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), unlit_skinned_forward_create_info);
+    unlit_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 }
 
 gearoenix::vulkan::pipeline::Manager::Manager()
