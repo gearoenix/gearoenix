@@ -28,6 +28,9 @@ public:
     ~Manager() override;
 
     [[nodiscard]] std::shared_ptr<Buffer> create(Type buffer_type = Type::Primary, std::optional<std::uint64_t> thread_index = std::nullopt);
+
+    /// The created command buffer will have its own dedicated pool so it can be passed between threads.
+    [[nodiscard]] static std::shared_ptr<Buffer> create_thread_independent();
 };
 }
 #endif

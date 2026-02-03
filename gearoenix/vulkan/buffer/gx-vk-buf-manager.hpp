@@ -30,8 +30,6 @@ struct Uniform;
 struct Manager final : core::Singleton<Manager> {
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer);
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer);
-    GX_GET_UPTR_PRV(queue::Queue, uploader_queue);
-    GX_GET_UCPTR_PRV(core::sync::WorkWaiter, uploader);
 
     const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
@@ -53,12 +51,12 @@ public:
     [[nodiscard]] std::shared_ptr<Buffer> create_static(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::int64_t size);
-    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, const core::job::EndCaller<>& end);
+    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, core::job::EndCaller<>&& end);
 
     template <typename T>
-    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const std::vector<T>& data, const core::job::EndCaller<>& end)
+    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const std::vector<T>& data, core::job::EndCaller<>&& end)
     {
-        return create(name, data.data(), data.size() * sizeof(T), end);
+        return create(name, data.data(), data.size() * sizeof(T), std::move(end));
     }
 
     void upload_dynamics(VkCommandBuffer vk_cmd);

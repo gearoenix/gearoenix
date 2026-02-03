@@ -20,6 +20,7 @@ namespace gearoenix::vulkan::queue {
 /// Even those devices, which support several queues, don't have a good parallelism.
 struct Queue final : core::Singleton<Queue> {
     GX_GET_CVAL_PRV(VkQueue, vulkan_data);
+    std::mutex submission_lock;
 
 public:
     Queue(Queue&&) = delete;

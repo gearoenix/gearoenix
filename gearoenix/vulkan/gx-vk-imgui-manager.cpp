@@ -46,7 +46,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     info.PhysicalDevice = device::Physical::get().get_vulkan_data();
     info.Device = vk_dev;
     info.QueueFamily = device::Physical::get().get_graphics_queue_node_index();
-    info.Queue = core::Singleton<engine::Engine>::get().get_render_queue()->get_vulkan_data();
+    info.Queue = queue::Queue::get().get_vulkan_data();
     info.DescriptorPool = descriptor_pool;
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(Swapchain::get().get_image_views().size());
     info.ImageCount = info.MinImageCount;

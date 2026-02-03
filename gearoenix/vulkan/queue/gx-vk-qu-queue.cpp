@@ -32,6 +32,7 @@ void gearoenix::vulkan::queue::Queue::submit(const command::Buffer& cmd, const s
     info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     info.commandBufferCount = 1;
     info.pCommandBuffers = cmd.get_vulkan_data_ptr();
+    const std::lock_guard _(submission_lock);
     GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence.get_vulkan_data()));
 }
 
@@ -55,6 +56,7 @@ void gearoenix::vulkan::queue::Queue::submit(
     info.pCommandBuffers = commands;
     info.signalSemaphoreCount = static_cast<std::uint32_t>(signal_semaphores_count);
     info.pSignalSemaphores = signal_semaphores;
+    const std::lock_guard _(submission_lock);
     GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence));
 }
 

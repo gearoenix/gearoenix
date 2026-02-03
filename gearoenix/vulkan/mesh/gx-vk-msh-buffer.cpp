@@ -25,13 +25,13 @@ void gearoenix::vulkan::mesh::Buffer::construct(
     auto result = buffer_allocator->make_shared(occlusion_box);
     result->indices_count = static_cast<std::uint32_t>(indices.size());
 
-    const core::job::EndCaller end([c = std::move(end_callback), r = result] {
+    core::job::EndCaller end([c = std::move(end_callback), r = result] {
         c.set_return(r);
     });
 
     auto& buf_mgr = buffer::Manager::get();
-    result->vertex = buf_mgr.create(name + "-vertex", render::get_data(vertices), static_cast<std::int64_t>(core::bytes_count(vertices)), end);
-    result->index = buf_mgr.create(name + "-index", indices.data(), static_cast<std::int64_t>(indices.size() * sizeof(std::uint32_t)), end);
+    result->vertex = buf_mgr.create(name + "-vertex", render::get_data(vertices), static_cast<std::int64_t>(core::bytes_count(vertices)), core::job::EndCaller(end));
+    result->index = buf_mgr.create(name + "-index", indices.data(), static_cast<std::int64_t>(indices.size() * sizeof(std::uint32_t)), std::move(end));
 }
 
 #endif

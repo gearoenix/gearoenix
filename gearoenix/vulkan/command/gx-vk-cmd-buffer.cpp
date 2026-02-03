@@ -38,8 +38,7 @@ gearoenix::vulkan::command::Buffer::Buffer(Buffer&& o) noexcept
 gearoenix::vulkan::command::Buffer::~Buffer()
 {
     if (nullptr != vulkan_data) {
-        vkFreeCommandBuffers(
-            device::Logical::get().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data);
+        vkFreeCommandBuffers(device::Logical::get().get_vulkan_data(), pool->get_vulkan_data(), 1, &vulkan_data);
         vulkan_data = nullptr;
     }
 }

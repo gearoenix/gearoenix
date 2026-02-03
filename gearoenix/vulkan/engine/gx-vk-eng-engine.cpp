@@ -54,9 +54,8 @@ gearoenix::vulkan::engine::Engine::Engine()
     , swapchain(new Swapchain())
     , memory_manager(new memory::Manager())
     , command_manager(new command::Manager())
-    , pipeline_manager(new pipeline::Manager())
     , buffer_manager(new buffer::Manager())
-    , imgui_manager(new ImGuiManager())
+    , render_queue(new queue::Queue())
     , image_manager(new image::Manager())
     , sampler_manager(new sampler::Manager())
     , vk_texture_manager(new texture::Manager())
@@ -67,7 +66,6 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_camera_manager(new camera::Manager())
     , vk_scene_manager(new scene::Manager())
     , vk_reflection_manager(new reflection::Manager())
-    , render_queue(new queue::Queue())
 {
     frames_count = swapchain->get_image_views().size();
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vk_mesh_manager);
@@ -90,6 +88,8 @@ gearoenix::vulkan::engine::Engine::Engine()
         vk_model_manager->get_bone_uniform_indexer().get_gpu_buffer(),
         vk_reflection_manager->get_uniform_indexer().get_gpu_buffer(),
         vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_gpu_buffer());
+    pipeline_manager = std::make_unique<pipeline::Manager>();
+    imgui_manager = std::make_unique<ImGuiManager>();
     initialize_frame();
 }
 

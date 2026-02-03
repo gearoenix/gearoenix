@@ -60,11 +60,7 @@ gearoenix::vulkan::buffer::Manager::Manager()
     , gpu_root_buffer(create_gpu_root_buffer())
     , each_frame_upload_source(create_each_frame_upload_source())
     , each_frame_upload_destination(create_each_frame_upload_destination())
-    , uploader(new core::sync::WorkWaiter())
 {
-    uploader->push([this] {
-        uploader_queue = std::make_unique<queue::Queue>();
-    });
 }
 
 gearoenix::vulkan::buffer::Manager::~Manager() = default;
@@ -90,29 +86,36 @@ std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::M
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
-    const std::string& name, const void* const data, const std::int64_t size, const core::job::EndCaller<>& end)
+    const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu) {
         return nullptr;
     }
+    cpu->write(data, size);
+
     auto gpu = gpu_root_buffer->allocate(size);
     if (nullptr == gpu) {
         return nullptr;
     }
-    cpu->write(data, size);
-    uploader->push([this, name, cpu = std::move(cpu), gpu, end = end]() mutable {
-        auto cmd = command::Manager::get().create();
-        GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data());
-        cmd->begin();
-        cmd->copy(*cpu, *gpu);
-        cmd->end();
-        auto fence = std::make_shared<sync::Fence>();
-        uploader_queue->submit(*cmd, *fence);
-        uploader->push([cpu = std::move(cpu), gpu = std::move(gpu), end = std::move(end), cmd = std::move(cmd), fence = std::move(fence)] {
-            fence->wait();
-        });
+
+    auto fence = std::make_shared<sync::Fence>();
+
+    auto cmd = command::Manager::create_thread_independent();
+    GX_VK_MARK(name + "-copy-buffer-cmd", cmd->get_vulkan_data());
+    cmd->begin();
+    cmd->copy(*cpu, *gpu);
+    cmd->end();
+    queue::Queue::get().submit(*cmd, *fence);
+
+    core::job::send_job_to_pool([end = std::move(end), fence = std::move(fence), gpu, cpu = std::move(cpu), cmd = std::move(cmd)] {
+        fence->wait();
+        (void)end;
+        (void)gpu;
+        (void)cpu;
+        (void)cmd;
     });
+
     return gpu;
 }
 
