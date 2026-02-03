@@ -52,12 +52,12 @@ void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
     // TODO: render shadows
     // TODO: render reflection probes
 
-    if (render::engine::Engine::get().get_specification().is_deferred_supported) {
+    // if (render::engine::Engine::get().get_specification().is_deferred_supported) {
         // render_with_deferred();
-        GX_UNIMPLEMENTED;
-    } else {
+        // GX_UNIMPLEMENTED;
+    // } else {
         render_forward(vk_cmd);
-    }
+    // }
 }
 
 void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_cmd)

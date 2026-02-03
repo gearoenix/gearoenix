@@ -57,6 +57,8 @@ gearoenix::vulkan::device::Logical::Logical()
     // Dynamic rendering must be supported by the selected physical device.
     GX_ASSERT(supported_v13_features.dynamicRendering == VK_TRUE || supported_dynamic_features.dynamicRendering == VK_TRUE);
     enabled_v13_features.dynamicRendering = VK_TRUE;
+    GX_ASSERT(supported_v13_features.synchronization2 == VK_TRUE);
+    enabled_v13_features.synchronization2 = VK_TRUE;
     // shaderDemoteToHelperInvocation is required but not supported by the selected physical device.
     GX_ASSERT(supported_v13_features.shaderDemoteToHelperInvocation == VK_TRUE);
     enabled_v13_features.shaderDemoteToHelperInvocation = VK_TRUE;

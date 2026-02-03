@@ -174,7 +174,14 @@ void gearoenix::vulkan::engine::Engine::submit()
     vk_scene_manager->submit(vk_cmd);
     imgui_manager->update();
     cmd.end();
-    render_queue->submit(cmd, *frame.render_fence); // TODO: make sure it is the way, maybe I need to call the other function.
+
+    constexpr VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    render_queue->submit(
+        1, frame.present_semaphore->get_vulkan_data_ptr(),
+        &wait_stage,
+        1, cmd.get_vulkan_data_ptr(),
+        1, frame.end_semaphore->get_vulkan_data_ptr(),
+        frame.render_fence->get_vulkan_data());
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()
