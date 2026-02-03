@@ -1,6 +1,8 @@
 #include "gx-vk-loader.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../platform/gx-plt-log.hpp"
+#include "device/gx-vk-dev-logical.hpp"
+#include "gx-vk-instance.hpp"
 
 #include <SDL3/SDL_vulkan.h>
 #include <cstdlib>
@@ -61,7 +63,7 @@ bool gearoenix::vulkan::Loader::load()
     return is_loaded();
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance)
+void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkInstance instance)
 {
 #define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
     if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
@@ -74,7 +76,7 @@ void gearoenix::vulkan::Loader::load([[maybe_unused]] VkInstance instance)
 #undef GX_VULKAN_LOADER_LOAD_FUNCTION
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] VkDevice device)
+void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkDevice device)
 {
 #define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
     if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
@@ -94,7 +96,17 @@ void gearoenix::vulkan::Loader::unload()
 
 PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name)
 {
-    return vkGetInstanceProcAddr(VK_NULL_HANDLE, name);
+    auto result = vkGetInstanceProcAddr(VK_NULL_HANDLE, name);
+    if (result) {
+        return result;
+    }
+
+    result = vkGetInstanceProcAddr(Instance::get().get_vulkan_data(), name);
+    if (result) {
+        return result;
+    }
+
+    return vkGetDeviceProcAddr(device::Logical::get().get_vulkan_data(), name);
 }
 
 #endif

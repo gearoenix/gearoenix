@@ -8,6 +8,8 @@
 layout(constant_id = 0) const bool GX_SPEC_HAS_BONES = false;
 
 layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec4 in_tangent;
 layout(location = 3) in vec2 in_uv;
 layout(location = 4) in vec4 in_bones_weight;
 layout(location = 5) in vec4 in_bones_indices;
@@ -19,6 +21,8 @@ void main() {
     GxShaderDataCamera camera = cameras[pc.camera_index];
     GxShaderDataMaterial material = materials[pc.material_index];
 
+    vec3 ttt = (in_normal + in_tangent.xyz) * 0.00001;
+
     // uv_transform stored in emission_roughness_factor: xy = scale, zw = offset
     out_uv = in_uv * material.emission_roughness_factor.xy + material.emission_roughness_factor.zw;
 
@@ -29,8 +33,8 @@ void main() {
                  (bones[bone_index.z].m * in_bones_weight.z) +
                  (bones[bone_index.w].m * in_bones_weight.w);
 
-        gl_Position = camera.view_projection * m * vec4(in_position, 1.0);
+        gl_Position = camera.view_projection * (m * vec4(in_position + ttt, 1.0));
     } else {
-        gl_Position = camera.view_projection * model.m * vec4(in_position, 1.0);
+        gl_Position = camera.view_projection * (model.m * vec4(in_position, 1.0));
     }
 }

@@ -8,6 +8,11 @@ gearoenix::vulkan::material::Manager::Manager()
     : Singleton<Manager>(this)
     , uniform_indexer(Pbr::max_count + Unlit::max_count + Sprite::max_count)
 {
+    core::Object::register_type<Material, Pbr>();
+
+    core::Object::register_type<Pbr>();
+    core::Object::register_type<Sprite>();
+    core::Object::register_type<Unlit>();
 }
 
 gearoenix::vulkan::material::Manager::~Manager() = default;

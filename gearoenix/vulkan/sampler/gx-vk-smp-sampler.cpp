@@ -11,7 +11,7 @@ gearoenix::vulkan::sampler::Sampler::Sampler(const render::texture::SamplerInfo&
 {
     const auto max_anisotropy = device::Physical::get().get_properties().limits.maxSamplerAnisotropy;
     const auto anisotropic_level = static_cast<float>(sampler_info.get_anisotropic_level());
-    GX_ASSERT_D(anisotropic_level > max_anisotropy);
+    GX_ASSERT_D(anisotropic_level <= max_anisotropy);
 
     VkSamplerCreateInfo info;
     GX_SET_ZERO(info);

@@ -10,7 +10,7 @@
 
 gearoenix::vulkan::engine::Frame::Frame(std::shared_ptr<image::View>&& view)
     : view(std::move(view))
-    , render_fence(new sync::Fence())
+    , render_fence(new sync::Fence(true))
     , present_semaphore(new sync::Semaphore())
     , end_semaphore(new sync::Semaphore())
     , cmd(command::Manager::get().create())
