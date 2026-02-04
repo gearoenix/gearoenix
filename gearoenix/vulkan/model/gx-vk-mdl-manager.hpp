@@ -12,6 +12,8 @@ struct Manager final : render::model::Manager, core::Singleton<Manager> {
 public:
     Manager();
     ~Manager() override;
+
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable) override;
 };
 }
 #endif

@@ -14,7 +14,7 @@
 #include "../mesh/gx-vk-msh-mesh.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 
-gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable)
+gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
     : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
 {
     for (const auto& mesh : meshes) {
@@ -66,17 +66,22 @@ void gearoenix::vulkan::model::Model::after_record(const render::record::CameraM
     sd.m = math::Mat4x4<float>(trn.get_global_matrix());
     sd.inv_transpose_m = math::Mat4x4<float>(trn.get_transposed_inverted_global_matrix());
 
-    auto& bone_indexer = descriptor::UniformIndexer<GxShaderDataBone>::get();
-    sd.bones_begin_index = bone_indexer.get_current_index();
-    for (const auto& all_bones = rec_mdl.armature->get_all_bones(); const auto* const b : all_bones) {
-        auto bone_sd = bone_indexer.get_next();
-        auto& [m, inv_transpose_m] = *bone_sd.get_ptr();
-        m = math::Mat4x4<float>(b->get_global_matrix());
-        inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
-    }
-    sd.bones_end_index = bone_indexer.get_current_index();
-    if (sd.bones_begin_index != sd.bones_end_index) {
-        ++sd.bones_begin_index;
+    if (rec_mdl.armature) {
+        auto& bone_indexer = descriptor::UniformIndexer<GxShaderDataBone>::get();
+        sd.bones_begin_index = bone_indexer.get_current_index();
+        for (const auto& all_bones = rec_mdl.armature->get_all_bones(); const auto* const b : all_bones) {
+            auto bone_sd = bone_indexer.get_next();
+            auto& [m, inv_transpose_m] = *bone_sd.get_ptr();
+            m = math::Mat4x4<float>(b->get_global_matrix());
+            inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
+        }
+        sd.bones_end_index = bone_indexer.get_current_index();
+        if (sd.bones_begin_index != sd.bones_end_index) {
+            ++sd.bones_begin_index;
+        }
+    } else {
+        sd.bones_begin_index = 0;
+        sd.bones_end_index = 0;
     }
 
     sd.point_light_begin_index = 0;
