@@ -86,7 +86,7 @@ void gearoenix::vulkan::camera::Camera::render_forward(
 
     const auto render_models = [&](auto& models) {
         for (const auto& camera_model : models | std::views::values) {
-            pc.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
+            pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index]: 0;
             core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, cmd, pc, current_bound_pipeline);
         }
     };
