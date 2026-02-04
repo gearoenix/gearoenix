@@ -84,6 +84,28 @@ void gearoenix::vulkan::camera::Camera::render_forward(
         return gapi_target.get_default().main->create_rendering_scope(cmd);
     }();
 
+    const VkViewport viewport {
+        .x = cmr.viewport_clip.x,
+        .y = cmr.viewport_clip.y,
+        .width = cmr.viewport_clip.z,
+        .height = cmr.viewport_clip.w,
+        .minDepth = 0.0f,
+        .maxDepth = 1.0f,
+    };
+    vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+    const VkRect2D scissor {
+        .offset = {
+            .x = static_cast<std::int32_t>(cmr.viewport_clip.x),
+            .y = static_cast<std::int32_t>(cmr.viewport_clip.y),
+        },
+        .extent = {
+            .width = static_cast<std::uint32_t>(cmr.viewport_clip.z),
+            .height = static_cast<std::uint32_t>(cmr.viewport_clip.w),
+        },
+    };
+    vkCmdSetScissor(cmd, 0, 1, &scissor);
+
     const auto render_models = [&](auto& models) {
         for (const auto& camera_model : models | std::views::values) {
             pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index]: 0;
