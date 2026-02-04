@@ -6,7 +6,6 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-swapchain.hpp"
 #include "../shader/gx-vk-shd-manager.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
 #include "gx-vk-pip-cache.hpp"
@@ -118,8 +117,9 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
 
     const auto& physical_device = device::Physical::get();
     const auto& bindless = descriptor::Bindless::get();
-    const auto depth_format = physical_device.get_supported_depth_format();
-    const auto color_format = Swapchain::get().get_format().format;
+    constexpr auto depth_format = VK_FORMAT_D32_SFLOAT;
+    // Forward rendering uses HDR render targets (RgbaFloat16), not the swapchain format
+    constexpr auto color_format = VK_FORMAT_R16G16B16A16_SFLOAT;
 
     std::array<VkPipelineShaderStageCreateInfo, 2> stages{};
     GX_SET_ZERO(stages);
