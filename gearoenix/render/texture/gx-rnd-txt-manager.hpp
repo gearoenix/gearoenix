@@ -23,7 +23,7 @@ struct Target;
 
 struct DefaultCameraTargets final {
     std::shared_ptr<Target> main;
-    std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 4> targets; // TODO: see all the usages and make sure the new 4 thing is correct for them
+    std::array<std::array<std::shared_ptr<Target>, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT>, 2> targets;
 };
 
 struct Manager : core::Singleton<Manager> {

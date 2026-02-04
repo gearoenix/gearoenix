@@ -426,10 +426,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_1d_image(const std::uint32_t 
 {
     const std::lock_guard _lg(allocation_lock);
     GX_ASSERT_D(index < max_1d_images);
-    
-    // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(0, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
-    
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_1d_image_indices.push_back(index);
 }
 
@@ -437,10 +434,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_2d_image(const std::uint32_t 
 {
     const std::lock_guard _lg(allocation_lock);
     GX_ASSERT_D(index < max_2d_images);
-    
-    // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(1, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
-    
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_2d_image_indices.push_back(index);
 }
 
@@ -448,10 +442,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_3d_image(const std::uint32_t 
 {
     const std::lock_guard _lg(allocation_lock);
     GX_ASSERT_D(index < max_3d_images);
-    
-    // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(2, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
-    
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_3d_image_indices.push_back(index);
 }
 
@@ -459,10 +450,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_cube_image(const std::uint32_
 {
     const std::lock_guard _lg(allocation_lock);
     GX_ASSERT_D(index < max_cube_images);
-    
-    // Write a null descriptor to avoid undefined behaviour
-    write_image_descriptor(3, index, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED);
-    
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_cube_image_indices.push_back(index);
 }
 
@@ -470,10 +458,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t i
 {
     const std::lock_guard _lg(allocation_lock);
     GX_ASSERT_D(index < max_samplers);
-    
-    // Write a null descriptor to avoid undefined behaviour
-    write_sampler_descriptor(index, VK_NULL_HANDLE);
-    
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_sampler_indices.push_back(index);
 }
 

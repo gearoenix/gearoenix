@@ -13,16 +13,29 @@
 
 namespace {
 gearoenix::vulkan::texture::Texture2D *brdflut = nullptr;
+
+void initialize_brdflut()
+{
+    if (brdflut) {
+        return;
+    }
+
+    gearoenix::render::texture::Manager::get().get_brdflut(gearoenix::core::job::EndCallerShared<gearoenix::render::texture::Texture2D>([](auto&& t) {
+        brdflut = gearoenix::core::cast_ptr<gearoenix::vulkan::texture::Texture2D>(t.get());
+    }));
+}
 }
 
 gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const double layer)
     : render::scene::Scene(e, core::ecs::ComponentType::create_index(this), layer, std::move(name))
 {
+    initialize_brdflut();
 }
 
 gearoenix::vulkan::scene::Scene::Scene(const core::object_id_t id, std::string&& name)
     : render::scene::Scene(core::ecs::ComponentType::create_index(this), id, std::move(name))
 {
+    initialize_brdflut();
 }
 
 void gearoenix::vulkan::scene::Scene::read(

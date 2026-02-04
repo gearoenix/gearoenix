@@ -44,6 +44,6 @@ void gearoenix::vulkan::texture::Texture2D::write(
     const core::job::EndCaller<>&,
     bool) const
 {
-    GX_UNIMPLEMENTED;
+    GX_TODO;
 }
 #endif

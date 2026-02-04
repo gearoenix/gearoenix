@@ -23,6 +23,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_ba
     std::shared_ptr<render::texture::TextureCube>&& radiance,
     const math::Aabb3<double>& include_box)
 {
+    GX_UNIMPLEMENTED;
 }
 
 void gearoenix::vulkan::reflection::Manager::build_runtime(

@@ -6,6 +6,7 @@
 gearoenix::render::mesh::Manager::Manager()
     : Singleton(this)
 {
+    core::Object::register_type<Mesh>();
 }
 
 gearoenix::render::mesh::Manager::~Manager() = default;

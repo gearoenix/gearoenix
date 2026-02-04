@@ -6,12 +6,14 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 
 gearoenix::vulkan::camera::Manager::Manager()
     : Singleton<Manager>(this)
     , camera_uniform_indexer(Camera::max_count)
     , cameras_joint_models_uniform_indexer(render::record::Camera::cameras_joint_models_max_count)
 {
+    core::ecs::ComponentType::add<Camera>();
 }
 
 gearoenix::vulkan::camera::Manager::~Manager() = default;

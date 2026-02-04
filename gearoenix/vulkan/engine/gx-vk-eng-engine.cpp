@@ -95,16 +95,34 @@ gearoenix::vulkan::engine::Engine::Engine()
 
 gearoenix::vulkan::engine::Engine::~Engine()
 {
-    world = nullptr;
-    bindless_descriptor_manager = nullptr;
+    core::job::execute_current_thread_jobs();
     logical_device->wait_to_finish();
+    world = nullptr;
+    sampler_manager = nullptr;
+    buffer_manager = nullptr;
+    render_queue = nullptr;
+    mesh_manager = nullptr;
+    texture_manager = nullptr;
+    material_manager = nullptr;
+    model_manager = nullptr;
+    camera_manager = nullptr;
+    light_manager = nullptr;
+    scene_manager = nullptr;
+    reflection_manager = nullptr;
+    bindless_descriptor_manager = nullptr;
     imgui_manager = nullptr;
+    logical_device->wait_to_finish();
     frames = {};
 }
 
 void gearoenix::vulkan::engine::Engine::start_frame()
 {
+    core::job::execute_current_thread_jobs();
+
     render::engine::Engine::start_frame();
+
+    core::job::execute_current_thread_jobs();
+
     if (swapchain_image_is_valid) {
         frames[frame_number]->render_fence->wait();
     } else if (!platform::BaseApplication::get().get_window_resizing()) {
@@ -116,7 +134,13 @@ void gearoenix::vulkan::engine::Engine::start_frame()
         swapchain_image_is_valid = true;
         swapchain_image_index = 0;
     }
+
+    core::job::execute_current_thread_jobs();
+
     imgui_manager->start_frame();
+
+    core::job::execute_current_thread_jobs();
+
     if (swapchain_image_is_valid) {
         const auto& frame_data = *frames[frame_number];
         if (const auto next_image = swapchain->get_next_image_index(*frame_data.present_semaphore); next_image.has_value()) {
@@ -136,6 +160,8 @@ void gearoenix::vulkan::engine::Engine::end_frame()
         submit();
         swapchain_image_is_valid = present();
     }
+
+    core::job::execute_current_thread_jobs();
 }
 
 void gearoenix::vulkan::engine::Engine::upload_imgui_fonts()

@@ -6,6 +6,7 @@
 gearoenix::vulkan::mesh::Manager::Manager()
     : Singleton<Manager>(this)
 {
+    core::Object::register_type<Mesh>();
 }
 
 gearoenix::vulkan::mesh::Manager::~Manager() = default;

@@ -15,7 +15,7 @@
 #include "pipeline/gx-vk-pip-manager.hpp"
 #include "queue/gx-vk-qu-queue.hpp"
 
-#include <imgui/backends/imgui_impl_vulkan.h>
+#include <ImGui/backends/imgui_impl_vulkan.h>
 
 gearoenix::vulkan::ImGuiManager::ImGuiManager()
 {
@@ -93,11 +93,6 @@ void gearoenix::vulkan::ImGuiManager::end_frame()
 
 void gearoenix::vulkan::ImGuiManager::update()
 {
-    auto* const draw_data = ImGui::GetDrawData();
-    if (nullptr == draw_data || draw_data->TotalVtxCount == 0) {
-        return;
-    }
-
     auto& e = core::Singleton<engine::Engine>::get();
     const auto& frame = e.get_current_frame();
     const auto& swapchain_view = *frame.view;
@@ -105,63 +100,91 @@ void gearoenix::vulkan::ImGuiManager::update()
     const auto vk_cmd = frame.cmd->get_vulkan_data();
     const auto vk_image = swapchain_image.get_vulkan_data();
 
-    // Transition swapchain image to color attachment optimal
-    {
+    auto* const draw_data = ImGui::GetDrawData();
+    const bool has_draw_data = nullptr != draw_data && draw_data->TotalVtxCount > 0;
+
+    if (has_draw_data) {
+        // Transition swapchain image to color attachment optimal
+        {
+            VkImageMemoryBarrier barrier;
+            GX_SET_ZERO(barrier);
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.image = vk_image;
+            barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            barrier.subresourceRange.baseMipLevel = 0;
+            barrier.subresourceRange.levelCount = 1;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.layerCount = 1;
+
+            vkCmdPipelineBarrier(
+                vk_cmd,
+                VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                0, 0, nullptr, 0, nullptr, 1, &barrier);
+        }
+
+        // Begin dynamic rendering
+        VkRenderingAttachmentInfo color_attachment;
+        GX_SET_ZERO(color_attachment);
+        color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+        color_attachment.imageView = swapchain_view.get_vulkan_data();
+        color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        color_attachment.clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
+
+        VkRenderingInfo rendering_info;
+        GX_SET_ZERO(rendering_info);
+        rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        rendering_info.renderArea.extent = { swapchain_view.get_extent().width, swapchain_view.get_extent().height };
+        rendering_info.layerCount = 1;
+        rendering_info.colorAttachmentCount = 1;
+        rendering_info.pColorAttachments = &color_attachment;
+
+        vkCmdBeginRendering(vk_cmd, &rendering_info);
+
+        ImGui_ImplVulkan_RenderDrawData(draw_data, vk_cmd);
+
+        vkCmdEndRendering(vk_cmd);
+
+        // Transition swapchain image to present
+        {
+            VkImageMemoryBarrier barrier;
+            GX_SET_ZERO(barrier);
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            barrier.dstAccessMask = 0;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.image = vk_image;
+            barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            barrier.subresourceRange.baseMipLevel = 0;
+            barrier.subresourceRange.levelCount = 1;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.layerCount = 1;
+
+            vkCmdPipelineBarrier(
+                vk_cmd,
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                0, 0, nullptr, 0, nullptr, 1, &barrier);
+        }
+    } else {
+        // No draw data, but still need to transition to present layout
         VkImageMemoryBarrier barrier;
         GX_SET_ZERO(barrier);
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.srcAccessMask = 0;
-        barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        barrier.image = vk_image;
-        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        barrier.subresourceRange.baseMipLevel = 0;
-        barrier.subresourceRange.levelCount = 1;
-        barrier.subresourceRange.baseArrayLayer = 0;
-        barrier.subresourceRange.layerCount = 1;
-
-        vkCmdPipelineBarrier(
-            vk_cmd,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
-    }
-
-    // Begin dynamic rendering
-    VkRenderingAttachmentInfo color_attachment;
-    GX_SET_ZERO(color_attachment);
-    color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-    color_attachment.imageView = swapchain_view.get_vulkan_data();
-    color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    color_attachment.clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
-
-    VkRenderingInfo rendering_info;
-    GX_SET_ZERO(rendering_info);
-    rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-    rendering_info.renderArea.extent = { swapchain_view.get_extent().width, swapchain_view.get_extent().height };
-    rendering_info.layerCount = 1;
-    rendering_info.colorAttachmentCount = 1;
-    rendering_info.pColorAttachments = &color_attachment;
-
-    vkCmdBeginRendering(vk_cmd, &rendering_info);
-
-    ImGui_ImplVulkan_RenderDrawData(draw_data, vk_cmd);
-
-    vkCmdEndRendering(vk_cmd);
-
-    // Transition swapchain image to present
-    {
-        VkImageMemoryBarrier barrier;
-        GX_SET_ZERO(barrier);
-        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         barrier.dstAccessMask = 0;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -174,7 +197,7 @@ void gearoenix::vulkan::ImGuiManager::update()
 
         vkCmdPipelineBarrier(
             vk_cmd,
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
             0, 0, nullptr, 0, nullptr, 1, &barrier);
     }

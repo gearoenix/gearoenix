@@ -46,7 +46,7 @@ void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(
     }
     auto img = std::shared_ptr(result->get_view()->get_image());
     c.set_return(std::move(result));
-    image::Manager::get().upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] {}));
+    image::Manager::upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] {}));
 }
 
 void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(

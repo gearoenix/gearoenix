@@ -1,5 +1,6 @@
 #include "gx-vk-img-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
+#include "../../core/macro/gx-cr-mcr-flagger.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
@@ -11,6 +12,29 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "gx-vk-img-image.hpp"
+
+namespace {
+[[nodiscard]] VkImageAspectFlags get_aspect_flags(const VkFormat format, const VkImageUsageFlags usage)
+{
+    if (!GX_FLAG_CHECK(usage, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
+        return VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+    switch (format) {
+    case VK_FORMAT_D16_UNORM:
+    case VK_FORMAT_D32_SFLOAT:
+    case VK_FORMAT_X8_D24_UNORM_PACK32:
+        return VK_IMAGE_ASPECT_DEPTH_BIT;
+    case VK_FORMAT_S8_UINT:
+        return VK_IMAGE_ASPECT_STENCIL_BIT;
+    case VK_FORMAT_D16_UNORM_S8_UINT:
+    case VK_FORMAT_D24_UNORM_S8_UINT:
+    case VK_FORMAT_D32_SFLOAT_S8_UINT:
+        return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    default:
+        GX_UNEXPECTED;
+    }
+}
+}
 
 gearoenix::vulkan::image::Manager::Manager()
     : Singleton(this)
@@ -33,6 +57,8 @@ void gearoenix::vulkan::image::Manager::upload(
     const auto provided_mip_count = buffs.empty() ? 0u : static_cast<std::uint32_t>(buffs[0].size());
     const bool needs_mip_generation = generate_mipmaps && provided_mip_count == 1 && mip_levels > 1;
 
+    const auto aspect_flags = get_aspect_flags(img->get_format(), img->get_usage());
+
     VkImageMemoryBarrier barrier;
     GX_SET_ZERO(barrier);
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -41,7 +67,7 @@ void gearoenix::vulkan::image::Manager::upload(
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.image = img->get_vulkan_data();
-    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.aspectMask = aspect_flags;
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = mip_levels;
     barrier.subresourceRange.baseArrayLayer = 0;
@@ -65,7 +91,7 @@ void gearoenix::vulkan::image::Manager::upload(
             region.bufferOffset = 0;
             region.bufferRowLength = 0;
             region.bufferImageHeight = 0;
-            region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            region.imageSubresource.aspectMask = aspect_flags;
             region.imageSubresource.mipLevel = mip_index;
             region.imageSubresource.baseArrayLayer = array_index;
             region.imageSubresource.layerCount = 1;
@@ -103,7 +129,7 @@ void gearoenix::vulkan::image::Manager::upload(
             GX_SET_ZERO(blit);
             blit.srcOffsets[0] = { 0, 0, 0 };
             blit.srcOffsets[1] = { mip_width, mip_height, mip_depth };
-            blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.srcSubresource.aspectMask = aspect_flags;
             blit.srcSubresource.mipLevel = mip - 1;
             blit.srcSubresource.baseArrayLayer = 0;
             blit.srcSubresource.layerCount = array_layers;
@@ -114,7 +140,7 @@ void gearoenix::vulkan::image::Manager::upload(
 
             blit.dstOffsets[0] = { 0, 0, 0 };
             blit.dstOffsets[1] = { next_width, next_height, next_depth };
-            blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.dstSubresource.aspectMask = aspect_flags;
             blit.dstSubresource.mipLevel = mip;
             blit.dstSubresource.baseArrayLayer = 0;
             blit.dstSubresource.layerCount = array_layers;

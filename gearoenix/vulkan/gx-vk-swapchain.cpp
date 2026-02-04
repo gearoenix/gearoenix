@@ -3,14 +3,15 @@
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "device/gx-vk-dev-logical.hpp"
-#include <utility>
 #include "device/gx-vk-dev-physical.hpp"
 #include "engine/gx-vk-eng-engine.hpp"
 #include "gx-vk-check.hpp"
 #include "gx-vk-surface.hpp"
-#include "sync/gx-vk-sync-semaphore.hpp"
-#include "image/gx-vk-img-view.hpp"
 #include "image/gx-vk-img-image.hpp"
+#include "image/gx-vk-img-view.hpp"
+#include "sync/gx-vk-sync-semaphore.hpp"
+
+#include <utility>
 
 #if GX_DEBUG_MODE
 #define GX_DEBUG_SWAPCHAIN true
@@ -18,7 +19,7 @@
 
 gearoenix::vulkan::Swapchain::Swapchain()
     : Singleton(this)
-    , format {}
+    , format { }
 {
     initialize();
 }
@@ -51,7 +52,7 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
 
 void gearoenix::vulkan::Swapchain::initialize()
 {
-    image_views = {};
+    image_views = { };
 
     const auto& physical_device = device::Physical::get();
     const auto& logical_device = device::Logical::get();
@@ -100,8 +101,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 &&
-        caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
+    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 && caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
         info.imageExtent = caps.currentExtent;
     } else {
         const auto window_size = platform::BaseApplication::get().get_window_size();
@@ -137,7 +137,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
 
     for (auto i = 0; i < count; ++i) {
-        image_views[i] = std::make_shared<image::View>(std::make_unique<image::Image>(
+        auto img = std::make_unique<image::Image>(
             static_cast<std::uint32_t>(info.imageExtent.width),
             static_cast<std::uint32_t>(info.imageExtent.height),
             static_cast<std::uint32_t>(1),
@@ -147,7 +147,9 @@ void gearoenix::vulkan::Swapchain::initialize()
             info.imageFormat,
             static_cast<VkImageCreateFlags>(0),
             info.imageUsage,
-            images[i]));
+            images[i]);
+        img->set_owned(false);
+        image_views[i] = std::make_shared<image::View>(std::move(img));
     }
     if (nullptr != old_swapchain) {
         vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);

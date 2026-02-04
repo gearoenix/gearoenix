@@ -21,6 +21,13 @@ struct PushConstants;
 namespace gearoenix::vulkan::mesh {
 struct Buffer;
 struct Mesh final : render::mesh::Mesh {
+    GEAROENIX_OBJECT_STRUCT_DEF;
+
+    constexpr static auto object_type_index = gearoenix_gapi_mesh_type_index;
+    constexpr static std::array all_parent_object_type_indices { render::mesh::Mesh::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { render::mesh::Mesh::object_type_index };
+
+
     GX_GET_CREF_PRV(std::shared_ptr<Buffer>, gapi_buffer);
     GX_GET_CREF_PRV(std::shared_ptr<material::Material>, gapi_material);
 

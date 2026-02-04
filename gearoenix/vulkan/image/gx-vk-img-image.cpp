@@ -84,7 +84,9 @@ gearoenix::vulkan::image::Image::Image(
 
 gearoenix::vulkan::image::Image::~Image()
 {
-    vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
+    if (owned) {
+        vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
+    }
 }
 
 //
