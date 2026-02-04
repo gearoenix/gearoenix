@@ -42,6 +42,7 @@ public:
     Mesh(const Mesh&) = delete;
 
     void draw(VkCommandBuffer cmd, pipeline::PushConstants& pc) const;
+    void set_material(std::shared_ptr<render::material::Material>&& material) override;
 };
 }
 

@@ -7,6 +7,8 @@
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../material/gx-vk-mat-material.hpp"
+#include "../../render/material/gx-rnd-mat-material.hpp"
 #include "gx-vk-msh-buffer.hpp"
 
 gearoenix::vulkan::mesh::Mesh::Mesh(
@@ -14,8 +16,18 @@ gearoenix::vulkan::mesh::Mesh::Mesh(
     std::shared_ptr<render::mesh::Buffer>&& buffer,
     std::shared_ptr<render::material::Material>&& material)
     : render::mesh::Mesh(std::move(name), std::move(buffer), std::move(material))
-    , gapi_buffer(std::dynamic_pointer_cast<Buffer>(this->buffer))
+    , gapi_buffer(core::cast_shared<Buffer>(std::shared_ptr(this->buffer)))
+    , gapi_material(std::dynamic_pointer_cast<material::Material>(this->bound_material))
 {
+}
+
+void gearoenix::vulkan::mesh::Mesh::construct(
+    std::string&& name,
+    std::shared_ptr<render::mesh::Buffer>&& buffer,
+    std::shared_ptr<render::material::Material>&& material,
+    const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
+{
+    end_callback.set_return(Object::construct<Mesh>(std::move(name), std::move(buffer), std::move(material)));
 }
 
 gearoenix::vulkan::mesh::Mesh::~Mesh() = default;
@@ -37,13 +49,10 @@ void gearoenix::vulkan::mesh::Mesh::draw(const VkCommandBuffer cmd, pipeline::Pu
     vkCmdDrawIndexed(cmd, gapi_buffer->get_indices_count(), 1, 0, 0, 0);
 }
 
-void gearoenix::vulkan::mesh::Mesh::construct(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material,
-    const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
+void gearoenix::vulkan::mesh::Mesh::set_material(std::shared_ptr<render::material::Material>&& material)
 {
-    end_callback.set_return(Object::construct<Mesh>(std::move(name), std::move(buffer), std::move(material)));
+    render::mesh::Mesh::set_material(std::move(material));
+    gapi_material = std::dynamic_pointer_cast<material::Material>(this->bound_material);
 }
 
 #endif
