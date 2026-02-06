@@ -90,8 +90,15 @@ void gearoenix::vulkan::Swapchain::initialize()
     std::uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
     vkGetPhysicalDeviceFormatProperties(physical_device.get_vulkan_data(), format.format, &format_props);
-    if ((format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
+    // Enable transfer source if supported (for screenshots, etc.)
+    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) != 0
+        && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    }
+    // Enable transfer destination if supported (for blitting camera render targets to swapchain)
+    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT) != 0
+        && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_DST_BIT) != 0) {
+        image_usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     }
 
     VkSwapchainCreateInfoKHR info;

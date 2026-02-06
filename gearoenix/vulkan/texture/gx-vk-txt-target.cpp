@@ -85,7 +85,7 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
             GX_SET_ZERO(attachment_info);
             attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
             attachment_info.imageView = view.get_vulkan_data();
-            attachment_info.imageLayout = view.get_layout();
+            attachment_info.imageLayout = view.get_image()->get_layout();
             attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 

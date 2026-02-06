@@ -96,22 +96,27 @@ void gearoenix::vulkan::ImGuiManager::update()
     auto& e = core::Singleton<engine::Engine>::get();
     const auto& frame = e.get_current_frame();
     const auto& swapchain_view = *frame.view;
-    const auto& swapchain_image = *swapchain_view.get_image();
+    auto& swapchain_image = *swapchain_view.get_image();
     const auto vk_cmd = frame.cmd->get_vulkan_data();
     const auto vk_image = swapchain_image.get_vulkan_data();
+
+    // Capture original layout before any transitions to determine if scene content is present
+    const auto original_layout = swapchain_image.get_layout();
+    const bool scene_content_present = original_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     auto* const draw_data = ImGui::GetDrawData();
     const bool has_draw_data = nullptr != draw_data && draw_data->TotalVtxCount > 0;
 
     if (has_draw_data) {
-        // Transition swapchain image to color attachment optimal
-        {
+        // Transition swapchain image to color attachment optimal if needed
+        if (original_layout != VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+            const bool from_undefined = original_layout == VK_IMAGE_LAYOUT_UNDEFINED;
             VkImageMemoryBarrier barrier;
             GX_SET_ZERO(barrier);
             barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            barrier.srcAccessMask = 0;
+            barrier.srcAccessMask = from_undefined ? 0 : VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
             barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            barrier.oldLayout = original_layout;
             barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -124,9 +129,11 @@ void gearoenix::vulkan::ImGuiManager::update()
 
             vkCmdPipelineBarrier(
                 vk_cmd,
-                VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                from_undefined ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
                 VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
                 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+            swapchain_image.set_layout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         }
 
         // Begin dynamic rendering
@@ -135,7 +142,8 @@ void gearoenix::vulkan::ImGuiManager::update()
         color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
         color_attachment.imageView = swapchain_view.get_vulkan_data();
         color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        // If scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content
+        color_attachment.loadOp = scene_content_present ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
         color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         color_attachment.clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
 
@@ -178,13 +186,13 @@ void gearoenix::vulkan::ImGuiManager::update()
                 0, 0, nullptr, 0, nullptr, 1, &barrier);
         }
     } else {
-        // No draw data, but still need to transition to present layout
+        // No ImGui draw data - just transition to PRESENT based on current layout
         VkImageMemoryBarrier barrier;
         GX_SET_ZERO(barrier);
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier.srcAccessMask = 0;
+        barrier.srcAccessMask = scene_content_present ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : 0;
         barrier.dstAccessMask = 0;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.oldLayout = original_layout;
         barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -197,10 +205,12 @@ void gearoenix::vulkan::ImGuiManager::update()
 
         vkCmdPipelineBarrier(
             vk_cmd,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            scene_content_present ? VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT : VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
             0, 0, nullptr, 0, nullptr, 1, &barrier);
     }
+
+    swapchain_image.set_layout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
 #endif

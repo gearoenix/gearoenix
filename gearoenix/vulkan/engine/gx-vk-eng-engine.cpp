@@ -16,6 +16,7 @@
 #include "../gx-vk-surface.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-manager.hpp"
+#include "../image/gx-vk-img-view.hpp"
 #include "../light/gx-vk-lt-manager.hpp"
 #include "../material/gx-vk-mat-manager.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
@@ -145,6 +146,8 @@ void gearoenix::vulkan::engine::Engine::start_frame()
         const auto& frame_data = *frames[frame_number];
         if (const auto next_image = swapchain->get_next_image_index(*frame_data.present_semaphore); next_image.has_value()) {
             swapchain_image_index = *next_image;
+            // Reset swapchain image layout to UNDEFINED after acquiring the image
+            frames[swapchain_image_index]->view->get_image()->set_layout(VK_IMAGE_LAYOUT_UNDEFINED);
             frame_data.render_fence->reset();
         } else {
             swapchain_image_is_valid = false;

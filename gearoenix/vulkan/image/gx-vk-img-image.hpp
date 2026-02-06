@@ -28,6 +28,7 @@ struct Image final {
     GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0);
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
     GX_GETSET_VAL_PRV(bool, owned, true);
+    GX_GETSET_VAL_PRV(VkImageLayout, layout, VK_IMAGE_LAYOUT_UNDEFINED);
 
 public:
     Image(Image&&) = delete;
