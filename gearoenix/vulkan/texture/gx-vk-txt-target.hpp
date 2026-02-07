@@ -5,10 +5,15 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 #include "../gx-vk-loader.hpp"
+#include "../image/gx-vk-img-image.hpp"
 
 #include <memory>
 #include <variant>
 #include <vector>
+
+namespace gearoenix::vulkan::image {
+struct View;
+}
 
 namespace gearoenix::vulkan::texture {
 struct Texture2D;
@@ -31,6 +36,8 @@ struct Target final : render::texture::Target {
         constexpr static std::uint32_t VARIANT_CUBE_INDEX = 1;
 
         std::variant<std::shared_ptr<Texture2D>, std::shared_ptr<TextureCube>> texture;
+        std::shared_ptr<image::View> view;
+        image::TransitionRequest transition_request;
     };
 
     GX_GET_CREF_PRV(std::vector<GapiAttachment>, gapi_attachments);

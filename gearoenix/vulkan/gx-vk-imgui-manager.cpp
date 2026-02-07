@@ -102,12 +102,9 @@ void gearoenix::vulkan::ImGuiManager::update()
     // Capture if scene content is present before any transitions to determine the load operation
     const bool scene_content_present = swapchain_image.get_layout() == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    auto* const draw_data = ImGui::GetDrawData();
-    const bool has_draw_data = nullptr != draw_data && draw_data->TotalVtxCount > 0;
-
-    if (has_draw_data) {
-        // Transition swapchain image to color attachment optimal if needed
-        swapchain_image.transit(vk_cmd, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    if (auto* const draw_data = ImGui::GetDrawData(); nullptr != draw_data && draw_data->TotalVtxCount > 0) {
+        // Transition swapchain image to colour attachment optimal if needed
+        swapchain_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
 
         // Begin dynamic rendering
         VkRenderingAttachmentInfo color_attachment;
@@ -115,7 +112,7 @@ void gearoenix::vulkan::ImGuiManager::update()
         color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
         color_attachment.imageView = swapchain_view.get_vulkan_data();
         color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        // If scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content
+        // If a scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content.
         color_attachment.loadOp = scene_content_present ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
         color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         color_attachment.clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
@@ -136,7 +133,7 @@ void gearoenix::vulkan::ImGuiManager::update()
     }
 
     // Transition swapchain image to present
-    swapchain_image.transit(vk_cmd, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    swapchain_image.transit(vk_cmd, image::TransitionRequest::present());
 }
 
 #endif

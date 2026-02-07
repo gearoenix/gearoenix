@@ -153,3 +153,7 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         // TODO: I have to show all other things
     });
 }
+
+void gearoenix::render::engine::Engine::flush()
+{
+}

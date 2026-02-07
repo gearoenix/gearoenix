@@ -36,7 +36,7 @@ void gearoenix::vulkan::image::Manager::upload(
     const auto aspect_flags = img->get_aspect_flags();
 
     // Transition the entire image to TRANSFER_DST_OPTIMAL for upload
-    img->transit(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    img->transit(vk_cmd, TransitionRequest::transfer_dst());
 
     std::uint32_t array_index = 0;
     for (const auto& array_buffs : buffs) {
@@ -73,7 +73,7 @@ void gearoenix::vulkan::image::Manager::upload(
 
         for (std::uint32_t mip = 1; mip < mip_levels; ++mip) {
             // Transition previous mip level to TRANSFER_SRC
-            img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, mip - 1, 1);
+            img->transit(vk_cmd, TransitionRequest::transfer_src().with_mips(mip - 1, 1));
 
             VkImageBlit blit;
             GX_SET_ZERO(blit);
@@ -103,7 +103,7 @@ void gearoenix::vulkan::image::Manager::upload(
                 VK_FILTER_LINEAR);
 
             // Transition the source mip to SHADER_READ_ONLY
-            img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mip - 1, 1);
+            img->transit(vk_cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));
 
             mip_width = next_width;
             mip_height = next_height;
@@ -111,10 +111,10 @@ void gearoenix::vulkan::image::Manager::upload(
         }
 
         // Transition last mip level to SHADER_READ_ONLY
-        img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mip_levels - 1, 1);
+        img->transit(vk_cmd, TransitionRequest::shader_read().with_mips(mip_levels - 1, 1));
     } else {
         // Transition the entire image to SHADER_READ_ONLY
-        img->transit(vk_cmd, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        img->transit(vk_cmd, TransitionRequest::shader_read());
     }
 
     cmd->end();

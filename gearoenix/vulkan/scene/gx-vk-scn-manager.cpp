@@ -155,10 +155,10 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
 
                 // Transition source image from COLOR_ATTACHMENT_OPTIMAL (after rendering) to TRANSFER_SRC_OPTIMAL
                 // Note: After rendering completes, the image is in COLOR_ATTACHMENT_OPTIMAL layout.
-                src_image.transit(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                src_image.transit(vk_cmd, image::TransitionRequest::transfer_src());
 
                 // Transition swapchain image to TRANSFER_DST_OPTIMAL (with clear on first camera)
-                swapchain_image.transit(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                swapchain_image.transit(vk_cmd, image::TransitionRequest::transfer_dst());
 
                 // Clear swapchain on first camera blit (to get black bars)
                 if (first_camera) {
@@ -197,7 +197,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
                     VK_FILTER_LINEAR);
 
                 // Transition the source image back to COLOR_ATTACHMENT_OPTIMAL for the next frame's rendering.
-                src_image.transit(vk_cmd, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+                src_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
 
                 first_camera = false;
             }
@@ -205,7 +205,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
 
         // If we blitted, transition swapchain to COLOR_ATTACHMENT_OPTIMAL for ImGui
         if (swapchain_image.get_layout() == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-            swapchain_image.transit(vk_cmd, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            swapchain_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
         }
     }
 }

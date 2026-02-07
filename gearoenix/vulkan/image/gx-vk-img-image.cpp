@@ -11,31 +11,132 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
-namespace {
-[[nodiscard]] std::pair<VkAccessFlags, VkPipelineStageFlags> get_layout_access_and_stage(const VkImageLayout layout)
+
+bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
 {
-    switch (layout) {
-    case VK_IMAGE_LAYOUT_UNDEFINED:
-        return { 0, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT };
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-        return { VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT };
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-        return { VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT };
-    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-        return { VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT };
-    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-        return { VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-        return {
-            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
-        };
-    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
-        return { 0, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT };
-    default:
-        GX_UNEXPECTED;
-    }
+    return layout == other.layout
+        && queue_family_index == other.queue_family_index
+        && access == other.access
+        && stage == other.stage;
 }
+
+bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const
+{
+    return per_mip_states == other.per_mip_states;
+}
+
+bool gearoenix::vulkan::image::Image::State::is_uniform() const
+{
+    if (per_array_states.empty()) {
+        return true;
+    }
+    const auto& first = per_array_states[0].per_mip_states[0];
+    for (const auto& array_state : per_array_states) {
+        for (const auto& mip_state : array_state.per_mip_states) {
+            if (!(mip_state == first)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool gearoenix::vulkan::image::Image::State::has_uniform_layout() const
+{
+    if (per_array_states.empty()) {
+        return true;
+    }
+
+    const auto first = per_array_states[0].per_mip_states[0].layout;
+    for (const auto& [per_mip_states] : per_array_states) {
+        for (const auto& mip_state : per_mip_states) {
+            if (first != mip_state.layout) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::shader_read(const VkPipelineStageFlags2 stage)
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        .access = VK_ACCESS_2_SHADER_READ_BIT,
+        .stage = stage,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_dst()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        .access = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_src()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        .access = VK_ACCESS_2_TRANSFER_READ_BIT,
+        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::color_attachment()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .access = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::depth_attachment()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        .access = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::present()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .access = VK_ACCESS_2_NONE,
+        .stage = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_mips(
+    const std::uint32_t base, const std::uint32_t count) const
+{
+    auto result = *this;
+    result.base_mip = base;
+    result.mip_count = count;
+    return result;
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_layers(
+    const std::uint32_t base, const std::uint32_t count) const
+{
+    auto result = *this;
+    result.base_layer = base;
+    result.layer_count = count;
+    return result;
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_queue_family(
+    const std::uint32_t family) const
+{
+    auto result = *this;
+    result.queue_family = family;
+    return result;
 }
 
 gearoenix::vulkan::image::Image::Image(
@@ -60,6 +161,7 @@ gearoenix::vulkan::image::Image::Image(
     , flags(flags)
     , usage(usage)
     , vulkan_data(vulkan_data)
+    , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
     GX_VK_MARK(name, vulkan_data);
 }
@@ -84,6 +186,7 @@ gearoenix::vulkan::image::Image::Image(
     , format(format)
     , flags(flags)
     , usage(usage)
+    , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
     auto& logical_device = device::Logical::get();
 
@@ -122,6 +225,14 @@ gearoenix::vulkan::image::Image::~Image()
     }
 }
 
+VkImageLayout gearoenix::vulkan::image::Image::get_layout() const
+{
+    GX_ASSERT_D(!state.per_array_states.empty());
+    GX_ASSERT_D(!state.per_array_states[0].per_mip_states.empty());
+    GX_ASSERT_D(state.has_uniform_layout());
+    return state.per_array_states[0].per_mip_states[0].layout;
+}
+
 VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
 {
     if (!GX_FLAG_CHECK(usage, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
@@ -143,73 +254,67 @@ VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
     }
 }
 
-void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const VkImageLayout new_layout)
+void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const TransitionRequest& request)
 {
-    if (layout == new_layout) {
+    const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS
+        ? mipmap_levels - request.base_mip
+        : request.mip_count;
+    const auto actual_layer_count = request.layer_count == VK_REMAINING_ARRAY_LAYERS
+        ? array_layers - request.base_layer
+        : request.layer_count;
+
+    std::vector<VkImageMemoryBarrier2> barriers;
+    barriers.reserve(actual_mip_count * actual_layer_count);
+
+    for (std::uint32_t layer = request.base_layer; layer < request.base_layer + actual_layer_count; ++layer) {
+        for (std::uint32_t mip = request.base_mip; mip < request.base_mip + actual_mip_count; ++mip) {
+            auto& [layout, queue_family_index, access, stage] = state.per_array_states[layer].per_mip_states[mip];
+
+            if (layout == request.layout &&
+                queue_family_index == request.queue_family &&
+                access == request.access &&
+                stage == request.stage) {
+                continue;
+            }
+
+            VkImageMemoryBarrier2 barrier;
+            GX_SET_ZERO(barrier);
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+            barrier.srcStageMask = stage;
+            barrier.srcAccessMask = access;
+            barrier.dstStageMask = request.stage;
+            barrier.dstAccessMask = request.access;
+            barrier.oldLayout = layout;
+            barrier.newLayout = request.layout;
+            barrier.srcQueueFamilyIndex = queue_family_index;
+            barrier.dstQueueFamilyIndex = request.queue_family;
+            barrier.image = vulkan_data;
+            barrier.subresourceRange.aspectMask = get_aspect_flags();
+            barrier.subresourceRange.baseMipLevel = mip;
+            barrier.subresourceRange.levelCount = 1;
+            barrier.subresourceRange.baseArrayLayer = layer;
+            barrier.subresourceRange.layerCount = 1;
+
+            barriers.push_back(barrier);
+
+            layout = request.layout;
+            access = request.access;
+            stage = request.stage;
+            queue_family_index = request.queue_family;
+        }
+    }
+
+    if (barriers.empty()) {
         return;
     }
 
-    const auto [src_access, src_stage] = get_layout_access_and_stage(layout);
-    const auto [dst_access, dst_stage] = get_layout_access_and_stage(new_layout);
+    VkDependencyInfo dependency_info;
+    GX_SET_ZERO(dependency_info);
+    dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependency_info.imageMemoryBarrierCount = static_cast<std::uint32_t>(barriers.size());
+    dependency_info.pImageMemoryBarriers = barriers.data();
 
-    VkImageMemoryBarrier barrier;
-    GX_SET_ZERO(barrier);
-    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.srcAccessMask = src_access;
-    barrier.dstAccessMask = dst_access;
-    barrier.oldLayout = layout;
-    barrier.newLayout = new_layout;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = vulkan_data;
-    barrier.subresourceRange.aspectMask = get_aspect_flags();
-    barrier.subresourceRange.baseMipLevel = 0;
-    barrier.subresourceRange.levelCount = mipmap_levels;
-    barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = array_layers;
-
-    vkCmdPipelineBarrier(
-        cmd,
-        src_stage, dst_stage,
-        0, 0, nullptr, 0, nullptr, 1, &barrier);
-
-    layout = new_layout;
-}
-
-void gearoenix::vulkan::image::Image::transit_mips(
-    const VkCommandBuffer cmd,
-    const VkImageLayout old_layout,
-    const VkImageLayout new_layout,
-    const std::uint32_t base_mip_level,
-    const std::uint32_t level_count) const
-{
-    if (old_layout == new_layout) {
-        return;
-    }
-
-    const auto [src_access, src_stage] = get_layout_access_and_stage(old_layout);
-    const auto [dst_access, dst_stage] = get_layout_access_and_stage(new_layout);
-
-    VkImageMemoryBarrier barrier;
-    GX_SET_ZERO(barrier);
-    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.srcAccessMask = src_access;
-    barrier.dstAccessMask = dst_access;
-    barrier.oldLayout = old_layout;
-    barrier.newLayout = new_layout;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = vulkan_data;
-    barrier.subresourceRange.aspectMask = get_aspect_flags();
-    barrier.subresourceRange.baseMipLevel = base_mip_level;
-    barrier.subresourceRange.levelCount = level_count;
-    barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = array_layers;
-
-    vkCmdPipelineBarrier(
-        cmd,
-        src_stage, dst_stage,
-        0, 0, nullptr, 0, nullptr, 1, &barrier);
+    vkCmdPipelineBarrier2(cmd, &dependency_info);
 }
 
 #endif

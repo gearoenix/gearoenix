@@ -5,13 +5,60 @@
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace gearoenix::vulkan::memory {
 struct Memory;
 }
 
 namespace gearoenix::vulkan::image {
+/// Describes the desired state for an image transition.
+/// Users only specify what they NEED - the image tracks the current state internally.
+struct TransitionRequest final {
+    VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    VkAccessFlags2 access = 0;
+    VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+    std::uint32_t queue_family = VK_QUEUE_FAMILY_IGNORED;
+    std::uint32_t base_mip = 0;
+    std::uint32_t mip_count = VK_REMAINING_MIP_LEVELS;
+    std::uint32_t base_layer = 0;
+    std::uint32_t layer_count = VK_REMAINING_ARRAY_LAYERS;
+
+    [[nodiscard]] static TransitionRequest shader_read(VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT);
+    [[nodiscard]] static TransitionRequest transfer_dst();
+    [[nodiscard]] static TransitionRequest transfer_src();
+    [[nodiscard]] static TransitionRequest color_attachment();
+    [[nodiscard]] static TransitionRequest depth_attachment();
+    [[nodiscard]] static TransitionRequest present();
+
+    [[nodiscard]] TransitionRequest with_mips(std::uint32_t base, std::uint32_t count) const;
+    [[nodiscard]] TransitionRequest with_layers(std::uint32_t base, std::uint32_t count) const;
+    [[nodiscard]] TransitionRequest with_queue_family(std::uint32_t family) const;
+};
+
 struct Image final {
+    struct PerMipState final {
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        std::uint32_t queue_family_index = VK_QUEUE_FAMILY_IGNORED;
+        VkAccessFlags2 access = 0;
+        VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+
+        [[nodiscard]] bool operator==(const PerMipState& other) const;
+    };
+
+    struct PerArrayState final {
+        std::vector<PerMipState> per_mip_states;
+
+        [[nodiscard]] bool operator==(const PerArrayState& other) const;
+    };
+
+    struct State final {
+        std::vector<PerArrayState> per_array_states;
+
+        [[nodiscard]] bool is_uniform() const;
+        [[nodiscard]] bool has_uniform_layout() const;
+    };
+
     GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory);
     GX_GET_VAL_PRV(std::uint32_t, image_width, 0);
     GX_GET_VAL_PRV(std::uint32_t, image_height, 0);
@@ -24,7 +71,7 @@ struct Image final {
     GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0);
     GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
     GX_GETSET_VAL_PRV(bool, owned, true);
-    GX_GETSET_VAL_PRV(VkImageLayout, layout, VK_IMAGE_LAYOUT_UNDEFINED);
+    GX_GET_CREF_PRV(State, state);
 
 public:
     [[nodiscard]] VkImageAspectFlags get_aspect_flags() const;
@@ -56,21 +103,13 @@ public:
         VkImageCreateFlags flags,
         VkImageUsageFlags usage);
     ~Image();
+    [[nodiscard]] VkImageLayout get_layout() const;
 
-    /// Transitions the image to the new layout if needed.
-    /// Uses the internally tracked layout as the old layout.
-    /// Updates the internal layout after transition.
-    void transit(VkCommandBuffer cmd, VkImageLayout new_layout);
-
-    /// Transitions a specific mip level range of the image.
-    /// This overload is used for per-mip operations like mipmap generation.
-    /// Does NOT update the internal layout (caller must manage state for partial transitions).
-    void transit_mips(
-        VkCommandBuffer cmd,
-        VkImageLayout old_layout,
-        VkImageLayout new_layout,
-        std::uint32_t base_mip_level,
-        std::uint32_t level_count) const;
+    /// Unified transition API - transitions to the requested state.
+    /// Automatically determines source state from internal tracking.
+    /// Updates internal state after transition.
+    /// Skips transition if already in the requested state.
+    void transit(VkCommandBuffer cmd, const TransitionRequest& request);
 };
 }
 #endif

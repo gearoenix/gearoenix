@@ -106,5 +106,6 @@ public:
     virtual void window_resized();
     virtual void upload_imgui_fonts() = 0;
     virtual void show_debug_gui();
+    virtual void flush();
 };
 }

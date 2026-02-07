@@ -2,6 +2,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
+#include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "gx-vk-txt-2d.hpp"
 #include "gx-vk-txt-3d.hpp"
@@ -34,7 +35,6 @@ void gearoenix::vulkan::texture::Target::construct(
 
 gearoenix::vulkan::texture::Target::~Target() = default;
 
-
 gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const VkCommandBuffer cb, const VkAttachmentLoadOp load_colours, const VkAttachmentLoadOp load_depth)
 {
     for (auto& ca : color_attachments) {
@@ -43,6 +43,11 @@ gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::T
     if (depth_attachment.has_value()) {
         depth_attachment->loadOp = load_depth;
     }
+
+    for (auto& [texture, view, transition_request] : gapi_attachments) {
+        view->get_image()->transit(cb, transition_request);
+    }
+
     vkCmdBeginRendering(cb, &rendering_info);
     return RenderingScope(cb);
 }
@@ -63,51 +68,62 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
     gapi_attachments.reserve(attachments.size());
     for (const auto& a : attachments) {
         gapi_attachments.emplace_back();
-        auto& ga = gapi_attachments.back();
+        auto& [texture, view, transition_request] = gapi_attachments.back();
 
-        const auto att_conv = [&] <std::size_t I, typename Tex> () {
+        const auto att_conv = [&]<std::size_t I, typename Tex>() {
             const auto& at = std::get<I>(a.var);
-            auto texture = std::dynamic_pointer_cast<Tex>(at.txt);
-            GX_ASSERT_D(nullptr != texture);
+            auto vk_txt = std::dynamic_pointer_cast<Tex>(at.txt);
+            GX_ASSERT_D(nullptr != vk_txt);
 
-            const auto& view = *[&] {
-                if constexpr (I == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
-                    GX_ASSERT_D(texture->get_mips().size() > a.mipmap_level);
-                    return texture->get_mips()[a.mipmap_level].get();
-                } else if constexpr (I == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
-                    GX_ASSERT_D(texture->get_mips()[static_cast<std::size_t>(at.face)].size() > a.mipmap_level);
-                    return texture->get_mips()[static_cast<std::size_t>(at.face)][a.mipmap_level].get();
-                }
+            int array_index = 0;
+            int mip_index = 0;
+
+            if constexpr (I == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+                GX_ASSERT_D(vk_txt->get_mips().size() > a.mipmap_level);
+                view = vk_txt->get_mips()[a.mipmap_level];
+                array_index = 0;
+                mip_index = a.mipmap_level;
+            } else if constexpr (I == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+                const auto face_index = static_cast<int>(at.face);
+                GX_ASSERT_D(vk_txt->get_mips()[face_index].size() > a.mipmap_level);
+                view = vk_txt->get_mips()[face_index][a.mipmap_level];
+                array_index = face_index;
+                mip_index = a.mipmap_level;
+            } else {
                 GX_UNEXPECTED;
-            }();
+            }
+
+            const auto& info = vk_txt->get_info();
+            const auto is_depth = render::texture::format_is_depth(info.get_format());
+
+            transition_request = is_depth? image::TransitionRequest::depth_attachment(): image::TransitionRequest::color_attachment();
+            transition_request = transition_request.with_mips(mip_index, 1).with_layers(array_index, 1);
 
             VkRenderingAttachmentInfo attachment_info;
             GX_SET_ZERO(attachment_info);
             attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-            attachment_info.imageView = view.get_vulkan_data();
-            attachment_info.imageLayout = view.get_image()->get_layout();
+            attachment_info.imageView = view->get_vulkan_data();
+            attachment_info.imageLayout = is_depth? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-            const auto& info = texture->get_info();
-
-            if (render::texture::format_is_depth(info.get_format())) {
+            if (is_depth) {
                 attachment_info.clearValue.depthStencil = VkClearDepthStencilValue { 1.0f, 0 };
-
                 depth_attachment = attachment_info;
             } else {
                 attachment_info.clearValue.color = VkClearColorValue { 0.0f, 0.0f, 0.0f, 0.0f };
-
                 color_attachments.emplace_back(attachment_info);
             }
 
+            const auto& extent = view->get_extent();
+
             GX_ASSERT_D(0 != info.get_width() && 0 != info.get_height());
             GX_ASSERT_D((rendering_info.renderArea.extent.width == 0 && rendering_info.renderArea.extent.height == 0)
-                || (rendering_info.renderArea.extent.width == view.get_extent().width && rendering_info.renderArea.extent.height == view.get_extent().height));
-            rendering_info.renderArea.extent.width = view.get_extent().width;
-            rendering_info.renderArea.extent.height = view.get_extent().height;
+                || (rendering_info.renderArea.extent.width == extent.width && rendering_info.renderArea.extent.height == extent.height));
+            rendering_info.renderArea.extent.width = extent.width;
+            rendering_info.renderArea.extent.height = extent.height;
 
-            ga.texture = std::move(texture);
+            texture = std::move(vk_txt);
         };
 
         if (a.var.index() == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {

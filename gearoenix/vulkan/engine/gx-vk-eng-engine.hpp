@@ -136,6 +136,7 @@ public:
     [[nodiscard]] Frame& get_current_frame();
     [[nodiscard]] const Frame& get_current_frame() const;
     [[nodiscard]] static bool is_supported();
+    void flush() override;
 };
 }
 #endif

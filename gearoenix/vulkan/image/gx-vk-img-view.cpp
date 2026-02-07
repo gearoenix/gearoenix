@@ -87,12 +87,8 @@ gearoenix::vulkan::image::View::View(
 
     if GX_FLAG_CHECK (image->get_usage(), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
         info.subresourceRange.aspectMask = get_depth_stencil_aspect(image->get_format());
-        image->set_layout(VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
     } else {
         info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        if GX_FLAG_CHECK (image->get_usage(), VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
-            image->set_layout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        }
     }
 
     GX_VK_CHK(vkCreateImageView(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));

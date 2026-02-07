@@ -345,6 +345,7 @@ void gearoenix::platform::BaseApplication::terminate()
 {
     running = false;
     core_application = nullptr;
+    render_engine->flush();
     core::ecs::World::get().clear();
     render_engine = nullptr;
     ImGui::DestroyContext();
