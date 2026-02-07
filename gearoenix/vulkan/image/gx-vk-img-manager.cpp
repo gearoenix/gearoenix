@@ -1,40 +1,15 @@
 #include "gx-vk-img-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-flagger.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
-#include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "gx-vk-img-image.hpp"
-
-namespace {
-[[nodiscard]] VkImageAspectFlags get_aspect_flags(const VkFormat format, const VkImageUsageFlags usage)
-{
-    if (!GX_FLAG_CHECK(usage, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
-        return VK_IMAGE_ASPECT_COLOR_BIT;
-    }
-    switch (format) {
-    case VK_FORMAT_D16_UNORM:
-    case VK_FORMAT_D32_SFLOAT:
-    case VK_FORMAT_X8_D24_UNORM_PACK32:
-        return VK_IMAGE_ASPECT_DEPTH_BIT;
-    case VK_FORMAT_S8_UINT:
-        return VK_IMAGE_ASPECT_STENCIL_BIT;
-    case VK_FORMAT_D16_UNORM_S8_UINT:
-    case VK_FORMAT_D24_UNORM_S8_UINT:
-    case VK_FORMAT_D32_SFLOAT_S8_UINT:
-        return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-    default:
-        GX_UNEXPECTED;
-    }
-}
-}
 
 gearoenix::vulkan::image::Manager::Manager()
     : Singleton(this)
@@ -52,32 +27,16 @@ void gearoenix::vulkan::image::Manager::upload(
     auto cmd = command::Manager::create_thread_independent();
     cmd->begin();
 
+    const auto vk_cmd = cmd->get_vulkan_data();
     const auto mip_levels = img->get_mipmap_levels();
     const auto array_layers = img->get_array_layers();
     const auto provided_mip_count = buffs.empty() ? 0u : static_cast<std::uint32_t>(buffs[0].size());
     const bool needs_mip_generation = generate_mipmaps && provided_mip_count == 1 && mip_levels > 1;
 
-    const auto aspect_flags = get_aspect_flags(img->get_format(), img->get_usage());
+    const auto aspect_flags = img->get_aspect_flags();
 
-    VkImageMemoryBarrier barrier;
-    GX_SET_ZERO(barrier);
-    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image = img->get_vulkan_data();
-    barrier.subresourceRange.aspectMask = aspect_flags;
-    barrier.subresourceRange.baseMipLevel = 0;
-    barrier.subresourceRange.levelCount = mip_levels;
-    barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = array_layers;
-    barrier.srcAccessMask = 0;
-    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-    vkCmdPipelineBarrier(
-        cmd->get_vulkan_data(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0, 0, nullptr, 0, nullptr, 1, &barrier);
+    // Transition the entire image to TRANSFER_DST_OPTIMAL for upload
+    img->transit(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     std::uint32_t array_index = 0;
     for (const auto& array_buffs : buffs) {
@@ -97,7 +56,7 @@ void gearoenix::vulkan::image::Manager::upload(
             region.imageSubresource.layerCount = 1;
             region.imageOffset = { 0, 0, 0 };
             region.imageExtent = { mip_width, mip_height, mip_depth };
-            vkCmdCopyBufferToImage(cmd->get_vulkan_data(), mip_buff->get_vulkan_data(), img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+            vkCmdCopyBufferToImage(vk_cmd, mip_buff->get_vulkan_data(), img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
             ++mip_index;
             mip_width = std::max(1u, mip_width >> 1);
@@ -114,16 +73,7 @@ void gearoenix::vulkan::image::Manager::upload(
 
         for (std::uint32_t mip = 1; mip < mip_levels; ++mip) {
             // Transition previous mip level to TRANSFER_SRC
-            barrier.subresourceRange.baseMipLevel = mip - 1;
-            barrier.subresourceRange.levelCount = 1;
-            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-            barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-
-            vkCmdPipelineBarrier(
-                cmd->get_vulkan_data(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                0, 0, nullptr, 0, nullptr, 1, &barrier);
+            img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, mip - 1, 1);
 
             VkImageBlit blit;
             GX_SET_ZERO(blit);
@@ -146,22 +96,14 @@ void gearoenix::vulkan::image::Manager::upload(
             blit.dstSubresource.layerCount = array_layers;
 
             vkCmdBlitImage(
-                cmd->get_vulkan_data(),
+                vk_cmd,
                 img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 1, &blit,
                 VK_FILTER_LINEAR);
 
             // Transition the source mip to SHADER_READ_ONLY
-            barrier.subresourceRange.baseMipLevel = mip - 1;
-            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-            vkCmdPipelineBarrier(
-                cmd->get_vulkan_data(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                0, 0, nullptr, 0, nullptr, 1, &barrier);
+            img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mip - 1, 1);
 
             mip_width = next_width;
             mip_height = next_height;
@@ -169,25 +111,10 @@ void gearoenix::vulkan::image::Manager::upload(
         }
 
         // Transition last mip level to SHADER_READ_ONLY
-        barrier.subresourceRange.baseMipLevel = mip_levels - 1;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-        vkCmdPipelineBarrier(
-            cmd->get_vulkan_data(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        img->transit_mips(vk_cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mip_levels - 1, 1);
     } else {
-        barrier.subresourceRange.baseMipLevel = 0;
-        barrier.subresourceRange.levelCount = mip_levels;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        vkCmdPipelineBarrier(
-            cmd->get_vulkan_data(), VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        // Transition the entire image to SHADER_READ_ONLY
+        img->transit(vk_cmd, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     cmd->end();

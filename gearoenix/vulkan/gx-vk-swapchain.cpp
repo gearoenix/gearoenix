@@ -90,7 +90,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     std::uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
     vkGetPhysicalDeviceFormatProperties(physical_device.get_vulkan_data(), format.format, &format_props);
-    // Enable transfer source if supported (for screenshots, etc.)
+    // Enable a transfer source if supported (for screenshots, etc.)
     if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) != 0
         && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
@@ -145,6 +145,7 @@ void gearoenix::vulkan::Swapchain::initialize()
 
     for (auto i = 0; i < count; ++i) {
         auto img = std::make_unique<image::Image>(
+            "swapchain-img-" + std::to_string(i),
             static_cast<std::uint32_t>(info.imageExtent.width),
             static_cast<std::uint32_t>(info.imageExtent.height),
             static_cast<std::uint32_t>(1),

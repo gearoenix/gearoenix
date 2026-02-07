@@ -11,9 +11,10 @@
 #include "gx-vk-txt-2d.hpp"
 #include "gx-vk-txt-util.hpp"
 
-gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& name)
-    : render::texture::TextureCube(std::move(name), info)
+gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& in_name)
+    : render::texture::TextureCube(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(
+        name,
         info.get_width(), info.get_height(), 1u,
         convert_image_type(info.get_type()),
         static_cast<std::uint32_t>(compute_mipmaps_count(info)),

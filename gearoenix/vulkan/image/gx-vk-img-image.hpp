@@ -6,10 +6,6 @@
 
 #include <memory>
 
-namespace gearoenix::vulkan::command {
-struct Buffer;
-}
-
 namespace gearoenix::vulkan::memory {
 struct Memory;
 }
@@ -31,11 +27,13 @@ struct Image final {
     GX_GETSET_VAL_PRV(VkImageLayout, layout, VK_IMAGE_LAYOUT_UNDEFINED);
 
 public:
+    [[nodiscard]] VkImageAspectFlags get_aspect_flags() const;
     Image(Image&&) = delete;
     Image(const Image&) = delete;
     Image& operator=(Image&&) = delete;
     Image& operator=(const Image&) = delete;
     Image(
+        const std::string& name,
         std::uint32_t image_width,
         std::uint32_t image_height,
         std::uint32_t image_depth,
@@ -47,6 +45,7 @@ public:
         VkImageUsageFlags usage,
         VkImage vulkan_data);
     Image(
+        const std::string& name,
         std::uint32_t image_width,
         std::uint32_t image_height,
         std::uint32_t image_depth,
@@ -57,10 +56,21 @@ public:
         VkImageCreateFlags flags,
         VkImageUsageFlags usage);
     ~Image();
-    //    void transit(command::Buffer& cmd, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt) ;
-    //    void transit_for_writing(command::Buffer& cmd) ;
-    //    void copy_from_buffer(command::Buffer& cmd, const buffer::Buffer& buf) ;
-    //    void transit_for_reading(command::Buffer& cmd) ;
+
+    /// Transitions the image to the new layout if needed.
+    /// Uses the internally tracked layout as the old layout.
+    /// Updates the internal layout after transition.
+    void transit(VkCommandBuffer cmd, VkImageLayout new_layout);
+
+    /// Transitions a specific mip level range of the image.
+    /// This overload is used for per-mip operations like mipmap generation.
+    /// Does NOT update the internal layout (caller must manage state for partial transitions).
+    void transit_mips(
+        VkCommandBuffer cmd,
+        VkImageLayout old_layout,
+        VkImageLayout new_layout,
+        std::uint32_t base_mip_level,
+        std::uint32_t level_count) const;
 };
 }
 #endif

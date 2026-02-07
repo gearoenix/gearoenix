@@ -103,13 +103,13 @@ gearoenix::vulkan::image::View::~View()
     vkDestroyImageView(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::shared_ptr<gearoenix::vulkan::image::View> gearoenix::vulkan::image::View::create_depth_stencil()
+std::shared_ptr<gearoenix::vulkan::image::View> gearoenix::vulkan::image::View::create_depth_stencil(const std::string& name)
 {
     const auto& physical_device = device::Physical::get();
     const auto depth_format = physical_device.get_supported_depth_format();
     const auto surf_cap = physical_device.get_surface_capabilities();
     return std::make_shared<View>(std::make_shared<Image>(
-        surf_cap.currentExtent.width, surf_cap.currentExtent.height, 1, VK_IMAGE_TYPE_2D, 1, 1, depth_format, 0,
+        name, surf_cap.currentExtent.width, surf_cap.currentExtent.height, 1, VK_IMAGE_TYPE_2D, 1, 1, depth_format, 0,
         VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
 }
 

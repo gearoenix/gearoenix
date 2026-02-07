@@ -38,7 +38,7 @@ public:
     View& operator=(const View&) = delete;
     ~View();
 
-    [[nodiscard]] static std::shared_ptr<View> create_depth_stencil();
+    [[nodiscard]] static std::shared_ptr<View> create_depth_stencil(const std::string& name);
 };
 }
 #endif

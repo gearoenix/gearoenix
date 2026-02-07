@@ -20,7 +20,7 @@ struct Texture2D final : render::texture::Texture2D {
     GX_GET_CVAL_PRV(std::uint32_t, sampler_index);
 
 public:
-    Texture2D(const render::texture::TextureInfo& info, std::string &&name);
+    Texture2D(const render::texture::TextureInfo& info, std::string&&);
     ~Texture2D() override;
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
 };

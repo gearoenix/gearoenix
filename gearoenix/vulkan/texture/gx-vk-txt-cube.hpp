@@ -18,7 +18,7 @@ struct TextureCube final : render::texture::TextureCube {
     GX_GET_CVAL_PRV(std::uint32_t, sampler_index);
 
 public:
-    TextureCube(const render::texture::TextureInfo& info, std::string&& name);
+    TextureCube(const render::texture::TextureInfo& info, std::string&&);
     ~TextureCube() override;
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
 };

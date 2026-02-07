@@ -13,9 +13,10 @@
 #include "../sampler/gx-vk-smp-sampler.hpp"
 #include "gx-vk-txt-util.hpp"
 
-gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string && name)
-    : render::texture::Texture2D(std::move(name), info)
+gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string && in_name)
+    : render::texture::Texture2D(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(
+          name,
           info.get_width(), info.get_height(), info.get_depth(),
           convert_image_type(info.get_type()),
           static_cast<std::uint32_t>(compute_mipmaps_count(info)),
