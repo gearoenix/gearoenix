@@ -37,3 +37,7 @@ void gearoenix::render::light::Manager::build_shadow_caster_directional(
     entity->add_component(core::Object::construct<physics::Transformation>(entity.get(), entity->get_object_name() + "-light-directional-shadow-caster-transform"));
     entity_callback.set_return(std::move(entity));
 }
+
+void gearoenix::render::light::Manager::update()
+{
+}

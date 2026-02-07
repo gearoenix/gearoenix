@@ -51,8 +51,8 @@ public:
 
     void set_material(GxPbrPtr&& material)
     {
-        material->get_normal_metallic_factor().w = 0.01f;
-        material->get_emission_roughness_factor().w = 0.99f;
+        material->set_normal_metallic_factor({1.0f, 1.0f , 1.0f, 0.01f});
+        material->set_emission_roughness_factor({1.0f, 1.0f , 1.0f, 0.01f});
 
         std::vector<GxPbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };
@@ -92,9 +92,11 @@ public:
     {
         camera_entity->get_component<GxTran>()->set_local_position({ 0.0f, 0.0f, 5.0f });
 
-        GxLightManager::get().build_shadow_caster_directional(
-            "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
-            GxEntityEndCaller([this](GxEntityPtr&& l) { set_light(std::move(l)); }));
+        scene_entity->add_to_world(); // TODO: temporary, remove it, see set_light
+
+        // GxLightManager::get().build_shadow_caster_directional(
+        //     "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
+        //     GxEntityEndCaller([this](GxEntityPtr&& l) { set_light(std::move(l)); }));
     }
 
     void set_light(GxEntityPtr&& light_entity)

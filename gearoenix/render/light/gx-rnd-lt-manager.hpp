@@ -19,5 +19,6 @@ struct Manager : core::Singleton<Manager> {
         float camera_near,
         float camera_aspect,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+    virtual void update();
 };
 }

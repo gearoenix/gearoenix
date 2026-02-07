@@ -13,9 +13,9 @@ struct TextureInfo final {
     GX_GET_VAL_PRV(std::uintptr_t, hash, 0);
     GX_GET_VAL_PRV(TextureFormat, format, TextureFormat::Unknown);
     GX_GET_CREF_PRV(SamplerInfo, sampler_info);
-    GX_GET_VAL_PRV(std::uint32_t, width, 0);
-    GX_GET_VAL_PRV(std::uint32_t, height, 0);
-    GX_GET_VAL_PRV(std::uint32_t, depth, 0);
+    GX_GET_VAL_PRV(std::uint32_t, width, 1);
+    GX_GET_VAL_PRV(std::uint32_t, height, 1);
+    GX_GET_VAL_PRV(std::uint32_t, depth, 1);
     GX_GET_VAL_PRV(Type, type, Type::Unknown);
     GX_GET_VAL_PRV(bool, has_mipmap, true);
 
@@ -23,9 +23,9 @@ public:
     explicit TextureInfo(
         TextureFormat format = TextureFormat::Unknown,
         const SamplerInfo& sampler_info = SamplerInfo(),
-        std::uint32_t width = 0,
-        std::uint32_t height = 0,
-        std::uint32_t depth = 0,
+        std::uint32_t width = 1,
+        std::uint32_t height = 1,
+        std::uint32_t depth = 1,
         Type type = Type::Unknown,
         bool has_mipmap = true);
 

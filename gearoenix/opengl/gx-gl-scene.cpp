@@ -5,6 +5,7 @@
 #include "gx-gl-camera.hpp"
 #include "gx-gl-context.hpp"
 #include "gx-gl-label.hpp"
+
 #include <ranges>
 
 gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const double layer)

@@ -13,6 +13,6 @@ public:
 
     /// By layer, you decide in what order scenes to be rendered on top of each other
     [[nodiscard]] virtual core::ecs::EntityPtr build(std::string&& name, double layer) const;
-    virtual void update() const;
+    virtual void update();
 };
 }

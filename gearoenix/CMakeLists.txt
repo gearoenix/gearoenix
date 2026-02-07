@@ -112,6 +112,11 @@ endforeach ()
 
 add_custom_target(GearoenixAssets)
 
+if(NOT GX_IN_WASM)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/vulkan/gx-vk-shader-compile.cmake)
+    add_dependencies(GearoenixAssets GearoenixVulkanShaders)
+endif()
+
 function(gx_prepare_target GX_CURRENT_TARGET)
     message(STATUS "Preparing target ${GX_CURRENT_TARGET}")
 

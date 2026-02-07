@@ -73,7 +73,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     const auto& configuration = platform::RuntimeConfiguration::get();
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
-        result = std::make_unique<vulkan::engine::Engine>(platform_application);
+        result = std::make_unique<vulkan::engine::Engine>();
     }
 #endif
 #ifdef GX_RENDER_DIRECT3D_ENABLED
@@ -128,8 +128,12 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame; in start_frame of Engine, we prepare everything for user interaction.
+    // Don't mistake the following with the actual start of a frame.
+    // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
+    physics_engine->start_frame();
+
     camera_manager->update();
+    light_manager->update();
     reflection_manager->update();
     scene_manager->update();
     physics_engine->end_frame();
@@ -148,4 +152,8 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         core::ecs::World::get().show_debug_gui();
         // TODO: I have to show all other things
     });
+}
+
+void gearoenix::render::engine::Engine::flush()
+{
 }

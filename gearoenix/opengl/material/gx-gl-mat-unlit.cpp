@@ -18,9 +18,10 @@ gearoenix::gl::material::Unlit::Unlit(std::string&& name)
 
 void gearoenix::gl::material::Unlit::construct(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c)
 {
-    const auto result = Object::construct<Unlit>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Unlit>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::gl::material::Unlit::~Unlit() = default;

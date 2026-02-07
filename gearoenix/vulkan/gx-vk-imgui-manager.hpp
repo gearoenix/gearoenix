@@ -1,24 +1,12 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include <memory>
-#include <vector>
-
-namespace gearoenix::vulkan::command {
-struct Buffer;
-}
-
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
+#if GX_RENDER_VULKAN_ENABLED
+#include "gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan {
 struct ImGuiManager final {
-    constexpr static const auto* const NODE_NAME = "ui";
-
 private:
-    engine::Engine& e;
-    const std::vector<std::shared_ptr<command::Buffer>> cmds;
+    VkDescriptorPool descriptor_pool = VK_NULL_HANDLE;
 
 public:
     ImGuiManager(ImGuiManager&&) = delete;
@@ -26,7 +14,7 @@ public:
     ImGuiManager& operator=(ImGuiManager&&) = delete;
     ImGuiManager& operator=(const ImGuiManager&&) = delete;
 
-    explicit ImGuiManager(engine::Engine& e);
+    ImGuiManager();
     ~ImGuiManager();
 
     void upload_fonts();

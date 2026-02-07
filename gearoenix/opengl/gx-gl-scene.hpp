@@ -9,7 +9,7 @@ namespace gearoenix::gl {
 struct Scene final : render::scene::Scene {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
-    constexpr static auto object_type_index = gearoenix_gl_scene_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_scene_type_index;
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
