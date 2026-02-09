@@ -30,7 +30,7 @@ struct Frame final {
     Frame& operator=(Frame&&) = delete;
     Frame& operator=(const Frame&) = delete;
 
-    explicit Frame(std::shared_ptr<image::View>&& view);
+    Frame(std::shared_ptr<image::View>&& view, int frame_index);
     ~Frame();
 };
 }

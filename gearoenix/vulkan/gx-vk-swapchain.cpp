@@ -9,6 +9,7 @@
 #include "gx-vk-surface.hpp"
 #include "image/gx-vk-img-image.hpp"
 #include "image/gx-vk-img-view.hpp"
+#include "queue/gx-vk-qu-queue.hpp"
 #include "sync/gx-vk-sync-semaphore.hpp"
 
 #include <utility>
@@ -29,9 +30,8 @@ gearoenix::vulkan::Swapchain::~Swapchain()
     vkDestroySwapchainKHR(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
 }
 
-std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(const sync::Semaphore& semaphore)
+void gearoenix::vulkan::Swapchain::acquire_next_image(const sync::Semaphore& semaphore)
 {
-    std::uint32_t image_index = 0;
     const VkResult result = vkAcquireNextImageKHR(
         device::Logical::get().get_vulkan_data(),
         vulkan_data,
@@ -42,9 +42,11 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
-        return std::nullopt;
+        is_valid = false;
+        return;
     case VK_SUCCESS:
-        return image_index;
+        is_valid = true;
+        return;
     default:
         GX_LOG_F("Swapchain failed to get the next image, result: " << result_to_string(result));
     }
@@ -52,7 +54,7 @@ std::optional<std::uint32_t> gearoenix::vulkan::Swapchain::get_next_image_index(
 
 void gearoenix::vulkan::Swapchain::initialize()
 {
-    image_views = { };
+    frames = { };
 
     const auto& physical_device = device::Physical::get();
     const auto& logical_device = device::Logical::get();
@@ -157,16 +159,45 @@ void gearoenix::vulkan::Swapchain::initialize()
             info.imageUsage,
             images[i]);
         img->set_owned(false);
-        image_views[i] = std::make_shared<image::View>(std::move(img));
+        frames[i].view = std::make_shared<image::View>(std::move(img));
+        frames[i].present = std::make_unique<sync::Semaphore>("present-" + std::to_string(i));
     }
     if (nullptr != old_swapchain) {
         vkDestroySwapchainKHR(logical_device.get_vulkan_data(), old_swapchain, nullptr);
     }
+    is_valid = true;
+    image_index = 0;
 }
 
 const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const
 {
     return &vulkan_data;
+}
+
+void gearoenix::vulkan::Swapchain::present()
+{
+    VkPresentInfoKHR info;
+    GX_SET_ZERO(info);
+    info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    info.waitSemaphoreCount = 1;
+    info.pWaitSemaphores = frames[image_index].present->get_vulkan_data_ptr();
+    info.swapchainCount = 1;
+    info.pSwapchains = &vulkan_data;
+    info.pImageIndices = &image_index;
+    const auto present_result = queue::Queue::get().present(info);
+    if (VK_ERROR_OUT_OF_DATE_KHR == present_result) {
+        is_valid = false;
+        return;
+    }
+    if (VK_SUCCESS != present_result) {
+        GX_LOG_F("Presentation failed with result: " << result_to_string(present_result));
+    }
+    is_valid = true;
+}
+
+const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::Swapchain::get_present_semaphore() const
+{
+    return *frames[image_index].present;
 }
 
 #endif

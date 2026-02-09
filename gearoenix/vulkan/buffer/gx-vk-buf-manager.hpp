@@ -1,11 +1,13 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/gx-cr-singleton.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
+#include "../gx-vk-build-configuration.hpp"
 #include "../gx-vk-loader.hpp"
 
+#include <array>
 #include <memory>
 
 namespace gearoenix::core::sync {
@@ -31,13 +33,13 @@ struct Manager final : core::Singleton<Manager> {
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, upload_root_buffer);
     GX_GET_REFC_PRV(std::shared_ptr<Buffer>, gpu_root_buffer);
 
-    const std::vector<std::shared_ptr<Buffer>> each_frame_upload_source;
+    const std::array<std::shared_ptr<Buffer>, frames_in_flight> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
 
     [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const;
     [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const;
-    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_each_frame_upload_source() const;
+    [[nodiscard]] std::array<std::shared_ptr<Buffer>, frames_in_flight> create_each_frame_upload_source() const;
     [[nodiscard]] std::shared_ptr<Buffer> create_each_frame_upload_destination() const;
 
 public:

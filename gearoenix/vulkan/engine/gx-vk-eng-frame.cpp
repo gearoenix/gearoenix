@@ -8,11 +8,11 @@
 #include "../command/gx-vk-cmd-manager.hpp"
 
 
-gearoenix::vulkan::engine::Frame::Frame(std::shared_ptr<image::View>&& view)
+gearoenix::vulkan::engine::Frame::Frame(std::shared_ptr<image::View>&& view, const int frame_index)
     : view(std::move(view))
     , render_fence(new sync::Fence(true))
-    , present_semaphore(new sync::Semaphore())
-    , end_semaphore(new sync::Semaphore())
+    , present_semaphore(new sync::Semaphore("frame-preset-" + std::to_string(frame_index)))
+    , end_semaphore(new sync::Semaphore("frame-end" + std::to_string(frame_index)))
     , cmd(command::Manager::get().create())
 {
 }

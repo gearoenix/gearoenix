@@ -40,7 +40,7 @@ public:
         std::uint64_t signal_semaphores_count,
         const VkSemaphore* signal_semaphores,
         VkFence fence = nullptr);
-    void update();
+    [[nodiscard]] VkResult present(const VkPresentInfoKHR& info);
 };
 }
 #endif

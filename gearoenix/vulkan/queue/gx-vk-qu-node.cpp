@@ -56,7 +56,7 @@ void gearoenix::vulkan::queue::Node::connect(Node& provider, Node& consumer)
     GX_CHECK_EQUAL_D(provider.consumers.end(), provider.consumers.find(consumer.node_label));
 
     consumer.providers.insert(provider.node_label);
-    provider.consumers.emplace(consumer.node_label, sync::Semaphore::create_frame_based());
+    provider.consumers.emplace(consumer.node_label, sync::Semaphore::create_frame_based("node"));
 }
 
 #endif

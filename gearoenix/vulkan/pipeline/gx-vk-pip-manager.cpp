@@ -373,9 +373,8 @@ gearoenix::vulkan::pipeline::Manager::Manager()
 {
     if (device::Physical::get().get_rtx_supported()) {
         initialise_ray_tracing();
-    } else {
-        initialise_rasterizer();
     }
+    initialise_rasterizer();
 }
 
 gearoenix::vulkan::pipeline::Manager::~Manager() = default;

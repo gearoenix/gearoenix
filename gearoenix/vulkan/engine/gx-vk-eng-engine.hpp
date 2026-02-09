@@ -112,8 +112,6 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_PTRC_PRV(scene::Manager, vk_scene_manager);
     GX_GET_PTRC_PRV(reflection::Manager, vk_reflection_manager);
     GX_GET_CREF_PRV(frames_t, frames);
-    GX_GET_VAL_PRV(std::uint32_t, swapchain_image_index, 0);
-    GX_GET_VAL_PRV(bool, swapchain_image_is_valid, true);
     GX_GET_UPTR_PRV(queue::Queue, render_queue);
 
     void initialize_frame();
@@ -129,10 +127,7 @@ public:
     void start_frame() override;
     void end_frame() override;
     void upload_imgui_fonts() override;
-
-    [[nodiscard]] bool present();
     void submit();
-
     [[nodiscard]] Frame& get_current_frame();
     [[nodiscard]] const Frame& get_current_frame() const;
     [[nodiscard]] static bool is_supported();

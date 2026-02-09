@@ -4,7 +4,8 @@
 #include "../../core/gx-cr-singleton.hpp"
 #include "../../render/texture/gx-rnd-txt-sampler.hpp"
 
-#include <flat_map>
+#include <boost/container/flat_map.hpp>
+
 #include <mutex>
 #include <memory>
 
@@ -13,7 +14,7 @@ struct Sampler;
 struct Manager final: core::Singleton<Manager> {
 private:
     std::mutex samplers_lock;
-    std::flat_map<render::texture::SamplerInfo, std::shared_ptr<Sampler>> samplers;
+    boost::container::flat_map<render::texture::SamplerInfo, std::shared_ptr<Sampler>> samplers;
 
 public:
     Manager();

@@ -8,7 +8,6 @@
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../gx-vk-swapchain.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-buf-buffer.hpp"
@@ -32,18 +31,16 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return Buffer::construct("gpu-buffer", gpu_sz, memory::Place::Gpu);
 }
 
-std::vector<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_source() const
+std::array<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>, gearoenix::vulkan::frames_in_flight> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_source() const
 {
     const auto& cfg = render::RuntimeConfiguration::get();
     const auto& phs_dev = device::Physical::get();
     const auto dyn_sz = phs_dev.align_size(cfg.get_maximum_dynamic_buffer_size());
-    std::vector<std::shared_ptr<Buffer>> result;
-    const auto frames_count = Swapchain::get().get_image_views().size();
-    result.reserve(frames_count);
-    for (auto i = decltype(frames_count) { 0 }; i < frames_count; ++i) {
-        result.push_back(std::move(upload_root_buffer->allocate(dyn_sz)));
-    }
-    return result;
+    return {
+        upload_root_buffer->allocate(dyn_sz),
+        upload_root_buffer->allocate(dyn_sz),
+        upload_root_buffer->allocate(dyn_sz)
+    };
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_destination() const

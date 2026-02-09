@@ -48,7 +48,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     info.QueueFamily = device::Physical::get().get_graphics_queue_node_index();
     info.Queue = queue::Queue::get().get_vulkan_data();
     info.DescriptorPool = descriptor_pool;
-    info.MinImageCount = static_cast<decltype(info.MinImageCount)>(Swapchain::get().get_image_views().size());
+    info.MinImageCount = static_cast<decltype(info.MinImageCount)>(frames_in_flight);
     info.ImageCount = info.MinImageCount;
     info.PipelineCache = pipeline::Manager::get().get_cache()->get_vulkan_data();
     info.UseDynamicRendering = true;

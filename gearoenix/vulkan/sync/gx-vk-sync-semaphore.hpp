@@ -5,6 +5,7 @@
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace gearoenix::vulkan::sync {
@@ -17,10 +18,10 @@ public:
     Semaphore(const Semaphore&) = delete;
     Semaphore& operator=(Semaphore&&) = delete;
     Semaphore& operator=(const Semaphore&) = delete;
-    Semaphore();
+    explicit Semaphore(const std::string&);
     ~Semaphore();
     [[nodiscard]] const VkSemaphore* get_vulkan_data_ptr() const;
-    [[nodiscard]] static std::vector<std::shared_ptr<Semaphore>> create_frame_based();
+    [[nodiscard]] static std::vector<std::shared_ptr<Semaphore>> create_frame_based(const std::string& base_name);
 };
 }
 #endif

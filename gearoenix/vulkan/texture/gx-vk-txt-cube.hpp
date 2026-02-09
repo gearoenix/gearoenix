@@ -4,6 +4,8 @@
 #include "../../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
 
+#include <array>
+
 namespace gearoenix::vulkan::image {
 struct View;
 }

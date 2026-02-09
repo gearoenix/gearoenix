@@ -5,6 +5,7 @@
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace gearoenix::vulkan::memory {

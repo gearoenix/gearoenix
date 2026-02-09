@@ -6,8 +6,6 @@
 #include "gx-vk-loader.hpp"
 #include "gx-vk-build-configuration.hpp"
 
-#include <optional>
-#include <vector>
 #include <memory>
 #include <array>
 
@@ -21,11 +19,18 @@ struct Semaphore;
 
 namespace gearoenix::vulkan {
 struct Swapchain final : core::Singleton<Swapchain> {
-    using views_t = std::array<std::shared_ptr<image::View>, frames_in_flight>;
+    struct Frame final {
+        std::shared_ptr<image::View> view;
+        std::unique_ptr<sync::Semaphore> present;
+    };
+
+    using frames_t = std::array<Frame, frames_in_flight>;
 
     GX_GET_CREF_PRV(VkSurfaceFormatKHR, format);
     GX_GET_VAL_PRV(VkSwapchainKHR, vulkan_data, nullptr);
-    GX_GET_CREF_PRV(views_t, image_views);
+    GX_GET_CREF_PRV(frames_t, frames);
+    GX_GET_VAL_PRV(bool, is_valid, true);
+    GX_GET_VAL_PRV(std::uint32_t, image_index, 0);
 
 public:
     Swapchain();
@@ -36,9 +41,11 @@ public:
     ~Swapchain() override;
 
     /// If the frame is valid, it returns true otherwise false.
-    [[nodiscard]] std::optional<std::uint32_t> get_next_image_index(const sync::Semaphore& semaphore);
+    void acquire_next_image(const sync::Semaphore& semaphore);
     void initialize();
     [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const;
+    void present();
+    [[nodiscard]] const sync::Semaphore& get_present_semaphore() const;
 };
 }
 #endif

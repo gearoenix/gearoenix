@@ -60,4 +60,10 @@ void gearoenix::vulkan::queue::Queue::submit(
     GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence));
 }
 
+VkResult gearoenix::vulkan::queue::Queue::present(const VkPresentInfoKHR& info)
+{
+    const std::lock_guard _(submission_lock);
+    return vkQueuePresentKHR(vulkan_data, &info);
+}
+
 #endif

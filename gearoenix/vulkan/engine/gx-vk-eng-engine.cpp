@@ -1,7 +1,6 @@
 #include "gx-vk-eng-engine.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
@@ -16,7 +15,6 @@
 #include "../gx-vk-surface.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-manager.hpp"
-#include "../image/gx-vk-img-view.hpp"
 #include "../light/gx-vk-lt-manager.hpp"
 #include "../material/gx-vk-mat-manager.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
@@ -34,9 +32,8 @@
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
-    frames_count = static_cast<decltype(frames_count)>(swapchain->get_image_views().size());
-    for (auto frame_index = decltype(frames_count) { 0 }; frame_index < frames_count; ++frame_index) {
-        frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain->get_image_views()[frame_index]));
+    for (int frame_index = 0; frame_index < frames_count; ++frame_index) {
+        frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain->get_frames()[frame_index].view), frame_index);
     }
 }
 
@@ -68,7 +65,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_scene_manager(new scene::Manager())
     , vk_reflection_manager(new reflection::Manager())
 {
-    frames_count = swapchain->get_image_views().size();
+    frames_count = frames_in_flight;
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vk_mesh_manager);
     texture_manager = std::unique_ptr<render::texture::Manager>(vk_texture_manager);
     material_manager = std::unique_ptr<material::Manager>(vk_material_manager);
@@ -124,16 +121,16 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     core::job::execute_current_thread_jobs();
 
-    if (swapchain_image_is_valid) {
-        frames[frame_number]->render_fence->wait();
+    if (swapchain->get_is_valid()) {
+        auto& fence = *frames[frame_number]->render_fence;
+        fence.wait();
+        fence.reset();
     } else if (!platform::BaseApplication::get().get_window_resizing()) {
         logical_device->wait_to_finish();
         frames = {};
         // depth_stencil = image::View::create_depth_stencil();
         swapchain->initialize();
         initialize_frame();
-        swapchain_image_is_valid = true;
-        swapchain_image_index = 0;
     }
 
     core::job::execute_current_thread_jobs();
@@ -142,14 +139,8 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     core::job::execute_current_thread_jobs();
 
-    if (swapchain_image_is_valid) {
-        const auto& frame_data = *frames[frame_number];
-        if (const auto next_image = swapchain->get_next_image_index(*frame_data.present_semaphore); next_image.has_value()) {
-            swapchain_image_index = *next_image;
-            frame_data.render_fence->reset();
-        } else {
-            swapchain_image_is_valid = false;
-        }
+    if (swapchain->get_is_valid()) {
+        swapchain->acquire_next_image(*frames[frame_number]->present_semaphore);
     }
 }
 
@@ -157,9 +148,9 @@ void gearoenix::vulkan::engine::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
     imgui_manager->end_frame();
-    if (swapchain_image_is_valid) {
+    if (swapchain->get_is_valid()) {
         submit();
-        swapchain_image_is_valid = present();
+        swapchain->present();
     }
 
     core::job::execute_current_thread_jobs();
@@ -168,26 +159,6 @@ void gearoenix::vulkan::engine::Engine::end_frame()
 void gearoenix::vulkan::engine::Engine::upload_imgui_fonts()
 {
     imgui_manager->upload_fonts();
-}
-
-bool gearoenix::vulkan::engine::Engine::present()
-{
-    VkPresentInfoKHR info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    info.waitSemaphoreCount = 1;
-    info.pWaitSemaphores = frames[frame_number]->end_semaphore->get_vulkan_data_ptr();
-    info.swapchainCount = 1;
-    info.pSwapchains = Swapchain::get().get_vulkan_data_ptr();
-    info.pImageIndices = &swapchain_image_index;
-    const auto present_result = vkQueuePresentKHR(render_queue->get_vulkan_data(), &info);
-    if (VK_ERROR_OUT_OF_DATE_KHR == present_result) {
-        return false;
-    }
-    if (VK_SUCCESS != present_result) {
-        GX_LOG_F("Presentation failed with result: " << result_to_string(present_result));
-    }
-    return true;
 }
 
 void gearoenix::vulkan::engine::Engine::submit()
@@ -207,18 +178,18 @@ void gearoenix::vulkan::engine::Engine::submit()
         1, frame.present_semaphore->get_vulkan_data_ptr(),
         &wait_stage,
         1, cmd.get_vulkan_data_ptr(),
-        1, frame.end_semaphore->get_vulkan_data_ptr(),
+        1, swapchain->get_present_semaphore().get_vulkan_data_ptr(),
         frame.render_fence->get_vulkan_data());
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()
 {
-    return *frames[swapchain_image_index];
+    return *frames[frame_number];
 }
 
 const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const
 {
-    return *frames[swapchain_image_index];
+    return *frames[frame_number];
 }
 
 bool gearoenix::vulkan::engine::Engine::is_supported()

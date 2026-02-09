@@ -7,7 +7,8 @@
 #include "gx-vk-cmd-pool.hpp"
 #include "gx-vk-cmd-type.hpp"
 
-#include <flat_map>
+#include <boost/container/flat_map.hpp>
+
 #include <memory>
 #include <optional>
 #include <thread>
@@ -16,8 +17,8 @@ namespace gearoenix::vulkan::command {
 struct Manager final: core::Singleton<Manager> {
 private:
     std::mutex this_lock;
-    std::flat_map<std::uint64_t, PoolPtr> indexed_pools;
-    std::flat_map<std::thread::id, PoolPtr> threads_pools;
+    boost::container::flat_map<std::uint64_t, PoolPtr> indexed_pools;
+    boost::container::flat_map<std::thread::id, PoolPtr> threads_pools;
 
 public:
     Manager();
