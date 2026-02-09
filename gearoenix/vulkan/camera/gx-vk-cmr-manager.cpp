@@ -42,4 +42,10 @@ void gearoenix::vulkan::camera::Manager::update()
     cameras_joint_models_uniform_indexer.reset();
     render::camera::Manager::update();
 }
+
+void gearoenix::vulkan::camera::Manager::upload_uniforms()
+{
+    camera_uniform_indexer.update();
+    cameras_joint_models_uniform_indexer.update();
+}
 #endif

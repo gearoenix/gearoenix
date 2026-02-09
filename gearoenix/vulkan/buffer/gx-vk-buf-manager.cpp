@@ -122,8 +122,8 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer v
     const auto& src = *each_frame_upload_source[frame_number];
     const auto& dst = *each_frame_upload_destination;
 
-    const auto& src_alloc = *src.get_allocator();
-    const auto& dst_alloc = *dst.get_allocator();
+    const auto& src_alloc = *src.get_allocated_memory()->get_allocator();
+    const auto& dst_alloc = *dst.get_allocated_memory()->get_allocator();
 
     VkBufferCopy region { };
     region.srcOffset = static_cast<VkDeviceSize>(src_alloc.get_offset());

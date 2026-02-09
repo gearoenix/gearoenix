@@ -11,11 +11,11 @@
 #include "../memory/gx-vk-mem-manager.hpp"
 
 gearoenix::vulkan::buffer::Buffer::Buffer(
-    std::shared_ptr<core::allocator::Range> allocator,
-    std::shared_ptr<const Buffer> parent,
-    std::shared_ptr<memory::Memory> allocated_memory,
+    const std::uint32_t offset,
+    std::shared_ptr<const Buffer>&& parent,
+    std::shared_ptr<memory::Memory>&& allocated_memory,
     const VkBuffer vulkan_data)
-    : allocator(std::move(allocator))
+    : offset(offset)
     , parent(std::move(parent))
     , allocated_memory(std::move(allocated_memory))
     , vulkan_data(vulkan_data)
@@ -28,7 +28,6 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     const auto& logical_device = device::Logical::get();
     const auto& physical_device = device::Physical::get();
     const auto aligned_size = physical_device.align_size(size);
-    auto allocator = core::allocator::Range::construct(aligned_size);
     VkBufferCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -60,7 +59,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     GX_VK_CHK(vkBindBufferMemory(
         dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
     GX_VK_MARK(name, vulkan_data);
-    std::shared_ptr<Buffer> result(new Buffer(std::move(allocator), nullptr, std::move(allocated_memory), vulkan_data));
+    std::shared_ptr<Buffer> result(new Buffer(0, nullptr, std::move(allocated_memory), vulkan_data));
     result->self = result;
     return result;
 }
@@ -76,16 +75,14 @@ gearoenix::vulkan::buffer::Buffer::~Buffer()
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size)
 {
     const auto aligned_size = device::Physical::get().align_size(size);
-    const std::lock_guard _(allocation_lock);
-    auto alc = allocator->allocate(aligned_size);
-    if (nullptr == alc) {
-        return nullptr;
-    }
     auto alc_mem = allocated_memory->allocate(aligned_size);
     if (nullptr == alc_mem) {
         return nullptr;
     }
-    std::shared_ptr<Buffer> result(new Buffer(std::move(alc), self.lock(), std::move(alc_mem), vulkan_data));
+
+    const auto mem_off = alc_mem->get_allocator()->get_offset() - allocated_memory->get_allocator()->get_offset();
+
+    std::shared_ptr<Buffer> result(new Buffer(offset + mem_off, self.lock(), std::move(alc_mem), vulkan_data));
     result->self = result;
     return result;
 }
@@ -102,7 +99,7 @@ VkDeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
     info.buffer = vulkan_data;
-    return vkGetBufferDeviceAddress(device::Logical::get().get_vulkan_data(), &info) + static_cast<VkDeviceAddress>(allocator->get_offset());
+    return vkGetBufferDeviceAddress(device::Logical::get().get_vulkan_data(), &info) + static_cast<VkDeviceAddress>(offset);
 }
 
 #endif

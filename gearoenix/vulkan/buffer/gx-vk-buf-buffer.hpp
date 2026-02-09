@@ -16,18 +16,13 @@ struct Range;
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer final {
-    GX_GET_CREF_PRT(std::shared_ptr<core::allocator::Range>, allocator);
-    GX_GET_REFC_PRT(std::shared_ptr<const Buffer>, parent);
-    GX_GET_CREF_PRT(std::shared_ptr<memory::Memory>, allocated_memory);
-    GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr);
-    std::mutex allocation_lock;
-
-private:
+    GX_GET_CVAL_PRV(std::uint8_t, offset);
+    GX_GET_REFC_PRV(std::shared_ptr<const Buffer>, parent);
+    GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory);
+    GX_GET_VAL_PRV(VkBuffer, vulkan_data, nullptr);
     std::weak_ptr<Buffer> self;
 
-    Buffer(
-        std::shared_ptr<core::allocator::Range> allocator, std::shared_ptr<const Buffer> parent,
-        std::shared_ptr<memory::Memory> allocated_memory, VkBuffer vulkan_data);
+    Buffer(std::uint32_t offset, std::shared_ptr<const Buffer>&& parent, std::shared_ptr<memory::Memory>&& allocated_memory, VkBuffer vulkan_data);
 
 public:
     Buffer(Buffer&&) = delete;

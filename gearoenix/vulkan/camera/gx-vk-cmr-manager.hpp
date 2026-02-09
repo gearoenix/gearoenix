@@ -18,6 +18,7 @@ public:
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void window_resized() override;
     void update() override;
+    void upload_uniforms();
 };
 }
 

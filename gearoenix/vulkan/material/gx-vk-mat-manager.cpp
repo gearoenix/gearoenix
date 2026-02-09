@@ -32,4 +32,9 @@ void gearoenix::vulkan::material::Manager::construct_sprite(std::string&& name, 
     GX_UNIMPLEMENTED;
 }
 
+void gearoenix::vulkan::material::Manager::upload_uniforms()
+{
+    uniform_indexer.update();
+}
+
 #endif

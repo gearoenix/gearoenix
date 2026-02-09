@@ -18,6 +18,7 @@ public:
     Manager();
     ~Manager() override;
     void update() override;
+    void upload_uniforms();
 };
 }
 #endif

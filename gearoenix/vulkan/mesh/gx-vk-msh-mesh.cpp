@@ -37,11 +37,11 @@ void gearoenix::vulkan::mesh::Mesh::draw(const VkCommandBuffer cmd, pipeline::Pu
     const auto& vertex_buffer = *gapi_buffer->get_vertex();
     const auto vk_vertex_buffer = vertex_buffer.get_vulkan_data();
 
-    const auto vertex_offset = static_cast<VkDeviceSize>(vertex_buffer.get_allocator()->get_offset());
+    const auto vertex_offset = static_cast<VkDeviceSize>(vertex_buffer.get_allocated_memory()->get_allocator()->get_offset());
     vkCmdBindVertexBuffers(cmd, 0, 1, &vk_vertex_buffer, &vertex_offset);
 
     const auto& index_buffer = *gapi_buffer->get_index();
-    const auto index_offset = static_cast<VkDeviceSize>(index_buffer.get_allocator()->get_offset());
+    const auto index_offset = static_cast<VkDeviceSize>(index_buffer.get_allocated_memory()->get_allocator()->get_offset());
     vkCmdBindIndexBuffer(cmd, index_buffer.get_vulkan_data(), index_offset, VK_INDEX_TYPE_UINT32);
 
     vkCmdPushConstants(cmd, descriptor::Bindless::get().get_pipeline_layout(), VK_SHADER_STAGE_ALL, 0, sizeof(pc), &pc);

@@ -258,7 +258,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
 
     for (std::uint32_t i = 0; i < buffers.size(); ++i) {
         const auto& buff = *buffers[i];
-        const auto& allocator = *buff.get_allocator();
+        const auto& allocator = *buff.get_allocated_memory()->get_allocator();
         buffer_infos[i].buffer = buff.get_vulkan_data();
         buffer_infos[i].offset = static_cast<VkDeviceSize>(allocator.get_offset());
         buffer_infos[i].range = static_cast<VkDeviceSize>(allocator.get_size());

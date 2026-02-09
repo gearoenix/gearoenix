@@ -34,4 +34,9 @@ void gearoenix::vulkan::reflection::Manager::build_runtime(
 {
 }
 
+void gearoenix::vulkan::reflection::Manager::upload_uniforms()
+{
+    uniform_indexer.update();
+}
+
 #endif

@@ -28,6 +28,7 @@ public:
     void update() override;
     void submit(VkCommandBuffer vk_cmd);
     void render_forward(VkCommandBuffer vk_cmd);
+    void upload_uniforms();
 };
 }
 #endif

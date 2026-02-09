@@ -28,6 +28,7 @@ public:
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void upload_uniforms();
 };
 }
 #endif

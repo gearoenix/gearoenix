@@ -29,4 +29,10 @@ void gearoenix::vulkan::model::Manager::update()
     bone_uniform_indexer.reset();
 }
 
+void gearoenix::vulkan::model::Manager::upload_uniforms()
+{
+    model_uniform_indexer.update();
+    bone_uniform_indexer.update();
+}
+
 #endif

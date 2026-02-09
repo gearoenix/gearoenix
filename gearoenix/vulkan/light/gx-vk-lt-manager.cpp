@@ -22,4 +22,11 @@ void gearoenix::vulkan::light::Manager::update()
     render::light::Manager::update();
 }
 
+void gearoenix::vulkan::light::Manager::upload_uniforms()
+{
+    directionals_uniform_indexer.update();
+    points_uniform_indexer.update();
+    directional_shadow_casters_uniform_indexer.update();
+}
+
 #endif

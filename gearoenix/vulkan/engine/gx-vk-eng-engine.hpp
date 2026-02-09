@@ -132,6 +132,7 @@ public:
     [[nodiscard]] const Frame& get_current_frame() const;
     [[nodiscard]] static bool is_supported();
     void flush() override;
+    void upload_uniforms();
 };
 }
 #endif

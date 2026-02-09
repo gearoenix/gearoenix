@@ -34,6 +34,7 @@ public:
     void construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;
     void construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c) override;
     void construct_sprite(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c) override;
+    void upload_uniforms();
 };
 }
 #endif

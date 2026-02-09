@@ -17,22 +17,14 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
     const auto& physical_device = device::Physical::get();
     const auto memory_properties = place == Place::Gpu ? VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT :(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     const auto index = std::make_pair(physical_device.get_memory_type_index(type_bits, memory_properties), place);
-    std::shared_ptr<Memory> result;
     const std::lock_guard _lg(memories_lock);
-    if (const auto search = memories.find(index); memories.end() == search) {
-        result = Memory::construct(place, index.first);
-        memories.emplace(index, result);
-    } else {
-        result = search->second.lock();
-        if (nullptr == result) {
-            result = Memory::construct(place, index.first);
-            search->second = result;
-        }
+    auto& root_weak = memories[index];
+    auto root = root_weak.lock();
+    if (nullptr == root) {
+        root = Memory::construct(place, index.first);
+        root_weak = root;
     }
-    if (nullptr == result) {
-        return nullptr;
-    }
-    return result->allocate(size);
+    return root->allocate(size);
 }
 
 #endif

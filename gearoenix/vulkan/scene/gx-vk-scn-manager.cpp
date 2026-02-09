@@ -209,4 +209,9 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
         }
     }
 }
+
+void gearoenix::vulkan::scene::Manager::upload_uniforms()
+{
+    uniform_indexer.update();
+}
 #endif

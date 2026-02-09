@@ -168,6 +168,7 @@ void gearoenix::vulkan::engine::Engine::submit()
     auto& cmd = *frame.cmd;
     const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
+    upload_uniforms();
     buffer_manager->upload_dynamics(vk_cmd);
     bindless_descriptor_manager->bind(vk_cmd);
     vk_scene_manager->submit(vk_cmd);
@@ -213,5 +214,15 @@ void gearoenix::vulkan::engine::Engine::flush()
 {
     render::engine::Engine::flush();
     logical_device->wait_to_finish();
+}
+
+void gearoenix::vulkan::engine::Engine::upload_uniforms()
+{
+    vk_camera_manager->upload_uniforms();
+    vk_light_manager->upload_uniforms();
+    vk_material_manager->upload_uniforms();
+    vk_model_manager->upload_uniforms();
+    vk_scene_manager->upload_uniforms();
+    vk_reflection_manager->upload_uniforms();
 }
 #endif

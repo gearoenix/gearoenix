@@ -16,8 +16,8 @@ gearoenix::vulkan::buffer::Uniform::~Uniform() = default;
 
 void gearoenix::vulkan::buffer::Uniform::update(const void* const src)
 {
-    const auto& b = *cpu[core::Singleton<engine::Engine>::get().get_frame_number()];
-    std::memcpy(b.get_allocated_memory()->get_data(), src, b.get_allocator()->get_size());
+    auto& b = *cpu[core::Singleton<engine::Engine>::get().get_frame_number()];
+    b.write(src, b.get_allocated_memory()->get_allocator()->get_size());
 }
 
 #endif

@@ -15,6 +15,7 @@ public:
 
     [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable) override;
     void update() override;
+    void upload_uniforms();
 };
 }
 #endif

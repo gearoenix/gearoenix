@@ -77,7 +77,8 @@ void main() {
 
     // Alpha test
     if (alb.a <= material.alpha_cutoff_occlusion_strength_reserved.x) {
-        discard;
+        frag_out = vec4(1.0);
+        return;
     }
 
     vec2 mtr = texture(sampler2D(textures_2d[nonuniformEXT(material.metallic_roughness_texture_index)], samplers[nonuniformEXT(material.metallic_roughness_sampler_index)]), in_uv).xy;
@@ -209,5 +210,5 @@ void main() {
     // Final color
     vec3 frag_colour = ambient + ems + illumination;
 
-    frag_out = vec4(frag_colour, 1.0);
+    frag_out = vec4(frag_colour + 0.5, 1.0);
 }

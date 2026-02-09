@@ -41,12 +41,12 @@ gearoenix::vulkan::memory::Memory::~Memory()
 std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::int64_t size)
 {
     const auto aligned_size = align(size);
-    auto alc = allocator->allocate(static_cast<std::int64_t>(aligned_size));
+    auto alc = allocator->allocate(aligned_size);
     if (nullptr == alc) {
         GX_LOG_D("No more space left in this Vulkan memory");
         return nullptr;
     }
-    void* const new_data = data == nullptr ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::intptr_t>(data) + static_cast<std::intptr_t>(alc->get_offset() - allocator->get_offset()));
+    void* const new_data = data == nullptr ? nullptr : reinterpret_cast<void*>(reinterpret_cast<std::intptr_t>(data) + alc->get_offset() - allocator->get_offset());
     std::shared_ptr<Memory> result(new Memory(self.lock(), std::move(alc), new_data, place, type_index, vulkan_data));
     result->self = result;
     return result;
@@ -78,6 +78,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     GX_VK_CHK(vkAllocateMemory(vk_dev, &info, nullptr, &vulkan_data));
     if (Place::Cpu == place) {
         GX_VK_CHK(vkMapMemory(vk_dev, vulkan_data, 0, static_cast<VkDeviceSize>(aligned_size), 0, &data));
+        GX_ASSERT_D(nullptr != data);
     }
     std::shared_ptr<Memory> result(new Memory(nullptr, core::allocator::Range::construct(aligned_size), data, place, type_index, vulkan_data));
     result->self = result;
