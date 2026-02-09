@@ -50,4 +50,14 @@ void main() {
     out_pos = pos.xyz;
     out_btg = normalize(cross(out_nrm, out_tng) * in_tangent.w);
     gl_Position = camera.view_projection * pos;
+    //gl_Position *= 0.000001;
+    //gl_Position.w += 1.0;
+    //gl_Position.z += 0.5;
+
+    //const vec2 positions[3] = vec2[3](
+    //    vec2( 0.0,  0.5),
+    //    vec2(-0.5, -0.5),
+    //    vec2( 0.5, -0.5)
+    //);
+    //gl_Position.xy += positions[gl_VertexIndex % 3];
 }

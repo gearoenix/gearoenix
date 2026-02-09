@@ -76,6 +76,7 @@ gearoenix::vulkan::buffer::Buffer::~Buffer()
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size)
 {
     const auto aligned_size = device::Physical::get().align_size(size);
+    const std::lock_guard _(allocation_lock);
     auto alc = allocator->allocate(aligned_size);
     if (nullptr == alc) {
         return nullptr;

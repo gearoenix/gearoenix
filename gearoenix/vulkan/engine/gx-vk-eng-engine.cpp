@@ -66,6 +66,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_reflection_manager(new reflection::Manager())
 {
     frames_count = frames_in_flight;
+    half_depth_clip = true;
     mesh_manager = std::unique_ptr<render::mesh::Manager>(vk_mesh_manager);
     texture_manager = std::unique_ptr<render::texture::Manager>(vk_texture_manager);
     material_manager = std::unique_ptr<material::Manager>(vk_material_manager);

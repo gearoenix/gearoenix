@@ -27,3 +27,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(std::st
     entity->add_component(std::move(transform));
     return entity;
 }
+
+void gearoenix::render::model::Manager::update()
+{
+}

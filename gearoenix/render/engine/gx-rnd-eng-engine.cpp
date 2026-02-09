@@ -132,6 +132,7 @@ void gearoenix::render::engine::Engine::end_frame()
     // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
     physics_engine->start_frame();
 
+    model_manager->update();
     camera_manager->update();
     light_manager->update();
     reflection_manager->update();

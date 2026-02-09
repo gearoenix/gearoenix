@@ -7,6 +7,7 @@
 #include "../memory/gx-vk-mem-place.hpp"
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 namespace gearoenix::core::allocator {
@@ -19,6 +20,7 @@ struct Buffer final {
     GX_GET_REFC_PRT(std::shared_ptr<const Buffer>, parent);
     GX_GET_CREF_PRT(std::shared_ptr<memory::Memory>, allocated_memory);
     GX_GET_VAL_PRT(VkBuffer, vulkan_data, nullptr);
+    std::mutex allocation_lock;
 
 private:
     std::weak_ptr<Buffer> self;

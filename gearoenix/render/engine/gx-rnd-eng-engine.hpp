@@ -92,6 +92,7 @@ struct Engine : core::Singleton<Engine> {
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
     GX_GET_CREF_PRT(std::chrono::time_point<clock_t>, last_frame_time);
+    GX_GET_VAL_PRT(bool, half_depth_clip, false);
 
     explicit Engine(Type engine_type);
 

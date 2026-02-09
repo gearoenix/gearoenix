@@ -23,4 +23,10 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::model::Manager::build(
     return entity;
 }
 
+void gearoenix::vulkan::model::Manager::update()
+{
+    model_uniform_indexer.reset();
+    bone_uniform_indexer.reset();
+}
+
 #endif
