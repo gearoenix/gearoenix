@@ -9,6 +9,16 @@ endif()
 
 message(STATUS "Found glslc: ${GX_GLSLC}")
 
+option(GX_VK_SHADER_DEBUG "Compile Vulkan shaders with debug info for NSight/RenderDoc" ON)
+
+if(GX_VK_SHADER_DEBUG)
+    set(GX_VK_SHADER_OPT_FLAGS -g -O0)
+    message(STATUS "Vulkan shaders: DEBUG mode (debug info, no optimization)")
+else()
+    set(GX_VK_SHADER_OPT_FLAGS -O)
+    message(STATUS "Vulkan shaders: RELEASE mode (maximum performance optimization)")
+endif()
+
 set(GX_VK_SHADER_GLSL_DIR "${CMAKE_CURRENT_LIST_DIR}/shader/glsl")
 set(GX_VK_SHADER_OUTPUT_DIR "${GX_MAIN_ASSETS_PATH}/vulkan/shader")
 set(GX_VK_SHADER_DEPS_DIR "${CMAKE_BINARY_DIR}/shader_deps")
@@ -50,7 +60,7 @@ foreach(SHADER_SOURCE ${GX_VK_SHADER_SOURCES})
             -MD -MF ${DEP_FILE}
             -I${GX_VK_SHADER_GLSL_DIR}
             --target-env=vulkan1.4
-            -O
+            ${GX_VK_SHADER_OPT_FLAGS}
             -o ${OUTPUT_FILE}
             ${SHADER_SOURCE}
         DEPENDS ${SHADER_SOURCE}
