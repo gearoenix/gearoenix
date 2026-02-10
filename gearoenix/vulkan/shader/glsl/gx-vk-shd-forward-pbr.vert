@@ -50,8 +50,4 @@ void main() {
     out_tng = normalize((inv_trn_m * vec4(in_tangent.xyz, 0.0)).xyz);
     out_btg = normalize(cross(out_nrm, out_tng) * in_tangent.w);
     gl_Position = camera.view_projection * pos;
-    gl_Position *= 0.000001;
-    gl_Position.w += 1.0;
-    gl_Position.z += 0.5;
-    gl_Position.xy += pos.xy;
 }
