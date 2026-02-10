@@ -16,7 +16,7 @@ struct Range;
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer final {
-    GX_GET_CVAL_PRV(std::uint8_t, offset);
+    GX_GET_CVAL_PRV(std::uint32_t, offset);
     GX_GET_REFC_PRV(std::shared_ptr<const Buffer>, parent);
     GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory);
     GX_GET_VAL_PRV(VkBuffer, vulkan_data, nullptr);

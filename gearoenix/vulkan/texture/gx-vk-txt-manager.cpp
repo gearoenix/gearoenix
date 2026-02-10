@@ -2,13 +2,11 @@
 
 #include <memory>
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
 #include "gx-vk-txt-2d.hpp"
 #include "gx-vk-txt-cube.hpp"
 #include "gx-vk-txt-target.hpp"
@@ -18,9 +16,7 @@ namespace {
 {
     GX_ASSERT_D(!pixels.empty());
     auto buff = gearoenix::vulkan::buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixels.size()));
-    auto* buffer_ptr = static_cast<std::uint8_t*>(buff->get_allocated_memory()->get_data());
-    GX_ASSERT_D(nullptr != buffer_ptr);
-    std::memcpy(buffer_ptr, pixels.data(), pixels.size());
+    buff->write(pixels.data(), static_cast<std::int64_t>(pixels.size()));
     return buff;
 }
 }

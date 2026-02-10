@@ -263,7 +263,8 @@ void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const T
         ? array_layers - request.base_layer
         : request.layer_count;
 
-    std::vector<VkImageMemoryBarrier2> barriers;
+    thread_local std::vector<VkImageMemoryBarrier2> barriers;
+    barriers.clear();
     barriers.reserve(actual_mip_count * actual_layer_count);
 
     for (std::uint32_t layer = request.base_layer; layer < request.base_layer + actual_layer_count; ++layer) {

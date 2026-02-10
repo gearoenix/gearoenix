@@ -1,14 +1,15 @@
 #include "gx-vk-img-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/sync/gx-cr-sync-work-waiter.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../gx-vk-check.hpp"
-#include "../sync/gx-vk-sync-fence.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
+#include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-img-image.hpp"
 
 gearoenix::vulkan::image::Manager::Manager()
@@ -47,7 +48,7 @@ void gearoenix::vulkan::image::Manager::upload(
         for (const auto& mip_buff : array_buffs) {
             VkBufferImageCopy region;
             GX_SET_ZERO(region);
-            region.bufferOffset = 0;
+            region.bufferOffset = mip_buff->get_offset();
             region.bufferRowLength = 0;
             region.bufferImageHeight = 0;
             region.imageSubresource.aspectMask = aspect_flags;
