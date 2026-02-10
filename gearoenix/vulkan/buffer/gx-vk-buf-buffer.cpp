@@ -34,6 +34,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     info.size = static_cast<VkDeviceSize>(aligned_size);
     if (memory::Place::Cpu == place) {
         info.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        info.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     } else {
         info.usage |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         info.usage |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
