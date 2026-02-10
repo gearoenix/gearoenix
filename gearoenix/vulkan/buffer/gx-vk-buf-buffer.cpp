@@ -82,7 +82,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
 
     const auto mem_off = alc_mem->get_allocator()->get_offset() - allocated_memory->get_allocator()->get_offset();
 
-    std::shared_ptr<Buffer> result(new Buffer(offset + mem_off, self.lock(), std::move(alc_mem), vulkan_data));
+    std::shared_ptr<Buffer> result(new Buffer(offset + static_cast<std::uint32_t>(mem_off), self.lock(), std::move(alc_mem), vulkan_data));
     result->self = result;
     return result;
 }

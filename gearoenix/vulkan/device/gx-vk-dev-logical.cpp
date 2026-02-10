@@ -144,7 +144,7 @@ gearoenix::vulkan::device::Logical::Logical()
         auto& queue_create_info = queue_create_infos.back();
         GX_SET_ZERO(queue_create_info);
         queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_create_info.queueCount = queue_priorities.size();
+        queue_create_info.queueCount = static_cast<std::uint32_t>(queue_priorities.size());
         queue_create_info.queueFamilyIndex = q;
         queue_create_info.pQueuePriorities = queue_priorities.data();
         GX_LOG_D("queue node index added is " << q);
