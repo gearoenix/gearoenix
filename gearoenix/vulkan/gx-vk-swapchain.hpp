@@ -21,6 +21,7 @@ namespace gearoenix::vulkan {
 struct Swapchain final : core::Singleton<Swapchain> {
     struct Frame final {
         std::shared_ptr<image::View> view;
+        std::shared_ptr<image::View> imgui_view; // UNORM view for ImGui (null if swapchain is not sRGB)
         std::unique_ptr<sync::Semaphore> present;
     };
 

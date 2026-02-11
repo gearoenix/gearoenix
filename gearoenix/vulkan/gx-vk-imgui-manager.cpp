@@ -39,6 +39,27 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
 
     const auto api_version = Instance::get().get_api_version();
 
+    // Determine the colour format for ImGui rendering.
+    // If the swapchain has a UNORM imgui_view (mutable sRGB swapchain), use the UNORM format
+    // to avoid double gamma correction. Otherwise, use the swapchain format as-is.
+    const auto& swapchain = Swapchain::get();
+    const auto& swapchain_format = swapchain.get_format().format;
+    if (swapchain.get_frames()[0].imgui_view) {
+        switch (swapchain_format) {
+        case VK_FORMAT_R8G8B8A8_SRGB:
+            imgui_colour_format = VK_FORMAT_R8G8B8A8_UNORM;
+            break;
+        case VK_FORMAT_B8G8R8A8_SRGB:
+            imgui_colour_format = VK_FORMAT_B8G8R8A8_UNORM;
+            break;
+        default:
+            imgui_colour_format = swapchain_format;
+            break;
+        }
+    } else {
+        imgui_colour_format = swapchain_format;
+    }
+
     // Initialize ImGui Vulkan backend with dynamic rendering
     ImGui_ImplVulkan_InitInfo info {};
     info.ApiVersion = api_version;
@@ -54,7 +75,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     info.UseDynamicRendering = true;
     info.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
     info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
-    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &Swapchain::get().get_format().format;
+    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &imgui_colour_format;
 #if GX_DEBUG_MODE
     info.CheckVkResultFn = +[](const VkResult result) {
         GX_VK_CHK(result);
@@ -96,6 +117,8 @@ void gearoenix::vulkan::ImGuiManager::update()
     auto& e = core::Singleton<engine::Engine>::get();
     const auto& frame = e.get_current_frame();
     const auto& swapchain_view = *frame.view;
+    // Use the UNORM view for ImGui rendering if available, to avoid double gamma correction
+    const auto& imgui_render_view = frame.imgui_view ? *frame.imgui_view : swapchain_view;
     auto& swapchain_image = *swapchain_view.get_image();
     const auto vk_cmd = frame.cmd->get_vulkan_data();
 
@@ -110,7 +133,7 @@ void gearoenix::vulkan::ImGuiManager::update()
         VkRenderingAttachmentInfo color_attachment;
         GX_SET_ZERO(color_attachment);
         color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-        color_attachment.imageView = swapchain_view.get_vulkan_data();
+        color_attachment.imageView = imgui_render_view.get_vulkan_data();
         color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         // If a scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content.
         color_attachment.loadOp = scene_content_present ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;

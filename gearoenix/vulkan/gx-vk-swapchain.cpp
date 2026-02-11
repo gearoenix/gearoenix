@@ -18,6 +18,20 @@
 #define GX_DEBUG_SWAPCHAIN true
 #endif
 
+namespace {
+[[nodiscard]] std::optional<VkFormat> srgb_to_unorm(const VkFormat format)
+{
+    switch (format) {
+    case VK_FORMAT_R8G8B8A8_SRGB:
+        return VK_FORMAT_R8G8B8A8_UNORM;
+    case VK_FORMAT_B8G8R8A8_SRGB:
+        return VK_FORMAT_B8G8R8A8_UNORM;
+    default:
+        return std::nullopt;
+    }
+}
+}
+
 gearoenix::vulkan::Swapchain::Swapchain()
     : Singleton(this)
     , format { }
@@ -103,9 +117,29 @@ void gearoenix::vulkan::Swapchain::initialize()
         image_usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     }
 
+    const auto unorm_format = srgb_to_unorm(format.format);
+    const auto mutable_format_supported = unorm_format.has_value()
+        && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
+
+    // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
+    std::array<VkFormat, 2> format_list_entries{};
+    VkImageFormatListCreateInfo format_list_info;
+    GX_SET_ZERO(format_list_info);
+    format_list_info.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_LIST_CREATE_INFO;
+
+    if (mutable_format_supported) {
+        format_list_entries = { format.format, *unorm_format };
+        format_list_info.viewFormatCount = static_cast<std::uint32_t>(format_list_entries.size());
+        format_list_info.pViewFormats = format_list_entries.data();
+    }
+
     VkSwapchainCreateInfoKHR info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    if (mutable_format_supported) {
+        info.flags = VK_SWAPCHAIN_CREATE_MUTABLE_FORMAT_BIT_KHR;
+        info.pNext = &format_list_info;
+    }
     info.surface = surface.get_vulkan_data();
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
@@ -146,7 +180,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
 
     for (auto i = 0; i < count; ++i) {
-        auto img = std::make_unique<image::Image>(
+        auto img = std::make_shared<image::Image>(
             "swapchain-img-" + std::to_string(i),
             static_cast<std::uint32_t>(info.imageExtent.width),
             static_cast<std::uint32_t>(info.imageExtent.height),
@@ -155,11 +189,15 @@ void gearoenix::vulkan::Swapchain::initialize()
             static_cast<std::uint32_t>(1),
             static_cast<std::uint32_t>(1),
             info.imageFormat,
-            static_cast<VkImageCreateFlags>(0),
+            mutable_format_supported ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : static_cast<VkImageCreateFlags>(0),
             info.imageUsage,
             images[i]);
         img->set_owned(false);
-        frames[i].view = std::make_shared<image::View>(std::move(img));
+        frames[i].view = std::make_shared<image::View>(std::shared_ptr(img));
+        if (mutable_format_supported) {
+            frames[i].imgui_view = std::make_shared<image::View>(
+                std::shared_ptr(img), 0, std::nullopt, 0, std::nullopt, *unorm_format);
+        }
         frames[i].present = std::make_unique<sync::Semaphore>("present-" + std::to_string(i));
     }
     if (nullptr != old_swapchain) {

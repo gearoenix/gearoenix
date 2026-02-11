@@ -33,7 +33,11 @@
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     for (int frame_index = 0; frame_index < frames_count; ++frame_index) {
-        frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain->get_frames()[frame_index].view), frame_index);
+        auto& swapchain_frame = swapchain->get_frames()[frame_index];
+        frames[frame_index] = std::make_unique<Frame>(
+            std::shared_ptr(swapchain_frame.view),
+            std::shared_ptr(swapchain_frame.imgui_view),
+            frame_index);
     }
 }
 

@@ -110,6 +110,8 @@ gearoenix::vulkan::device::Logical::Logical()
 
     std::vector<const char*> device_extensions;
     device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    GX_ASSERT_D(physical.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME));
+    device_extensions.push_back(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
     if (physical.get_supported_extensions().contains(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         device_extensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
     }

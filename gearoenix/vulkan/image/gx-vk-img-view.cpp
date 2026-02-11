@@ -32,7 +32,8 @@ gearoenix::vulkan::image::View::View(
     std::uint32_t base_level,
     std::optional<std::uint32_t> level_count,
     std::uint32_t base_layer,
-    std::optional<std::uint32_t> layer_count)
+    std::optional<std::uint32_t> layer_count,
+    std::optional<VkFormat> format_override)
     : image(std::move(img))
     , extent {
         .width = std::max(image->get_image_width() >> base_level, 1u),
@@ -75,7 +76,7 @@ gearoenix::vulkan::image::View::View(
         GX_UNEXPECTED;
     }
 
-    info.format = image->get_format();
+    info.format = format_override.value_or(image->get_format());
     info.components.r = VK_COMPONENT_SWIZZLE_R;
     info.components.g = VK_COMPONENT_SWIZZLE_G;
     info.components.b = VK_COMPONENT_SWIZZLE_B;
