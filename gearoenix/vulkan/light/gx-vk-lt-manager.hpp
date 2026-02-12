@@ -9,6 +9,10 @@ struct Uniform;
 }
 
 namespace gearoenix::vulkan::light {
+using directionals_uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataDirectionalLight>;
+using points_uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataPointLight>;
+using directional_shadow_casters_uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight>;
+
 struct Manager final : render::light::Manager, core::Singleton<Manager> {
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataDirectionalLight>, directionals_uniform_indexer);
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataPointLight>, points_uniform_indexer);
@@ -19,6 +23,15 @@ public:
     ~Manager() override;
     void update() override;
     void upload_uniforms();
+    [[nodiscard]] core::ecs::EntityPtr build_directional(std::string&&, core::ecs::Entity*) override;
+    void build_shadow_caster_directional(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        std::uint32_t shadow_map_resolution,
+        float camera_far,
+        float camera_near,
+        float camera_aspect,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 };
 }
 #endif

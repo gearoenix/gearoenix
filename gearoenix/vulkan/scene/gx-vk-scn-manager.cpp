@@ -9,7 +9,6 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../engine/gx-vk-eng-frame.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
@@ -17,6 +16,7 @@
 #include "gx-vk-scn-scene.hpp"
 
 #include <boost/container/flat_set.hpp>
+
 #include <ranges>
 
 namespace {
@@ -46,18 +46,20 @@ void gearoenix::vulkan::scene::Manager::update()
 
     render::scene::Manager::update();
 
+    const auto frame_number = render::engine::Engine::get().get_frame_number_from_start();
+
     core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, Scene* const scene) -> void {
         if (!scene->get_enabled()) {
             return;
         }
         scenes.emplace(scene->get_layer(), scene);
-        scene->after_record();
+        scene->after_record(frame_number);
     });
 }
 
 void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
 {
-    // TODO: render shadows
+    render_shadows(vk_cmd);
     // TODO: render reflection probes
 
     // if (render::engine::Engine::get().get_specification().is_deferred_supported) {
@@ -88,7 +90,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
         const auto& swapchain_view = *frame.view;
         auto& swapchain_image = *swapchain_view.get_image();
 
-        // Check if swapchain supports being a blit destination
+        // Check if the swapchain supports being a blit destination
         if ((swapchain_image.get_usage() & VK_IMAGE_USAGE_TRANSFER_DST_BIT) == 0) {
             // TODO: Fall back to shader-based rendering to swapchain
             GX_LOG_D("Swapchain does not support blit destination, skipping camera composition.");
@@ -207,6 +209,15 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
         if (swapchain_image.get_layout() == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
             swapchain_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
         }
+    }
+}
+
+void gearoenix::vulkan::scene::Manager::render_shadows(const VkCommandBuffer vk_cmd)
+{
+    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
+    VkPipeline current_bound_pipeline = nullptr;
+    for (const auto& scene : scenes | std::views::values) {
+        scene->render_shadows(vk_cmd, current_bound_pipeline);
     }
 }
 

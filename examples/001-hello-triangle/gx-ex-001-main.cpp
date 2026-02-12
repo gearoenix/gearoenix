@@ -92,11 +92,9 @@ public:
     {
         camera_entity->get_component<GxTran>()->set_local_position({ 0.0f, 0.0f, 5.0f });
 
-        scene_entity->add_to_world(); // TODO: temporary, remove it, see set_light
-
-        // GxLightManager::get().build_shadow_caster_directional(
-        //     "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
-        //     GxEntityEndCaller([this](GxEntityPtr&& l) { set_light(std::move(l)); }));
+        GxLightManager::get().build_shadow_caster_directional(
+            "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
+            GxEntityEndCaller([this](GxEntityPtr&& l) { set_light(std::move(l)); }));
     }
 
     void set_light(GxEntityPtr&& light_entity)

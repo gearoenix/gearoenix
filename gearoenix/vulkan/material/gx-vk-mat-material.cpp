@@ -24,12 +24,11 @@ void gearoenix::vulkan::material::Material::bind_shadow(const VkCommandBuffer, c
 
 void gearoenix::vulkan::material::Material::bind_graphics(const VkPipeline pipeline, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
-    if (current_bound_pipeline == pipeline) {
-        return;
-    }
-    current_bound_pipeline = pipeline;
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     pc.material_index = shader_data.get_index();
+    if (current_bound_pipeline != pipeline) {
+        current_bound_pipeline = pipeline;
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    }
 }
 
 #endif

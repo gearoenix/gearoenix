@@ -55,9 +55,13 @@ void gearoenix::vulkan::scene::Scene::update()
 void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
+
+    pipeline::PushConstants pc;
+    pc.scene_index = shader_data_index;
+
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
         auto& cmr_rcd = record.cameras.cameras[index];
-        core::cast_ptr<camera::Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, vk_cmd);
+        core::cast_ptr<camera::Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, vk_cmd, pc, current_bound_pipeline);
     }
 }
 
@@ -91,7 +95,7 @@ void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cm
     }
 }
 
-void gearoenix::vulkan::scene::Scene::after_record()
+void gearoenix::vulkan::scene::Scene::after_record(const std::uint64_t frame_number)
 {
     auto sd = descriptor::UniformIndexer<GxShaderDataScene>::get().get_next();
     shader_data_index = sd.get_index();
@@ -104,7 +108,7 @@ void gearoenix::vulkan::scene::Scene::after_record()
     const auto& cameras = record.cameras;
     for (auto cam_i = 0; cam_i < cameras.last_camera_index; ++cam_i) {
         auto& rc = cameras.cameras[cam_i];
-        core::cast_ptr<camera::Camera>(rc.camera)->after_record(rc);
+        core::cast_ptr<camera::Camera>(rc.camera)->after_record(frame_number, rc);
     }
 }
 

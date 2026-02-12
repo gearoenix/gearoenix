@@ -13,6 +13,7 @@ using uint = std::uint32_t;
 
 #endif
 
+#define GX_VK_SHD_MAX_SHADOW_CASTER_DIRECTIONAL_LIGHTS 8
 
 #ifndef GX_PI
 #define GX_PI 3.141592653589793238
@@ -75,14 +76,10 @@ struct GxShaderDataModel {
     uint directional_light_begin_index;
     uint directional_light_end_index;
 
-    uint shadow_caster_directional_light_begin_index;
-    uint shadow_caster_directional_light_end_index;
+    uint shadow_caster_directional_lights_count;
+    uint shadow_caster_directional_lights[GX_VK_SHD_MAX_SHADOW_CASTER_DIRECTIONAL_LIGHTS];
 
     uint reflection_probe_index;
-
-    uint _padding0;
-    uint _padding1;
-    uint _padding2;
 };
 
 struct GxShaderDataReflectionProbe {
@@ -137,15 +134,9 @@ struct GxShaderDataDirectionalLight {
 };
 
 struct GxShaderDataShadowCasterDirectionalLight {
-    vec4 direction;
+    vec4 direction_bit_shadow_map_texture_index;
     vec4 colour;
     mat4 normalised_vp;
-
-    uint shadow_map_texture_index;
-
-    uint _padding0;
-    uint _padding1;
-    uint _padding2;
 };
 
 struct GxShaderDataBone {

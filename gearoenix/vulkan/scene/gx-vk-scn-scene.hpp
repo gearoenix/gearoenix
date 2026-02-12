@@ -28,7 +28,7 @@ public:
     void render_shadows(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
     void render_reflection_probes(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline) const;
     void render_forward(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
-    void after_record();
+    void after_record(std::uint64_t frame_number);
 };
 }
 #endif

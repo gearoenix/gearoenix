@@ -77,8 +77,7 @@ void main() {
 
     // Alpha test
     if (alb.a <= material.alpha_cutoff_occlusion_strength_reserved.x) {
-        frag_out = vec4(1.0);
-        return;
+        discard;
     }
 
     vec2 mtr = texture(sampler2D(textures_2d[nonuniformEXT(material.metallic_roughness_texture_index)], samplers[nonuniformEXT(material.metallic_roughness_sampler_index)]), in_uv).xy;
@@ -146,16 +145,18 @@ void main() {
     }
 
     // ========== Shadow-Casting Directional Lights ==========
-    for (uint i = model.shadow_caster_directional_light_begin_index; i < model.shadow_caster_directional_light_end_index; ++i) {
-        GxShaderDataShadowCasterDirectionalLight light = shadow_caster_directional_lights[i];
+    for (uint i = 0; i < model.shadow_caster_directional_lights_count; ++i) {
+        GxShaderDataShadowCasterDirectionalLight light = shadow_caster_directional_lights[model.shadow_caster_directional_lights[i]];
+
+        uint shadow_map_texture_index = floatBitsToUint(light.direction_bit_shadow_map_texture_index.w);
 
         // Shadow calculation
-        float normal_dot_light = max(dot(nrm, light.direction.xyz), 0.00001);
+        float normal_dot_light = max(dot(nrm, light.direction_bit_shadow_map_texture_index.xyz), 0.00001);
         float shadow_bias = clamp(sqrt((0.000025 / (normal_dot_light * normal_dot_light)) - 0.000025), 0.001, 0.02);
 
         vec4 light_uv_depth = light.normalised_vp * vec4(in_pos, 1.0);
         light_uv_depth.xyz /= light_uv_depth.w;
-        light_uv_depth.xyz = light_uv_depth.xyz * 0.5 + 0.5;
+        light_uv_depth.xy = light_uv_depth.xy * 0.5 + 0.5;
         light_uv_depth.z -= shadow_bias;
 
         // Check bounds
@@ -163,15 +164,13 @@ void main() {
         float in_shadow_map = uv_bounds.x * uv_bounds.y * uv_bounds.z;
 
         // Sample shadow map using comparison sampler
-        float shadow_sample = texture(
-            sampler2DShadow(textures_2d[nonuniformEXT(light.shadow_map_texture_index)], shadow_sampler_cmp),
-            light_uv_depth.xyz);
+        float shadow_sample = texture(sampler2DShadow(textures_2d[nonuniformEXT(shadow_map_texture_index)], shadow_sampler_cmp), light_uv_depth.xyz);
 
         float shadow_w = in_shadow_map * (1.0 - shadow_sample);
         float light_w = 1.0 - shadow_w;
 
         illumination += light_w * compute_light(
-            light.direction.xyz,
+            light.direction_bit_shadow_map_texture_index.xyz,
             light.colour.rgb,
             view, nrm, normal_dot_view, roughness, metallic, f0, f90, alb.rgb);
     }
@@ -210,5 +209,5 @@ void main() {
     // Final color
     vec3 frag_colour = ambient + ems + illumination;
 
-    frag_out = vec4(frag_colour + 0.5, 1.0);
+    frag_out = vec4(frag_colour, 1.0);
 }

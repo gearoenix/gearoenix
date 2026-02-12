@@ -56,18 +56,28 @@ void gearoenix::vulkan::camera::Camera::construct(core::ecs::Entity* const entit
 
 gearoenix::vulkan::camera::Camera::~Camera() = default;
 
-void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
-    // push_debug_group(render_pass_name);
-    // ctx::set_framebuffer(gapi_target.get_customised().target->get_framebuffer());
-    // ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    // for (auto& distance_model_data : cmr.all_models) {
-    //     auto& camera_model = distance_model_data.second;
-    //     auto& model = *core::cast_ptr<Model>(camera_model.model->model);
-    //     model.render_shadow(cmr, camera_model, current_shader);
-    // }
-    // pop_debug_group();
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.3f, 0.5f, 0.9f, "render-shadow-camera for camera: {}", object_name);
+
+    pc.camera_index = shader_data_index;
+
+    // Shadow's camera must always have a customised target.
+    GX_ASSERT_D(target.is_customised());
+    const auto render_scope = gapi_target.get_customised().target->create_rendering_scope(cmd);
+
+    record_viewport(cmr, cmd);
+
+    const auto render_models = [&](const auto& models) {
+        for (const auto& camera_model : models | std::views::values) {
+            GX_ASSERT_D(camera_model.first_mvp_index != static_cast<std::uint32_t>(-1));
+            pc.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
+            core::cast_ptr<model::Model>(camera_model.model->model)->render_shadow(camera_model, cmd, pc, current_bound_pipeline);
+        }
+    };
+
+    render_models(cmr.opaque_models);
+    render_models(cmr.translucent_models);
 }
 
 void gearoenix::vulkan::camera::Camera::render_forward(
@@ -84,29 +94,9 @@ void gearoenix::vulkan::camera::Camera::render_forward(
         return gapi_target.get_default().main->create_rendering_scope(cmd);
     }();
 
-    const VkViewport viewport {
-        .x = cmr.viewport_clip.x,
-        .y = cmr.viewport_clip.y,
-        .width = cmr.viewport_clip.z,
-        .height = cmr.viewport_clip.w,
-        .minDepth = 0.0f,
-        .maxDepth = 1.0f,
-    };
-    vkCmdSetViewport(cmd, 0, 1, &viewport);
+    record_viewport(cmr, cmd);
 
-    const VkRect2D scissor {
-        .offset = {
-            .x = static_cast<std::int32_t>(cmr.viewport_clip.x),
-            .y = static_cast<std::int32_t>(cmr.viewport_clip.y),
-        },
-        .extent = {
-            .width = static_cast<std::uint32_t>(cmr.viewport_clip.z),
-            .height = static_cast<std::uint32_t>(cmr.viewport_clip.w),
-        },
-    };
-    vkCmdSetScissor(cmd, 0, 1, &scissor);
-
-    const auto render_models = [&](auto& models) {
+    const auto render_models = [&](const auto& models) {
         for (const auto& camera_model : models | std::views::values) {
             pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index]: 0;
             core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, cmd, pc, current_bound_pipeline);
@@ -339,8 +329,13 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(c
     // GX_GL_CHECK_D;
 }
 
-void gearoenix::vulkan::camera::Camera::after_record(const render::record::Camera& rc)
+void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_number, const render::record::Camera& rc)
 {
+    if (frame_number == last_update_frame_number) {
+        return;
+    }
+    last_update_frame_number = frame_number;
+
     cameras_joint_model_indices.clear();
 
     {
@@ -358,11 +353,36 @@ void gearoenix::vulkan::camera::Camera::after_record(const render::record::Camer
     }
 
     for (const auto& camera_model : rc.opaque_models | std::views::values) {
-        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(camera_model);
+        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(frame_number, camera_model);
     }
 
     for (const auto& camera_model : rc.translucent_models | std::views::values) {
-        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(camera_model);
+        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(frame_number, camera_model);
     }
+}
+
+void gearoenix::vulkan::camera::Camera::record_viewport(const render::record::Camera& cmr, const VkCommandBuffer cmd)
+{
+    const VkViewport viewport {
+        .x = cmr.viewport_clip.x,
+        .y = cmr.viewport_clip.y,
+        .width = cmr.viewport_clip.z,
+        .height = cmr.viewport_clip.w,
+        .minDepth = 0.0f,
+        .maxDepth = 1.0f,
+    };
+    vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+    const VkRect2D scissor {
+        .offset = {
+            .x = static_cast<std::int32_t>(cmr.viewport_clip.x),
+            .y = static_cast<std::int32_t>(cmr.viewport_clip.y),
+        },
+        .extent = {
+            .width = static_cast<std::uint32_t>(cmr.viewport_clip.z),
+            .height = static_cast<std::uint32_t>(cmr.viewport_clip.w),
+        },
+    };
+    vkCmdSetScissor(cmd, 0, 1, &scissor);
 }
 #endif
