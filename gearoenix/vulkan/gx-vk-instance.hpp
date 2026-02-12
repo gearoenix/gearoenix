@@ -6,6 +6,8 @@
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 
+#include <memory>
+
 #if GX_DEBUG_MODE
 #define GX_VULKAN_INSTANCE_DEBUG true
 #endif

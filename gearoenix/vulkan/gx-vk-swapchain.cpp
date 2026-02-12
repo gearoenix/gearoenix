@@ -101,7 +101,7 @@ void gearoenix::vulkan::Swapchain::initialize()
 
     format = formats[chosen_format_index];
     GX_ASSERT_D(caps.minImageCount <= frames_in_flight);
-    GX_ASSERT_D(caps.maxImageCount >= frames_in_flight);
+    GX_ASSERT_D(caps.maxImageCount == 0 || caps.maxImageCount >= frames_in_flight);
 
     std::uint32_t image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     VkFormatProperties format_props;
