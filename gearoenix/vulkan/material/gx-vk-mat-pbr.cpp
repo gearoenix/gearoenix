@@ -23,9 +23,9 @@ gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
     if (not_initialised.exchange(false, std::memory_order_relaxed)) {
         const auto& pip_mgr = pipeline::Manager::get();
 
-        shadow_pipeline = pip_mgr.get_pbr_shadow_pipeline().get();
+        shadow_pipeline = pip_mgr.get_shadow_pipeline().get();
         forward_pipeline = pip_mgr.get_pbr_forward_pipeline().get();
-        skinned_shadow_pipeline = pip_mgr.get_pbr_skinned_shadow_pipeline().get();
+        skinned_shadow_pipeline = pip_mgr.get_skinned_shadow_pipeline().get();
         skinned_forward_pipeline = pip_mgr.get_pbr_skinned_forward_pipeline().get();
 
         vk_shadow_pipeline = shadow_pipeline->get_vulkan_data();

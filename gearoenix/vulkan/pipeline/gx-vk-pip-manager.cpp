@@ -277,18 +277,6 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
 
     pbr_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
-    // ========== Shadow pipeline (depth-only, vertex shader only) ==========
-    // Reuse rendering_info and color_blend, modifying only what differs
-    rendering_info.colorAttachmentCount = 0;
-    rendering_info.pColorAttachmentFormats = nullptr;
-
-    color_blend.attachmentCount = 0;
-    color_blend.pAttachments = nullptr;
-
-    create_info.stageCount = 1;
-
-    pbr_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
-
     // ========== Unlit Forward Pipeline (non-skinned) ==========
     unlit_vert_sm = shader_manager->get("forward-unlit.vert");
     unlit_frag_sm = shader_manager->get("forward-unlit.frag");
@@ -339,17 +327,6 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
 
     pbr_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
-    // Skinned PBR shadow pipeline
-    rendering_info.colorAttachmentCount = 0;
-    rendering_info.pColorAttachmentFormats = nullptr;
-
-    color_blend.attachmentCount = 0;
-    color_blend.pAttachments = nullptr;
-
-    create_info.stageCount = 1;
-
-    pbr_skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
-
     // Skinned unlit forward pipeline - reuse vert_stage with unlit shaders
     vert_stage.module = unlit_vert_sm->get_vulkan_data();
     frag_stage.module = unlit_frag_sm->get_vulkan_data();
@@ -364,6 +341,64 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     create_info.stageCount = static_cast<std::uint32_t>(stages.size());
 
     unlit_skinned_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
+
+    // ========== Shadow pipelines (unified, depth-only, vertex shader only) ==========
+    shadow_caster_vert_sm = shader_manager->get("shadow-caster.vert");
+
+    vert_stage.module = shadow_caster_vert_sm->get_vulkan_data();
+    vert_stage.pSpecializationInfo = nullptr;
+
+    rendering_info.colorAttachmentCount = 0;
+    rendering_info.pColorAttachmentFormats = nullptr;
+
+    color_blend.attachmentCount = 0;
+    color_blend.pAttachments = nullptr;
+
+    // Shadow caster only uses locations 0 (position), 3 (uv), 4 (bone_weights), 5 (bone_indices)
+    std::array<VkVertexInputAttributeDescription, 4> shadow_vertex_attributes{};
+    GX_SET_ZERO(shadow_vertex_attributes);
+
+    // position: vec3 (location 0)
+    shadow_vertex_attributes[0].binding = 0;
+    shadow_vertex_attributes[0].location = 0;
+    shadow_vertex_attributes[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    shadow_vertex_attributes[0].offset = offsetof(render::PbrVertex, position);
+
+    // uv: vec2 (location 3)
+    shadow_vertex_attributes[1].binding = 0;
+    shadow_vertex_attributes[1].location = 3;
+    shadow_vertex_attributes[1].format = VK_FORMAT_R32G32_SFLOAT;
+    shadow_vertex_attributes[1].offset = offsetof(render::PbrVertex, uv);
+
+    // bone_weights: vec4 (location 4, dummy for non-skinned)
+    shadow_vertex_attributes[2].binding = 0;
+    shadow_vertex_attributes[2].location = 4;
+    shadow_vertex_attributes[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    shadow_vertex_attributes[2].offset = 0;
+
+    // bone_indices: vec4 (location 5, dummy for non-skinned)
+    shadow_vertex_attributes[3].binding = 0;
+    shadow_vertex_attributes[3].location = 5;
+    shadow_vertex_attributes[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    shadow_vertex_attributes[3].offset = 0;
+
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(shadow_vertex_attributes.size());
+    vertex_input_info.pVertexAttributeDescriptions = shadow_vertex_attributes.data();
+
+    // Non-skinned shadow pipeline
+    vertex_binding.stride = sizeof(render::PbrVertex);
+
+    create_info.stageCount = 1;
+
+    shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
+
+    // Skinned shadow pipeline
+    vertex_binding.stride = sizeof(render::PbrVertexAnimated);
+    shadow_vertex_attributes[2].offset = offsetof(render::PbrVertexAnimated, bone_weights);
+    shadow_vertex_attributes[3].offset = offsetof(render::PbrVertexAnimated, bone_indices);
+    vert_stage.pSpecializationInfo = &spec_info;
+
+    skinned_shadow_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 }
 
 gearoenix::vulkan::pipeline::Manager::Manager()

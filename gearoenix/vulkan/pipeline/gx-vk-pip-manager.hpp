@@ -38,14 +38,16 @@ struct Manager final : core::Singleton<Manager> {
     std::shared_ptr<shader::Module> pbr_vert_sm;
     std::shared_ptr<shader::Module> pbr_frag_sm;
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_forward_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_shadow_pipeline);
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_forward_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_shadow_pipeline);
 
     std::shared_ptr<shader::Module> unlit_vert_sm;
     std::shared_ptr<shader::Module> unlit_frag_sm;
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_forward_pipeline);
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_skinned_forward_pipeline);
+
+    std::shared_ptr<shader::Module> shadow_caster_vert_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skinned_shadow_pipeline);
 
     void initialise_ray_tracing();
     void initialise_rasterizer();
