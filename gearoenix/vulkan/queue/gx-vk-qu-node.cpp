@@ -1,9 +1,9 @@
 #include "gx-vk-qu-node.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "../command/gx-vk-cmd-manager.hpp"
 
 gearoenix::vulkan::queue::Node::Node(const NodeLabel node_label, const VkPipelineStageFlags stage)
     : node_label(node_label)

@@ -88,6 +88,7 @@ void gearoenix::render::mesh::Manager::build_icosphere(
     };
 
     std::vector<std::uint32_t> indices {
+        // clang-format off
         0, 1, 2, // 0
         1, 0, 3, // 1
         0, 2, 4, // 2
@@ -108,6 +109,7 @@ void gearoenix::render::mesh::Manager::build_icosphere(
         9, 8, 11, // 17
         10, 9, 11, // 18
         6, 10, 11, // 19
+        // clang-format on
     };
     boost::container::flat_map<std::pair<std::uint32_t, std::uint32_t>, std::uint32_t> cached_vertices;
 
@@ -367,6 +369,7 @@ void gearoenix::render::mesh::Manager::build_cube(
                 math::Vec2(1.0f, 1.0f)),
         },
         std::vector<std::uint32_t> {
+            // clang-format off
             0, 1, 2, // 1
             1, 3, 2, // 2
             4, 6, 5, // 3
@@ -379,6 +382,7 @@ void gearoenix::render::mesh::Manager::build_cube(
             17, 19, 18, // 10
             20, 22, 21, // 11
             21, 22, 23, // 12
+            // clang-format on
         },
         std::move(material),
         std::move(end_callback));
@@ -527,6 +531,7 @@ void gearoenix::render::mesh::Manager::build_inward_cube(
                 math::Vec2(1.0f, 1.0f)),
         },
         std::vector<std::uint32_t> {
+            // clang-format off
             0, 2, 1, // 1
             1, 2, 3, // 2
             4, 5, 6, // 3
@@ -539,6 +544,7 @@ void gearoenix::render::mesh::Manager::build_inward_cube(
             17, 18, 19, // 10
             20, 21, 22, // 11
             21, 23, 22, // 12
+            // clang-format on
         },
         std::move(material),
         std::move(end_callback));

@@ -1,7 +1,7 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>

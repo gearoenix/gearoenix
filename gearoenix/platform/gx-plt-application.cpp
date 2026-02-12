@@ -371,7 +371,7 @@ std::pair<void*, int> gearoenix::platform::BaseApplication::get_default_font_dat
 {
     const auto font = stream::Stream::open(stream::Path::create_asset("default-font.ttf"));
     if (nullptr == font) {
-        return {nullptr, 0};
+        return { nullptr, 0 };
     }
     const auto content_sz = font->size();
     auto* const content = new std::uint8_t[content_sz];

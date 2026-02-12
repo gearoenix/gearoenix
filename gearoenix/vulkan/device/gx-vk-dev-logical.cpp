@@ -151,7 +151,7 @@ gearoenix::vulkan::device::Logical::Logical()
         queue_create_info.pQueuePriorities = queue_priorities.data();
         GX_LOG_D("queue node index added is " << q);
     }
-    
+
     VkDeviceCreateInfo device_create_info;
     GX_SET_ZERO(device_create_info);
     device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -161,7 +161,7 @@ gearoenix::vulkan::device::Logical::Logical()
     device_create_info.ppEnabledExtensionNames = device_extensions.data();
     device_create_info.pNext = &device_features2;
     GX_VK_CHK(vkCreateDevice(physical.get_vulkan_data(), &device_create_info, nullptr, &vulkan_data));
-    
+
     Loader::load(vulkan_data);
 
 #if GX_VULKAN_DEVICE_DEBUG_MODE

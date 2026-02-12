@@ -43,7 +43,7 @@ struct Target final : render::texture::Target {
     GX_GET_CREF_PRV(std::vector<GapiAttachment>, gapi_attachments);
     std::vector<VkRenderingAttachmentInfo> color_attachments;
     std::optional<VkRenderingAttachmentInfo> depth_attachment;
-    VkRenderingInfo rendering_info{};
+    VkRenderingInfo rendering_info {};
 
     Target(std::string&&, std::vector<render::texture::Attachment>&& attachments);
 

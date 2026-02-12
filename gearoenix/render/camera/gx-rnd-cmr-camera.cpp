@@ -202,10 +202,11 @@ void gearoenix::render::camera::Camera::update_projection()
     }
     if (engine::Engine::get().get_half_depth_clip()) {
         projection = math::Mat4x4(
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, -1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.5f, 0.0f,
-            0.0f, 0.0f, 0.5f, 1.0f) * projection;
+                         1.0f, 0.0f, 0.0f, 0.0f,
+                         0.0f, -1.0f, 0.0f, 0.0f,
+                         0.0f, 0.0f, 0.5f, 0.0f,
+                         0.0f, 0.0f, 0.5f, 1.0f)
+            * projection;
     }
     view_projection = projection * view;
 }

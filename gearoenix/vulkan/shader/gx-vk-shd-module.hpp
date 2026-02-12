@@ -4,8 +4,8 @@
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
-#include <span>
 #include <cstdint>
+#include <span>
 
 namespace gearoenix::vulkan::shader {
 struct Module final {

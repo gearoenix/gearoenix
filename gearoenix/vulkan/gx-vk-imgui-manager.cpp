@@ -82,9 +82,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     };
 #endif
 
-    ImGui_ImplVulkan_LoadFunctions(api_version, +[](const char* const name, void*) {
-        return Loader::get(name);
-    }, nullptr);
+    ImGui_ImplVulkan_LoadFunctions(api_version, +[](const char* const name, void*) { return Loader::get(name); }, nullptr);
     ImGui_ImplVulkan_Init(&info);
 }
 

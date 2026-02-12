@@ -1,9 +1,9 @@
 #include "gx-vk-mdl-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "gx-vk-mdl-model.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../physics/animation/gx-phs-anm-bone.hpp"
+#include "gx-vk-mdl-model.hpp"
 
 gearoenix::vulkan::model::Manager::Manager()
     : Singleton<Manager>(this)

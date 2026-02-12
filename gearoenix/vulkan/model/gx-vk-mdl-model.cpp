@@ -9,10 +9,10 @@
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../light/gx-vk-lt-shadow-caster-directional.hpp"
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
-#include "../light/gx-vk-lt-shadow-caster-directional.hpp"
 
 gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
     : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
@@ -94,7 +94,7 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
     sd.directional_light_end_index = 0;
 
     sd.shadow_caster_directional_lights_count = lights.shadow_caster_directionals.size();
-    for(std::uint32_t li = 0; li < sd.shadow_caster_directional_lights_count; ++li) {
+    for (std::uint32_t li = 0; li < sd.shadow_caster_directional_lights_count; ++li) {
         auto& rl = *lights.shadow_caster_directionals[li];
         auto& l = *core::cast_ptr<light::ShadowCasterDirectional>(rl.shadow_caster_directional);
         l.after_record(frame_number, rl);

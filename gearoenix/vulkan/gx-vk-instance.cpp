@@ -1,9 +1,9 @@
 #include "gx-vk-instance.hpp"
 #if GX_RENDER_VULKAN_ENABLED
+#include "../core/gx-cr-application.hpp"
 #include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
 #include "gx-vk-check.hpp"
-#include "../core/gx-cr-application.hpp"
 
 #include <set>
 #include <sstream>
@@ -85,7 +85,11 @@ static std::uint32_t find_api_version()
 }
 }
 
-gearoenix::vulkan::Instance::Instance() : Singleton(this), api_version(find_api_version()) {}
+gearoenix::vulkan::Instance::Instance()
+    : Singleton(this)
+    , api_version(find_api_version())
+{
+}
 
 std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct()
 {
@@ -194,7 +198,7 @@ gearoenix::vulkan::Instance::~Instance()
             debug_messenger = nullptr;
         }
 #endif
-        
+
         vkDestroyInstance(vulkan_data, nullptr);
         vulkan_data = nullptr;
     }

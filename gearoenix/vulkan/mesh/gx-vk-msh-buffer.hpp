@@ -1,9 +1,9 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../render/mesh/gx-rnd-msh-buffer.hpp"
-#include "../../render/gx-rnd-vertex.hpp"
 #include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "../../render/gx-rnd-vertex.hpp"
+#include "../../render/mesh/gx-rnd-msh-buffer.hpp"
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;

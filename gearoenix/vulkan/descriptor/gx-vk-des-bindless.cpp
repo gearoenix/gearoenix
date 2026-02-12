@@ -1,20 +1,17 @@
 #include "gx-vk-des-bindless.hpp"
 #if GX_RENDER_VULKAN_ENABLED
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/job/gx-cr-job-manager.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
-#include "../../core/allocator/gx-cr-alc-range.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
-#include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
 
 namespace {
-constexpr VkDescriptorBindingFlags gx_binding_flags =
-    VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT |
-    VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT |
-    VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT;
+constexpr VkDescriptorBindingFlags gx_binding_flags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT;
 }
 
 gearoenix::vulkan::descriptor::Bindless::Bindless(
@@ -136,7 +133,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         0, // shadow caster directional lights buffer
         0, // bones buffer
         0, // reflection probes buffer
-        0  // cameras joint models buffer
+        0 // cameras joint models buffer
     };
 
     VkDescriptorSetLayoutBindingFlagsCreateInfo binding_flags_info;
@@ -173,7 +170,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     GX_VK_CHK(vkCreatePipelineLayout(vk_dev, &pipeline_layout_info, nullptr, &pipeline_layout));
 
     // ========== Descriptor Pool ==========
-    std::array<VkDescriptorPoolSize, 3> pool_sizes{};
+    std::array<VkDescriptorPoolSize, 3> pool_sizes {};
     GX_SET_ZERO(pool_sizes);
 
     pool_sizes[0].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -250,10 +247,10 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         &cameras_joint_models_buffer
     };
 
-    std::array<VkDescriptorBufferInfo, 10> buffer_infos{};
+    std::array<VkDescriptorBufferInfo, 10> buffer_infos {};
     std::memset(buffer_infos.data(), 0, sizeof(VkDescriptorBufferInfo) * buffer_infos.size());
 
-    std::array<VkWriteDescriptorSet, 10> writes{};
+    std::array<VkWriteDescriptorSet, 10> writes {};
     std::memset(writes.data(), 0, sizeof(VkWriteDescriptorSet) * writes.size());
 
     for (std::uint32_t i = 0; i < buffers.size(); ++i) {
@@ -325,7 +322,7 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
     GX_SET_ZERO(info);
     info.imageView = view;
     info.imageLayout = layout;
-    
+
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -334,7 +331,7 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
     write.dstArrayElement = index;
     write.descriptorCount = 1;
     write.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    
+
     core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info]() mutable {
         write.pImageInfo = &info;
         vkUpdateDescriptorSets(device::Logical::get().get_vulkan_data(), 1, &write, 0, nullptr);
@@ -342,11 +339,11 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
 }
 
 void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const VkSampler sampler) const
-{   
+{
     VkDescriptorImageInfo info;
     GX_SET_ZERO(info);
     info.sampler = sampler;
-    
+
     VkWriteDescriptorSet write;
     GX_SET_ZERO(write);
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -464,7 +461,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t i
 
 void gearoenix::vulkan::descriptor::Bindless::bind(const VkCommandBuffer cmd) const
 {
-    vkCmdBindDescriptorSets(cmd,VK_PIPELINE_BIND_POINT_GRAPHICS,pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
 }
 
 #endif

@@ -92,7 +92,7 @@ gearoenix::net::Client::Client(
                 std::swap(local_packets, packets);
             }
 
-            for (const auto& local_packet: local_packets) {
+            for (const auto& local_packet : local_packets) {
                 if (local_packet.empty()) {
                     continue;
                 }

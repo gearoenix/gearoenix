@@ -11,7 +11,6 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
-
 bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
 {
     return layout == other.layout
@@ -271,10 +270,7 @@ void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const T
         for (std::uint32_t mip = request.base_mip; mip < request.base_mip + actual_mip_count; ++mip) {
             auto& [layout, queue_family_index, access, stage] = state.per_array_states[layer].per_mip_states[mip];
 
-            if (layout == request.layout &&
-                queue_family_index == request.queue_family &&
-                access == request.access &&
-                stage == request.stage) {
+            if (layout == request.layout && queue_family_index == request.queue_family && access == request.access && stage == request.stage) {
                 continue;
             }
 

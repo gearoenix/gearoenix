@@ -1,11 +1,11 @@
 #include "gx-vk-lt-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../engine/gx-vk-eng-engine.hpp"
-#include "../../render/light/gx-rnd-lt-directional.hpp"
-#include "../../render/light/gx-rnd-lt-point.hpp"
-#include "gx-vk-lt-shadow-caster-directional.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../render/light/gx-rnd-lt-directional.hpp"
+#include "../../render/light/gx-rnd-lt-point.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
+#include "gx-vk-lt-shadow-caster-directional.hpp"
 
 gearoenix::vulkan::light::Manager::Manager()
     : Singleton<Manager>(this)
@@ -33,7 +33,7 @@ void gearoenix::vulkan::light::Manager::upload_uniforms()
     directional_shadow_casters_uniform_indexer.update();
 }
 
-gearoenix::core::ecs::EntityPtr gearoenix::vulkan::light::Manager::build_directional(std::string&&, core::ecs::Entity*const)
+gearoenix::core::ecs::EntityPtr gearoenix::vulkan::light::Manager::build_directional(std::string&&, core::ecs::Entity* const)
 {
     GX_UNIMPLEMENTED;
 }

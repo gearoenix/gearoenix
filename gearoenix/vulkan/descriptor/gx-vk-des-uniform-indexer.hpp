@@ -8,10 +8,10 @@
 #include "../buffer/gx-vk-buf-uniform.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
 
-#include <vector>
 #include <atomic>
-#include <type_traits>
 #include <mutex>
+#include <type_traits>
+#include <vector>
 
 namespace gearoenix::vulkan::descriptor {
 enum struct IndexingPolicy {
@@ -35,10 +35,15 @@ struct UniformIndexer : core::Singleton<UniformIndexer<GlslStruct, Policy>> {
         GX_GET_VAL_PRV(std::uint32_t, index, static_cast<std::uint32_t>(-1));
 
     public:
-        explicit DataAccess(GlslStruct* const ptr, const std::uint32_t index) : ptr(ptr), index(index) {}
+        explicit DataAccess(GlslStruct* const ptr, const std::uint32_t index)
+            : ptr(ptr)
+            , index(index)
+        {
+        }
 
         DataAccess(DataAccess&& o) noexcept
-            : ptr(o.ptr), index(o.index)
+            : ptr(o.ptr)
+            , index(o.index)
         {
             o.ptr = nullptr;
             o.index = static_cast<std::uint32_t>(-1);
@@ -100,7 +105,8 @@ public:
         return DataAccess(&shader_datas[i], i);
     }
 
-    void reset() requires(!IsAllocator)
+    void reset()
+        requires(!IsAllocator)
     {
         if constexpr (IsAtomic) {
             policy_holder.store(0, std::memory_order_relaxed);
@@ -110,7 +116,8 @@ public:
         static_assert(IsAtomic || IsDefault);
     }
 
-    void free(const std::uint32_t index) requires IsAllocator
+    void free(const std::uint32_t index)
+        requires IsAllocator
     {
         static_assert(IsAllocator);
         const std::lock_guard _(policy_holder.first);
@@ -122,7 +129,8 @@ public:
         uniform_buffer->update(shader_datas.data());
     }
 
-    [[nodiscard]] std::uint32_t get_current_index() const requires(!IsAllocator)
+    [[nodiscard]] std::uint32_t get_current_index() const
+        requires(!IsAllocator)
     {
         if constexpr (IsAtomic) {
             return policy_holder.load(std::memory_order_relaxed);

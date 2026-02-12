@@ -1,18 +1,18 @@
 #include "gx-vk-scn-scene.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "../gx-vk-marker.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
-#include "gx-vk-scn-manager.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
-#include "../texture/gx-vk-txt-manager.hpp"
-#include "../texture/gx-vk-txt-2d.hpp"
+#include "../gx-vk-marker.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
+#include "../texture/gx-vk-txt-2d.hpp"
+#include "../texture/gx-vk-txt-manager.hpp"
+#include "gx-vk-scn-manager.hpp"
 
 #include <ranges>
 
 namespace {
-gearoenix::vulkan::texture::Texture2D *brdflut = nullptr;
+gearoenix::vulkan::texture::Texture2D* brdflut = nullptr;
 
 void initialize_brdflut()
 {

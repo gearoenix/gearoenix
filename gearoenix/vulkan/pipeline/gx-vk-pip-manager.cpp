@@ -121,7 +121,7 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     // Forward rendering uses HDR render targets (RgbaFloat16), not the swapchain format
     constexpr auto color_format = VK_FORMAT_R16G16B16A16_SFLOAT;
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages{};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
     GX_SET_ZERO(stages);
 
     // ========== Shader stages ==========
@@ -147,7 +147,7 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     // Non-skinned pipelines need 6 attributes: locations 0-3 for actual data,
     // and dummy locations 4-5 for bone_weights/bone_indices that shaders declare
     // but won't use when GX_SPEC_HAS_BONES is false.
-    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes{};
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes {};
     GX_SET_ZERO(vertex_attributes);
 
     // position: vec3
@@ -355,7 +355,7 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
     color_blend.pAttachments = nullptr;
 
     // Shadow caster only uses locations 0 (position), 3 (uv), 4 (bone_weights), 5 (bone_indices)
-    std::array<VkVertexInputAttributeDescription, 4> shadow_vertex_attributes{};
+    std::array<VkVertexInputAttributeDescription, 4> shadow_vertex_attributes {};
     GX_SET_ZERO(shadow_vertex_attributes);
 
     // position: vec3 (location 0)

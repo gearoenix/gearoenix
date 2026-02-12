@@ -6,12 +6,12 @@
 
 #include <boost/container/flat_map.hpp>
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 namespace gearoenix::vulkan::sampler {
 struct Sampler;
-struct Manager final: core::Singleton<Manager> {
+struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex samplers_lock;
     boost::container::flat_map<render::texture::SamplerInfo, std::shared_ptr<Sampler>> samplers;

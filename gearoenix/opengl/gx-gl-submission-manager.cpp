@@ -173,9 +173,12 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
 void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 {
     constexpr std::array screen_vertices = {
-        -1.0f, 3.0f, // 1
-        -1.0f, -1.0f, // 2
-        3.0f, -1.0f, // 3
+        -1.0f,
+        3.0f, // 1
+        -1.0f,
+        -1.0f, // 2
+        3.0f,
+        -1.0f, // 3
     };
     glGenVertexArrays(1, &screen_vertex_object);
     glBindVertexArray(screen_vertex_object);

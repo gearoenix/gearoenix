@@ -2,8 +2,8 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
-#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../core/gx-cr-singleton.hpp"
+#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 
 #if GX_DEBUG_MODE

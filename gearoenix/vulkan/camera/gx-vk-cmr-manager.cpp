@@ -1,12 +1,12 @@
 #include "gx-vk-cmr-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../engine/gx-vk-eng-engine.hpp"
-#include "gx-vk-cmr-camera.hpp"
+#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
-#include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
+#include "../shader/glsl/gx-vk-shd-common.glslh"
+#include "gx-vk-cmr-camera.hpp"
 
 gearoenix::vulkan::camera::Manager::Manager()
     : Singleton<Manager>(this)

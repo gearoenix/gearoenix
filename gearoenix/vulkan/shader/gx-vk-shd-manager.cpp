@@ -1,7 +1,7 @@
 #include "gx-vk-shd-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "gx-vk-shd-module.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
+#include "gx-vk-shd-module.hpp"
 
 gearoenix::vulkan::shader::Manager::Manager()
     : Singleton(this)
@@ -20,7 +20,7 @@ std::shared_ptr<gearoenix::vulkan::shader::Module> gearoenix::vulkan::shader::Ma
     const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct(file_address));
     GX_ASSERT_D(stream);
     const auto file_content = stream->get_file_content();
-    auto result = std::make_shared<Module>(std::span{file_content.data(), file_content.size()});
+    auto result = std::make_shared<Module>(std::span { file_content.data(), file_content.size() });
     search = result;
     return result;
 }

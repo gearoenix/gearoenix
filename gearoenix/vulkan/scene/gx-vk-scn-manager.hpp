@@ -2,8 +2,8 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/scene/gx-rnd-scn-manager.hpp"
-#include "../gx-vk-loader.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
+#include "../gx-vk-loader.hpp"
 
 #include <vector>
 

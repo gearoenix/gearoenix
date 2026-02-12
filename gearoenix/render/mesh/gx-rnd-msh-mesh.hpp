@@ -7,7 +7,7 @@ struct Material;
 
 namespace gearoenix::render::mesh {
 struct Buffer;
-struct Mesh: core::Object {
+struct Mesh : core::Object {
     constexpr static auto max_count = 8192;
     constexpr static auto object_type_index = gearoenix_render_mesh_type_index;
 

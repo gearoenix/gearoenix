@@ -1,8 +1,8 @@
 #include "gx-vk-rfl-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../engine/gx-vk-eng-engine.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 
 void gearoenix::vulkan::reflection::Manager::update()
 {

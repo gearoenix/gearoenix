@@ -6,7 +6,7 @@
 #include "gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan {
-struct Surface final: core::Singleton<Surface> {
+struct Surface final : core::Singleton<Surface> {
     GX_GET_VAL_PRV(VkSurfaceKHR, vulkan_data, nullptr);
 
 public:

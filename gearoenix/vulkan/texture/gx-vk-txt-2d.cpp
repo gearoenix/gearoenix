@@ -19,7 +19,7 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-txt-util.hpp"
 
-gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string && in_name)
+gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& in_name)
     : render::texture::Texture2D(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(
           name,
@@ -29,8 +29,7 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureI
           1u,
           convert_image_format(info.get_format()),
           0u,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
-          (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT: VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
+          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
     , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
     , mips([this] {
         std::vector<std::shared_ptr<image::View>> result;
@@ -42,7 +41,8 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureI
         return result;
     }())
     , sampler_index(sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index())
-{}
+{
+}
 
 gearoenix::vulkan::texture::Texture2D::~Texture2D() = default;
 
@@ -115,8 +115,8 @@ void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform
     });
 
     core::job::send_job_to_pool([fence = std::move(fence), cmd = std::move(cmd),
-            staging_buffers = std::move(staging_buffers), end = std::move(end), sss,
-            width, height, pixel_size, mips_count, format] {
+                                    staging_buffers = std::move(staging_buffers), end = std::move(end), sss,
+                                    width, height, pixel_size, mips_count, format] {
         fence->wait();
 
         auto level_width = width;

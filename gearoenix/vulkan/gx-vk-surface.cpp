@@ -9,7 +9,8 @@
 #include <android_native_app_glue.h>
 #endif
 
-gearoenix::vulkan::Surface::Surface() : Singleton(this)
+gearoenix::vulkan::Surface::Surface()
+    : Singleton(this)
 {
 #if GX_PLATFORM_INTERFACE_ANDROID
     VkAndroidSurfaceCreateInfoKHR info;

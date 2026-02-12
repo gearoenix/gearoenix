@@ -3,8 +3,8 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
-#include "gx-vk-cmr-target.hpp"
 #include "../gx-vk-loader.hpp"
+#include "gx-vk-cmr-target.hpp"
 
 namespace gearoenix::render::record {
 struct Model;
@@ -49,7 +49,6 @@ struct Camera final : render::camera::Camera {
 
     std::vector<std::uint32_t> cameras_joint_model_indices; // MVPs
     std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
-
 
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;

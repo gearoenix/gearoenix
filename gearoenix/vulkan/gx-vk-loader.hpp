@@ -66,17 +66,17 @@
 #endif
 
 #if GX_USE_DEBUG_EXTENSIONS
-#define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)      \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDebugUtilsMessengerEXT);       \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDebugUtilsMessengerEXT);      \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSubmitDebugUtilsMessageEXT);         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectTagEXT);          \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectNameEXT);         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginDebugUtilsLabelEXT);         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndDebugUtilsLabelEXT);           \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdInsertDebugUtilsLabelEXT);        \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueBeginDebugUtilsLabelEXT);       \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueEndDebugUtilsLabelEXT);         \
+#define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDebugUtilsMessengerEXT);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDebugUtilsMessengerEXT);  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSubmitDebugUtilsMessageEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectTagEXT);      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectNameEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginDebugUtilsLabelEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndDebugUtilsLabelEXT);       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdInsertDebugUtilsLabelEXT);    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueBeginDebugUtilsLabelEXT);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueEndDebugUtilsLabelEXT);     \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueInsertDebugUtilsLabelEXT);
 #else
 #define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)

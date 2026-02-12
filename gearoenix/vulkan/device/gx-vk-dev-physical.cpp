@@ -19,8 +19,7 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
 
     VkPhysicalDeviceProperties candidate_properties;
     vkGetPhysicalDeviceProperties(gpu, &candidate_properties);
-    if (VK_VERSION_MAJOR(candidate_properties.apiVersion) < 1 ||
-        (VK_VERSION_MAJOR(candidate_properties.apiVersion) == 1 && VK_VERSION_MINOR(candidate_properties.apiVersion) < 3)) {
+    if (VK_VERSION_MAJOR(candidate_properties.apiVersion) < 1 || (VK_VERSION_MAJOR(candidate_properties.apiVersion) == 1 && VK_VERSION_MINOR(candidate_properties.apiVersion) < 3)) {
         GX_LOG_D("Skipping GPU " << candidate_properties.deviceName << " because it does not meet the Vulkan 1.3 requirement.");
         return -1;
     }
@@ -53,13 +52,12 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
         return -1;
     }
 
-    const bool descriptor_indexing_supported =
-        v12_features.descriptorIndexing == VK_TRUE &&
-        v12_features.runtimeDescriptorArray == VK_TRUE &&
-        v12_features.descriptorBindingPartiallyBound == VK_TRUE &&
-        v12_features.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE &&
-        v12_features.descriptorBindingVariableDescriptorCount == VK_TRUE &&
-        v12_features.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+    bool descriptor_indexing_supported = v12_features.descriptorIndexing == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.runtimeDescriptorArray == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingPartiallyBound == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingVariableDescriptorCount == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
     if (!descriptor_indexing_supported) {
         GX_LOG_D("Skipping GPU " << candidate_properties.deviceName << " because required descriptor indexing features are missing.");
         return -1;
@@ -160,12 +158,10 @@ void gearoenix::vulkan::device::Physical::initialize_extensions()
         supported_extensions.emplace(extension_name);
     }
 
-    if (supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) &&
-        supported_extensions.contains(VK_KHR_RAY_QUERY_EXTENSION_NAME) &&
-        supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) &&
-        supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)) {
-        rtx_supported = true;
-    }
+    rtx_supported = supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+    rtx_supported = rtx_supported && supported_extensions.contains(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+    rtx_supported = rtx_supported && supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    rtx_supported = rtx_supported && supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 
     GX_LOG_D("Supported extensions are:");
     for (auto& s : supported_extensions) {
@@ -214,13 +210,12 @@ void gearoenix::vulkan::device::Physical::initialize_features()
     }
 
     const auto& v12 = vulkan_12_features;
-    const bool descriptor_indexing_supported =
-        v12.descriptorIndexing == VK_TRUE &&
-        v12.runtimeDescriptorArray == VK_TRUE &&
-        v12.descriptorBindingPartiallyBound == VK_TRUE &&
-        v12.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE &&
-        v12.descriptorBindingVariableDescriptorCount == VK_TRUE &&
-        v12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+    bool descriptor_indexing_supported = v12.descriptorIndexing == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12.runtimeDescriptorArray == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingPartiallyBound == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingVariableDescriptorCount == VK_TRUE;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
     if (!descriptor_indexing_supported) {
         GX_LOG_F("Bindless descriptor indexing requirements are not fully supported by the selected physical device.");
     }
@@ -255,17 +250,17 @@ void gearoenix::vulkan::device::Physical::initialize_properties()
 
 gearoenix::vulkan::device::Physical::Physical()
     : Singleton(this)
-    , features { }
-    , ray_query_features { }
-    , ray_tracing_pipeline_features { }
-    , shader_clock_features { }
-    , vulkan_12_features { }
-    , vulkan_13_features { }
-    , dynamic_rendering_features { }
-    , descriptor_indexing_properties { }
-    , properties { }
-    , memory_properties { }
-    , ray_tracing_pipeline_properties { }
+    , features {}
+    , ray_query_features {}
+    , ray_tracing_pipeline_features {}
+    , shader_clock_features {}
+    , vulkan_12_features {}
+    , vulkan_13_features {}
+    , dynamic_rendering_features {}
+    , descriptor_indexing_properties {}
+    , properties {}
+    , memory_properties {}
+    , ray_tracing_pipeline_properties {}
 {
     const auto gpus = get_available_devices(Instance::get().get_vulkan_data());
     int best_device_index = -1;
@@ -321,26 +316,19 @@ gearoenix::vulkan::device::Physical::Physical()
     }
 
     auto& limits = properties.limits;
-    max_memory_alignment =
+    max_memory_alignment = std::max(
         std::max(
             std::max(
-                std::max(
-                    static_cast<std::uint32_t>(limits.minMemoryMapAlignment),
-                    static_cast<std::uint32_t>(limits.minStorageBufferOffsetAlignment)
-                ),
-                std::max(
-                    static_cast<std::uint32_t>(limits.minTexelBufferOffsetAlignment),
-                    static_cast<std::uint32_t>(limits.minUniformBufferOffsetAlignment)
-                )
-            ),
+                static_cast<std::uint32_t>(limits.minMemoryMapAlignment),
+                static_cast<std::uint32_t>(limits.minStorageBufferOffsetAlignment)),
             std::max(
-                std::max(
-                    static_cast<std::uint32_t>(limits.optimalBufferCopyOffsetAlignment),
-                    static_cast<std::uint32_t>(limits.optimalBufferCopyRowPitchAlignment)
-                ),
-            static_cast<std::uint32_t>(limits.bufferImageGranularity)
-            )
-        );
+                static_cast<std::uint32_t>(limits.minTexelBufferOffsetAlignment),
+                static_cast<std::uint32_t>(limits.minUniformBufferOffsetAlignment))),
+        std::max(
+            std::max(
+                static_cast<std::uint32_t>(limits.optimalBufferCopyOffsetAlignment),
+                static_cast<std::uint32_t>(limits.optimalBufferCopyRowPitchAlignment)),
+            static_cast<std::uint32_t>(limits.bufferImageGranularity)));
 }
 
 gearoenix::vulkan::device::Physical::~Physical() = default;

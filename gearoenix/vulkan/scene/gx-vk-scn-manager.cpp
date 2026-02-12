@@ -63,10 +63,10 @@ void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
     // TODO: render reflection probes
 
     // if (render::engine::Engine::get().get_specification().is_deferred_supported) {
-        // render_with_deferred();
-        // GX_UNIMPLEMENTED;
+    // render_with_deferred();
+    // GX_UNIMPLEMENTED;
     // } else {
-        render_forward(vk_cmd);
+    render_forward(vk_cmd);
     // }
 }
 

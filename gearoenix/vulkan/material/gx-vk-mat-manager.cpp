@@ -1,8 +1,8 @@
 #include "gx-vk-mat-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-mat-pbr.hpp"
-#include "gx-vk-mat-unlit.hpp"
 #include "gx-vk-mat-sprite.hpp"
+#include "gx-vk-mat-unlit.hpp"
 
 gearoenix::vulkan::material::Manager::Manager()
     : Singleton<Manager>(this)

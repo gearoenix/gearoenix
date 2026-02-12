@@ -1,8 +1,8 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/gx-cr-singleton.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-cmd-buffer.hpp"
 #include "gx-vk-cmd-pool.hpp"
 #include "gx-vk-cmd-type.hpp"
@@ -14,7 +14,7 @@
 #include <thread>
 
 namespace gearoenix::vulkan::command {
-struct Manager final: core::Singleton<Manager> {
+struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex this_lock;
     boost::container::flat_map<std::uint64_t, PoolPtr> indexed_pools;

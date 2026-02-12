@@ -5,8 +5,8 @@
 #if GX_USE_DEBUG_EXTENSIONS
 #include "../core/macro/gx-cr-mcr-concatenate.hpp"
 
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace gearoenix::vulkan::device {
 struct Logical;
@@ -56,9 +56,9 @@ void mark(const std::string& name, VkSwapchainKHR o);
 #define GX_VK_PUSH_DEBUG_GROUP_STR_VAR GX_CONCAT(_gearoenix_vulkan_push_debug_str_, __LINE__)
 #define GX_VK_PUSH_DEBUG_GROUP_OBJ_VAR GX_CONCAT(_gearoenix_vulkan_push_debug_obj_, __LINE__)
 
-#define GX_VK_PUSH_DEBUG_GROUP(cmd, red, green, blue, ...) \
-    thread_local std::string GX_VK_PUSH_DEBUG_GROUP_STR_VAR; \
-    GX_VK_PUSH_DEBUG_GROUP_STR_VAR.clear(); \
+#define GX_VK_PUSH_DEBUG_GROUP(cmd, red, green, blue, ...)                           \
+    thread_local std::string GX_VK_PUSH_DEBUG_GROUP_STR_VAR;                         \
+    GX_VK_PUSH_DEBUG_GROUP_STR_VAR.clear();                                          \
     std::format_to(std::back_inserter(GX_VK_PUSH_DEBUG_GROUP_STR_VAR), __VA_ARGS__); \
     const gearoenix::vulkan::PushDebugGroup GX_VK_PUSH_DEBUG_GROUP_OBJ_VAR(cmd, red, green, blue, GX_VK_PUSH_DEBUG_GROUP_STR_VAR.c_str());
 

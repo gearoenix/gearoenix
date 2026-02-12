@@ -51,8 +51,8 @@ public:
 
     void set_material(GxPbrPtr&& material)
     {
-        material->set_normal_metallic_factor({1.0f, 1.0f , 1.0f, 0.01f});
-        material->set_emission_roughness_factor({1.0f, 1.0f , 1.0f, 0.01f});
+        material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, 0.01f });
+        material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, 0.01f });
 
         std::vector<GxPbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };

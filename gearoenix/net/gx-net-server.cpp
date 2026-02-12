@@ -115,8 +115,8 @@ void gearoenix::net::Server::create_thread()
 
             case ENET_EVENT_TYPE_RECEIVE: {
                 if (!event.packet) {
-                   GX_LOG_E("Packet received with null");
-                   break;
+                    GX_LOG_E("Packet received with null");
+                    break;
                 }
                 const auto search = clients.find(event.peer);
                 if (clients.end() == search) {

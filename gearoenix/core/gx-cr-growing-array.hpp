@@ -68,7 +68,7 @@ public:
 
     constexpr void clear()
     {
-        for (auto i = decltype(index){0}; i < index; ++i) {
+        for (auto i = decltype(index) { 0 }; i < index; ++i) {
             array[i].~T();
         }
         index = 0;

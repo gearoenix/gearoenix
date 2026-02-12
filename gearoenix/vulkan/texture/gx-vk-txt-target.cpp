@@ -96,14 +96,14 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
             const auto& info = vk_txt->get_info();
             const auto is_depth = render::texture::format_is_depth(info.get_format());
 
-            transition_request = is_depth? image::TransitionRequest::depth_attachment(): image::TransitionRequest::color_attachment();
+            transition_request = is_depth ? image::TransitionRequest::depth_attachment() : image::TransitionRequest::color_attachment();
             transition_request = transition_request.with_mips(mip_index, 1).with_layers(array_index, 1);
 
             VkRenderingAttachmentInfo attachment_info;
             GX_SET_ZERO(attachment_info);
             attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
             attachment_info.imageView = view->get_vulkan_data();
-            attachment_info.imageLayout = is_depth? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL: VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            attachment_info.imageLayout = is_depth ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 

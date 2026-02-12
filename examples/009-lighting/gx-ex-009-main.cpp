@@ -105,9 +105,9 @@ public:
 
     void icosphere_material_is_ready(GxPbrPtr&& material, std::string&& postfix, const float metallic, const float roughness, const GxEndCaller& end)
     {
-        material->set_albedo_factor({0.999f, 0.1f, 0.4f, 1.0f});
-        material->set_normal_metallic_factor({1.0f, 1.0f, 1.0f, metallic});
-        material->set_emission_roughness_factor({1.0f, 1.0f, 1.0f, roughness});
+        material->set_albedo_factor({ 0.999f, 0.1f, 0.4f, 1.0f });
+        material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, metallic });
+        material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, roughness });
 
         GxMeshManager::get().build_icosphere(4, std::move(material), GxMeshEndCaller([this, e = end, metallic, roughness, p = std::move(postfix)](GxMeshPtr&& mesh) {
             icosphere_mesh_is_ready(std::move(mesh), p, e, metallic, roughness);
@@ -125,8 +125,8 @@ public:
     void plate_material_is_ready(GxPbrPtr&& material, const GxEndCaller& end)
     {
         material->set_albedo_factor({ 0.1f, 0.999f, 0.3f, 1.0f });
-        material->set_normal_metallic_factor({1.0f, 1.0f, 1.0f, 0.001});
-        material->set_emission_roughness_factor({1.0f, 1.0f, 1.0f, 0.99f});
+        material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, 0.001 });
+        material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, 0.99f });
 
         GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this, e = end](GxMeshPtr&& mesh) {
             plate_mesh_is_ready(std::move(mesh), e);

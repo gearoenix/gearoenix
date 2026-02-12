@@ -4,10 +4,10 @@
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
 
 gearoenix::vulkan::shader::Resources::Resources(pipeline::Pipeline* pip, buffer::Uniform* u)
 {

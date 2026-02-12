@@ -1,7 +1,7 @@
 #include "gx-vk-mat-pbr.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
+#include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "gx-vk-mat-manager.hpp"
 
@@ -112,12 +112,12 @@ void gearoenix::vulkan::material::Pbr::set_occlusion(std::shared_ptr<render::tex
 
 void gearoenix::vulkan::material::Pbr::bind_forward(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
-    bind_graphics(skinned? vk_skinned_forward_pipeline: vk_forward_pipeline, cmd, pc, current_bound_pipeline);
+    bind_graphics(skinned ? vk_skinned_forward_pipeline : vk_forward_pipeline, cmd, pc, current_bound_pipeline);
 }
 
 void gearoenix::vulkan::material::Pbr::bind_shadow(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
-    bind_graphics(skinned? vk_skinned_shadow_pipeline: vk_shadow_pipeline, cmd, pc, current_bound_pipeline);
+    bind_graphics(skinned ? vk_skinned_shadow_pipeline : vk_shadow_pipeline, cmd, pc, current_bound_pipeline);
 }
 
 void gearoenix::vulkan::material::Pbr::set_albedo_factor(const math::Vec4<float>& v)

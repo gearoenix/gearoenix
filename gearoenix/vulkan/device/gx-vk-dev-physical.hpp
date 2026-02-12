@@ -1,15 +1,15 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../core/gx-cr-singleton.hpp"
+#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
+#include <array>
 #include <limits>
 #include <set>
 #include <string>
 #include <vector>
-#include <array>
 
 namespace gearoenix::vulkan {
 struct Instance;

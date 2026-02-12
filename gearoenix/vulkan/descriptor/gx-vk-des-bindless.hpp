@@ -29,11 +29,11 @@ struct Bindless final : core::Singleton<Bindless> {
     GX_GET_VAL_PRV(VkPipelineLayout, pipeline_layout, VK_NULL_HANDLE);
     GX_GET_VAL_PRV(VkSampler, shadow_sampler, VK_NULL_HANDLE);
 
-    std::vector<std::uint32_t> free_1d_image_indices = { };
-    std::vector<std::uint32_t> free_2d_image_indices = { };
-    std::vector<std::uint32_t> free_3d_image_indices = { };
-    std::vector<std::uint32_t> free_cube_image_indices = { };
-    std::vector<std::uint32_t> free_sampler_indices = { };
+    std::vector<std::uint32_t> free_1d_image_indices = {};
+    std::vector<std::uint32_t> free_2d_image_indices = {};
+    std::vector<std::uint32_t> free_3d_image_indices = {};
+    std::vector<std::uint32_t> free_cube_image_indices = {};
+    std::vector<std::uint32_t> free_sampler_indices = {};
 
     std::mutex allocation_lock;
 

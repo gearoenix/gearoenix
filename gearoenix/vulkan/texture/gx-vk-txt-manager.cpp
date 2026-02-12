@@ -42,7 +42,7 @@ void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(
     }
     auto img = std::shared_ptr(result->get_view()->get_image());
     c.set_return(std::move(result));
-    image::Manager::upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] {}));
+    image::Manager::upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] { }));
 }
 
 void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(
@@ -55,7 +55,7 @@ void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(
 
     std::vector<std::vector<std::shared_ptr<buffer::Buffer>>> buffers;
     buffers.reserve(pixels.size());
-    for (const auto& face_pixels: pixels) {
+    for (const auto& face_pixels : pixels) {
         std::vector<std::shared_ptr<buffer::Buffer>> face_buffers;
         face_buffers.reserve(face_pixels.size());
         for (auto& mip_pixels : face_pixels) {
@@ -66,7 +66,7 @@ void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(
 
     auto img = std::shared_ptr(result->get_view()->get_image());
     c.set_return(std::move(result));
-    image::Manager::get().upload(std::move(img),std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] {}));
+    image::Manager::get().upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] { }));
 }
 
 void gearoenix::vulkan::texture::Manager::create_target_v(

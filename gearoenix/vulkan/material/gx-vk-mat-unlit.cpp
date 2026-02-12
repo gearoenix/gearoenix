@@ -1,7 +1,7 @@
 #include "gx-vk-mat-unlit.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
+#include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "gx-vk-mat-manager.hpp"
 

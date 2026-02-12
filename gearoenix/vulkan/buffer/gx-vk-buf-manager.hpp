@@ -36,7 +36,6 @@ struct Manager final : core::Singleton<Manager> {
     const std::array<std::shared_ptr<Buffer>, frames_in_flight> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
-
     [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const;
     [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const;
     [[nodiscard]] std::array<std::shared_ptr<Buffer>, frames_in_flight> create_each_frame_upload_source() const;

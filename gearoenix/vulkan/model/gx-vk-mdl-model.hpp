@@ -22,7 +22,6 @@ namespace gearoenix::vulkan::scene {
 struct Scene;
 }
 
-
 namespace gearoenix::vulkan::model {
 struct Model final : render::model::Model {
     GEAROENIX_OBJECT_STRUCT_DEF;

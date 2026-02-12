@@ -3,10 +3,9 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-target.hpp"
 
-#include <memory>
 #include <array>
+#include <memory>
 #include <variant>
-
 
 namespace gearoenix::vulkan::texture {
 struct Target;

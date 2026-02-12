@@ -1,8 +1,8 @@
 #include "gx-vk-mat-material.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../platform/gx-plt-log.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 
 gearoenix::vulkan::material::Material::Material()

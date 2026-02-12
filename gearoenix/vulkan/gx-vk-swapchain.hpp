@@ -3,11 +3,11 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-singleton.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "gx-vk-loader.hpp"
 #include "gx-vk-build-configuration.hpp"
+#include "gx-vk-loader.hpp"
 
-#include <memory>
 #include <array>
+#include <memory>
 
 namespace gearoenix::vulkan::image {
 struct View;

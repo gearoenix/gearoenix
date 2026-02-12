@@ -340,7 +340,7 @@ std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions
 {
     std::uint32_t count = 0;
     const auto extensions_ptr = SDL_Vulkan_GetInstanceExtensions(&count);
-    return {std::from_range, std::span { extensions_ptr, count }};
+    return { std::from_range, std::span { extensions_ptr, count } };
 }
 
 void gearoenix::platform::Application::create_vulkan_surface(void* const vulkan_instance, void* const vulkan_data_ptr) const

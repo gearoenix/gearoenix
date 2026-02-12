@@ -77,7 +77,7 @@ void gearoenix::render::record::Camera::update_models(Models& models)
 
     mvps.clear();
     auto gather_mvps = [&](auto& trn_opq_models) {
-        for (auto& t: threads_mvps) {
+        for (auto& t : threads_mvps) {
             t.clear();
         }
         core::sync::parallel_for_i(trn_opq_models, [&](const auto& d_m, const auto i, const auto ki) {

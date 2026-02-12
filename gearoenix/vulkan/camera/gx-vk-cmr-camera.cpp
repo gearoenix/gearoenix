@@ -98,7 +98,7 @@ void gearoenix::vulkan::camera::Camera::render_forward(
 
     const auto render_models = [&](const auto& models) {
         for (const auto& camera_model : models | std::views::values) {
-            pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index]: 0;
+            pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
             core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, cmd, pc, current_bound_pipeline);
         }
     };
@@ -342,11 +342,11 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
         auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
         shader_data_index = sd.get_index();
         auto& [vp, position_reserved] = *sd.get_ptr();
-        position_reserved = {math::Vec3<float>(rc.transform->get_local_position()), 1.0f};
+        position_reserved = { math::Vec3<float>(rc.transform->get_local_position()), 1.0f };
         vp = view_projection;
     }
 
-    for (const auto& mvp: rc.mvps) {
+    for (const auto& mvp : rc.mvps) {
         auto sd = descriptor::UniformIndexer<GxShaderDataCameraJointModel>::get().get_next();
         sd.get_ptr()->mvp = mvp;
         cameras_joint_model_indices.push_back(sd.get_index());

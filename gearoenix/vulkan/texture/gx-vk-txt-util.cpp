@@ -51,12 +51,12 @@ VkFormat gearoenix::vulkan::texture::convert_image_format(const render::texture:
 bool gearoenix::vulkan::texture::has_depth(const VkFormat format)
 {
     switch (format) {
-        case VK_FORMAT_D32_SFLOAT:
-        case VK_FORMAT_X8_D24_UNORM_PACK32:
-        case VK_FORMAT_D16_UNORM:
-            return true;
-        default:
-            return false;
+    case VK_FORMAT_D32_SFLOAT:
+    case VK_FORMAT_X8_D24_UNORM_PACK32:
+    case VK_FORMAT_D16_UNORM:
+        return true;
+    default:
+        return false;
     }
 }
 

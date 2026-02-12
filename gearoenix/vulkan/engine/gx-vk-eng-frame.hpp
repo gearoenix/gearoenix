@@ -12,7 +12,7 @@ struct View;
 }
 
 namespace gearoenix::vulkan::sync {
-    struct Fence;
+struct Fence;
 struct Semaphore;
 }
 
@@ -24,7 +24,6 @@ struct Frame final {
     const std::shared_ptr<sync::Semaphore> present_semaphore;
     const std::shared_ptr<sync::Semaphore> end_semaphore;
     const std::shared_ptr<command::Buffer> cmd;
-
 
     Frame(Frame&&) = delete;
     Frame(const Frame&) = delete;

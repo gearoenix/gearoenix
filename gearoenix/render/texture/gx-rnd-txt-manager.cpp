@@ -257,10 +257,12 @@ void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared
                                   .set_type(Type::Texture2D)
                                   .set_has_mipmap(false);
     std::vector<std::vector<std::uint8_t>> pixels { {
-        0u, 0u, 0u, 255u, // Pixel 0
+        // clang-format off
+          0u,   0u,   0u, 255u, // Pixel 0
         255u, 255u, 255u, 255u, // Pixel 1
         255u, 255u, 255u, 255u, // Pixel 2
-        0u, 0u, 0u, 255u, // Pixel 3
+          0u,   0u,   0u, 255u, // Pixel 3
+        // clang-format on
     } };
     create_2d_from_pixels(
         "default-checker", std::move(pixels), texture_info,
