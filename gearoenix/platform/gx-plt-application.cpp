@@ -4,6 +4,7 @@
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../core/event/gx-cr-ev-engine.hpp"
 #include "../core/gx-cr-application.hpp"
+#include "../core/gx-cr-profiler.hpp"
 #include "../core/sync/gx-cr-sync-thread.hpp"
 #include "../net/gx-net-manager.hpp"
 #include "../render/engine/gx-rnd-eng-engine.hpp"
@@ -95,6 +96,7 @@ gearoenix::platform::BaseApplication::BaseApplication()
         return !running;
     })
 {
+    GX_PROFILE_NEW_FRAME;
     register_types();
 
     GX_LOG_D("This machine has " << core::sync::threads_count() << " number of thread cores.");
@@ -350,6 +352,7 @@ void gearoenix::platform::BaseApplication::terminate()
     render_engine = nullptr;
     ImGui::DestroyContext();
     core::job::terminate();
+    GX_PROFILE_REPORT;
 }
 
 void gearoenix::platform::BaseApplication::update()

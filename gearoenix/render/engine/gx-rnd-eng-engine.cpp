@@ -1,5 +1,7 @@
 #include "gx-rnd-eng-engine.hpp"
+
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-runtime-configuration.hpp"
@@ -99,6 +101,7 @@ gearoenix::render::engine::Engine::~Engine() = default;
 
 void gearoenix::render::engine::Engine::start_frame()
 {
+    GX_PROFILE_NEW_FRAME;
     if (const auto diff = minimum_frame_time - std::chrono::duration<double>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
         std::this_thread::sleep_for(std::chrono::duration<double>(diff));
     }
@@ -128,16 +131,39 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
+    GX_PROFILE_BEGIN(render-engine-end-frame);
     // Don't mistake the following with the actual start of a frame.
     // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
-    physics_engine->start_frame();
 
+    GX_PROFILE_BEGIN(render-engine-physics_engine->start_frame);
+    physics_engine->start_frame();
+    GX_PROFILE_END(render-engine-physics_engine->start_frame);
+
+    GX_PROFILE_BEGIN(render-engine-model_manager->update);
     model_manager->update();
+    GX_PROFILE_END(render-engine-model_manager->update);
+
+    GX_PROFILE_BEGIN(render-engine-camera_manager->update);
     camera_manager->update();
+    GX_PROFILE_END(render-engine-camera_manager->update);
+
+    GX_PROFILE_BEGIN(render-engine-light_manager->update);
     light_manager->update();
+    GX_PROFILE_END(render-engine-light_manager->update);
+
+    GX_PROFILE_BEGIN(render-engine-reflection_manager->update);
     reflection_manager->update();
+    GX_PROFILE_END(render-engine-reflection_manager->update);
+
+    GX_PROFILE_BEGIN(render-engine-scene_manager->update);
     scene_manager->update();
+    GX_PROFILE_END(render-engine-scene_manager->update);
+
+    GX_PROFILE_BEGIN(render-engine-physics_engine->end_frame);
     physics_engine->end_frame();
+    GX_PROFILE_END(render-engine-physics_engine->end_frame);
+
+    GX_PROFILE_END(render-engine-end-frame);
 }
 
 void gearoenix::render::engine::Engine::window_resized()

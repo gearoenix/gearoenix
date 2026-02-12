@@ -165,12 +165,12 @@ public:
             GxMatManager::get().get_pbr(
                 "material-" + std::to_string(model_index),
                 GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
-                    m->get_albedo_factor() = {
+                    m->set_albedo_factor({
                         colour_distribution(random_engine),
                         colour_distribution(random_engine),
                         colour_distribution(random_engine),
                         1.0f
-                    };
+                    });
                     (*materials)[model_index] = std::move(m);
                     (void)end; }));
         }

@@ -1,6 +1,7 @@
 #include "gx-vk-eng-engine.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
@@ -127,9 +128,11 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     core::job::execute_current_thread_jobs();
 
     if (swapchain->get_is_valid()) {
+        GX_PROFILE_BEGIN(vulkan-start-frame-fence-wait);
         auto& fence = *frames[frame_number]->render_fence;
         fence.wait();
         fence.reset();
+        GX_PROFILE_END(vulkan-start-frame-fence-wait);
     } else if (!platform::BaseApplication::get().get_window_resizing()) {
         logical_device->wait_to_finish();
         frames = {};
@@ -144,19 +147,24 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     core::job::execute_current_thread_jobs();
 
+    GX_PROFILE_BEGIN(vulkan-start-frame-swapchain-wait);
     if (swapchain->get_is_valid()) {
         swapchain->acquire_next_image(*frames[frame_number]->present_semaphore);
     }
+    GX_PROFILE_END(vulkan-start-frame-swapchain-wait);
 }
 
 void gearoenix::vulkan::engine::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
+
+    GX_PROFILE_BEGIN(vulkan-end-frame);
     imgui_manager->end_frame();
     if (swapchain->get_is_valid()) {
         submit();
         swapchain->present();
     }
+    GX_PROFILE_END(vulkan-end-frame);
 
     core::job::execute_current_thread_jobs();
 }

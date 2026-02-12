@@ -1,2 +1,2 @@
 BasedOnStyle: WebKit
-ColumnLimit: 0
+ColumnLimit: 250
