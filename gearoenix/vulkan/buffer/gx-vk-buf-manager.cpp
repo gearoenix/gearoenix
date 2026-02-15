@@ -112,11 +112,10 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer v
     const auto& dst = *each_frame_upload_destination;
 
     const auto& src_alloc = *src.get_allocated_memory()->get_allocator();
-    const auto& dst_alloc = *dst.get_allocated_memory()->get_allocator();
 
     VkBufferCopy region {};
-    region.srcOffset = static_cast<VkDeviceSize>(src_alloc.get_offset());
-    region.dstOffset = static_cast<VkDeviceSize>(dst_alloc.get_offset());
+    region.srcOffset = static_cast<VkDeviceSize>(src.get_offset());
+    region.dstOffset = static_cast<VkDeviceSize>(dst.get_offset());
     region.size = static_cast<VkDeviceSize>(src_alloc.get_size());
 
     vkCmdCopyBuffer(vk_cmd, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &region);
@@ -125,8 +124,14 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer v
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
     barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
     barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
-    barrier.dstStageMask = VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
-    barrier.dstAccessMask = VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_2_UNIFORM_READ_BIT | VK_ACCESS_2_SHADER_STORAGE_READ_BIT | VK_ACCESS_2_SHADER_READ_BIT;
+    barrier.dstStageMask = VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT | // ------
+        VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT | // ------------------------
+        VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT | // ----------------------
+        VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT; // ------------------------
+    barrier.dstAccessMask = VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT | // ----
+        VK_ACCESS_2_UNIFORM_READ_BIT | // ---------------------------------
+        VK_ACCESS_2_SHADER_STORAGE_READ_BIT | // --------------------------
+        VK_ACCESS_2_SHADER_READ_BIT; // -----------------------------------
     barrier.buffer = dst.get_vulkan_data();
     barrier.offset = region.dstOffset;
     barrier.size = region.size;
