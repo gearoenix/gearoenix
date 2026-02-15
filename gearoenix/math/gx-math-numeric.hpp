@@ -85,7 +85,13 @@ struct Numeric {
     template <typename T>
     [[nodiscard]] constexpr static T clamp(const T v, const T mn, const T mx)
     {
-        return v < mn ? mn : v > mx ? mx : v;
+        if (v < mn) {
+            return mn;
+        }
+        if (v > mx) {
+            return mx;
+        }
+        return v;
     }
 
     /// On failure it returns static_cast<T>(-1).

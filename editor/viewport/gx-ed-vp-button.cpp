@@ -11,6 +11,7 @@ void gearoenix::editor::viewport::Button::show()
     ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
     [[maybe_unused]] const auto is_window_open = ImGui::Begin(invisible_window_id.c_str(), nullptr,
+        // clang-format off
         ImGuiWindowFlags_NoBackground |
         ImGuiWindowFlags_NoBringToFrontOnFocus |
         ImGuiWindowFlags_NoCollapse |
@@ -23,7 +24,9 @@ void gearoenix::editor::viewport::Button::show()
         ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoSavedSettings |
-        ImGuiWindowFlags_NoTitleBar);
+        ImGuiWindowFlags_NoTitleBar
+        // clang-format on
+    );
 
     GX_ASSERT_D(is_window_open);
 

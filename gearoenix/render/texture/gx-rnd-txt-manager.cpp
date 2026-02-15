@@ -679,13 +679,15 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(co
         std::move(first_colour_name), {}, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->colours[0] = std::move(t);
-        }), use_cache);
+        }),
+        use_cache);
 
     create_2d_from_pixels(
         std::move(second_colour_name), {}, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->colours[1] = std::move(t);
-        }), use_cache);
+        }),
+        use_cache);
 
     auto depth_info = txt_info;
     depth_info.set_format(TextureFormat::D32);

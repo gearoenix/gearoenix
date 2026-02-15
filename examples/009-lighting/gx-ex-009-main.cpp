@@ -90,7 +90,7 @@ public:
                         { 0.0, 1.0, 0.0 });
                     light->colour = { 2.0f, 2.0f, 2.0f };
                     (void)e;
-            }));
+                }));
         }
 
         GX_LOG_D("Initialised");

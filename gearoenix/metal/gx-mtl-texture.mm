@@ -74,30 +74,30 @@ static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MT
 gearoenix::metal::TextureManager::TextureManager(Engine& e)
     : e(e)
     , samplers(create_samplers(
-        { render::texture::SamplerInfo {
-             .min_filter = render::texture::Filter::Linear,
-             .mag_filter = render::texture::Filter::Linear,
-             .wrap_s = render::texture::Wrap::Repeat,
-             .wrap_t = render::texture::Wrap::Repeat,
-             .wrap_r = render::texture::Wrap::Repeat,
-             .anisotropic_level = 0,
-         },
-           render::texture::SamplerInfo {
-               .min_filter = render::texture::Filter::Nearest,
-               .mag_filter = render::texture::Filter::Nearest,
-               .wrap_s = render::texture::Wrap::Repeat,
-               .wrap_t = render::texture::Wrap::Repeat,
-               .wrap_r = render::texture::Wrap::Repeat,
-               .anisotropic_level = 0,
-           },
-           render::texture::SamplerInfo {
-               .min_filter = render::texture::Filter::LinearMipmapLinear,
-               .mag_filter = render::texture::Filter::Linear,
-               .wrap_s = render::texture::Wrap::Repeat,
-               .wrap_t = render::texture::Wrap::Repeat,
-               .wrap_r = render::texture::Wrap::Repeat,
-               .anisotropic_level = 0,
-           } },
+          { render::texture::SamplerInfo {
+                .min_filter = render::texture::Filter::Linear,
+                .mag_filter = render::texture::Filter::Linear,
+                .wrap_s = render::texture::Wrap::Repeat,
+                .wrap_t = render::texture::Wrap::Repeat,
+                .wrap_r = render::texture::Wrap::Repeat,
+                .anisotropic_level = 0,
+            },
+              render::texture::SamplerInfo {
+                  .min_filter = render::texture::Filter::Nearest,
+                  .mag_filter = render::texture::Filter::Nearest,
+                  .wrap_s = render::texture::Wrap::Repeat,
+                  .wrap_t = render::texture::Wrap::Repeat,
+                  .wrap_r = render::texture::Wrap::Repeat,
+                  .anisotropic_level = 0,
+              },
+              render::texture::SamplerInfo {
+                  .min_filter = render::texture::Filter::LinearMipmapLinear,
+                  .mag_filter = render::texture::Filter::Linear,
+                  .wrap_s = render::texture::Wrap::Repeat,
+                  .wrap_t = render::texture::Wrap::Repeat,
+                  .wrap_r = render::texture::Wrap::Repeat,
+                  .anisotropic_level = 0,
+              } },
           e.get_device()))
 {
 }

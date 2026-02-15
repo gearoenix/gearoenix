@@ -77,8 +77,7 @@ void gearoenix::core::sync::KernelWorkers::add_step(std::function<void()> sender
         .sender = std::move(sender),
         .worker = std::move(worker),
         .meanwhile = std::move(meanwhile),
-        .receiver = std::move(receiver)
-    });
+        .receiver = std::move(receiver) });
     for (std::shared_ptr<std::mutex>& m : workers_syncers)
         m->unlock();
 }
