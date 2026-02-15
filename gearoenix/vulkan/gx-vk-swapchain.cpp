@@ -43,7 +43,13 @@ gearoenix::vulkan::Swapchain::~Swapchain() { vkDestroySwapchainKHR(device::Logic
 
 void gearoenix::vulkan::Swapchain::acquire_next_image(const sync::Semaphore& semaphore)
 {
-    const VkResult result = vkAcquireNextImageKHR(device::Logical::get().get_vulkan_data(), vulkan_data, std::numeric_limits<std::uint64_t>::max(), semaphore.get_vulkan_data(), nullptr, &image_index);
+    const VkResult result = vkAcquireNextImageKHR(
+        device::Logical::get().get_vulkan_data(),
+        vulkan_data,
+        std::numeric_limits<std::uint64_t>::max(),
+        semaphore.get_vulkan_data(),
+        nullptr,
+        &image_index);
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:

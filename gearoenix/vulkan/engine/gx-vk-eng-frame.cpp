@@ -18,4 +18,10 @@ gearoenix::vulkan::engine::Frame::Frame(std::shared_ptr<image::View>&& view, std
 
 gearoenix::vulkan::engine::Frame::~Frame() = default;
 
+void gearoenix::vulkan::engine::Frame::start()
+{
+    render_fence->wait();
+    render_fence->reset();
+}
+
 #endif

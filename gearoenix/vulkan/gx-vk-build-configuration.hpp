@@ -6,7 +6,7 @@
 
 namespace gearoenix::vulkan {
 
-constexpr std::uint32_t frames_in_flight = 3;
+constexpr std::uint32_t frames_in_flight = 2;
 
 }
 #endif

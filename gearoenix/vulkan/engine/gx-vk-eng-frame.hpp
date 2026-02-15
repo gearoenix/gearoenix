@@ -32,6 +32,7 @@ struct Frame final {
 
     Frame(std::shared_ptr<image::View>&& view, std::shared_ptr<image::View>&& imgui_view, int frame_index);
     ~Frame();
+    void start();
 };
 }
 

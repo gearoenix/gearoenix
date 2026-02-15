@@ -33,6 +33,9 @@
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
+    logical_device->wait_to_finish();
+    frames = {};
+    swapchain->initialize();
     for (int frame_index = 0; frame_index < frames_count; ++frame_index) {
         auto& swapchain_frame = swapchain->get_frames()[frame_index];
         frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain_frame.view), std::shared_ptr(swapchain_frame.imgui_view), frame_index);
@@ -75,10 +78,17 @@ gearoenix::vulkan::engine::Engine::Engine()
     scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
     reflection_manager = std::unique_ptr<reflection::Manager>(vk_reflection_manager);
 
-    bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(vk_scene_manager->get_uniform_indexer().get_gpu_buffer(), vk_camera_manager->get_camera_uniform_indexer().get_gpu_buffer(),
-        vk_model_manager->get_model_uniform_indexer().get_gpu_buffer(), vk_material_manager->get_uniform_indexer().get_gpu_buffer(), vk_light_manager->get_points_uniform_indexer().get_gpu_buffer(),
-        vk_light_manager->get_directionals_uniform_indexer().get_gpu_buffer(), vk_light_manager->get_directional_shadow_casters_uniform_indexer().get_gpu_buffer(), vk_model_manager->get_bone_uniform_indexer().get_gpu_buffer(),
-        vk_reflection_manager->get_uniform_indexer().get_gpu_buffer(), vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_gpu_buffer());
+    bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
+        vk_scene_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_camera_manager->get_camera_uniform_indexer().get_gpu_buffer(),
+        vk_model_manager->get_model_uniform_indexer().get_gpu_buffer(),
+        vk_material_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_points_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_directionals_uniform_indexer().get_gpu_buffer(),
+        vk_light_manager->get_directional_shadow_casters_uniform_indexer().get_gpu_buffer(),
+        vk_model_manager->get_bone_uniform_indexer().get_gpu_buffer(),
+        vk_reflection_manager->get_uniform_indexer().get_gpu_buffer(),
+        vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_gpu_buffer());
     pipeline_manager = std::make_unique<pipeline::Manager>();
     imgui_manager = std::make_unique<ImGuiManager>();
     initialize_frame();
@@ -116,15 +126,9 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     if (swapchain->get_is_valid()) {
         GX_PROFILE_BEGIN(vulkan - start - frame - fence - wait);
-        auto& fence = *frames[frame_number]->render_fence;
-        fence.wait();
-        fence.reset();
+        frames[frame_number]->start();
         GX_PROFILE_END(vulkan - start - frame - fence - wait);
     } else if (!platform::BaseApplication::get().get_window_resizing()) {
-        logical_device->wait_to_finish();
-        frames = {};
-        // depth_stencil = image::View::create_depth_stencil();
-        swapchain->initialize();
         initialize_frame();
     }
 
@@ -172,7 +176,12 @@ void gearoenix::vulkan::engine::Engine::submit()
     cmd.end();
 
     constexpr VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    render_queue->submit(1, frame.present_semaphore->get_vulkan_data_ptr(), &wait_stage, 1, cmd.get_vulkan_data_ptr(), 1, swapchain->get_present_semaphore().get_vulkan_data_ptr(), frame.render_fence->get_vulkan_data());
+    render_queue->submit(
+        1, frame.present_semaphore->get_vulkan_data_ptr(),
+        &wait_stage,
+        1, cmd.get_vulkan_data_ptr(),
+        1, swapchain->get_present_semaphore().get_vulkan_data_ptr(),
+        frame.render_fence->get_vulkan_data());
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() { return *frames[frame_number]; }

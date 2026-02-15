@@ -36,7 +36,11 @@ std::array<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>, gearoenix::vulkan
     const auto& cfg = render::RuntimeConfiguration::get();
     const auto& phs_dev = device::Physical::get();
     const auto dyn_sz = phs_dev.align_size(cfg.get_maximum_dynamic_buffer_size());
-    return { upload_root_buffer->allocate(dyn_sz), upload_root_buffer->allocate(dyn_sz), upload_root_buffer->allocate(dyn_sz) };
+    return {
+        upload_root_buffer->allocate(dyn_sz),
+        upload_root_buffer->allocate(dyn_sz),
+        // upload_root_buffer->allocate(dyn_sz),
+    };
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_destination() const
