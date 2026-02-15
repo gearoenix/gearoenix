@@ -28,6 +28,4 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(std::st
     return entity;
 }
 
-void gearoenix::render::model::Manager::update()
-{
-}
+void gearoenix::render::model::Manager::update() { }

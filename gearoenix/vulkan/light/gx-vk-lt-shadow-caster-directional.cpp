@@ -16,9 +16,7 @@ gearoenix::vulkan::light::ShadowCasterDirectional::ShadowCasterDirectional(core:
 
 gearoenix::vulkan::light::ShadowCasterDirectional::~ShadowCasterDirectional() = default;
 
-void gearoenix::vulkan::light::ShadowCasterDirectional::set_shadow_map(
-    std::shared_ptr<render::texture::Texture2D>&& t,
-    core::job::EndCaller<>&& end_callback)
+void gearoenix::vulkan::light::ShadowCasterDirectional::set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback)
 {
     vk_shadow_map_texture = std::dynamic_pointer_cast<texture::Texture2D>(t);
     shadow_map_shader_index = vk_shadow_map_texture->get_view_index();

@@ -50,10 +50,7 @@ void gearoenix::vulkan::material::Pbr::construct(std::string&& name, core::job::
 
 gearoenix::vulkan::material::Pbr::~Pbr() = default;
 
-void gearoenix::vulkan::material::Pbr::show_debug_gui()
-{
-    render::material::Pbr::show_debug_gui();
-}
+void gearoenix::vulkan::material::Pbr::show_debug_gui() { render::material::Pbr::show_debug_gui(); }
 
 void gearoenix::vulkan::material::Pbr::set_albedo(std::shared_ptr<render::texture::Texture2D>&& txt)
 {

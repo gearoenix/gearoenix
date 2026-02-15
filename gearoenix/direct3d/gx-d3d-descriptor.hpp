@@ -24,11 +24,7 @@ struct DescriptorAllocator final {
     D3D12_GPU_DESCRIPTOR_HANDLE gpu_starting_handle {};
     UINT size_increment = 0;
 
-    explicit DescriptorAllocator(
-        Device& d,
-        UINT descriptors_count,
-        D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-        const wchar_t* name);
+    explicit DescriptorAllocator(Device& d, UINT descriptors_count, D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* name);
     ~DescriptorAllocator();
 };
 
@@ -38,11 +34,7 @@ struct CpuDescriptorAllocator final {
     D3D12_CPU_DESCRIPTOR_HANDLE cpu_starting_handle {};
     UINT size_increment = 0;
 
-    explicit CpuDescriptorAllocator(
-        Device& d,
-        UINT descriptors_count,
-        D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-        const wchar_t* name);
+    explicit CpuDescriptorAllocator(Device& d, UINT descriptors_count, D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* name);
     ~CpuDescriptorAllocator();
 };
 
@@ -56,11 +48,7 @@ struct Descriptor final {
 private:
     std::shared_ptr<core::Allocator> allocator;
 
-    Descriptor(
-        UINT resource_index,
-        D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-        D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
-        std::shared_ptr<core::Allocator>&& allocator);
+    Descriptor(UINT resource_index, D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle, std::shared_ptr<core::Allocator>&& allocator);
 
 public:
     ~Descriptor();
@@ -76,10 +64,7 @@ struct CpuDescriptor final {
 private:
     std::shared_ptr<core::Allocator> allocator;
 
-    CpuDescriptor(
-        UINT resource_index,
-        D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-        std::shared_ptr<core::Allocator>&& allocator);
+    CpuDescriptor(UINT resource_index, D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle, std::shared_ptr<core::Allocator>&& allocator);
 
 public:
     ~CpuDescriptor();

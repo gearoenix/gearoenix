@@ -10,11 +10,7 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
-gearoenix::vulkan::buffer::Buffer::Buffer(
-    const std::uint32_t offset,
-    std::shared_ptr<const Buffer>&& parent,
-    std::shared_ptr<memory::Memory>&& allocated_memory,
-    const VkBuffer vulkan_data)
+gearoenix::vulkan::buffer::Buffer::Buffer(const std::uint32_t offset, std::shared_ptr<const Buffer>&& parent, std::shared_ptr<memory::Memory>&& allocated_memory, const VkBuffer vulkan_data)
     : offset(offset)
     , parent(std::move(parent))
     , allocated_memory(std::move(allocated_memory))
@@ -22,8 +18,7 @@ gearoenix::vulkan::buffer::Buffer::Buffer(
 {
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
-    const std::string& name, const std::int64_t size, const memory::Place place)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(const std::string& name, const std::int64_t size, const memory::Place place)
 {
     const auto& logical_device = device::Logical::get();
     const auto& physical_device = device::Physical::get();
@@ -57,8 +52,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
         vkDestroyBuffer(logical_device.get_vulkan_data(), vulkan_data, nullptr);
         return nullptr;
     }
-    GX_VK_CHK(vkBindBufferMemory(
-        dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
+    GX_VK_CHK(vkBindBufferMemory(dev, vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
     GX_VK_MARK(name, vulkan_data);
     std::shared_ptr<Buffer> result(new Buffer(0, nullptr, std::move(allocated_memory), vulkan_data));
     result->self = result;

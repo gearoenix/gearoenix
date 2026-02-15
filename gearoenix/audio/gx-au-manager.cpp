@@ -29,12 +29,6 @@ std::uint64_t gearoenix::audio::Manager::create_audio(platform::stream::Stream& 
     return create_audio_ogg(data, name);
 }
 
-std::uint64_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>&, const std::string&)
-{
-    GX_UNIMPLEMENTED;
-}
+std::uint64_t gearoenix::audio::Manager::create_audio_ogg(const std::vector<std::uint8_t>&, const std::string&) { GX_UNIMPLEMENTED; }
 
-std::uint64_t gearoenix::audio::Manager::create_player(const std::string&, const std::uint64_t, const bool)
-{
-    GX_UNIMPLEMENTED;
-}
+std::uint64_t gearoenix::audio::Manager::create_player(const std::string&, const std::uint64_t, const bool) { GX_UNIMPLEMENTED; }

@@ -6,10 +6,7 @@ gearoenix::core::ecs::EntityPtr::EntityPtr(std::shared_ptr<Entity>&& ptr)
 {
 }
 
-gearoenix::core::ecs::EntityPtr::~EntityPtr()
-{
-    clear();
-}
+gearoenix::core::ecs::EntityPtr::~EntityPtr() { clear(); }
 
 gearoenix::core::ecs::EntityPtr::EntityPtr(const EntityPtr&) = default;
 

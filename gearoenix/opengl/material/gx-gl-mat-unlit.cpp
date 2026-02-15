@@ -26,11 +26,7 @@ void gearoenix::gl::material::Unlit::construct(std::string&& name, core::job::En
 
 gearoenix::gl::material::Unlit::~Unlit() = default;
 
-void gearoenix::gl::material::Unlit::shadow(
-    const Mesh& mesh,
-    const render::record::Camera& cam,
-    const render::record::CameraModel& cmm,
-    uint& current_shader)
+void gearoenix::gl::material::Unlit::shadow(const Mesh& mesh, const render::record::Camera& cam, const render::record::CameraModel& cmm, uint& current_shader)
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(cmm.model->bones_count);
     shadow_caster_shader.bind(current_shader);
@@ -45,12 +41,7 @@ void gearoenix::gl::material::Unlit::shadow(
     glDrawElements(GL_TRIANGLES, mesh.get_cached_indices_count(), GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Unlit::render_forward(
-    const Scene&,
-    const render::record::Camera& cam,
-    const render::record::CameraModel& cmm,
-    const Mesh& mesh,
-    uint& current_shader)
+void gearoenix::gl::material::Unlit::render_forward(const Scene&, const render::record::Camera& cam, const render::record::CameraModel& cmm, const Mesh& mesh, uint& current_shader)
 {
     const auto& shader = unlit_combination->get(false, true, true, true);
     shader.bind(current_shader);

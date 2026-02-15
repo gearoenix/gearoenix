@@ -99,20 +99,16 @@ void gearoenix::editor::ui::MenuScene::update()
             platform::file_chooser_open(
                 [this](platform::stream::Path&&, std::shared_ptr<platform::stream::Stream>&& stream) {
                     auto progress_bar = WindowOverlayProgressBarManager::get().add("Loading Scenes from GLTF File...");
-                    render::gltf::load(
-                        std::move(stream),
-                        core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar = std::move(progress_bar)](auto&& entities) {
-                            for (auto& e : entities) {
-                                set_current_scene(e.get());
-                                e->add_to_world();
-                                active_scenes.emplace(std::move(e));
-                            }
-                            (void)progress_bar;
-                        }));
+                    render::gltf::load(std::move(stream), core::job::EndCaller<std::vector<core::ecs::EntityPtr>>([this, progress_bar = std::move(progress_bar)](auto&& entities) {
+                        for (auto& e : entities) {
+                            set_current_scene(e.get());
+                            e->add_to_world();
+                            active_scenes.emplace(std::move(e));
+                        }
+                        (void)progress_bar;
+                    }));
                 },
-                [] {},
-                "Import GLTF file",
-                ".glb" /*because of webassembly support we cant have gltf*/);
+                [] {}, "Import GLTF file", ".glb" /*because of webassembly support we cant have gltf*/);
         }
         if (ImGui::BeginMenu("Scenes")) {
             ImGui::Text("Active scenes: %zu", static_cast<std::size_t>(active_scenes.size()));
@@ -120,9 +116,7 @@ void gearoenix::editor::ui::MenuScene::update()
 
             if (ImGui::MenuItem("Refresh list")) {
                 auto scenes = decltype(active_scenes) {};
-                core::ecs::World::get().synchronised_system<render::scene::Scene>([&](const auto* const entity, auto* const) {
-                    scenes.emplace(entity->get_ptr());
-                });
+                core::ecs::World::get().synchronised_system<render::scene::Scene>([&](const auto* const entity, auto* const) { scenes.emplace(entity->get_ptr()); });
                 if (!current_scene || !scenes.contains(current_scene->get_ptr())) {
                     if (scenes.empty()) {
                         set_current_scene(nullptr);
@@ -189,7 +183,4 @@ void gearoenix::editor::ui::MenuScene::add_active_scene(core::ecs::EntityPtr&& e
     active_scenes.emplace(std::move(e));
 }
 
-bool gearoenix::editor::ui::MenuScene::has_active_scene() const
-{
-    return !active_scenes.empty();
-}
+bool gearoenix::editor::ui::MenuScene::has_active_scene() const { return !active_scenes.empty(); }

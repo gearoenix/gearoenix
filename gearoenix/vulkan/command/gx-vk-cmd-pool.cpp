@@ -15,9 +15,6 @@ gearoenix::vulkan::command::Pool::Pool()
     GX_VK_CHK(vkCreateCommandPool(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::command::Pool::~Pool()
-{
-    vkDestroyCommandPool(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-}
+gearoenix::vulkan::command::Pool::~Pool() { vkDestroyCommandPool(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
 
 #endif

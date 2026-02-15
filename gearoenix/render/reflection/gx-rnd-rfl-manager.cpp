@@ -16,11 +16,7 @@ gearoenix::render::reflection::Manager::Manager()
 
 gearoenix::render::reflection::Manager::~Manager() = default;
 
-void gearoenix::render::reflection::Manager::build_baked(
-    std::string&& name,
-    core::ecs::Entity* const parent,
-    const platform::stream::Path& path,
-    core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
+void gearoenix::render::reflection::Manager::build_baked(std::string&& name, core::ecs::Entity* const parent, const platform::stream::Path& path, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
     const auto stream = platform::stream::Stream::open(path);
     GX_ASSERT(nullptr != stream);
@@ -48,13 +44,9 @@ void gearoenix::render::reflection::Manager::build_baked(
 
     GX_TODO; // I have to read it from the object streamer
 
-    texture::Manager::get().read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) {
-        values->irradiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t));
-    }));
+    texture::Manager::get().read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) { values->irradiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t)); }));
 
-    texture::Manager::get().read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) {
-        values->radiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t));
-    }));
+    texture::Manager::get().read_gx3d(*stream, core::job::EndCallerShared<texture::Texture>([values](std::shared_ptr<texture::Texture>&& t) { values->radiance = std::dynamic_pointer_cast<texture::TextureCube>(std::move(t)); }));
 }
 
 void gearoenix::render::reflection::Manager::update()

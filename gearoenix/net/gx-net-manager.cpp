@@ -11,10 +11,7 @@ gearoenix::net::Manager::Manager()
     GX_ASSERT_D(enet_initialize() == 0);
 }
 
-gearoenix::net::Manager::~Manager()
-{
-    enet_deinitialize();
-}
+gearoenix::net::Manager::~Manager() { enet_deinitialize(); }
 
 void gearoenix::net::Manager::construct_client(
     std::string&& address,

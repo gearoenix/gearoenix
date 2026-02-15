@@ -9,10 +9,7 @@ namespace {
 const std::shared_ptr<gearoenix::core::ecs::Component> null_comp = nullptr;
 }
 
-void gearoenix::core::ecs::Entity::write(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    std::shared_ptr<ObjectStreamer>&& sc,
-    job::EndCaller<>&&)
+void gearoenix::core::ecs::Entity::write(std::shared_ptr<platform::stream::Stream>&& s, std::shared_ptr<ObjectStreamer>&& sc, job::EndCaller<>&&)
 {
     static_flat_set<std::shared_ptr<Component>, max_components> components;
     for (const auto& ci : all_types_to_components) {

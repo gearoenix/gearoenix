@@ -414,10 +414,6 @@ gearoenix::vulkan::pipeline::Manager::Manager()
 
 gearoenix::vulkan::pipeline::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(
-    const std::shared_ptr<descriptor::SetLayout>&)
-{
-    GX_UNIMPLEMENTED;
-}
+std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>&) { GX_UNIMPLEMENTED; }
 
 #endif

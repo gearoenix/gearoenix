@@ -34,11 +34,7 @@ private:
 public: /// TODO: support bone-count too
     [[nodiscard]] Unlit& get(const bool uv_transform, const bool alpha_cutoff, const bool albedo_factor, const bool albedo)
     {
-        auto& s = combinations
-            [static_cast<std::uint32_t>(uv_transform)]
-            [static_cast<std::uint32_t>(alpha_cutoff)]
-            [static_cast<std::uint32_t>(albedo_factor)]
-            [static_cast<std::uint32_t>(albedo)];
+        auto& s = combinations[static_cast<std::uint32_t>(uv_transform)][static_cast<std::uint32_t>(alpha_cutoff)][static_cast<std::uint32_t>(albedo_factor)][static_cast<std::uint32_t>(albedo)];
         if (s.has_value()) {
             return s.value();
         }

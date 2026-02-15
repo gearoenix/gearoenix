@@ -16,21 +16,10 @@ struct Texture {
 
     Texture(std::string name, const TextureInfo& info);
 
-    static void write_gx3d_image(
-        std::shared_ptr<platform::stream::Stream>&& s,
-        std::vector<std::uint8_t>&& data,
-        std::uint32_t img_width,
-        std::uint32_t img_height,
-        TextureFormat format,
-        core::job::EndCaller<>&& end);
+    static void write_gx3d_image(std::shared_ptr<platform::stream::Stream>&& s, std::vector<std::uint8_t>&& data, std::uint32_t img_width, std::uint32_t img_height, TextureFormat format, core::job::EndCaller<>&& end);
 
 private:
-    static void write_image(
-        platform::stream::Stream& s,
-        const std::uint8_t* data,
-        std::uint32_t img_width,
-        std::uint32_t img_height,
-        TextureFormat format);
+    static void write_image(platform::stream::Stream& s, const std::uint8_t* data, std::uint32_t img_width, std::uint32_t img_height, TextureFormat format);
 
 public:
     virtual ~Texture();
@@ -38,27 +27,14 @@ public:
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c) const;
     [[nodiscard]] std::uint64_t get_mipmaps_count() const;
 
-    [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(
-        const float* data,
-        std::uint64_t in_components_count,
-        std::uint64_t pixels_count,
-        std::uint64_t out_components_count);
+    [[nodiscard]] static std::vector<std::uint8_t> convert_pixels(const float* data, std::uint64_t in_components_count, std::uint64_t pixels_count, std::uint64_t out_components_count);
 
-    [[nodiscard]] static std::vector<std::vector<std::uint8_t>> convert_float_pixels(
-        const std::vector<std::vector<std::uint8_t>>& data,
-        std::uint64_t in_components_count,
-        std::uint64_t out_components_count);
+    [[nodiscard]] static std::vector<std::vector<std::uint8_t>> convert_float_pixels(const std::vector<std::vector<std::uint8_t>>& data, std::uint64_t in_components_count, std::uint64_t out_components_count);
 
-    [[nodiscard]] static std::vector<std::vector<std::vector<std::uint8_t>>> convert_float_pixels(
-        const std::vector<std::vector<std::vector<std::uint8_t>>>& data,
-        std::uint64_t in_components_count,
-        std::uint64_t out_components_count);
+    [[nodiscard]] static std::vector<std::vector<std::vector<std::uint8_t>>> convert_float_pixels(const std::vector<std::vector<std::vector<std::uint8_t>>>& data, std::uint64_t in_components_count, std::uint64_t out_components_count);
 
-    [[nodiscard]] static std::uint64_t compute_mipmaps_count(
-        std::uint64_t img_width,
-        std::uint64_t img_height);
+    [[nodiscard]] static std::uint64_t compute_mipmaps_count(std::uint64_t img_width, std::uint64_t img_height);
 
-    [[nodiscard]] static std::uint64_t compute_mipmaps_count(
-        const TextureInfo& info);
+    [[nodiscard]] static std::uint64_t compute_mipmaps_count(const TextureInfo& info);
 };
 }

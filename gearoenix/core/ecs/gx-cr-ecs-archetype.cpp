@@ -78,10 +78,7 @@ void gearoenix::core::ecs::Archetype::delete_entity(Entity* const e)
     entities.erase(e);
 }
 
-bool gearoenix::core::ecs::Archetype::contains(Entity* const e) const
-{
-    return entities.contains(e);
-}
+bool gearoenix::core::ecs::Archetype::contains(Entity* const e) const { return entities.contains(e); }
 
 gearoenix::core::ecs::Archetype::~Archetype() = default;
 

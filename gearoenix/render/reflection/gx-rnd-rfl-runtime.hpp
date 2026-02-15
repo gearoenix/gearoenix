@@ -72,18 +72,8 @@ struct Runtime : Probe {
     GX_GET_CREF_PRT(math::Aabb3<double>, exclude_box);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, environment_depth);
 
-    Runtime(
-        core::ecs::Entity* entity,
-        core::object_type_index_t final_component_type_index,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::string&& name);
-    void set_runtime_reflection_self(
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
-        core::job::EndCaller<>&& end_callback);
+    Runtime(core::ecs::Entity* entity, core::object_type_index_t final_component_type_index, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name);
+    void set_runtime_reflection_self(std::uint32_t environment_resolution, std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCaller<>&& end_callback);
 
 public:
     ~Runtime() override;

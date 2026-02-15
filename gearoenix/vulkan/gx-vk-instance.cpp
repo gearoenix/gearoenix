@@ -11,11 +11,7 @@
 
 namespace gearoenix::vulkan {
 #if GX_VULKAN_INSTANCE_DEBUG
-static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(
-    const VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    const VkDebugUtilsMessageTypeFlagsEXT types,
-    const VkDebugUtilsMessengerCallbackDataEXT* const callback_data,
-    void* const)
+static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessageSeverityFlagBitsEXT severity, const VkDebugUtilsMessageTypeFlagsEXT types, const VkDebugUtilsMessengerCallbackDataEXT* const callback_data, void* const)
 {
     thread_local std::stringstream msg;
     msg.clear();
@@ -113,9 +109,7 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
 #endif
 
     auto sdl_extensions = platform::Application::get().get_vulkan_extensions();
-    instance_extensions_set.insert(
-        std::make_move_iterator(sdl_extensions.begin()),
-        std::make_move_iterator(sdl_extensions.end()));
+    instance_extensions_set.insert(std::make_move_iterator(sdl_extensions.begin()), std::make_move_iterator(sdl_extensions.end()));
 
 #if GX_VULKAN_INSTANCE_DEBUG
     instance_extensions_set.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

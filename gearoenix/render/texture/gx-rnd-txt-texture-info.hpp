@@ -20,14 +20,7 @@ struct TextureInfo final {
     GX_GET_VAL_PRV(bool, has_mipmap, true);
 
 public:
-    explicit TextureInfo(
-        TextureFormat format = TextureFormat::Unknown,
-        const SamplerInfo& sampler_info = SamplerInfo(),
-        std::uint32_t width = 1,
-        std::uint32_t height = 1,
-        std::uint32_t depth = 1,
-        Type type = Type::Unknown,
-        bool has_mipmap = true);
+    explicit TextureInfo(TextureFormat format = TextureFormat::Unknown, const SamplerInfo& sampler_info = SamplerInfo(), std::uint32_t width = 1, std::uint32_t height = 1, std::uint32_t depth = 1, Type type = Type::Unknown, bool has_mipmap = true);
 
     TextureInfo& set_format(TextureFormat v);
     TextureInfo& set_sampler_info(const SamplerInfo& v);

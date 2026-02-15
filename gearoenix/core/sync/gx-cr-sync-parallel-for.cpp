@@ -1,7 +1,7 @@
 #include "gx-cr-sync-parallel-for.hpp"
-#include "gx-cr-sync-thread.hpp"
 #include "../job/gx-cr-job-manager.hpp"
 #include "gx-cr-sync-semaphore.hpp"
+#include "gx-cr-sync-thread.hpp"
 
 #include <latch>
 

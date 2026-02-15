@@ -7,10 +7,7 @@
 
 #define GX_MAIN_ENTRY_ARGS state
 
-#define GX_MAIN_ENTRY(expr)                   \
-    void android_main(GX_MAIN_ENTRY_ARGS_DEF) \
-    {                                         \
-        expr;                                 \
-    }
+#define GX_MAIN_ENTRY(expr) \
+    void android_main(GX_MAIN_ENTRY_ARGS_DEF) { expr; }
 
 #endif

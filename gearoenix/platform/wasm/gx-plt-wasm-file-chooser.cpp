@@ -65,14 +65,8 @@ EMSCRIPTEN_KEEPALIVE int gearoenix_upload_file_return(char const* const filename
 }
 }
 
-void gearoenix::platform::wasm::open(const std::string& accept_types, const open_callback callback, void* const callback_data)
-{
-    ::upload(accept_types.c_str(), callback, callback_data);
-}
+void gearoenix::platform::wasm::open(const std::string& accept_types, const open_callback callback, void* const callback_data) { ::upload(accept_types.c_str(), callback, callback_data); }
 
-void gearoenix::platform::wasm::save(const std::string& file_name, const std::string& mime_type, std::vector<std::uint8_t>&& buffer)
-{
-    ::download(file_name.c_str(), mime_type.c_str(), buffer.data(), buffer.size());
-}
+void gearoenix::platform::wasm::save(const std::string& file_name, const std::string& mime_type, std::vector<std::uint8_t>&& buffer) { ::download(file_name.c_str(), mime_type.c_str(), buffer.data(), buffer.size()); }
 
 #endif

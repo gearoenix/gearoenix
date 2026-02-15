@@ -81,14 +81,15 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
     case AINPUT_EVENT_TYPE_KEY:
         base.keyboard_key(convert_android_key(AKeyEvent_getKeyCode(e)), [&]() {
             switch (AKeyEvent_getAction(e)) {
-                case AKEY_EVENT_ACTION_UP:
-                    return gearoenix::platform::key::Action::Release;
-                case AKEY_EVENT_ACTION_DOWN:
-                    return gearoenix::platform::key::Action::Press;
-                default:
-                    GX_LOG_E("Unhandled key action.");
-                    return gearoenix::platform::key::Action::Press;
-            } }());
+            case AKEY_EVENT_ACTION_UP:
+                return gearoenix::platform::key::Action::Release;
+            case AKEY_EVENT_ACTION_DOWN:
+                return gearoenix::platform::key::Action::Press;
+            default:
+                GX_LOG_E("Unhandled key action.");
+                return gearoenix::platform::key::Action::Press;
+            }
+        }());
         break;
     case AINPUT_EVENT_TYPE_MOTION: {
         const auto action = AMotionEvent_getAction(e);
@@ -98,18 +99,12 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
         switch (flags) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN:
-            base.touch_down(
-                static_cast<FingerId>(pointer_id),
-                static_cast<double>(AMotionEvent_getRawX(e, pointer_index)),
-                static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
+            base.touch_down(static_cast<FingerId>(pointer_id), static_cast<double>(AMotionEvent_getRawX(e, pointer_index)), static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
             break;
         case AMOTION_EVENT_ACTION_MOVE: {
             const auto pointer_counts = AMotionEvent_getPointerCount(e);
             for (auto pi = decltype(pointer_counts) { 0 }; pi < pointer_counts; ++pi) {
-                base.touch_move(
-                    static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)),
-                    static_cast<double>(AMotionEvent_getRawX(e, pi)),
-                    static_cast<double>(AMotionEvent_getRawY(e, pi)));
+                base.touch_move(static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)), static_cast<double>(AMotionEvent_getRawX(e, pi)), static_cast<double>(AMotionEvent_getRawY(e, pi)));
             }
             break;
         }
@@ -157,9 +152,7 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
 #ifdef GX_RENDER_OPENGL_ENABLED
         if (gl_context != nullptr) {
             gl_context->init(android_application->window);
-            base.initialize_window_size(
-                ANativeWindow_getWidth(android_application->window),
-                ANativeWindow_getHeight(android_application->window));
+            base.initialize_window_size(ANativeWindow_getWidth(android_application->window), ANativeWindow_getHeight(android_application->window));
             make_thread_current_jni();
             base.initialize_engine(*this);
         }
@@ -248,10 +241,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app)
     running = false;
 }
 
-const char* gearoenix::platform::Application::get_clipboard() const
-{
-    return nullptr;
-}
+const char* gearoenix::platform::Application::get_clipboard() const { return nullptr; }
 
 void gearoenix::platform::Application::set_soft_keyboard_visibility(const bool show)
 {

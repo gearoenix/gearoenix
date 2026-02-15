@@ -54,9 +54,7 @@ public:
     GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void {
-            material_is_ready(std::move(m));
-        }));
+        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void { material_is_ready(std::move(m)); }));
     }
 
     void material_is_ready(GxPbrPtr&& material)
@@ -101,22 +99,14 @@ public:
     {
         material->set_albedo(std::move(texture));
 
-        GxMeshManager::get().build_plate(
-            std::move(material),
-            GxMeshEndCaller([this](GxMeshPtr&& mesh) -> void {
-                mesh_is_ready(std::move(mesh));
-            }));
+        GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this](GxMeshPtr&& mesh) -> void { mesh_is_ready(std::move(mesh)); }));
     }
 
     void mesh_is_ready(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxMdlManager::get().build(
-            "triangle", scene_entity.get(), { std::move(mesh) }, false);
+        auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false);
 
-        GxCamManager::get().build(
-            "camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
-                camera_is_ready(std::move(e));
-            }));
+        GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void { camera_is_ready(std::move(e)); }));
     }
 
     void camera_is_ready(GxEntityPtr&& camera_entity)
@@ -124,22 +114,17 @@ public:
         auto trn = camera_entity->get_component_shared_ptr<GxTransform>();
         trn->set_local_position({ 0.0f, 0.0f, 5.0f });
 
-        (void)GxConstraintManager::get().create_jet_controller(
-            camera_entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+        (void)GxConstraintManager::get().create_jet_controller(camera_entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
 
         GxLightManager::get().build_shadow_caster_directional(
-            "directional-light", scene_entity.get(), 1024,
-            10.0f, 1.0f, 10.0f,
-            GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
-                light_is_ready(std::move(e));
-            }));
+            "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
+            GxEntityEndCaller([this](GxEntityPtr&& e) -> void { light_is_ready(std::move(e)); }));
     }
 
     void light_is_ready(GxEntityPtr&& light_entity)
     {
         auto* const light = light_entity->get_component<GxShadowCaster>();
-        light->get_shadow_transform()->local_look_at(
-            { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+        light->get_shadow_transform()->local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
         light->colour = { 8.0f, 8.0f, 8.0f };
 
         scene_entity->add_to_world();

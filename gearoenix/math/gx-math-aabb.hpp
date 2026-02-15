@@ -177,12 +177,7 @@ public:
 
     [[nodiscard]] constexpr IntersectionStatus check_intersection_status(const Aabb3& o) const
     {
-        if (upper.x > o.upper.x
-            && upper.y > o.upper.y
-            && upper.z > o.upper.z
-            && lower.x < o.lower.x
-            && lower.y < o.lower.y
-            && lower.z < o.lower.z) {
+        if (upper.x > o.upper.x && upper.y > o.upper.y && upper.z > o.upper.z && lower.x < o.lower.x && lower.y < o.lower.y && lower.z < o.lower.z) {
             return IntersectionStatus::In;
         }
         if (check_intersection(o)) {
@@ -193,8 +188,7 @@ public:
 
     [[nodiscard]] constexpr bool check_intersection(const Sphere<Element>& sphere) const
     {
-        return check_intersection(Aabb3(
-            sphere.get_center() + sphere.get_radius(), sphere.get_center() - sphere.get_radius()));
+        return check_intersection(Aabb3(sphere.get_center() + sphere.get_radius(), sphere.get_center() - sphere.get_radius()));
     }
 
     [[nodiscard]] constexpr bool check_intersection(const Aabb3& o, Aabb3& intersection) const

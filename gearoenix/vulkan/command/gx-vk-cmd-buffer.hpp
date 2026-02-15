@@ -39,10 +39,7 @@ public:
     void end();
     void copy(const buffer::Buffer& src, const buffer::Buffer& des, const std::vector<VkBufferCopy>&);
     void copy(const buffer::Buffer& src, const buffer::Buffer& des);
-    void barrier(
-        buffer::Buffer& buff,
-        std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
-        std::pair<VkAccessFlags, VkPipelineStageFlags> des_state);
+    void barrier(buffer::Buffer& buff, std::pair<VkAccessFlags, VkPipelineStageFlags> src_state, std::pair<VkAccessFlags, VkPipelineStageFlags> des_state);
     void set(const Viewport& viewport);
     void set(const Scissor& scissor);
     void bind(Pipeline pip);

@@ -31,23 +31,19 @@ gearoenix::render::camera::Camera::Camera(core::ecs::Entity* const entity, const
     }
 }
 
-gearoenix::render::camera::Camera::~Camera()
-{
-    RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_observer);
-}
+gearoenix::render::camera::Camera::~Camera() { RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_observer); }
 
 void gearoenix::render::camera::Camera::initialise()
 {
     if (0 == resolution_cfg_observer) {
-        resolution_cfg_observer = RuntimeConfiguration::get().get_runtime_resolution().add_observer(
-            [c = object_self](const Resolution&) {
-                const auto cam = std::static_pointer_cast<Camera>(std::move(c.lock()));
-                if (nullptr == cam) {
-                    return false;
-                }
-                cam->update_target(core::job::EndCaller([] { }));
-                return true;
-            });
+        resolution_cfg_observer = RuntimeConfiguration::get().get_runtime_resolution().add_observer([c = object_self](const Resolution&) {
+            const auto cam = std::static_pointer_cast<Camera>(std::move(c.lock()));
+            if (nullptr == cam) {
+                return false;
+            }
+            cam->update_target(core::job::EndCaller([] { }));
+            return true;
+        });
     }
 }
 
@@ -107,12 +103,7 @@ void gearoenix::render::camera::Camera::read(std::shared_ptr<platform::stream::S
     }));
 }
 
-void gearoenix::render::camera::Camera::generate_frustum_points(
-    const math::Vec3<double>& location,
-    const math::Vec3<double>& x,
-    const math::Vec3<double>& y,
-    const math::Vec3<double>& z,
-    std::array<math::Vec3<double>, 8>& points) const
+void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3<double>& location, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, std::array<math::Vec3<double>, 8>& points) const
 {
     const auto [scale, fpn] = [&] {
         if (projection_data.is_perspective()) {
@@ -177,15 +168,9 @@ void gearoenix::render::camera::Camera::set_projection_data(const ProjectionData
     update_projection();
 }
 
-bool gearoenix::render::camera::Camera::is_perspective() const
-{
-    return projection_data.is_perspective();
-}
+bool gearoenix::render::camera::Camera::is_perspective() const { return projection_data.is_perspective(); }
 
-bool gearoenix::render::camera::Camera::is_orthographic() const
-{
-    return projection_data.is_orthographic();
-}
+bool gearoenix::render::camera::Camera::is_orthographic() const { return projection_data.is_orthographic(); }
 
 void gearoenix::render::camera::Camera::update_projection()
 {
@@ -201,12 +186,7 @@ void gearoenix::render::camera::Camera::update_projection()
         GX_UNEXPECTED;
     }
     if (engine::Engine::get().get_half_depth_clip()) {
-        projection = math::Mat4x4(
-                         1.0f, 0.0f, 0.0f, 0.0f,
-                         0.0f, -1.0f, 0.0f, 0.0f,
-                         0.0f, 0.0f, 0.5f, 0.0f,
-                         0.0f, 0.0f, 0.5f, 1.0f)
-            * projection;
+        projection = math::Mat4x4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f) * projection;
     }
     view_projection = projection * view;
 }
@@ -279,10 +259,7 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::disable_bloom()
-{
-    bloom_data = std::nullopt;
-}
+void gearoenix::render::camera::Camera::disable_bloom() { bloom_data = std::nullopt; }
 
 void gearoenix::render::camera::Camera::enable_bloom()
 {
@@ -292,25 +269,21 @@ void gearoenix::render::camera::Camera::enable_bloom()
     bloom_data.emplace();
 }
 
-void gearoenix::render::camera::Camera::update_bloom()
-{
-}
+void gearoenix::render::camera::Camera::update_bloom() { }
 
 void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& end)
 {
     if (!target.is_default()) {
         return;
     }
-    texture::Manager::get().create_default_camera_render_target(
-        object_name,
-        core::job::EndCaller<texture::DefaultCameraTargets>([this, w = object_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
-            const auto s = w.lock();
-            if (nullptr == s) {
-                return;
-            }
-            target = Target(std::move(t));
-            update_projection();
-            update_bloom();
-            (void)s;
-        }));
+    texture::Manager::get().create_default_camera_render_target(object_name, core::job::EndCaller<texture::DefaultCameraTargets>([this, w = object_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
+        const auto s = w.lock();
+        if (nullptr == s) {
+            return;
+        }
+        target = Target(std::move(t));
+        update_projection();
+        update_bloom();
+        (void)s;
+    }));
 }

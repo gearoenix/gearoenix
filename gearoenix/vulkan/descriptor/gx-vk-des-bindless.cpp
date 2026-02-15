@@ -14,17 +14,8 @@ namespace {
 constexpr VkDescriptorBindingFlags gx_binding_flags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT;
 }
 
-gearoenix::vulkan::descriptor::Bindless::Bindless(
-    const buffer::Buffer& scenes_buffer,
-    const buffer::Buffer& cameras_buffer,
-    const buffer::Buffer& models_buffer,
-    const buffer::Buffer& materials_buffer,
-    const buffer::Buffer& point_lights_buffer,
-    const buffer::Buffer& directional_lights_buffer,
-    const buffer::Buffer& shadow_caster_directional_lights_buffer,
-    const buffer::Buffer& bones_buffer,
-    const buffer::Buffer& reflection_probes_buffer,
-    const buffer::Buffer& cameras_joint_models_buffer)
+gearoenix::vulkan::descriptor::Bindless::Bindless(const buffer::Buffer& scenes_buffer, const buffer::Buffer& cameras_buffer, const buffer::Buffer& models_buffer, const buffer::Buffer& materials_buffer, const buffer::Buffer& point_lights_buffer,
+    const buffer::Buffer& directional_lights_buffer, const buffer::Buffer& shadow_caster_directional_lights_buffer, const buffer::Buffer& bones_buffer, const buffer::Buffer& reflection_probes_buffer, const buffer::Buffer& cameras_joint_models_buffer)
     : Singleton(this)
 {
     const auto vk_dev = device::Logical::get().get_vulkan_data();
@@ -234,18 +225,8 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     }
 
     // ========== Initialize Buffer Descriptors ==========
-    const std::array buffers = {
-        &scenes_buffer,
-        &cameras_buffer,
-        &models_buffer,
-        &materials_buffer,
-        &point_lights_buffer,
-        &directional_lights_buffer,
-        &shadow_caster_directional_lights_buffer,
-        &bones_buffer,
-        &reflection_probes_buffer,
-        &cameras_joint_models_buffer
-    };
+    const std::array buffers
+        = { &scenes_buffer, &cameras_buffer, &models_buffer, &materials_buffer, &point_lights_buffer, &directional_lights_buffer, &shadow_caster_directional_lights_buffer, &bones_buffer, &reflection_probes_buffer, &cameras_joint_models_buffer };
 
     std::array<VkDescriptorBufferInfo, 10> buffer_infos {};
     std::memset(buffer_infos.data(), 0, sizeof(VkDescriptorBufferInfo) * buffer_infos.size());
@@ -459,9 +440,6 @@ void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t i
     free_sampler_indices.push_back(index);
 }
 
-void gearoenix::vulkan::descriptor::Bindless::bind(const VkCommandBuffer cmd) const
-{
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
-}
+void gearoenix::vulkan::descriptor::Bindless::bind(const VkCommandBuffer cmd) const { vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &descriptor_set, 0, nullptr); }
 
 #endif

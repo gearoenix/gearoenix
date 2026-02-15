@@ -20,8 +20,5 @@ gearoenix::vulkan::shader::stage::Stage::Stage(const std::span<std::uint8_t> dat
 {
 }
 
-gearoenix::vulkan::shader::stage::Stage::~Stage()
-{
-    vkDestroyShaderModule(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-}
+gearoenix::vulkan::shader::stage::Stage::~Stage() { vkDestroyShaderModule(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
 #endif

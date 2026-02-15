@@ -18,18 +18,12 @@ using duration_t = std::chrono::nanoseconds;
 
 struct SvHash final {
     using is_transparent = void;
-    std::size_t operator()(const std::string_view sv) const
-    {
-        return std::hash<std::string_view> {}(sv);
-    }
+    std::size_t operator()(const std::string_view sv) const { return std::hash<std::string_view> {}(sv); }
 };
 
 struct SvEqual final {
     using is_transparent = void;
-    bool operator()(const std::string_view a, const std::string_view b) const
-    {
-        return a == b;
-    }
+    bool operator()(const std::string_view a, const std::string_view b) const { return a == b; }
 };
 
 template <typename V>
@@ -97,10 +91,7 @@ ThreadData::~ThreadData()
     }
 }
 
-static double to_ms(const duration_t d)
-{
-    return std::chrono::duration<double, std::milli>(d).count();
-}
+static double to_ms(const duration_t d) { return std::chrono::duration<double, std::milli>(d).count(); }
 
 static void ensure_registered()
 {
@@ -197,9 +188,7 @@ void report()
     ss << std::fixed << std::setprecision(3);
     ss << "\n======== Profiler Report ========\n";
     ss << "Total frames: " << frame_count << "\n";
-    ss << "Frame time (ms)  -  min: " << min_frame_ms
-       << "  avg: " << avg_frame_ms
-       << "  max: " << max_frame_ms << "\n";
+    ss << "Frame time (ms)  -  min: " << min_frame_ms << "  avg: " << avg_frame_ms << "  max: " << max_frame_ms << "\n";
     ss << "Avg FPS: " << (1000.0 / avg_frame_ms) << "\n";
     ss << "\n--- Per-Tag Statistics ---\n";
 
@@ -212,8 +201,9 @@ void report()
             max_tag_len = tag.size();
         }
     }
-    std::sort(sorted_tags.begin(), sorted_tags.end(),
-        [](const auto& a, const auto& b) { return a.second->total_ms > b.second->total_ms; });
+    std::sort(sorted_tags.begin(), sorted_tags.end(), [](const auto& a, const auto& b) {
+        return a.second->total_ms > b.second->total_ms;
+    });
 
     const auto tag_w = static_cast<int>(max_tag_len + 2);
 

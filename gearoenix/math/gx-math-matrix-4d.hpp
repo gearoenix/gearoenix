@@ -43,10 +43,7 @@ struct Mat4x4 final {
     {
     }
 
-    explicit Mat4x4(platform::stream::Stream& f)
-    {
-        read(f);
-    }
+    explicit Mat4x4(platform::stream::Stream& f) { read(f); }
 
     constexpr explicit Mat4x4(const Mat3x3<Element>& m)
         : columns { {
@@ -172,52 +169,28 @@ struct Mat4x4 final {
     }
 
     template <typename T>
-    constexpr const Vec4<Element>& operator[](const T i) const
-    {
-        return columns[i];
-    }
+    constexpr const Vec4<Element>& operator[](const T i) const { return columns[i]; }
 
     template <typename T>
-    constexpr Vec4<Element>& operator[](const T i)
-    {
-        return columns[i];
-    }
+    constexpr Vec4<Element>& operator[](const T i) { return columns[i]; }
 
     /// It does not change position
-    [[nodiscard]] constexpr Vec3<Element> get_diameter() const
-    {
-        return { columns[0].x, columns[1].y, columns[2].z };
-    }
+    [[nodiscard]] constexpr Vec3<Element> get_diameter() const { return { columns[0].x, columns[1].y, columns[2].z }; }
 
     /// It does not change position
-    constexpr void local_scale(const Element s)
-    {
-        local_scale(s, s, s);
-    }
+    constexpr void local_scale(const Element s) { local_scale(s, s, s); }
 
     /// It does not change position
-    constexpr void local_x_scale(const Element s)
-    {
-        columns[0] *= s;
-    }
+    constexpr void local_x_scale(const Element s) { columns[0] *= s; }
 
     /// It does not change position
-    constexpr void local_y_scale(const Element s)
-    {
-        columns[1] *= s;
-    }
+    constexpr void local_y_scale(const Element s) { columns[1] *= s; }
 
     /// It does not change position
-    constexpr void local_z_scale(const Element s)
-    {
-        columns[2] *= s;
-    }
+    constexpr void local_z_scale(const Element s) { columns[2] *= s; }
 
     /// It does not change position
-    constexpr void local_w_scale(const Element s)
-    {
-        columns[3] *= s;
-    }
+    constexpr void local_w_scale(const Element s) { columns[3] *= s; }
 
     /// It does not change position
     constexpr void local_scale(const Element a, const Element b, const Element c)
@@ -235,22 +208,13 @@ struct Mat4x4 final {
     }
 
     /// It does not change position
-    constexpr void local_scale(const Vec3<Element>& s)
-    {
-        local_scale(s.x, s.y, s.z);
-    }
+    constexpr void local_scale(const Vec3<Element>& s) { local_scale(s.x, s.y, s.z); }
 
     /// It changes position
-    constexpr void local_scale(const Vec4<Element>& s)
-    {
-        local_scale(s.x, s.y, s.z, s.w);
-    }
+    constexpr void local_scale(const Vec4<Element>& s) { local_scale(s.x, s.y, s.z, s.w); }
 
     /// It changes position
-    constexpr void global_scale(const Element s)
-    {
-        global_scale(s, s, s);
-    }
+    constexpr void global_scale(const Element s) { global_scale(s, s, s); }
 
     /// It changes position
     constexpr void global_scale(const Element a, const Element b, const Element c)
@@ -283,16 +247,10 @@ struct Mat4x4 final {
     }
 
     /// It changes position
-    constexpr void global_scale(const Vec3<Element>& s)
-    {
-        global_scale(s.x, s.y, s.z);
-    }
+    constexpr void global_scale(const Vec3<Element>& s) { global_scale(s.x, s.y, s.z); }
 
     /// It changes position
-    constexpr void global_scale(const Vec4<Element>& s)
-    {
-        global_scale(s.x, s.y, s.z, s.w);
-    }
+    constexpr void global_scale(const Vec4<Element>& s) { global_scale(s.x, s.y, s.z, s.w); }
 
     constexpr void translate(const Vec3<Element>& v)
     {
@@ -308,10 +266,7 @@ struct Mat4x4 final {
         columns[3].z = position.z;
     }
 
-    constexpr void get_position(Vec3<Element>& position) const
-    {
-        position = columns[3].xyz();
-    }
+    constexpr void get_position(Vec3<Element>& position) const { position = columns[3].xyz(); }
 
     constexpr void get_axes(Vec3<Element>& x, Vec3<Element>& y, Vec3<Element>& z) const
     {
@@ -341,10 +296,7 @@ struct Mat4x4 final {
         columns[2] = { m[2], columns[2].w };
     }
 
-    constexpr void inverse()
-    {
-        *this = inverted();
-    }
+    constexpr void inverse() { *this = inverted(); }
 
     constexpr void transpose()
     {
@@ -525,11 +477,7 @@ struct Mat4x4 final {
         return r;
     }
 
-    [[nodiscard]] constexpr static Mat4x4 orthographic(
-        const Element proj_width,
-        const Element proj_height,
-        const Element proj_near,
-        const Element proj_far)
+    [[nodiscard]] constexpr static Mat4x4 orthographic(const Element proj_width, const Element proj_height, const Element proj_near, const Element proj_far)
     {
         Mat4x4 r;
         r[0][0] = static_cast<Element>(2) / proj_width;
@@ -551,11 +499,7 @@ struct Mat4x4 final {
         return r;
     }
 
-    [[nodiscard]] constexpr static Mat4x4 perspective(
-        const Element proj_width,
-        const Element proj_height,
-        const Element proj_near,
-        const Element proj_far)
+    [[nodiscard]] constexpr static Mat4x4 perspective(const Element proj_width, const Element proj_height, const Element proj_near, const Element proj_far)
     {
         Mat4x4 r;
         r[0][0] = (static_cast<Element>(2) * proj_near) / proj_width;

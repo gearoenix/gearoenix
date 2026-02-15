@@ -17,24 +17,12 @@ gearoenix::vulkan::material::Manager::Manager()
 
 gearoenix::vulkan::material::Manager::~Manager() = default;
 
-void gearoenix::vulkan::material::Manager::construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c)
-{
-    Pbr::construct(std::move(name), std::move(c));
-}
+void gearoenix::vulkan::material::Manager::construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c) { Pbr::construct(std::move(name), std::move(c)); }
 
-void gearoenix::vulkan::material::Manager::construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c)
-{
-    Unlit::construct(std::move(name), std::move(c));
-}
+void gearoenix::vulkan::material::Manager::construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c) { Unlit::construct(std::move(name), std::move(c)); }
 
-void gearoenix::vulkan::material::Manager::construct_sprite(std::string&&, core::job::EndCallerShared<render::material::Sprite>&&)
-{
-    GX_UNIMPLEMENTED;
-}
+void gearoenix::vulkan::material::Manager::construct_sprite(std::string&&, core::job::EndCallerShared<render::material::Sprite>&&) { GX_UNIMPLEMENTED; }
 
-void gearoenix::vulkan::material::Manager::upload_uniforms()
-{
-    uniform_indexer.update();
-}
+void gearoenix::vulkan::material::Manager::upload_uniforms() { uniform_indexer.update(); }
 
 #endif

@@ -16,11 +16,7 @@ void gearoenix::vulkan::mesh::Manager::build(std::string&& name, render::Vertice
     Buffer::construct(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(end_callback));
 }
 
-void gearoenix::vulkan::mesh::Manager::build(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material,
-    core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
+void gearoenix::vulkan::mesh::Manager::build(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
 {
     Mesh::construct(std::move(name), std::move(buffer), std::move(material), end_callback);
 }

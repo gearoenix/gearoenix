@@ -39,12 +39,8 @@ gearoenix::render::material::Manager::~Manager() = default;
     });                                                                                                \
     construct_##sx(std::move(name), std::move(end))
 
-#define GX_RND_MAT_FUNC(x, sx)                                 \
-    void gearoenix::render::material::Manager::get_##sx(       \
-        std::string&& name, core::job::EndCallerShared<x>&& c) \
-    {                                                          \
-        GX_RND_MAT_CONSTRUCT(x, sx);                           \
-    }                                                          \
+#define GX_RND_MAT_FUNC(x, sx)                                                                                                                  \
+    void gearoenix::render::material::Manager::get_##sx(std::string&& name, core::job::EndCallerShared<x>&& c) { GX_RND_MAT_CONSTRUCT(x, sx); } \
     static_assert(true, "")
 
 GX_RND_MAT_FUNC(Pbr, pbr);

@@ -43,10 +43,7 @@ struct ForwardPbr final : Shader {
     sizei bones_matrices_count = static_cast<sizei>(-1);
 
 public:
-    ForwardPbr(
-        std::uint32_t directional_lights_count,
-        std::uint32_t shadow_casters_directional_lights_count,
-        std::uint32_t bones_count);
+    ForwardPbr(std::uint32_t directional_lights_count, std::uint32_t shadow_casters_directional_lights_count, std::uint32_t bones_count);
     ForwardPbr(ForwardPbr&&) noexcept;
     ~ForwardPbr() override;
     void bind(uint& current_shader) const override;
@@ -71,9 +68,7 @@ private:
 
     bones combinations;
 
-    ForwardPbrCombination()
-    {
-    }
+    ForwardPbrCombination() { }
 
 public:
     [[nodiscard]] ForwardPbr& get(const std::uint32_t bones_count, const std::uint32_t shadow_casters_directional_lights_count, const std::uint32_t directional_lights_count)

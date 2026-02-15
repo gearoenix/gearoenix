@@ -48,12 +48,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_3d)
 
     for (int i = 0; i < 100; ++i) {
         const auto vs = random();
-        glmm = glm::mat3(vs[0][0], vs[0][1], vs[0][2],
-            vs[1][0], vs[1][1], vs[1][2],
-            vs[2][0], vs[2][1], vs[2][2]);
-        gxm = GxMat3(vs[0][0], vs[0][1], vs[0][2],
-            vs[1][0], vs[1][1], vs[1][2],
-            vs[2][0], vs[2][1], vs[2][2]);
+        glmm = glm::mat3(vs[0][0], vs[0][1], vs[0][2], vs[1][0], vs[1][1], vs[1][2], vs[2][0], vs[2][1], vs[2][2]);
+        gxm = GxMat3(vs[0][0], vs[0][1], vs[0][2], vs[1][0], vs[1][1], vs[1][2], vs[2][0], vs[2][1], vs[2][2]);
 
         BOOST_TEST(GxN::equal(glm::determinant(glmm), gxm.determinant()));
     }

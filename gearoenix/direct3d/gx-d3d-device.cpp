@@ -10,8 +10,7 @@
 gearoenix::d3d::Device::Device(std::shared_ptr<Adapter> _adapter)
     : adapter(std::move(_adapter))
 {
-    if (FAILED(D3D12CreateDevice(
-            adapter->get_adapter().Get(), Adapter::MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&device))))
+    if (FAILED(D3D12CreateDevice(adapter->get_adapter().Get(), Adapter::MINIMUM_FEATURE_LEVEL, IID_PPV_ARGS(&device))))
         GX_LOG_F("Can not create device.");
 #if GX_DEBUG_MODE
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3d_info_queue;

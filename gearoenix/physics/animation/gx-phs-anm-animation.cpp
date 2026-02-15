@@ -32,10 +32,7 @@ gearoenix::physics::animation::ArmatureAnimation::ArmatureAnimation(std::string&
 
 gearoenix::physics::animation::ArmatureAnimation::~ArmatureAnimation() = default;
 
-void gearoenix::physics::animation::ArmatureAnimation::animate(const double time)
-{
-    animate(*root_bone, time);
-}
+void gearoenix::physics::animation::ArmatureAnimation::animate(const double time) { animate(*root_bone, time); }
 
 void gearoenix::physics::animation::ArmatureAnimation::animate(const Bone& bone, const double time)
 {
@@ -93,13 +90,11 @@ void gearoenix::physics::animation::ArmatureAnimation::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
         Animation::show_debug_gui();
-        render::imgui::table_scope(
-            "##gearoenix::physics::animation::ArmatureAnimation::show_debug_gui",
-            [this] {
-                ImGui::Text("Root Bone:");
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", root_bone->get_object_name().c_str());
-            });
+        render::imgui::table_scope("##gearoenix::physics::animation::ArmatureAnimation::show_debug_gui", [this] {
+            ImGui::Text("Root Bone:");
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", root_bone->get_object_name().c_str());
+        });
         root_bone->show_debug_gui();
     });
 }
@@ -136,11 +131,7 @@ gearoenix::math::Vec2<double> gearoenix::physics::animation::ArmatureAnimation::
     return start_end;
 }
 
-gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(
-    std::string&& name,
-    std::shared_ptr<render::material::Sprite>&& sprite,
-    const std::uint32_t width,
-    const std::uint32_t height)
+gearoenix::physics::animation::SpriteAnimation::SpriteAnimation(std::string&& name, std::shared_ptr<render::material::Sprite>&& sprite, const std::uint32_t width, const std::uint32_t height)
     : Animation(object_type_index, std::move(name))
     , sprite(std::move(sprite))
     , count(static_cast<double>(width * height))
@@ -161,13 +152,11 @@ void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
         Animation::show_debug_gui();
-        render::imgui::table_scope(
-            "##gearoenix::physics::animation::SpriteAnimation::show_debug_gui",
-            [this] {
-                ImGui::Text("Count:");
-                ImGui::TableNextColumn();
-                ImGui::Text("%lf", count);
-            });
+        render::imgui::table_scope("##gearoenix::physics::animation::SpriteAnimation::show_debug_gui", [this] {
+            ImGui::Text("Count:");
+            ImGui::TableNextColumn();
+            ImGui::Text("%lf", count);
+        });
     });
 }
 
@@ -180,10 +169,7 @@ void gearoenix::physics::animation::SpriteAnimation::write(platform::stream::Str
     aspect.write(s);
     uv_scale.write(s);
 }
-gearoenix::math::Vec2<double> gearoenix::physics::animation::SpriteAnimation::get_start_end() const
-{
-    GX_UNIMPLEMENTED;
-}
+gearoenix::math::Vec2<double> gearoenix::physics::animation::SpriteAnimation::get_start_end() const { GX_UNIMPLEMENTED; }
 
 gearoenix::physics::animation::SpriteAnimation::~SpriteAnimation() = default;
 
@@ -191,39 +177,38 @@ void gearoenix::physics::animation::AnimationPlayer::show_debug_gui()
 {
     render::imgui::tree_scope(this, [this] {
         Component::show_debug_gui();
-        render::imgui::table_scope(
-            "##gearoenix::physics::animation::AnimationPlayer::show_debug_gui", [this] {
-                ImGui::Text("Time: ");
-                ImGui::TableNextColumn();
-                ImGui::InputDouble("##time", &time);
-                ImGui::TableNextColumn();
+        render::imgui::table_scope("##gearoenix::physics::animation::AnimationPlayer::show_debug_gui", [this] {
+            ImGui::Text("Time: ");
+            ImGui::TableNextColumn();
+            ImGui::InputDouble("##time", &time);
+            ImGui::TableNextColumn();
 
-                ImGui::Text("Speed: ");
-                ImGui::TableNextColumn();
-                ImGui::InputDouble("##speed", &speed);
-                ImGui::TableNextColumn();
+            ImGui::Text("Speed: ");
+            ImGui::TableNextColumn();
+            ImGui::InputDouble("##speed", &speed);
+            ImGui::TableNextColumn();
 
-                ImGui::Text("Is Loop: ");
-                ImGui::TableNextColumn();
-                ImGui::Checkbox("##is_loop", &is_loop);
-                ImGui::TableNextColumn();
+            ImGui::Text("Is Loop: ");
+            ImGui::TableNextColumn();
+            ImGui::Checkbox("##is_loop", &is_loop);
+            ImGui::TableNextColumn();
 
-                ImGui::Text("Loop Start Time: ");
-                ImGui::TableNextColumn();
-                ImGui::InputDouble("##loop_start_time", &loop_start_time);
-                ImGui::TableNextColumn();
+            ImGui::Text("Loop Start Time: ");
+            ImGui::TableNextColumn();
+            ImGui::InputDouble("##loop_start_time", &loop_start_time);
+            ImGui::TableNextColumn();
 
-                ImGui::Text("Loop End Time: ");
-                ImGui::TableNextColumn();
-                ImGui::InputDouble("##loop_end_time", &loop_end_time);
-                ImGui::TableNextColumn();
+            ImGui::Text("Loop End Time: ");
+            ImGui::TableNextColumn();
+            ImGui::InputDouble("##loop_end_time", &loop_end_time);
+            ImGui::TableNextColumn();
 
-                loop_end_time = std::max(loop_start_time, loop_end_time);
+            loop_end_time = std::max(loop_start_time, loop_end_time);
 
-                ImGui::Text("Loop Time: ");
-                ImGui::TableNextColumn();
-                ImGui::Text("%lf", loop_length_time);
-            });
+            ImGui::Text("Loop Time: ");
+            ImGui::TableNextColumn();
+            ImGui::Text("%lf", loop_length_time);
+        });
     });
 }
 
@@ -268,10 +253,7 @@ void gearoenix::physics::animation::AnimationPlayer::set_loop_range_time(const d
     loop_length_time = loop_end_time - loop_start_time;
 }
 
-void gearoenix::physics::animation::AnimationPlayer::animate() const
-{
-    animation->animate(time);
-}
+void gearoenix::physics::animation::AnimationPlayer::animate() const { animation->animate(time); }
 
 // void gearoenix::physics::animation::AnimationPlayer::write_in_io_context(
 //     std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<>&& end_caller) const

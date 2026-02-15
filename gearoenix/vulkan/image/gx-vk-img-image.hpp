@@ -80,28 +80,9 @@ public:
     Image(const Image&) = delete;
     Image& operator=(Image&&) = delete;
     Image& operator=(const Image&) = delete;
-    Image(
-        const std::string& name,
-        std::uint32_t image_width,
-        std::uint32_t image_height,
-        std::uint32_t image_depth,
-        VkImageType image_type,
-        std::uint32_t mipmap_levels,
-        std::uint32_t array_layers,
-        VkFormat format,
-        VkImageCreateFlags flags,
-        VkImageUsageFlags usage,
-        VkImage vulkan_data);
-    Image(
-        const std::string& name,
-        std::uint32_t image_width,
-        std::uint32_t image_height,
-        std::uint32_t image_depth,
-        VkImageType image_type,
-        std::uint32_t mipmap_levels,
-        std::uint32_t array_layers,
-        VkFormat format,
-        VkImageCreateFlags flags,
+    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, VkImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, VkFormat format, VkImageCreateFlags flags,
+        VkImageUsageFlags usage, VkImage vulkan_data);
+    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, VkImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, VkFormat format, VkImageCreateFlags flags,
         VkImageUsageFlags usage);
     ~Image();
     [[nodiscard]] VkImageLayout get_layout() const;

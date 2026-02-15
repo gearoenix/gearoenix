@@ -3,9 +3,7 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <cstring>
 
-gearoenix::core::allocator::SameSizeBlock::SameSizeBlock(
-    const std::int64_t object_size,
-    const std::int64_t objects_count_in_each_block)
+gearoenix::core::allocator::SameSizeBlock::SameSizeBlock(const std::int64_t object_size, const std::int64_t objects_count_in_each_block)
     : object_size(object_size)
     , objects_count_in_each_block(objects_count_in_each_block)
     , block_bytes_count(object_size * objects_count_in_each_block)

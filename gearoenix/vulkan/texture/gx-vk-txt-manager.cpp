@@ -28,11 +28,7 @@ gearoenix::vulkan::texture::Manager::Manager()
 
 gearoenix::vulkan::texture::Manager::~Manager() = default;
 
-void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(
-    std::string&& name,
-    std::vector<std::vector<std::uint8_t>>&& pixels,
-    const render::texture::TextureInfo& info,
-    core::job::EndCallerShared<render::texture::Texture2D>&& c)
+void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
     auto result = std::make_shared<Texture2D>(info, std::move(name));
     std::vector<std::vector<std::shared_ptr<buffer::Buffer>>> buffers(1);
@@ -46,10 +42,7 @@ void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(
 }
 
 void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(
-    std::string&& name,
-    std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
-    const render::texture::TextureInfo& info,
-    core::job::EndCallerShared<render::texture::TextureCube>&& c)
+    std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::TextureCube>&& c)
 {
     auto result = std::make_shared<TextureCube>(info, std::move(name));
 
@@ -69,10 +62,7 @@ void gearoenix::vulkan::texture::Manager::create_cube_from_pixels_v(
     image::Manager::get().upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] { }));
 }
 
-void gearoenix::vulkan::texture::Manager::create_target_v(
-    std::string&& name,
-    std::vector<render::texture::Attachment>&& attachments,
-    core::job::EndCallerShared<render::texture::Target>&& c)
+void gearoenix::vulkan::texture::Manager::create_target_v(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& c)
 {
     Target::construct(std::move(name), std::move(attachments), std::move(c));
 }

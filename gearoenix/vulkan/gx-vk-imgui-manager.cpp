@@ -77,9 +77,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
     info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &imgui_colour_format;
 #if GX_DEBUG_MODE
-    info.CheckVkResultFn = +[](const VkResult result) {
-        GX_VK_CHK(result);
-    };
+    info.CheckVkResultFn = +[](const VkResult result) { GX_VK_CHK(result); };
 #endif
 
     ImGui_ImplVulkan_LoadFunctions(api_version, +[](const char* const name, void*) { return Loader::get(name); }, nullptr);
@@ -105,10 +103,7 @@ void gearoenix::vulkan::ImGuiManager::start_frame()
     ImGui::NewFrame();
 }
 
-void gearoenix::vulkan::ImGuiManager::end_frame()
-{
-    ImGui::Render();
-}
+void gearoenix::vulkan::ImGuiManager::end_frame() { ImGui::Render(); }
 
 void gearoenix::vulkan::ImGuiManager::update()
 {

@@ -17,12 +17,7 @@ struct Buffer final : render::mesh::Buffer {
 
 public:
     explicit Buffer(const math::Aabb3<double>& box);
-    static void construct(
-        std::string&& name,
-        render::Vertices&& vertices,
-        std::vector<std::uint32_t>&& indices,
-        const math::Aabb3<double>& occlusion_box,
-        core::job::EndCallerShared<render::mesh::Buffer>&& end_callback);
+    static void construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<double>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback);
     ~Buffer() override;
 };
 }

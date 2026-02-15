@@ -26,9 +26,7 @@ gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model:
 
 gearoenix::vulkan::model::Model::~Model() = default;
 
-void gearoenix::vulkan::model::Model::render_shadow(
-    const render::record::CameraModel& camera_model, const VkCommandBuffer cmd,
-    pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::model::Model::render_shadow(const render::record::CameraModel& camera_model, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
     pc.model_index = shader_data_index;
     const auto skinned = camera_model.model->bones_count > 0;
@@ -38,9 +36,7 @@ void gearoenix::vulkan::model::Model::render_shadow(
     }
 }
 
-void gearoenix::vulkan::model::Model::render_forward(
-    const render::record::CameraModel& camera_model, const VkCommandBuffer cmd,
-    pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::model::Model::render_forward(const render::record::CameraModel& camera_model, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
     pc.model_index = shader_data_index;
     const auto skinned = camera_model.model->bones_count > 0;

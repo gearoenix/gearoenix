@@ -37,11 +37,7 @@ void gearoenix::gl::material::Pbr::construct(std::string&& name, core::job::EndC
 
 gearoenix::gl::material::Pbr::~Pbr() = default;
 
-void gearoenix::gl::material::Pbr::shadow(
-    const Mesh& mesh,
-    const render::record::Camera& camera,
-    const render::record::CameraModel& recorded_cam_model,
-    uint& current_shader)
+void gearoenix::gl::material::Pbr::shadow(const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel& recorded_cam_model, uint& current_shader)
 {
     auto& shadow_caster_shader = shadow_caster_combination->get(recorded_cam_model.model->bones_count);
     shadow_caster_shader.bind(current_shader);
@@ -103,19 +99,11 @@ void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::
     render::material::Pbr::set_brdflut(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::render_forward(
-    const Scene&,
-    const render::record::Camera& camera,
-    const render::record::CameraModel& camera_model,
-    const Mesh& mesh,
-    uint& current_shader)
+void gearoenix::gl::material::Pbr::render_forward(const Scene&, const render::record::Camera& camera, const render::record::CameraModel& camera_model, const Mesh& mesh, uint& current_shader)
 {
     const auto& rm = *camera_model.model;
     const auto& rls = rm.lights;
-    auto& shader = forward_pbr_combination->get(
-        rm.bones_count,
-        static_cast<std::uint32_t>(rls.shadow_caster_directionals.size()),
-        static_cast<std::uint32_t>(rls.directionals.size()));
+    auto& shader = forward_pbr_combination->get(rm.bones_count, static_cast<std::uint32_t>(rls.shadow_caster_directionals.size()), static_cast<std::uint32_t>(rls.directionals.size()));
     shader.bind(current_shader);
     shader.set_vp_data(camera.camera->get_view_projection().data());
 
@@ -126,8 +114,7 @@ void gearoenix::gl::material::Pbr::render_forward(
         static std::vector<std::array<math::Mat4x4<float>, 2>> bones_data;
         bones_data.clear();
         for (const auto* const b : rm.armature->get_all_bones()) {
-            bones_data.push_back({ math::Mat4x4<float>(b->get_global_matrix()),
-                math::Mat4x4<float>(b->get_transposed_inverted_global_matrix()) });
+            bones_data.push_back({ math::Mat4x4<float>(b->get_global_matrix()), math::Mat4x4<float>(b->get_transposed_inverted_global_matrix()) });
         }
         shader.set_bones_m_inv_m_data(bones_data.data()->data());
     } else {

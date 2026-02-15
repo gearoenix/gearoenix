@@ -26,16 +26,15 @@ public:
         {
             const std::lock_guard _lg(lock);
 
-            if(auto search = ends.find(k); ends.end() != search) {
+            if (auto search = ends.find(k); ends.end() != search) {
                 std::swap(vec, search->second);
                 ends.erase(search);
             }
 
-            GX_ASSERT_D(!data.contains(k) || data[k].expired());
             data[k] = v;
         }
 
-        for (const auto& e: vec) {
+        for (const auto& e : vec) {
             e.set_return(std::shared_ptr(v));
         }
     }

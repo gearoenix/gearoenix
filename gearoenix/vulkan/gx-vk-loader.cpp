@@ -8,17 +8,13 @@
 #include <cstdlib>
 #include <string>
 
-#define GX_VULKAN_LOADER_DECL_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) \
-    PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION = nullptr
+#define GX_VULKAN_LOADER_DECL_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION = nullptr
 
 GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DECL_FUNCTIONS)
 
 #undef GX_VULKAN_LOADER_DECL_FUNCTIONS
 
-bool gearoenix::vulkan::Loader::is_loaded()
-{
-    return vkCreateInstance != nullptr;
-}
+bool gearoenix::vulkan::Loader::is_loaded() { return vkCreateInstance != nullptr; }
 
 bool gearoenix::vulkan::Loader::load()
 {
@@ -51,10 +47,9 @@ bool gearoenix::vulkan::Loader::load()
         return false;
     }
 
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>( \
-            vkGetInstanceProcAddr(VK_NULL_HANDLE, #GX_VULKAN_LOADER_FUNCTION));        \
+#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                                         \
+    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                           \
+        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetInstanceProcAddr(VK_NULL_HANDLE, #GX_VULKAN_LOADER_FUNCTION)); \
     }
 
     GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
@@ -65,10 +60,9 @@ bool gearoenix::vulkan::Loader::load()
 
 void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkInstance instance)
 {
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>( \
-            vkGetInstanceProcAddr(instance, #GX_VULKAN_LOADER_FUNCTION));              \
+#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                                   \
+    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                     \
+        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetInstanceProcAddr(instance, #GX_VULKAN_LOADER_FUNCTION)); \
     }
 
     GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
@@ -78,10 +72,9 @@ void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkInstance instance)
 
 void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkDevice device)
 {
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                      \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                        \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>( \
-            vkGetDeviceProcAddr(device, #GX_VULKAN_LOADER_FUNCTION));                  \
+#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                               \
+    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                 \
+        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetDeviceProcAddr(device, #GX_VULKAN_LOADER_FUNCTION)); \
     }
 
     GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
@@ -89,10 +82,7 @@ void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkDevice device)
 #undef GX_VULKAN_LOADER_LOAD_FUNCTION
 }
 
-void gearoenix::vulkan::Loader::unload()
-{
-    SDL_Vulkan_UnloadLibrary();
-}
+void gearoenix::vulkan::Loader::unload() { SDL_Vulkan_UnloadLibrary(); }
 
 PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name)
 {

@@ -7,13 +7,12 @@
 void gearoenix::render::record::Reflections::update(core::ecs::Entity* const scene_entity)
 {
     data.clear();
-    core::ecs::World::get().synchronised_system<reflection::Probe>(
-        [&](auto* const entity, auto* const probe) {
-            if (!probe->get_enabled() || !entity->contains_in_parents(scene_entity)) {
-                return;
-            }
-            data.emplace(entity, Data { .probe = probe });
-        });
+    core::ecs::World::get().synchronised_system<reflection::Probe>([&](auto* const entity, auto* const probe) {
+        if (!probe->get_enabled() || !entity->contains_in_parents(scene_entity)) {
+            return;
+        }
+        data.emplace(entity, Data { .probe = probe });
+    });
 }
 
 void gearoenix::render::record::Reflections::update_models(const Data& d, physics::accelerator::Bvh<Model>& bvh)
@@ -37,12 +36,6 @@ void gearoenix::render::record::Reflections::update_models(physics::accelerator:
     }
 }
 
-void gearoenix::render::record::Reflections::update_static_models(Models& models)
-{
-    update_models(models.static_models_bvh);
-}
+void gearoenix::render::record::Reflections::update_static_models(Models& models) { update_models(models.static_models_bvh); }
 
-void gearoenix::render::record::Reflections::update_dynamic_models(Models& models)
-{
-    update_models(models.dynamic_models_bvh);
-}
+void gearoenix::render::record::Reflections::update_dynamic_models(Models& models) { update_models(models.dynamic_models_bvh); }

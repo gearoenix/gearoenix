@@ -18,10 +18,7 @@ struct PbrVertex final {
     {
     }
 
-    constexpr PbrVertex(const math::Vec3<float>& position,
-        const math::Vec3<float>& normal,
-        const math::Vec4<float>& tangent,
-        const math::Vec2<float>& uv)
+    constexpr PbrVertex(const math::Vec3<float>& position, const math::Vec3<float>& normal, const math::Vec4<float>& tangent, const math::Vec2<float>& uv)
         : position(position)
         , normal(normal)
         , tangent(tangent)

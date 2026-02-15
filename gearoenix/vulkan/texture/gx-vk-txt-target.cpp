@@ -13,20 +13,14 @@ gearoenix::vulkan::texture::Target::RenderingScope::RenderingScope(const VkComma
 {
 }
 
-gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope()
-{
-    vkCmdEndRendering(command_buffer);
-}
+gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope() { vkCmdEndRendering(command_buffer); }
 
 gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
     : render::texture::Target(std::move(in_name), std::move(attachments))
 {
 }
 
-void gearoenix::vulkan::texture::Target::construct(
-    std::string&& name,
-    std::vector<render::texture::Attachment>&& attachments,
-    core::job::EndCallerShared<render::texture::Target>&& end_callback)
+void gearoenix::vulkan::texture::Target::construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback)
 {
     std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
     self->update_rendering_info();
@@ -118,8 +112,7 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
             const auto& extent = view->get_extent();
 
             GX_ASSERT_D(0 != info.get_width() && 0 != info.get_height());
-            GX_ASSERT_D((rendering_info.renderArea.extent.width == 0 && rendering_info.renderArea.extent.height == 0)
-                || (rendering_info.renderArea.extent.width == extent.width && rendering_info.renderArea.extent.height == extent.height));
+            GX_ASSERT_D((rendering_info.renderArea.extent.width == 0 && rendering_info.renderArea.extent.height == 0) || (rendering_info.renderArea.extent.width == extent.width && rendering_info.renderArea.extent.height == extent.height));
             rendering_info.renderArea.extent.width = extent.width;
             rendering_info.renderArea.extent.height = extent.height;
 

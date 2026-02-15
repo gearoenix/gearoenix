@@ -93,10 +93,7 @@ void gearoenix::core::job::initialise()
     // pool is ready
 }
 
-void gearoenix::core::job::register_current_thread()
-{
-    register_thread(std::this_thread::get_id());
-}
+void gearoenix::core::job::register_current_thread() { register_thread(std::this_thread::get_id()); }
 
 void gearoenix::core::job::register_thread(const std::thread::id thread_id, std::optional<std::thread>&& thread)
 {

@@ -32,11 +32,7 @@ struct Mesh final : render::mesh::Mesh {
 
 public:
     Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material);
-    static void construct(
-        std::string&& name,
-        std::shared_ptr<render::mesh::Buffer>&& buffer,
-        std::shared_ptr<render::material::Material>&& material,
-        const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
+    static void construct(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
     ~Mesh() override;
     Mesh(const Mesh&) = delete;
 

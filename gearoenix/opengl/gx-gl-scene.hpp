@@ -16,9 +16,7 @@ struct Scene final : render::scene::Scene {
 private:
     Scene(core::ecs::Entity* entity, std::string&& name, double layer);
     Scene(core::object_id_t id, std::string&& name);
-    static void read(
-        std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
-        std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
+    static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
 
 public:
     ~Scene() override;

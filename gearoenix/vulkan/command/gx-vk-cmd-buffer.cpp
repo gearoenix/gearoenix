@@ -75,10 +75,7 @@ void gearoenix::vulkan::command::Buffer::copy(const buffer::Buffer& src, const b
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &info);
 }
 
-void gearoenix::vulkan::command::Buffer::barrier(
-    buffer::Buffer& buff,
-    std::pair<VkAccessFlags, VkPipelineStageFlags> src_state,
-    std::pair<VkAccessFlags, VkPipelineStageFlags> des_state)
+void gearoenix::vulkan::command::Buffer::barrier(buffer::Buffer& buff, std::pair<VkAccessFlags, VkPipelineStageFlags> src_state, std::pair<VkAccessFlags, VkPipelineStageFlags> des_state)
 {
     const auto& alc = *buff.get_allocated_memory()->get_allocator();
     VkBufferMemoryBarrier info;
@@ -135,21 +132,13 @@ void gearoenix::vulkan::command::Buffer::barrier(
 //     Loader::vkCmdBindIndexBuffer(vulkan_data, buf, offset, VK_INDEX_TYPE_UINT32);
 // }
 
-void gearoenix::vulkan::command::Buffer::draw_indices(const VkDeviceSize count)
-{
-    vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1);
-}
+void gearoenix::vulkan::command::Buffer::draw_indices(const VkDeviceSize count) { vkCmdDrawIndexed(vulkan_data, static_cast<std::uint32_t>(count), 1, 0, 0, 1); }
 
-void gearoenix::vulkan::command::Buffer::build_acceleration_structure(
-    const VkAccelerationStructureBuildGeometryInfoKHR& info,
-    const VkAccelerationStructureBuildRangeInfoKHR* const* const ranges)
+void gearoenix::vulkan::command::Buffer::build_acceleration_structure(const VkAccelerationStructureBuildGeometryInfoKHR& info, const VkAccelerationStructureBuildRangeInfoKHR* const* const ranges)
 {
     vkCmdBuildAccelerationStructuresKHR(vulkan_data, 1, &info, ranges);
 }
 
-const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const
-{
-    return &vulkan_data;
-}
+const VkCommandBuffer* gearoenix::vulkan::command::Buffer::get_vulkan_data_ptr() const { return &vulkan_data; }
 
 #endif

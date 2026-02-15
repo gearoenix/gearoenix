@@ -27,12 +27,7 @@ public:
      * @param layer_count The number of layers to include in the view, if it is null, it will use all layers.
      * @param format_override If provided, overrides the image's format for this view (e.g. UNORM view on sRGB image).
      */
-    explicit View(
-        std::shared_ptr<Image>&& img,
-        std::uint32_t base_level = 0,
-        std::optional<std::uint32_t> level_count = std::nullopt,
-        std::uint32_t base_layer = 0,
-        std::optional<std::uint32_t> layer_count = std::nullopt,
+    explicit View(std::shared_ptr<Image>&& img, std::uint32_t base_level = 0, std::optional<std::uint32_t> level_count = std::nullopt, std::uint32_t base_layer = 0, std::optional<std::uint32_t> layer_count = std::nullopt,
         std::optional<VkFormat> format_override = std::nullopt);
     View(View&&) = delete;
     View(const View&) = delete;

@@ -20,13 +20,7 @@ struct SamplerInfo final {
     GX_GET_VAL_PRV(std::uint8_t, anisotropic_level, 0);
 
 public:
-    explicit SamplerInfo(
-        Filter min_filter = Filter::LinearMipmapLinear,
-        Filter mag_filter = Filter::Linear,
-        Wrap wrap_s = Wrap::Repeat,
-        Wrap wrap_t = Wrap::Repeat,
-        Wrap wrap_r = Wrap::Repeat,
-        std::uint8_t anisotropic_level = 0);
+    explicit SamplerInfo(Filter min_filter = Filter::LinearMipmapLinear, Filter mag_filter = Filter::Linear, Wrap wrap_s = Wrap::Repeat, Wrap wrap_t = Wrap::Repeat, Wrap wrap_r = Wrap::Repeat, std::uint8_t anisotropic_level = 0);
 
     void write(platform::stream::Stream& s) const;
     void read(platform::stream::Stream& s);

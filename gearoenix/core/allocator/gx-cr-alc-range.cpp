@@ -2,8 +2,7 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <algorithm>
 
-gearoenix::core::allocator::Range::Range(
-    const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
+gearoenix::core::allocator::Range::Range(const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
     : size(size)
     , offset(offset)
     , parent(std::move(parent))
@@ -57,11 +56,7 @@ gearoenix::core::allocator::Range::~Range()
 std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz)
 {
     std::lock_guard<std::mutex> _lg(this_lock);
-    auto search = std::upper_bound(
-        ranges.begin(), ranges.end(), sz,
-        [](const std::int64_t a, const decltype(ranges)::value_type& b) {
-            return a <= b.first.first;
-        });
+    auto search = std::upper_bound(ranges.begin(), ranges.end(), sz, [](const std::int64_t a, const decltype(ranges)::value_type& b) { return a <= b.first.first; });
     if (ranges.end() == search) {
         GX_LOG_D("Not enough space left to allocate: " << sz);
         return nullptr;

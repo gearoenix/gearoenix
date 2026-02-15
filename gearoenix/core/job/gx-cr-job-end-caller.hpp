@@ -42,23 +42,18 @@ private:
 
         explicit Caller(Function&& f)
             : function(std::move(f))
-            , context_thread(std::this_thread::get_id())
-                  GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+            , context_thread(std::this_thread::get_id()) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
         {
         }
 
         ~Caller()
         {
             if constexpr (std::is_same_v<void, T>) {
-                send_job(context_thread, [f = std::move(function)]() mutable {
-                    f();
-                });
+                send_job(context_thread, [f = std::move(function)]() mutable { f(); });
             } else {
                 GX_ASSERT_D(ignore_empty_value || value.has_value());
                 if (value.has_value()) {
-                    send_job(context_thread, [v = std::move(*value), f = std::move(function)]() mutable {
-                        f(std::move(v));
-                    });
+                    send_job(context_thread, [v = std::move(*value), f = std::move(function)]() mutable { f(std::move(v)); });
                 }
             }
         }
@@ -72,21 +67,18 @@ private:
 
 public:
     explicit EndCaller(Function&& f)
-        : caller(new Caller(std::move(f)))
-              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(new Caller(std::move(f))) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
     }
 
     EndCaller(const EndCaller& o)
-        : caller(o.caller)
-              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(o.caller) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
         GX_ASSERT_D(nullptr != caller);
     }
 
     EndCaller(EndCaller&& o) noexcept
-        : caller(std::move(o.caller))
-              GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(std::move(o.caller)) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
     {
         GX_ASSERT_D(nullptr != caller);
     }
@@ -121,10 +113,13 @@ public:
         return *caller->value;
     }
 
-    void set_ignore_empty_value(const bool ignore_empty_value) const
+    template <typename TT = T>
+    std::enable_if_t<!std::is_same_v<void, TT>, bool> has_return() const
     {
-        caller->ignore_empty_value = ignore_empty_value;
+        return caller->value.has_value();
     }
+
+    void set_ignore_empty_value(const bool ignore_empty_value) const { caller->ignore_empty_value = ignore_empty_value; }
 };
 
 template <typename T>

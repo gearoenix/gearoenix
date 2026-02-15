@@ -70,10 +70,8 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     update_models(models.static_models_bvh);
     update_models(models.dynamic_models_bvh);
 
-    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(),
-        [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(),
-        [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
 
     mvps.clear();
     auto gather_mvps = [&](auto& trn_opq_models) {
@@ -128,46 +126,43 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
     reflections.clear();
 
     std::uint64_t flag = 1;
-    core::ecs::World::get().synchronised_system<core::ecs::All<camera::Camera, physics::Transformation, physics::collider::Collider>>(
-        [&](auto* const e, auto* const cam, auto* const trn, auto* const cld) {
-            if (!cam->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
-                return;
-            }
-            auto& cam_ref = cameras[last_camera_index];
-            cam_ref.entity = e;
-            cam_ref.camera = cam;
-            cam_ref.transform = trn;
-            cam_ref.collider = cld;
+    core::ecs::World::get().synchronised_system<core::ecs::All<camera::Camera, physics::Transformation, physics::collider::Collider>>([&](auto* const e, auto* const cam, auto* const trn, auto* const cld) {
+        if (!cam->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
+            return;
+        }
+        auto& cam_ref = cameras[last_camera_index];
+        cam_ref.entity = e;
+        cam_ref.camera = cam;
+        cam_ref.transform = trn;
+        cam_ref.collider = cld;
 
-            indices_map.emplace(e, last_camera_index);
-            switch (cam->get_usage()) {
-            case camera::Camera::Usage::Main: {
-                mains.emplace(e, last_camera_index);
-                break;
-            }
-            case camera::Camera::Usage::Shadow: {
-                shadow_casters.emplace(e, last_camera_index);
-                break;
-            }
-            case camera::Camera::Usage::ReflectionProbe: {
-                reflections.emplace(e, last_camera_index);
-                break;
-            }
-            default:
-                GX_UNEXPECTED;
-            }
-            cam->set_flag(flag);
+        indices_map.emplace(e, last_camera_index);
+        switch (cam->get_usage()) {
+        case camera::Camera::Usage::Main: {
+            mains.emplace(e, last_camera_index);
+            break;
+        }
+        case camera::Camera::Usage::Shadow: {
+            shadow_casters.emplace(e, last_camera_index);
+            break;
+        }
+        case camera::Camera::Usage::ReflectionProbe: {
+            reflections.emplace(e, last_camera_index);
+            break;
+        }
+        default:
+            GX_UNEXPECTED;
+        }
+        cam->set_flag(flag);
 
-            flag <<= 1;
-            ++last_camera_index;
-        });
+        flag <<= 1;
+        ++last_camera_index;
+    });
 }
 
 void gearoenix::render::record::Cameras::update_models(Models& models)
 {
     if (last_camera_index > 0) {
-        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
-            c.update_models(models);
-        });
+        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) { c.update_models(models); });
     }
 }

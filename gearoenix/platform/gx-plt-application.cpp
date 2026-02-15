@@ -30,9 +30,7 @@ void initialise_default_font()
     io.FontDefault = fonts->AddFontFromMemoryTTF(content, read_bytes, 15);
 }
 
-void register_types()
-{
-}
+void register_types() { }
 
 void platform_set_ime_data(ImGuiContext*, ImGuiViewport*, ImGuiPlatformImeData* const data)
 {
@@ -40,26 +38,16 @@ void platform_set_ime_data(ImGuiContext*, ImGuiViewport*, ImGuiPlatformImeData* 
         gearoenix::platform::Application::get().stop_keyboard_capture();
     }
     if (data->WantVisible) {
-        gearoenix::platform::Application::get().set_text_input_area(
-            static_cast<int>(data->InputPos.x),
-            static_cast<int>(data->InputPos.y),
-            1,
-            static_cast<int>(data->InputLineHeight));
+        gearoenix::platform::Application::get().set_text_input_area(static_cast<int>(data->InputPos.x), static_cast<int>(data->InputPos.y), 1, static_cast<int>(data->InputLineHeight));
     }
     if (data->WantVisible || data->WantTextInput) {
         gearoenix::platform::Application::get().start_keyboard_capture();
     }
 }
 
-const char* get_clipboard_text(ImGuiContext*)
-{
-    return gearoenix::platform::Application::get().get_clipboard();
-}
+const char* get_clipboard_text(ImGuiContext*) { return gearoenix::platform::Application::get().get_clipboard(); }
 
-void set_clipboard_text(ImGuiContext* const, const char* text)
-{
-    gearoenix::platform::Application::get().set_clipboard(text);
-}
+void set_clipboard_text(ImGuiContext* const, const char* text) { gearoenix::platform::Application::get().set_clipboard(text); }
 }
 
 void gearoenix::platform::BaseApplication::initialise_imgui()
@@ -75,9 +63,7 @@ void gearoenix::platform::BaseApplication::initialise_imgui()
     platform_io.Platform_SetClipboardTextFn = set_clipboard_text;
     platform_io.Platform_GetClipboardTextFn = get_clipboard_text;
     platform_io.Platform_SetImeDataFn = platform_set_ime_data;
-    platform_io.Platform_OpenInShellFn = [](ImGuiContext*, const char* const url) {
-        return !Application::get().open_url(url);
-    };
+    platform_io.Platform_OpenInShellFn = [](ImGuiContext*, const char* const url) { return !Application::get().open_url(url); };
 }
 
 gearoenix::platform::BaseApplication::BaseApplication()
@@ -87,9 +73,7 @@ gearoenix::platform::BaseApplication::BaseApplication()
     , should_window_be_closed([this] {
         static constexpr char name[] = "Quit Gearoenix application?";
         static constexpr char body[] = "Are you sure you want to quit this Gearoenix instance?\nYou will loose your current unsaved progress in your game or work!";
-        static const std::function<void()> fun = [this] {
-            running = false;
-        };
+        static const std::function<void()> fun = [this] { running = false; };
 
         render::imgui::show_sure_popup(name, window_is_going_to_be_closed, body, fun);
 
@@ -105,9 +89,7 @@ gearoenix::platform::BaseApplication::BaseApplication()
     initialise_imgui();
 
     if (const auto& config = RuntimeConfiguration::get(); !config.get_fullscreen()) {
-        initialize_window_size(
-            static_cast<int>(config.get_window_width()),
-            static_cast<int>(config.get_window_height()));
+        initialize_window_size(static_cast<int>(config.get_window_width()), static_cast<int>(config.get_window_height()));
     }
 }
 
@@ -152,7 +134,8 @@ void gearoenix::platform::BaseApplication::update_window()
         window_resizing && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last_time_window_resized).count() > config.get_window_resizing_event_interval_ms()) {
         window_resizing = false;
         render_engine->window_resized();
-        event_engine->broadcast(core::event::Data(core::event::Id::PlatformWindowSizeChange,
+        event_engine->broadcast(core::event::Data(
+            core::event::Id::PlatformWindowSizeChange,
             core::event::platform::WindowSizeChangeData(
                 previous_window_size.x,
                 previous_window_size.y,
@@ -179,30 +162,22 @@ void gearoenix::platform::BaseApplication::update_mouse_position(const double x,
 
     ImGui::GetIO().MousePos = { static_cast<float>(x), static_cast<float>(y) };
 
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::MovementMouse,
-            core::event::movement::Mouse(
-                mouse_position,
-                mouse_normalised_position,
-                mouse_previous_position,
-                mouse_previous_normalised_position)));
+    event_engine->broadcast(core::event::Data(
+        core::event::Id::MovementMouse,
+        core::event::movement::Mouse(
+            mouse_position,
+            mouse_normalised_position,
+            mouse_previous_position,
+            mouse_previous_normalised_position)));
 }
 
 void gearoenix::platform::BaseApplication::mouse_key(const key::Id k, const key::Action a)
 {
     ImGui::GetIO().MouseDown[key::convert_mouse_to_imgui(k)] = a == key::Action::Press;
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::ButtonMouse,
-            core::event::button::Mouse(
-                a, k, mouse_normalised_position, mouse_position)));
+    event_engine->broadcast(core::event::Data(core::event::Id::ButtonMouse, core::event::button::Mouse(a, k, mouse_normalised_position, mouse_position)));
 }
 
-void gearoenix::platform::BaseApplication::mouse_wheel(const double v)
-{
-    ImGui::GetIO().MouseWheel += static_cast<float>(v);
-}
+void gearoenix::platform::BaseApplication::mouse_wheel(const double v) { ImGui::GetIO().MouseWheel += static_cast<float>(v); }
 
 void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const key::Action a)
 {
@@ -229,16 +204,10 @@ void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const k
     default:
         break;
     }
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::ButtonKeyboard,
-            core::event::button::Keyboard(a, k)));
+    event_engine->broadcast(core::event::Data(core::event::Id::ButtonKeyboard, core::event::button::Keyboard(a, k)));
 }
 
-void gearoenix::platform::BaseApplication::character_input(const char16_t ch)
-{
-    ImGui::GetIO().AddInputCharacterUTF16(ch);
-}
+void gearoenix::platform::BaseApplication::character_input(const char16_t ch) { ImGui::GetIO().AddInputCharacterUTF16(ch); }
 
 void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const double x, const double y)
 {
@@ -257,25 +226,15 @@ void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, 
     if (touch_states.size() == 1 && p.get_delta_start_time() > click_time_threshold) {
         const core::event::gesture::Drag2D d(p);
         event_engine->broadcast(core::event::Data(core::event::Id::GestureDrag2D, d));
-        event_engine->broadcast(core::event::Data(
-            core::event::Id::GestureTouchDrag,
-            core::event::gesture::TouchDrag(d, finger_id)));
+        event_engine->broadcast(core::event::Data(core::event::Id::GestureTouchDrag, core::event::gesture::TouchDrag(d, finger_id)));
     } else if (touch_states.size() == 2) {
         const auto first = touch_states.begin();
         const auto second = first + 1;
         const core::event::gesture::Scale s(first->second, second->second);
         event_engine->broadcast(core::event::Data(core::event::Id::GestureScale, s));
-        event_engine->broadcast(core::event::Data(
-            core::event::Id::GestureTouchScale,
-            core::event::gesture::TouchScale(s, first->first, second->first)));
+        event_engine->broadcast(core::event::Data(core::event::Id::GestureTouchScale, core::event::gesture::TouchScale(s, first->first, second->first)));
     }
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::Touch,
-            core::event::touch::Data(
-                p,
-                finger_id,
-                core::event::touch::Action::Move)));
+    event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(p, finger_id, core::event::touch::Action::Move)));
 }
 
 void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id)
@@ -286,24 +245,10 @@ void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id)
     const auto& p = search->second;
     if (touch_states.size() == 1 && search->second.get_delta_start_position().length() < click_distance_threshold && p.get_delta_start_time() < click_time_threshold) {
         core::event::gesture::Click click(p);
-        event_engine->broadcast(
-            core::event::Data(
-                core::event::Id::GestureClick,
-                click));
-        event_engine->broadcast(
-            core::event::Data(
-                core::event::Id::GestureTouchClick,
-                core::event::gesture::TouchClick(
-                    click,
-                    finger_id)));
+        event_engine->broadcast(core::event::Data(core::event::Id::GestureClick, click));
+        event_engine->broadcast(core::event::Data(core::event::Id::GestureTouchClick, core::event::gesture::TouchClick(click, finger_id)));
     }
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::Touch,
-            core::event::touch::Data(
-                p,
-                finger_id,
-                core::event::touch::Action::Up)));
+    event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(p, finger_id, core::event::touch::Action::Up)));
     touch_states.erase(search);
 }
 
@@ -312,13 +257,7 @@ void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id
     const auto search = touch_states.find(finger_id);
     if (touch_states.end() == search)
         return;
-    event_engine->broadcast(
-        core::event::Data(
-            core::event::Id::Touch,
-            core::event::touch::Data(
-                search->second,
-                finger_id,
-                core::event::touch::Action::Cancel)));
+    event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(search->second, finger_id, core::event::touch::Action::Cancel)));
     touch_states.erase(finger_id);
 }
 
@@ -338,10 +277,7 @@ void gearoenix::platform::BaseApplication::initialize_core_application(core::App
     }
 }
 
-void gearoenix::platform::BaseApplication::close()
-{
-    running = false;
-}
+void gearoenix::platform::BaseApplication::close() { running = false; }
 
 void gearoenix::platform::BaseApplication::terminate()
 {
@@ -383,17 +319,8 @@ std::pair<void*, int> gearoenix::platform::BaseApplication::get_default_font_dat
     return { content, static_cast<int>(read_bytes) };
 }
 
-double gearoenix::platform::BaseApplication::normalise_x(const double x) const
-{
-    return (x - static_cast<double>(window_size.x) * 0.5) / static_cast<double>(window_size.y);
-}
+double gearoenix::platform::BaseApplication::normalise_x(const double x) const { return (x - static_cast<double>(window_size.x) * 0.5) / static_cast<double>(window_size.y); }
 
-double gearoenix::platform::BaseApplication::normalise_y(const double y) const
-{
-    return 0.5 - (y / static_cast<double>(window_size.y));
-}
+double gearoenix::platform::BaseApplication::normalise_y(const double y) const { return 0.5 - (y / static_cast<double>(window_size.y)); }
 
-gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const
-{
-    return { normalise_x(x), normalise_y(y) };
-}
+gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const { return { normalise_x(x), normalise_y(y) }; }

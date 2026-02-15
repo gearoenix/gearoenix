@@ -8,10 +8,7 @@
 #include <optional>
 
 gearoenix::net::Client::Client(
-    std::string&& addr,
-    const std::uint16_t p,
-    std::function<void()>&& disconnect_c,
-    std::function<void(std::vector<std::uint8_t>&&)>&& data_c,
+    std::string&& addr, const std::uint16_t p, std::function<void()>&& disconnect_c, std::function<void(std::vector<std::uint8_t>&&)>&& data_c,
     std::function<void(std::shared_ptr<Client>&&)>&& connection_c)
     : address(std::move(addr))
     , port(p)
@@ -157,11 +154,7 @@ void gearoenix::net::Client::construct(
     std::function<void(std::vector<std::uint8_t>&&)>&& data_callback,
     std::function<void(std::shared_ptr<Client>&&)>&& connection_callback)
 {
-    const std::shared_ptr<Client> result(new Client(
-        std::move(address), port,
-        std::move(disconnection_callback),
-        std::move(data_callback),
-        std::move(connection_callback)));
+    const std::shared_ptr<Client> result(new Client(std::move(address), port, std::move(disconnection_callback), std::move(data_callback), std::move(connection_callback)));
     result->running = false;
     result->weak_self = result;
     do {

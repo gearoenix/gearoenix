@@ -39,8 +39,7 @@ gearoenix::vulkan::query::Pool::~Pool()
     }
 }
 
-void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size(
-    command::Buffer& cmd, const VkAccelerationStructureKHR accel, const std::uint64_t id)
+void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size(command::Buffer& cmd, const VkAccelerationStructureKHR accel, const std::uint64_t id)
 {
     constexpr auto query_type = VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR;
     const auto qi = register_request(query_type, id);
@@ -51,10 +50,7 @@ void gearoenix::vulkan::query::Pool::issue_acceleration_structure_compacted_size
 VkDeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compacted_size(const std::uint64_t id)
 {
     VkDeviceSize result = 0;
-    GX_VK_CHK(vkGetQueryPoolResults(
-        device::Logical::get().get_vulkan_data(), vulkan_data,
-        indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1,
-        sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT));
+    GX_VK_CHK(vkGetQueryPoolResults(device::Logical::get().get_vulkan_data(), vulkan_data, indices[VK_QUERY_TYPE_ACCELERATION_STRUCTURE_COMPACTED_SIZE_KHR][id], 1, sizeof(VkDeviceSize), &result, sizeof(VkDeviceSize), VK_QUERY_RESULT_WAIT_BIT));
     return result;
 }
 

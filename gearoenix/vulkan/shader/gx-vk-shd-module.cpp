@@ -14,9 +14,6 @@ gearoenix::vulkan::shader::Module::Module(const std::span<const std::uint8_t> fi
     GX_VK_CHK(vkCreateShaderModule(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::shader::Module::~Module()
-{
-    vkDestroyShaderModule(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-}
+gearoenix::vulkan::shader::Module::~Module() { vkDestroyShaderModule(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
 
 #endif

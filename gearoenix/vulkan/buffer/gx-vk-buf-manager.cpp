@@ -36,11 +36,7 @@ std::array<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>, gearoenix::vulkan
     const auto& cfg = render::RuntimeConfiguration::get();
     const auto& phs_dev = device::Physical::get();
     const auto dyn_sz = phs_dev.align_size(cfg.get_maximum_dynamic_buffer_size());
-    return {
-        upload_root_buffer->allocate(dyn_sz),
-        upload_root_buffer->allocate(dyn_sz),
-        upload_root_buffer->allocate(dyn_sz)
-    };
+    return { upload_root_buffer->allocate(dyn_sz), upload_root_buffer->allocate(dyn_sz), upload_root_buffer->allocate(dyn_sz) };
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_destination() const
@@ -62,15 +58,9 @@ gearoenix::vulkan::buffer::Manager::Manager()
 
 gearoenix::vulkan::buffer::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::int64_t size)
-{
-    return gpu_root_buffer->allocate(size);
-}
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_static(const std::int64_t size) { return gpu_root_buffer->allocate(size); }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::int64_t size)
-{
-    return upload_root_buffer->allocate(size);
-}
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::int64_t size) { return upload_root_buffer->allocate(size); }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::int64_t size)
 {
@@ -82,8 +72,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::M
     return std::make_shared<Uniform>(std::move(cpus), std::move(gpu));
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(
-    const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu) {

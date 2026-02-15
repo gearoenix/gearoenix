@@ -9,13 +9,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::memory::Memory::Memory(
-    std::shared_ptr<Memory> parent,
-    std::shared_ptr<core::allocator::Range> allocator,
-    void* const data,
-    const Place place,
-    const std::uint32_t type_index,
-    const VkDeviceMemory vulkan_data)
+gearoenix::vulkan::memory::Memory::Memory(std::shared_ptr<Memory> parent, std::shared_ptr<core::allocator::Range> allocator, void* const data, const Place place, const std::uint32_t type_index, const VkDeviceMemory vulkan_data)
     : parent(std::move(parent))
     , allocator(std::move(allocator))
     , data(data)
@@ -25,10 +19,7 @@ gearoenix::vulkan::memory::Memory::Memory(
 {
 }
 
-std::int64_t gearoenix::vulkan::memory::Memory::align(const std::int64_t sz)
-{
-    return math::Numeric::align(sz, static_cast<std::int64_t>(device::Physical::get().get_max_memory_alignment()));
-}
+std::int64_t gearoenix::vulkan::memory::Memory::align(const std::int64_t sz) { return math::Numeric::align(sz, static_cast<std::int64_t>(device::Physical::get().get_max_memory_alignment())); }
 
 gearoenix::vulkan::memory::Memory::~Memory()
 {
@@ -52,8 +43,7 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(
-    const Place place, const std::uint32_t type_index)
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place place, const std::uint32_t type_index)
 {
     const auto is_gpu = place == Place::Gpu;
     const auto& cfg = render::RuntimeConfiguration::get();

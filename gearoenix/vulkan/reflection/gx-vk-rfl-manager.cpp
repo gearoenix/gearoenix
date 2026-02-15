@@ -4,10 +4,7 @@
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 
-void gearoenix::vulkan::reflection::Manager::update()
-{
-    render::reflection::Manager::update();
-}
+void gearoenix::vulkan::reflection::Manager::update() { render::reflection::Manager::update(); }
 
 gearoenix::vulkan::reflection::Manager::Manager()
     : Singleton<Manager>(this)
@@ -18,25 +15,16 @@ gearoenix::vulkan::reflection::Manager::Manager()
 gearoenix::vulkan::reflection::Manager::~Manager() = default;
 
 gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_baked(
-    std::string&& name, core::ecs::Entity* const parent,
-    std::shared_ptr<render::texture::TextureCube>&& irradiance,
-    std::shared_ptr<render::texture::TextureCube>&& radiance,
-    const math::Aabb3<double>& include_box)
+    std::string&& name, core::ecs::Entity* const parent, std::shared_ptr<render::texture::TextureCube>&& irradiance, std::shared_ptr<render::texture::TextureCube>&& radiance, const math::Aabb3<double>& include_box)
 {
     GX_UNIMPLEMENTED;
 }
 
-void gearoenix::vulkan::reflection::Manager::build_runtime(
-    std::string&& name, core::ecs::Entity* const parent,
-    const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
-    const std::uint32_t environment_resolution, const std::uint32_t irradiance_resolution, const std::uint32_t radiance_resolution,
-    core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
+void gearoenix::vulkan::reflection::Manager::build_runtime(std::string&& name, core::ecs::Entity* const parent, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+    const std::uint32_t environment_resolution, const std::uint32_t irradiance_resolution, const std::uint32_t radiance_resolution, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
 {
 }
 
-void gearoenix::vulkan::reflection::Manager::upload_uniforms()
-{
-    uniform_indexer.update();
-}
+void gearoenix::vulkan::reflection::Manager::upload_uniforms() { uniform_indexer.update(); }
 
 #endif

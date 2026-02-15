@@ -23,15 +23,9 @@ gearoenix::vulkan::sync::Fence::~Fence()
     vulkan_data = nullptr;
 }
 
-void gearoenix::vulkan::sync::Fence::wait()
-{
-    GX_VK_CHK(vkWaitForFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX));
-}
+void gearoenix::vulkan::sync::Fence::wait() { GX_VK_CHK(vkWaitForFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX)); }
 
-void gearoenix::vulkan::sync::Fence::reset()
-{
-    GX_VK_CHK(vkResetFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data));
-}
+void gearoenix::vulkan::sync::Fence::reset() { GX_VK_CHK(vkResetFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data)); }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> gearoenix::vulkan::sync::Fence::create_frame_based(const bool signaled)
 {

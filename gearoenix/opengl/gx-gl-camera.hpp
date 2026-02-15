@@ -86,10 +86,7 @@ public:
 
 struct CameraManager final : render::camera::Manager {
 private:
-    void build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void build(std::string&& name, core::ecs::Entity* parent, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void window_resized() override;
 
 public:

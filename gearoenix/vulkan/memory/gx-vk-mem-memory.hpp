@@ -21,13 +21,7 @@ struct Memory final {
     GX_GET_CVAL_PRV(std::uint32_t, type_index);
     GX_GET_VAL_PRV(VkDeviceMemory, vulkan_data, nullptr);
 
-    Memory(
-        std::shared_ptr<Memory> parent,
-        std::shared_ptr<core::allocator::Range> allocator,
-        void* data,
-        Place place,
-        std::uint32_t type_index,
-        VkDeviceMemory vulkan_data);
+    Memory(std::shared_ptr<Memory> parent, std::shared_ptr<core::allocator::Range> allocator, void* data, Place place, std::uint32_t type_index, VkDeviceMemory vulkan_data);
 
 public:
     Memory(Memory&&) = delete;

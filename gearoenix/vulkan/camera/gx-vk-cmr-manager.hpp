@@ -12,10 +12,7 @@ struct Manager final : render::camera::Manager, core::Singleton<Manager> {
 public:
     Manager();
     ~Manager() override;
-    void build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void build(std::string&& name, core::ecs::Entity* parent, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void window_resized() override;
     void update() override;
     void upload_uniforms();

@@ -36,15 +36,8 @@ void gearoenix::vulkan::queue::Queue::submit(const command::Buffer& cmd, const s
     GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence.get_vulkan_data()));
 }
 
-void gearoenix::vulkan::queue::Queue::submit(
-    const std::uint64_t wait_semaphores_count,
-    const VkSemaphore* const wait_semaphores,
-    const VkPipelineStageFlags* const wait_stages,
-    const std::uint64_t commands_count,
-    const VkCommandBuffer* const commands,
-    const std::uint64_t signal_semaphores_count,
-    const VkSemaphore* const signal_semaphores,
-    const VkFence fence)
+void gearoenix::vulkan::queue::Queue::submit(const std::uint64_t wait_semaphores_count, const VkSemaphore* const wait_semaphores, const VkPipelineStageFlags* const wait_stages, const std::uint64_t commands_count,
+    const VkCommandBuffer* const commands, const std::uint64_t signal_semaphores_count, const VkSemaphore* const signal_semaphores, const VkFence fence)
 {
     VkSubmitInfo info;
     GX_SET_ZERO(info);

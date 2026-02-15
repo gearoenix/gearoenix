@@ -177,9 +177,6 @@ gearoenix::vulkan::device::Logical::~Logical()
     }
 }
 
-void gearoenix::vulkan::device::Logical::wait_to_finish()
-{
-    vkDeviceWaitIdle(vulkan_data);
-}
+void gearoenix::vulkan::device::Logical::wait_to_finish() { vkDeviceWaitIdle(vulkan_data); }
 
 #endif

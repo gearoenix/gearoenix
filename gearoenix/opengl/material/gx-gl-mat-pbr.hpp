@@ -34,11 +34,8 @@ struct Pbr final : render::material::Pbr, Material {
 public:
     static void construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c);
     ~Pbr() override;
-    void shadow(
-        const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel&, uint& current_shader) override;
-    void render_forward(
-        const Scene& scene, const render::record::Camera& camera, const render::record::CameraModel&,
-        const Mesh& mesh, uint& current_shader) override;
+    void shadow(const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel&, uint& current_shader) override;
+    void render_forward(const Scene& scene, const render::record::Camera& camera, const render::record::CameraModel&, const Mesh& mesh, uint& current_shader) override;
     // void deferred_gbuffer_render(const Model& model, const Mesh& mesh, const Camera& camera, const Scene& scene, uint& current_shader) override;
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;

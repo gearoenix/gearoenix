@@ -95,7 +95,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e3s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST((e1s == 1 && e2s == 1 && e3s == 1));
         e1s = e2s = e3s = 0;
@@ -106,7 +107,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             else if (ent == e5)
                 ++e5s;
             else
-                BOOST_TEST(false); });
+                BOOST_TEST(false);
+        });
 
         BOOST_TEST((e2s == 1 && e5s == 1));
         e2s = e5s = 0;
@@ -117,7 +119,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
             else if (ent == e5)
                 ++e5s;
             else
-                BOOST_TEST(false); });
+                BOOST_TEST(false);
+        });
 
         BOOST_TEST((e4s == 1 && e5s == 1));
         e4s = e5s = 0;
@@ -131,7 +134,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e4s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
         e1s = e3s = e4s = 0;
@@ -143,7 +147,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e3s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST((e1s == 1 && e3s == 1));
         e1s = e3s = 0;
@@ -153,7 +158,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e2s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST(e2s == 1);
         e2s = 0;
@@ -163,7 +169,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e4s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST(e4s == 1);
         e4s = 0;
@@ -177,7 +184,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
                 ++e4s;
             } else {
                 BOOST_TEST(false);
-            } });
+            }
+        });
 
         BOOST_TEST((e1s == 1 && e3s == 1 && e4s == 1));
         e1s = e3s = e4s = 0;

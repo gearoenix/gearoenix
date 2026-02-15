@@ -95,8 +95,7 @@ public:
     void set_camera(const GxEntity* const e)
     {
         [[maybe_unused]] auto entity = GxConstraintManager::get().create_jet_controller(
-            e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(),
-            scene_entities[0].get());
+            e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(), scene_entities[0].get());
         entity->get_component<GxConstraintJet>()->set_movement_speed(3.0);
         scene_entities[0]->add_to_world();
     }
@@ -133,10 +132,7 @@ public:
         light->colour = { 2.0f, 2.0f, 2.0f };
     }
 
-    void update() override
-    {
-        GxRndEngine::get().show_debug_gui();
-    }
+    void update() override { GxRndEngine::get().show_debug_gui(); }
 };
 
 GEAROENIX_START(GameApp);

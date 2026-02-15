@@ -357,7 +357,8 @@
 //                 const bool shift_pressed = event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftShift) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightShift);
 //                 const auto key = core::String::to_character(data.get_key(), shift_pressed);
 //                 if (key.has_value()) {
-//                     if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) && event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
+//                     if (pressed_count == 2 && (event_engine->is_pressed(core::event::button::KeyboardKeyId::LeftControl) || event_engine->is_pressed(core::event::button::KeyboardKeyId::RightControl)) &&
+//                     event_engine->is_pressed(core::event::button::KeyboardKeyId::V)) {
 //                         const char* const clipboard = e->get_platform_application()->get_clipboard();
 //                         if (clipboard != nullptr) {
 //                             for (int i = 0; clipboard[i] != 0; ++i) {
@@ -467,7 +468,8 @@
 //             ++temporary_left;
 //         }
 //         left_text.push_back(character);
-//     } else if ((static_cast<int>(character) > 1535 && static_cast<int>(character) < 1791) || (static_cast<int>(character) > 1871 && static_cast<int>(character) < 1919) || (static_cast<int>(character) > 64335 && static_cast<int>(character) < 65023) || (static_cast<int>(character) > 65135 && static_cast<int>(character) < 65279)) {
+//     } else if ((static_cast<int>(character) > 1535 && static_cast<int>(character) < 1791) || (static_cast<int>(character) > 1871 && static_cast<int>(character) < 1919) || (static_cast<int>(character) > 64335 && static_cast<int>(character) < 65023)
+//     || (static_cast<int>(character) > 65135 && static_cast<int>(character) < 65279)) {
 //         if (left_to_right) {
 //             ++temporary_right;
 //         } else {

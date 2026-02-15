@@ -15,8 +15,7 @@ gearoenix::vulkan::model::Manager::Manager()
 
 gearoenix::vulkan::model::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::vulkan::model::Manager::build(
-    std::string&& name, core::ecs::Entity* const parent, render::model::meshes_set_t&& meshes, const bool is_transformable)
+gearoenix::core::ecs::EntityPtr gearoenix::vulkan::model::Manager::build(std::string&& name, core::ecs::Entity* const parent, render::model::meshes_set_t&& meshes, const bool is_transformable)
 {
     auto entity = render::model::Manager::build(std::move(name), parent, std::move(meshes), is_transformable);
     entity->add_component(core::Object::construct<Model>(entity.get(), std::move(meshes), std::move(name), is_transformable));

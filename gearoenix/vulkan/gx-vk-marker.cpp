@@ -38,149 +38,62 @@ gearoenix::vulkan::PushDebugGroup::PushDebugGroup(const VkCommandBuffer cmd, con
     vkCmdBeginDebugUtilsLabelEXT(cmd, &info);
 }
 
-gearoenix::vulkan::PushDebugGroup::~PushDebugGroup()
-{
-    vkCmdEndDebugUtilsLabelEXT(cmd);
-}
+gearoenix::vulkan::PushDebugGroup::~PushDebugGroup() { vkCmdEndDebugUtilsLabelEXT(cmd); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkAccelerationStructureKHR o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkAccelerationStructureKHR o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkBuffer o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_BUFFER);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkBuffer o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_BUFFER); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkBufferView o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_BUFFER_VIEW);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkBufferView o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_BUFFER_VIEW); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkCommandBuffer o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_COMMAND_BUFFER);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkCommandBuffer o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_COMMAND_BUFFER); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkCommandPool o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_COMMAND_POOL);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkCommandPool o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_COMMAND_POOL); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorPool o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_POOL);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorPool o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_POOL); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorSet o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_SET);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorSet o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_SET); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorSetLayout o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkDescriptorSetLayout o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkDevice o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DEVICE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkDevice o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DEVICE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkDeviceMemory o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DEVICE_MEMORY);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkDeviceMemory o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_DEVICE_MEMORY); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkEvent o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_EVENT);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkEvent o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_EVENT); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkFence o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_FENCE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkFence o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_FENCE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkFramebuffer o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_FRAMEBUFFER);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkFramebuffer o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_FRAMEBUFFER); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkImage o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_IMAGE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkImage o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_IMAGE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkImageView o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_IMAGE_VIEW);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkImageView o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_IMAGE_VIEW); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkInstance o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_INSTANCE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkInstance o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_INSTANCE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkPhysicalDevice o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PHYSICAL_DEVICE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkPhysicalDevice o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PHYSICAL_DEVICE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkPipeline o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkPipeline o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkPipelineCache o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE_CACHE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkPipelineCache o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE_CACHE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkPipelineLayout o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE_LAYOUT);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkPipelineLayout o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_PIPELINE_LAYOUT); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkQueryPool o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_QUERY_POOL);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkQueryPool o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_QUERY_POOL); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkQueue o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_QUEUE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkQueue o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_QUEUE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkRenderPass o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_RENDER_PASS);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkRenderPass o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_RENDER_PASS); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkSampler o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SAMPLER);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkSampler o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SAMPLER); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkSemaphore o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SEMAPHORE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkSemaphore o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SEMAPHORE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkShaderModule o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SHADER_MODULE);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkShaderModule o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SHADER_MODULE); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkSurfaceKHR o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SURFACE_KHR);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkSurfaceKHR o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SURFACE_KHR); }
 
-void gearoenix::vulkan::mark(const std::string& name, const VkSwapchainKHR o)
-{
-    ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SWAPCHAIN_KHR);
-}
+void gearoenix::vulkan::mark(const std::string& name, const VkSwapchainKHR o) { ::mark(name, reinterpret_cast<std::uint64_t>(o), VK_OBJECT_TYPE_SWAPCHAIN_KHR); }
 
 #endif

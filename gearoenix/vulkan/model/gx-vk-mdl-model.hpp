@@ -40,12 +40,8 @@ struct Model final : render::model::Model {
 
 public:
     ~Model() override;
-    void render_shadow(
-        const render::record::CameraModel& camera_model, VkCommandBuffer cmd,
-        pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
-    void render_forward(
-        const render::record::CameraModel& camera_model, VkCommandBuffer cmd,
-        pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    void render_shadow(const render::record::CameraModel& camera_model, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    void render_forward(const render::record::CameraModel& camera_model, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
     void after_record(std::uint64_t frame_number, const render::record::CameraModel& rec_cam_mdl);
 };
 }

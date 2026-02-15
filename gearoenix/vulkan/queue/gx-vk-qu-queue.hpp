@@ -30,15 +30,8 @@ public:
     Queue();
     ~Queue() override;
     void submit(const command::Buffer&, const sync::Fence& fence);
-    void submit(
-        std::uint64_t wait_semaphores_count,
-        const VkSemaphore* wait_semaphores,
-        const VkPipelineStageFlags* wait_stages,
-        std::uint64_t commands_count,
-        const VkCommandBuffer* commands,
-        std::uint64_t signal_semaphores_count,
-        const VkSemaphore* signal_semaphores,
-        VkFence fence = nullptr);
+    void submit(std::uint64_t wait_semaphores_count, const VkSemaphore* wait_semaphores, const VkPipelineStageFlags* wait_stages, std::uint64_t commands_count, const VkCommandBuffer* commands, std::uint64_t signal_semaphores_count,
+        const VkSemaphore* signal_semaphores, VkFence fence = nullptr);
     [[nodiscard]] VkResult present(const VkPresentInfoKHR& info);
 };
 }

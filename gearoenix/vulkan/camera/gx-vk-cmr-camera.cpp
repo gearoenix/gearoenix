@@ -49,9 +49,7 @@ void gearoenix::vulkan::camera::Camera::construct(core::ecs::Entity* const entit
         // self.colour_tuning_anti_aliasing_shader_combination = shader::Manager::get().get_combiner<shader::ColourTuningAntiAliasingCombination>();
     });
     c.get_return()->initialise();
-    c.get_return()->update_target(core::job::EndCaller([c] {
-        c.get_return()->enable_bloom();
-    }));
+    c.get_return()->update_target(core::job::EndCaller([c] { c.get_return()->enable_bloom(); }));
 }
 
 gearoenix::vulkan::camera::Camera::~Camera() = default;
@@ -80,8 +78,7 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
     render_models(cmr.translucent_models);
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(
-    const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 

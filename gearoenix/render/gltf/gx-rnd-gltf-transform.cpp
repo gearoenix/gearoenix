@@ -25,10 +25,7 @@ void gearoenix::render::gltf::apply_transform(const int node_index, const Contex
     }
 
     if (!node.matrix.empty()) {
-        const auto local_matrix = math::Mat4x4(
-            node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3],
-            node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7],
-            node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
+        const auto local_matrix = math::Mat4x4(node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3], node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7], node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
             node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]);
 
         if (!transform.get_local_matrix().equal(local_matrix)) {
@@ -45,8 +42,7 @@ bool gearoenix::render::gltf::has_transformation(const int node_index, const Con
     return !node.rotation.empty() || !node.scale.empty() || !node.translation.empty();
 }
 
-gearoenix::core::ecs::EntityPtr gearoenix::render::gltf::create_empty_entity_transform(
-    const int node_index, const Context& context, core::ecs::Entity* const parent)
+gearoenix::core::ecs::EntityPtr gearoenix::render::gltf::create_empty_entity_transform(const int node_index, const Context& context, core::ecs::Entity* const parent)
 {
     const auto& node = context.data.nodes[node_index];
     GX_ASSERT_D(!node.name.empty());

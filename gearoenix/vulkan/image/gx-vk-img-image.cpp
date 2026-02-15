@@ -11,18 +11,9 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
-bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
-{
-    return layout == other.layout
-        && queue_family_index == other.queue_family_index
-        && access == other.access
-        && stage == other.stage;
-}
+bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const { return layout == other.layout && queue_family_index == other.queue_family_index && access == other.access && stage == other.stage; }
 
-bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const
-{
-    return per_mip_states == other.per_mip_states;
-}
+bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const { return per_mip_states == other.per_mip_states; }
 
 bool gearoenix::vulkan::image::Image::State::is_uniform() const
 {
@@ -112,8 +103,7 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
     };
 }
 
-gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_mips(
-    const std::uint32_t base, const std::uint32_t count) const
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_mips(const std::uint32_t base, const std::uint32_t count) const
 {
     auto result = *this;
     result.base_mip = base;
@@ -121,8 +111,7 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
     return result;
 }
 
-gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_layers(
-    const std::uint32_t base, const std::uint32_t count) const
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_layers(const std::uint32_t base, const std::uint32_t count) const
 {
     auto result = *this;
     result.base_layer = base;
@@ -130,26 +119,15 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
     return result;
 }
 
-gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_queue_family(
-    const std::uint32_t family) const
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_queue_family(const std::uint32_t family) const
 {
     auto result = *this;
     result.queue_family = family;
     return result;
 }
 
-gearoenix::vulkan::image::Image::Image(
-    const std::string& name,
-    const std::uint32_t image_width,
-    const std::uint32_t image_height,
-    const std::uint32_t image_depth,
-    const VkImageType image_type,
-    const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers,
-    const VkFormat format,
-    const VkImageCreateFlags flags,
-    const VkImageUsageFlags usage,
-    const VkImage vulkan_data)
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage, const VkImage vulkan_data)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -165,17 +143,8 @@ gearoenix::vulkan::image::Image::Image(
     GX_VK_MARK(name, vulkan_data);
 }
 
-gearoenix::vulkan::image::Image::Image(
-    const std::string& name,
-    const std::uint32_t image_width,
-    const std::uint32_t image_height,
-    const std::uint32_t image_depth,
-    const VkImageType image_type,
-    const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers,
-    const VkFormat format,
-    const VkImageCreateFlags flags,
-    const VkImageUsageFlags usage)
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -255,12 +224,8 @@ VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
 
 void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const TransitionRequest& request)
 {
-    const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS
-        ? mipmap_levels - request.base_mip
-        : request.mip_count;
-    const auto actual_layer_count = request.layer_count == VK_REMAINING_ARRAY_LAYERS
-        ? array_layers - request.base_layer
-        : request.layer_count;
+    const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS ? mipmap_levels - request.base_mip : request.mip_count;
+    const auto actual_layer_count = request.layer_count == VK_REMAINING_ARRAY_LAYERS ? array_layers - request.base_layer : request.layer_count;
 
     thread_local std::vector<VkImageMemoryBarrier2> barriers;
     barriers.clear();

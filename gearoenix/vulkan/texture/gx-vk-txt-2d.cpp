@@ -21,14 +21,8 @@
 
 gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& in_name)
     : render::texture::Texture2D(std::move(in_name), info)
-    , view(new image::View(std::make_shared<image::Image>(
-          name,
-          info.get_width(), info.get_height(), info.get_depth(),
-          convert_image_type(info.get_type()),
-          static_cast<std::uint32_t>(compute_mipmaps_count(info)),
-          1u,
-          convert_image_format(info.get_format()),
-          0u,
+    , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), info.get_depth(), convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 1u,
+          convert_image_format(info.get_format()), 0u,
           VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
     , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
     , mips([this] {
@@ -64,8 +58,7 @@ void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform
     std::vector<std::shared_ptr<buffer::Buffer>> staging_buffers;
     staging_buffers.reserve(mips_count);
     for (std::uint32_t mip = 0; mip < mips_count; ++mip) {
-        staging_buffers.push_back(buffer::Manager::get().create_staging(
-            static_cast<std::int64_t>(pixel_size) * static_cast<std::int64_t>(level_width) * static_cast<std::int64_t>(level_height)));
+        staging_buffers.push_back(buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixel_size) * static_cast<std::int64_t>(level_width) * static_cast<std::int64_t>(level_height)));
         level_width = std::max(1u, level_width >> 1);
         level_height = std::max(1u, level_height >> 1);
     }
@@ -88,8 +81,7 @@ void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform
         region.imageSubresource.layerCount = 1;
         region.imageExtent = { level_width, level_height, 1 };
 
-        vkCmdCopyImageToBuffer(vk_cmd, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            staging_buffers[mip]->get_vulkan_data(), 1, &region);
+        vkCmdCopyImageToBuffer(vk_cmd, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, staging_buffers[mip]->get_vulkan_data(), 1, &region);
 
         level_width = std::max(1u, level_width >> 1);
         level_height = std::max(1u, level_height >> 1);
@@ -114,9 +106,7 @@ void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform
         });
     });
 
-    core::job::send_job_to_pool([fence = std::move(fence), cmd = std::move(cmd),
-                                    staging_buffers = std::move(staging_buffers), end = std::move(end), sss,
-                                    width, height, pixel_size, mips_count, format] {
+    core::job::send_job_to_pool([fence = std::move(fence), cmd = std::move(cmd), staging_buffers = std::move(staging_buffers), end = std::move(end), sss, width, height, pixel_size, mips_count, format] {
         fence->wait();
 
         auto level_width = width;

@@ -30,9 +30,7 @@ public:
     GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        GxEndCaller<void> end([this] {
-            scene_entity->add_to_world();
-        });
+        GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
 
         GxSkyboxManager::get().build("skybox", scene_entity.get(), GxPath::create_asset("sky.hdr"), GxEntityEndCaller([end](auto&&) { (void)end; }));
 
@@ -45,10 +43,7 @@ public:
         GX_LOG_D("Initialised");
     }
 
-    void update() override
-    {
-        Application::update();
-    }
+    void update() override { Application::update(); }
 };
 
 GEAROENIX_START(GameApp);

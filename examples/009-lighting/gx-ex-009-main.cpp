@@ -62,15 +62,14 @@ public:
                 const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
                 const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "-metallic:" + std::to_string(metallic) + "-roughness:" + std::to_string(roughness);
-                GxMaterialManager::get().get_pbr("icosphere-material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
-                    icosphere_material_is_ready(std::move(material), std::move(p), metallic, roughness, e);
-                }));
+                GxMaterialManager::get().get_pbr(
+                    "icosphere-material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
+                        icosphere_material_is_ready(std::move(material), std::move(p), metallic, roughness, e);
+                    }));
             }
         }
 
-        GxMaterialManager::get().get_pbr("ground", GxPbrEndCaller([this, e = end](GxPbrPtr&& material) {
-            plate_material_is_ready(std::move(material), e);
-        }));
+        GxMaterialManager::get().get_pbr("ground", GxPbrEndCaller([this, e = end](GxPbrPtr&& material) { plate_material_is_ready(std::move(material), e); }));
 
         GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) {
             auto trn = entity->template get_component_shared_ptr<GxTransform>();
@@ -91,7 +90,7 @@ public:
                         { 0.0, 1.0, 0.0 });
                     light->colour = { 2.0f, 2.0f, 2.0f };
                     (void)e;
-                }));
+            }));
         }
 
         GX_LOG_D("Initialised");
@@ -128,9 +127,7 @@ public:
         material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, 0.001 });
         material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, 0.99f });
 
-        GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this, e = end](GxMeshPtr&& mesh) {
-            plate_mesh_is_ready(std::move(mesh), e);
-        }));
+        GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this, e = end](GxMeshPtr&& mesh) { plate_mesh_is_ready(std::move(mesh), e); }));
     }
 };
 

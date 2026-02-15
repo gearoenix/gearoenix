@@ -11,14 +11,9 @@ gearoenix::render::scene::Manager::Manager()
 
 gearoenix::render::scene::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::string&& name, const double) const
-{
-    return core::ecs::Entity::construct(std::move(name), nullptr);
-}
+gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::string&& name, const double) const { return core::ecs::Entity::construct(std::move(name), nullptr); }
 
 void gearoenix::render::scene::Manager::update()
 {
-    core::ecs::World::get().parallel_system<Scene>([](auto* const, Scene* const s, const auto /*kernel_index*/) {
-        s->update();
-    });
+    core::ecs::World::get().parallel_system<Scene>([](auto* const, Scene* const s, const auto /*kernel_index*/) { s->update(); });
 }

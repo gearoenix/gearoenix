@@ -19,11 +19,7 @@ gearoenix::vulkan::image::Manager::Manager()
 
 gearoenix::vulkan::image::Manager::~Manager() = default;
 
-void gearoenix::vulkan::image::Manager::upload(
-    std::shared_ptr<Image>&& img,
-    std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs,
-    const bool generate_mipmaps,
-    core::job::EndCaller<>&& end)
+void gearoenix::vulkan::image::Manager::upload(std::shared_ptr<Image>&& img, std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs, const bool generate_mipmaps, core::job::EndCaller<>&& end)
 {
     auto cmd = command::Manager::create_thread_independent();
     cmd->begin();
@@ -96,12 +92,7 @@ void gearoenix::vulkan::image::Manager::upload(
             blit.dstSubresource.baseArrayLayer = 0;
             blit.dstSubresource.layerCount = array_layers;
 
-            vkCmdBlitImage(
-                vk_cmd,
-                img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                1, &blit,
-                VK_FILTER_LINEAR);
+            vkCmdBlitImage(vk_cmd, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
 
             // Transition the source mip to SHADER_READ_ONLY
             img->transit(vk_cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));

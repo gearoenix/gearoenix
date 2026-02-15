@@ -5,27 +5,16 @@
 #import "gx-mtl-uploader.hpp"
 #import <vector>
 
-gearoenix::metal::Texture2D::Texture2D(
-    Engine& e,
-    id<MTLTexture> resource,
-    id<MTLSamplerState> sampler,
-    const render::texture::TextureInfo& info,
-    std::string name)
+gearoenix::metal::Texture2D::Texture2D(Engine& e, id<MTLTexture> resource, id<MTLSamplerState> sampler, const render::texture::TextureInfo& info, std::string name)
     : render::texture::Texture2D(std::move(name), info, e)
     , resource(resource)
     , sampler(sampler)
 {
 }
 
-gearoenix::metal::Texture2D::~Texture2D()
-{
-    [resource release];
-}
+gearoenix::metal::Texture2D::~Texture2D() { [resource release]; }
 
-void convert(
-    MTLSamplerDescriptor* desc,
-    const gearoenix::render::texture::Filter mag_filter,
-    const gearoenix::render::texture::Filter min_filter)
+void convert(MTLSamplerDescriptor* desc, const gearoenix::render::texture::Filter mag_filter, const gearoenix::render::texture::Filter min_filter)
 {
     if (mag_filter == gearoenix::render::texture::Filter::LinearMipmapLinear && min_filter == gearoenix::render::texture::Filter::LinearMipmapLinear) {
         desc.minFilter = MTLSamplerMinMagFilterLinear;
@@ -60,8 +49,7 @@ static MTLSamplerAddressMode convert(const gearoenix::render::texture::Wrap w)
     }
 }
 
-static id<MTLSamplerState> create_sampler(
-    const gearoenix::render::texture::SamplerInfo& sample_info, id<MTLDevice> device, MTLSamplerDescriptor* desc)
+static id<MTLSamplerState> create_sampler(const gearoenix::render::texture::SamplerInfo& sample_info, id<MTLDevice> device, MTLSamplerDescriptor* desc)
 {
     convert(desc, sample_info.mag_filter, sample_info.min_filter);
     desc.rAddressMode = convert(sample_info.wrap_r);
@@ -73,8 +61,7 @@ static id<MTLSamplerState> create_sampler(
     return [device newSamplerStateWithDescriptor:desc];
 }
 
-static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MTLSamplerState>> create_samplers(
-    const std::vector<gearoenix::render::texture::SamplerInfo>& sample_infos, id<MTLDevice> device)
+static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MTLSamplerState>> create_samplers(const std::vector<gearoenix::render::texture::SamplerInfo>& sample_infos, id<MTLDevice> device)
 {
     boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MTLSamplerState>> samplers;
     MTLSamplerDescriptor* desc = [MTLSamplerDescriptor new];
@@ -87,30 +74,30 @@ static boost::container::flat_map<gearoenix::render::texture::SamplerInfo, id<MT
 gearoenix::metal::TextureManager::TextureManager(Engine& e)
     : e(e)
     , samplers(create_samplers(
-          { render::texture::SamplerInfo {
-                .min_filter = render::texture::Filter::Linear,
-                .mag_filter = render::texture::Filter::Linear,
-                .wrap_s = render::texture::Wrap::Repeat,
-                .wrap_t = render::texture::Wrap::Repeat,
-                .wrap_r = render::texture::Wrap::Repeat,
-                .anisotropic_level = 0,
-            },
-              render::texture::SamplerInfo {
-                  .min_filter = render::texture::Filter::Nearest,
-                  .mag_filter = render::texture::Filter::Nearest,
-                  .wrap_s = render::texture::Wrap::Repeat,
-                  .wrap_t = render::texture::Wrap::Repeat,
-                  .wrap_r = render::texture::Wrap::Repeat,
-                  .anisotropic_level = 0,
-              },
-              render::texture::SamplerInfo {
-                  .min_filter = render::texture::Filter::LinearMipmapLinear,
-                  .mag_filter = render::texture::Filter::Linear,
-                  .wrap_s = render::texture::Wrap::Repeat,
-                  .wrap_t = render::texture::Wrap::Repeat,
-                  .wrap_r = render::texture::Wrap::Repeat,
-                  .anisotropic_level = 0,
-              } },
+        { render::texture::SamplerInfo {
+             .min_filter = render::texture::Filter::Linear,
+             .mag_filter = render::texture::Filter::Linear,
+             .wrap_s = render::texture::Wrap::Repeat,
+             .wrap_t = render::texture::Wrap::Repeat,
+             .wrap_r = render::texture::Wrap::Repeat,
+             .anisotropic_level = 0,
+         },
+           render::texture::SamplerInfo {
+               .min_filter = render::texture::Filter::Nearest,
+               .mag_filter = render::texture::Filter::Nearest,
+               .wrap_s = render::texture::Wrap::Repeat,
+               .wrap_t = render::texture::Wrap::Repeat,
+               .wrap_r = render::texture::Wrap::Repeat,
+               .anisotropic_level = 0,
+           },
+           render::texture::SamplerInfo {
+               .min_filter = render::texture::Filter::LinearMipmapLinear,
+               .mag_filter = render::texture::Filter::Linear,
+               .wrap_s = render::texture::Wrap::Repeat,
+               .wrap_t = render::texture::Wrap::Repeat,
+               .wrap_r = render::texture::Wrap::Repeat,
+               .anisotropic_level = 0,
+           } },
           e.get_device()))
 {
 }
@@ -122,10 +109,7 @@ gearoenix::metal::TextureManager::~TextureManager()
 }
 
 [[nodiscard]] std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::metal::TextureManager::create_2d_from_pixels(
-    std::string name,
-    std::vector<std::vector<std::uint8_t>> pixels,
-    const render::texture::TextureInfo& info,
-    const core::job::EndCaller& c)
+    std::string name, std::vector<std::vector<std::uint8_t>> pixels, const render::texture::TextureInfo& info, const core::job::EndCaller& c)
 {
     const auto sampler_search = samplers.find(info.sampler_info);
     if (samplers.end() == sampler_search)

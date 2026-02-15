@@ -11,8 +11,7 @@ gearoenix::vulkan::memory::Manager::Manager()
 
 gearoenix::vulkan::memory::Manager::~Manager() = default;
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Manager::allocate(
-    const std::int64_t size, const std::uint32_t type_bits, const Place place)
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Manager::allocate(const std::int64_t size, const std::uint32_t type_bits, const Place place)
 {
     const auto& physical_device = device::Physical::get();
     const auto memory_properties = place == Place::Gpu ? VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT : (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);

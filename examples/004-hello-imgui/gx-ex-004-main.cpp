@@ -37,11 +37,16 @@ public:
                 opened_file_name.clear();
                 file_browser_canceled = false;
 
-                gearoenix::platform::file_chooser_open([this](auto&& path, auto&&) {
-                    file_browser_canceled = false;
-                    opened_file_name = path.get_raw_data(); }, [this] {
-                    file_browser_canceled = true;
-                    opened_file_name.clear(); }, "[Gearoenix Game Engine] Open Any File", ".*");
+                gearoenix::platform::file_chooser_open(
+                    [this](auto&& path, auto&&) {
+                        file_browser_canceled = false;
+                        opened_file_name = path.get_raw_data();
+                    },
+                    [this] {
+                        file_browser_canceled = true;
+                        opened_file_name.clear();
+                    },
+                    "[Gearoenix Game Engine] Open Any File", ".*");
             }
         } else {
             opened_file_name.clear();

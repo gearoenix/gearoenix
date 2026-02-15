@@ -78,10 +78,7 @@ void gearoenix::d3d::Engine::window_resized(int failed_tries)
         device_lost_handle(++failed_tries);
 }
 
-void gearoenix::d3d::Engine::window_resized()
-{
-    window_resized(0);
-}
+void gearoenix::d3d::Engine::window_resized() { window_resized(0); }
 
 gearoenix::d3d::Engine::~Engine()
 {
@@ -95,16 +92,9 @@ bool gearoenix::d3d::Engine::is_supported()
     return true;
 }
 
-std::unique_ptr<gearoenix::d3d::Engine> gearoenix::d3d::Engine::construct(
-    platform::Application& platform_application)
-{
-    return std::unique_ptr<Engine>(new Engine(platform_application));
-}
+std::unique_ptr<gearoenix::d3d::Engine> gearoenix::d3d::Engine::construct(platform::Application& platform_application) { return std::unique_ptr<Engine>(new Engine(platform_application)); }
 
-void gearoenix::d3d::Engine::start_frame()
-{
-    render::engine::Engine::start_frame();
-}
+void gearoenix::d3d::Engine::start_frame() { render::engine::Engine::start_frame(); }
 
 void gearoenix::d3d::Engine::end_frame()
 {
@@ -113,9 +103,6 @@ void gearoenix::d3d::Engine::end_frame()
         device_lost_handle(0);
 }
 
-void gearoenix::d3d::Engine::upload_imgui_fonts()
-{
-    GX_TODO;
-}
+void gearoenix::d3d::Engine::upload_imgui_fonts() { GX_TODO; }
 
 #endif

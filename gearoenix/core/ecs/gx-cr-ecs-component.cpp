@@ -37,9 +37,7 @@ void gearoenix::core::ecs::Component::read(std::shared_ptr<Component>&& self, st
     const auto entity_id = stream->read<object_id_t>();
     // Don't capture the end here because, if the call is from an entity, you will enter a loop of dependency
     // The entity depends on the component to end and the component depends on the entity to end.
-    object_streamer->read(entity_id, [self = std::move(self)](const std::shared_ptr<Object>& e) {
-        self->set_entity(cast_ptr<Entity>(e.get()));
-    });
+    object_streamer->read(entity_id, [self = std::move(self)](const std::shared_ptr<Object>& e) { self->set_entity(cast_ptr<Entity>(e.get())); });
 }
 
 gearoenix::core::ecs::Component::~Component() = default;
@@ -67,7 +65,4 @@ void gearoenix::core::ecs::Component::show_debug_gui()
     });
 }
 
-void gearoenix::core::ecs::Component::set_entity(Entity* const e)
-{
-    entity = e;
-}
+void gearoenix::core::ecs::Component::set_entity(Entity* const e) { entity = e; }

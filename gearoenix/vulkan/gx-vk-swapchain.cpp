@@ -39,20 +39,11 @@ gearoenix::vulkan::Swapchain::Swapchain()
     initialize();
 }
 
-gearoenix::vulkan::Swapchain::~Swapchain()
-{
-    vkDestroySwapchainKHR(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-}
+gearoenix::vulkan::Swapchain::~Swapchain() { vkDestroySwapchainKHR(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
 
 void gearoenix::vulkan::Swapchain::acquire_next_image(const sync::Semaphore& semaphore)
 {
-    const VkResult result = vkAcquireNextImageKHR(
-        device::Logical::get().get_vulkan_data(),
-        vulkan_data,
-        std::numeric_limits<std::uint64_t>::max(),
-        semaphore.get_vulkan_data(),
-        nullptr,
-        &image_index);
+    const VkResult result = vkAcquireNextImageKHR(device::Logical::get().get_vulkan_data(), vulkan_data, std::numeric_limits<std::uint64_t>::max(), semaphore.get_vulkan_data(), nullptr, &image_index);
     switch (result) {
     case VK_ERROR_OUT_OF_DATE_KHR:
     case VK_ERROR_INITIALIZATION_FAILED:
@@ -107,19 +98,16 @@ void gearoenix::vulkan::Swapchain::initialize()
     VkFormatProperties format_props;
     vkGetPhysicalDeviceFormatProperties(physical_device.get_vulkan_data(), format.format, &format_props);
     // Enable a transfer source if supported (for screenshots, etc.)
-    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) != 0
-        && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
+    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) != 0 && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT) != 0) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     }
     // Enable transfer destination if supported (for blitting camera render targets to swapchain)
-    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT) != 0
-        && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_DST_BIT) != 0) {
+    if ((caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT) != 0 && (format_props.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_DST_BIT) != 0) {
         image_usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     }
 
     const auto unorm_format = srgb_to_unorm(format.format);
-    const auto mutable_format_supported = unorm_format.has_value()
-        && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
+    const auto mutable_format_supported = unorm_format.has_value() && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
 
     // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
     std::array<VkFormat, 2> format_list_entries {};
@@ -144,7 +132,8 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 && caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
+    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 && caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max()
+        && caps.currentExtent.height != 0) {
         info.imageExtent = caps.currentExtent;
     } else {
         const auto window_size = platform::BaseApplication::get().get_window_size();
@@ -180,23 +169,12 @@ void gearoenix::vulkan::Swapchain::initialize()
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
 
     for (auto i = 0; i < count; ++i) {
-        auto img = std::make_shared<image::Image>(
-            "swapchain-img-" + std::to_string(i),
-            static_cast<std::uint32_t>(info.imageExtent.width),
-            static_cast<std::uint32_t>(info.imageExtent.height),
-            static_cast<std::uint32_t>(1),
-            VK_IMAGE_TYPE_2D,
-            static_cast<std::uint32_t>(1),
-            static_cast<std::uint32_t>(1),
-            info.imageFormat,
-            mutable_format_supported ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : static_cast<VkImageCreateFlags>(0),
-            info.imageUsage,
-            images[i]);
+        auto img = std::make_shared<image::Image>("swapchain-img-" + std::to_string(i), static_cast<std::uint32_t>(info.imageExtent.width), static_cast<std::uint32_t>(info.imageExtent.height), static_cast<std::uint32_t>(1), VK_IMAGE_TYPE_2D,
+            static_cast<std::uint32_t>(1), static_cast<std::uint32_t>(1), info.imageFormat, mutable_format_supported ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : static_cast<VkImageCreateFlags>(0), info.imageUsage, images[i]);
         img->set_owned(false);
         frames[i].view = std::make_shared<image::View>(std::shared_ptr(img));
         if (mutable_format_supported) {
-            frames[i].imgui_view = std::make_shared<image::View>(
-                std::shared_ptr(img), 0, std::nullopt, 0, std::nullopt, *unorm_format);
+            frames[i].imgui_view = std::make_shared<image::View>(std::shared_ptr(img), 0, std::nullopt, 0, std::nullopt, *unorm_format);
         }
         frames[i].present = std::make_unique<sync::Semaphore>("present-" + std::to_string(i));
     }
@@ -207,10 +185,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     image_index = 0;
 }
 
-const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const
-{
-    return &vulkan_data;
-}
+const VkSwapchainKHR* gearoenix::vulkan::Swapchain::get_vulkan_data_ptr() const { return &vulkan_data; }
 
 void gearoenix::vulkan::Swapchain::present()
 {
@@ -233,9 +208,6 @@ void gearoenix::vulkan::Swapchain::present()
     is_valid = true;
 }
 
-const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::Swapchain::get_present_semaphore() const
-{
-    return *frames[image_index].present;
-}
+const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::Swapchain::get_present_semaphore() const { return *frames[image_index].present; }
 
 #endif

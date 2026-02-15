@@ -48,9 +48,7 @@ struct Target final : render::texture::Target {
     Target(std::string&&, std::vector<render::texture::Attachment>&& attachments);
 
 public:
-    static void construct(
-        std::string&& name, std::vector<render::texture::Attachment>&& attachments,
-        core::job::EndCallerShared<render::texture::Target>&& end_callback);
+    static void construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback);
     ~Target() override;
     [[nodiscard]] RenderingScope create_rendering_scope(VkCommandBuffer cb, VkAttachmentLoadOp load_colours = VK_ATTACHMENT_LOAD_OP_CLEAR, VkAttachmentLoadOp load_depth = VK_ATTACHMENT_LOAD_OP_CLEAR);
     void update_rendering_info();

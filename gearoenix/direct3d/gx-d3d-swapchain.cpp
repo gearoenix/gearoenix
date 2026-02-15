@@ -47,12 +47,7 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
     // If the swapchain already exists, resize it, otherwise create one.
     if (swapchain) {
         // If the swapchain already exists, resize it.
-        HRESULT hr = swapchain->ResizeBuffers(
-            GX_D3D_FRAMES_BACKBUFFER_NUMBER,
-            window_width,
-            window_height,
-            BACK_BUFFER_FORMAT,
-            0);
+        HRESULT hr = swapchain->ResizeBuffers(GX_D3D_FRAMES_BACKBUFFER_NUMBER, window_width, window_height, BACK_BUFFER_FORMAT, 0);
 
         if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
             GX_LOG_D("Device lost on resize.");
@@ -84,16 +79,9 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
         // if (prevIsFullscreen) {
         //    Win32Application::SetWindowZorderToTopMost(false);
         // }
-        const auto& factory
-            = device->get_adapter()->get_factory();
+        const auto& factory = device->get_adapter()->get_factory();
         Microsoft::WRL::ComPtr<IDXGISwapChain1> base_swapchain;
-        GX_D3D_CHECK(factory->CreateSwapChainForHwnd(
-            queue->get_command_queue().Get(),
-            platform_application.get_window(),
-            &swap_chain_desc,
-            &fs_swapchain_desc,
-            nullptr,
-            &base_swapchain));
+        GX_D3D_CHECK(factory->CreateSwapChainForHwnd(queue->get_command_queue().Get(), platform_application.get_window(), &swap_chain_desc, &fs_swapchain_desc, nullptr, &base_swapchain));
         GX_TODO; // We have to make sure the following commented is not necessary
                  // if (prevIsFullscreen) {
                  //    Win32Application::SetWindowZorderToTopMost(true);
@@ -121,21 +109,14 @@ bool gearoenix::d3d::Swapchain::set_window_size(const platform::Application& pla
     // Reset the index to the current back buffer.
     back_buffer_index = swapchain->GetCurrentBackBufferIndex();
     CD3DX12_HEAP_PROPERTIES depth_heap_properties(D3D12_HEAP_TYPE_DEFAULT);
-    D3D12_RESOURCE_DESC depth_stencil_desc = CD3DX12_RESOURCE_DESC::Tex2D(
-        DEPTH_BUFFER_FORMAT, window_width, window_height, 1, 1);
+    D3D12_RESOURCE_DESC depth_stencil_desc = CD3DX12_RESOURCE_DESC::Tex2D(DEPTH_BUFFER_FORMAT, window_width, window_height, 1, 1);
     depth_stencil_desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     D3D12_CLEAR_VALUE depth_optimized_clear_value;
     GX_SET_ZERO(depth_optimized_clear_value);
     depth_optimized_clear_value.Format = DEPTH_BUFFER_FORMAT;
     depth_optimized_clear_value.DepthStencil.Depth = 1.0f;
     depth_optimized_clear_value.DepthStencil.Stencil = 0;
-    GX_D3D_CHECK(dev->CreateCommittedResource(
-        &depth_heap_properties,
-        D3D12_HEAP_FLAG_NONE,
-        &depth_stencil_desc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        &depth_optimized_clear_value,
-        IID_PPV_ARGS(&depth_stencil)));
+    GX_D3D_CHECK(dev->CreateCommittedResource(&depth_heap_properties, D3D12_HEAP_FLAG_NONE, &depth_stencil_desc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depth_optimized_clear_value, IID_PPV_ARGS(&depth_stencil)));
     depth_stencil->SetName(L"main-depth-stencil");
     depth_stencil_descriptor = nullptr; // making space for new one
     depth_stencil_descriptor = std::make_unique<CpuDescriptor>(descriptor_manager->allocate_dsv());
@@ -168,17 +149,11 @@ void gearoenix::d3d::Swapchain::wait_for_gpu()
         fence_values.push(current_fence_value);
 }
 
-const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::d3d::Swapchain::get_current_render_target() const
-{
-    return frames[back_buffer_index].render_target;
-}
+const Microsoft::WRL::ComPtr<ID3D12Resource>& gearoenix::d3d::Swapchain::get_current_render_target() const { return frames[back_buffer_index].render_target; }
 
 void gearoenix::d3d::Swapchain::transit_to_target(ID3D12GraphicsCommandList6* const cmd)
 {
-    D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        frames[back_buffer_index].render_target.Get(),
-        D3D12_RESOURCE_STATE_PRESENT,
-        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(frames[back_buffer_index].render_target.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
     cmd->ResourceBarrier(1, &barrier);
 }
 
@@ -198,10 +173,7 @@ void gearoenix::d3d::Swapchain::clear(ID3D12GraphicsCommandList6* const cmd)
 
 void gearoenix::d3d::Swapchain::transit_to_present(ID3D12GraphicsCommandList6* const cmd)
 {
-    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        frames[back_buffer_index].render_target.Get(),
-        D3D12_RESOURCE_STATE_RENDER_TARGET,
-        D3D12_RESOURCE_STATE_PRESENT);
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(frames[back_buffer_index].render_target.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     cmd->ResourceBarrier(1, &barrier);
 }
 

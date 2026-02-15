@@ -43,7 +43,6 @@ public:
     void disable_scale_handle();
     void enable_local_transform_mode();
     void disable_local_transform_mode();
-    [[nodiscard]] bool draw_translate_handle(
-        math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id);
+    [[nodiscard]] bool draw_translate_handle(math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id);
 };
 }

@@ -18,32 +18,15 @@ gearoenix::render::camera::Target::Target(texture::DefaultCameraTargets&& d)
 {
 }
 
-gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_customised(
-    std::shared_ptr<texture::Target>&& target)
-{
-    return Target(Customised { .target = std::move(target) });
-}
+gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_customised(std::shared_ptr<texture::Target>&& target) { return Target(Customised { .target = std::move(target) }); }
 
-gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_default(
-    texture::DefaultCameraTargets&& targets)
-{
-    return Target(std::move(targets));
-}
+gearoenix::render::camera::Target gearoenix::render::camera::Target::construct_default(texture::DefaultCameraTargets&& targets) { return Target(std::move(targets)); }
 
-bool gearoenix::render::camera::Target::is_customised() const
-{
-    return target.index() == customised_var_index;
-}
+bool gearoenix::render::camera::Target::is_customised() const { return target.index() == customised_var_index; }
 
-bool gearoenix::render::camera::Target::is_default() const
-{
-    return target.index() == default_var_index;
-}
+bool gearoenix::render::camera::Target::is_default() const { return target.index() == default_var_index; }
 
-void gearoenix::render::camera::Target::set_customised(std::shared_ptr<texture::Target>&& customised_target)
-{
-    target = Customised { .target = std::move(customised_target) };
-}
+void gearoenix::render::camera::Target::set_customised(std::shared_ptr<texture::Target>&& customised_target) { target = Customised { .target = std::move(customised_target) }; }
 
 double gearoenix::render::camera::Target::get_aspect_ratio() const
 {
@@ -87,8 +70,7 @@ const gearoenix::render::camera::Target::Customised& gearoenix::render::camera::
     return std::get<customised_var_index>(target);
 }
 
-void gearoenix::render::camera::Target::write(
-    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
+void gearoenix::render::camera::Target::write(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
 {
     const auto d = is_default();
     s->write_fail_debug(d);
@@ -98,15 +80,11 @@ void gearoenix::render::camera::Target::write(
     std::get<customised_var_index>(target).target->write(std::move(s), std::move(end));
 }
 
-void gearoenix::render::camera::Target::read(
-    std::shared_ptr<platform::stream::Stream>&& stream,
-    core::job::EndCaller<Target>&& end)
+void gearoenix::render::camera::Target::read(std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<Target>&& end)
 {
     if (stream->read<bool>()) {
         end.set_return(construct_default(texture::DefaultCameraTargets()));
         return;
     }
-    texture::Manager::get().create_target(std::move(stream), core::job::EndCallerShared<texture::Target>([e = std::move(end)](std::shared_ptr<texture::Target>&& t) {
-        e.set_return(construct_customised(std::move(t)));
-    }));
+    texture::Manager::get().create_target(std::move(stream), core::job::EndCallerShared<texture::Target>([e = std::move(end)](std::shared_ptr<texture::Target>&& t) { e.set_return(construct_customised(std::move(t))); }));
 }

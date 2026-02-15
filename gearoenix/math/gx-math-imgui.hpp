@@ -5,14 +5,8 @@
 
 namespace gearoenix {
 template <typename Element>
-constexpr math::Vec2<Element> cast(const ImVec2& v)
-{
-    return { static_cast<Element>(v.x), static_cast<Element>(v.y) };
-}
+constexpr math::Vec2<Element> cast(const ImVec2& v) { return { static_cast<Element>(v.x), static_cast<Element>(v.y) }; }
 
 template <typename Element>
-constexpr ImVec2 cast(const math::Vec2<Element>& v)
-{
-    return { static_cast<float>(v.x), static_cast<float>(v.y) };
-}
+constexpr ImVec2 cast(const math::Vec2<Element>& v) { return { static_cast<float>(v.x), static_cast<float>(v.y) }; }
 }

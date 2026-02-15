@@ -77,12 +77,7 @@ struct Camera : core::ecs::Component {
 
 public:
     ~Camera() override;
-    void generate_frustum_points(
-        const math::Vec3<double>& location,
-        const math::Vec3<double>& x,
-        const math::Vec3<double>& y,
-        const math::Vec3<double>& z,
-        std::array<math::Vec3<double>, 8>& points) const;
+    void generate_frustum_points(const math::Vec3<double>& location, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, std::array<math::Vec3<double>, 8>& points) const;
     void set_view(const math::Mat4x4<float>& view);
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
     void disable_customised_target_aspect_ratio();

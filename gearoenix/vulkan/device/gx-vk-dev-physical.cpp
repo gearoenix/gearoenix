@@ -316,25 +316,14 @@ gearoenix::vulkan::device::Physical::Physical()
     }
 
     auto& limits = properties.limits;
-    max_memory_alignment = std::max(
-        std::max(
-            std::max(
-                static_cast<std::uint32_t>(limits.minMemoryMapAlignment),
-                static_cast<std::uint32_t>(limits.minStorageBufferOffsetAlignment)),
-            std::max(
-                static_cast<std::uint32_t>(limits.minTexelBufferOffsetAlignment),
-                static_cast<std::uint32_t>(limits.minUniformBufferOffsetAlignment))),
-        std::max(
-            std::max(
-                static_cast<std::uint32_t>(limits.optimalBufferCopyOffsetAlignment),
-                static_cast<std::uint32_t>(limits.optimalBufferCopyRowPitchAlignment)),
-            static_cast<std::uint32_t>(limits.bufferImageGranularity)));
+    max_memory_alignment = std::max(std::max(std::max(static_cast<std::uint32_t>(limits.minMemoryMapAlignment), static_cast<std::uint32_t>(limits.minStorageBufferOffsetAlignment)),
+                                        std::max(static_cast<std::uint32_t>(limits.minTexelBufferOffsetAlignment), static_cast<std::uint32_t>(limits.minUniformBufferOffsetAlignment))),
+        std::max(std::max(static_cast<std::uint32_t>(limits.optimalBufferCopyOffsetAlignment), static_cast<std::uint32_t>(limits.optimalBufferCopyRowPitchAlignment)), static_cast<std::uint32_t>(limits.bufferImageGranularity)));
 }
 
 gearoenix::vulkan::device::Physical::~Physical() = default;
 
-std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
-    std::uint32_t type_bits, const std::uint32_t mem_properties) const
+std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(std::uint32_t type_bits, const std::uint32_t mem_properties) const
 {
     for (uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
         if ((type_bits & 1u) == 1u) {
@@ -347,10 +336,7 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(
     GX_LOG_F("Could not find the requested memory type.");
 }
 
-std::int64_t gearoenix::vulkan::device::Physical::align_size(const std::int64_t size) const
-{
-    return math::Numeric::align(size, static_cast<std::int64_t>(max_memory_alignment));
-}
+std::int64_t gearoenix::vulkan::device::Physical::align_size(const std::int64_t size) const { return math::Numeric::align(size, static_cast<std::int64_t>(max_memory_alignment)); }
 
 VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
 {

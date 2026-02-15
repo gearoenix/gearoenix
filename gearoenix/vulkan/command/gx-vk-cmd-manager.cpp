@@ -31,9 +31,6 @@ std::shared_ptr<gearoenix::vulkan::command::Buffer> gearoenix::vulkan::command::
     return std::make_shared<Buffer>(std::move(pool), buffer_type);
 }
 
-std::shared_ptr<gearoenix::vulkan::command::Buffer> gearoenix::vulkan::command::Manager::create_thread_independent()
-{
-    return std::make_shared<Buffer>(std::make_shared<Pool>(), Type::Primary);
-}
+std::shared_ptr<gearoenix::vulkan::command::Buffer> gearoenix::vulkan::command::Manager::create_thread_independent() { return std::make_shared<Buffer>(std::make_shared<Pool>(), Type::Primary); }
 
 #endif

@@ -55,10 +55,7 @@ public:
     [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, core::job::EndCaller<>&& end);
 
     template <typename T>
-    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const std::vector<T>& data, core::job::EndCaller<>&& end)
-    {
-        return create(name, data.data(), data.size() * sizeof(T), std::move(end));
-    }
+    [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const std::vector<T>& data, core::job::EndCaller<>&& end) { return create(name, data.data(), data.size() * sizeof(T), std::move(end)); }
 
     void upload_dynamics(VkCommandBuffer vk_cmd);
 };

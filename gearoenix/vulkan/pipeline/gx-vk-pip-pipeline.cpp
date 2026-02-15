@@ -6,26 +6,17 @@
 #include "../gx-vk-check.hpp"
 #include "gx-vk-pip-cache.hpp"
 
-gearoenix::vulkan::pipeline::Pipeline::Pipeline(
-    std::shared_ptr<Layout>&& layout,
-    std::shared_ptr<Cache>&& cache,
-    const VkPipeline vulkan_data)
+gearoenix::vulkan::pipeline::Pipeline::Pipeline(std::shared_ptr<Layout>&& layout, std::shared_ptr<Cache>&& cache, const VkPipeline vulkan_data)
     : layout(std::move(layout))
     , cache(std::move(cache))
     , vulkan_data(vulkan_data)
 {
 }
 
-gearoenix::vulkan::pipeline::Pipeline::~Pipeline()
-{
-    vkDestroyPipeline(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-}
+gearoenix::vulkan::pipeline::Pipeline::~Pipeline() { vkDestroyPipeline(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
 
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Pipeline::construct_ray_tracing(
-    std::shared_ptr<Layout>&& layout,
-    std::shared_ptr<Cache>&& cache,
-    const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
-    const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info)
+    std::shared_ptr<Layout>&& layout, std::shared_ptr<Cache>&& cache, const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info, const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info)
 {
     VkRayTracingPipelineCreateInfoKHR info;
     GX_SET_ZERO(info);
@@ -41,8 +32,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     return std::shared_ptr<Pipeline>(new Pipeline(std::move(layout), std::move(cache), vulkan_data));
 }
 
-std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Pipeline::construct_graphics(
-    std::shared_ptr<Cache>&& cache, const VkGraphicsPipelineCreateInfo& create_info)
+std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Pipeline::construct_graphics(std::shared_ptr<Cache>&& cache, const VkGraphicsPipelineCreateInfo& create_info)
 {
     VkPipeline vulkan_data = nullptr;
     GX_VK_CHK(vkCreateGraphicsPipelines(device::Logical::get().get_vulkan_data(), cache->get_vulkan_data(), 1, &create_info, nullptr, &vulkan_data));

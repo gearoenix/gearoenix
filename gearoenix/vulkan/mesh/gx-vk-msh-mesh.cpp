@@ -11,21 +11,14 @@
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "gx-vk-msh-buffer.hpp"
 
-gearoenix::vulkan::mesh::Mesh::Mesh(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material)
+gearoenix::vulkan::mesh::Mesh::Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material)
     : render::mesh::Mesh(std::move(name), std::move(buffer), std::move(material))
     , gapi_buffer(core::cast_shared<Buffer>(std::shared_ptr(this->buffer)))
     , gapi_material(std::dynamic_pointer_cast<material::Material>(this->bound_material))
 {
 }
 
-void gearoenix::vulkan::mesh::Mesh::construct(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material,
-    const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
+void gearoenix::vulkan::mesh::Mesh::construct(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
 {
     end_callback.set_return(Object::construct<Mesh>(std::move(name), std::move(buffer), std::move(material)));
 }

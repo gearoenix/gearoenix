@@ -25,10 +25,7 @@ gearoenix::vulkan::sync::Semaphore::~Semaphore()
     }
 }
 
-const VkSemaphore* gearoenix::vulkan::sync::Semaphore::get_vulkan_data_ptr() const
-{
-    return &vulkan_data;
-}
+const VkSemaphore* gearoenix::vulkan::sync::Semaphore::get_vulkan_data_ptr() const { return &vulkan_data; }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Semaphore>> gearoenix::vulkan::sync::Semaphore::create_frame_based(const std::string& base_name)
 {

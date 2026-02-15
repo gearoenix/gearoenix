@@ -6,6 +6,7 @@
 #include "../../platform/stream/gx-plt-stm-local.hpp"
 #include "../../platform/stream/gx-plt-stm-path.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "gx-rnd-txt-denormalise.hpp"
 #include "gx-rnd-txt-image.hpp"
 #include "gx-rnd-txt-target.hpp"
 #include "gx-rnd-txt-texture-2d.hpp"
@@ -19,30 +20,6 @@
 #undef main
 #endif
 
-void gearoenix::render::texture::Manager::create_2d_from_pixels_update_cache(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const TextureInfo& info)
-{
-    core::job::EndCallerShared<Texture2D> end([this, name](std::shared_ptr<Texture2D>&& t) {
-        textures_2d.set(name, t);
-    });
-    create_2d_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
-}
-
-void gearoenix::render::texture::Manager::create_cube_from_pixels_update_cache(std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const TextureInfo& info)
-{
-    core::job::EndCallerShared<TextureCube> end([this, name](std::shared_ptr<TextureCube>&& t) {
-        textures_cube.set(name, t);
-    });
-    create_cube_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
-}
-
-void gearoenix::render::texture::Manager::create_target_update_cache(std::string&& name, std::vector<Attachment>&& attachments)
-{
-    core::job::EndCallerShared<Target> end([this, name](std::shared_ptr<Target>&& t) {
-        targets.set(name, t);
-    });
-    create_target_v(std::move(name), std::move(attachments), std::move(end));
-}
-
 gearoenix::render::texture::Manager::Manager()
     : Singleton(this)
 {
@@ -50,15 +27,13 @@ gearoenix::render::texture::Manager::Manager()
 
 gearoenix::render::texture::Manager::~Manager() = default;
 
-void gearoenix::render::texture::Manager::read_gx3d(
-    const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::read_gx3d(const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
 {
     const auto stream = platform::stream::Stream::open(path);
     read_gx3d(*stream, std::move(c), use_cache);
 }
 
-void gearoenix::render::texture::Manager::read_gx3d(
-    platform::stream::Stream& stream, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::read_gx3d(platform::stream::Stream& stream, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
 {
     bool include_content;
     stream.read(include_content);
@@ -85,6 +60,7 @@ void gearoenix::render::texture::Manager::read_gx3d(
     } else {
         GX_ASSERT_D(8 == comp_bits);
     }
+
     const auto fill_mips = [&](std::vector<std::vector<std::uint8_t>>& pixels) {
         pixels.resize(mips_count);
         auto mip_w = txt_info.get_width();
@@ -108,12 +84,11 @@ void gearoenix::render::texture::Manager::read_gx3d(
                     for (std::uint32_t pixel_index = 0, float_index = 0; pixel_index < mip_pixels.size();) {
                         std::uint32_t comp_index = 0;
                         for (; comp_index < comps_count; ++comp_index, ++pixel_index, ++float_index) {
-                            const float f = float_pixels[float_index];
-                            mip_pixels[pixel_index] = f >= 1.0f ? 225 : f <= 0.0f ? 0
-                                                                                  : static_cast<std::uint8_t>(std::lroundf(f * 255.0f));
+                            mip_pixels[pixel_index] = denormalise(float_pixels[float_index]);
                         }
-                        for (; comp_index < 3; ++comp_index, ++pixel_index)
+                        for (; comp_index < 3; ++comp_index, ++pixel_index) {
                             mip_pixels[pixel_index] = 0;
+                        }
                         if (comp_index < 4) {
                             mip_pixels[pixel_index] = 0;
                             ++pixel_index;
@@ -128,40 +103,51 @@ void gearoenix::render::texture::Manager::read_gx3d(
             }
         }
     };
+
     if (Type::TextureCube == txt_info.get_type()) {
         GX_ASSERT_D(txt_info.get_width() == txt_info.get_height());
         std::vector<std::vector<std::vector<std::uint8_t>>> pixels(include_content ? 6 : 0);
         for (auto& face_pixels : pixels) {
             fill_mips(face_pixels);
         }
-        create_cube_from_pixels_update_cache(std::move(name), std::move(pixels), txt_info);
+        core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) {
+            if (!c.has_return()) {
+                c.set_return(std::move(t));
+            }
+        });
+        create_cube_from_pixels(std::move(name), std::move(pixels), txt_info, std::move(end), false);
         return;
     }
+
     if (Type::Texture2D == txt_info.get_type()) {
         std::vector<std::vector<std::uint8_t>> pixels;
         if (include_content) {
             fill_mips(pixels);
         }
-        create_2d_from_pixels_update_cache(std::move(name), std::move(pixels), txt_info);
+        core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) {
+            if (!c.has_return()) {
+                c.set_return(std::move(t));
+            }
+        });
+        create_2d_from_pixels(std::move(name), std::move(pixels), txt_info, std::move(end), false);
         return;
     }
+
     GX_UNIMPLEMENTED;
 }
 
-void gearoenix::render::texture::Manager::create_2d_from_colour(
-    const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::create_2d_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
 {
     std::vector<std::uint8_t> pixels0(4);
-    pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
-                                                                                     : colour.x * 255.0f + 0.51f);
-    pixels0[1] = static_cast<std::uint8_t>(colour.y >= 1.0 ? 255.1 : colour.y <= 0.0 ? 0.1
-                                                                                     : colour.y * 255.0f + 0.51f);
-    pixels0[2] = static_cast<std::uint8_t>(colour.z >= 1.0 ? 255.1 : colour.z <= 0.0 ? 0.1
-                                                                                     : colour.z * 255.0f + 0.51f);
-    pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
-                                                                                     : colour.w * 255.0f + 0.51f);
+    pixels0[0] = denormalise(colour.x);
+    pixels0[1] = denormalise(colour.y);
+    pixels0[2] = denormalise(colour.z);
+    pixels0[3] = denormalise(colour.w);
 
-    auto name = std::format("colour[ {}, {}, {}, {} ]", pixels0[0], pixels0[1], pixels0[2], pixels0[3]);
+    thread_local std::string name;
+    name.clear();
+
+    std::format_to(std::back_inserter(name), "colour[ {}, {}, {}, {} ]", pixels0[0], pixels0[1], pixels0[2], pixels0[3]);
 
     if (use_cache && get_from_cache(name, c, nullptr)) {
         return;
@@ -169,12 +155,12 @@ void gearoenix::render::texture::Manager::create_2d_from_colour(
 
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
 
-    create_2d_from_pixels_update_cache(
-        std::move(name),
-        std::move(pixels),
+    create_2d_from_pixels(
+        std::move(name), std::move(pixels),
         TextureInfo()
             .set_format(TextureFormat::RgbaUint8)
-            .set_sampler_info(SamplerInfo()
+            .set_sampler_info(
+                SamplerInfo() // ---
                     .set_min_filter(Filter::Nearest)
                     .set_mag_filter(Filter::Nearest)
                     .set_wrap_s(Wrap::Repeat)
@@ -183,7 +169,9 @@ void gearoenix::render::texture::Manager::create_2d_from_colour(
             .set_width(1)
             .set_height(1)
             .set_type(Type::Texture2D)
-            .set_has_mipmap(false));
+            .set_has_mipmap(false),
+        std::move(c),
+        false);
 }
 
 void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared<Texture2D>&& c)
@@ -206,38 +194,45 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
                 *stream,
                 core::job::EndCallerShared<Texture>([this, c = std::move(c)](std::shared_ptr<Texture>&& t) {
                     brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
-                    c.set_return(std::shared_ptr(brdflut));
-                    textures_2d.set(file_name, brdflut);
+                    // c is needed because it is possible that the texture name is difference when it got loaded by GX3D.
+                    if (!c.has_return()) {
+                        c.set_return(std::shared_ptr(brdflut));
+                    }
                 }),
                 false);
             return;
         }
     }
     constexpr std::uint32_t resolution = 256;
-    const auto texture_info = TextureInfo()
-                                  .set_format(TextureFormat::RgbaUint8)
-                                  .set_sampler_info(SamplerInfo()
-                                          .set_min_filter(Filter::Linear)
-                                          .set_mag_filter(Filter::Linear)
-                                          .set_wrap_s(Wrap::ClampToEdge)
-                                          .set_wrap_t(Wrap::ClampToEdge)
-                                          .set_wrap_r(Wrap::ClampToEdge))
-                                  .set_width(resolution)
-                                  .set_height(resolution)
-                                  .set_type(Type::Texture2D)
-                                  .set_has_mipmap(false);
+    const auto texture_info = // ---
+        TextureInfo()
+            .set_format(TextureFormat::RgbaUint8)
+            .set_sampler_info(
+                SamplerInfo() // ---
+                    .set_min_filter(Filter::Linear)
+                    .set_mag_filter(Filter::Linear)
+                    .set_wrap_s(Wrap::ClampToEdge)
+                    .set_wrap_t(Wrap::ClampToEdge)
+                    .set_wrap_r(Wrap::ClampToEdge))
+            .set_width(resolution)
+            .set_height(resolution)
+            .set_type(Type::Texture2D)
+            .set_has_mipmap(false);
     const auto pixels_vectors = create_brdflut_pixels();
     std::vector<std::uint8_t> pixels0(pixels_vectors.size() * sizeof(math::Vec4<std::uint8_t>));
     std::memcpy(pixels0.data(), pixels_vectors.data(), pixels0.size());
     std::vector<std::vector<std::uint8_t>> pixels { std::move(pixels0) };
-    create_2d_from_pixels_v(
+    create_2d_from_pixels(
         file_name, std::move(pixels), texture_info,
         core::job::EndCallerShared<Texture2D>([this](std::shared_ptr<Texture2D>&& t) {
+            if (brdflut) {
+                return;
+            }
             brdflut = std::move(t);
-            textures_2d.set(file_name, brdflut);
             const std::shared_ptr<platform::stream::Stream> stream(new platform::stream::Local(file_name, true));
             brdflut->write(stream, core::job::EndCaller([] { }));
-        }));
+        }),
+        false);
 }
 
 void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared<Texture2D>&& c)
@@ -250,18 +245,20 @@ void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared
     if (textures_2d.get(file_name, std::move(c))) {
         return;
     }
-    const auto texture_info = TextureInfo()
-                                  .set_format(TextureFormat::RgbaUint8)
-                                  .set_sampler_info(SamplerInfo()
-                                          .set_min_filter(Filter::Nearest)
-                                          .set_mag_filter(Filter::Nearest)
-                                          .set_wrap_s(Wrap::Repeat)
-                                          .set_wrap_t(Wrap::Repeat)
-                                          .set_wrap_r(Wrap::Repeat))
-                                  .set_width(2)
-                                  .set_height(2)
-                                  .set_type(Type::Texture2D)
-                                  .set_has_mipmap(false);
+    const auto texture_info = // ---
+        TextureInfo()
+            .set_format(TextureFormat::RgbaUint8)
+            .set_sampler_info(
+                SamplerInfo() // ---
+                    .set_min_filter(Filter::Nearest)
+                    .set_mag_filter(Filter::Nearest)
+                    .set_wrap_s(Wrap::Repeat)
+                    .set_wrap_t(Wrap::Repeat)
+                    .set_wrap_r(Wrap::Repeat))
+            .set_width(2)
+            .set_height(2)
+            .set_type(Type::Texture2D)
+            .set_has_mipmap(false);
     std::vector<std::vector<std::uint8_t>> pixels { {
         // clang-format off
           0u,   0u,   0u, 255u, // Pixel 0
@@ -270,21 +267,15 @@ void gearoenix::render::texture::Manager::get_checker(core::job::EndCallerShared
           0u,   0u,   0u, 255u, // Pixel 3
         // clang-format on
     } };
-    create_2d_from_pixels_v(
-        file_name, std::move(pixels), texture_info,
-        core::job::EndCallerShared<Texture2D>([this](std::shared_ptr<Texture2D>&& t) {
-            checkers = std::move(t);
-            textures_2d.set(file_name, checkers);
-        }));
+    core::job::EndCallerShared<Texture2D> end([this](std::shared_ptr<Texture2D>&& t) { checkers = std::move(t); });
+    create_2d_from_pixels(file_name, std::move(pixels), texture_info, std::move(end), false);
 }
 
 bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<Texture>&& c, const TextureInfo& info)
 {
     switch (info.get_type()) {
     case Type::Texture2D: {
-        core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) {
-            c.set_return(std::move(t));
-        });
+        core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) { c.set_return(std::move(t)); });
         end.set_ignore_empty_value(true);
         if (get_from_cache(name, end, &info)) {
             return true;
@@ -292,9 +283,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
         return false;
     }
     case Type::TextureCube: {
-        core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) {
-            c.set_return(std::move(t));
-        });
+        core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) { c.set_return(std::move(t)); });
         end.set_ignore_empty_value(true);
         if (get_from_cache(name, end, &info)) {
             return true;
@@ -309,7 +298,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
 bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<Texture2D>& c, const TextureInfo* const info)
 {
 #if GX_DEBUG_MODE
-#define GX_DEBUG_TXT_INFO , info = info? std::make_optional(*info): std::nullopt
+#define GX_DEBUG_TXT_INFO , info = info ? std::make_optional(*info) : std::nullopt
 #endif
 
     return textures_2d.get(name, core::job::EndCallerShared<Texture2D>([c GX_DEBUG_TXT_INFO](std::shared_ptr<Texture2D>&& t) {
@@ -328,26 +317,21 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     }));
 }
 
-void gearoenix::render::texture::Manager::create_2d_from_pixels(
-    std::string&& name,
-    std::vector<std::vector<std::uint8_t>>&& pixels,
-    const TextureInfo& info,
-    core::job::EndCallerShared<Texture2D>&& c,
-    const bool use_cache)
+void gearoenix::render::texture::Manager::create_2d_from_pixels(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const TextureInfo& info, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
 {
     if (use_cache && get_from_cache(name, c, &info)) {
         return;
     }
-    create_2d_from_pixels_update_cache(std::move(name), std::move(pixels), info);
+    core::job::EndCallerShared<Texture2D> end([this, c = std::move(c), name](std::shared_ptr<Texture2D>&& t) {
+        textures_2d.set(name, t);
+        if (!c.has_return()) {
+            c.set_return(std::move(t));
+        }
+    });
+    create_2d_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
 }
 
-void gearoenix::render::texture::Manager::create_2d_from_formatted(
-    std::string&& name,
-    const void* const data,
-    const std::uint32_t size,
-    const TextureInfo& info,
-    core::job::EndCallerShared<Texture2D>&& c,
-    const bool use_cache)
+void gearoenix::render::texture::Manager::create_2d_from_formatted(std::string&& name, const void* const data, const std::uint32_t size, const TextureInfo& info, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
 {
     if (use_cache && get_from_cache(name, c, &info)) {
         return;
@@ -372,16 +356,10 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(
     new_info.set_width(img_width);
     new_info.set_height(img_height);
 
-    create_2d_from_pixels_update_cache(std::move(name), { pixels0 }, new_info);
+    create_2d_from_pixels(std::move(name), { pixels0 }, new_info, std::move(c), false);
 }
 
-void gearoenix::render::texture::Manager::create_2df_from_formatted(
-    std::string&& name,
-    const void* const data,
-    std::uint32_t size,
-    const TextureInfo& info,
-    core::job::EndCallerShared<Texture2D>&& c,
-    const bool use_cache)
+void gearoenix::render::texture::Manager::create_2df_from_formatted(std::string&& name, const void* const data, std::uint32_t size, const TextureInfo& info, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
 {
     if (use_cache && get_from_cache(name, c, &info)) {
         return;
@@ -394,9 +372,7 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     std::uint32_t img_height = 0;
     std::uint32_t img_channels = 0;
     std::vector<float> pixels0f;
-    Image::decode(
-        static_cast<const unsigned char*>(data), size, 4,
-        pixels0f, img_width, img_height, img_channels);
+    Image::decode(static_cast<const unsigned char*>(data), size, 4, pixels0f, img_width, img_height, img_channels);
     GX_LOG_D("Texture 2D Image imported with file size: " << size << ", width: " << img_width << " height: " << img_height << ", channels: " << img_channels);
     std::vector<std::uint8_t> pixels0;
     TextureInfo new_info = info;
@@ -408,22 +384,15 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(
     } else {
         new_info.set_format(TextureFormat::RgbaUint8);
         pixels0.resize(pixels0f.size());
-        core::sync::parallel_for_i(pixels0f, [&](const float p, const unsigned int index, unsigned int) {
-            pixels0[index] = p >= 1.0f ? 255 : p <= 0.0f ? 0
-                                                         : static_cast<std::uint8_t>(p * 255.0f + 0.501f);
-        });
+        core::sync::parallel_for_i(pixels0f, [&](const float p, const unsigned int index, unsigned int) { pixels0[index] = denormalise(p); });
     }
     new_info.set_type(Type::Texture2D);
     new_info.set_width(img_width);
     new_info.set_height(img_height);
-    create_2d_from_pixels_update_cache(std::move(name), { std::move(pixels0) }, new_info);
+    create_2d_from_pixels(std::move(name), { std::move(pixels0) }, new_info, std::move(c), false);
 }
 
-void gearoenix::render::texture::Manager::create_2d_from_file(
-    const platform::stream::Path& path,
-    const TextureInfo& info,
-    core::job::EndCallerShared<Texture2D>&& c,
-    const bool use_cache)
+void gearoenix::render::texture::Manager::create_2d_from_file(const platform::stream::Path& path, const TextureInfo& info, core::job::EndCallerShared<Texture2D>&& c, const bool use_cache)
 {
     if (use_cache && get_from_cache(path.get_raw_data(), c, &info)) {
         return;
@@ -438,16 +407,13 @@ void gearoenix::render::texture::Manager::create_2d_from_file(
     return create_2d_from_formatted(std::string(path.get_raw_data()), data.data(), static_cast<std::uint32_t>(data.size()), info, std::move(c), false);
 }
 
-void gearoenix::render::texture::Manager::create(
-    const platform::stream::Path& path, platform::stream::Stream& stream, const TextureInfo& info, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::create(const platform::stream::Path& path, platform::stream::Stream& stream, const TextureInfo& info, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
 {
     if (path.get_raw_data().ends_with(".gx-2d-texture") || path.get_raw_data().ends_with(".gx-cube-texture") || path.get_raw_data().ends_with(".gx-texture")) {
         return read_gx3d(stream, std::move(c), use_cache);
     }
     const auto data = stream.get_file_content();
-    core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) {
-        c.set_return(std::move(t));
-    });
+    core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) { c.set_return(std::move(t)); });
     if (path.get_raw_data().ends_with(".hdr")) {
         create_2df_from_formatted(std::string(path.get_raw_data()), data.data(), static_cast<std::uint32_t>(data.size()), info, std::move(end), use_cache);
         return;
@@ -455,18 +421,13 @@ void gearoenix::render::texture::Manager::create(
     return create_2d_from_formatted(std::string(path.get_raw_data()), data.data(), static_cast<std::uint32_t>(data.size()), info, std::move(end), use_cache);
 }
 
-void gearoenix::render::texture::Manager::create_cube_from_colour(
-    const math::Vec4<float>& colour, core::job::EndCallerShared<TextureCube>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::create_cube_from_colour(const math::Vec4<float>& colour, core::job::EndCallerShared<TextureCube>&& c, const bool use_cache)
 {
     std::vector<std::uint8_t> pixels0(4);
-    pixels0[0] = static_cast<std::uint8_t>(colour.x >= 1.0 ? 255.1 : colour.x <= 0.0 ? 0.1
-                                                                                     : colour.x * 255.0f + 0.51f);
-    pixels0[1] = static_cast<std::uint8_t>(colour.y >= 1.0 ? 255.1 : colour.y <= 0.0 ? 0.1
-                                                                                     : colour.y * 255.0f + 0.51f);
-    pixels0[2] = static_cast<std::uint8_t>(colour.z >= 1.0 ? 255.1 : colour.z <= 0.0 ? 0.1
-                                                                                     : colour.z * 255.0f + 0.51f);
-    pixels0[3] = static_cast<std::uint8_t>(colour.w >= 1.0 ? 255.1 : colour.w <= 0.0 ? 0.1
-                                                                                     : colour.w * 255.0f + 0.51f);
+    pixels0[0] = denormalise(colour.x);
+    pixels0[1] = denormalise(colour.y);
+    pixels0[2] = denormalise(colour.z);
+    pixels0[3] = denormalise(colour.w);
 
     auto name = std::format("colour [ {}, {}, {}, {} ]", pixels0[0], pixels0[1], pixels0[2], pixels0[3]);
 
@@ -480,7 +441,7 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
         TextureInfo()
             .set_format(TextureFormat::RgbaUint8)
             .set_sampler_info(
-                SamplerInfo()
+                SamplerInfo() // ---
                     .set_min_filter(Filter::Nearest)
                     .set_mag_filter(Filter::Nearest)
                     .set_wrap_s(Wrap::Repeat)
@@ -495,52 +456,49 @@ void gearoenix::render::texture::Manager::create_cube_from_colour(
 }
 
 void gearoenix::render::texture::Manager::create_cube_from_pixels(
-    std::string&& name,
-    std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
-    const TextureInfo& info,
-    core::job::EndCallerShared<TextureCube>&& c,
-    const bool use_cache)
+    std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const TextureInfo& info, core::job::EndCallerShared<TextureCube>&& c, const bool use_cache)
 {
     if (use_cache && get_from_cache(name, c, &info)) {
         return;
     }
 
-    core::job::EndCallerShared<TextureCube> end([this, n = name](std::shared_ptr<TextureCube>&& t) mutable {
+    core::job::EndCallerShared<TextureCube> end([this, n = name, c = std::move(c), use_cache](std::shared_ptr<TextureCube>&& t) mutable {
         textures_cube.set(n, t);
+        if (!use_cache) {
+            c.set_return(std::move(t));
+        }
     });
     create_cube_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
 }
 
-void gearoenix::render::texture::Manager::create_target(
-    std::string&& name, std::vector<Attachment>&& attachments, core::job::EndCallerShared<Target>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::create_target(std::string&& name, std::vector<Attachment>&& attachments, core::job::EndCallerShared<Target>&& c, const bool use_cache)
 {
 #if GX_DEBUG_MODE
 #define GX_DEBUG_TARGET_ATT , attachments
 #endif
 
     if (use_cache && targets.get(name, core::job::EndCallerShared<Target>([c GX_DEBUG_TARGET_ATT](std::shared_ptr<Target>&& t) {
-        if constexpr (GX_DEBUG_MODE) {
-            GX_ASSERT_D(attachments.size() == t->get_attachments().size());
-            for (std::size_t i = 0; i < attachments.size(); ++i) {
-                GX_ASSERT_D(attachments[i].shallow_equal(t->get_attachments()[i]));
+            if constexpr (GX_DEBUG_MODE) {
+                GX_ASSERT_D(attachments.size() == t->get_attachments().size());
+                for (std::size_t i = 0; i < attachments.size(); ++i) {
+                    GX_ASSERT_D(attachments[i].shallow_equal(t->get_attachments()[i]));
+                }
             }
-        }
-        c.set_return(std::move(t));
-    }))) {
+            c.set_return(std::move(t));
+        }))) {
         return;
     }
 
     core::job::EndCallerShared<Target> end_caller([this, n = name, c = std::move(c)](std::shared_ptr<Target>&& t) {
         targets.set(n, t);
-        if (!c.get_return()) {
+        if (!c.has_return()) {
             c.set_return(std::move(t));
         }
     });
     create_target_v(std::move(name), std::move(attachments), std::move(end_caller));
 }
 
-void gearoenix::render::texture::Manager::create_target(
-    std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCallerShared<Target>&& c, const bool use_cache)
+void gearoenix::render::texture::Manager::create_target(std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCallerShared<Target>&& c, const bool use_cache)
 {
     core::job::send_job_to_pool([this, s = std::move(stream), c = std::move(c), use_cache]() mutable {
         std::string n;
@@ -548,9 +506,11 @@ void gearoenix::render::texture::Manager::create_target(
         if (use_cache && targets.get(n, core::job::EndCallerShared(c))) {
             return;
         }
-        Attachment::read(std::move(s), core::job::EndCaller<std::vector<Attachment>>([this, n = std::move(n), e = std::move(c)](std::vector<Attachment>&& a) mutable {
-            create_target(std::move(n), std::move(a), std::move(e), false);
-        }));
+        Attachment::read(
+            std::move(s),
+            core::job::EndCaller<std::vector<Attachment>>([this, n = std::move(n), c = std::move(c)](std::vector<Attachment>&& a) mutable {
+                create_target(std::move(n), std::move(a), std::move(c), false);
+            }));
     });
 }
 
@@ -598,15 +558,9 @@ std::vector<gearoenix::math::Vec4<std::uint8_t>> gearoenix::render::texture::Man
     const auto inv_res = 1.0f / static_cast<float>(resolution);
     core::sync::parallel_for_i(pixels, [&](auto& pixel, const std::uint32_t index, auto) {
         const auto roughness_index = (resolution - 1) - index / resolution;
-        auto p = integrate_brdf(
-            (static_cast<float>(index % resolution) + 0.5f) * inv_res,
-            (static_cast<float>(roughness_index) + 0.5f) * inv_res);
-        p *= 255.0f;
-        p += 0.5f;
-        pixel.x = p.x >= 255.0f ? 255 : p.x <= 0.0f ? 0
-                                                    : static_cast<std::uint8_t>(p.x);
-        pixel.y = p.y >= 255.0f ? 255 : p.y <= 0.0f ? 0
-                                                    : static_cast<std::uint8_t>(p.y);
+        const auto p = integrate_brdf((static_cast<float>(index % resolution) + 0.5f) * inv_res, (static_cast<float>(roughness_index) + 0.5f) * inv_res);
+        pixel.x = denormalise(p.x);
+        pixel.y = denormalise(p.y);
         pixel.z = 0;
         pixel.w = 255;
     });
@@ -630,8 +584,7 @@ gearoenix::math::Vec2<std::uint32_t> gearoenix::render::texture::Manager::get_de
     }
 }
 
-void gearoenix::render::texture::Manager::create_default_camera_render_target(
-    const std::string& camera_name, core::job::EndCaller<DefaultCameraTargets>&& callback, const bool use_cache)
+void gearoenix::render::texture::Manager::create_default_camera_render_target(const std::string& camera_name, core::job::EndCaller<DefaultCameraTargets>&& callback, const bool use_cache)
 {
     static std::atomic unique_id = 0;
     // This allows having multiple initialisations.
@@ -681,31 +634,23 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
 
             const auto target_name = camera_name + "-render-target-uid:" + unique_id_str;
 
-            manager->create_target(
-                target_name + "-main",
+            manager->create_target(target_name + "-main",
                 std::vector {
                     Attachment { Attachment2D { std::shared_ptr(colours[0]) } },
                     Attachment { Attachment2D { std::move(depth) } },
                 },
-                core::job::EndCallerShared<Target>([target_gatherer](std::shared_ptr<Target>&& t) {
-                    target_gatherer->targets.main = std::move(t);
-                }),
-                use_cache);
+                core::job::EndCallerShared<Target>([target_gatherer](std::shared_ptr<Target>&& t) { target_gatherer->targets.main = std::move(t); }), use_cache);
 
             for (std::uint32_t target_index = 0; target_index < target_gatherer->targets.targets.size(); ++target_index) {
                 const auto target_target_name = target_name + "-index:" + std::to_string(target_index) + "-mip:";
                 for (std::uint32_t mip_index = 0; mip_index < target_gatherer->targets.targets[0].size(); ++mip_index) {
                     manager->create_target(
                         target_target_name + std::to_string(mip_index),
-                        std::vector {
-                            Attachment {
-                                Attachment2D { std::shared_ptr(colours[target_index]) },
-                                static_cast<decltype(Attachment::mipmap_level)>(mip_index) } },
-                        core::job::EndCallerShared<Target>(
-                            [target_gatherer, mip_index, target_index](std::shared_ptr<Target>&& t) {
-                                target_gatherer->targets.targets[target_index][mip_index] = std::move(t);
-                            }),
-                            use_cache);
+                        std::vector { Attachment { Attachment2D { std::shared_ptr(colours[target_index]) }, static_cast<decltype(Attachment::mipmap_level)>(mip_index) } },
+                        core::job::EndCallerShared<Target>([target_gatherer, mip_index, target_index](std::shared_ptr<Target>&& t) {
+                            target_gatherer->targets.targets[target_index][mip_index] = std::move(t);
+                        }),
+                        use_cache);
                 }
             }
         }
@@ -715,18 +660,20 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
 
     const auto dim = get_default_camera_render_target_dimensions();
 
-    const auto txt_info = TextureInfo()
-                              .set_format(TextureFormat::RgbaFloat16)
-                              .set_sampler_info(SamplerInfo()
-                                      .set_min_filter(Filter::LinearMipmapLinear)
-                                      .set_mag_filter(Filter::Linear)
-                                      .set_wrap_s(Wrap::ClampToEdge)
-                                      .set_wrap_t(Wrap::ClampToEdge)
-                                      .set_wrap_r(Wrap::ClampToEdge))
-                              .set_width(dim.x)
-                              .set_height(dim.y)
-                              .set_type(Type::Texture2D)
-                              .set_has_mipmap(true);
+    const auto txt_info = // ---
+        TextureInfo()
+            .set_format(TextureFormat::RgbaFloat16)
+            .set_sampler_info(
+                SamplerInfo() // ---
+                    .set_min_filter(Filter::LinearMipmapLinear)
+                    .set_mag_filter(Filter::Linear)
+                    .set_wrap_s(Wrap::ClampToEdge)
+                    .set_wrap_t(Wrap::ClampToEdge)
+                    .set_wrap_r(Wrap::ClampToEdge))
+            .set_width(dim.x)
+            .set_height(dim.y)
+            .set_type(Type::Texture2D)
+            .set_has_mipmap(true);
 
     create_2d_from_pixels(
         std::move(first_colour_name), {}, txt_info,
@@ -742,15 +689,13 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(
 
     auto depth_info = txt_info;
     depth_info.set_format(TextureFormat::D32);
-    depth_info.set_sampler_info(
-        SamplerInfo(depth_info.get_sampler_info())
-            .set_min_filter(Filter::Nearest)
-            .set_mag_filter(Filter::Nearest));
+    depth_info.set_sampler_info(SamplerInfo(depth_info.get_sampler_info()).set_min_filter(Filter::Nearest).set_mag_filter(Filter::Nearest));
     depth_info.set_has_mipmap(false);
 
     create_2d_from_pixels(
         std::move(depth_name), {}, depth_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer = std::move(texture_gatherer)](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->depth = std::move(t);
-        }), use_cache);
+        }),
+        use_cache);
 }

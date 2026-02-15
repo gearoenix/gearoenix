@@ -41,16 +41,8 @@ struct Bindless final : core::Singleton<Bindless> {
     void write_sampler_descriptor(std::uint32_t index, VkSampler sampler) const;
 
 public:
-    Bindless(
-        const buffer::Buffer& scenes_buffer,
-        const buffer::Buffer& cameras_buffer,
-        const buffer::Buffer& models_buffer,
-        const buffer::Buffer& materials_buffer,
-        const buffer::Buffer& point_lights_buffer,
-        const buffer::Buffer& directional_lights_buffer,
-        const buffer::Buffer& shadow_caster_directional_lights_buffer,
-        const buffer::Buffer& bones_buffer,
-        const buffer::Buffer& reflection_probes_buffer,
+    Bindless(const buffer::Buffer& scenes_buffer, const buffer::Buffer& cameras_buffer, const buffer::Buffer& models_buffer, const buffer::Buffer& materials_buffer, const buffer::Buffer& point_lights_buffer,
+        const buffer::Buffer& directional_lights_buffer, const buffer::Buffer& shadow_caster_directional_lights_buffer, const buffer::Buffer& bones_buffer, const buffer::Buffer& reflection_probes_buffer,
         const buffer::Buffer& cameras_joint_models_buffer);
     ~Bindless() override;
 

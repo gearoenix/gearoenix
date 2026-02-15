@@ -13,9 +13,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     base.initialize_engine(*this);
 }
 
-gearoenix::platform::Application::~Application()
-{
-}
+gearoenix::platform::Application::~Application() { }
 
 void gearoenix::platform::Application::run(core::Application* const core_app)
 {
@@ -23,9 +21,6 @@ void gearoenix::platform::Application::run(core::Application* const core_app)
     [NSApp run];
 }
 
-void gearoenix::platform::Application::update()
-{
-    base.update();
-}
+void gearoenix::platform::Application::update() { base.update(); }
 
 #endif

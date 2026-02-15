@@ -22,10 +22,7 @@ namespace {
 bool sdl_initialized = false;
 
 #if GX_PLATFORM_WEBASSEMBLY
-static void gearoenix_platform_application_loop(void* const arg)
-{
-    reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
-}
+static void gearoenix_platform_application_loop(void* const arg) { reinterpret_cast<gearoenix::platform::Application*>(arg)->loop(); }
 #endif
 }
 
@@ -271,10 +268,7 @@ void gearoenix::platform::Application::loop()
     base.update();
 }
 
-void gearoenix::platform::Application::set_caption(const std::string& s)
-{
-    SDL_SetWindowTitle(window, s.c_str());
-}
+void gearoenix::platform::Application::set_caption(const std::string& s) { SDL_SetWindowTitle(window, s.c_str()); }
 
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
@@ -330,10 +324,7 @@ void gearoenix::platform::Application::set_clipboard(const char* const clipboard
     GX_LOG_E("Failed to set clipboard: " << SDL_GetError());
 }
 
-bool gearoenix::platform::Application::open_url(const char* const url)
-{
-    return SDL_OpenURL(url);
-}
+bool gearoenix::platform::Application::open_url(const char* const url) { return SDL_OpenURL(url); }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const

@@ -76,20 +76,11 @@ struct Vec4 final {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
     }
 
-    [[nodiscard]] constexpr Vec2<Element> xy() const
-    {
-        return { x, y };
-    }
+    [[nodiscard]] constexpr Vec2<Element> xy() const { return { x, y }; }
 
-    [[nodiscard]] constexpr Vec2<Element> zw() const
-    {
-        return { z, w };
-    }
+    [[nodiscard]] constexpr Vec2<Element> zw() const { return { z, w }; }
 
-    [[nodiscard]] constexpr Vec3<Element> xyz() const
-    {
-        return Vec3<Element>(x, y, z);
-    }
+    [[nodiscard]] constexpr Vec3<Element> xyz() const { return Vec3<Element>(x, y, z); }
 
     constexpr void xyz(const Vec3<Element>& v)
     {
@@ -112,40 +103,19 @@ struct Vec4 final {
         return reinterpret_cast<Element*>(this)[i];
     }
 
-    [[nodiscard]] constexpr bool operator<(const Vec4& o) const
-    {
-        return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x < o.x)))));
-    }
+    [[nodiscard]] constexpr bool operator<(const Vec4& o) const { return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x < o.x))))); }
 
-    [[nodiscard]] constexpr bool operator<=(const Vec4& o) const
-    {
-        return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x <= o.x)))));
-    }
+    [[nodiscard]] constexpr bool operator<=(const Vec4& o) const { return w < o.w || (w == o.w && (z < o.z || (z == o.z && (y < o.y || (y == o.y && x <= o.x))))); }
 
-    [[nodiscard]] constexpr bool operator>(const Vec4& o) const
-    {
-        return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x > o.x)))));
-    }
+    [[nodiscard]] constexpr bool operator>(const Vec4& o) const { return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x > o.x))))); }
 
-    [[nodiscard]] constexpr bool operator>=(const Vec4& o) const
-    {
-        return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x >= o.x)))));
-    }
+    [[nodiscard]] constexpr bool operator>=(const Vec4& o) const { return w > o.w || (w == o.w && (z > o.z || (z == o.z && (y > o.y || (y == o.y && x >= o.x))))); }
 
-    [[nodiscard]] constexpr bool operator==(const Vec4& o) const
-    {
-        return w == o.w && z == o.z && y == o.y && x == o.x;
-    }
+    [[nodiscard]] constexpr bool operator==(const Vec4& o) const { return w == o.w && z == o.z && y == o.y && x == o.x; }
 
-    [[nodiscard]] constexpr Vec4 operator+(const Element o) const
-    {
-        return { x + o, y + o, z + o, w + o };
-    }
+    [[nodiscard]] constexpr Vec4 operator+(const Element o) const { return { x + o, y + o, z + o, w + o }; }
 
-    [[nodiscard]] constexpr Vec4 operator+(const Vec4& o) const
-    {
-        return { x + o.x, y + o.y, z + o.z, w + o.w };
-    }
+    [[nodiscard]] constexpr Vec4 operator+(const Vec4& o) const { return { x + o.x, y + o.y, z + o.z, w + o.w }; }
 
     constexpr Vec4& operator+=(const Vec4& o)
     {
@@ -156,15 +126,9 @@ struct Vec4 final {
         return *this;
     }
 
-    [[nodiscard]] constexpr Vec4 operator*(const Element o) const
-    {
-        return { x * o, y * o, z * o, w * o };
-    }
+    [[nodiscard]] constexpr Vec4 operator*(const Element o) const { return { x * o, y * o, z * o, w * o }; }
 
-    [[nodiscard]] constexpr Vec4 operator*(const Vec4& o) const
-    {
-        return { x * o.x, y * o.y, z * o.z, w * o.w };
-    }
+    [[nodiscard]] constexpr Vec4 operator*(const Vec4& o) const { return { x * o.x, y * o.y, z * o.z, w * o.w }; }
 
     [[nodiscard]] constexpr Vec4 operator/(const Element o) const
     {
@@ -197,40 +161,19 @@ struct Vec4 final {
         }
     }
 
-    [[nodiscard]] constexpr Vec4 operator-(const Vec4& o) const
-    {
-        return { x - o.x, y - o.y, z - o.z, w - o.w };
-    }
+    [[nodiscard]] constexpr Vec4 operator-(const Vec4& o) const { return { x - o.x, y - o.y, z - o.z, w - o.w }; }
 
-    [[nodiscard]] constexpr Element length() const
-    {
-        return static_cast<Element>(std::sqrt(square_length()));
-    }
+    [[nodiscard]] constexpr Element length() const { return static_cast<Element>(std::sqrt(square_length())); }
 
-    [[nodiscard]] constexpr Element square_length() const
-    {
-        return dot(*this);
-    }
+    [[nodiscard]] constexpr Element square_length() const { return dot(*this); }
 
-    [[nodiscard]] constexpr Element dot(const Vec4& o) const
-    {
-        return x * o.x + y * o.y + z * o.z + w * o.w;
-    }
+    [[nodiscard]] constexpr Element dot(const Vec4& o) const { return x * o.x + y * o.y + z * o.z + w * o.w; }
 
-    [[nodiscard]] constexpr Vec4 cross(const Vec4& o) const
-    {
-        return { (y * o.z) - (z * o.y), (z * o.x) - (x * o.z), (x * o.y) - (y * o.x), w * o.w };
-    }
+    [[nodiscard]] constexpr Vec4 cross(const Vec4& o) const { return { (y * o.z) - (z * o.y), (z * o.x) - (x * o.z), (x * o.y) - (y * o.x), w * o.w }; }
 
-    [[nodiscard]] constexpr Vec4 normalized() const
-    {
-        return *this / length();
-    }
+    [[nodiscard]] constexpr Vec4 normalized() const { return *this / length(); }
 
-    constexpr void normalize() const
-    {
-        *this /= length();
-    }
+    constexpr void normalize() const { *this /= length(); }
 
     void write(platform::stream::Stream& s) const
     {
@@ -248,15 +191,9 @@ struct Vec4 final {
         w = s.read<Element>();
     }
 
-    [[nodiscard]] constexpr const Element* data() const
-    {
-        return reinterpret_cast<const Element*>(this);
-    }
+    [[nodiscard]] constexpr const Element* data() const { return reinterpret_cast<const Element*>(this); }
 
-    [[nodiscard]] constexpr Element* data()
-    {
-        return reinterpret_cast<Element*>(this);
-    }
+    [[nodiscard]] constexpr Element* data() { return reinterpret_cast<Element*>(this); }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec4& v)
     {

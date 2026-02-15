@@ -42,7 +42,4 @@ void gearoenix::render::scene::Scene::write(std::shared_ptr<platform::stream::St
 
 gearoenix::render::scene::Scene::~Scene() = default;
 
-void gearoenix::render::scene::Scene::update()
-{
-    record.update(entity);
-}
+void gearoenix::render::scene::Scene::update() { record.update(entity); }

@@ -53,23 +53,13 @@ public:
     }
 
     template <typename Tuple, std::uint32_t... I>
-    constexpr static void tuple_check(std::index_sequence<I...> const&)
-    {
-        ((check<std::tuple_element_t<I, Tuple>>()), ...);
-    }
+    constexpr static void tuple_check(std::index_sequence<I...> const&) { ((check<std::tuple_element_t<I, Tuple>>()), ...); }
 
     template <typename Condition>
-    constexpr static void condition_check()
-    {
-        tuple_check<typename ConditionTypesPack<Condition>::types>(
-            std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>());
-    }
+    constexpr static void condition_check() { tuple_check<typename ConditionTypesPack<Condition>::types>(std::make_index_sequence<std::tuple_size_v<typename ConditionTypesPack<Condition>::types>>()); }
 
     template <typename T>
-    [[nodiscard]] constexpr static object_type_index_t create_index()
-    {
-        return T::object_type_index;
-    }
+    [[nodiscard]] constexpr static object_type_index_t create_index() { return T::object_type_index; }
 
     template <typename T>
     [[nodiscard]] constexpr static object_type_index_t create_index(const T* const)

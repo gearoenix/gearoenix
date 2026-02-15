@@ -23,12 +23,8 @@ public:
     Pipeline& operator=(const Pipeline&) = delete;
     ~Pipeline();
     [[nodiscard]] static std::shared_ptr<Pipeline> construct_ray_tracing(
-        std::shared_ptr<Layout>&& layout,
-        std::shared_ptr<Cache>&& cache,
-        const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info,
-        const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info);
-    [[nodiscard]] static std::shared_ptr<Pipeline> construct_graphics(
-        std::shared_ptr<Cache>&& cache, const VkGraphicsPipelineCreateInfo& create_info);
+        std::shared_ptr<Layout>&& layout, std::shared_ptr<Cache>&& cache, const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info, const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info);
+    [[nodiscard]] static std::shared_ptr<Pipeline> construct_graphics(std::shared_ptr<Cache>&& cache, const VkGraphicsPipelineCreateInfo& create_info);
 };
 }
 #endif

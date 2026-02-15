@@ -23,19 +23,10 @@ void gearoenix::vulkan::camera::Manager::build(std::string&& name, core::ecs::En
     build_impl(std::move(name), parent, entity_callback);
     auto* const entity = entity_callback.get_return().get();
     auto transform = entity->get_component_shared_ptr<physics::Transformation>();
-    Camera::construct(
-        entity,
-        entity->get_object_name() + "-vk-camera",
-        core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) {
-            end.get_return()->add_component(std::move(c));
-        }),
-        std::move(transform));
+    Camera::construct(entity, entity->get_object_name() + "-vk-camera", core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) { end.get_return()->add_component(std::move(c)); }), std::move(transform));
 }
 
-void gearoenix::vulkan::camera::Manager::window_resized()
-{
-    render::camera::Manager::window_resized();
-}
+void gearoenix::vulkan::camera::Manager::window_resized() { render::camera::Manager::window_resized(); }
 void gearoenix::vulkan::camera::Manager::update()
 {
     camera_uniform_indexer.reset();

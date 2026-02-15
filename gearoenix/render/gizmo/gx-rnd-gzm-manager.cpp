@@ -123,12 +123,7 @@ void gearoenix::render::gizmo::Manager::set_viewport_camera(camera::Camera* cons
 bool gearoenix::render::gizmo::Manager::show_transform(math::Mat4x4<double>& inout) const
 {
     math::Mat4x4<float> m(inout);
-    if (!Manipulate(
-            current_view_matrix.data(),
-            current_projection_matrix.data(),
-            static_cast<ImGuizmo::OPERATION>(operation_handles),
-            static_cast<ImGuizmo::MODE>(transform_mode),
-            m.data())) {
+    if (!Manipulate(current_view_matrix.data(), current_projection_matrix.data(), static_cast<ImGuizmo::OPERATION>(operation_handles), static_cast<ImGuizmo::MODE>(transform_mode), m.data())) {
         return false;
     }
     inout = math::Mat4x4<double>(m);
@@ -155,37 +150,19 @@ bool gearoenix::render::gizmo::Manager::show(math::Aabb3<double>& box)
     auto* const dl = ImGui::GetWindowDrawList();
     const auto box_center = math::Vec3<float>(box.get_center());
     const auto box_radius = math::Vec3<float>(box.get_diameter()) * 0.5f;
-    constexpr std::array<math::Vec3<float>, 6> unit_directions { { { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, -1.0f },
-        { 1.0f, 0.0f, 0.0f },
-        { -1.0f, 0.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, -1.0f, 0.0f } } };
+    constexpr std::array<math::Vec3<float>, 6> unit_directions { { { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } } };
     std::array<bool, 6> backs {};
     for (auto i = 0; i < unit_directions.size(); ++i) {
         const auto& direction = unit_directions[i];
         const auto dir = (box_center + (direction * box_radius)) - current_camera_position;
         backs[i] = dir.dot(direction) > 0;
     }
-    const std::array<std::tuple<int, int, bool>, 12> index_pair_normals { { { 0, 1, backs[0] && backs[4] },
-        { 1, 3, backs[0] && backs[3] },
-        { 3, 2, backs[0] && backs[5] },
-        { 2, 0, backs[0] && backs[2] },
-        { 0, 4, backs[2] && backs[4] },
-        { 1, 5, backs[3] && backs[4] },
-        { 2, 6, backs[2] && backs[5] },
-        { 3, 7, backs[3] && backs[5] },
-        { 4, 5, backs[1] && backs[4] },
-        { 5, 7, backs[1] && backs[3] },
-        { 7, 6, backs[1] && backs[5] },
-        { 6, 4, backs[1] && backs[2] } } };
+    const std::array<std::tuple<int, int, bool>, 12> index_pair_normals { { { 0, 1, backs[0] && backs[4] }, { 1, 3, backs[0] && backs[3] }, { 3, 2, backs[0] && backs[5] }, { 2, 0, backs[0] && backs[2] }, { 0, 4, backs[2] && backs[4] },
+        { 1, 5, backs[3] && backs[4] }, { 2, 6, backs[2] && backs[5] }, { 3, 7, backs[3] && backs[5] }, { 4, 5, backs[1] && backs[4] }, { 5, 7, backs[1] && backs[3] }, { 7, 6, backs[1] && backs[5] }, { 6, 4, backs[1] && backs[2] } } };
     for (const auto& [fi, si, back] : index_pair_normals) {
         const auto& fp = display_points[fi];
         const auto& sp = display_points[si];
-        dl->AddLine(
-            reinterpret_cast<const ImVec2&>(fp), reinterpret_cast<const ImVec2&>(sp),
-            back ? IM_COL32(200, 200, 100, 128) : IM_COL32(250, 250, 140, 128),
-            back ? 1.0f : 3.5f);
+        dl->AddLine(reinterpret_cast<const ImVec2&>(fp), reinterpret_cast<const ImVec2&>(sp), back ? IM_COL32(200, 200, 100, 128) : IM_COL32(250, 250, 140, 128), back ? 1.0f : 3.5f);
     }
     auto hash = boost::hash_value(__FUNCTION__);
     boost::hash_combine(hash, boost::hash_value(reinterpret_cast<std::uintptr_t>(&box)));
@@ -202,63 +179,29 @@ bool gearoenix::render::gizmo::Manager::show(math::Aabb3<double>& box)
     return result;
 }
 
-bool gearoenix::render::gizmo::Manager::is_processing_inputs() const
-{
-    return ImGuizmo::IsUsingAny();
-}
+bool gearoenix::render::gizmo::Manager::is_processing_inputs() const { return ImGuizmo::IsUsingAny(); }
 
-void gearoenix::render::gizmo::Manager::register_drawer(Drawer* const d)
-{
-    drawers.emplace(d);
-}
+void gearoenix::render::gizmo::Manager::register_drawer(Drawer* const d) { drawers.emplace(d); }
 
-void gearoenix::render::gizmo::Manager::remove_drawer(Drawer* const d)
-{
-    drawers.erase(d);
-}
+void gearoenix::render::gizmo::Manager::remove_drawer(Drawer* const d) { drawers.erase(d); }
 
-void gearoenix::render::gizmo::Manager::enable_translation_handle()
-{
-    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE);
-}
+void gearoenix::render::gizmo::Manager::enable_translation_handle() { operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE); }
 
-void gearoenix::render::gizmo::Manager::disable_translation_handle()
-{
-    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE);
-}
+void gearoenix::render::gizmo::Manager::disable_translation_handle() { operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::TRANSLATE); }
 
-void gearoenix::render::gizmo::Manager::enable_rotation_handle()
-{
-    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE);
-}
+void gearoenix::render::gizmo::Manager::enable_rotation_handle() { operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE); }
 
-void gearoenix::render::gizmo::Manager::disable_rotation_handle()
-{
-    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE);
-}
+void gearoenix::render::gizmo::Manager::disable_rotation_handle() { operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::ROTATE); }
 
-void gearoenix::render::gizmo::Manager::enable_scale_handle()
-{
-    operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE);
-}
+void gearoenix::render::gizmo::Manager::enable_scale_handle() { operation_handles |= static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE); }
 
-void gearoenix::render::gizmo::Manager::disable_scale_handle()
-{
-    operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE);
-}
+void gearoenix::render::gizmo::Manager::disable_scale_handle() { operation_handles &= ~static_cast<decltype(operation_handles)>(ImGuizmo::OPERATION::SCALE); }
 
-void gearoenix::render::gizmo::Manager::enable_local_transform_mode()
-{
-    transform_mode = ImGuizmo::MODE::LOCAL;
-}
+void gearoenix::render::gizmo::Manager::enable_local_transform_mode() { transform_mode = ImGuizmo::MODE::LOCAL; }
 
-void gearoenix::render::gizmo::Manager::disable_local_transform_mode()
-{
-    transform_mode = ImGuizmo::MODE::WORLD;
-}
+void gearoenix::render::gizmo::Manager::disable_local_transform_mode() { transform_mode = ImGuizmo::MODE::WORLD; }
 
-bool gearoenix::render::gizmo::Manager::draw_translate_handle(
-    math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id)
+bool gearoenix::render::gizmo::Manager::draw_translate_handle(math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id)
 {
     constexpr auto radius = 5.0f;
     constexpr auto colour = IM_COL32(250, 140, 140, 128);
@@ -276,9 +219,7 @@ bool gearoenix::render::gizmo::Manager::draw_translate_handle(
     if (pointer_id == active_handle) {
         math::Mat4x4<float> m;
         m.set_position(math::Vec3<float>(point));
-        if (Manipulate(
-                current_view_matrix.data(), current_projection_matrix.data(),
-                ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, m.data())) {
+        if (Manipulate(current_view_matrix.data(), current_projection_matrix.data(), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, m.data())) {
             point = math::Vec3<double>(m.get_position());
             return true;
         }

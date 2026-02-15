@@ -191,12 +191,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
                 blit.dstSubresource.baseArrayLayer = 0;
                 blit.dstSubresource.layerCount = 1;
 
-                vkCmdBlitImage(
-                    vk_cmd,
-                    vk_src_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    1, &blit,
-                    VK_FILTER_LINEAR);
+                vkCmdBlitImage(vk_cmd, vk_src_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
 
                 // Transition the source image back to COLOR_ATTACHMENT_OPTIMAL for the next frame's rendering.
                 src_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
@@ -221,8 +216,5 @@ void gearoenix::vulkan::scene::Manager::render_shadows(const VkCommandBuffer vk_
     }
 }
 
-void gearoenix::vulkan::scene::Manager::upload_uniforms()
-{
-    uniform_indexer.update();
-}
+void gearoenix::vulkan::scene::Manager::upload_uniforms() { uniform_indexer.update(); }
 #endif
