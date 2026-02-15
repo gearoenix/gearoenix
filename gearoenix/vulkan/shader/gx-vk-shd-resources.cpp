@@ -17,7 +17,7 @@ gearoenix::vulkan::shader::Resources::Resources(pipeline::Pipeline* pip, buffer:
         VkDescriptorBufferInfo inf;
         GX_SET_ZERO(inf);
         inf.buffer = u->get_gpu()->get_vulkan_data();
-        inf.offset = u->get_gpu()->get_allocated_memory()->get_allocator()->get_offset();
+        inf.offset = u->get_gpu()->get_offset();
         inf.range = u->get_gpu()->get_allocated_memory()->get_allocator()->get_size();
         // descriptors[i] = new descriptor::Set(pipeline::Manager::get().get_descriptor_pool(), pip->get_descriptor_set_layout(), inf);
     }

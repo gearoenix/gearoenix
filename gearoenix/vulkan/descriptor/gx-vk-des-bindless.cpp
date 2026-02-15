@@ -238,7 +238,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(const buffer::Buffer& scenes_b
         const auto& buff = *buffers[i];
         const auto& allocator = *buff.get_allocated_memory()->get_allocator();
         buffer_infos[i].buffer = buff.get_vulkan_data();
-        buffer_infos[i].offset = static_cast<VkDeviceSize>(allocator.get_offset());
+        buffer_infos[i].offset = static_cast<VkDeviceSize>(buff.get_offset());
         buffer_infos[i].range = static_cast<VkDeviceSize>(allocator.get_size());
 
         writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

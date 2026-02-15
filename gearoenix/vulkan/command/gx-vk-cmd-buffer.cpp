@@ -70,8 +70,8 @@ void gearoenix::vulkan::command::Buffer::copy(const buffer::Buffer& src, const b
     const auto& src_alc = *src.get_allocated_memory()->get_allocator();
     const auto& dst_alc = *dst.get_allocated_memory()->get_allocator();
     info.size = std::min(src_alc.get_size(), dst_alc.get_size());
-    info.srcOffset = src_alc.get_offset();
-    info.dstOffset = dst_alc.get_offset();
+    info.srcOffset = src.get_offset();
+    info.dstOffset = dst.get_offset();
     vkCmdCopyBuffer(vulkan_data, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &info);
 }
 
@@ -82,7 +82,7 @@ void gearoenix::vulkan::command::Buffer::barrier(buffer::Buffer& buff, std::pair
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     info.buffer = buff.get_vulkan_data();
-    info.offset = alc.get_offset();
+    info.offset = buff.get_offset();
     info.size = alc.get_size();
     info.srcAccessMask = src_state.first;
     info.dstAccessMask = des_state.first;
