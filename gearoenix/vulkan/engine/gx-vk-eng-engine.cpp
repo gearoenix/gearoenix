@@ -26,9 +26,9 @@
 #include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../sampler/gx-vk-smp-manager.hpp"
 #include "../scene/gx-vk-scn-manager.hpp"
+#include "../skybox/gx-vk-sky-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
-#include "../skybox/gx-vk-sky-manager.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "gx-vk-eng-frame.hpp"
 

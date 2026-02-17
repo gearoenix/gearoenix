@@ -8,8 +8,8 @@
 #include "../model/gx-vk-mdl-model.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
-#include "../texture/gx-vk-txt-target.hpp"
 #include "../skybox/gx-vk-sky-skybox.hpp"
+#include "../texture/gx-vk-txt-target.hpp"
 
 #include <ranges>
 

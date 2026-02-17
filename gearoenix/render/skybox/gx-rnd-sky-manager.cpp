@@ -31,9 +31,9 @@ void gearoenix::render::skybox::Manager::build(std::string&& name, core::ecs::En
                     texture::Wrap::ClampToEdge,
                     texture::Wrap::ClampToEdge,
                     texture::Wrap::ClampToEdge),
-                    0, 0, 1,
-                    texture::Type::Unknown,
-                    false),
+                0, 0, 1,
+                texture::Type::Unknown,
+                false),
             core::job::EndCallerShared<texture::Texture2D>([this, end = std::move(entity_callback), n = name, parent](std::shared_ptr<texture::Texture2D>&& t) mutable -> void { build(std::move(n), parent, std::move(t), std::move(end)); }));
         return;
     }
