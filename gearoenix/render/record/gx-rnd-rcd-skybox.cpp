@@ -13,7 +13,7 @@ void gearoenix::render::record::Skyboxes::update(core::ecs::Entity* const scene_
             Data {
                 .entity = entity,
                 .skybox = skybox,
-                .equirectangular = skybox->is_equirectangular(),
+                .equirectangular = skybox->is_equirectangular,
             });
     });
 }

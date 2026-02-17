@@ -3,6 +3,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
+#include "../../render/record/gx-rnd-rcd-skybox.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-cmr-target.hpp"
 
@@ -59,8 +60,8 @@ public:
     static void construct(core::ecs::Entity* entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
     ~Camera() override;
     void render_shadow(const render::record::Camera&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
-    void render_forward(const render::record::Camera&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
-    void render_forward_skyboxes(const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_forward(const render::record::Camera&, const render::record::Skyboxes&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
+    void render_forward_skyboxes(const render::record::Skyboxes&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
     void render_bloom(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
     void render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
     void after_record(std::uint64_t frame_number, const render::record::Camera& rc);

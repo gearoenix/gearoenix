@@ -107,7 +107,7 @@ void main() {
     float f90 = clamp(dot(f0, vec3(50.0 * 0.33)), 0.0001, 1.0);
 
     // View direction (from surface to camera)
-    vec3 eye = normalize(in_pos - camera.position_reserved.xyz);
+    vec3 eye = normalize(in_pos - camera.position_far.xyz);
     vec3 view = -eye;
     vec3 reflection = reflect(eye, nrm);
 

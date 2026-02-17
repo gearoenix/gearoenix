@@ -45,6 +45,10 @@ struct Manager final : core::Singleton<Manager> {
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_forward_pipeline);
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_skinned_forward_pipeline);
 
+    std::shared_ptr<shader::Module> skybox_equirectangular_vert_sm;
+    std::shared_ptr<shader::Module> skybox_equirectangular_frag_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skybox_equirectangular_pipeline);
+
     std::shared_ptr<shader::Module> shadow_caster_vert_sm;
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow_pipeline);
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skinned_shadow_pipeline);

@@ -17,6 +17,7 @@ struct Buffer;
 struct Mesh;
 struct Manager : core::Singleton<Manager> {
 protected:
+    // TODO: it must use the new structure for caching logic
     std::mutex buffers_lock;
     std::map<std::string, std::weak_ptr<Buffer>> buffers;
 

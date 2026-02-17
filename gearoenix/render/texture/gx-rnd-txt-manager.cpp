@@ -302,7 +302,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
 #endif
 
     return textures_2d.get(name, core::job::EndCallerShared<Texture2D>([c GX_DEBUG_TXT_INFO](std::shared_ptr<Texture2D>&& t) {
-        GX_ASSERT_D(!info.has_value() || *info == t->get_info());
+        GX_ASSERT_D(!info.has_value() || info->get_type() == Type::Unknown || *info == t->get_info());
         GX_ASSERT_D(Type::Texture2D == t->get_info().get_type());
         c.set_return(std::move(t));
     }));

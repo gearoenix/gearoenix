@@ -28,6 +28,7 @@
 #include "../scene/gx-vk-scn-manager.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
+#include "../skybox/gx-vk-sky-manager.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "gx-vk-eng-frame.hpp"
 
@@ -65,6 +66,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_light_manager(new light::Manager())
     , vk_camera_manager(new camera::Manager())
     , vk_scene_manager(new scene::Manager())
+    , vk_skybox_manager(new skybox::Manager())
     , vk_reflection_manager(new reflection::Manager())
 {
     frames_count = frames_in_flight;
@@ -77,6 +79,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     light_manager = std::unique_ptr<light::Manager>(vk_light_manager);
     scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
     reflection_manager = std::unique_ptr<reflection::Manager>(vk_reflection_manager);
+    skybox_manager = std::unique_ptr<skybox::Manager>(vk_skybox_manager);
 
     bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
         vk_scene_manager->get_uniform_indexer().get_gpu_buffer(),
@@ -99,6 +102,7 @@ gearoenix::vulkan::engine::Engine::~Engine()
     core::job::execute_current_thread_jobs();
     logical_device->wait_to_finish();
     world = nullptr;
+    skybox_manager = nullptr;
     sampler_manager = nullptr;
     buffer_manager = nullptr;
     render_queue = nullptr;

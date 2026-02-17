@@ -24,7 +24,16 @@ void gearoenix::render::skybox::Manager::build(std::string&& name, core::ecs::En
     if (texture_path.get_raw_data().ends_with(".hdr") || texture_path.get_raw_data().ends_with(".png")) {
         texture::Manager::get().create_2d_from_file(texture_path,
             texture::TextureInfo(
-                texture::TextureFormat::Unknown, texture::SamplerInfo(texture::Filter::Linear, texture::Filter::Linear, texture::Wrap::ClampToEdge, texture::Wrap::ClampToEdge, texture::Wrap::ClampToEdge), 0, 0, 0, texture::Type::Unknown, false),
+                texture::TextureFormat::Unknown,
+                texture::SamplerInfo(
+                    texture::Filter::Linear,
+                    texture::Filter::Linear,
+                    texture::Wrap::ClampToEdge,
+                    texture::Wrap::ClampToEdge,
+                    texture::Wrap::ClampToEdge),
+                    0, 0, 1,
+                    texture::Type::Unknown,
+                    false),
             core::job::EndCallerShared<texture::Texture2D>([this, end = std::move(entity_callback), n = name, parent](std::shared_ptr<texture::Texture2D>&& t) mutable -> void { build(std::move(n), parent, std::move(t), std::move(end)); }));
         return;
     }

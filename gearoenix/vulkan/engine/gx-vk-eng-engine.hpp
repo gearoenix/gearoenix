@@ -81,6 +81,10 @@ namespace gearoenix::vulkan::scene {
 struct Manager;
 }
 
+namespace gearoenix::vulkan::skybox {
+struct Manager;
+}
+
 namespace gearoenix::vulkan::texture {
 struct Manager;
 }
@@ -110,6 +114,7 @@ struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_PTRC_PRV(light::Manager, vk_light_manager);
     GX_GET_PTRC_PRV(camera::Manager, vk_camera_manager);
     GX_GET_PTRC_PRV(scene::Manager, vk_scene_manager);
+    GX_GET_PTRC_PRV(skybox::Manager, vk_skybox_manager);
     GX_GET_PTRC_PRV(reflection::Manager, vk_reflection_manager);
     GX_GET_CREF_PRV(frames_t, frames);
     GX_GET_UPTR_PRV(queue::Queue, render_queue);

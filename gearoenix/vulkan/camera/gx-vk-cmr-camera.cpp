@@ -9,8 +9,13 @@
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
+#include "../skybox/gx-vk-sky-skybox.hpp"
 
 #include <ranges>
+
+#ifdef far
+#undef far
+#endif
 
 struct GxShaderDataCameraJointModel;
 void gearoenix::vulkan::camera::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
@@ -78,7 +83,7 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
     render_models(cmr.translucent_models);
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const render::record::Skyboxes& skyboxes, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 
@@ -101,45 +106,17 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
     };
 
     render_models(cmr.opaque_models);
-    // render_forward_skyboxes(cmr, cmd); // TODO
+    render_forward_skyboxes(skyboxes, cmd, pc, current_bound_pipeline);
     render_models(cmr.translucent_models);
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const render::record::Camera& cmr, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
+    const render::record::Skyboxes& skyboxes, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
-    // glDepthMask(GL_FALSE);
-    // // Rendering skyboxes
-    // const math::Vec4 camera_pos_scale = { math::Vec3<float>(cmr.transform->get_global_position()), cmr.skybox_scale };
-    // bool is_equirectangular_current = true;
-    // skybox_equirectangular_shader->bind(current_shader);
-    // skybox_equirectangular_shader->set_vp_data(cmr.camera->get_view_projection().data());
-    // skybox_equirectangular_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
-    // auto skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
-    // for (const auto& distance_skybox : scene.get_record().skyboxes.skyboxes) {
-    //     const auto& skybox = distance_skybox.second;
-    //     const auto is_equirectangular = skybox.equirectangular;
-    //     if (is_equirectangular != is_equirectangular_current) {
-    //         is_equirectangular_current = is_equirectangular;
-    //         if (is_equirectangular) {
-    //             skybox_equirectangular_shader->bind(current_shader);
-    //             skybox_equirectangular_shader->set_vp_data(cmr.camera->get_view_projection().data());
-    //             skybox_equirectangular_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
-    //             skybox_texture_bind_index = static_cast<enumerated>(skybox_equirectangular_shader->get_albedo_index());
-    //         } else {
-    //             skybox_cube_shader->bind(current_shader);
-    //             skybox_cube_shader->set_vp_data(cmr.camera->get_view_projection().data());
-    //             skybox_cube_shader->set_camera_position_box_scale_data(camera_pos_scale.data());
-    //             skybox_texture_bind_index = static_cast<enumerated>(skybox_cube_shader->get_albedo_index());
-    //         }
-    //     }
-    //     glActiveTexture(GL_TEXTURE0 + skybox_texture_bind_index);
-    //     const auto& gl_sky = *core::cast_ptr<const Skybox>(skybox.skybox);
-    //     glBindTexture(is_equirectangular ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP, gl_sky.get_texture_object());
-    //     glBindVertexArray(gl_sky.get_vertex_object());
-    //     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-    // }
-    // glDepthMask(GL_TRUE);
+    for (const auto& skybox_data : skyboxes.skyboxes | std::views::values) {
+        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(cmd, pc, current_bound_pipeline);
+    }
 }
 
 void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const render::record::Camera& record_cam, const VkCommandBuffer cmd) const
@@ -338,8 +315,8 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
     {
         auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
         shader_data_index = sd.get_index();
-        auto& [vp, position_reserved] = *sd.get_ptr();
-        position_reserved = { math::Vec3<float>(rc.transform->get_local_position()), 1.0f };
+        auto& [vp, position_far] = *sd.get_ptr();
+        position_far = { math::Vec3<float>(rc.transform->get_local_position()), far };
         vp = view_projection;
     }
 

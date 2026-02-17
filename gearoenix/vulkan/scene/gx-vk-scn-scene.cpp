@@ -8,6 +8,7 @@
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "gx-vk-scn-manager.hpp"
+#include "../skybox/gx-vk-sky-skybox.hpp"
 
 #include <ranges>
 
@@ -67,7 +68,7 @@ void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBu
 
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
-        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(camera, vk_cmd, pc, current_bound_pipeline);
+        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(camera, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
     }
 }
 
@@ -82,7 +83,7 @@ void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cm
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& rc = record.cameras.cameras[camera_index];
         auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
-        cam.render_forward(rc, vk_cmd, pc, current_bound_pipeline);
+        cam.render_forward(rc, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
         // cam.render_bloom(*this, camera, vk_cmd); // TODO
         // cam.render_colour_correction_anti_aliasing(*this, camera, vk_cmd); // TODO
     }

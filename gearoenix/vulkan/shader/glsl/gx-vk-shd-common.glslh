@@ -56,7 +56,7 @@ struct GxShaderDataScene
 
 struct GxShaderDataCamera {
     mat4 view_projection;
-    vec4 position_reserved;
+    vec4 position_far;
 };
 
 struct GxShaderDataCameraJointModel {

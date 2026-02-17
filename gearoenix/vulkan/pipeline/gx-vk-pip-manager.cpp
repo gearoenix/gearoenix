@@ -296,6 +296,25 @@ void gearoenix::vulkan::pipeline::Manager::initialise_rasterizer()
 
     unlit_forward_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
 
+    // ========== Skybox Equirectangular Pipeline ==========
+    skybox_equirectangular_vert_sm = shader_manager->get("skybox-equirectangular.vert");
+    skybox_equirectangular_frag_sm = shader_manager->get("skybox-equirectangular.frag");
+
+    vert_stage.module = skybox_equirectangular_vert_sm->get_vulkan_data();
+    frag_stage.module = skybox_equirectangular_frag_sm->get_vulkan_data();
+
+    depth_stencil.depthWriteEnable = VK_FALSE;
+
+    // Skybox shader only uses locations 0-3 (position, normal, tangent, uv), no bone attributes
+    vertex_input_info.vertexAttributeDescriptionCount = 4;
+
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
+
+    skybox_equirectangular_pipeline = Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
+
+    depth_stencil.depthWriteEnable = VK_TRUE;
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(vertex_attributes.size());
+
     // ========== Skinned pipelines ==========
     // Update vertex_attributes for skinned: set proper bone offsets (locations 4-5)
     vertex_attributes[4].offset = offsetof(render::PbrVertexAnimated, bone_weights);
