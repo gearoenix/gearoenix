@@ -28,8 +28,7 @@ struct Mat2x2 {
 
     constexpr bool invert(const Element zero_tolerance = Numeric::epsilon<Element>)
     {
-        static_assert(std::numeric_limits<Element>::is_signed,
-            "This functionality is only available for signed element types.");
+        static_assert(std::numeric_limits<Element>::is_signed, "This functionality is only available for signed element types.");
         const auto det = e0 * e3 - e1 * e2;
         if (det < -zero_tolerance && det > zero_tolerance)
             return false;
@@ -44,9 +43,6 @@ struct Mat2x2 {
         return true;
     }
 
-    constexpr Vec2<Element> operator*(const Vec2<Element>& v) const
-    {
-        return Vec2(e0 * v.x + e1 * v.y, e2 * v.x + e3 * v.y);
-    }
+    constexpr Vec2<Element> operator*(const Vec2<Element>& v) const { return Vec2(e0 * v.x + e1 * v.y, e2 * v.x + e3 * v.y); }
 };
 }

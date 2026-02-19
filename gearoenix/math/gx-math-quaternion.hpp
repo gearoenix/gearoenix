@@ -66,10 +66,7 @@ struct Quat final {
         return q;
     }
 
-    constexpr Mat4x4<Element> to_m4x4() const
-    {
-        return Mat4x4(to_m3x3());
-    }
+    constexpr Mat4x4<Element> to_m4x4() const { return Mat4x4(to_m3x3()); }
 
     constexpr Mat3x3<Element> to_m3x3() const
     {
@@ -83,17 +80,9 @@ struct Quat final {
         const Element zz = z * z;
         const Element zw = z * w;
 
-        return {
-            { static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz),
-                static_cast<Element>(2) * (xy + zw),
-                static_cast<Element>(2) * (xz - yw) },
-            { static_cast<Element>(2) * (xy - zw),
-                static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz),
-                static_cast<Element>(2) * (yz + xw) },
-            { static_cast<Element>(2) * (xz + yw),
-                static_cast<Element>(2) * (yz - xw),
-                static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy) }
-        };
+        return { { static_cast<Element>(1) - static_cast<Element>(2) * (yy + zz), static_cast<Element>(2) * (xy + zw), static_cast<Element>(2) * (xz - yw) },
+            { static_cast<Element>(2) * (xy - zw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + zz), static_cast<Element>(2) * (yz + xw) },
+            { static_cast<Element>(2) * (xz + yw), static_cast<Element>(2) * (yz - xw), static_cast<Element>(1) - static_cast<Element>(2) * (xx + yy) } };
     }
 
     [[nodiscard]] constexpr bool safe_equal(const Quat& o) const
@@ -103,10 +92,7 @@ struct Quat final {
         return Numeric::equal(nt.x, no.x) && Numeric::equal(nt.y, no.y) && Numeric::equal(nt.z, no.z) && Numeric::equal(nt.w, no.w);
     }
 
-    [[nodiscard]] constexpr Quat conjugate() const
-    {
-        return { -x, -y, -z, w };
-    }
+    [[nodiscard]] constexpr Quat conjugate() const { return { -x, -y, -z, w }; }
 
     [[nodiscard]] constexpr Vec3<Element> rotate(const Vec3<Element>& v) const
     {
@@ -114,70 +100,33 @@ struct Quat final {
         return { q.x, q.y, q.z };
     }
 
-    [[nodiscard]] constexpr Quat operator*(const Element v) const
-    {
-        return { x * v, y * v, z * v, w * v };
-    }
+    [[nodiscard]] constexpr Quat operator*(const Element v) const { return { x * v, y * v, z * v, w * v }; }
 
-    [[nodiscard]] constexpr Quat operator/(const Element v) const
-    {
-        return *this * (static_cast<Element>(1) / v);
-    }
+    [[nodiscard]] constexpr Quat operator/(const Element v) const { return *this * (static_cast<Element>(1) / v); }
 
     [[nodiscard]] constexpr Quat operator*(const Quat& o) const
     {
-        return {
-            w * o.x + x * o.w + y * o.z - z * o.y,
-            w * o.y + y * o.w + z * o.x - x * o.z,
-            w * o.z + z * o.w + x * o.y - y * o.x,
-            w * o.w - x * o.x - y * o.y - z * o.z
-        };
+        return { w * o.x + x * o.w + y * o.z - z * o.y, w * o.y + y * o.w + z * o.x - x * o.z, w * o.z + z * o.w + x * o.y - y * o.x, w * o.w - x * o.x - y * o.y - z * o.z };
     }
 
-    constexpr void operator*=(const Quat& o)
-    {
-        *this = *this * o;
-    }
+    constexpr void operator*=(const Quat& o) { *this = *this * o; }
 
     [[nodiscard]] constexpr Quat operator*(const Vec3<Element>& o) const
     {
-        return {
-            w * o.x + y * o.z - z * o.y,
-            w * o.y + z * o.x - x * o.z,
-            w * o.z + x * o.y - y * o.x,
-            -x * o.x - y * o.y - z * o.z
-        };
+        return { w * o.x + y * o.z - z * o.y, w * o.y + z * o.x - x * o.z, w * o.z + x * o.y - y * o.x, -x * o.x - y * o.y - z * o.z };
     }
 
-    [[nodiscard]] constexpr Quat operator+(const Quat& o) const
-    {
-        return { x + o.x, y + o.y, z + o.z, w + o.w };
-    }
+    [[nodiscard]] constexpr Quat operator+(const Quat& o) const { return { x + o.x, y + o.y, z + o.z, w + o.w }; }
 
-    [[nodiscard]] constexpr Quat operator-(const Quat& o) const
-    {
-        return { x - o.x, y - o.y, z - o.z, w - o.w };
-    }
+    [[nodiscard]] constexpr Quat operator-(const Quat& o) const { return { x - o.x, y - o.y, z - o.z, w - o.w }; }
 
-    [[nodiscard]] constexpr Quat operator-(const Element v) const
-    {
-        return { x - v, y - v, z - v, w - v };
-    }
+    [[nodiscard]] constexpr Quat operator-(const Element v) const { return { x - v, y - v, z - v, w - v }; }
 
-    [[nodiscard]] constexpr Quat operator-() const
-    {
-        return { -x, -y, -z, -w };
-    }
+    [[nodiscard]] constexpr Quat operator-() const { return { -x, -y, -z, -w }; }
 
-    [[nodiscard]] constexpr Quat abs() const
-    {
-        return { std::abs(x), std::abs(y), std::abs(z), std::abs(w) };
-    }
+    [[nodiscard]] constexpr Quat abs() const { return { std::abs(x), std::abs(y), std::abs(z), std::abs(w) }; }
 
-    [[nodiscard]] constexpr Element dot(const Quat& o) const
-    {
-        return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w);
-    }
+    [[nodiscard]] constexpr Element dot(const Quat& o) const { return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w); }
 
     friend std::ostream& operator<<(std::ostream& os, const Quat& q)
     {
@@ -211,9 +160,7 @@ struct Quat final {
     {
         Vec3<Element> angles;
 
-        const auto pitch_atan_xy = Vec2<Element>(
-            static_cast<Element>(2) * (w * x + y * z),
-            w * w - x * x - y * y + z * z);
+        const auto pitch_atan_xy = Vec2<Element>(static_cast<Element>(2) * (w * x + y * z), w * w - x * x - y * y + z * z);
         if (pitch_atan_xy.equal(static_cast<Element>(0))) {
             angles.x = static_cast<Element>(2) * std::atan2(x, w);
         } else {
@@ -223,9 +170,7 @@ struct Quat final {
         const auto sin_p = std::clamp(static_cast<Element>(2) * (w * y - x * z), static_cast<Element>(-1), static_cast<Element>(1));
         angles.y = std::asin(sin_p);
 
-        const auto roll_atan_xy = Vec2<Element>(
-            static_cast<Element>(2) * (w * z + x * y),
-            w * w + x * x - y * y - z * z);
+        const auto roll_atan_xy = Vec2<Element>(static_cast<Element>(2) * (w * z + x * y), w * w + x * x - y * y - z * z);
         if (roll_atan_xy.equal(static_cast<Element>(0))) {
             angles.z = static_cast<Element>(0);
         } else {
@@ -235,10 +180,7 @@ struct Quat final {
         return angles;
     }
 
-    [[nodiscard]] constexpr Quat mix(const Quat& o, const Element t) const
-    {
-        return (*this * (static_cast<Element>(1) - t)) + (o * t);
-    }
+    [[nodiscard]] constexpr Quat mix(const Quat& o, const Element t) const { return (*this * (static_cast<Element>(1) - t)) + (o * t); }
 
     [[nodiscard]] Quat slerp(const Quat& o, const Element t) const
     {
@@ -264,15 +206,9 @@ struct Quat final {
         return ((*this * std::sin((static_cast<Element>(1) - t) * angle)) + (oo * std::sin(t * angle))) / std::sin(angle);
     }
 
-    [[nodiscard]] Quat linear_mix(const Quat& o, const Element t) const
-    {
-        return slerp(o, t);
-    }
+    [[nodiscard]] Quat linear_mix(const Quat& o, const Element t) const { return slerp(o, t); }
 
-    [[nodiscard]] Vec3<Element> to_euler_degree() const
-    {
-        return to_euler() * (180.0 / std::numbers::pi);
-    }
+    [[nodiscard]] Vec3<Element> to_euler_degree() const { return to_euler() * (180.0 / std::numbers::pi); }
 
     [[nodiscard]] constexpr static Quat from_euler(const Element x, const Element y, const Element z)
     {
@@ -283,23 +219,12 @@ struct Quat final {
         const auto cy = static_cast<Element>(std::cos(z * static_cast<Element>(0.5)));
         const auto sy = static_cast<Element>(std::sin(z * static_cast<Element>(0.5)));
 
-        return {
-            sr * cp * cy - cr * sp * sy,
-            cr * sp * cy + sr * cp * sy,
-            cr * cp * sy - sr * sp * cy,
-            cr * cp * cy + sr * sp * sy
-        };
+        return { sr * cp * cy - cr * sp * sy, cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy, cr * cp * cy + sr * sp * sy };
     }
 
-    [[nodiscard]] constexpr static Quat from_euler(Vec3<Element> angles)
-    {
-        return from_euler(angles.x, angles.y, angles.z);
-    }
+    [[nodiscard]] constexpr static Quat from_euler(Vec3<Element> angles) { return from_euler(angles.x, angles.y, angles.z); }
 
-    [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles)
-    {
-        return from_euler(angles * static_cast<Element>(std::numbers::pi / 180.0));
-    }
+    [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles) { return from_euler(angles * static_cast<Element>(std::numbers::pi / 180.0)); }
 
     [[nodiscard]] constexpr static Quat from(const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
     {
@@ -348,10 +273,7 @@ struct Quat final {
         return from(x, y, z);
     }
 
-    [[nodiscard]] constexpr static Quat from(const Mat3x3<Element>& m)
-    {
-        return from(m[0], m[1], m[2]);
-    }
+    [[nodiscard]] constexpr static Quat from(const Mat3x3<Element>& m) { return from(m[0], m[1], m[2]); }
 
     [[nodiscard]] constexpr static Quat angle_axis(const Element rad, const Vec3<Element>& axis)
     {

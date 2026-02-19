@@ -3,10 +3,7 @@
 #include "imgui/gx-rnd-imgui-input-uint.hpp"
 
 namespace {
-constexpr const char* names[] = {
-    "Fixed",
-    "Screen Based"
-};
+constexpr const char* names[] = { "Fixed", "Screen Based" };
 }
 
 const gearoenix::render::Resolution::Fixed& gearoenix::render::Resolution::get_fixed() const

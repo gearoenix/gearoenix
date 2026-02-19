@@ -1,19 +1,12 @@
 #pragma once
-#include "../../../core/gx-cr-build-configuration.hpp"
-#ifdef USE_VULKAN
+#include "../../../render/gx-rnd-build-configuration.hpp"
+#if GX_RENDER_VULKAN_ENABLED
 #include "gx-vk-shader-stage.hpp"
-namespace gearoenix {
-namespace render {
-    struct Engine;
-    namespace shader {
-        namespace stage {
-            struct Vertex : public Stage {
-            private:
-            public:
-                Vertex(std::vector<unsigned char>& data, Engine* engine);
-            };
-        }
-    }
-}
+
+namespace gearoenix::vulkan::shader::stage {
+struct Vertex final : Stage {
+    explicit Vertex(std::span<std::uint8_t> data);
+    ~Vertex() override;
+};
 }
 #endif

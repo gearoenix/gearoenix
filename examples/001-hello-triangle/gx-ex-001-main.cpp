@@ -51,8 +51,8 @@ public:
 
     void set_material(GxPbrPtr&& material)
     {
-        material->get_normal_metallic_factor().w = 0.01f;
-        material->get_emission_roughness_factor().w = 0.99f;
+        material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, 0.01f });
+        material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, 0.01f });
 
         std::vector<GxPbrVertex> vertices(3);
         vertices[0].position = { 1.0f, -1.0f, 0.0f };
@@ -80,12 +80,9 @@ public:
 
     void set_mesh(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxModelManager::get().build(
-            "triangle-model", scene_entity.get(), { std::move(mesh) }, true);
+        auto model_builder = GxModelManager::get().build("triangle-model", scene_entity.get(), { std::move(mesh) }, true);
 
-        GxCamManager::get().build(
-            "camera", scene_entity.get(),
-            GxEntityEndCaller([this](GxEntityPtr&& c) { set_camera(std::move(c)); }));
+        GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& c) { set_camera(std::move(c)); }));
     }
 
     void set_camera(GxEntityPtr&& camera_entity)
@@ -100,10 +97,7 @@ public:
     void set_light(GxEntityPtr&& light_entity)
     {
         auto* const light = light_entity->get_component<GxShadowCasterDirLight>();
-        light->get_shadow_transform()->local_look_at(
-            { 0.0, 0.0, 5.0 },
-            { 0.0, 0.0, 0.0 },
-            { 0.0, 1.0, 0.0 });
+        light->get_shadow_transform()->local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
         light->colour = { 10.0f, 10.0f, 10.0f };
 
         scene_entity->add_to_world();

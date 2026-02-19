@@ -8,10 +8,7 @@ gearoenix::net::ServerClient::ServerClient(ENetPeer* const peer, std::shared_ptr
 {
 }
 
-gearoenix::net::ServerClient::~ServerClient()
-{
-    enet_peer_disconnect(peer, 0);
-}
+gearoenix::net::ServerClient::~ServerClient() { enet_peer_disconnect(peer, 0); }
 
 bool gearoenix::net::ServerClient::send(const std::span<const std::uint8_t> data) const
 {
@@ -30,7 +27,7 @@ bool gearoenix::net::ServerClient::send(const std::span<const std::uint8_t> data
 
 gearoenix::net::uniform_ip_t gearoenix::net::ServerClient::get_ip() const
 {
-    uniform_ip_t ip{};
+    uniform_ip_t ip {};
 
     const auto ipv4 = peer->address.host;
 
@@ -44,6 +41,6 @@ gearoenix::net::uniform_ip_t gearoenix::net::ServerClient::get_ip() const
 
 void gearoenix::net::ServerClient::clean()
 {
-    disconnected_callback = []{};
-    received_callback = [](auto&&) {};
+    disconnected_callback = [] { };
+    received_callback = [](auto&&) { };
 }

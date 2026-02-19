@@ -1,15 +1,12 @@
-#ifndef GEAROENIX_VULKAN_COMMAND_TYPE_HPP
-#define GEAROENIX_VULKAN_COMMAND_TYPE_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-types.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include <cstdint>
 
 namespace gearoenix::vulkan::command {
-enum struct Type : core::TypeId {
+enum struct Type : std::uint8_t {
     Primary = 1,
     Secondary = 2,
 };
 }
-
-#endif
 #endif

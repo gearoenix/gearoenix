@@ -9,16 +9,14 @@ namespace gearoenix::gl {
 struct Scene final : render::scene::Scene {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
-    constexpr static auto object_type_index = gearoenix_gl_scene_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_scene_type_index;
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
 private:
     Scene(core::ecs::Entity* entity, std::string&& name, double layer);
     Scene(core::object_id_t id, std::string&& name);
-    static void read(
-        std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
-        std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
+    static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
 
 public:
     ~Scene() override;

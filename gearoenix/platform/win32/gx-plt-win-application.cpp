@@ -7,11 +7,7 @@
 #include "gx-plt-win-key.hpp"
 #include <Windows.h>
 
-LRESULT CALLBACK gearoenix::platform::Application::static_handler(
-    HWND hwnd,
-    const UINT message,
-    const WPARAM w_param,
-    const LPARAM l_param)
+LRESULT CALLBACK gearoenix::platform::Application::static_handler(HWND hwnd, const UINT message, const WPARAM w_param, const LPARAM l_param)
 {
     auto platform_application = reinterpret_cast<Application*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     if (WM_CREATE == message) {
@@ -26,11 +22,7 @@ LRESULT CALLBACK gearoenix::platform::Application::static_handler(
     return platform_application->handler(hwnd, message, w_param, l_param);
 }
 
-LRESULT gearoenix::platform::Application::handler(
-    HWND hwnd,
-    const UINT message,
-    const WPARAM w_param,
-    const LPARAM l_param)
+LRESULT gearoenix::platform::Application::handler(HWND hwnd, const UINT message, const WPARAM w_param, const LPARAM l_param)
 {
     switch (message) {
     case WM_CLOSE:
@@ -151,15 +143,10 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
         base.initialize_window_position(0, 0);
         style |= WS_POPUP;
     } else {
-        base.initialize_window_position(
-            (GetSystemMetrics(SM_CXSCREEN) - base.window_size.x) / 2,
-            (GetSystemMetrics(SM_CYSCREEN) - base.window_size.x) / 2);
+        base.initialize_window_position((GetSystemMetrics(SM_CXSCREEN) - base.window_size.x) / 2, (GetSystemMetrics(SM_CYSCREEN) - base.window_size.x) / 2);
         style |= WS_OVERLAPPEDWINDOW;
     }
-    window = CreateWindowExA(
-        WS_EX_APPWINDOW, GX_APPLICATION_NAME, GX_APPLICATION_NAME, style,
-        base.window_position.x, base.window_position.y, base.window_size.x, base.window_size.y,
-        nullptr, nullptr, instance, this);
+    window = CreateWindowExA(WS_EX_APPWINDOW, GX_APPLICATION_NAME, GX_APPLICATION_NAME, style, base.window_position.x, base.window_position.y, base.window_size.x, base.window_size.y, nullptr, nullptr, instance, this);
     ShowWindow(window, SW_SHOW);
     SetForegroundWindow(window);
     SetFocus(window);

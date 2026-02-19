@@ -4,10 +4,7 @@
 #include <sstream>
 #include <string>
 
-gearoenix::gl::shader::ForwardPbr::ForwardPbr(
-    const std::uint32_t directional_lights_count,
-    const std::uint32_t shadow_casters_directional_lights_count,
-    const std::uint32_t bones_count)
+gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_lights_count, const std::uint32_t shadow_casters_directional_lights_count, const std::uint32_t bones_count)
     : directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
     , bones_matrices_count(static_cast<sizei>(bones_count * 2))
@@ -263,43 +260,21 @@ void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data)
 {
-    glUniformMatrix4fv(
-        shadow_caster_directional_light_normalised_vp,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        GL_FALSE,
-        reinterpret_cast<const float*>(data));
+    glUniformMatrix4fv(shadow_caster_directional_light_normalised_vp, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data)
-{
-    glUniform3fv(
-        directional_light_direction,
-        directional_lights_count,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data) { glUniform3fv(directional_light_direction, directional_lights_count, reinterpret_cast<const float*>(data)); }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data)
-{
-    glUniform3fv(
-        directional_light_colour,
-        directional_lights_count,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data) { glUniform3fv(directional_light_colour, directional_lights_count, reinterpret_cast<const float*>(data)); }
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data)
 {
-    glUniform3fv(
-        shadow_caster_directional_light_direction,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        reinterpret_cast<const float*>(data));
+    glUniform3fv(shadow_caster_directional_light_direction, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), reinterpret_cast<const float*>(data));
 }
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data)
 {
-    glUniform3fv(
-        shadow_caster_directional_light_colour,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        reinterpret_cast<const float*>(data));
+    glUniform3fv(shadow_caster_directional_light_colour, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), reinterpret_cast<const float*>(data));
 }
 
 const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const
@@ -309,13 +284,6 @@ const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_
     return shadow_caster_directional_light_shadow_map_indices.data();
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data)
-{
-    glUniformMatrix4fv(
-        bones_m_inv_m,
-        bones_matrices_count,
-        GL_FALSE,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data) { glUniformMatrix4fv(bones_m_inv_m, bones_matrices_count, GL_FALSE, reinterpret_cast<const float*>(data)); }
 
 #endif

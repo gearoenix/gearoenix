@@ -94,10 +94,7 @@ void gearoenix::gl::unload_library()
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_UNLOAD);
 }
 
-bool gearoenix::gl::extension_exists(const std::string& ext_name)
-{
-    return gearoenix_gl_extensions.contains(ext_name);
-}
+bool gearoenix::gl::extension_exists(const std::string& ext_name) { return gearoenix_gl_extensions.contains(ext_name); }
 
 #if GX_DEBUG_MODE
 static const char* severity_to_string(const gearoenix::gl::enumerated severity)
@@ -117,13 +114,7 @@ static const char* severity_to_string(const gearoenix::gl::enumerated severity)
 }
 
 void GX_GL_APIENTRY_TYPE gearoenix::gl::debug_callback(
-    const enumerated source,
-    const enumerated t,
-    const uint id,
-    const enumerated severity,
-    const sizei length,
-    const char* const message,
-    const void* const /*userParam*/)
+    const enumerated source, const enumerated t, const uint id, const enumerated severity, const sizei length, const char* const message, const void* const /*userParam*/)
 {
     const auto* const srv = severity_to_string(severity);
     if (nullptr == srv) {

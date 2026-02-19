@@ -1,46 +1,51 @@
 #include "gx-vk-msh-mesh.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/allocator/gx-cr-alc-range.hpp"
+#include "../../core/gx-cr-object.hpp"
+#include "../../render/material/gx-rnd-mat-material.hpp"
+#include "../../render/record/gx-rnd-rcd-camera.hpp"
+#include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../buffer/gx-vk-buf-manager.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
+#include "../material/gx-vk-mat-material.hpp"
+#include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "gx-vk-msh-buffer.hpp"
 
-void gearoenix::vulkan::mesh::Mesh::initialize_blas()
-{
-    VkAccelerationStructureDeviceAddressInfoKHR info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-    info.accelerationStructure = vulkan_data;
-    acceleration_address = vkGetAccelerationStructureDeviceAddressKHR(
-        vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), &info);
-}
-
-gearoenix::vulkan::mesh::Mesh::Mesh(
-    engine::Engine& e,
-    const std::string& name,
-    const render::Vertices& vertices,
-    const std::vector<std::uint32_t>& indices,
-    math::Aabb3<double>&& occlusion_box,
-    const core::job::EndCaller& c)
-    : render::mesh::Mesh(occlusion_box)
-    , vertex(e.get_buffer_manager().create(name + "-vertices", render::get_data(vertices), core::bytes_count(vertices), c))
-    , index(e.get_buffer_manager().create(name + "-indices", indices, c))
+gearoenix::vulkan::mesh::Mesh::Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material)
+    : render::mesh::Mesh(std::move(name), std::move(buffer), std::move(material))
+    , gapi_buffer(core::cast_shared<Buffer>(std::shared_ptr(this->buffer)))
+    , gapi_material(std::dynamic_pointer_cast<material::Material>(this->bound_material))
 {
 }
 
-gearoenix::vulkan::mesh::Mesh::~Mesh()
+void gearoenix::vulkan::mesh::Mesh::construct(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
 {
-    vkDestroyAccelerationStructureKHR(
-        vertex->get_allocated_memory()->get_e().get_logical_device().get_vulkan_data(), vulkan_data, nullptr);
-    vulkan_data = nullptr;
+    end_callback.set_return(Object::construct<Mesh>(std::move(name), std::move(buffer), std::move(material)));
 }
 
-std::pair<VkDeviceAddress, VkDeviceAddress> gearoenix::vulkan::mesh::Mesh::get_buffers_address() const
+gearoenix::vulkan::mesh::Mesh::~Mesh() = default;
+
+void gearoenix::vulkan::mesh::Mesh::draw(const VkCommandBuffer cmd, pipeline::PushConstants& pc) const
 {
-    return {
-        vertex->get_device_address(),
-        index->get_device_address(),
-    };
+    const auto& vertex_buffer = *gapi_buffer->get_vertex();
+    const auto vk_vertex_buffer = vertex_buffer.get_vulkan_data();
+
+    const auto vertex_offset = static_cast<VkDeviceSize>(vertex_buffer.get_offset());
+    vkCmdBindVertexBuffers(cmd, 0, 1, &vk_vertex_buffer, &vertex_offset);
+
+    const auto& index_buffer = *gapi_buffer->get_index();
+    const auto index_offset = static_cast<VkDeviceSize>(index_buffer.get_offset());
+    vkCmdBindIndexBuffer(cmd, index_buffer.get_vulkan_data(), index_offset, VK_INDEX_TYPE_UINT32);
+
+    vkCmdPushConstants(cmd, descriptor::Bindless::get().get_pipeline_layout(), VK_SHADER_STAGE_ALL, 0, sizeof(pc), &pc);
+
+    vkCmdDrawIndexed(cmd, gapi_buffer->get_indices_count(), 1, 0, 0, 0);
+}
+
+void gearoenix::vulkan::mesh::Mesh::set_material(std::shared_ptr<render::material::Material>&& material)
+{
+    render::mesh::Mesh::set_material(std::move(material));
+    gapi_material = std::dynamic_pointer_cast<material::Material>(this->bound_material);
 }
 
 #endif

@@ -2,10 +2,10 @@
 
 #include <atomic>
 #include <functional>
-#include <unordered_map>
 #include <memory>
 #include <span>
 #include <thread>
+#include <unordered_map>
 
 #include <enet/enet.h>
 
@@ -51,6 +51,5 @@ public:
     /// server; the server at first puts it in a yellow-carded list of clients after that if for
     /// three times the client is reported as a bad actor, it will totally ignore the client actions for 3 minutes.
     void bad_client(ServerClient&);
-
 };
 }

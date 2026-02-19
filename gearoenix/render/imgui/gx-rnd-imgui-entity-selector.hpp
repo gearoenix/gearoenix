@@ -39,10 +39,7 @@ public:
         }
     }
 
-    [[nodiscard]] bool selected() const
-    {
-        return current_selection >= 0;
-    }
+    [[nodiscard]] bool selected() const { return current_selection >= 0; }
 
     [[nodiscard]] core::ecs::Entity* get_selection() const
     {

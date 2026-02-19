@@ -32,12 +32,8 @@ struct LightManager final : render::light::Manager {
 private:
     [[nodiscard]] core::ecs::EntityPtr build_directional(std::string&&, core::ecs::Entity*) override;
     void build_shadow_caster_directional(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::uint32_t shadow_map_resolution,
-        float camera_far,
-        float camera_near,
-        float camera_aspect,
+        std::string&& name, core::ecs::Entity* parent, std::uint32_t shadow_map_resolution,
+        float camera_far, float camera_near, float camera_aspect,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:

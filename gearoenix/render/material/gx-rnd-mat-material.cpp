@@ -11,10 +11,7 @@ gearoenix::render::material::Material::Material(const core::object_type_index_t 
 
 gearoenix::render::material::Material::~Material() = default;
 
-void gearoenix::render::material::Material::set_albedo(std::shared_ptr<texture::Texture2D>&&)
-{
-    GX_UNIMPLEMENTED;
-}
+void gearoenix::render::material::Material::set_albedo(std::shared_ptr<texture::Texture2D>&&) { GX_UNIMPLEMENTED; }
 
 void gearoenix::render::material::Material::show_debug_gui()
 {

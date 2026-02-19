@@ -6,10 +6,7 @@
 #include "imgui/gx-rnd-imgui-type-table.hpp"
 #include "imgui/gx-rnd-imgui-type-tree.hpp"
 
-gearoenix::render::RuntimeConfiguration::RuntimeConfiguration()
-{
-    set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution);
-}
+gearoenix::render::RuntimeConfiguration::RuntimeConfiguration() { set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution); }
 
 gearoenix::render::RuntimeConfiguration::~RuntimeConfiguration() = default;
 

@@ -8,6 +8,7 @@ gearoenix::render::scene::Scene::Scene(core::ecs::Entity* const entity, const co
     : Component(entity, final_type_index, std::move(name))
     , ssao_settings(0.08f, math::Numeric::epsilon<float>, 0.000f, 0.003f)
     , layer(layer)
+    , forward_render_pass_name("forward render for scene: " + object_name)
     , shadow_render_pass_name("render-shadows for scene: " + object_name)
     , shadow_reflection_probe_render_pass_name("render-reflection-probes for scene: " + object_name)
 {
@@ -16,6 +17,7 @@ gearoenix::render::scene::Scene::Scene(core::ecs::Entity* const entity, const co
 gearoenix::render::scene::Scene::Scene(const core::object_type_index_t final_type_index, const core::object_id_t id, std::string&& name)
     : Component(nullptr, final_type_index, id, std::move(name))
     , ssao_settings(0.08f, math::Numeric::epsilon<float>, 0.000f, 0.003f)
+    , forward_render_pass_name("forward render for scene: " + object_name)
     , shadow_render_pass_name("render-shadows for scene: " + object_name)
     , shadow_reflection_probe_render_pass_name("render-reflection-probes for scene: " + object_name)
 {
@@ -40,7 +42,4 @@ void gearoenix::render::scene::Scene::write(std::shared_ptr<platform::stream::St
 
 gearoenix::render::scene::Scene::~Scene() = default;
 
-void gearoenix::render::scene::Scene::update()
-{
-    record.update(entity);
-}
+void gearoenix::render::scene::Scene::update() { record.update(entity); }

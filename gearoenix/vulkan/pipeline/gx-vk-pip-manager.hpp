@@ -1,9 +1,10 @@
-#ifndef GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
-#define GEAROENIX_VULKAN_PIPELINE_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -23,11 +24,10 @@ struct Module;
 namespace gearoenix::vulkan::pipeline {
 struct Cache;
 struct Pipeline;
-struct Manager final {
+struct Manager final : core::Singleton<Manager> {
     GX_GET_CREF_PRV(std::shared_ptr<Cache>, cache);
     GX_GET_UCPTR_PRV(shader::Manager, shader_manager);
 
-private:
     std::shared_ptr<shader::Module> ray_gen_sm;
     std::shared_ptr<shader::Module> close_hit_sm;
     std::shared_ptr<shader::Module> shadow_miss_sm;
@@ -35,17 +35,35 @@ private:
     std::vector<VkPipelineShaderStageCreateInfo> stages_create_info;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> shader_group_create_info;
 
-    void initialize_ray_tracing();
+    std::shared_ptr<shader::Module> pbr_vert_sm;
+    std::shared_ptr<shader::Module> pbr_frag_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_forward_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_forward_pipeline);
+
+    std::shared_ptr<shader::Module> unlit_vert_sm;
+    std::shared_ptr<shader::Module> unlit_frag_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_forward_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_skinned_forward_pipeline);
+
+    std::shared_ptr<shader::Module> skybox_equirectangular_vert_sm;
+    std::shared_ptr<shader::Module> skybox_equirectangular_frag_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skybox_equirectangular_pipeline);
+
+    std::shared_ptr<shader::Module> shadow_caster_vert_sm;
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skinned_shadow_pipeline);
+
+    void initialise_ray_tracing();
+    void initialise_rasterizer();
 
 public:
     Manager(Manager&&) = delete;
     Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
-    explicit Manager(const engine::Engine& e);
-    ~Manager();
+    Manager();
+    ~Manager() override;
     [[nodiscard]] std::shared_ptr<Pipeline> create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>& des_set_layout);
 };
 }
-#endif
 #endif

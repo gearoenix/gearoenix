@@ -47,20 +47,11 @@ public:
         return k;
     }
 
-    [[nodiscard]] constexpr bool is_step() const
-    {
-        return type == step_type_index;
-    }
+    [[nodiscard]] constexpr bool is_step() const { return type == step_type_index; }
 
-    [[nodiscard]] constexpr bool is_linear() const
-    {
-        return type == linear_type_index;
-    }
+    [[nodiscard]] constexpr bool is_linear() const { return type == linear_type_index; }
 
-    [[nodiscard]] constexpr bool is_gltf2_bezier() const
-    {
-        return type == gltf2_bezier_type_index;
-    }
+    [[nodiscard]] constexpr bool is_gltf2_bezier() const { return type == gltf2_bezier_type_index; }
 
     [[nodiscard]] const Value& get_in() const
     {

@@ -12,12 +12,7 @@ struct Manager : core::Singleton<Manager> {
 
     [[nodiscard]] virtual core::ecs::EntityPtr build_directional(std::string&& name, core::ecs::Entity* parent);
     virtual void build_shadow_caster_directional(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::uint32_t shadow_map_resolution,
-        float camera_far,
-        float camera_near,
-        float camera_aspect,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+        std::string&& name, core::ecs::Entity* parent, std::uint32_t shadow_map_resolution, float camera_far, float camera_near, float camera_aspect, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+    virtual void update();
 };
 }

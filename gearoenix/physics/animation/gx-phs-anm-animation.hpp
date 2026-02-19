@@ -59,11 +59,7 @@ struct SpriteAnimation final : Animation {
     const math::Vec2<std::uint32_t> aspect;
     const math::Vec2<double> uv_scale;
 
-    SpriteAnimation(
-        std::string&& name,
-        std::shared_ptr<render::material::Sprite>&& sprite,
-        std::uint32_t width,
-        std::uint32_t height);
+    SpriteAnimation(std::string&& name, std::shared_ptr<render::material::Sprite>&& sprite, std::uint32_t width, std::uint32_t height);
     ~SpriteAnimation() override;
     void animate(double time) override;
     void show_debug_gui() override;

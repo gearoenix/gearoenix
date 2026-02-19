@@ -31,9 +31,7 @@ struct Target final : render::texture::Target {
     Target(std::string&&, std::vector<render::texture::Attachment>&& attachments);
 
 public:
-    static void construct(
-        std::string&& name, std::vector<render::texture::Attachment>&& attachments,
-        core::job::EndCallerShared<render::texture::Target>&& end_callback);
+    static void construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback);
     ~Target() override;
     void bind() const;
 };

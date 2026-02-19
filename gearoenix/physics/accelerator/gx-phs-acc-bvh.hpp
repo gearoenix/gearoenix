@@ -59,11 +59,7 @@ private:
         return *n;
     }
 
-    void create_node(
-        const std::uintptr_t data_starting_index,
-        const std::uintptr_t data_ending_index,
-        const math::Aabb3<double>& center_volume,
-        const math::Aabb3<double>& volume)
+    void create_node(const std::uintptr_t data_starting_index, const std::uintptr_t data_ending_index, const math::Aabb3<double>& center_volume, const math::Aabb3<double>& volume)
     {
         const auto data_size = data_ending_index - data_starting_index;
         GX_ASSERT_D(data_size > 0);
@@ -201,19 +197,11 @@ private:
 
             current_node.left = nodes.size();
 
-            create_node(
-                left_data_starting_index,
-                left_data_ending_index,
-                left_center_volume,
-                best_wall_left_box);
+            create_node(left_data_starting_index, left_data_ending_index, left_center_volume, best_wall_left_box);
 
             reinterpret_cast<Node*>(&nodes[current_node_index])->right = nodes.size();
 
-            create_node(
-                right_data_starting_index,
-                right_data_ending_index,
-                right_center_volume,
-                best_wall_right_box);
+            create_node(right_data_starting_index, right_data_ending_index, right_center_volume, best_wall_right_box);
 
             return;
         }
@@ -226,10 +214,7 @@ private:
         }
     }
 
-    [[nodiscard]] std::optional<std::pair<double, const Data*>> hit(
-        const std::uintptr_t ptr,
-        const math::Ray3<double>& ray,
-        const double minimum_distance) const
+    [[nodiscard]] std::optional<std::pair<double, const Data*>> hit(const std::uintptr_t ptr, const math::Ray3<double>& ray, const double minimum_distance) const
     {
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         auto hit_result = node.volume.hit(ray, minimum_distance);
@@ -239,10 +224,7 @@ private:
             const auto data_size = node.left;
             const auto min_dis = minimum_distance;
             const Data* min_data = nullptr;
-            for (
-                std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                data_index < data_size;
-                ++data_index, data_ptr += sizeof(Data)) {
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf); data_index < data_size; ++data_index, data_ptr += sizeof(Data)) {
                 const auto* const d = reinterpret_cast<const Data*>(data_ptr);
                 const auto h = d->volume.hit(ray, min_dis);
                 if (h.has_value()) {
@@ -266,9 +248,7 @@ private:
         const auto& node = *reinterpret_cast<const Node*>(ptr);
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                data_index < data_size;
-                ++data_index, data_ptr += sizeof(Data)) {
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf); data_index < data_size; ++data_index, data_ptr += sizeof(Data)) {
                 function(*reinterpret_cast<Data*>(data_ptr));
             }
         } else {
@@ -291,9 +271,7 @@ private:
         }
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                data_index < data_size;
-                ++data_index, data_ptr += sizeof(Data)) {
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf); data_index < data_size; ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
                 const auto is = cld.check_intersection_status(d.box);
                 if (math::IntersectionStatus::Out == is)
@@ -321,9 +299,7 @@ private:
         }
         if (node.leaf) {
             const auto data_size = node.left;
-            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf);
-                data_index < data_size;
-                ++data_index, data_ptr += sizeof(Data)) {
+            for (std::uintptr_t data_index = 0, data_ptr = ptr + sizeof(Leaf); data_index < data_size; ++data_index, data_ptr += sizeof(Data)) {
                 auto& d = *reinterpret_cast<Data*>(data_ptr);
                 const auto is = cld.check_intersection_status(d.box);
                 if (math::IntersectionStatus::Out == is)

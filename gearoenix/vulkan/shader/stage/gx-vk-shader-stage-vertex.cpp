@@ -1,7 +1,11 @@
 #include "gx-vk-shader-stage-vertex.hpp"
-#ifdef USE_VULKAN
-gearoenix::render::shader::stage::Vertex::Vertex(std::vector<unsigned char>& data, Engine* engine)
-    : Stage(data, engine)
+#if GX_RENDER_VULKAN_ENABLED
+
+gearoenix::vulkan::shader::stage::Vertex::Vertex(const std::span<std::uint8_t> data)
+    : Stage(data)
 {
 }
+
+gearoenix::vulkan::shader::stage::Vertex::~Vertex() = default;
+
 #endif

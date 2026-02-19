@@ -2,13 +2,7 @@
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include <boost/functional/hash.hpp>
 
-gearoenix::render::texture::SamplerInfo::SamplerInfo(
-    const Filter min_filter,
-    const Filter mag_filter,
-    const Wrap wrap_s,
-    const Wrap wrap_t,
-    const Wrap wrap_r,
-    const std::uint8_t anisotropic_level)
+gearoenix::render::texture::SamplerInfo::SamplerInfo(const Filter min_filter, const Filter mag_filter, const Wrap wrap_s, const Wrap wrap_t, const Wrap wrap_r, const std::uint8_t anisotropic_level)
     : min_filter(min_filter)
     , mag_filter(mag_filter)
     , wrap_s(wrap_s)
@@ -42,7 +36,8 @@ void gearoenix::render::texture::SamplerInfo::read(platform::stream::Stream& s)
 
 bool gearoenix::render::texture::SamplerInfo::needs_mipmap() const
 {
-    return min_filter == Filter::CubicMipmapCubic || min_filter == Filter::CubicMipmapLinear || min_filter == Filter::CubicMipmapNearest || min_filter == Filter::LinearMipmapCubic || min_filter == Filter::LinearMipmapLinear || min_filter == Filter::LinearMipmapNearest || min_filter == Filter::NearestMipmapCubic || min_filter == Filter::NearestMipmapLinear || min_filter == Filter::NearestMipmapNearest;
+    return min_filter == Filter::CubicMipmapCubic || min_filter == Filter::CubicMipmapLinear || min_filter == Filter::CubicMipmapNearest || min_filter == Filter::LinearMipmapCubic || min_filter == Filter::LinearMipmapLinear
+        || min_filter == Filter::LinearMipmapNearest || min_filter == Filter::NearestMipmapCubic || min_filter == Filter::NearestMipmapLinear || min_filter == Filter::NearestMipmapNearest;
 }
 
 bool gearoenix::render::texture::SamplerInfo::operator<(const SamplerInfo& o) const

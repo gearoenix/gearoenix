@@ -21,21 +21,22 @@ def print_fatal(msg):
     print(f"\033[91m Error: {msg} \033[0m ", file=sys.stderr)
     sys.exit(1)
 
+CLANG_FORMAT_VERSION = 21
 
 def find_clang_format():
     try:
-        subprocess.run(['clang-format-20', '--version'], capture_output=True, text=True)
-        print("Found clang-format-20")
-        return 'clang-format-20'
+        subprocess.run([f'clang-format-{CLANG_FORMAT_VERSION}', '--version'], capture_output=True, text=True)
+        print(f"Found clang-format-{CLANG_FORMAT_VERSION}")
+        return f'clang-format-{CLANG_FORMAT_VERSION}'
     except:
         try:
             result = subprocess.run(['clang-format', '--version'], capture_output=True, text=True)
             version_match = re.search(r'version (\d+)', result.stdout)
-            if version_match and int(version_match.group(1)) >= 20:
+            if version_match and int(version_match.group(1)) >= CLANG_FORMAT_VERSION:
                 print(f"Found clang-format with version: {result.stdout}")
                 return 'clang-format'
             else:
-                print_fatal("clang-format version must be 20 or higher")
+                print_fatal(f"clang-format version must be {CLANG_FORMAT_VERSION} or higher {result.stdout}")
         except:
             print_fatal("No suitable clang-format found")
     return None

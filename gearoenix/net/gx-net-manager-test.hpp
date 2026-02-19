@@ -28,30 +28,28 @@ BOOST_AUTO_TEST_CASE(gearoenix_net_manager_000)
 
     constexpr std::uint16_t server_port = 14567;
 
-    auto server = GxManager::get().construct_server(
-        server_port, 1000,
-        [&](std::shared_ptr<GxServerClient>&& c) {
-            BOOST_TEST(c);
+    auto server = GxManager::get().construct_server(server_port, 1000, [&](std::shared_ptr<GxServerClient>&& c) {
+        BOOST_TEST(c);
 
-            const auto client_index = server_clients_count++;
-            BOOST_TEST(client_index < server_clients.size());
+        const auto client_index = server_clients_count++;
+        BOOST_TEST(client_index < server_clients.size());
 
-            c->disconnected_callback = [&, client_index] {
-                BOOST_TEST(server_clients[client_index]);
-                server_clients[client_index] = nullptr;
-                disconnect_sem.release();
-            };
+        c->disconnected_callback = [&, client_index] {
+            BOOST_TEST(server_clients[client_index]);
+            server_clients[client_index] = nullptr;
+            disconnect_sem.release();
+        };
 
-            c->received_callback = [&, client_index](std::vector<std::uint8_t>&& data) {
-                BOOST_TEST(clients_messages[client_index] == std::string(reinterpret_cast<const char*>(data.data()), data.size()));
-                receive_sem.release();
-            };
+        c->received_callback = [&, client_index](std::vector<std::uint8_t>&& data) {
+            BOOST_TEST(clients_messages[client_index] == std::string(reinterpret_cast<const char*>(data.data()), data.size()));
+            receive_sem.release();
+        };
 
-            BOOST_TEST(server_clients[client_index] == nullptr);
-            server_clients[client_index] = std::move(c);
+        BOOST_TEST(server_clients[client_index] == nullptr);
+        server_clients[client_index] = std::move(c);
 
-            clients_init_sem.release();
-        });
+        clients_init_sem.release();
+    });
 
     BOOST_TEST(server);
 

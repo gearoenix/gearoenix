@@ -89,10 +89,7 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator& gearoenix::core::PtrR
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*()
-{
-    return ptr;
-}
+constexpr typename gearoenix::core::PtrRange<T>::Iterator::reference gearoenix::core::PtrRange<T>::Iterator::operator*() { return ptr; }
 
 template <typename T>
 template <typename I>
@@ -115,16 +112,10 @@ constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRa
 }
 
 template <typename T>
-constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator==(const Iterator& o) const
-{
-    return ptr == o.ptr && jump == o.jump && end_ptr == o.end_ptr;
-}
+constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator==(const Iterator& o) const { return ptr == o.ptr && jump == o.jump && end_ptr == o.end_ptr; }
 
 template <typename T>
-constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator!=(const Iterator& o) const
-{
-    return ptr != o.ptr || jump != o.jump || end_ptr != o.end_ptr;
-}
+constexpr bool gearoenix::core::PtrRange<T>::Iterator::operator!=(const Iterator& o) const { return ptr != o.ptr || jump != o.jump || end_ptr != o.end_ptr; }
 
 template <typename T>
 constexpr void gearoenix::core::PtrRange<T>::Iterator::swap(Iterator& o)
@@ -136,10 +127,7 @@ constexpr void gearoenix::core::PtrRange<T>::Iterator::swap(Iterator& o)
 
 template <typename T>
 template <typename O>
-constexpr O* gearoenix::core::PtrRange<T>::Iterator::cast()
-{
-    return reinterpret_cast<O*>(ptr);
-}
+constexpr O* gearoenix::core::PtrRange<T>::Iterator::cast() { return reinterpret_cast<O*>(ptr); }
 
 template <typename T>
 constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::uint32_t count, const std::uint32_t jump)
@@ -151,13 +139,7 @@ constexpr gearoenix::core::PtrRange<T>::PtrRange(T* const ptr, const std::uint32
 }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::begin()
-{
-    return Iterator(ptr, jump, end_ptr);
-}
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::begin() { return Iterator(ptr, jump, end_ptr); }
 
 template <typename T>
-constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::end()
-{
-    return Iterator(end_ptr, jump, end_ptr);
-}
+constexpr typename gearoenix::core::PtrRange<T>::Iterator gearoenix::core::PtrRange<T>::end() { return Iterator(end_ptr, jump, end_ptr); }

@@ -16,7 +16,4 @@ void gearoenix::editor::ui::Manager::update()
     window_overlay_progress_bar_manager->update();
 }
 
-void gearoenix::editor::ui::Manager::renew()
-{
-    menu_bar->renew();
-}
+void gearoenix::editor::ui::Manager::renew() { menu_bar->renew(); }

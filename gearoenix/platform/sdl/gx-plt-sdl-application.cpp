@@ -5,6 +5,8 @@
 #include "../gx-plt-runtime-configuration.hpp"
 #include "gx-plt-sdl-key.hpp"
 
+#include <span>
+
 #if GX_RENDER_OPENGL_ENABLED
 #include "../../opengl/gx-gl-engine.hpp"
 #include "../../opengl/gx-gl-loader.hpp"
@@ -20,10 +22,7 @@ namespace {
 bool sdl_initialized = false;
 
 #if GX_PLATFORM_WEBASSEMBLY
-static void gearoenix_platform_application_loop(void* const arg)
-{
-    reinterpret_cast<gearoenix::platform::Application*>(arg)->loop();
-}
+static void gearoenix_platform_application_loop(void* const arg) { reinterpret_cast<gearoenix::platform::Application*>(arg)->loop(); }
 #endif
 }
 
@@ -62,8 +61,7 @@ void gearoenix::platform::Application::initialize_window()
     const auto available_engines = render::engine::Engine::get_available_engines();
 #if GX_RENDER_VULKAN_ENABLED
     if (available_engines.contains(render::engine::Type::Vulkan)) {
-        std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN;
-        if (create_window(flags)) {
+        if (const std::uint32_t flags = core_flags | SDL_WINDOW_VULKAN; create_window(flags)) {
             GX_LOG_D("Gearoenix SDL window has been created by Vulkan setting.");
             return;
         }
@@ -73,6 +71,7 @@ void gearoenix::platform::Application::initialize_window()
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         const std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+        SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -269,10 +268,7 @@ void gearoenix::platform::Application::loop()
     base.update();
 }
 
-void gearoenix::platform::Application::set_caption(const std::string& s)
-{
-    SDL_SetWindowTitle(window, s.c_str());
-}
+void gearoenix::platform::Application::set_caption(const std::string& s) { SDL_SetWindowTitle(window, s.c_str()); }
 
 void gearoenix::platform::Application::set_window_fullscreen(const bool b)
 {
@@ -328,30 +324,22 @@ void gearoenix::platform::Application::set_clipboard(const char* const clipboard
     GX_LOG_E("Failed to set clipboard: " << SDL_GetError());
 }
 
-bool gearoenix::platform::Application::open_url(const char* const url)
-{
-    return SDL_OpenURL(url);
-}
+bool gearoenix::platform::Application::open_url(const char* const url) { return SDL_OpenURL(url); }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
 std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const
 {
-    std::uint32_t extensions_count = 0;
-    SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, nullptr);
-    std::vector<const char*> extensions(static_cast<std::uint32_t>(extensions_count));
-    SDL_Vulkan_GetInstanceExtensions(window, &extensions_count, extensions.data());
-    return extensions;
+    std::uint32_t count = 0;
+    const auto extensions_ptr = SDL_Vulkan_GetInstanceExtensions(&count);
+    return { std::from_range, std::span { extensions_ptr, count } };
 }
 
-void gearoenix::platform::Application::create_vulkan_surface(
-    void* vulkan_instance, void* const vulkan_data_ptr) const
+void gearoenix::platform::Application::create_vulkan_surface(void* const vulkan_instance, void* const vulkan_data_ptr) const
 {
-    if (SDL_Vulkan_CreateSurface(
-            window,
-            reinterpret_cast<VkInstance>(vulkan_instance),
-            reinterpret_cast<VkSurfaceKHR*>(vulkan_data_ptr))
-        == SDL_FALSE)
-        GX_LOG_F("Failed to create Vulkan surface.");
+    if (SDL_Vulkan_CreateSurface(window, reinterpret_cast<VkInstance>(vulkan_instance), nullptr, reinterpret_cast<VkSurfaceKHR*>(vulkan_data_ptr))) {
+        return;
+    }
+    GX_LOG_F("Failed to create Vulkan surface. " << SDL_GetError());
 }
 #endif
 

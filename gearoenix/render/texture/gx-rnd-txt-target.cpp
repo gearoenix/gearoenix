@@ -25,8 +25,7 @@ float gearoenix::render::texture::Target::get_aspect_ratio() const
     return static_cast<float>(d.x) / static_cast<float>(d.y);
 }
 
-void gearoenix::render::texture::Target::write(
-    std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
+void gearoenix::render::texture::Target::write(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
 {
     s->write_fail_debug(name);
     GX_ASSERT(attachments.size() < 255);

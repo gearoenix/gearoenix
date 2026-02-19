@@ -54,15 +54,15 @@ gearoenix::gl::Engine::Engine()
     sint max_texture_size = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
     constexpr sint min_supported_texture_size = 2048;
-    specification.texture_maximum_aspect = static_cast<unsigned int>(
-        max_texture_size > min_supported_texture_size ? max_texture_size : min_supported_texture_size);
+    specification.texture_maximum_aspect = static_cast<unsigned int>(max_texture_size > min_supported_texture_size ? max_texture_size : min_supported_texture_size);
     sint max_attach = 0;
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attach);
     specification.texture_maximum_target_attachments = static_cast<unsigned int>(max_attach);
     specification.is_deferred_supported = max_attach >= GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT;
     specification.is_raytracing_supported = false;
     specification.is_float_texture_supported = // ------------------------------------
-        !is_es_profile_activated || ( // ---------------------------------------------
+        !is_es_profile_activated
+        || ( // ---------------------------------------------
             extension_exists("GL_OES_texture_float") && // ----------------
             extension_exists("GL_OES_texture_float_linear") && // ---------
             extension_exists("GL_OES_texture_half_float") && // -----------
@@ -129,14 +129,9 @@ void gearoenix::gl::Engine::window_resized()
     submission_manager->window_resized();
 }
 
-void gearoenix::gl::Engine::upload_imgui_fonts()
-{
-}
+void gearoenix::gl::Engine::upload_imgui_fonts() { }
 
-bool gearoenix::gl::Engine::is_supported()
-{
-    return load_library();
-}
+bool gearoenix::gl::Engine::is_supported() { return load_library(); }
 
 std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct()
 {
@@ -152,10 +147,7 @@ void gearoenix::gl::Engine::set_es_profile()
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-bool gearoenix::gl::Engine::is_es_profile()
-{
-    return is_es_profile_activated;
-}
+bool gearoenix::gl::Engine::is_es_profile() { return is_es_profile_activated; }
 
 void gearoenix::gl::Engine::set_core_profile()
 {
@@ -163,10 +155,7 @@ void gearoenix::gl::Engine::set_core_profile()
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-bool gearoenix::gl::Engine::is_core_profile()
-{
-    return !is_es_profile_activated;
-}
+bool gearoenix::gl::Engine::is_core_profile() { return !is_es_profile_activated; }
 
 void gearoenix::gl::Engine::set_gl_version(const int major, const int minor)
 {
@@ -175,9 +164,6 @@ void gearoenix::gl::Engine::set_gl_version(const int major, const int minor)
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-std::pair<int, int> gearoenix::gl::Engine::get_gl_version()
-{
-    return { profile_major_version, profile_minor_version };
-}
+std::pair<int, int> gearoenix::gl::Engine::get_gl_version() { return { profile_major_version, profile_minor_version }; }
 
 #endif

@@ -20,8 +20,5 @@ public:
 }
 
 template <typename FunctionPtr>
-FunctionPtr gearoenix::platform::Library::load(const char* function_name)
-{
-    return reinterpret_cast<FunctionPtr>(raw_load(function_name));
-}
+FunctionPtr gearoenix::platform::Library::load(const char* function_name) { return reinterpret_cast<FunctionPtr>(raw_load(function_name)); }
 #endif

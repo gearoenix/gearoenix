@@ -30,10 +30,7 @@ public:
         }
     }
 
-    explicit TypeIndexSet(platform::stream::Stream& s)
-    {
-        read(s);
-    }
+    explicit TypeIndexSet(platform::stream::Stream& s) { read(s); }
 
     constexpr bool operator==(const TypeIndexSet& other) const = default;
     constexpr bool operator!=(const TypeIndexSet& other) const = default;
@@ -189,15 +186,9 @@ public:
             }
         }
 
-        constexpr reference operator*() const
-        {
-            return current;
-        }
+        constexpr reference operator*() const { return current; }
 
-        constexpr pointer operator->() const
-        {
-            return &current;
-        }
+        constexpr pointer operator->() const { return &current; }
 
         constexpr Iterator& operator++()
         {
@@ -214,26 +205,14 @@ public:
             return temp;
         }
 
-        constexpr bool operator==(const Iterator& o) const
-        {
-            return current == o.current;
-        }
+        constexpr bool operator==(const Iterator& o) const { return current == o.current; }
 
-        constexpr bool operator!=(const Iterator& o) const
-        {
-            return current != o.current;
-        }
+        constexpr bool operator!=(const Iterator& o) const { return current != o.current; }
     };
 
-    constexpr Iterator begin() const
-    {
-        return { this, 0 };
-    }
+    constexpr Iterator begin() const { return { this, 0 }; }
 
-    constexpr Iterator end() const
-    {
-        return { this, bits_count };
-    }
+    constexpr Iterator end() const { return { this, bits_count }; }
 
     [[nodiscard]] constexpr element_t size() const
     {

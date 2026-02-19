@@ -10,19 +10,12 @@ struct Numeric {
     constexpr static T epsilon = static_cast<T>(0.0001);
 
     template <typename T>
-    constexpr static void check_signable()
-    {
-        static_assert(
-            std::numeric_limits<T>::is_signed,
-            "This functionality only works when the type is signable.");
-    }
+    constexpr static void check_signable() { static_assert(std::numeric_limits<T>::is_signed, "This functionality only works when the type is signable."); }
 
     template <typename T1, typename T2>
     constexpr static void check_same_signibility()
     {
-        static_assert(
-            !std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed,
-            "This functionality only works when both of the type have signedness compatibility.");
+        static_assert(!std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed, "This functionality only works when both of the type have signedness compatibility.");
     }
 
     template <typename T>
@@ -92,8 +85,13 @@ struct Numeric {
     template <typename T>
     [[nodiscard]] constexpr static T clamp(const T v, const T mn, const T mx)
     {
-        return v < mn ? mn : v > mx ? mx
-                                    : v;
+        if (v < mn) {
+            return mn;
+        }
+        if (v > mx) {
+            return mx;
+        }
+        return v;
     }
 
     /// On failure it returns static_cast<T>(-1).
@@ -151,27 +149,15 @@ struct Numeric {
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T normalise_radian(const T r)
-    {
-        return positive_mod(r, static_cast<T>(std::numbers::pi * 2.0));
-    }
+    [[nodiscard]] constexpr static T normalise_radian(const T r) { return positive_mod(r, static_cast<T>(std::numbers::pi * 2.0)); }
 
     template <typename T>
-    [[nodiscard]] constexpr static T normalise_degree(const T r)
-    {
-        return positive_mod(r, static_cast<T>(360.0));
-    }
+    [[nodiscard]] constexpr static T normalise_degree(const T r) { return positive_mod(r, static_cast<T>(360.0)); }
 
     template <typename T>
-    [[nodiscard]] constexpr static T to_degree(const T r)
-    {
-        return r * static_cast<T>(180.0 / std::numbers::pi);
-    }
+    [[nodiscard]] constexpr static T to_degree(const T r) { return r * static_cast<T>(180.0 / std::numbers::pi); }
 
     template <typename T>
-    [[nodiscard]] constexpr static T to_radian(const T r)
-    {
-        return r * static_cast<T>(std::numbers::pi / 180.0);
-    }
+    [[nodiscard]] constexpr static T to_radian(const T r) { return r * static_cast<T>(std::numbers::pi / 180.0); }
 };
 }

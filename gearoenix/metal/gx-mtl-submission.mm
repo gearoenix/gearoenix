@@ -25,10 +25,7 @@ gearoenix::metal::SubmissionManager::SubmissionManager(Engine& e)
 {
 }
 
-gearoenix::metal::SubmissionManager::~SubmissionManager()
-{
-    [queue release];
-}
+gearoenix::metal::SubmissionManager::~SubmissionManager() { [queue release]; }
 
 void gearoenix::metal::SubmissionManager::update()
 {
@@ -40,9 +37,7 @@ void gearoenix::metal::SubmissionManager::update()
     cmd.label = @"Gearoenix-Command-Submission";
 
     __block dispatch_semaphore_t blocked_present_semaphore = present_semaphore;
-    [cmd addCompletedHandler:^(id<MTLCommandBuffer>) {
-        dispatch_semaphore_signal(blocked_present_semaphore);
-    }];
+    [cmd addCompletedHandler:^(id<MTLCommandBuffer>) { dispatch_semaphore_signal(blocked_present_semaphore); }];
 
     auto view = e.get_platform_application().get_app_delegate().view_controller.metal_kit_view;
     MTLRenderPassDescriptor* render_pass_descriptor = view.currentRenderPassDescriptor; // TODO: it maybe needed to have different render-pass-desc for each camera
@@ -70,9 +65,7 @@ void gearoenix::metal::SubmissionManager::update()
             auto& camera_pool_ref = camera_pool[camera_pool_index];
             camera_pool_ref.uniform_ptr = metal_camera.uniform.data[frame_number];
             camera_pool_ref.uniform_gpu_offset = metal_camera.uniform.gpu_offset;
-            scene_pool_ref.cameras.emplace(
-                std::make_pair(camera.get_layer(), camera_id),
-                camera_pool_index);
+            scene_pool_ref.cameras.emplace(std::make_pair(camera.get_layer(), camera_id), camera_pool_index);
         });
         scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
     });
@@ -83,48 +76,49 @@ void gearoenix::metal::SubmissionManager::update()
         auto& scene_data = scene_pool[scenes[std::make_pair(scene.get_layer(), scene_id)]];
         auto& bvh = bvh_pool[scene_data.bvh_pool_index];
         bvh.reset();
-        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>([&](const core::ecs::entity_id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
-            if (!render_model.enabled)
-                return;
-            if (render_model.scene_id != scene_id)
-                return;
-            auto& mesh = *model.bound_mesh;
-            auto* const uniform_ptr = reinterpret_cast<ModelUniform*>(model.uniform.data[frame_number]);
-            uniform_ptr->model = simd_make_float4x4_t(model_transform.get_matrix());
-            uniform_ptr->transposed_reversed_model = simd_make_float4x4_t(model_transform.get_inverted_matrix().transposed());
-            bvh.add({ collider.get_updated_box(),
-                ModelBvhData {
-                    .blocked_cameras_flags = render_model.block_cameras_flags,
-                    .model = ModelData {
-                        .args = model.gbuffers_filler_args.buffer,
-                        .vertex = mesh.vertex_buffer,
-                        .index = mesh.index_buffer,
-                        .indices_count = mesh.indices_count,
-                    } } });
-        });
-        bvh.create_nodes();
-        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>([&](const core::ecs::entity_id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& metal_camera, const unsigned int) {
-            if (!render_camera.get_is_enabled())
-                return;
-            if (scene_id != render_camera.get_scene_id())
-                return;
-            const auto camera_location = transform.get_location();
-            auto& camera_data = camera_pool[scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)]];
-            auto* const uniform_ptr = reinterpret_cast<CameraUniform*>(camera_data.uniform_ptr);
-            uniform_ptr->view_projection = simd_make_float4x4_t(render_camera.get_view_projection());
-            camera_data.opaque_models_data.clear();
-            camera_data.tranclucent_models_data.clear();
-            bvh.call_on_intersecting(frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
-                if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
+        world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
+            [&](const core::ecs::entity_id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
+                if (!render_model.enabled)
                     return;
-                const auto dir = camera_location - bvh_node_data.box.get_center();
-                const auto dis = dir.square_length() * (dir.dot(transform.get_z_axis()) > 0.0 ? 1.0 : -1.0) - bvh_node_data.box.get_diameter().square_length() * 0.5;
-                camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data.model });
-                // TODO opaque/translucent in ModelBvhData
+                if (render_model.scene_id != scene_id)
+                    return;
+                auto& mesh = *model.bound_mesh;
+                auto* const uniform_ptr = reinterpret_cast<ModelUniform*>(model.uniform.data[frame_number]);
+                uniform_ptr->model = simd_make_float4x4_t(model_transform.get_matrix());
+                uniform_ptr->transposed_reversed_model = simd_make_float4x4_t(model_transform.get_inverted_matrix().transposed());
+                bvh.add({ collider.get_updated_box(),
+                    ModelBvhData { .blocked_cameras_flags = render_model.block_cameras_flags,
+                        .model = ModelData {
+                            .args = model.gbuffers_filler_args.buffer,
+                            .vertex = mesh.vertex_buffer,
+                            .index = mesh.index_buffer,
+                            .indices_count = mesh.indices_count,
+                        } } });
             });
-            std::sort(camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-            std::sort(camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-        });
+        bvh.create_nodes();
+        world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>(
+            [&](const core::ecs::entity_id_t camera_id, render::camera::Camera& render_camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& metal_camera, const unsigned int) {
+                if (!render_camera.get_is_enabled())
+                    return;
+                if (scene_id != render_camera.get_scene_id())
+                    return;
+                const auto camera_location = transform.get_location();
+                auto& camera_data = camera_pool[scene_data.cameras[std::make_pair(render_camera.get_layer(), camera_id)]];
+                auto* const uniform_ptr = reinterpret_cast<CameraUniform*>(camera_data.uniform_ptr);
+                uniform_ptr->view_projection = simd_make_float4x4_t(render_camera.get_view_projection());
+                camera_data.opaque_models_data.clear();
+                camera_data.tranclucent_models_data.clear();
+                bvh.call_on_intersecting(frustum, [&](const std::remove_reference_t<decltype(bvh)>::Data& bvh_node_data) {
+                    if ((bvh_node_data.user_data.blocked_cameras_flags & render_camera.get_flag()) == 0)
+                        return;
+                    const auto dir = camera_location - bvh_node_data.box.get_center();
+                    const auto dis = dir.square_length() * (dir.dot(transform.get_z_axis()) > 0.0 ? 1.0 : -1.0) - bvh_node_data.box.get_diameter().square_length() * 0.5;
+                    camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data.model });
+                    // TODO opaque/translucent in ModelBvhData
+                });
+                std::sort(camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+                std::sort(camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+            });
     });
 
     const auto blit = [cmd blitCommandEncoder];

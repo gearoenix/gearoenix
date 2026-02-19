@@ -36,14 +36,17 @@ void save_world()
 
 void open_world()
 {
-    gearoenix::platform::file_chooser_open([](gearoenix::platform::stream::Path&& path, std::shared_ptr<gearoenix::platform::stream::Stream>&& stream) {
-        gearoenix::core::ecs::World::get().clear();
-        auto progress_bar = gearoenix::editor::ui::WindowOverlayProgressBarManager::get().add("Opening World...");
-        gearoenix::core::ecs::World::read(std::move(stream), gearoenix::core::job::EndCaller<std::vector<gearoenix::core::ecs::EntityPtr>>([progress_bar = std::move(progress_bar)](auto&& entities) {
-            for (auto& e : entities) {
-                gearoenix::editor::ui::MenuScene::get().add_active_scene(std::move(e));
-            }
-        })); }, [] {}, "Open the World", file_chooser_filter);
+    gearoenix::platform::file_chooser_open(
+        [](gearoenix::platform::stream::Path&& path, std::shared_ptr<gearoenix::platform::stream::Stream>&& stream) {
+            gearoenix::core::ecs::World::get().clear();
+            auto progress_bar = gearoenix::editor::ui::WindowOverlayProgressBarManager::get().add("Opening World...");
+            gearoenix::core::ecs::World::read(std::move(stream), gearoenix::core::job::EndCaller<std::vector<gearoenix::core::ecs::EntityPtr>>([progress_bar = std::move(progress_bar)](auto&& entities) {
+                for (auto& e : entities) {
+                    gearoenix::editor::ui::MenuScene::get().add_active_scene(std::move(e));
+                }
+            }));
+        },
+        [] {}, "Open the World", file_chooser_filter);
 }
 }
 
@@ -51,9 +54,7 @@ void gearoenix::editor::ui::MenuWorld::show_new_popup()
 {
     static constexpr char name[] = "Start a new project?";
     static constexpr char body[] = "Are you sure you want to start a new project?\nYou will loose your current unsaved work!";
-    static const std::function<void()> fun = [] {
-        core::Singleton<EditorApplication>::get().renew();
-    };
+    static const std::function<void()> fun = [] { core::Singleton<EditorApplication>::get().renew(); };
 
     render::imgui::show_sure_popup(name, is_new_popup_open, body, fun);
 }
@@ -86,9 +87,7 @@ void gearoenix::editor::ui::MenuWorld::show_quit_popup()
 {
     static constexpr char name[] = "Quit the project?";
     static constexpr char body[] = "Are you sure, you want to quit the editor?\nYou will loose your current unsaved work!";
-    static const std::function<void()> fun = [] {
-        core::Singleton<EditorApplication>::get().quit();
-    };
+    static const std::function<void()> fun = [] { core::Singleton<EditorApplication>::get().quit(); };
 
     render::imgui::show_sure_popup(name, is_quit_popup_open, body, fun);
 }
@@ -134,6 +133,4 @@ void gearoenix::editor::ui::MenuWorld::update()
     show_quit_popup();
 }
 
-void gearoenix::editor::ui::MenuWorld::renew()
-{
-}
+void gearoenix::editor::ui::MenuWorld::renew() { }

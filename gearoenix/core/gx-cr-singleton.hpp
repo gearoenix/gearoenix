@@ -24,14 +24,8 @@ public:
     Singleton& operator=(Singleton&&) = delete;
     Singleton& operator=(const Singleton&) = delete;
 
-    virtual ~Singleton()
-    {
-        get_singleton_instance() = nullptr;
-    }
+    virtual ~Singleton() { get_singleton_instance() = nullptr; }
 
-    [[nodiscard]] static Target& get()
-    {
-        return *get_singleton_instance();
-    }
+    [[nodiscard]] static Target& get() { return *get_singleton_instance(); }
 };
 }

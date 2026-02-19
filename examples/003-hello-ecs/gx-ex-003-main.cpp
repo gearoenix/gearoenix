@@ -5,7 +5,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
@@ -20,6 +19,7 @@
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
+
 #include <random>
 
 namespace {
@@ -88,10 +88,7 @@ struct Position final : GxComp {
 
 Speed::Speed(GxEntity* const e)
     : GxComp(e, gearoenix::core::ecs::ComponentType::create_index(this), "speed")
-    , value(
-          speed_distribution(random_engine),
-          speed_distribution(random_engine),
-          speed_distribution(random_engine))
+    , value(speed_distribution(random_engine), speed_distribution(random_engine), speed_distribution(random_engine))
 {
     value.x += value.x > 0 ? max_speed : -max_speed;
     value.y += value.y > 0 ? max_speed : -max_speed;
@@ -132,10 +129,7 @@ void Speed::update(const Position& p)
 
 Position::Position(GxEntity* const e)
     : GxComp(e, gearoenix::core::ecs::ComponentType::create_index(this), "position")
-    , value(
-          space_distribution(random_engine),
-          space_distribution(random_engine),
-          space_distribution(random_engine))
+    , value(space_distribution(random_engine), space_distribution(random_engine), space_distribution(random_engine))
 {
 }
 
@@ -162,17 +156,11 @@ public:
         const GxEndCaller<void> end([this, materials] { materials_ready(*materials); });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            GxMatManager::get().get_pbr(
-                "material-" + std::to_string(model_index),
-                GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
-                    m->get_albedo_factor() = {
-                        colour_distribution(random_engine),
-                        colour_distribution(random_engine),
-                        colour_distribution(random_engine),
-                        1.0f
-                    };
-                    (*materials)[model_index] = std::move(m);
-                    (void)end; }));
+            GxMatManager::get().get_pbr("material-" + std::to_string(model_index), GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
+                m->set_albedo_factor({ colour_distribution(random_engine), colour_distribution(random_engine), colour_distribution(random_engine), 1.0f });
+                (*materials)[model_index] = std::move(m);
+                (void)end;
+            }));
         }
     }
 
@@ -183,20 +171,17 @@ public:
         const GxEndCaller<void> end([this, meshes] { meshes_ready(*meshes); });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            GxMeshManager::get().build_cube(
-                std::move(materials[model_index]),
-                GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
-                    (*meshes)[model_index] = std::move(mesh);
-                    (void)end; }));
+            GxMeshManager::get().build_cube(std::move(materials[model_index]), GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
+                (*meshes)[model_index] = std::move(mesh);
+                (void)end;
+            }));
         }
     }
 
     void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
     {
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            auto entity = GxModelManager::get().build(
-                "triangle" + std::to_string(model_index), scene_entity.get(),
-                { std::move(meshes[model_index]) }, true);
+            auto entity = GxModelManager::get().build("triangle" + std::to_string(model_index), scene_entity.get(), { std::move(meshes[model_index]) }, true);
             auto speed = Speed::construct<Speed>(entity.get());
             auto position = Position::construct<Position>(entity.get());
             auto* const trn = entity->get_component<GxTransform>();
@@ -208,23 +193,19 @@ public:
 
         const GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
 
-        GxCameraManager::get().build(
-            "camera", scene_entity.get(),
-            GxEntityEndCaller([this, end](GxEntityPtr&& entity) -> void {
-                auto trn = entity->get_component_shared_ptr<GxTransform>();
-                trn->set_local_position({ 0.0f, 0.0f, 5.0f });
-                (void)GxConstraintManager::get().create_jet_controller(
-                    entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
-                (void)end;
-            }));
+        GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](GxEntityPtr&& entity) -> void {
+            auto trn = entity->get_component_shared_ptr<GxTransform>();
+            trn->set_local_position({ 0.0f, 0.0f, 5.0f });
+            (void)GxConstraintManager::get().create_jet_controller(entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+            (void)end;
+        }));
 
         GxLightManager::get().build_shadow_caster_directional(
             "directional-light", scene_entity.get(),
             1024, 10.0f, 1.0f, 20.0f,
-            GxEntityEndCaller([this, end](GxEntityPtr&& entity) {
+            GxEntityEndCaller([end](GxEntityPtr&& entity) {
                 auto* const l = entity->get_component<GxShadowCaster>();
-                l->get_shadow_transform()->local_look_at(
-                    { 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
+                l->get_shadow_transform()->local_look_at({ 0.0, 0.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 });
                 l->colour = { 8.0f, 8.0f, 8.0f };
                 (void)end;
             }));

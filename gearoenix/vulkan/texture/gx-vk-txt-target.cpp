@@ -1,104 +1,137 @@
 #include "gx-vk-txt-target.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/asset/gx-cr-asset-manager.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../render/texture/gx-rnd-txt-target.hpp"
+#include "../image/gx-vk-img-image.hpp"
+#include "../image/gx-vk-img-view.hpp"
 #include "gx-vk-txt-2d.hpp"
+#include "gx-vk-txt-3d.hpp"
 #include "gx-vk-txt-cube.hpp"
 
-// MSVC does not support trivial copy constructor
-gearoenix::vulkan::texture::Target::Target(const Target& o)
-    : render::texture::Target(o)
-    , render_pass(o.render_pass)
-    , start_semaphore(o.start_semaphore)
-    , end_semaphore(o.end_semaphore)
-    , framebuffer(o.framebuffer)
+gearoenix::vulkan::texture::Target::RenderingScope::RenderingScope(const VkCommandBuffer cb)
+    : command_buffer(cb)
 {
 }
 
-gearoenix::vulkan::texture::Target::Target(
-    const core::Id id,
-    const std::vector<render::texture::AttachmentInfo>& infos,
-    engine::Engine* const e,
-    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
-    : render::texture::Target(id, e)
+gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope() { vkCmdEndRendering(command_buffer); }
+
+gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
+    : render::texture::Target(std::move(in_name), std::move(attachments))
 {
-    GX_CHECK_NOT_EQUAL_D(infos.size(), 0)
-    clipping_width = infos[0].img_width;
-    clipping_height = infos[0].img_height;
-    attachments.reserve(infos.size());
-    for (const auto& info : infos) {
-        decltype(std::declval<render::texture::Attachment>().txt) txt;
-        decltype(std::declval<render::texture::Attachment>().var) var;
+}
 
-        if (info.txt.has_value()) {
-            txt = info.txt.value();
-            switch (info.texture_info.texture_type) {
-            case render::texture::Type::Texture2D: {
-                var = render::texture::Attachment2D {
-                    .txt = std::dynamic_pointer_cast<Texture2D>(txt),
-                };
-                break;
-            }
-            case render::texture::Type::TextureCube: {
-                GX_CHECK_EQUAL_D(info.img_width, info.img_height)
-                var = render::texture::AttachmentCube {
-                    .txt = std::dynamic_pointer_cast<TextureCube>(txt),
-                    .face = info.face.value(),
-                };
-                break;
-            }
-            default:
-                GX_UNIMPLEMENTED
-            }
-        } else {
-            const auto txt_id = core::asset::Manager::create_id();
-            switch (info.texture_info.texture_type) {
-            case render::texture::Type::Texture2D: {
-                auto t = std::make_shared<Texture2D>(
-                    txt_id, std::string("target-") + std::to_string(target_id) + "-2d-" + std::to_string(txt_id),
-                    e, std::vector<std::vector<std::uint8_t>> {}, info.texture_info,
-                    static_cast<std::uint64_t>(info.img_width), static_cast<std::uint64_t>(info.img_height), call);
-                txt = t;
-                var = render::texture::Attachment2D {
-                    .txt = std::move(t),
-                };
-                break;
-            }
-            case render::texture::Type::TextureCube: {
-                GX_CHECK_EQUAL_D(info.img_width, info.img_height)
-                auto t = std::make_shared<TextureCube>(
-                    txt_id, std::string("target-") + std::to_string(target_id) + "-cube-" + std::to_string(txt_id),
-                    e, std::vector<std::vector<std::vector<std::uint8_t>>> {},
-                    info.texture_info, static_cast<std::uint64_t>(info.img_width), call);
-                txt = t;
-                var = render::texture::AttachmentCube {
-                    .txt = std::move(t),
-                    .face = info.face.value(),
-                };
-                break;
-            }
-            default:
-                GX_UNIMPLEMENTED
-            }
-        }
-
-        attachments.push_back(render::texture::Attachment {
-            .txt = std::move(txt),
-            .img_width = info.img_width,
-            .img_height = info.img_height,
-            .img_depth = 0,
-            .mipmap_level = info.mipmap_level,
-            .usage = info.usage,
-            .var = std::move(var),
-        });
-    }
+void gearoenix::vulkan::texture::Target::construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback)
+{
+    std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
+    self->update_rendering_info();
+    end_callback.set_return(std::move(self));
 }
 
 gearoenix::vulkan::texture::Target::~Target() = default;
 
-gearoenix::vulkan::texture::Target* gearoenix::vulkan::texture::Target::clone() const
+gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const VkCommandBuffer cb, const VkAttachmentLoadOp load_colours, const VkAttachmentLoadOp load_depth)
 {
-    return new Target(*this);
+    for (auto& ca : color_attachments) {
+        ca.loadOp = load_colours;
+    }
+    if (depth_attachment.has_value()) {
+        depth_attachment->loadOp = load_depth;
+    }
+
+    for (auto& [texture, view, transition_request] : gapi_attachments) {
+        view->get_image()->transit(cb, transition_request);
+    }
+
+    vkCmdBeginRendering(cb, &rendering_info);
+    return RenderingScope(cb);
+}
+
+void gearoenix::vulkan::texture::Target::update_rendering_info()
+{
+    GX_ASSERT_D(!attachments.empty());
+
+    GX_SET_ZERO(rendering_info);
+    rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+
+    color_attachments.clear();
+    color_attachments.reserve(attachments.size());
+
+    depth_attachment.reset();
+
+    gapi_attachments.clear();
+    gapi_attachments.reserve(attachments.size());
+    for (const auto& a : attachments) {
+        gapi_attachments.emplace_back();
+        auto& [texture, view, transition_request] = gapi_attachments.back();
+
+        const auto att_conv = [&]<std::size_t I, typename Tex>() {
+            const auto& at = std::get<I>(a.var);
+            auto vk_txt = std::dynamic_pointer_cast<Tex>(at.txt);
+            GX_ASSERT_D(nullptr != vk_txt);
+
+            int array_index = 0;
+            int mip_index = 0;
+
+            if constexpr (I == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+                GX_ASSERT_D(vk_txt->get_mips().size() > a.mipmap_level);
+                view = vk_txt->get_mips()[a.mipmap_level];
+                array_index = 0;
+                mip_index = a.mipmap_level;
+            } else if constexpr (I == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+                const auto face_index = static_cast<int>(at.face);
+                GX_ASSERT_D(vk_txt->get_mips()[face_index].size() > a.mipmap_level);
+                view = vk_txt->get_mips()[face_index][a.mipmap_level];
+                array_index = face_index;
+                mip_index = a.mipmap_level;
+            } else {
+                GX_UNEXPECTED;
+            }
+
+            const auto& info = vk_txt->get_info();
+            const auto is_depth = render::texture::format_is_depth(info.get_format());
+
+            transition_request = is_depth ? image::TransitionRequest::depth_attachment() : image::TransitionRequest::color_attachment();
+            transition_request = transition_request.with_mips(mip_index, 1).with_layers(array_index, 1);
+
+            VkRenderingAttachmentInfo attachment_info;
+            GX_SET_ZERO(attachment_info);
+            attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+            attachment_info.imageView = view->get_vulkan_data();
+            attachment_info.imageLayout = is_depth ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+            if (is_depth) {
+                attachment_info.clearValue.depthStencil = VkClearDepthStencilValue { 1.0f, 0 };
+                depth_attachment = attachment_info;
+            } else {
+                attachment_info.clearValue.color = VkClearColorValue { 0.0f, 0.0f, 0.0f, 0.0f };
+                color_attachments.emplace_back(attachment_info);
+            }
+
+            const auto& extent = view->get_extent();
+
+            GX_ASSERT_D(0 != info.get_width() && 0 != info.get_height());
+            GX_ASSERT_D((rendering_info.renderArea.extent.width == 0 && rendering_info.renderArea.extent.height == 0) || (rendering_info.renderArea.extent.width == extent.width && rendering_info.renderArea.extent.height == extent.height));
+            rendering_info.renderArea.extent.width = extent.width;
+            rendering_info.renderArea.extent.height = extent.height;
+
+            texture = std::move(vk_txt);
+        };
+
+        if (a.var.index() == render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX) {
+            att_conv.operator()<render::texture::Attachment::ATTACHMENT_2D_VARIANT_INDEX, Texture2D>();
+        } else if (a.var.index() == render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX) {
+            att_conv.operator()<render::texture::Attachment::ATTACHMENT_CUBE_VARIANT_INDEX, TextureCube>();
+        } else {
+            GX_UNEXPECTED;
+        }
+    }
+
+    rendering_info.layerCount = 1;
+    rendering_info.colorAttachmentCount = static_cast<uint32_t>(color_attachments.size());
+    rendering_info.pColorAttachments = color_attachments.data();
+    rendering_info.pDepthAttachment = depth_attachment.has_value() ? &*depth_attachment : nullptr;
 }
 
 #endif

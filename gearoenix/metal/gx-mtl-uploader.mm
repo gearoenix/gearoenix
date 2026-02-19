@@ -71,8 +71,7 @@ void gearoenix::metal::Uploader::upload(id<MTLTexture> destination, MTLTextureDe
             for (NSUInteger hi = 0; hi < height; ++hi, src -= w_src, dst += w_dst, offset_in_buffer += w_dst) {
                 std::memcpy(dst, src, w_src);
             }
-            [enc
-                     copyFromBuffer:buffer
+            [enc copyFromBuffer:buffer
                        sourceOffset:offset
                   sourceBytesPerRow:w_dst
                 sourceBytesPerImage:w_dst * height

@@ -11,12 +11,7 @@
 #include "../texture/gx-rnd-txt-texture-cube.hpp"
 
 gearoenix::render::reflection::Runtime::Runtime(
-    core::ecs::Entity* const entity,
-    const core::object_type_index_t final_component_type_index,
-    const math::Aabb3<double>& receive_box,
-    const math::Aabb3<double>& exclude_box,
-    const math::Aabb3<double>& include_box,
-    std::string&& name)
+    core::ecs::Entity* const entity, const core::object_type_index_t final_component_type_index, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name)
     : Probe(entity, final_component_type_index, include_box, std::move(name))
     , on_rendered([] { })
     , receive_box(receive_box)
@@ -26,11 +21,7 @@ gearoenix::render::reflection::Runtime::Runtime(
     GX_ASSERT(include_box.get_center() == exclude_box.get_center());
 }
 
-void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
-    const std::uint32_t environment_resolution,
-    const std::uint32_t irradiance_resolution,
-    const std::uint32_t radiance_resolution,
-    core::job::EndCaller<>&& end_callback)
+void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(const std::uint32_t environment_resolution, const std::uint32_t irradiance_resolution, const std::uint32_t radiance_resolution, core::job::EndCaller<>&& end_callback)
 {
     const auto radiance_mipmap_levels = static_cast<std::uint32_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
     const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
@@ -60,12 +51,8 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     const auto environment_texture_info = // ---
         texture::TextureInfo()
             .set_format(engine::Engine::get().get_specification().is_float_texture_supported ? texture::TextureFormat::RgbaFloat32 : texture::TextureFormat::RgbaUint8)
-            .set_sampler_info(texture::SamplerInfo()
-                    .set_min_filter(texture::Filter::LinearMipmapLinear)
-                    .set_mag_filter(texture::Filter::Linear)
-                    .set_wrap_s(texture::Wrap::ClampToEdge)
-                    .set_wrap_t(texture::Wrap::ClampToEdge)
-                    .set_wrap_r(texture::Wrap::ClampToEdge))
+            .set_sampler_info(
+                texture::SamplerInfo().set_min_filter(texture::Filter::LinearMipmapLinear).set_mag_filter(texture::Filter::Linear).set_wrap_s(texture::Wrap::ClampToEdge).set_wrap_t(texture::Wrap::ClampToEdge).set_wrap_r(texture::Wrap::ClampToEdge))
             .set_width(environment_resolution)
             .set_height(environment_resolution)
             .set_type(texture::Type::TextureCube)
@@ -77,11 +64,8 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             const auto& face = faces[face_index];
             const auto name_ext = "-" + std::to_string(face.face);
             const auto& cam = cameras[face_index].cmr;
-            texture::Manager::get().create_target(
-                object_name + "-environment-target" + name_ext,
-                std::vector {
-                    texture::Attachment(texture::AttachmentCube(std::shared_ptr(environment), face.face)),
-                    texture::Attachment(texture::Attachment2D(std::shared_ptr(environment_depth))) },
+            texture::Manager::get().create_target(object_name + "-environment-target" + name_ext,
+                std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(environment), face.face)), texture::Attachment(texture::Attachment2D(std::shared_ptr(environment_depth))) },
                 core::job::EndCallerShared<texture::Target>([this, main_end_callback, _s, face_index, cam](std::shared_ptr<texture::Target>&& t) -> void {
                     environment_targets[face_index] = std::move(t);
                     cam->set_customised_target(std::shared_ptr(environment_targets[face_index]));
@@ -97,27 +81,19 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
             transform->local_inner_y_rotate(face.y_rotate);
             transform->local_inner_z_rotate(face.z_rotate);
             transform->set_local_position(receive_box.get_center());
-            texture::Manager::get().create_target(
-                object_name + "-irradiance-target" + name_ext,
-                std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(irradiance), face.face)) },
-                core::job::EndCallerShared<texture::Target>([this, main_end_callback, _s, face_index, cam](std::shared_ptr<texture::Target>&& t) {
-                    irradiance_targets[face_index] = std::move(t);
-                }));
+            texture::Manager::get().create_target(object_name + "-irradiance-target" + name_ext, std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(irradiance), face.face)) },
+                core::job::EndCallerShared<texture::Target>([this, main_end_callback, _s, face_index, cam](std::shared_ptr<texture::Target>&& t) { irradiance_targets[face_index] = std::move(t); }));
             radiance_targets[face_index].resize(roughnesses.size());
             for (std::uint64_t mip_index = 0; mip_index < roughnesses.size(); ++mip_index) {
-                texture::Manager::get().create_target(
-                    object_name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
+                texture::Manager::get().create_target(object_name + "-radiance-target" + name_ext + "-" + std::to_string(mip_index),
                     std::vector { texture::Attachment(texture::AttachmentCube(std::shared_ptr(radiance), face.face), static_cast<std::uint8_t>(mip_index)) },
-                    core::job::EndCallerShared<texture::Target>([this, main_end_callback, _s, face_index, mip_index, cam](std::shared_ptr<texture::Target>&& t) {
-                        radiance_targets[face_index][mip_index] = std::move(t);
-                    }));
+                    core::job::EndCallerShared<texture::Target>([this, main_end_callback, _s, face_index, mip_index, cam](std::shared_ptr<texture::Target>&& t) { radiance_targets[face_index][mip_index] = std::move(t); }));
             }
         }
     });
 
     texture::Manager::get().create_cube_from_pixels(
-        object_name + "-environment", {}, environment_texture_info,
-        core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
+        object_name + "-environment", {}, environment_texture_info, core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
             environment = std::move(t);
             (void)when_all_textures_are_ready;
             (void)self;
@@ -126,8 +102,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     irradiance_texture_info.set_width(irradiance_resolution);
     irradiance_texture_info.set_height(irradiance_resolution);
     texture::Manager::get().create_cube_from_pixels(
-        object_name + "-irradiance", {}, irradiance_texture_info,
-        core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
+        object_name + "-irradiance", {}, irradiance_texture_info, core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
             irradiance = std::move(t);
             (void)when_all_textures_are_ready;
             (void)self;
@@ -148,23 +123,16 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         }
     }
     texture::Manager::get().create_cube_from_pixels(
-        object_name + "-radiance", {}, radiance_texture_info,
-        core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
+        object_name + "-radiance", {}, radiance_texture_info, core::job::EndCallerShared<texture::TextureCube>([this, when_all_textures_are_ready, self = runtime_self](std::shared_ptr<texture::TextureCube>&& t) {
             set_radiance(std::move(t));
             (void)when_all_textures_are_ready;
             (void)self;
         }));
-    texture::Manager::get().create_2d_from_pixels(
-        object_name + "-environment-depth",
-        {},
+    texture::Manager::get().create_2d_from_pixels(object_name + "-environment-depth", {},
         texture::TextureInfo()
             .set_format(texture::TextureFormat::D32)
-            .set_sampler_info(texture::SamplerInfo()
-                    .set_min_filter(texture::Filter::Nearest)
-                    .set_mag_filter(texture::Filter::Nearest)
-                    .set_wrap_s(texture::Wrap::ClampToEdge)
-                    .set_wrap_t(texture::Wrap::ClampToEdge)
-                    .set_wrap_r(texture::Wrap::ClampToEdge))
+            .set_sampler_info(
+                texture::SamplerInfo().set_min_filter(texture::Filter::Nearest).set_mag_filter(texture::Filter::Nearest).set_wrap_s(texture::Wrap::ClampToEdge).set_wrap_t(texture::Wrap::ClampToEdge).set_wrap_r(texture::Wrap::ClampToEdge))
             .set_width(environment_resolution)
             .set_height(environment_resolution)
             .set_type(texture::Type::Texture2D)
@@ -178,14 +146,12 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         const auto& face = faces[face_index];
         const auto name_ext = "-" + std::to_string(face.face);
         auto camera_name = std::string(object_name).append("-camera").append(name_ext);
-        camera::Manager::get().build(
-            std::move(camera_name), entity,
-            core::job::EndCaller<core::ecs::EntityPtr>([this, face_index, when_all_textures_are_ready, self = runtime_self](core::ecs::EntityPtr&& camera_entity) {
-                cameras[face_index].cmr = camera_entity->get_component_shared_ptr<camera::Camera>();
-                cameras[face_index].trn = camera_entity->get_component_shared_ptr<physics::Transformation>();
-                (void)when_all_textures_are_ready;
-                (void)self;
-            }));
+        camera::Manager::get().build(std::move(camera_name), entity, core::job::EndCaller<core::ecs::EntityPtr>([this, face_index, when_all_textures_are_ready, self = runtime_self](core::ecs::EntityPtr&& camera_entity) {
+            cameras[face_index].cmr = camera_entity->get_component_shared_ptr<camera::Camera>();
+            cameras[face_index].trn = camera_entity->get_component_shared_ptr<physics::Transformation>();
+            (void)when_all_textures_are_ready;
+            (void)self;
+        }));
     }
 }
 
@@ -273,15 +239,10 @@ void gearoenix::render::reflection::Runtime::update_state()
     }
 }
 
-void gearoenix::render::reflection::Runtime::set_on_rendered(std::function<void()>&& f)
-{
-    on_rendered = std::move(f);
-}
+void gearoenix::render::reflection::Runtime::set_on_rendered(std::function<void()>&& f) { on_rendered = std::move(f); }
 
 void gearoenix::render::reflection::Runtime::export_baked(const std::shared_ptr<platform::stream::Stream>& s, core::job::EndCaller<>&& end_callback) const
 {
     include_box.write(*s);
-    irradiance->write(s, core::job::EndCaller([s, radiance = radiance, end_callback = std::move(end_callback)] {
-        radiance->write(s, end_callback);
-    }));
+    irradiance->write(s, core::job::EndCaller([s, radiance = radiance, end_callback = std::move(end_callback)] { radiance->write(s, end_callback); }));
 }

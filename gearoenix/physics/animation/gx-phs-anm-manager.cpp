@@ -17,15 +17,9 @@ gearoenix::physics::animation::Manager::Manager()
     core::Object::register_type<SpriteAnimation>();
 }
 
-gearoenix::physics::animation::Manager::~Manager()
-{
-    animations.clear();
-}
+gearoenix::physics::animation::Manager::~Manager() { animations.clear(); }
 
-gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_armature(
-    std::string&& name,
-    core::ecs::Entity* const parent,
-    std::shared_ptr<Bone>&& root_bone)
+gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_armature(std::string&& name, core::ecs::Entity* const parent, std::shared_ptr<Bone>&& root_bone)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
     root_bone->get_entity()->set_parent(entity.get());
@@ -48,11 +42,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_a
     return entity;
 }
 
-void gearoenix::physics::animation::Manager::create_sprite(
-    core::ecs::EntityPtr& entity,
-    std::shared_ptr<render::material::Sprite>&& sprite,
-    const std::uint32_t width,
-    const std::uint32_t height)
+void gearoenix::physics::animation::Manager::create_sprite(core::ecs::EntityPtr& entity, std::shared_ptr<render::material::Sprite>&& sprite, const std::uint32_t width, const std::uint32_t height)
 {
     auto anim = core::Object::construct<SpriteAnimation>(entity->get_object_name() + "-sprite-animation", std::move(sprite), width, height);
     auto player = core::Object::construct<AnimationPlayer>(entity.get(), std::shared_ptr(anim), entity->get_object_name() + "-animation-player", 0.0);

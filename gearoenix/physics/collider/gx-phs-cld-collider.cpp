@@ -25,23 +25,13 @@ void gearoenix::physics::collider::Collider::show_debug_gui()
 
 gearoenix::physics::collider::Collider::~Collider() = default;
 
-bool gearoenix::physics::collider::Collider::check_intersection(const math::Aabb3<double>& box) const
-{
-    return surrounding_box.check_intersection(box);
-}
+bool gearoenix::physics::collider::Collider::check_intersection(const math::Aabb3<double>& box) const { return surrounding_box.check_intersection(box); }
 
-gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::check_intersection_status(
-    const math::Aabb3<double>& box) const
-{
-    return surrounding_box.check_intersection_status(box);
-}
+gearoenix::math::IntersectionStatus gearoenix::physics::collider::Collider::check_intersection_status(const math::Aabb3<double>& box) const { return surrounding_box.check_intersection_status(box); }
 
 void gearoenix::physics::collider::Collider::update_all_after_transform_update()
 {
-    core::ecs::World::get().parallel_system<Collider>(
-        [&](const auto, auto* const cld, const auto) {
-            cld->update_surrounding_box();
-        });
+    core::ecs::World::get().parallel_system<Collider>([&](const auto, auto* const cld, const auto) { cld->update_surrounding_box(); });
 }
 
 void gearoenix::physics::collider::Collider::draw_gizmo()

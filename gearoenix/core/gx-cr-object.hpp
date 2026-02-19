@@ -29,9 +29,7 @@ typedef boost::container::flat_set<object_type_index_t> ObjectTypeIndexSet;
 template <typename T>
 concept ObjectTypeHasRead = requires(std::shared_ptr<T>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& os, job::EndCaller<>&& end) {
     { T::read(std::move(self), std::move(stream), std::move(os), std::move(end)) } -> std::same_as<void>;
-} && requires(object_id_t id, std::string&& name) {
-    T { id, std::move(name) };
-};
+} && requires(object_id_t id, std::string&& name) { T { id, std::move(name) }; };
 
 #define GEAROENIX_OBJECT_STRUCT_DEF        \
     friend struct gearoenix::core::Object; \
@@ -116,10 +114,7 @@ struct Object {
 
 private:
     /// This function should only be called in the ObjectStreamer.
-    static void read(
-        std::shared_ptr<platform::stream::Stream>&& stream,
-        std::shared_ptr<ObjectStreamer>&& stream_context,
-        job::EndCallerShared<Object>&& end_callback);
+    static void read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& stream_context, job::EndCallerShared<Object>&& end_callback);
 
     /// This function should only be called in the ObjectStreamer.
     void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer);
@@ -133,10 +128,7 @@ public:
     virtual void show_debug_gui();
 
     template <typename T>
-    [[nodiscard]] static std::string create_type_name()
-    {
-        return boost::core::demangle(typeid(std::remove_cvref_t<T>).name());
-    }
+    [[nodiscard]] static std::string create_type_name() { return boost::core::demangle(typeid(std::remove_cvref_t<T>).name()); }
 
     template <typename T, typename... Args>
     [[nodiscard]] static std::shared_ptr<T> construct(Args&&... args)
@@ -190,19 +182,13 @@ public:
     [[nodiscard]] static bool check_object_type_registration_state(object_type_index_t ti);
 
     template <typename T>
-    [[nodiscard]] static const ObjectTypeInfo& get_type_info()
-    {
-        return get_type_info(T::object_type_index);
-    }
+    [[nodiscard]] static const ObjectTypeInfo& get_type_info() { return get_type_info(T::object_type_index); }
 
     [[nodiscard]] const ObjectTypeIndexSet& get_all_parent_types() const;
     [[nodiscard]] static std::shared_ptr<Object> find_object(object_id_t);
 
     template <typename T>
-    [[nodiscard]] static std::shared_ptr<T> find_object_t(const object_id_t id)
-    {
-        return cast_shared<T>(find_object(id));
-    }
+    [[nodiscard]] static std::shared_ptr<T> find_object_t(const object_id_t id) { return cast_shared<T>(find_object(id)); }
 
     [[nodiscard]] virtual bool is_castable_to(object_type_index_t ti) const;
 };

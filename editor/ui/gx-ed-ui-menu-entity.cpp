@@ -83,9 +83,12 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
     (void)render::imgui::entity_name_text_input(create_skybox_entity_name);
 
     if (ImGui::Button("Browse File")) {
-        platform::file_chooser_open([this](platform::stream::Path&& path, std::shared_ptr<platform::stream::Stream>&& stream) {
-            skybox_stream = std::move(stream);
-            create_skybox_file_path = std::move(path); }, [] {}, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
+        platform::file_chooser_open(
+            [this](platform::stream::Path&& path, std::shared_ptr<platform::stream::Stream>&& stream) {
+                skybox_stream = std::move(stream);
+                create_skybox_file_path = std::move(path);
+            },
+            [] {}, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
     }
 
     scene_selector->show<render::scene::Scene>();
@@ -95,8 +98,7 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
             if (ImGui::Button("Create")) {
                 auto progress_bar = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_file_path.get_raw_data() + "]...");
                 core::job::send_job_to_pool([this, scene_entity, progress_bar = std::move(progress_bar)]() mutable noexcept -> void {
-                    render::texture::Manager::get().create(
-                        create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
+                    render::texture::Manager::get().create(create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
                         core::job::EndCallerShared<render::texture::Texture>([this, progress_bar = std::move(progress_bar), scene_entity](std::shared_ptr<render::texture::Texture>&& txt) mutable {
                             render::skybox::Manager::get().build(std::string(create_skybox_entity_name), scene_entity, std::move(txt), core::job::EndCaller<core::ecs::EntityPtr>([progress_bar = std::move(progress_bar)](auto&& skybox_entity) {
                                 (void)progress_bar;
@@ -163,7 +165,4 @@ void gearoenix::editor::ui::MenuEntity::update()
     show_create_skybox_window();
 }
 
-void gearoenix::editor::ui::MenuEntity::renew()
-{
-    GX_TODO;
-}
+void gearoenix::editor::ui::MenuEntity::renew() { GX_TODO; }

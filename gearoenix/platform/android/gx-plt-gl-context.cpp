@@ -80,8 +80,7 @@ void gearoenix::platform::GlContext::init_egl_surface()
                 continue;
             eglQuerySurface(display, surface, EGL_WIDTH, &screen_width);
             eglQuerySurface(display, surface, EGL_HEIGHT, &screen_height);
-            GX_LOG_D("Surface with OpenGL: " << (c[0] == EGL_OPENGL_ES3_BIT ? "ES3" : "ES2")
-                                             << ", depth: " << c[1] << ", samples: " << c[2]);
+            GX_LOG_D("Surface with OpenGL: " << (c[0] == EGL_OPENGL_ES3_BIT ? "ES3" : "ES2") << ", depth: " << c[1] << ", samples: " << c[2]);
             return;
         }
     }
@@ -101,10 +100,7 @@ void gearoenix::platform::GlContext::init_egl_context()
     GX_LOG_F("Can not create the required context");
 }
 
-gearoenix::platform::GlContext::~GlContext()
-{
-    terminate();
-}
+gearoenix::platform::GlContext::~GlContext() { terminate(); }
 
 void gearoenix::platform::GlContext::init(ANativeWindow* const _window)
 {

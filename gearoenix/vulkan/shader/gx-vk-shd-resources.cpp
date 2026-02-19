@@ -1,63 +1,51 @@
 #include "gx-vk-shd-resources.hpp"
-#ifdef USE_VULKAN
-#include "../../core/gx-cr-static.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/allocator/gx-cr-alc-range.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../buffer/gx-vk-buf-sub-buffer.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
-#include "../descriptor/gx-vk-des-set.hpp"
-#include "../gx-vk-engine.hpp"
+#include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
-#include "../texture/gx-vk-txt-sampler-2d.hpp"
-#include "../texture/gx-vk-txt-texture-2d.hpp"
 
-gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u)
-    : e(e)
+gearoenix::vulkan::shader::Resources::Resources(pipeline::Pipeline* pip, buffer::Uniform* u)
 {
-    dc = u->get_count();
-    dessets = new descriptor::Set*[dc];
-    for (unsigned int i = 0; i < dc; ++i) {
+    descriptors_count = 1;
+    descriptors.resize(descriptors_count);
+    for (unsigned int i = 0; i < descriptors_count; ++i) {
         VkDescriptorBufferInfo inf;
-        setz(inf);
-        inf.buffer = u->get_vbuf()[i]->get_buffer()->get_vulkan_data();
-        inf.offset = u->get_vbuf()[i]->get_offset();
-        inf.range = u->get_size();
-        dessets[i] = new descriptor::Set(e->get_pipeline_manager()->get_descriptor_pool(), pip->get_descriptor_set_layout(), inf);
+        GX_SET_ZERO(inf);
+        inf.buffer = u->get_gpu()->get_vulkan_data();
+        inf.offset = u->get_gpu()->get_offset();
+        inf.range = u->get_gpu()->get_allocated_memory()->get_allocator()->get_size();
+        // descriptors[i] = new descriptor::Set(pipeline::Manager::get().get_descriptor_pool(), pip->get_descriptor_set_layout(), inf);
     }
 }
 
-gearoenix::render::shader::Resources::Resources(Engine* e, pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t)
-    : e(e)
+gearoenix::vulkan::shader::Resources::Resources(pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t)
 {
-    dc = u->get_count();
-    dessets = new descriptor::Set*[dc];
-    for (unsigned int i = 0; i < dc; ++i) {
+    descriptors_count = 1;
+    descriptors.resize(descriptors_count);
+    for (unsigned int i = 0; i < descriptors_count; ++i) {
         VkDescriptorBufferInfo inf;
-        setz(inf);
-        inf.buffer = u->get_vbuf()[i]->get_buffer()->get_vulkan_data();
-        inf.offset = u->get_vbuf()[i]->get_offset();
-        inf.range = u->get_size();
+        GX_SET_ZERO(inf);
+        // inf.buffer = u->get_vbuf()[i]->get_buffer()->get_vulkan_data();
+        // inf.offset = u->get_vbuf()[i]->get_offset();
+        // inf.range = u->get_size();
         VkDescriptorImageInfo imginf;
-        setz(imginf);
-        imginf.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imginf.imageView = t->get_view()->get_vulkan_data();
-        imginf.sampler = e->get_sampler_2d()->get_vulkan_data();
-        dessets[i] = new descriptor::Set(e->get_pipeline_manager()->get_descriptor_pool(), pip->get_descriptor_set_layout(), inf, imginf);
+        GX_SET_ZERO(imginf);
+        // imginf.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        // imginf.imageView = t->get_view()->get_vulkan_data();
+        // imginf.sampler = e->get_sampler_2d()->get_vulkan_data();
+        // dessets[i] = new descriptor::Set(e->get_pipeline_manager()->get_descriptor_pool(), pip->get_descriptor_set_layout(), inf, imginf);
     }
 }
 
-gearoenix::render::shader::Resources::~Resources()
-{
-    for (unsigned int i = 0; i < dc; ++i) {
-        delete dessets[i];
-    }
-    delete[] dessets;
-}
+gearoenix::vulkan::shader::Resources::~Resources() = default;
 
-void gearoenix::render::shader::Resources::bind(pipeline::Pipeline* p)
+void gearoenix::vulkan::shader::Resources::bind(pipeline::Pipeline& pip)
 {
-    command::Buffer* c = e->get_current_command_buffer();
-    dessets[e->get_current_frame_index()]->bind(p, c);
+    // descriptors[core::Singleton<engine::Engine>::get().get_frame_number()]->(p, cmd);
 }
 #endif

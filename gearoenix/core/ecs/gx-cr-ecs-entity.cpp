@@ -5,10 +5,11 @@
 #include "../gx-cr-static-flat-set.hpp"
 #include "gx-cr-ecs-world.hpp"
 
-void gearoenix::core::ecs::Entity::write(
-    std::shared_ptr<platform::stream::Stream>&& s,
-    std::shared_ptr<ObjectStreamer>&& sc,
-    job::EndCaller<>&&)
+namespace {
+const std::shared_ptr<gearoenix::core::ecs::Component> null_comp = nullptr;
+}
+
+void gearoenix::core::ecs::Entity::write(std::shared_ptr<platform::stream::Stream>&& s, std::shared_ptr<ObjectStreamer>&& sc, job::EndCaller<>&&)
 {
     static_flat_set<std::shared_ptr<Component>, max_components> components;
     for (const auto& ci : all_types_to_components) {
@@ -177,7 +178,6 @@ const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::En
     if (const auto search = all_types_to_components.find(component_type); search != all_types_to_components.end()) {
         return search->second;
     }
-    static const std::shared_ptr<Component> null_comp = nullptr;
     return null_comp;
 }
 

@@ -40,12 +40,10 @@ private:
 public:
     GameApp()
     {
-        gearoenix::render::gltf::load(
-            GxPath::create_absolute("../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
-            GxEndCaller<std::vector<GxEntityPtr>>([this](auto&& entities) {
-                scene_entity = std::move(entities[0]);
-                gltf_is_ready();
-            }));
+        gearoenix::render::gltf::load(GxPath::create_absolute("../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"), GxEndCaller<std::vector<GxEntityPtr>>([this](auto&& entities) {
+            scene_entity = std::move(entities[0]);
+            gltf_is_ready();
+        }));
     }
 
     void gltf_is_ready()
@@ -67,9 +65,7 @@ public:
         if (camera_entity) {
             camera_is_ready(camera_entity, end);
         } else {
-            GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) {
-                camera_is_ready(entity.get(), end);
-            }));
+            GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) { camera_is_ready(entity.get(), end); }));
         }
     }
 

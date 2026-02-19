@@ -50,20 +50,9 @@ struct TextureManager final : render::texture::Manager, core::Singleton<TextureM
     ~TextureManager() override;
 
 private:
-    void create_2d_from_pixels_v(
-        std::string&& name,
-        std::vector<std::vector<std::uint8_t>>&& pixels,
-        const render::texture::TextureInfo& info,
-        core::job::EndCallerShared<render::texture::Texture2D>&& c) override;
-    void create_cube_from_pixels_v(
-        std::string&& name,
-        std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
-        const render::texture::TextureInfo& info,
-        core::job::EndCallerShared<render::texture::TextureCube>&& c) override;
-    void create_target_v(
-        std::string&& name,
-        std::vector<render::texture::Attachment>&& attachments,
-        core::job::EndCallerShared<render::texture::Target>&& c) override;
+    void create_2d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c) override;
+    void create_cube_from_pixels_v(std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::TextureCube>&& c) override;
+    void create_target_v(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& c) override;
 };
 }
 

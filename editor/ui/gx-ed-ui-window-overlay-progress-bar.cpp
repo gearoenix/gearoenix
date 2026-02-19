@@ -27,9 +27,7 @@ public:
         }
         const ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
         ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-        if (ImGui::BeginPopupModal(
-                progress_bar_id, nullptr,
-                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (ImGui::BeginPopupModal(progress_bar_id, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
             const auto progress_bar_length = static_cast<float>(progress_bar_text.size()) * 10.0f;
             if (progress_indicator.has_value()) {
                 const auto progress = (*progress_indicator)();
@@ -50,10 +48,7 @@ struct WindowOverlayProgressBarHandle final {
     {
     }
 
-    ~WindowOverlayProgressBarHandle() noexcept
-    {
-        WindowOverlayProgressBarManager::get().remove(id);
-    }
+    ~WindowOverlayProgressBarHandle() noexcept { WindowOverlayProgressBarManager::get().remove(id); }
 };
 }
 
@@ -64,9 +59,7 @@ gearoenix::editor::ui::WindowOverlayProgressBarManager::WindowOverlayProgressBar
 
 gearoenix::editor::ui::WindowOverlayProgressBarManager::~WindowOverlayProgressBarManager() = default;
 
-std::shared_ptr<gearoenix::editor::ui::WindowOverlayProgressBarHandle> gearoenix::editor::ui::WindowOverlayProgressBarManager::add(
-    std::string&& progress_bar_text,
-    std::optional<std::function<float()>>&& progress_indicator)
+std::shared_ptr<gearoenix::editor::ui::WindowOverlayProgressBarHandle> gearoenix::editor::ui::WindowOverlayProgressBarManager::add(std::string&& progress_bar_text, std::optional<std::function<float()>>&& progress_indicator)
 {
     const auto id = ++id_generator;
     auto handle = std::make_shared<WindowOverlayProgressBarHandle>(id);

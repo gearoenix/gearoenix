@@ -1,35 +1,24 @@
-#ifndef GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
-#define GEAROENIX_VULKAN_IMAGE_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
-#include "../../core/sync/gx-cr-job-end-caller.hpp"
-#include <tuple>
-#include <vector>
+#include "../../core/gx-cr-singleton.hpp"
+#include "../../core/job/gx-cr-job-end-caller.hpp"
+#include "../gx-vk-loader.hpp"
+#include <memory>
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
 }
 
-namespace gearoenix::vulkan::command {
-struct Buffer;
-}
-
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
-
 namespace gearoenix::vulkan::image {
 struct Image;
-struct Manager final {
-private:
-    engine::Engine& e;
 
-public:
-    explicit Manager(engine::Engine& e);
-    ~Manager();
+struct Manager final : core::Singleton<Manager> {
+    Manager();
+    ~Manager() override;
+
+    /// Uploads image data from multiple buffers <(Array or Face)<Mip>> to the image
+    static void upload(std::shared_ptr<Image>&& img, std::vector<std::vector<std::shared_ptr<buffer::Buffer>>>&& buffs, bool generate_mipmaps, core::job::EndCaller<>&& end);
 };
 }
-
-#endif
 #endif

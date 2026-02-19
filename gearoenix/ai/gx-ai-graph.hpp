@@ -52,9 +52,7 @@ struct Graph {
         return true;
     }
 
-    static void get_all_descendants(
-        std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s,
-        const std::shared_ptr<Node<VertexData, EdgeData>>& n)
+    static void get_all_descendants(std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s, const std::shared_ptr<Node<VertexData, EdgeData>>& n)
     {
         if (s.find(n) != s.end())
             return;
@@ -71,10 +69,7 @@ struct Graph {
         return s;
     }
 
-    static void print(
-        std::ostream& os,
-        std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s,
-        const std::shared_ptr<Node<VertexData, EdgeData>>& n)
+    static void print(std::ostream& os, std::set<std::shared_ptr<Node<VertexData, EdgeData>>>& s, const std::shared_ptr<Node<VertexData, EdgeData>>& n)
     {
         s.insert(n);
         os << "{\"node\":" << (*n) << ",\"connections\":[";

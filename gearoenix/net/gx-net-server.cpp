@@ -34,8 +34,7 @@ gearoenix::net::Server::Server(const std::uint16_t p, const std::uint64_t cc, ne
     clients.reserve(max_clients);
 }
 
-std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(
-    const std::uint16_t port, const std::uint64_t max_clients, new_client_callback_t&& on_connect)
+std::shared_ptr<gearoenix::net::Server> gearoenix::net::Server::construct(const std::uint16_t port, const std::uint64_t max_clients, new_client_callback_t&& on_connect)
 {
     std::shared_ptr<Server> server(new Server(port, max_clients, std::move(on_connect)));
     if (!server->host) {
@@ -115,8 +114,8 @@ void gearoenix::net::Server::create_thread()
 
             case ENET_EVENT_TYPE_RECEIVE: {
                 if (!event.packet) {
-                   GX_LOG_E("Packet received with null");
-                   break;
+                    GX_LOG_E("Packet received with null");
+                    break;
                 }
                 const auto search = clients.find(event.peer);
                 if (clients.end() == search) {
@@ -131,9 +130,7 @@ void gearoenix::net::Server::create_thread()
                 }
                 core::job::send_job_to_pool([packet = event.packet, c = std::move(c)] {
                     std::vector<std::uint8_t> data;
-                    data.assign(
-                        reinterpret_cast<const std::uint8_t*>(packet->data),
-                        reinterpret_cast<const std::uint8_t*>(packet->data) + packet->dataLength);
+                    data.assign(reinterpret_cast<const std::uint8_t*>(packet->data), reinterpret_cast<const std::uint8_t*>(packet->data) + packet->dataLength);
 
                     c->received_callback(std::move(data));
                     enet_packet_destroy(packet);
@@ -185,10 +182,7 @@ void gearoenix::net::Server::terminate()
     thread.reset();
 }
 
-gearoenix::net::Server::~Server()
-{
-    terminate();
-}
+gearoenix::net::Server::~Server() { terminate(); }
 
 void gearoenix::net::Server::broadcast(const std::span<const std::byte> data) const
 {

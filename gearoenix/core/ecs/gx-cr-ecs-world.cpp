@@ -34,10 +34,7 @@ void gearoenix::core::ecs::World::delayed_add_entity(EntityPtr&& e)
     delayed_actions.push_back(Action { .variant = Action::Add { .entity = std::move(e) } });
 }
 
-void gearoenix::core::ecs::World::delete_entity(std::shared_ptr<Entity>&& e)
-{
-    get_archetype(e.get())->delete_entity(e.get());
-}
+void gearoenix::core::ecs::World::delete_entity(std::shared_ptr<Entity>&& e) { get_archetype(e.get())->delete_entity(e.get()); }
 
 void gearoenix::core::ecs::World::delayed_delete_entity(std::shared_ptr<Entity>&& e)
 {
@@ -62,10 +59,7 @@ void gearoenix::core::ecs::World::delayed_pullout_entity(EntityPtr&& e, job::End
     });
 }
 
-gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(const EntityPtr& e)
-{
-    return get_archetype(e.get());
-}
+gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(const EntityPtr& e) { return get_archetype(e.get()); }
 
 gearoenix::core::ecs::Archetype* gearoenix::core::ecs::World::get_archetype(const Entity* const e)
 {

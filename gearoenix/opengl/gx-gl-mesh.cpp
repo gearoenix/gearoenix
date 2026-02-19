@@ -95,9 +95,7 @@ void gearoenix::gl::Buffer::construct(
     });
 }
 
-gearoenix::gl::Mesh::Mesh(
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material)
+gearoenix::gl::Mesh::Mesh(std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material)
     : render::mesh::Mesh(std::move(buffer), std::move(material))
     , gl_buffer(std::dynamic_pointer_cast<Buffer>(this->buffer))
     , gl_material(std::dynamic_pointer_cast<material::Material>(bound_material))

@@ -21,7 +21,6 @@ enum struct ThreadState {
 
 struct ThreadData {
     ThreadState state = ThreadState::Working;
-    gearoenix::core::sync::Semaphore signal;
 };
 
 struct WorkerData {
@@ -36,7 +35,8 @@ boost::container::flat_map<std::thread::id, std::unique_ptr<WorkerData>> workers
 std::mutex tasks_lock;
 std::queue<std::function<void()>> tasks;
 
-std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
+gearoenix::core::sync::Semaphore pool_signal;
+std::size_t pool_size = 0;
 
 [[nodiscard]] std::thread::id register_new_thread()
 {
@@ -46,7 +46,7 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
         data->thread_data->state = ThreadState::Working;
         while (ThreadState::Working == data->thread_data->state) {
             if (tasks.empty() && data->function_loader.empty()) {
-                data->thread_data->signal.lock();
+                pool_signal.lock();
             }
             if (ThreadState::Working != data->thread_data->state) {
                 break;
@@ -69,7 +69,7 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
     const auto return_value = worker->thread->get_id();
 
     const std::lock_guard _lg(workers_lock);
-    pool_signals.push_back(&(worker->thread_data->signal));
+    ++pool_size;
     workers[return_value] = std::move(worker);
 
     return return_value;
@@ -90,13 +90,10 @@ void gearoenix::core::job::initialise()
         (void)register_new_thread();
     }
 
-    pool_signals.shrink_to_fit();
+    // pool is ready
 }
 
-void gearoenix::core::job::register_current_thread()
-{
-    register_thread(std::this_thread::get_id());
-}
+void gearoenix::core::job::register_current_thread() { register_thread(std::this_thread::get_id()); }
 
 void gearoenix::core::job::register_thread(const std::thread::id thread_id, std::optional<std::thread>&& thread)
 {
@@ -122,7 +119,7 @@ void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, st
     auto& worker = *search->second;
     worker.function_loader.load(std::move(job));
     if (worker.thread_data.has_value()) {
-        worker.thread_data->signal.release();
+        pool_signal.release();
     }
 }
 
@@ -132,9 +129,7 @@ void gearoenix::core::job::send_job_to_pool(std::function<void()>&& job)
         std::lock_guard _lg(tasks_lock);
         tasks.push(std::move(job));
     }
-    for (auto* const s : pool_signals) {
-        s->release();
-    }
+    pool_signal.release();
 }
 
 void gearoenix::core::job::execute_current_thread_jobs()
@@ -151,7 +146,7 @@ void gearoenix::core::job::terminate()
             if (ThreadState::Terminated != worker->thread_data->state) {
                 worker->thread_data->state = ThreadState::Finished;
                 while (worker->thread_data->state != ThreadState::Terminated) {
-                    worker->thread_data->signal.release();
+                    pool_signal.release();
                 }
             }
         }

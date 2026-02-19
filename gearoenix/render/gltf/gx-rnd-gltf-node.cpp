@@ -49,10 +49,7 @@ bool gearoenix::render::gltf::Nodes::process_empty(const int node_index, core::e
     return true;
 }
 
-void gearoenix::render::gltf::Nodes::process(
-    const int node_index,
-    core::ecs::Entity* const parent,
-    const core::job::EndCaller<>& end_callback) const
+void gearoenix::render::gltf::Nodes::process(const int node_index, core::ecs::Entity* const parent, const core::job::EndCaller<>& end_callback) const
 {
     const auto& node = context.data.nodes[node_index];
     GX_LOG_D("Loading node: " << node.name);

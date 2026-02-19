@@ -24,15 +24,8 @@ public:
     Manager();
     ~Manager() override;
 
-    [[nodiscard]] core::ecs::EntityPtr create_armature(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<Bone>&& root_bone);
-    void create_sprite(
-        core::ecs::EntityPtr& entity,
-        std::shared_ptr<render::material::Sprite>&& sprite,
-        std::uint32_t width,
-        std::uint32_t height);
+    [[nodiscard]] core::ecs::EntityPtr create_armature(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<Bone>&& root_bone);
+    void create_sprite(core::ecs::EntityPtr& entity, std::shared_ptr<render::material::Sprite>&& sprite, std::uint32_t width, std::uint32_t height);
     void update() const;
 };
 }

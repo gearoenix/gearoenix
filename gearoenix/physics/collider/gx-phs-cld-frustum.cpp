@@ -45,8 +45,7 @@ bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3
     return Collider::check_intersection(b) && frustum.check_intersection_status(b) != math::IntersectionStatus::Out;
 }
 
-gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(
-    const math::Aabb3<double>& b) const
+gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(const math::Aabb3<double>& b) const
 {
     if (surrounding_box.check_intersection(b)) {
         return frustum.check_intersection_status(b);

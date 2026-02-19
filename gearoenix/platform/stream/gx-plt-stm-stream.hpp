@@ -73,10 +73,7 @@ public:
     void write(Stream& s);
 
     template <typename T>
-    [[nodiscard]] stream_size_t write(const T& d)
-    {
-        return write(&d, sizeof(T));
-    }
+    [[nodiscard]] stream_size_t write(const T& d) { return write(&d, sizeof(T)); }
 
     template <typename T>
     void write(const std::vector<T>& data)

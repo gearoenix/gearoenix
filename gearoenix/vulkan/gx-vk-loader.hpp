@@ -1,28 +1,24 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
 
-#ifdef GX_PLATFORM_ANDROID
-#define VK_USE_PLATFORM_ANDROID_KHR
-#elif defined(GX_PLATFORM_LINUX)
-#define VK_USE_PLATFORM_XLIB_KHR
-#elif defined(GX_PLATFORM_WINDOWS)
-#define VK_USE_PLATFORM_WIN32_KHR
+#if GX_PLATFORM_ANDROID
+#define VK_USE_PLATFORM_ANDROID_KHR true
+#elif GX_PLATFORM_LINUX
+#define VK_USE_PLATFORM_XLIB_KHR true
+#elif GX_PLATFORM_WINDOWS
+#define VK_USE_PLATFORM_WIN32_KHR true
 #endif
 
 #if GX_DEBUG_MODE
-#define GX_USE_DEBUG_EXTENSIONS
+#define GX_USE_DEBUG_EXTENSIONS true
 #endif
 
 #define VK_NO_PROTOTYPES 1
 #include <vulkan/vulkan.h>
 
-#ifdef GX_USE_DEBUG_EXTENSIONS
-#include <vulkan/vk_sdk_platform.h>
-#endif
-
-#ifdef VK_USE_PLATFORM_XLIB_KHR
+#if VK_USE_PLATFORM_XLIB_KHR
 #define GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateXlibSurfaceKHR);          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceXlibPresentationSupportKHR);
@@ -30,7 +26,7 @@
 #define GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef VK_USE_PLATFORM_XCB_KHR
+#if VK_USE_PLATFORM_XCB_KHR
 #define GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateXcbSurfaceKHR);          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceXcbPresentationSupportKHR);
@@ -38,7 +34,7 @@
 #define GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+#if VK_USE_PLATFORM_WAYLAND_KHR
 #define GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateWaylandSurfaceKHR);          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceWaylandPresentationSupportKHR);
@@ -46,7 +42,7 @@
 #define GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef VK_USE_PLATFORM_MIR_KHR
+#if VK_USE_PLATFORM_MIR_KHR
 #define GX_VULKAN_MIR_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateMirSurfaceKHR);          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceMirPresentationSupportKHR);
@@ -54,14 +50,13 @@
 #define GX_VULKAN_MIR_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef VK_USE_PLATFORM_ANDROID_KHR
-#define GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateAndroidSurfaceKHR);
+#if VK_USE_PLATFORM_ANDROID_KHR
+#define GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateAndroidSurfaceKHR);
 #else
 #define GX_VULKAN_ANDROID_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef VK_USE_PLATFORM_WIN32_KHR
+#if VK_USE_PLATFORM_WIN32_KHR
 #define GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateWin32SurfaceKHR);          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceWin32PresentationSupportKHR);
@@ -69,16 +64,19 @@
 #define GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
 
-#ifdef GX_USE_DEBUG_EXTENSIONS
+#if GX_USE_DEBUG_EXTENSIONS
 #define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION) \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDebugReportCallbackEXT);   \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDebugReportCallbackEXT);  \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugReportMessageEXT);          \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugMarkerSetObjectTagEXT);     \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDebugMarkerSetObjectNameEXT);    \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerBeginEXT);         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerEndEXT);           \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdDebugMarkerInsertEXT);
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDebugUtilsMessengerEXT);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroyDebugUtilsMessengerEXT);  \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSubmitDebugUtilsMessageEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectTagEXT);      \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkSetDebugUtilsObjectNameEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginDebugUtilsLabelEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndDebugUtilsLabelEXT);       \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdInsertDebugUtilsLabelEXT);    \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueBeginDebugUtilsLabelEXT);   \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueEndDebugUtilsLabelEXT);     \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueueInsertDebugUtilsLabelEXT);
 #else
 #define GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 #endif
@@ -228,9 +226,12 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRenderPass);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdNextSubpass);                               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRenderPass);                             \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdBeginRendering);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdEndRendering);                              \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdExecuteCommands);                           \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteAccelerationStructuresPropertiesKHR);  \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdPipelineBarrier2);                          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySurfaceKHR);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureBuildSizesKHR);        \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetBufferDeviceAddress);                       \
@@ -243,14 +244,6 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetSwapchainImagesKHR);                        \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkAcquireNextImageKHR);                          \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkQueuePresentKHR);                              \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPropertiesKHR);        \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetPhysicalDeviceDisplayPlanePropertiesKHR);   \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneSupportedDisplaysKHR);          \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayModePropertiesKHR);                  \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayModeKHR);                         \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetDisplayPlaneCapabilitiesKHR);               \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateDisplayPlaneSurfaceKHR);                 \
-    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCreateSharedSwapchainsKHR);                    \
     GX_VULKAN_XLIB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                    \
     GX_VULKAN_XCB_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                     \
     GX_VULKAN_WAYLAND_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                 \
@@ -259,8 +252,7 @@
     GX_VULKAN_WIN32_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)                   \
     GX_VULKAN_DEBUG_FUNCTIONS_MAP(GX_VULKAN_LOADER_MAPPED_FUNCTION)
 
-#define GX_VULKAN_LOADER_DEF_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) \
-    extern PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION
+#define GX_VULKAN_LOADER_DEF_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) extern PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION
 
 GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DEF_FUNCTIONS)
 

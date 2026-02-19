@@ -6,10 +6,7 @@
 #include "gx-d3d-device.hpp"
 #include "gx-d3d-engine.hpp"
 
-gearoenix::d3d::CpuBuffer::CpuBuffer(
-    ID3D12Device* const device,
-    const UINT buffer_size,
-    [[maybe_unused]] LPCWSTR resource_name)
+gearoenix::d3d::CpuBuffer::CpuBuffer(ID3D12Device* const device, const UINT buffer_size, [[maybe_unused]] LPCWSTR resource_name)
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);
@@ -35,15 +32,9 @@ gearoenix::d3d::CpuBuffer::CpuBuffer(CpuBuffer&& o)
     o.pointer = nullptr;
 }
 
-void gearoenix::d3d::CpuBuffer::copy(const void* data, std::uint32_t size)
-{
-    std::memcpy(pointer, data, size);
-}
+void gearoenix::d3d::CpuBuffer::copy(const void* data, std::uint32_t size) { std::memcpy(pointer, data, size); }
 
-gearoenix::d3d::GpuBuffer::GpuBuffer(
-    ID3D12Device* const device,
-    const UINT buffer_size,
-    [[maybe_unused]] LPCWSTR resource_name)
+gearoenix::d3d::GpuBuffer::GpuBuffer(ID3D12Device* const device, const UINT buffer_size, [[maybe_unused]] LPCWSTR resource_name)
 {
     auto p = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     auto d = CD3DX12_RESOURCE_DESC::Buffer(buffer_size);

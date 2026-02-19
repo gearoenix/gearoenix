@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GX_VK_SHD_BINDINGS_HPP
+#define GX_VK_SHD_BINDINGS_HPP
 
 #define GX_VK_BIND_RAY_VERTICES 0
 #define GX_VK_BIND_RAY_INDICES 1
@@ -10,3 +11,5 @@
 #define GX_VK_BIND_RAY_OUT_IMAGE 7
 #define GX_VK_BIND_RAY_CAMERA 8
 #define GX_VK_BIND_RAY_MAX 9
+
+#endif

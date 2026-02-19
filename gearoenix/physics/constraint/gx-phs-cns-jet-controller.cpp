@@ -139,8 +139,7 @@ void gearoenix::physics::constraint::JetController::update()
         return;
     }
 
-    if (const auto& io = ImGui::GetIO();
-        (io.WantCaptureMouse || io.WantCaptureKeyboard) && (ImGui::IsAnyItemActive() || ImGui::IsAnyItemFocused())) {
+    if (const auto& io = ImGui::GetIO(); (io.WantCaptureMouse || io.WantCaptureKeyboard) && (ImGui::IsAnyItemActive() || ImGui::IsAnyItemFocused())) {
         clear_transforms();
         return;
     }

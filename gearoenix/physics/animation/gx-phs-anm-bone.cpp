@@ -101,7 +101,5 @@ void gearoenix::physics::animation::Bone::update_matrices()
 
 void gearoenix::physics::animation::Bone::update_all_bones_after_transform_updates()
 {
-    core::ecs::World::get().parallel_system<Bone>([](auto, auto* const bone, auto) {
-        bone->update_matrices();
-    });
+    core::ecs::World::get().parallel_system<Bone>([](auto, auto* const bone, auto) { bone->update_matrices(); });
 }

@@ -75,14 +75,7 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
     }
 
     auto txt_info = texture::TextureInfo();
-    txt_info
-        .set_format(texture::TextureFormat::RgbaUint8)
-        .set_sampler_info(sampler)
-        .set_width(img.width)
-        .set_height(img.height)
-        .set_depth(0)
-        .set_type(texture::Type::Texture2D)
-        .set_has_mipmap(needs_mipmap);
+    txt_info.set_format(texture::TextureFormat::RgbaUint8).set_sampler_info(sampler).set_width(img.width).set_height(img.height).set_depth(0).set_type(texture::Type::Texture2D).set_has_mipmap(needs_mipmap);
 
     auto txt_name = img.name;
     if (txt_name.empty()) {
@@ -125,14 +118,11 @@ void gearoenix::render::gltf::Textures::load(core::job::EndCaller<>&& end)
     GX_ASSERT_D(textures_map.empty());
     textures_names.resize(context.data.textures.size());
     for (int index = 0; index < context.data.textures.size(); ++index) {
-        core::job::send_job_to_pool([index, this, e = end]() mutable {
-            load(index, std::move(e));
-        });
+        core::job::send_job_to_pool([index, this, e = end]() mutable { load(index, std::move(e)); });
     }
 }
 
-const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::gltf::Textures::get(
-    const int index, const std::shared_ptr<texture::Texture2D>& default_value) const
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::gltf::Textures::get(const int index, const std::shared_ptr<texture::Texture2D>& default_value) const
 {
     if (index < 0) {
         return default_value;

@@ -28,9 +28,7 @@ bool gearoenix::render::gltf::Lights::is_light(const int node_index) const
     return false;
 }
 
-bool gearoenix::render::gltf::Lights::process(
-    const int node_index, core::ecs::Entity* const parent,
-    const core::job::EndCaller<>& end_callback) const
+bool gearoenix::render::gltf::Lights::process(const int node_index, core::ecs::Entity* const parent, const core::job::EndCaller<>& end_callback) const
 {
     const auto& node = context.data.nodes[node_index];
     if (!is_light(node_index)) {
@@ -49,12 +47,10 @@ bool gearoenix::render::gltf::Lights::process(
     GX_ASSERT_D(1.0f >= colour.z);
     colour *= intensity;
     GX_ASSERT_D(light.type == "directional"); // We don't have support for other types yet
-    light::Manager::get().build_shadow_caster_directional(
-        std::string(node.name), parent, 1024, 20.0f, 1.0f, 1.0f,
-        core::job::EndCaller<core::ecs::EntityPtr>([this, node_index, e = end_callback, colour](auto&& l) {
-            l->template get_component<light::Light>()->colour = colour;
-            apply_transform(node_index, context, *l->template get_component<light::ShadowCasterDirectional>()->get_shadow_transform());
-            (void)e;
-        }));
+    light::Manager::get().build_shadow_caster_directional(std::string(node.name), parent, 1024, 20.0f, 1.0f, 1.0f, core::job::EndCaller<core::ecs::EntityPtr>([this, node_index, e = end_callback, colour](auto&& l) {
+        l->template get_component<light::Light>()->colour = colour;
+        apply_transform(node_index, context, *l->template get_component<light::ShadowCasterDirectional>()->get_shadow_transform());
+        (void)e;
+    }));
     return true;
 }

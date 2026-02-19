@@ -47,8 +47,7 @@ void gearoenix::core::event::Engine::remove_listener(Listener* const listener)
 void gearoenix::core::event::Engine::broadcast(const Data& event_data)
 {
     bool keep_continuing = true;
-    for (
-        auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<double>::max(), nullptr));
+    for (auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<double>::max(), nullptr));
         keep_continuing && search != events_id_priority_listeners.end() && std::get<0>(*search) == event_data.get_source();) {
         switch (std::get<2>(*search)->on_event(event_data)) {
         case Listener::Response::Erase:

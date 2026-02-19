@@ -81,10 +81,7 @@ public:
 
     [[nodiscard]] const type& get() const { return value; }
 
-    void write(platform::stream::Stream& stream) const
-    {
-        value.write(stream);
-    }
+    void write(platform::stream::Stream& stream) const { value.write(stream); }
 
     void read(platform::stream::Stream& stream)
     {

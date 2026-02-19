@@ -28,10 +28,7 @@ private:
     } data {};
 
 public:
-    constexpr ProjectionData()
-    {
-        data.perspective = {};
-    }
+    constexpr ProjectionData() { data.perspective = {}; }
 
     constexpr ProjectionData(const ProjectionData&) = default;
 
@@ -64,30 +61,15 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr index_t get_index() const
-    {
-        return index;
-    }
+    [[nodiscard]] constexpr index_t get_index() const { return index; }
 
-    [[nodiscard]] constexpr bool is_perspective() const
-    {
-        return index == perspective_index;
-    }
+    [[nodiscard]] constexpr bool is_perspective() const { return index == perspective_index; }
 
-    [[nodiscard]] constexpr bool is_orthographic() const
-    {
-        return index == orthographic_index;
-    }
+    [[nodiscard]] constexpr bool is_orthographic() const { return index == orthographic_index; }
 
-    [[nodiscard]] constexpr static ProjectionData construct_perspective(const float field_of_view_y = 0.8f)
-    {
-        return ProjectionData { Perspective { field_of_view_y } };
-    }
+    [[nodiscard]] constexpr static ProjectionData construct_perspective(const float field_of_view_y = 0.8f) { return ProjectionData { Perspective { field_of_view_y } }; }
 
-    [[nodiscard]] constexpr static ProjectionData construct_orthographic(const float scale = 1.0f)
-    {
-        return ProjectionData { Orthographic { scale } };
-    }
+    [[nodiscard]] constexpr static ProjectionData construct_orthographic(const float scale = 1.0f) { return ProjectionData { Orthographic { scale } }; }
 
     [[nodiscard]] const Perspective& get_perspective() const;
     [[nodiscard]] Perspective& get_perspective();

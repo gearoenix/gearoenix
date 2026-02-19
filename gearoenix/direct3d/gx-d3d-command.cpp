@@ -13,10 +13,7 @@ gearoenix::d3d::Command::Command(Device& device, const D3D12_COMMAND_LIST_TYPE t
 
 gearoenix::d3d::Command::~Command() = default;
 
-ID3D12GraphicsCommandList6* gearoenix::d3d::Command::get_list()
-{
-    return list.Get();
-}
+ID3D12GraphicsCommandList6* gearoenix::d3d::Command::get_list() { return list.Get(); }
 
 void gearoenix::d3d::Command::begin(ID3D12PipelineState* const pipeline_state)
 {

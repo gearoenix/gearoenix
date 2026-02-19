@@ -18,18 +18,15 @@ gearoenix::gl::material::Sprite::Sprite(std::string&& name)
 
 void gearoenix::gl::material::Sprite::construct(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c)
 {
-    const auto result = Object::construct<Sprite>(std::move(name));
-    c.set_return(result);
-    result->initialise(std::move(c));
+    auto result = Object::construct<Sprite>(std::move(name));
+    auto& r = *result;
+    c.set_return(std::move(result));
+    r.initialise(std::move(c));
 }
 
 gearoenix::gl::material::Sprite::~Sprite() = default;
 
-void gearoenix::gl::material::Sprite::shadow(
-    const Mesh& mesh,
-    const render::record::Camera& camera,
-    const render::record::CameraModel& camera_model,
-    uint& current_shader)
+void gearoenix::gl::material::Sprite::shadow(const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel& camera_model, uint& current_shader)
 {
     /// TODO: uv_transform must be used in here too
     auto& shadow_caster_shader = shadow_caster_combination->get(camera_model.model->bones_count);
@@ -45,12 +42,7 @@ void gearoenix::gl::material::Sprite::shadow(
     glDrawElements(GL_TRIANGLES, mesh.get_cached_indices_count(), GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Sprite::render_forward(
-    const Scene&,
-    const render::record::Camera& camera,
-    const render::record::CameraModel& camera_model,
-    const Mesh& mesh,
-    uint& current_shader)
+void gearoenix::gl::material::Sprite::render_forward(const Scene&, const render::record::Camera& camera, const render::record::CameraModel& camera_model, const Mesh& mesh, uint& current_shader)
 {
     const auto& shader = unlit_combination->get(true, true, true, true);
     shader.bind(current_shader);
@@ -64,8 +56,7 @@ void gearoenix::gl::material::Sprite::render_forward(
     glDrawElements(GL_TRIANGLES, mesh.get_cached_indices_count(), GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Sprite::deferred_gbuffer_render(
-    const Model&, const Mesh&, const Camera&, const Scene&, uint&)
+void gearoenix::gl::material::Sprite::deferred_gbuffer_render(const Model&, const Mesh&, const Camera&, const Scene&, uint&)
 {
     // Nothing should be rendered by this material
 }

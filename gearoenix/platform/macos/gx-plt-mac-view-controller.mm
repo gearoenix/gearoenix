@@ -40,10 +40,7 @@
     [metal_kit_view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];
     [metal_kit_view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float_Stencil8];
     [metal_kit_view setSampleCount:1];
-    [metal_kit_view addTrackingArea:[[NSTrackingArea alloc] initWithRect:[[NSScreen mainScreen] frame]
-                                                                 options:NSTrackingMouseMoved | NSTrackingActiveAlways | NSTrackingAssumeInside | NSTrackingEnabledDuringMouseDrag
-                                                                   owner:self
-                                                                userInfo:nil]];
+    [metal_kit_view addTrackingArea:[[NSTrackingArea alloc] initWithRect:[[NSScreen mainScreen] frame] options:NSTrackingMouseMoved | NSTrackingActiveAlways | NSTrackingAssumeInside | NSTrackingEnabledDuringMouseDrag owner:self userInfo:nil]];
     metal_kit_view.delegate = self;
     metal_kit_view.preferredFramesPerSecond = 60;
     metal_kit_view.device = device;
@@ -124,9 +121,7 @@
 
 - (void)keyDown:(NSEvent*)event
 {
-    os_app->get_base().keyboard_key(
-        gearoenix::platform::convert_key(event.keyCode),
-        gearoenix::platform::key::Action::Press);
+    os_app->get_base().keyboard_key(gearoenix::platform::convert_key(event.keyCode), gearoenix::platform::key::Action::Press);
 }
 
 @end

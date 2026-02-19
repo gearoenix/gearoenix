@@ -8,11 +8,7 @@
 #include "gx-d3d-texture.hpp"
 #include "shaders/gx-d3d-shd-common.hpp"
 
-gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(
-    Device& d,
-    const UINT descriptors_count,
-    const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-    const wchar_t* const name)
+gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(Device& d, const UINT descriptors_count, const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* const name)
     : allocator(core::Allocator::construct(descriptors_count))
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc;
@@ -34,11 +30,7 @@ gearoenix::d3d::DescriptorAllocator::DescriptorAllocator(
 
 gearoenix::d3d::DescriptorAllocator::~DescriptorAllocator() = default;
 
-gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(
-    Device& d,
-    const UINT descriptors_count,
-    const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type,
-    const wchar_t* const name)
+gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(Device& d, const UINT descriptors_count, const D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* const name)
     : allocator(core::Allocator::construct(descriptors_count))
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc;
@@ -58,11 +50,7 @@ gearoenix::d3d::CpuDescriptorAllocator::CpuDescriptorAllocator(
 
 gearoenix::d3d::CpuDescriptorAllocator::~CpuDescriptorAllocator() = default;
 
-gearoenix::d3d::Descriptor::Descriptor(
-    const UINT resource_index,
-    D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-    D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle,
-    std::shared_ptr<core::Allocator>&& allocator)
+gearoenix::d3d::Descriptor::Descriptor(const UINT resource_index, D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE&& gpu_handle, std::shared_ptr<core::Allocator>&& allocator)
     : resource_index(resource_index)
     , cpu_handle(std::move(cpu_handle))
     , gpu_handle(std::move(gpu_handle))
@@ -74,10 +62,7 @@ gearoenix::d3d::Descriptor::~Descriptor() = default;
 
 gearoenix::d3d::Descriptor::Descriptor(Descriptor&&) = default;
 
-gearoenix::d3d::CpuDescriptor::CpuDescriptor(
-    const UINT resource_index,
-    D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle,
-    std::shared_ptr<core::Allocator>&& allocator)
+gearoenix::d3d::CpuDescriptor::CpuDescriptor(const UINT resource_index, D3D12_CPU_DESCRIPTOR_HANDLE&& cpu_handle, std::shared_ptr<core::Allocator>&& allocator)
     : resource_index(resource_index)
     , cpu_handle(std::move(cpu_handle))
     , allocator(std::move(allocator))
@@ -112,8 +97,7 @@ gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_texture_2
 {
     auto alc = texture_2d_region_allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * allocator.size_increment;
-    return Descriptor(
-        static_cast<UINT>(alc->get_offset()),
+    return Descriptor(static_cast<UINT>(alc->get_offset()),
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + ptr_inc,
         },
@@ -127,8 +111,7 @@ gearoenix::d3d::Descriptor gearoenix::d3d::DescriptorManager::allocate_others()
 {
     auto alc = allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * allocator.size_increment;
-    return Descriptor(
-        static_cast<UINT>(alc->get_offset()),
+    return Descriptor(static_cast<UINT>(alc->get_offset()),
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = allocator.cpu_starting_handle.ptr + ptr_inc,
         },
@@ -142,8 +125,7 @@ gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_rtv()
 {
     auto alc = rtv_allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * rtv_allocator.size_increment;
-    return CpuDescriptor(
-        static_cast<UINT>(alc->get_offset()),
+    return CpuDescriptor(static_cast<UINT>(alc->get_offset()),
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = rtv_allocator.cpu_starting_handle.ptr + ptr_inc,
         },
@@ -154,8 +136,7 @@ gearoenix::d3d::CpuDescriptor gearoenix::d3d::DescriptorManager::allocate_dsv()
 {
     auto alc = dsv_allocator.allocator->allocate(1);
     const auto ptr_inc = alc->get_offset() * dsv_allocator.size_increment;
-    return CpuDescriptor(
-        static_cast<UINT>(alc->get_offset()),
+    return CpuDescriptor(static_cast<UINT>(alc->get_offset()),
         D3D12_CPU_DESCRIPTOR_HANDLE {
             .ptr = dsv_allocator.cpu_starting_handle.ptr + ptr_inc,
         },

@@ -9,9 +9,7 @@ struct Mat3x3 final {
     std::array<Vec3<Element>, 3> columns;
 
     constexpr Mat3x3()
-        : columns { { { 1, 0, 0 },
-              { 0, 1, 0 },
-              { 0, 0, 1 } } }
+        : columns { { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } } }
     {
     }
 
@@ -21,26 +19,16 @@ struct Mat3x3 final {
     }
 
     constexpr explicit Mat3x3(const Element diameter)
-        : columns { { { diameter, static_cast<Element>(0), static_cast<Element>(0) },
-              { static_cast<Element>(0), diameter, static_cast<Element>(0) },
-              { static_cast<Element>(0), static_cast<Element>(0), diameter } } }
+        : columns { { { diameter, static_cast<Element>(0), static_cast<Element>(0) }, { static_cast<Element>(0), diameter, static_cast<Element>(0) }, { static_cast<Element>(0), static_cast<Element>(0), diameter } } }
     {
     }
 
-    constexpr Mat3x3(
-        const Element e0, const Element e1, const Element e2,
-        const Element e3, const Element e4, const Element e5,
-        const Element e6, const Element e7, const Element e8)
-        : columns { { { e0, e1, e2 },
-              { e3, e4, e5 },
-              { e6, e7, e8 } } }
+    constexpr Mat3x3(const Element e0, const Element e1, const Element e2, const Element e3, const Element e4, const Element e5, const Element e6, const Element e7, const Element e8)
+        : columns { { { e0, e1, e2 }, { e3, e4, e5 }, { e6, e7, e8 } } }
     {
     }
 
-    explicit Mat3x3(platform::stream::Stream& s)
-    {
-        read(s);
-    }
+    explicit Mat3x3(platform::stream::Stream& s) { read(s); }
 
     constexpr Mat3x3(const Mat3x3& o)
         : columns(o.columns)
@@ -57,10 +45,7 @@ struct Mat3x3 final {
     {
     }
 
-    [[nodiscard]] constexpr Vec3<Element> operator*(const Vec3<Element>& v) const
-    {
-        return columns[0] * v.x + columns[1] * v.y + columns[2] * v.z;
-    }
+    [[nodiscard]] constexpr Vec3<Element> operator*(const Vec3<Element>& v) const { return columns[0] * v.x + columns[1] * v.y + columns[2] * v.z; }
 
     [[nodiscard]] constexpr Mat3x3 operator*(const Mat3x3& o) const
     {
@@ -75,47 +60,23 @@ struct Mat3x3 final {
 
     constexpr Mat3x3& operator=(const Mat3x3& o) = default;
 
-    constexpr void operator*=(const Mat3x3& o)
-    {
-        *this = *this * o;
-    }
+    constexpr void operator*=(const Mat3x3& o) { *this = *this * o; }
 
-    [[nodiscard]] constexpr bool operator==(const Mat3x3& o) const
-    {
-        return o.columns == columns;
-    }
+    [[nodiscard]] constexpr bool operator==(const Mat3x3& o) const { return o.columns == columns; }
 
     template <typename T>
-    constexpr const Vec3<Element>& operator[](const T i) const
-    {
-        return columns[i];
-    }
+    constexpr const Vec3<Element>& operator[](const T i) const { return columns[i]; }
 
     template <typename T>
-    constexpr Vec3<Element>& operator[](const T i)
-    {
-        return columns[i];
-    }
+    constexpr Vec3<Element>& operator[](const T i) { return columns[i]; }
 
-    constexpr void local_x_scale(const Element s)
-    {
-        columns[0] *= s;
-    }
+    constexpr void local_x_scale(const Element s) { columns[0] *= s; }
 
-    constexpr void local_y_scale(const Element s)
-    {
-        columns[1] *= s;
-    }
+    constexpr void local_y_scale(const Element s) { columns[1] *= s; }
 
-    constexpr void local_z_scale(const Element s)
-    {
-        columns[2] *= s;
-    }
+    constexpr void local_z_scale(const Element s) { columns[2] *= s; }
 
-    constexpr void local_scale(const Element s)
-    {
-        local_scale(s, s, s);
-    }
+    constexpr void local_scale(const Element s) { local_scale(s, s, s); }
 
     constexpr void local_scale(const Element a, const Element b, const Element c)
     {
@@ -124,15 +85,9 @@ struct Mat3x3 final {
         local_z_scale(c);
     }
 
-    constexpr void local_scale(const Vec3<Element>& s)
-    {
-        local_scale(s.x, s.y, s.z);
-    }
+    constexpr void local_scale(const Vec3<Element>& s) { local_scale(s.x, s.y, s.z); }
 
-    constexpr void global_scale(const Element s)
-    {
-        global_scale(s, s, s);
-    }
+    constexpr void global_scale(const Element s) { global_scale(s, s, s); }
 
     constexpr void global_x_scale(const Element v)
     {
@@ -162,15 +117,9 @@ struct Mat3x3 final {
         global_z_scale(z);
     }
 
-    constexpr void global_scale(const Vec3<Element>& s)
-    {
-        global_scale(s.x, s.y, s.z);
-    }
+    constexpr void global_scale(const Vec3<Element>& s) { global_scale(s.x, s.y, s.z); }
 
-    constexpr void inverse()
-    {
-        *this = inverted();
-    }
+    constexpr void inverse() { *this = inverted(); }
 
     constexpr void transpose()
     {
@@ -190,9 +139,7 @@ struct Mat3x3 final {
 
     [[nodiscard]] constexpr Element determinant() const
     {
-        return +columns[0].x * (columns[1].y * columns[2].z - columns[2].y * columns[1].z)
-            - columns[1].x * (columns[0].y * columns[2].z - columns[2].y * columns[0].z)
-            + columns[2].x * (columns[0].y * columns[1].z - columns[1].y * columns[0].z);
+        return +columns[0].x * (columns[1].y * columns[2].z - columns[2].y * columns[1].z) - columns[1].x * (columns[0].y * columns[2].z - columns[2].y * columns[0].z) + columns[2].x * (columns[0].y * columns[1].z - columns[1].y * columns[0].z);
     }
 
     [[nodiscard]] constexpr Mat3x3 inverted() const

@@ -71,4 +71,7 @@ build-release/
 build-webassembly/
 venv/
 
+.claude/
+
 .vs/
+nul

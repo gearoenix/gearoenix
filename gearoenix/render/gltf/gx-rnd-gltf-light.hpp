@@ -18,9 +18,6 @@ struct Lights final {
     explicit Lights(const Context& context);
     ~Lights();
     [[nodiscard]] bool is_light(int node_index) const;
-    [[nodiscard]] bool process(
-        int node_index,
-        core::ecs::Entity* parent,
-        const core::job::EndCaller<>& end_callback) const;
+    [[nodiscard]] bool process(int node_index, core::ecs::Entity* parent, const core::job::EndCaller<>& end_callback) const;
 };
 }

@@ -41,10 +41,7 @@ struct Frustum final {
     }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
-    [[nodiscard]] bool check_intersection(const Aabb3<Element>& aabb) const
-    {
-        return IntersectionStatus::Out != check_intersection_status(aabb);
-    }
+    [[nodiscard]] bool check_intersection(const Aabb3<Element>& aabb) const { return IntersectionStatus::Out != check_intersection_status(aabb); }
 
     /// This is not exact but rather fast, necessarily informative and conservatively includes objects
     /// It is not a completely correct, sometime it includes non-colliding objects

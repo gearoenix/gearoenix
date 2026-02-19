@@ -66,45 +66,25 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
 
     void initialise_gl();
 
-    RuntimeReflection(
-        core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::string&& name);
+    RuntimeReflection(core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name);
 
 public:
     static void construct(
-        core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::string&& name,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
-        core::job::EndCallerShared<RuntimeReflection>&& end_callback);
+        core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        std::string&& name, std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCallerShared<RuntimeReflection>&& end_callback);
     ~RuntimeReflection() override;
 };
 
 struct ReflectionManager final : render::reflection::Manager, core::Singleton<ReflectionManager> {
 private:
     [[nodiscard]] core::ecs::EntityPtr build_baked(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<render::texture::TextureCube>&& irradiance,
-        std::shared_ptr<render::texture::TextureCube>&& radiance,
+        std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::TextureCube>&& irradiance, std::shared_ptr<render::texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box) override;
 
-    void build_runtime(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
+    void build_runtime(std::string&& name, core::ecs::Entity* parent,
+        const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        std::uint32_t environment_resolution, std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:

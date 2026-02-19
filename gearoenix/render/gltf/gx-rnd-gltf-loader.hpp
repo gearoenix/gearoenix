@@ -9,11 +9,7 @@ struct Stream;
 }
 
 namespace gearoenix::render::gltf {
-void load(
-    const platform::stream::Path& file,
-    core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback);
+void load(const platform::stream::Path& file, core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback);
 
-void load(
-    std::shared_ptr<platform::stream::Stream>&& stream,
-    core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback);
+void load(std::shared_ptr<platform::stream::Stream>&& stream, core::job::EndCaller<std::vector<core::ecs::EntityPtr>>&& scene_entities_end_callback);
 }

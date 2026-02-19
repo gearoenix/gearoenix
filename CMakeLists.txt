@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
 project(Gearoenix LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)

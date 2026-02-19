@@ -1,5 +1,7 @@
 #include "gx-rnd-eng-engine.hpp"
+
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-runtime-configuration.hpp"
@@ -73,7 +75,7 @@ std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::En
     const auto& configuration = platform::RuntimeConfiguration::get();
 #ifdef GX_RENDER_VULKAN_ENABLED
     if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
-        result = std::make_unique<vulkan::engine::Engine>(platform_application);
+        result = std::make_unique<vulkan::engine::Engine>();
     }
 #endif
 #ifdef GX_RENDER_DIRECT3D_ENABLED
@@ -99,6 +101,7 @@ gearoenix::render::engine::Engine::~Engine() = default;
 
 void gearoenix::render::engine::Engine::start_frame()
 {
+    GX_PROFILE_NEW_FRAME;
     if (const auto diff = minimum_frame_time - std::chrono::duration<double>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
         std::this_thread::sleep_for(std::chrono::duration<double>(diff));
     }
@@ -128,17 +131,42 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame; in start_frame of Engine, we prepare everything for user interaction.
+    GX_PROFILE_BEGIN(render - engine - end - frame);
+    // Don't mistake the following with the actual start of a frame.
+    // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
+
+    GX_PROFILE_BEGIN(render - engine - physics_engine->start_frame);
+    physics_engine->start_frame();
+    GX_PROFILE_END(render - engine - physics_engine->start_frame);
+
+    GX_PROFILE_BEGIN(render - engine - model_manager->update);
+    model_manager->update();
+    GX_PROFILE_END(render - engine - model_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - camera_manager->update);
     camera_manager->update();
+    GX_PROFILE_END(render - engine - camera_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - light_manager->update);
+    light_manager->update();
+    GX_PROFILE_END(render - engine - light_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - reflection_manager->update);
     reflection_manager->update();
+    GX_PROFILE_END(render - engine - reflection_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - scene_manager->update);
     scene_manager->update();
+    GX_PROFILE_END(render - engine - scene_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - physics_engine->end_frame);
     physics_engine->end_frame();
+    GX_PROFILE_END(render - engine - physics_engine->end_frame);
+
+    GX_PROFILE_END(render - engine - end - frame);
 }
 
-void gearoenix::render::engine::Engine::window_resized()
-{
-    camera_manager->window_resized();
-}
+void gearoenix::render::engine::Engine::window_resized() { camera_manager->window_resized(); }
 
 void gearoenix::render::engine::Engine::show_debug_gui()
 {
@@ -149,3 +177,5 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         // TODO: I have to show all other things
     });
 }
+
+void gearoenix::render::engine::Engine::flush() { }

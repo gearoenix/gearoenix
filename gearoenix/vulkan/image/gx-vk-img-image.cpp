@@ -1,217 +1,328 @@
 #include "gx-vk-img-image.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
+#include "../../core/macro/gx-cr-mcr-flagger.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
+#include "../gx-vk-marker.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
 
-void gearoenix::vulkan::image::Image::terminate()
+bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const { return layout == other.layout && queue_family_index == other.queue_family_index && access == other.access && stage == other.stage; }
+
+bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const { return per_mip_states == other.per_mip_states; }
+
+bool gearoenix::vulkan::image::Image::State::is_uniform() const
 {
-    if (nullptr != allocated_memory && vulkan_data != nullptr) {
-        vkDestroyImage(logical_device->get_vulkan_data(), vulkan_data, nullptr);
-        vulkan_data = nullptr;
+    if (per_array_states.empty()) {
+        return true;
     }
+    const auto& first = per_array_states[0].per_mip_states[0];
+    for (const auto& array_state : per_array_states) {
+        for (const auto& mip_state : array_state.per_mip_states) {
+            if (!(mip_state == first)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
-gearoenix::vulkan::image::Image::Image(Image&& o)
-    : logical_device(o.logical_device)
-    , allocated_memory(std::move(o.allocated_memory))
-    , image_width(o.image_width)
-    , image_height(o.image_height)
-    , image_depth(o.image_depth)
-    , mipmap_level(o.mipmap_level)
-    , array_layers(o.array_layers)
-    , format(o.format)
-    , flags(o.flags)
-    , usage(o.usage)
-    , vulkan_data(o.vulkan_data)
+bool gearoenix::vulkan::image::Image::State::has_uniform_layout() const
 {
-    o.vulkan_data = nullptr;
+    if (per_array_states.empty()) {
+        return true;
+    }
+
+    const auto first = per_array_states[0].per_mip_states[0].layout;
+    for (const auto& [per_mip_states] : per_array_states) {
+        for (const auto& mip_state : per_mip_states) {
+            if (first != mip_state.layout) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
-gearoenix::vulkan::image::Image::Image(
-    const device::Logical* const logical_device,
-    const std::uint32_t image_width,
-    const std::uint32_t image_height,
-    const std::uint32_t image_depth,
-    const std::uint32_t mipmap_level,
-    const std::uint32_t array_layers,
-    const VkFormat format,
-    const VkImageCreateFlags flags,
-    const VkImageUsageFlags usage,
-    VkImage vulkan_data)
-    : logical_device(logical_device)
-    , image_width(image_width)
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::shader_read(const VkPipelineStageFlags2 stage)
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        .access = VK_ACCESS_2_SHADER_READ_BIT,
+        .stage = stage,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_dst()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        .access = VK_ACCESS_2_TRANSFER_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_src()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        .access = VK_ACCESS_2_TRANSFER_READ_BIT,
+        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::color_attachment()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .access = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::depth_attachment()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        .access = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+        .stage = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::present()
+{
+    return {
+        .layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .access = VK_ACCESS_2_NONE,
+        .stage = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
+    };
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_mips(const std::uint32_t base, const std::uint32_t count) const
+{
+    auto result = *this;
+    result.base_mip = base;
+    result.mip_count = count;
+    return result;
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_layers(const std::uint32_t base, const std::uint32_t count) const
+{
+    auto result = *this;
+    result.base_layer = base;
+    result.layer_count = count;
+    return result;
+}
+
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::with_queue_family(const std::uint32_t family) const
+{
+    auto result = *this;
+    result.queue_family = family;
+    return result;
+}
+
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage, const VkImage vulkan_data)
+    : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
-    , mipmap_level(mipmap_level)
+    , image_type(image_type)
+    , mipmap_levels(mipmap_levels)
     , array_layers(array_layers)
     , format(format)
     , flags(flags)
     , usage(usage)
     , vulkan_data(vulkan_data)
+    , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
+    GX_VK_MARK(name, vulkan_data);
 }
 
-gearoenix::vulkan::image::Image::Image(
-    const std::uint32_t image_width,
-    const std::uint32_t image_height,
-    const std::uint32_t image_depth,
-    const std::uint32_t mipmap_level,
-    const std::uint32_t array_layers,
-    const VkFormat format,
-    const VkImageCreateFlags flags,
-    const VkImageUsageFlags usage,
-    memory::Manager& mem_mgr)
-    : logical_device(&mem_mgr.get_e().get_logical_device())
-    , image_width(image_width)
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage)
+    : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
-    , mipmap_level(mipmap_level)
+    , image_type(image_type)
+    , mipmap_levels(mipmap_levels)
     , array_layers(array_layers)
     , format(format)
     , flags(flags)
     , usage(usage)
+    , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
+    auto& logical_device = device::Logical::get();
+
     VkImageCreateInfo info;
     GX_SET_ZERO(info);
     info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    info.imageType = image_depth <= 1 ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_3D;
+    info.imageType = image_type;
     info.format = format;
     info.extent.width = image_width;
     info.extent.height = image_height;
     info.extent.depth = image_depth;
-    info.mipLevels = mipmap_level;
+    info.mipLevels = mipmap_levels;
     info.arrayLayers = array_layers;
     info.samples = VK_SAMPLE_COUNT_1_BIT;
     info.tiling = VK_IMAGE_TILING_OPTIMAL;
     info.usage = usage;
     info.flags = flags;
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    GX_VK_CHK(vkCreateImage(logical_device->get_vulkan_data(), &info, nullptr, &vulkan_data));
+    GX_VK_CHK(vkCreateImage(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+
     VkMemoryRequirements mem_req;
     GX_SET_ZERO(mem_req);
-    vkGetImageMemoryRequirements(logical_device->get_vulkan_data(), vulkan_data, &mem_req);
-    allocated_memory = mem_mgr.allocate(mem_req.size, mem_req.memoryTypeBits, memory::Place::Gpu);
-    GX_VK_CHK(vkBindImageMemory(
-        logical_device->get_vulkan_data(),
-        vulkan_data,
-        allocated_memory->get_vulkan_data(),
-        allocated_memory->get_allocator()->get_offset()));
+    vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
+
+    allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size), mem_req.memoryTypeBits, memory::Place::Gpu);
+    GX_ASSERT_D(allocated_memory != nullptr);
+    GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
+
+    GX_VK_MARK(name, vulkan_data);
 }
 
 gearoenix::vulkan::image::Image::~Image()
 {
-    terminate();
+    if (owned) {
+        vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
+    }
 }
 
-gearoenix::vulkan::image::Image& gearoenix::vulkan::image::Image::operator=(Image&& o)
+VkImageLayout gearoenix::vulkan::image::Image::get_layout() const
 {
-    terminate();
-    logical_device = o.logical_device;
-    allocated_memory = std::move(o.allocated_memory);
-    image_width = o.image_width;
-    image_height = o.image_height;
-    image_depth = o.image_depth;
-    mipmap_level = o.mipmap_level;
-    array_layers = o.array_layers;
-    format = o.format;
-    flags = o.flags;
-    usage = o.usage;
-    vulkan_data = o.vulkan_data;
-    o.vulkan_data = nullptr;
-    return *this;
+    GX_ASSERT_D(!state.per_array_states.empty());
+    GX_ASSERT_D(!state.per_array_states[0].per_mip_states.empty());
+    GX_ASSERT_D(state.has_uniform_layout());
+    return state.per_array_states[0].per_mip_states[0].layout;
 }
-//
-// void gearoenix::vulkan::image::Image::transit(command::Buffer& c, const VkImageLayout& old_lyt, const VkImageLayout& new_lyt)
-//{
-//    VkPipelineStageFlags src_stage;
-//    VkPipelineStageFlags dst_stage;
-//    VkImageMemoryBarrier barrier;
-//    GX_SET_ZERO(barrier)
-//    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-//    barrier.oldLayout = old_lyt;
-//    barrier.newLayout = new_lyt;
-//    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-//    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-//    barrier.image = vulkan_data;
-//    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-//    barrier.subresourceRange.baseMipLevel = 0;
-//    barrier.subresourceRange.levelCount = 1;
-//    barrier.subresourceRange.baseArrayLayer = 0;
-//    barrier.subresourceRange.layerCount = 1;
-//    if (old_lyt == VK_IMAGE_LAYOUT_UNDEFINED && new_lyt == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-//        barrier.srcAccessMask = 0;
-//        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-//        src_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-//        dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-//    } else if (old_lyt == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_lyt == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-//        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-//        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-//        src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-//        dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-//    } else {
-//        GX_LOG_F("Unexpected layouts.")
-//    }
-//    Loader::vkCmdPipelineBarrier(
-//        c.get_vulkan_data(),
-//        src_stage, dst_stage,
-//        0,
-//        0, nullptr,
-//        0, nullptr,
-//        1, &barrier);
-//}
-//
-// void gearoenix::vulkan::image::Image::transit_for_writing(command::Buffer& c)
-//{
-//    transit(c, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-//}
-//
-// void gearoenix::vulkan::image::Image::copy_from_buffer(command::Buffer& c, const buffer::Buffer& b)
-//{
-//    VkBufferImageCopy region;
-//    GX_SET_ZERO(region)
-//    region.bufferOffset = b.get_allocator()->get_root_offset();
-//    switch (format) {
-//    case VK_FORMAT_R8G8B8A8_UNORM:
-//        region.bufferRowLength = 4 * image_width;
-//        break;
-//    case VK_FORMAT_R8G8B8_UNORM:
-//        region.bufferRowLength = 3 * image_width;
-//        break;
-//    case VK_FORMAT_R32G32B32A32_SFLOAT:
-//        region.bufferRowLength = 4 * 4 * image_width;
-//        break;
-//    default:
-//        GX_LOG_F("Unexpected format")
-//    }
-//    region.bufferImageHeight = image_height;
-//    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-//    region.imageSubresource.mipLevel = 0;
-//    region.imageSubresource.baseArrayLayer = 0;
-//    region.imageSubresource.layerCount = 1;
-//    region.imageOffset = { 0, 0, 0 };
-//    region.imageExtent = {
-//        image_width,
-//        image_height,
-//        1
-//    };
-//    Loader::vkCmdCopyBufferToImage(
-//        c.get_vulkan_data(),
-//        b.get_vulkan_data(),
-//        vulkan_data,
-//        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-//        1,
-//        &region);
-//}
-//
-// void gearoenix::vulkan::image::Image::transit_for_reading(command::Buffer& c)
-//{
-//    transit(c, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-//}
+
+VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
+{
+    if (!GX_FLAG_CHECK(usage, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
+        return VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+    switch (format) {
+    case VK_FORMAT_D16_UNORM:
+    case VK_FORMAT_D32_SFLOAT:
+    case VK_FORMAT_X8_D24_UNORM_PACK32:
+        return VK_IMAGE_ASPECT_DEPTH_BIT;
+    case VK_FORMAT_S8_UINT:
+        return VK_IMAGE_ASPECT_STENCIL_BIT;
+    case VK_FORMAT_D16_UNORM_S8_UINT:
+    case VK_FORMAT_D24_UNORM_S8_UINT:
+    case VK_FORMAT_D32_SFLOAT_S8_UINT:
+        return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    default:
+        GX_UNEXPECTED;
+    }
+}
+
+void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd)
+{
+    const auto aspect_flags = get_aspect_flags();
+
+    auto mip_width = static_cast<std::int32_t>(image_width);
+    auto mip_height = static_cast<std::int32_t>(image_height);
+    auto mip_depth = static_cast<std::int32_t>(image_depth);
+
+    for (std::uint32_t mip = 1; mip < mipmap_levels; ++mip) {
+        // Transition previous mip level to TRANSFER_SRC
+        transit(cmd, TransitionRequest::transfer_src().with_mips(mip - 1, 1));
+
+        VkImageBlit blit;
+        GX_SET_ZERO(blit);
+        blit.srcOffsets[0] = { 0, 0, 0 };
+        blit.srcOffsets[1] = { mip_width, mip_height, mip_depth };
+        blit.srcSubresource.aspectMask = aspect_flags;
+        blit.srcSubresource.mipLevel = mip - 1;
+        blit.srcSubresource.baseArrayLayer = 0;
+        blit.srcSubresource.layerCount = array_layers;
+
+        const auto next_width = std::max(1, mip_width >> 1);
+        const auto next_height = std::max(1, mip_height >> 1);
+        const auto next_depth = std::max(1, mip_depth >> 1);
+
+        blit.dstOffsets[0] = { 0, 0, 0 };
+        blit.dstOffsets[1] = { next_width, next_height, next_depth };
+        blit.dstSubresource.aspectMask = aspect_flags;
+        blit.dstSubresource.mipLevel = mip;
+        blit.dstSubresource.baseArrayLayer = 0;
+        blit.dstSubresource.layerCount = array_layers;
+
+        vkCmdBlitImage(cmd, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+
+        // Transition the source mip to SHADER_READ_ONLY
+        transit(cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));
+
+        mip_width = next_width;
+        mip_height = next_height;
+        mip_depth = next_depth;
+    }
+
+    // Transition last mip level to SHADER_READ_ONLY
+    transit(cmd, TransitionRequest::shader_read().with_mips(mipmap_levels - 1, 1));
+}
+
+void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const TransitionRequest& request)
+{
+    const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS ? mipmap_levels - request.base_mip : request.mip_count;
+    const auto actual_layer_count = request.layer_count == VK_REMAINING_ARRAY_LAYERS ? array_layers - request.base_layer : request.layer_count;
+
+    thread_local std::vector<VkImageMemoryBarrier2> barriers;
+    barriers.clear();
+    barriers.reserve(actual_mip_count * actual_layer_count);
+
+    for (std::uint32_t layer = request.base_layer; layer < request.base_layer + actual_layer_count; ++layer) {
+        for (std::uint32_t mip = request.base_mip; mip < request.base_mip + actual_mip_count; ++mip) {
+            auto& [layout, queue_family_index, access, stage] = state.per_array_states[layer].per_mip_states[mip];
+
+            if (layout == request.layout && queue_family_index == request.queue_family && access == request.access && stage == request.stage) {
+                continue;
+            }
+
+            VkImageMemoryBarrier2 barrier;
+            GX_SET_ZERO(barrier);
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+            barrier.srcStageMask = stage;
+            barrier.srcAccessMask = access;
+            barrier.dstStageMask = request.stage;
+            barrier.dstAccessMask = request.access;
+            barrier.oldLayout = layout;
+            barrier.newLayout = request.layout;
+            barrier.srcQueueFamilyIndex = queue_family_index;
+            barrier.dstQueueFamilyIndex = request.queue_family;
+            barrier.image = vulkan_data;
+            barrier.subresourceRange.aspectMask = get_aspect_flags();
+            barrier.subresourceRange.baseMipLevel = mip;
+            barrier.subresourceRange.levelCount = 1;
+            barrier.subresourceRange.baseArrayLayer = layer;
+            barrier.subresourceRange.layerCount = 1;
+
+            barriers.push_back(barrier);
+
+            layout = request.layout;
+            access = request.access;
+            stage = request.stage;
+            queue_family_index = request.queue_family;
+        }
+    }
+
+    if (barriers.empty()) {
+        return;
+    }
+
+    VkDependencyInfo dependency_info;
+    GX_SET_ZERO(dependency_info);
+    dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+    dependency_info.imageMemoryBarrierCount = static_cast<std::uint32_t>(barriers.size());
+    dependency_info.pImageMemoryBarriers = barriers.data();
+
+    vkCmdPipelineBarrier2(cmd, &dependency_info);
+}
 
 #endif

@@ -1,53 +1,47 @@
 #include "gx-vk-txt-cube.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#if GX_RENDER_VULKAN_ENABLED
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-image.hpp"
-#include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
+#include "../sampler/gx-vk-smp-sampler.hpp"
 #include "gx-vk-txt-2d.hpp"
+#include "gx-vk-txt-util.hpp"
 
-gearoenix::vulkan::texture::TextureCube::TextureCube(
-    const core::Id id,
-    std::string name,
-    engine::Engine* const eng,
-    std::vector<std::vector<std::vector<std::uint8_t>>> data,
-    const render::texture::TextureInfo& info,
-    const std::uint64_t aspect,
-    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
-    : render::texture::TextureCube(id, std::move(name), info.format, info.sampler_info, eng)
-    , view(new image::View(std::make_shared<image::Image>(
-          static_cast<std::uint32_t>(aspect), static_cast<std::uint32_t>(aspect), 1u,
-          static_cast<std::uint32_t>(compute_mipmaps_count(aspect, aspect)), 6u,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& in_name)
+    : render::texture::TextureCube(std::move(in_name), info)
+    , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), 1u, convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 6u, convert_image_format(info.get_format()),
           VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
-          Texture2D::convert(info.format), *eng->get_memory_manager())))
-{
-    const auto sz = view->get_image()->get_allocated_memory()->get_allocator()->get_size();
-    const auto sz_per_face = sz / 6;
-    auto buff = eng->get_vulkan_buffer_manager()->create_upload_buffer(sz);
-    std::vector<std::uint8_t> gathered_data;
-    gathered_data.reserve(sz);
-    for (std::uint64_t face_index = 0, ptr = reinterpret_cast<std::uint64_t>(buff->get_allocated_memory()->get_data()); face_index < 6; ++face_index, ptr += sz_per_face) {
-        gathered_data.clear();
-        for (const auto& d : data[face_index]) {
-            gathered_data.insert(gathered_data.end(), d.begin(), d.end());
+          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
+    , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
+    , mips([this] {
+        std::array<std::vector<std::shared_ptr<image::View>>, 6> result;
+        const auto mip_count = view->get_image()->get_mipmap_levels();
+        for (std::uint32_t face = 0; face < 6; ++face) {
+            result[face].reserve(mip_count);
+            for (std::uint32_t mip = 0; mip < mip_count; ++mip) {
+                result[face].push_back(std::make_shared<image::View>(std::shared_ptr(view->get_image()), mip, 1, face, 1));
+            }
         }
-        std::memcpy(reinterpret_cast<void*>(ptr), gathered_data.data(), gathered_data.size());
-    }
-    eng->get_image_manager()->upload(view->get_image(), std::move(buff), call);
+        return result;
+    }())
+    , sampler_index(sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index())
+{
 }
 
 gearoenix::vulkan::texture::TextureCube::~TextureCube() = default;
 
-void gearoenix::vulkan::texture::TextureCube::write_gx3d(
-    const std::shared_ptr<platform::stream::Stream>&,
-    const core::job::EndCaller<core::job::EndCallerIgnore>&)
+void gearoenix::vulkan::texture::TextureCube::write(const std::shared_ptr<platform::stream::Stream>&, const core::job::EndCaller<>&, const bool) const
 {
-    GX_UNIMPLEMENTED
+    GX_UNIMPLEMENTED;
+}
+
+void gearoenix::vulkan::texture::TextureCube::generate_mipmap(const VkCommandBuffer cmd)
+{
+    view->get_image()->generate_mipmaps(cmd);
 }
 
 #endif

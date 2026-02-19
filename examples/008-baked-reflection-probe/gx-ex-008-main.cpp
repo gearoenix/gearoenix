@@ -61,9 +61,10 @@ public:
                 const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
                 const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "-metallic:" + std::to_string(metallic) + "-roughness:" + std::to_string(roughness);
-                GxMaterialManager::get().get_pbr("material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
-                    material_is_ready(std::move(material), metallic, roughness, std::move(p), std::move(e));
-                }));
+                GxMaterialManager::get().get_pbr(
+                    "material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
+                        material_is_ready(std::move(material), metallic, roughness, std::move(p), std::move(e));
+                    }));
             }
         }
 
@@ -77,9 +78,7 @@ public:
             (void)end;
         }));
 
-        GxReflectionManager::get().build_baked(
-            "baked-reflection", scene_entity.get(),
-            GxPath::create_asset("exported.gx-reflection"),
+        GxReflectionManager::get().build_baked("baked-reflection", scene_entity.get(), GxPath::create_asset("exported.gx-reflection"),
             GxEntityEndCaller([end](auto&&) { (void)end; }));
 
         GX_LOG_D("Initialised");
@@ -90,9 +89,10 @@ public:
         material->get_normal_metallic_factor().w = metallic;
         material->get_emission_roughness_factor().w = roughness;
 
-        GxMeshManager::get().build_icosphere(4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
-            mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(e));
-        }));
+        GxMeshManager::get().build_icosphere(
+            4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
+                mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(e));
+            }));
     }
 
     void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&&)

@@ -32,11 +32,7 @@ struct SkyboxManager final : render::skybox::Manager {
     SkyboxManager();
     ~SkyboxManager() override;
 
-    [[nodiscard]] core::ecs::EntityPtr build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<render::texture::Texture>&& texture,
-        std::shared_ptr<render::mesh::Mesh>&& mesh) override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::Texture>&& texture, std::shared_ptr<render::mesh::Mesh>&& mesh) override;
 };
 }
 

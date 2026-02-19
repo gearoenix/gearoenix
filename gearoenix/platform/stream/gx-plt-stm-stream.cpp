@@ -53,10 +53,7 @@ std::vector<std::uint8_t> gearoenix::platform::stream::Stream::get_file_content(
     return result;
 }
 
-void gearoenix::platform::stream::Stream::write(Stream& s)
-{
-    write(s.get_file_content());
-}
+void gearoenix::platform::stream::Stream::write(Stream& s) { write(s.get_file_content()); }
 
 bool gearoenix::platform::stream::Stream::write(const std::string& s)
 {
