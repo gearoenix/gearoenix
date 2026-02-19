@@ -14,10 +14,23 @@ public:
     Manager();
     ~Manager() override;
     [[nodiscard]] core::ecs::EntityPtr build_baked(
-        std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::TextureCube>&& irradiance, std::shared_ptr<render::texture::TextureCube>&& radiance, const math::Aabb3<double>& include_box) override;
-    void build_runtime(std::string&& name, core::ecs::Entity* parent, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+        std::string&& name,
+        core::ecs::Entity* parent,
+        std::shared_ptr<render::texture::TextureCube>&& irradiance,
+        std::shared_ptr<render::texture::TextureCube>&& radiance,
+        const math::Aabb3<double>& include_box) override;
+    void build_runtime(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        const math::Aabb3<double>& receive_box,
+        const math::Aabb3<double>& exclude_box,
+        const math::Aabb3<double>& include_box,
+        std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution,
+        std::uint32_t radiance_resolution,
+        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void upload_uniforms();
+    void submit(VkCommandBuffer cmd) const;
 };
 }
 #endif

@@ -3,6 +3,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 
 #include <array>
 
@@ -23,6 +24,7 @@ public:
     TextureCube(const render::texture::TextureInfo& info, std::string&&);
     ~TextureCube() override;
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
+    void generate_mipmap(VkCommandBuffer cmd);
 };
 }
 #endif

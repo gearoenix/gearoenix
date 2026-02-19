@@ -222,6 +222,52 @@ VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
     }
 }
 
+void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd)
+{
+    const auto aspect_flags = get_aspect_flags();
+
+    auto mip_width = static_cast<std::int32_t>(image_width);
+    auto mip_height = static_cast<std::int32_t>(image_height);
+    auto mip_depth = static_cast<std::int32_t>(image_depth);
+
+    for (std::uint32_t mip = 1; mip < mipmap_levels; ++mip) {
+        // Transition previous mip level to TRANSFER_SRC
+        transit(cmd, TransitionRequest::transfer_src().with_mips(mip - 1, 1));
+
+        VkImageBlit blit;
+        GX_SET_ZERO(blit);
+        blit.srcOffsets[0] = { 0, 0, 0 };
+        blit.srcOffsets[1] = { mip_width, mip_height, mip_depth };
+        blit.srcSubresource.aspectMask = aspect_flags;
+        blit.srcSubresource.mipLevel = mip - 1;
+        blit.srcSubresource.baseArrayLayer = 0;
+        blit.srcSubresource.layerCount = array_layers;
+
+        const auto next_width = std::max(1, mip_width >> 1);
+        const auto next_height = std::max(1, mip_height >> 1);
+        const auto next_depth = std::max(1, mip_depth >> 1);
+
+        blit.dstOffsets[0] = { 0, 0, 0 };
+        blit.dstOffsets[1] = { next_width, next_height, next_depth };
+        blit.dstSubresource.aspectMask = aspect_flags;
+        blit.dstSubresource.mipLevel = mip;
+        blit.dstSubresource.baseArrayLayer = 0;
+        blit.dstSubresource.layerCount = array_layers;
+
+        vkCmdBlitImage(cmd, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+
+        // Transition the source mip to SHADER_READ_ONLY
+        transit(cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));
+
+        mip_width = next_width;
+        mip_height = next_height;
+        mip_depth = next_depth;
+    }
+
+    // Transition last mip level to SHADER_READ_ONLY
+    transit(cmd, TransitionRequest::shader_read().with_mips(mipmap_levels - 1, 1));
+}
+
 void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const TransitionRequest& request)
 {
     const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS ? mipmap_levels - request.base_mip : request.mip_count;

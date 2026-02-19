@@ -59,12 +59,9 @@ void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cm
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBuffer vk_cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
-
-    pipeline::PushConstants pc;
-    pc.scene_index = shader_data_index;
 
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
@@ -74,11 +71,12 @@ void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBu
 
 void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
 {
-    // render_reflection_probes(vk_cmd);
-    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
-
     pipeline::PushConstants pc;
     pc.scene_index = shader_data_index;
+
+    render_reflection_probes(vk_cmd, pc, current_bound_pipeline);
+
+    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
 
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& rc = record.cameras.cameras[camera_index];

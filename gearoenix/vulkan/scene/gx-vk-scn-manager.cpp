@@ -14,6 +14,7 @@
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
 #include "gx-vk-scn-scene.hpp"
+#include "../reflection/gx-vk-rfl-manager.hpp"
 
 #include <boost/container/flat_set.hpp>
 
@@ -57,26 +58,26 @@ void gearoenix::vulkan::scene::Manager::update()
     });
 }
 
-void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer vk_cmd)
+void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer cmd)
 {
-    render_shadows(vk_cmd);
-    // TODO: render reflection probes
+    render_shadows(cmd);
+    Singleton<reflection::Manager>::get().submit(cmd);
 
     // if (render::engine::Engine::get().get_specification().is_deferred_supported) {
     // render_with_deferred();
     // GX_UNIMPLEMENTED;
     // } else {
-    render_forward(vk_cmd);
+    render_forward(cmd);
     // }
 }
 
-void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_cmd)
+void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd)
 {
     {
-        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
+        GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
         VkPipeline current_bound_pipeline = nullptr;
         for (const auto& scene : scenes | std::views::values) {
-            scene->render_forward(vk_cmd, current_bound_pipeline);
+            scene->render_forward(cmd, current_bound_pipeline);
         }
     }
 
@@ -84,7 +85,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
     {
         auto& e = Singleton<engine::Engine>::get();
 
-        GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
+        GX_VK_PUSH_DEBUG_GROUP(cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
 
         const auto& frame = e.get_current_frame();
         const auto& swapchain_view = *frame.view;
@@ -157,10 +158,10 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
 
                 // Transition source image from COLOR_ATTACHMENT_OPTIMAL (after rendering) to TRANSFER_SRC_OPTIMAL
                 // Note: After rendering completes, the image is in COLOR_ATTACHMENT_OPTIMAL layout.
-                src_image.transit(vk_cmd, image::TransitionRequest::transfer_src());
+                src_image.transit(cmd, image::TransitionRequest::transfer_src());
 
                 // Transition swapchain image to TRANSFER_DST_OPTIMAL (with clear on first camera)
-                swapchain_image.transit(vk_cmd, image::TransitionRequest::transfer_dst());
+                swapchain_image.transit(cmd, image::TransitionRequest::transfer_dst());
 
                 // Clear swapchain on first camera blit (to get black bars)
                 if (first_camera) {
@@ -172,7 +173,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
                     clear_range.levelCount = 1;
                     clear_range.baseArrayLayer = 0;
                     clear_range.layerCount = 1;
-                    vkCmdClearColorImage(vk_cmd, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clear_color, 1, &clear_range);
+                    vkCmdClearColorImage(cmd, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clear_color, 1, &clear_range);
                 }
 
                 // Perform blit
@@ -191,10 +192,10 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
                 blit.dstSubresource.baseArrayLayer = 0;
                 blit.dstSubresource.layerCount = 1;
 
-                vkCmdBlitImage(vk_cmd, vk_src_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+                vkCmdBlitImage(cmd, vk_src_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
 
                 // Transition the source image back to COLOR_ATTACHMENT_OPTIMAL for the next frame's rendering.
-                src_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
+                src_image.transit(cmd, image::TransitionRequest::color_attachment());
 
                 first_camera = false;
             }
@@ -202,17 +203,17 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer vk_
 
         // If we blitted, transition swapchain to COLOR_ATTACHMENT_OPTIMAL for ImGui
         if (swapchain_image.get_layout() == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-            swapchain_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
+            swapchain_image.transit(cmd, image::TransitionRequest::color_attachment());
         }
     }
 }
 
-void gearoenix::vulkan::scene::Manager::render_shadows(const VkCommandBuffer vk_cmd)
+void gearoenix::vulkan::scene::Manager::render_shadows(const VkCommandBuffer cmd)
 {
-    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
     VkPipeline current_bound_pipeline = nullptr;
     for (const auto& scene : scenes | std::views::values) {
-        scene->render_shadows(vk_cmd, current_bound_pipeline);
+        scene->render_shadows(cmd, current_bound_pipeline);
     }
 }
 

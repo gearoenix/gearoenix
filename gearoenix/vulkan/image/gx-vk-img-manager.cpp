@@ -26,7 +26,6 @@ void gearoenix::vulkan::image::Manager::upload(std::shared_ptr<Image>&& img, std
 
     const auto vk_cmd = cmd->get_vulkan_data();
     const auto mip_levels = img->get_mipmap_levels();
-    const auto array_layers = img->get_array_layers();
     const auto provided_mip_count = buffs.empty() ? 0u : static_cast<std::uint32_t>(buffs[0].size());
     const bool needs_mip_generation = generate_mipmaps && provided_mip_count == 1 && mip_levels > 1;
 
@@ -64,46 +63,7 @@ void gearoenix::vulkan::image::Manager::upload(std::shared_ptr<Image>&& img, std
     }
 
     if (needs_mip_generation) {
-        auto mip_width = static_cast<std::int32_t>(img->get_image_width());
-        auto mip_height = static_cast<std::int32_t>(img->get_image_height());
-        auto mip_depth = static_cast<std::int32_t>(img->get_image_depth());
-
-        for (std::uint32_t mip = 1; mip < mip_levels; ++mip) {
-            // Transition previous mip level to TRANSFER_SRC
-            img->transit(vk_cmd, TransitionRequest::transfer_src().with_mips(mip - 1, 1));
-
-            VkImageBlit blit;
-            GX_SET_ZERO(blit);
-            blit.srcOffsets[0] = { 0, 0, 0 };
-            blit.srcOffsets[1] = { mip_width, mip_height, mip_depth };
-            blit.srcSubresource.aspectMask = aspect_flags;
-            blit.srcSubresource.mipLevel = mip - 1;
-            blit.srcSubresource.baseArrayLayer = 0;
-            blit.srcSubresource.layerCount = array_layers;
-
-            const auto next_width = std::max(1, mip_width >> 1);
-            const auto next_height = std::max(1, mip_height >> 1);
-            const auto next_depth = std::max(1, mip_depth >> 1);
-
-            blit.dstOffsets[0] = { 0, 0, 0 };
-            blit.dstOffsets[1] = { next_width, next_height, next_depth };
-            blit.dstSubresource.aspectMask = aspect_flags;
-            blit.dstSubresource.mipLevel = mip;
-            blit.dstSubresource.baseArrayLayer = 0;
-            blit.dstSubresource.layerCount = array_layers;
-
-            vkCmdBlitImage(vk_cmd, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
-
-            // Transition the source mip to SHADER_READ_ONLY
-            img->transit(vk_cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));
-
-            mip_width = next_width;
-            mip_height = next_height;
-            mip_depth = next_depth;
-        }
-
-        // Transition last mip level to SHADER_READ_ONLY
-        img->transit(vk_cmd, TransitionRequest::shader_read().with_mips(mip_levels - 1, 1));
+        img->generate_mipmaps(vk_cmd);
     } else {
         // Transition the entire image to SHADER_READ_ONLY
         img->transit(vk_cmd, TransitionRequest::shader_read());

@@ -112,8 +112,8 @@ public:
 
     void material_is_ready(GxPbrPtr&& material, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&& end)
     {
-        material->get_normal_metallic_factor().w = metallic;
-        material->get_emission_roughness_factor().w = roughness;
+        material->set_normal_metallic_factor({1.0f, 1.0f, 1.0f, metallic});
+        material->set_emission_roughness_factor({1.0f, 1.0f, 1.0f, roughness});
 
         GxMeshManager::get().build_icosphere(
             4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {

@@ -92,6 +92,11 @@ public:
     /// Updates internal state after transition.
     /// Skips transition if already in the requested state.
     void transit(VkCommandBuffer cmd, const TransitionRequest& request);
+
+    /// Generates mipmaps by blitting from each mip level to the next.
+    /// Expects the image to be in TRANSFER_DST layout before calling.
+    /// Leaves the entire image in SHADER_READ_ONLY layout when done.
+    void generate_mipmaps(VkCommandBuffer cmd);
 };
 }
 #endif

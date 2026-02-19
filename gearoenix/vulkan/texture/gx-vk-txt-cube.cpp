@@ -34,6 +34,14 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::Text
 
 gearoenix::vulkan::texture::TextureCube::~TextureCube() = default;
 
-void gearoenix::vulkan::texture::TextureCube::write(const std::shared_ptr<platform::stream::Stream>&, const core::job::EndCaller<>&, const bool) const { GX_UNIMPLEMENTED; }
+void gearoenix::vulkan::texture::TextureCube::write(const std::shared_ptr<platform::stream::Stream>&, const core::job::EndCaller<>&, const bool) const
+{
+    GX_UNIMPLEMENTED;
+}
+
+void gearoenix::vulkan::texture::TextureCube::generate_mipmap(const VkCommandBuffer cmd)
+{
+    view->get_image()->generate_mipmaps(cmd);
+}
 
 #endif

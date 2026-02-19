@@ -26,9 +26,9 @@ public:
     ~Manager() override;
     [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
     void update() override;
-    void submit(VkCommandBuffer vk_cmd);
-    void render_forward(VkCommandBuffer vk_cmd);
-    void render_shadows(VkCommandBuffer vk_cmd);
+    void submit(VkCommandBuffer cmd);
+    void render_forward(VkCommandBuffer cmd);
+    void render_shadows(VkCommandBuffer cmd);
     void upload_uniforms();
 };
 }
