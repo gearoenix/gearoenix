@@ -19,15 +19,19 @@ struct Runtime;
 struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataReflectionProbe>, uniform_indexer);
 
-    GX_GET_VAL_PRV(VkDescriptorSetLayout, irradiance_descriptor_set_layout, nullptr);
-    GX_GET_VAL_PRV(VkPipelineLayout, irradiance_pipeline_layout, nullptr);
-    GX_GET_VAL_PRV(VkSampler, irradiance_sampler, nullptr);
+    GX_GET_VAL_PRV(VkDescriptorSetLayout, convolution_descriptor_set_layout, nullptr);
+    GX_GET_VAL_PRV(VkSampler, convolution_sampler, nullptr);
+    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Cache>, convolution_pipeline_cache);
 
+    GX_GET_VAL_PRV(VkPipelineLayout, irradiance_pipeline_layout, nullptr);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, irradiance_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Cache>, irradiance_pipeline_cache);
     GX_GET_CREF_PRV(std::shared_ptr<shader::Module>, irradiance_shader_module);
 
-    void initialise_irradiance_compute();
+    GX_GET_VAL_PRV(VkPipelineLayout, radiance_pipeline_layout, nullptr);
+    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, radiance_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::Module>, radiance_shader_module);
+
+    void initialise_convolution_compute();
     void update() override;
 
 public:

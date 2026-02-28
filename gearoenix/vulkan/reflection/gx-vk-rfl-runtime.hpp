@@ -23,9 +23,20 @@ struct Runtime final : render::reflection::Runtime, Probe {
         std::uint32_t image_size;
     };
 
+    struct RadiancePushConstants final {
+        float u_axis[4];
+        float v_axis[4];
+        float face_axis[3];
+        std::uint32_t image_size;
+        float roughness;
+        float roughness_p_4;
+        float sa_texel;
+    };
+
     using GapiCubeTarget = std::array<std::shared_ptr<texture::Target>, 6>;
     using GapiMippedCubeTarget = std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6>;
     using CubeDescriptorSet = std::array<VkDescriptorSet, 6>;
+    using MippedCubeDescriptorSet = std::array<boost::container::static_vector<VkDescriptorSet, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6>;
 
     constexpr static auto max_count = render::reflection::Runtime::max_count;
     constexpr static auto object_type_index = gearoenix_gapi_reflection_runtime_type_index;
@@ -47,6 +58,9 @@ struct Runtime final : render::reflection::Runtime, Probe {
 
     GX_GET_VAL_PRV(VkDescriptorPool, irradiance_descriptor_pool, nullptr);
     GX_GET_CREF_PRV(CubeDescriptorSet, irradiance_descriptor_sets);
+
+    GX_GET_VAL_PRV(VkDescriptorPool, radiance_descriptor_pool, nullptr);
+    GX_GET_CREF_PRV(MippedCubeDescriptorSet, radiance_descriptor_sets);
 
     GX_GET_VAL_PRV(std::uint32_t, environment_texture_index, static_cast<std::uint32_t>(-1));
     GX_GET_VAL_PRV(std::uint32_t, environment_sampler_index, static_cast<std::uint32_t>(-1));
