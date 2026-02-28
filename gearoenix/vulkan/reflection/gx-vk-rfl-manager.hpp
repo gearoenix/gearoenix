@@ -3,11 +3,31 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-manager.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
+#include "../gx-vk-loader.hpp"
+
+namespace gearoenix::vulkan::pipeline {
+struct Cache;
+struct Pipeline;
+}
+
+namespace gearoenix::vulkan::shader {
+struct Module;
+}
 
 namespace gearoenix::vulkan::reflection {
+struct Runtime;
 struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataReflectionProbe>, uniform_indexer);
 
+    GX_GET_VAL_PRV(VkDescriptorSetLayout, irradiance_descriptor_set_layout, nullptr);
+    GX_GET_VAL_PRV(VkPipelineLayout, irradiance_pipeline_layout, nullptr);
+    GX_GET_VAL_PRV(VkSampler, irradiance_sampler, nullptr);
+
+    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, irradiance_pipeline);
+    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Cache>, irradiance_pipeline_cache);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::Module>, irradiance_shader_module);
+
+    void initialise_irradiance_compute();
     void update() override;
 
 public:

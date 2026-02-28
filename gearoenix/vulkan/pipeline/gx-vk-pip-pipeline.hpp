@@ -25,6 +25,7 @@ public:
     [[nodiscard]] static std::shared_ptr<Pipeline> construct_ray_tracing(
         std::shared_ptr<Layout>&& layout, std::shared_ptr<Cache>&& cache, const std::vector<VkPipelineShaderStageCreateInfo>& stages_create_info, const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& shader_group_create_info);
     [[nodiscard]] static std::shared_ptr<Pipeline> construct_graphics(std::shared_ptr<Cache>&& cache, const VkGraphicsPipelineCreateInfo& create_info);
+    [[nodiscard]] static std::shared_ptr<Pipeline> construct_compute(std::shared_ptr<Cache>&& cache, const VkComputePipelineCreateInfo& create_info);
 };
 }
 #endif

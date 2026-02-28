@@ -39,4 +39,11 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     return std::shared_ptr<Pipeline>(new Pipeline(nullptr, std::move(cache), vulkan_data));
 }
 
+std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Pipeline::construct_compute(std::shared_ptr<Cache>&& cache, const VkComputePipelineCreateInfo& create_info)
+{
+    VkPipeline vulkan_data = nullptr;
+    GX_VK_CHK(vkCreateComputePipelines(device::Logical::get().get_vulkan_data(), cache->get_vulkan_data(), 1, &create_info, nullptr, &vulkan_data));
+    return std::shared_ptr<Pipeline>(new Pipeline(nullptr, std::move(cache), vulkan_data));
+}
+
 #endif

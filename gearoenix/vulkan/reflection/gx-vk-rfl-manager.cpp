@@ -2,15 +2,105 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../texture/gx-vk-txt-manager.hpp"
+#include "../image/gx-vk-img-image.hpp"
+#include "../image/gx-vk-img-view.hpp"
+#include "../pipeline/gx-vk-pip-cache.hpp"
+#include "../pipeline/gx-vk-pip-pipeline.hpp"
+#include "../../platform/stream/gx-plt-stm-asset.hpp"
+#include "../shader/gx-vk-shd-module.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
+#include "../texture/gx-vk-txt-manager.hpp"
 #include "gx-vk-rfl-baked.hpp"
 #include "gx-vk-rfl-runtime.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+
+void gearoenix::vulkan::reflection::Manager::initialise_irradiance_compute()
+{
+    const auto dev = device::Logical::get().get_vulkan_data();
+
+    constexpr std::array bindings {
+        VkDescriptorSetLayoutBinding {
+            .binding = 0,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+            .pImmutableSamplers = nullptr
+        },
+        VkDescriptorSetLayoutBinding {
+            .binding = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+            .pImmutableSamplers = nullptr
+        },
+    };
+
+    VkDescriptorSetLayoutCreateInfo dsl_info;
+    GX_SET_ZERO(dsl_info);
+    dsl_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    dsl_info.bindingCount = static_cast<std::uint32_t>(bindings.size());
+    dsl_info.pBindings = bindings.data();
+    GX_VK_CHK(vkCreateDescriptorSetLayout(dev, &dsl_info, nullptr, &irradiance_descriptor_set_layout));
+
+    VkPushConstantRange push_range;
+    GX_SET_ZERO(push_range);
+    push_range.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+    push_range.offset = 0;
+    push_range.size = sizeof(Runtime::IrradiancePushConstants);
+
+    VkPipelineLayoutCreateInfo pl_info;
+    GX_SET_ZERO(pl_info);
+    pl_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pl_info.setLayoutCount = 1;
+    pl_info.pSetLayouts = &irradiance_descriptor_set_layout;
+    pl_info.pushConstantRangeCount = 1;
+    pl_info.pPushConstantRanges = &push_range;
+    GX_VK_CHK(vkCreatePipelineLayout(dev, &pl_info, nullptr, &irradiance_pipeline_layout));
+
+    VkSamplerCreateInfo sampler_info;
+    GX_SET_ZERO(sampler_info);
+    sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    sampler_info.magFilter = VK_FILTER_LINEAR;
+    sampler_info.minFilter = VK_FILTER_LINEAR;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.maxLod = VK_LOD_CLAMP_NONE;
+    GX_VK_CHK(vkCreateSampler(dev, &sampler_info, nullptr, &irradiance_sampler));
+
+    {
+        const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct("vulkan/shader/irradiance.comp.spv"));
+        GX_ASSERT_D(stream);
+        const auto file_content = stream->get_file_content();
+        irradiance_shader_module = std::make_shared<shader::Module>(std::span { file_content.data(), file_content.size() });
+    }
+
+    // Create compute pipeline
+    irradiance_pipeline_cache = std::make_shared<pipeline::Cache>();
+
+    VkPipelineShaderStageCreateInfo stage_info;
+    GX_SET_ZERO(stage_info);
+    stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stage_info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+    stage_info.module = irradiance_shader_module->get_vulkan_data();
+    stage_info.pName = "main";
+
+    VkComputePipelineCreateInfo compute_info;
+    GX_SET_ZERO(compute_info);
+    compute_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+    compute_info.stage = stage_info;
+    compute_info.layout = irradiance_pipeline_layout;
+
+    irradiance_pipeline = pipeline::Pipeline::construct_compute(std::shared_ptr(irradiance_pipeline_cache), compute_info);
+}
 
 void gearoenix::vulkan::reflection::Manager::update()
 {
@@ -25,6 +115,8 @@ gearoenix::vulkan::reflection::Manager::Manager()
     core::ecs::ComponentType::add<Baked>();
     core::ecs::ComponentType::add<Runtime>();
 
+    initialise_irradiance_compute();
+
     render::texture::Manager::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& irr) {
         auto rad = irr;
         black = core::Object::construct<Baked>(
@@ -33,7 +125,26 @@ gearoenix::vulkan::reflection::Manager::Manager()
     }));
 }
 
-gearoenix::vulkan::reflection::Manager::~Manager() = default;
+gearoenix::vulkan::reflection::Manager::~Manager()
+{
+    irradiance_pipeline = nullptr;
+    irradiance_pipeline_cache = nullptr;
+    irradiance_shader_module = nullptr;
+
+    const auto dev = device::Logical::get().get_vulkan_data();
+    if (nullptr != irradiance_sampler) {
+        vkDestroySampler(dev, irradiance_sampler, nullptr);
+        irradiance_sampler = nullptr;
+    }
+    if (nullptr != irradiance_pipeline_layout) {
+        vkDestroyPipelineLayout(dev, irradiance_pipeline_layout, nullptr);
+        irradiance_pipeline_layout = nullptr;
+    }
+    if (nullptr != irradiance_descriptor_set_layout) {
+        vkDestroyDescriptorSetLayout(dev, irradiance_descriptor_set_layout, nullptr);
+        irradiance_descriptor_set_layout = nullptr;
+    }
+}
 
 gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_baked(
     std::string&& name,
@@ -79,62 +190,8 @@ void gearoenix::vulkan::reflection::Manager::submit(const VkCommandBuffer cmd) c
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.5f, 1.0f, 0.5f, "render-reflection-probes");
 
-    core::ecs::World::get().synchronised_system<Runtime>([&](const auto* const, const auto* const r) {
-        constexpr std::array face_uv_axis {
-            std::array { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
-            std::array { math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(-1.0f, 0.0f, 0.0f) }, // NegativeX
-            std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f), math::Vec3(0.0f, 1.0f, 0.0f) }, // PositiveY
-            std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f) }, // NegativeY
-            std::array { math::Vec3(1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, 1.0f) }, // PositiveZ
-            std::array { math::Vec3(-1.0f, 0.0f, 0.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(0.0f, 0.0f, -1.0f) }, // NegativeZ
-        };
-        switch (r->get_state()) {
-        case Runtime::State::EnvironmentCubeMipMap:
-            r->get_gapi_environment()->generate_mipmap(cmd);
-            return;
-        case Runtime::State::IrradianceFace: {
-            const auto fi = r->get_state_irradiance_face();
-            ctx::set_framebuffer(r->get_gl_irradiance_targets_v()[fi]);
-            const auto w = static_cast<sizei>(r->get_irradiance()->get_info().get_width());
-            ctx::set_viewport_scissor_clip({ 0, 0, w, w });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            irradiance_shader->bind(current_shader);
-            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(irradiance_shader->get_environment_index()));
-            glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
-            irradiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            return;
-        }
-        case Runtime::State::IrradianceMipMap:
-            glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_irradiance_v());
-            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-            return;
-        case Runtime::State::RadianceFaceLevel: {
-            const auto fi = r->get_state_radiance_face();
-            const auto li = r->get_state_radiance_level();
-            ctx::set_framebuffer(r->get_gl_radiance_targets_v()[fi][li]);
-            const auto w = static_cast<sizei>(r->get_radiance()->get_info().get_width() >> li);
-            ctx::set_viewport_scissor_clip({ 0, 0, w, w });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            radiance_shader->bind(current_shader);
-            glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(radiance_shader->get_environment_index()));
-            glBindTexture(GL_TEXTURE_CUBE_MAP, r->get_gl_environment_v());
-            radiance_shader->set_m_data(reinterpret_cast<const float*>(&face_uv_axis[fi]));
-            const auto roughness = static_cast<float>(r->get_roughnesses()[li]);
-            radiance_shader->set_roughness_data(&roughness);
-            const float roughness_p_4 = roughness * roughness * roughness * roughness;
-            radiance_shader->set_roughness_p_4_data(&roughness_p_4);
-            const auto resolution = static_cast<float>(r->get_environment()->get_info().get_width());
-            const float sa_texel = (static_cast<float>(std::numbers::pi) / 1.5f) / (resolution * resolution);
-            radiance_shader->set_sa_texel_data(&sa_texel);
-            glBindVertexArray(screen_vertex_object);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            return;
-        }
-        default:
-            return;
-        }
+    core::ecs::World::get().synchronised_system<Runtime>([cmd](const auto* const, const auto* const r) {
+        r->vk_update(cmd);
     });
 }
 

@@ -1,0 +1,54 @@
+#version 460
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform samplerCube environment_map;
+layout(set = 0, binding = 1, rgba16f) writeonly uniform image2D irradiance_face;
+
+layout(push_constant) uniform PushConstants {
+    vec4 u_axis;
+    vec4 v_axis;
+    vec4 face_axis_and_image_size;
+};
+
+const float PI = 3.14159265358979323846;
+const float SAMPLE_DELTA = 0.005;
+
+void main() {
+    const uint image_size = floatBitsToUint(face_axis_and_image_size.w);
+    const uvec2 pixel = gl_GlobalInvocationID.xy;
+    if (pixel.x >= image_size || pixel.y >= image_size) {
+        return;
+    }
+
+    const vec2 uv = (vec2(pixel) + 0.5) / float(image_size) * 2.0 - 1.0;
+    const vec3 world_dir = normalize(u_axis.xyz * uv.x + v_axis.xyz * uv.y + face_axis_and_image_size.xyz);
+
+    const vec3 normal = world_dir;
+    const vec3 up = abs(normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, 1.0);
+    const vec3 right = normalize(cross(up, normal));
+    const vec3 forward = cross(normal, right);
+
+    vec3 irradiance = vec3(0.0);
+    float phi_count = 0.0;
+
+    for (float phi = 0.0; phi < 2.0 * PI; phi += SAMPLE_DELTA) {
+        const float cos_phi = cos(phi);
+        const float sin_phi = sin(phi);
+        vec3 theta_irradiance = vec3(0.0);
+        float theta_count = 0.0;
+        for (float theta = 0.0; theta < 0.5 * PI; theta += SAMPLE_DELTA) {
+            const float cos_theta = cos(theta);
+            const float sin_theta = sin(theta);
+            const vec3 tangent_sample = vec3(sin_theta * cos_phi, sin_theta * sin_phi, cos_theta);
+            const vec3 sample_dir = tangent_sample.x * right + tangent_sample.y * forward + tangent_sample.z * normal;
+            theta_irradiance += texture(environment_map, sample_dir).rgb * cos_theta * sin_theta;
+            theta_count += 1.0;
+        }
+        irradiance += theta_irradiance / theta_count;
+        phi_count += 1.0;
+    }
+
+    irradiance = PI * irradiance / phi_count;
+    imageStore(irradiance_face, ivec2(pixel), vec4(irradiance, 1.0));
+}
