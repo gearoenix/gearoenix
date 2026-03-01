@@ -19,7 +19,10 @@ gearoenix::vulkan::memory::Memory::Memory(std::shared_ptr<Memory> parent, std::s
 {
 }
 
-std::int64_t gearoenix::vulkan::memory::Memory::align(const std::int64_t sz) { return math::Numeric::align(sz, static_cast<std::int64_t>(device::Physical::get().get_max_memory_alignment())); }
+std::int64_t gearoenix::vulkan::memory::Memory::align(const std::int64_t sz)
+{
+    return math::Numeric::align(sz, static_cast<std::int64_t>(device::Physical::get().get_max_memory_alignment()));
+}
 
 gearoenix::vulkan::memory::Memory::~Memory()
 {

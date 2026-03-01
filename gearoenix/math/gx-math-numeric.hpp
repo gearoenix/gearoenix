@@ -10,7 +10,10 @@ struct Numeric {
     constexpr static T epsilon = static_cast<T>(0.0001);
 
     template <typename T>
-    constexpr static void check_signable() { static_assert(std::numeric_limits<T>::is_signed, "This functionality only works when the type is signable."); }
+    constexpr static void check_signable()
+    {
+        static_assert(std::numeric_limits<T>::is_signed, "This functionality only works when the type is signable.");
+    }
 
     template <typename T1, typename T2>
     constexpr static void check_same_signibility()
@@ -26,7 +29,7 @@ struct Numeric {
         return i;
     }
 
-    // It will raise given number to the nearest bigger or equal value that is in power of 2
+    // It will raise the given number to the nearest bigger or equal value that is in power of 2
     template <typename T>
     [[nodiscard]] constexpr static T raise_p2(const T v)
     {
@@ -40,10 +43,12 @@ struct Numeric {
     template <typename T>
     [[nodiscard]] constexpr static T raise_p2(const T v, const T maximum, const T minimum)
     {
-        if (v > maximum)
+        if (v > maximum) {
             return maximum;
-        if (v < minimum)
+        }
+        if (v < minimum) {
             return minimum;
+        }
         return raise_p2(v);
     }
 
@@ -62,10 +67,12 @@ struct Numeric {
     [[nodiscard]] constexpr static T safe_maximum(const T a, const T b)
     {
         if constexpr (std::is_floating_point_v<T>) {
-            if (std::isnan(a))
+            if (std::isnan(a)) {
                 return b;
-            if (std::isnan(b))
+            }
+            if (std::isnan(b)) {
                 return a;
+            }
         }
         return a > b ? a : b;
     }
@@ -74,10 +81,12 @@ struct Numeric {
     [[nodiscard]] constexpr static T safe_minimum(const T a, const T b)
     {
         if constexpr (std::is_floating_point_v<T>) {
-            if (std::isnan(a))
+            if (std::isnan(a)) {
                 return b;
-            if (std::isnan(b))
+            }
+            if (std::isnan(b)) {
                 return a;
+            }
         }
         return a > b ? b : a;
     }
@@ -114,7 +123,7 @@ struct Numeric {
         bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
         bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
         bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-        return float(bits) * 2.3283064365386963e-10f;
+        return static_cast<float>(bits) * 2.3283064365386963e-10f;
     }
 
     template <typename T>
@@ -127,8 +136,7 @@ struct Numeric {
     template <typename T>
     [[nodiscard]] constexpr static T align(const T value, const T alignment)
     {
-        const T r = value % alignment;
-        return r != 0 ? value + (alignment - r) : value;
+        return ((value + alignment - 1) / alignment) * alignment;
     }
 
     template <typename T>
@@ -149,15 +157,27 @@ struct Numeric {
     }
 
     template <typename T>
-    [[nodiscard]] constexpr static T normalise_radian(const T r) { return positive_mod(r, static_cast<T>(std::numbers::pi * 2.0)); }
+    [[nodiscard]] constexpr static T normalise_radian(const T r)
+    {
+        return positive_mod(r, static_cast<T>(std::numbers::pi * 2.0));
+    }
 
     template <typename T>
-    [[nodiscard]] constexpr static T normalise_degree(const T r) { return positive_mod(r, static_cast<T>(360.0)); }
+    [[nodiscard]] constexpr static T normalise_degree(const T r)
+    {
+        return positive_mod(r, static_cast<T>(360.0));
+    }
 
     template <typename T>
-    [[nodiscard]] constexpr static T to_degree(const T r) { return r * static_cast<T>(180.0 / std::numbers::pi); }
+    [[nodiscard]] constexpr static T to_degree(const T r)
+    {
+        return r * static_cast<T>(180.0 / std::numbers::pi);
+    }
 
     template <typename T>
-    [[nodiscard]] constexpr static T to_radian(const T r) { return r * static_cast<T>(std::numbers::pi / 180.0); }
+    [[nodiscard]] constexpr static T to_radian(const T r)
+    {
+        return r * static_cast<T>(std::numbers::pi / 180.0);
+    }
 };
 }

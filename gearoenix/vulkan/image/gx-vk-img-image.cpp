@@ -179,9 +179,12 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     GX_SET_ZERO(mem_req);
     vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
 
-    allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size), mem_req.memoryTypeBits, memory::Place::Gpu);
+    const auto alignment = static_cast<std::int64_t>(mem_req.alignment);
+    allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size) + alignment - 1, mem_req.memoryTypeBits, memory::Place::Gpu);
     GX_ASSERT_D(allocated_memory != nullptr);
-    GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset()));
+    const auto raw_offset = allocated_memory->get_allocator()->get_offset();
+    const auto aligned_offset = ((raw_offset + alignment - 1) / alignment) * alignment;
+    GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), static_cast<VkDeviceSize>(aligned_offset)));
 
     GX_VK_MARK(name, vulkan_data);
 }

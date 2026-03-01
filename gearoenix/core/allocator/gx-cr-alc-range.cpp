@@ -5,8 +5,8 @@
 gearoenix::core::allocator::Range::Range(const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
     : size(size)
     , offset(offset)
-    , parent(std::move(parent))
     , ranges { { { size, offset }, { nullptr, nullptr } } }
+    , parent(std::move(parent))
 {
 }
 
@@ -49,14 +49,15 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
 
 gearoenix::core::allocator::Range::~Range()
 {
-    if (nullptr != parent)
+    if (nullptr != parent) {
         parent->deallocate(this);
+    }
 }
 
 std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz)
 {
-    std::lock_guard<std::mutex> _lg(this_lock);
-    auto search = std::upper_bound(ranges.begin(), ranges.end(), sz, [](const std::int64_t a, const decltype(ranges)::value_type& b) { return a <= b.first.first; });
+    std::lock_guard _lg(this_lock);
+    const auto search = std::upper_bound(ranges.begin(), ranges.end(), sz, [](const std::int64_t a, const decltype(ranges)::value_type& b) { return a <= b.first.first; });
     if (ranges.end() == search) {
         GX_LOG_D("Not enough space left to allocate: " << sz);
         return nullptr;
@@ -66,8 +67,7 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
     std::shared_ptr<Range> result(new Range(sz, found_offset, self.lock()));
     const auto del_range = search->second;
     ranges.erase(search);
-    auto* const result_previous = del_range.first;
-    if (nullptr != result_previous) {
+    if (auto* const result_previous = del_range.first; nullptr != result_previous) {
         result_previous->next_key = std::nullopt;
         result_previous->next = result.get();
         result->previous = result_previous;
