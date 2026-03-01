@@ -42,7 +42,7 @@ void main() {
             const float sin_theta = sin(theta);
             const vec3 tangent_sample = vec3(sin_theta * cos_phi, sin_theta * sin_phi, cos_theta);
             const vec3 sample_dir = tangent_sample.x * right + tangent_sample.y * forward + tangent_sample.z * normal;
-            theta_irradiance += texture(environment_map, sample_dir).rgb * cos_theta * sin_theta;
+            theta_irradiance += textureLod(environment_map, sample_dir, 0.0).rgb * cos_theta * sin_theta;
             theta_count += 1.0;
         }
         irradiance += theta_irradiance / theta_count;

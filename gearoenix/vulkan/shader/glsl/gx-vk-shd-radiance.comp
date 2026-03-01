@@ -15,7 +15,7 @@ layout(push_constant) uniform PushConstants {
 };
 
 const float PI = 3.14159265358979323846;
-const uint SAMPLE_COUNT = 1024u;
+const uint SAMPLE_COUNT = 4096u;
 
 float distribution_ggx(float NdotH2) {
     float nom = roughness_p_4;
@@ -74,9 +74,9 @@ void main() {
             n_dot_h = max(n_dot_h, 0.0);
             float n_dot_h_p_2 = n_dot_h * n_dot_h;
             float d = distribution_ggx(n_dot_h_p_2);
-            float pdf = d * n_dot_h / (4.0 * n_dot_h) + 0.0001;
+            float pdf = (d / 4.0) + 0.0001;
             float sa_sample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
-            float mip_level = roughness == 0.0 ? 0.0 : 0.5 * log2(sa_sample / sa_texel);
+            float mip_level = roughness == 0.0 ? 0.0 : max(0.0, 0.5 * log2(sa_sample / sa_texel));
             prefiltered_colour += textureLod(environment_map, l, mip_level).rgb * n_dot_l;
             total_weight += n_dot_l;
         }

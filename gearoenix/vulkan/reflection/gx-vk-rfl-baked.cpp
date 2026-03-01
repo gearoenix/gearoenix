@@ -14,6 +14,7 @@ gearoenix::vulkan::reflection::Baked::Baked(
     set_textures(
         *core::cast_ptr<texture::TextureCube>(irradiance.get()),
         *core::cast_ptr<texture::TextureCube>(radiance.get()));
+    radiance_lod_coefficient = static_cast<float>(radiance_mips_count - 1);
 }
 
 gearoenix::vulkan::reflection::Baked::~Baked() = default;

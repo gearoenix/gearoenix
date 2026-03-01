@@ -40,6 +40,7 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
     environment_sampler_index = gapi_environment->get_sampler_index();
 
     set_textures(*gapi_irradiance, *gapi_radiance);
+    radiance_lod_coefficient = static_cast<float>(roughnesses.size() - 1);
 
     const auto& mgr = core::Singleton<Manager>::get();
     const auto dev = device::Logical::get().get_vulkan_data();
@@ -283,9 +284,12 @@ void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkComman
     pc.image_size = irr_width;
     vkCmdPushConstants(cmd, mgr.get_irradiance_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(IrradiancePushConstants), &pc);
 
-    const auto group_count_x = (irr_width + 15) / 16;
-    const auto group_count_y = (irr_width + 15) / 16;
-    vkCmdDispatch(cmd, group_count_x, group_count_y, 1);
+    const auto group_count_x = (irr_width + 15u) >> 4u;
+    const auto group_count_y = (irr_width + 15u) >> 4u;
+    vkCmdDispatch(cmd, group_count_x, group_count_y, 1u);
+
+    irr_cube.get_view()->get_image()->transit(cmd,
+        image::TransitionRequest::shader_read().with_layers(fi, 1).with_mips(0, 1));
 }
 
 void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandBuffer cmd) const
@@ -340,9 +344,12 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandB
     pc.sa_texel = static_cast<float>(sa_texel);
     vkCmdPushConstants(cmd, mgr.get_radiance_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(RadiancePushConstants), &pc);
 
-    const auto group_count_x = (rad_width + 15) > 4;
-    const auto group_count_y = (rad_width + 15) > 4;
-    vkCmdDispatch(cmd, group_count_x, group_count_y, 1);
+    const auto group_count_x = (rad_width + 15u) >> 4u;
+    const auto group_count_y = (rad_width + 15u) >> 4u;
+    vkCmdDispatch(cmd, group_count_x, group_count_y, 1u);
+
+    rad_cube.get_view()->get_image()->transit(cmd,
+        image::TransitionRequest::shader_read().with_layers(fi, 1).with_mips(li, 1));
 }
 
 void gearoenix::vulkan::reflection::Runtime::vk_update(const VkCommandBuffer cmd) const
@@ -363,7 +370,6 @@ void gearoenix::vulkan::reflection::Runtime::vk_update(const VkCommandBuffer cmd
     default:
         return;
     }
-    GX_UNEXPECTED;
 }
 
 #endif

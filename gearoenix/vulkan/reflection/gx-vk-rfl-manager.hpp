@@ -15,9 +15,10 @@ struct Module;
 }
 
 namespace gearoenix::vulkan::reflection {
+using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataReflectionProbe>;
 struct Runtime;
 struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataReflectionProbe>, uniform_indexer);
+    GX_GET_CREF_PRV(uniform_indexer_t, uniform_indexer);
 
     GX_GET_VAL_PRV(VkDescriptorSetLayout, convolution_descriptor_set_layout, nullptr);
     GX_GET_VAL_PRV(VkSampler, convolution_sampler, nullptr);

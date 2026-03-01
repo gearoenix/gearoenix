@@ -9,7 +9,7 @@ struct Baked final : Probe, render::reflection::Baked {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
     constexpr static auto max_count = render::reflection::Baked::max_count;
-    constexpr static auto object_type_index = gearoenix_gapi_reflection_runtime_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_baked_type_index;
     constexpr static std::array all_parent_object_type_indices {
         render::reflection::Baked::object_type_index,
         vulkan::reflection::Probe::object_type_index,

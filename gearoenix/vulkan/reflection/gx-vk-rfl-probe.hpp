@@ -2,6 +2,7 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 
 namespace gearoenix::vulkan::texture {
 struct TextureCube;
@@ -20,10 +21,17 @@ struct Probe {
     GX_GET_VAL_PRT(std::uint32_t, radiance_texture_index, static_cast<std::uint32_t>(-1));
     GX_GET_VAL_PRT(std::uint32_t, radiance_sampler_index, static_cast<std::uint32_t>(-1));
 
+    GX_GET_VAL_PRT(float, radiance_lod_coefficient, 0.0f);
+
+    GX_GET_VAL_PRT(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
+
+    std::uint64_t last_frame_number_update = static_cast<std::uint64_t>(-1);
+
     void set_textures(const texture::TextureCube& irr, const texture::TextureCube& rad);
 
 public:
     virtual ~Probe();
+    void after_record(std::uint64_t frame_number);
 };
 }
 #endif

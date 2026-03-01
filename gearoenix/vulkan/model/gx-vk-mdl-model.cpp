@@ -13,6 +13,7 @@
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../reflection/gx-vk-rfl-baked.hpp"
 
 gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
     : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
@@ -97,6 +98,9 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
         sd.shadow_caster_directional_lights[li] = l.get_shader_index();
     }
 
-    sd.reflection_probe_index = 0;
+    auto& probe = *dynamic_cast<reflection::Probe*>(rec_mdl.probe);
+    probe.after_record(frame_number);
+
+    sd.reflection_probe_index = probe.get_shader_data_index();
 }
 #endif
