@@ -9,7 +9,13 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-check.hpp"
 
-gearoenix::vulkan::memory::Memory::Memory(std::shared_ptr<Memory> parent, std::shared_ptr<core::allocator::Range> allocator, void* const data, const Place place, const std::uint32_t type_index, const VkDeviceMemory vulkan_data)
+gearoenix::vulkan::memory::Memory::Memory(
+    std::shared_ptr<Memory> parent,
+    std::shared_ptr<core::allocator::Range> allocator,
+    void* const data,
+    const Place place,
+    const std::uint32_t type_index,
+    const VkDeviceMemory vulkan_data)
     : parent(std::move(parent))
     , allocator(std::move(allocator))
     , data(data)
