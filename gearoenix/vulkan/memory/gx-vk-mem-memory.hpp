@@ -31,7 +31,7 @@ public:
     ~Memory();
     [[nodiscard]] static std::int64_t align(std::int64_t);
     [[nodiscard]] static std::shared_ptr<Memory> construct(Place, std::uint32_t type_index);
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::int64_t alignment);
 };
 }
 #endif

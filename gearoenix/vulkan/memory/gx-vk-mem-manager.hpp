@@ -23,7 +23,7 @@ public:
     Manager& operator=(const Manager&) = delete;
     ~Manager() override;
 
-    [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::uint32_t type_bits, Place place);
+    [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::int64_t alignment, std::uint32_t type_bits, Place place);
 };
 }
 #endif

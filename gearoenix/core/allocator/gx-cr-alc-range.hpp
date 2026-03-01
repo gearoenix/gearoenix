@@ -11,8 +11,6 @@ struct Range final {
     GX_GET_CVAL_PRV(std::int64_t, size);
     /// It is the offset from the origin parent
     GX_GET_VAL_PRV(std::int64_t, offset, 0);
-
-private:
     /// size, offset (within itself)
     typedef std::pair<std::int64_t, std::int64_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space
@@ -37,6 +35,6 @@ public:
     Range& operator=(Range&&) = delete;
     Range& operator=(const Range&) = delete;
     ~Range();
-    [[nodiscard]] std::shared_ptr<Range> allocate(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Range> allocate(std::int64_t sz, std::int64_t alignment);
 };
 }

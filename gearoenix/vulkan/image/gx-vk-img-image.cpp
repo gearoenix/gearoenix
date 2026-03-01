@@ -11,9 +11,15 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
 
-bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const { return layout == other.layout && queue_family_index == other.queue_family_index && access == other.access && stage == other.stage; }
+bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
+{
+    return layout == other.layout && queue_family_index == other.queue_family_index && access == other.access && stage == other.stage;
+}
 
-bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const { return per_mip_states == other.per_mip_states; }
+bool gearoenix::vulkan::image::Image::PerArrayState::operator==(const PerArrayState& other) const
+{
+    return per_mip_states == other.per_mip_states;
+}
 
 bool gearoenix::vulkan::image::Image::State::is_uniform() const
 {
@@ -179,12 +185,11 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     GX_SET_ZERO(mem_req);
     vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
 
-    const auto alignment = static_cast<std::int64_t>(mem_req.alignment);
-    allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size) + alignment - 1, mem_req.memoryTypeBits, memory::Place::Gpu);
+    allocated_memory = memory::Manager::get().allocate(
+        static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, memory::Place::Gpu);
     GX_ASSERT_D(allocated_memory != nullptr);
-    const auto raw_offset = allocated_memory->get_allocator()->get_offset();
-    const auto aligned_offset = ((raw_offset + alignment - 1) / alignment) * alignment;
-    GX_VK_CHK(vkBindImageMemory(logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), static_cast<VkDeviceSize>(aligned_offset)));
+    GX_VK_CHK(vkBindImageMemory(
+        logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), static_cast<VkDeviceSize>(allocated_memory->get_allocator()->get_offset())));
 
     GX_VK_MARK(name, vulkan_data);
 }

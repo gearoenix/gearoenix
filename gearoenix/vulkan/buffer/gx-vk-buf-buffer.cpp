@@ -47,7 +47,8 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     GX_VK_CHK(vkCreateBuffer(dev, &info, nullptr, &vulkan_data));
     VkMemoryRequirements mem_req;
     vkGetBufferMemoryRequirements(dev, vulkan_data, &mem_req);
-    auto allocated_memory = memory::Manager::get().allocate(aligned_size, mem_req.memoryTypeBits, place);
+    auto allocated_memory = memory::Manager::get().allocate(
+        static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, place);
     if (nullptr == allocated_memory) {
         vkDestroyBuffer(logical_device.get_vulkan_data(), vulkan_data, nullptr);
         return nullptr;
@@ -69,8 +70,7 @@ gearoenix::vulkan::buffer::Buffer::~Buffer()
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size)
 {
-    const auto aligned_size = device::Physical::get().align_size(size);
-    auto alc_mem = allocated_memory->allocate(aligned_size);
+    auto alc_mem = allocated_memory->allocate(size, 1);
     if (nullptr == alc_mem) {
         return nullptr;
     }

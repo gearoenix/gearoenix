@@ -32,10 +32,9 @@ gearoenix::vulkan::memory::Memory::~Memory()
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::int64_t size)
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::allocate(const std::int64_t size, const std::int64_t alignment)
 {
-    const auto aligned_size = align(size);
-    auto alc = allocator->allocate(aligned_size);
+    auto alc = allocator->allocate(size, alignment);
     if (nullptr == alc) {
         GX_LOG_D("No more space left in this Vulkan memory");
         return nullptr;
