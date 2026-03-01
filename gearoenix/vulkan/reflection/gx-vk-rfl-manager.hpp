@@ -34,6 +34,7 @@ struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
 
     void initialise_convolution_compute();
     void update() override;
+    void initialise_black();
 
 public:
     Manager();

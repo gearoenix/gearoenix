@@ -142,6 +142,23 @@ void gearoenix::vulkan::reflection::Manager::update()
     render::reflection::Manager::update();
 }
 
+void gearoenix::vulkan::reflection::Manager::initialise_black()
+{
+    if (descriptor::Bindless::singleton_is_invalid() || render::texture::Manager::singleton_is_invalid()) {
+        core::job::send_job_to_pool([this] {
+            initialise_black();
+        });
+        return;
+    }
+
+    render::texture::Manager::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& irr) {
+        auto rad = irr;
+        black = core::Object::construct<Baked>(
+            nullptr, "reflection-default-black", std::move(irr), std::move(rad),
+            math::Aabb3(math::Vec3(std::numeric_limits<double>::max()), -math::Vec3(std::numeric_limits<double>::max())));
+    }));
+}
+
 gearoenix::vulkan::reflection::Manager::Manager()
     : Singleton<Manager>(this)
     , uniform_indexer(render::reflection::Baked::max_count + render::reflection::Runtime::max_count)
@@ -152,12 +169,7 @@ gearoenix::vulkan::reflection::Manager::Manager()
 
     initialise_convolution_compute();
 
-    render::texture::Manager::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& irr) {
-        auto rad = irr;
-        black = core::Object::construct<Baked>(
-            nullptr, "reflection-default-black", std::move(irr), std::move(rad),
-            math::Aabb3(math::Vec3(std::numeric_limits<double>::max()), -math::Vec3(std::numeric_limits<double>::max())));
-    }));
+    initialise_black();
 }
 
 gearoenix::vulkan::reflection::Manager::~Manager()
