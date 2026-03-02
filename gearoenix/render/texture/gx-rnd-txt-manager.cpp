@@ -462,7 +462,7 @@ void gearoenix::render::texture::Manager::create_cube_from_pixels(
         return;
     }
 
-    core::job::EndCallerShared<TextureCube> end([this, n = name, c = std::move(c), use_cache](std::shared_ptr<TextureCube>&& t) mutable {
+    core::job::EndCallerShared<TextureCube> end([this, n = name, c = std::move(c)](std::shared_ptr<TextureCube>&& t) mutable {
         textures_cube.set(n, t);
         if (!c.has_return()) {
             c.set_return(std::move(t));

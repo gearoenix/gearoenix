@@ -10,6 +10,7 @@
 struct GxShaderDataMaterial;
 
 namespace gearoenix::vulkan::pipeline {
+struct FormatPipelines;
 struct PushConstants;
 }
 
@@ -30,7 +31,7 @@ public:
     Material(const Material&) = delete;
 
     virtual ~Material();
-    virtual void bind_forward(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    virtual void bind_forward(VkCommandBuffer cmd, bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
     virtual void bind_shadow(VkCommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
     void bind_graphics(VkPipeline pipeline, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
 };

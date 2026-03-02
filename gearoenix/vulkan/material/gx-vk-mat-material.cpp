@@ -12,7 +12,7 @@ gearoenix::vulkan::material::Material::Material()
 
 gearoenix::vulkan::material::Material::~Material() = default;
 
-void gearoenix::vulkan::material::Material::bind_forward(const VkCommandBuffer, const bool, pipeline::PushConstants&, VkPipeline&)
+void gearoenix::vulkan::material::Material::bind_forward(const VkCommandBuffer, const bool, const pipeline::FormatPipelines&, pipeline::PushConstants&, VkPipeline&)
 {
     GX_UNIMPLEMENTED; // needs to be implemented by the child type
 }

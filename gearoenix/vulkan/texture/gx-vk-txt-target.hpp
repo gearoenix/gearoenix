@@ -52,6 +52,7 @@ public:
     ~Target() override;
     [[nodiscard]] RenderingScope create_rendering_scope(VkCommandBuffer cb, VkAttachmentLoadOp load_colours = VK_ATTACHMENT_LOAD_OP_CLEAR, VkAttachmentLoadOp load_depth = VK_ATTACHMENT_LOAD_OP_CLEAR);
     void update_rendering_info();
+    [[nodiscard]] VkFormat get_colour_format() const;
 };
 }
 

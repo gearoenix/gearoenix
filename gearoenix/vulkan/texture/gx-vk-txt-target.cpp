@@ -134,4 +134,14 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
     rendering_info.pDepthAttachment = depth_attachment.has_value() ? &*depth_attachment : nullptr;
 }
 
+VkFormat gearoenix::vulkan::texture::Target::get_colour_format() const
+{
+    for (const auto& a : gapi_attachments) {
+        if (a.transition_request.layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+            return a.view->get_image()->get_format();
+        }
+    }
+    return VK_FORMAT_UNDEFINED;
+}
+
 #endif

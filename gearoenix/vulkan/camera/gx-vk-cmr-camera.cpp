@@ -6,6 +6,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../model/gx-vk-mdl-model.hpp"
+#include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
 #include "../skybox/gx-vk-sky-skybox.hpp"
@@ -20,7 +21,9 @@
 struct GxShaderDataCameraJointModel;
 void gearoenix::vulkan::camera::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
 {
-    gapi_target.target = Target::Customised { .target = std::dynamic_pointer_cast<texture::Target>(t) };
+    auto vk_t = std::dynamic_pointer_cast<texture::Target>(t);
+    rendering_colour_format = vk_t->get_colour_format();
+    gapi_target.target = Target::Customised { .target = std::move(vk_t) };
     render::camera::Camera::set_customised_target(std::move(t));
 }
 
@@ -30,6 +33,10 @@ void gearoenix::vulkan::camera::Camera::update_target(core::job::EndCaller<>&& e
         (void)end;
         (void)self;
         gapi_target = Target(target);
+        const auto* const txt_target = std::holds_alternative<Target::Customised>(gapi_target.target)
+            ? gapi_target.get_customised().target.get()
+            : gapi_target.get_default().main.get();
+        rendering_colour_format = txt_target->get_colour_format();
     }));
 }
 
@@ -98,24 +105,26 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
 
     record_viewport(cmr, cmd);
 
+    const auto& fp = pipeline::Manager::get().get_pipelines(rendering_colour_format);
+
     const auto render_models = [&](const auto& models) {
         for (const auto& camera_model : models | std::views::values) {
             pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
-            core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, cmd, pc, current_bound_pipeline);
+            core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, fp, cmd, pc, current_bound_pipeline);
         }
     };
 
     render_models(cmr.opaque_models);
-    render_forward_skyboxes(skyboxes, cmd, pc, current_bound_pipeline);
+    render_forward_skyboxes(skyboxes, fp, cmd, pc, current_bound_pipeline);
     render_models(cmr.translucent_models);
 }
 
 void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
-    const render::record::Skyboxes& skyboxes, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+    const render::record::Skyboxes& skyboxes, const pipeline::FormatPipelines& fp, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
     for (const auto& skybox_data : skyboxes.skyboxes | std::views::values) {
-        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(cmd, pc, current_bound_pipeline);
+        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(cmd, fp, pc, current_bound_pipeline);
     }
 }
 

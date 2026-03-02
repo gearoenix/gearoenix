@@ -2,8 +2,10 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-singleton.hpp"
+#include "../../core/gx-cr-static-flat-map.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
+#include "gx-vk-pip-format-pipelines.hpp"
 
 #include <memory>
 #include <vector>
@@ -37,24 +39,29 @@ struct Manager final : core::Singleton<Manager> {
 
     std::shared_ptr<shader::Module> pbr_vert_sm;
     std::shared_ptr<shader::Module> pbr_frag_sm;
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_forward_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, pbr_skinned_forward_pipeline);
-
     std::shared_ptr<shader::Module> unlit_vert_sm;
     std::shared_ptr<shader::Module> unlit_frag_sm;
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_forward_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, unlit_skinned_forward_pipeline);
-
     std::shared_ptr<shader::Module> skybox_equirectangular_vert_sm;
     std::shared_ptr<shader::Module> skybox_equirectangular_frag_sm;
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skybox_equirectangular_pipeline);
-
     std::shared_ptr<shader::Module> shadow_caster_vert_sm;
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skinned_shadow_pipeline);
+
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow);
+    GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, skinned_shadow);
+
+    core::static_flat_map<VkFormat, FormatPipelines, 4> formats_pipelines;
 
     void initialise_ray_tracing();
-    void initialise_rasterizer();
+    void load_shaders();
+    void initialise_shadow_pipelines();
+
+    [[nodiscard]] std::shared_ptr<Pipeline> create_pbr_forward_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_pbr_skinned_forward_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_unlit_forward_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_unlit_skinned_forward_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_skybox_equirectangular_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_shadow_pipeline(VkFormat depth_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_skinned_shadow_pipeline(VkFormat depth_format);
+    [[nodiscard]] FormatPipelines create_format_pipelines(VkFormat colour_format);
 
 public:
     Manager(Manager&&) = delete;
@@ -63,6 +70,9 @@ public:
     Manager& operator=(const Manager&) = delete;
     Manager();
     ~Manager() override;
+
+    [[nodiscard]] const FormatPipelines& get_pipelines(VkFormat colour_format);
+
     [[nodiscard]] std::shared_ptr<Pipeline> create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>& des_set_layout);
 };
 }

@@ -241,6 +241,8 @@ void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd
     for (std::uint32_t mip = 1; mip < mipmap_levels; ++mip) {
         // Transition previous mip level to TRANSFER_SRC
         transit(cmd, TransitionRequest::transfer_src().with_mips(mip - 1, 1));
+        // Transition destination mip level to TRANSFER_DST
+        transit(cmd, TransitionRequest::transfer_dst().with_mips(mip, 1));
 
         VkImageBlit blit;
         GX_SET_ZERO(blit);

@@ -16,6 +16,7 @@ struct BloomPrefilter;
 struct BloomHorizontal;
 struct BloomVertical;
 struct BloomUpsampler;
+struct FormatPipelines;
 struct Multiply;
 struct Pipeline;
 struct PushConstants;
@@ -48,6 +49,7 @@ struct Camera final : render::camera::Camera {
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::ColourTuningAntiAliasingCombination>, colour_tuning_anti_aliasing_combination);
     GX_GET_VAL_PRV(std::uint64_t, last_update_frame_number, static_cast<std::uint64_t>(-1));
 
+    VkFormat rendering_colour_format = VK_FORMAT_UNDEFINED;
     std::vector<std::uint32_t> cameras_joint_model_indices; // MVPs
     std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
 
@@ -61,7 +63,7 @@ public:
     ~Camera() override;
     void render_shadow(const render::record::Camera&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
     void render_forward(const render::record::Camera&, const render::record::Skyboxes&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
-    void render_forward_skyboxes(const render::record::Skyboxes&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
+    void render_forward_skyboxes(const render::record::Skyboxes&, const pipeline::FormatPipelines& fp, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
     void render_bloom(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
     void render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
     void after_record(std::uint64_t frame_number, const render::record::Camera& rc);

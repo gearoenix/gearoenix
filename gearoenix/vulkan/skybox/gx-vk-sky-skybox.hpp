@@ -24,7 +24,7 @@ struct Skybox final : render::skybox::Skybox {
 
 public:
     ~Skybox() override;
-    void render_forward(VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
+    void render_forward(VkCommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
 };
 }
 #endif

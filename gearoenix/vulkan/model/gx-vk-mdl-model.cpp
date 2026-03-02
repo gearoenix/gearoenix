@@ -12,6 +12,7 @@
 #include "../light/gx-vk-lt-shadow-caster-directional.hpp"
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
+#include "../pipeline/gx-vk-pip-format-pipelines.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../reflection/gx-vk-rfl-baked.hpp"
 
@@ -37,12 +38,12 @@ void gearoenix::vulkan::model::Model::render_shadow(const render::record::Camera
     }
 }
 
-void gearoenix::vulkan::model::Model::render_forward(const render::record::CameraModel& camera_model, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::model::Model::render_forward(const render::record::CameraModel& camera_model, const pipeline::FormatPipelines& fp, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
 {
     pc.model_index = shader_data_index;
     const auto skinned = camera_model.model->bones_count > 0;
     for (const auto& msh : gapi_meshes) {
-        msh->get_gapi_material()->bind_forward(cmd, skinned, pc, current_bound_pipeline);
+        msh->get_gapi_material()->bind_forward(cmd, skinned, fp, pc, current_bound_pipeline);
         msh->draw(cmd, pc);
     }
 }

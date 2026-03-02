@@ -140,13 +140,16 @@ void gearoenix::vulkan::reflection::Manager::initialise_convolution_compute()
 void gearoenix::vulkan::reflection::Manager::update()
 {
     render::reflection::Manager::update();
+    uniform_indexer.reset();
 }
 
 void gearoenix::vulkan::reflection::Manager::initialise_black()
 {
     if (descriptor::Bindless::singleton_is_invalid() || render::texture::Manager::singleton_is_invalid()) {
         core::job::send_job_to_pool([this] {
-            initialise_black();
+            core::job::send_job(Singleton<engine::Engine>::get().get_jobs_thread_id(), [this] {
+                initialise_black();
+            });
         });
         return;
     }

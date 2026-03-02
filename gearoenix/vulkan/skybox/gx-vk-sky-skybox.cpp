@@ -2,15 +2,11 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../material/gx-vk-mat-manager.hpp"
-#include "../pipeline/gx-vk-pip-manager.hpp"
+#include "../pipeline/gx-vk-pip-format-pipelines.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
-
-namespace {
-VkPipeline equirectangular_pipeline = nullptr;
-}
 
 gearoenix::vulkan::skybox::Skybox::Skybox(
     core::ecs::Entity* const entity,
@@ -35,29 +31,20 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
         GX_UNEXPECTED;
     }
 
-    if (is_equirectangular && !equirectangular_pipeline) {
-        equirectangular_pipeline = pipeline::Manager::get().get_skybox_equirectangular_pipeline()->get_vulkan_data();
-        GX_ASSERT_D(equirectangular_pipeline);
-    } else {
-        GX_UNEXPECTED;
-    }
+    GX_ASSERT_D(is_equirectangular);
 }
 
 gearoenix::vulkan::skybox::Skybox::~Skybox() = default;
 
-void gearoenix::vulkan::skybox::Skybox::render_forward(const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::skybox::Skybox::render_forward(const VkCommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
-    if (is_equirectangular) {
-        if (equirectangular_pipeline != current_bound_pipeline) {
-            current_bound_pipeline = equirectangular_pipeline;
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, equirectangular_pipeline);
-        }
-    } else {
-        GX_UNEXPECTED;
+    GX_ASSERT_D(is_equirectangular);
+    const auto vk_pipeline = fp.skybox_equirectangular->get_vulkan_data();
+    if (vk_pipeline != current_bound_pipeline) {
+        current_bound_pipeline = vk_pipeline;
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_pipeline);
     }
-
     pc.material_index = material_shader_data.get_index();
-
     vk_mesh->draw(cmd, pc);
 }
 #endif
