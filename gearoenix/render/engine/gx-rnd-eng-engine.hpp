@@ -3,9 +3,11 @@
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
+
+#include <boost/container/flat_set.hpp>
+
 #include <chrono>
 #include <memory>
-#include <set>
 #include <thread>
 
 namespace gearoenix::core::ecs {
@@ -99,7 +101,7 @@ struct Engine : core::Singleton<Engine> {
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
-    [[nodiscard]] static std::set<Type> get_available_engines();
+    [[nodiscard]] static const boost::container::flat_set<Type>& get_available_engines();
     [[nodiscard]] static std::unique_ptr<Engine> construct();
     ~Engine() override;
     virtual void start_frame();

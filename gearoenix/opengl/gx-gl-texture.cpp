@@ -37,12 +37,6 @@ void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::uint32_t 
         height >>= 1;
     }
 }
-
-void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::uint32_t height)
-{
-    for (auto& p : pixels)
-        flip_texture(p, height);
-}
 }
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f)
@@ -287,7 +281,6 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
                 data.resize(static_cast<std::uint32_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
-                flip_texture(data, level_aspect);
 #if GX_DEBUG_TEXTURE_WRITE
                 const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
                 platform::stream::Local l(e.get_platform_application(), "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
@@ -396,7 +389,6 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     const auto data_format = convert_data_format(info.get_format());
     const auto gl_img_width = static_cast<gl::sizei>(info.get_width());
     const auto gl_img_height = static_cast<gl::sizei>(info.get_height());
-    flip_texture(pixels, info.get_height());
     c.set_return(result);
     core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
