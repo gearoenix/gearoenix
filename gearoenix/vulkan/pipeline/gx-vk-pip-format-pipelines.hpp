@@ -13,6 +13,7 @@ struct FormatPipelines final {
     std::shared_ptr<Pipeline> unlit_forward;
     std::shared_ptr<Pipeline> unlit_skinned_forward;
     std::shared_ptr<Pipeline> skybox_equirectangular;
+    std::shared_ptr<Pipeline> skybox_cube;
 };
 }
 

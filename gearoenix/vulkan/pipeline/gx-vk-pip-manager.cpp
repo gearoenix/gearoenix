@@ -123,8 +123,9 @@ void gearoenix::vulkan::pipeline::Manager::load_shaders()
     pbr_frag_sm = shader_manager->get("forward-pbr.frag");
     unlit_vert_sm = shader_manager->get("forward-unlit.vert");
     unlit_frag_sm = shader_manager->get("forward-unlit.frag");
-    skybox_equirectangular_vert_sm = shader_manager->get("skybox-equirectangular.vert");
+    skybox_vert_sm = shader_manager->get("skybox.vert");
     skybox_equirectangular_frag_sm = shader_manager->get("skybox-equirectangular.frag");
+    skybox_cube_frag_sm = shader_manager->get("skybox-cube.frag");
     shadow_caster_vert_sm = shader_manager->get("shadow-caster.vert");
 }
 
@@ -678,11 +679,133 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    stages[0].module = skybox_equirectangular_vert_sm->get_vulkan_data();
+    stages[0].module = skybox_vert_sm->get_vulkan_data();
     stages[0].pName = default_stage_entry;
     stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     stages[1].module = skybox_equirectangular_frag_sm->get_vulkan_data();
+    stages[1].pName = default_stage_entry;
+
+    VkVertexInputBindingDescription vertex_binding;
+    GX_SET_ZERO(vertex_binding);
+    vertex_binding.binding = 0;
+    vertex_binding.stride = sizeof(render::PbrVertex);
+    vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    // Skybox only uses locations 0-3 (position, normal, tangent, uv), no bone attributes
+    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes { };
+    GX_SET_ZERO(vertex_attributes);
+    vertex_attributes[0].binding = 0;
+    vertex_attributes[0].location = 0;
+    vertex_attributes[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    vertex_attributes[0].offset = offsetof(render::PbrVertex, position);
+    vertex_attributes[1].binding = 0;
+    vertex_attributes[1].location = 1;
+    vertex_attributes[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+    vertex_attributes[1].offset = offsetof(render::PbrVertex, normal);
+    vertex_attributes[2].binding = 0;
+    vertex_attributes[2].location = 2;
+    vertex_attributes[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    vertex_attributes[2].offset = offsetof(render::PbrVertex, tangent);
+    vertex_attributes[3].binding = 0;
+    vertex_attributes[3].location = 3;
+    vertex_attributes[3].format = VK_FORMAT_R32G32_SFLOAT;
+    vertex_attributes[3].offset = offsetof(render::PbrVertex, uv);
+
+    VkPipelineVertexInputStateCreateInfo vertex_input_info;
+    GX_SET_ZERO(vertex_input_info);
+    vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input_info.vertexBindingDescriptionCount = 1;
+    vertex_input_info.pVertexBindingDescriptions = &vertex_binding;
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(vertex_attributes.size());
+    vertex_input_info.pVertexAttributeDescriptions = vertex_attributes.data();
+
+    VkPipelineInputAssemblyStateCreateInfo input_assembly;
+    GX_SET_ZERO(input_assembly);
+    input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+    VkPipelineDynamicStateCreateInfo dynamic_state;
+    GX_SET_ZERO(dynamic_state);
+    dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state.dynamicStateCount = static_cast<std::uint32_t>(dynamic_states.size());
+    dynamic_state.pDynamicStates = dynamic_states.data();
+
+    VkPipelineViewportStateCreateInfo viewport_state;
+    GX_SET_ZERO(viewport_state);
+    viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_state.viewportCount = 1;
+    viewport_state.scissorCount = 1;
+
+    VkPipelineRasterizationStateCreateInfo rasterization;
+    GX_SET_ZERO(rasterization);
+    rasterization.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterization.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterization.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterization.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterization.lineWidth = 1.0f;
+
+    VkPipelineMultisampleStateCreateInfo multisample;
+    GX_SET_ZERO(multisample);
+    multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisample.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+    VkPipelineDepthStencilStateCreateInfo depth_stencil;
+    GX_SET_ZERO(depth_stencil);
+    depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depth_stencil.depthTestEnable = VK_TRUE;
+    depth_stencil.depthWriteEnable = VK_FALSE; // skybox does not write depth
+    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+
+    VkPipelineColorBlendAttachmentState colour_blend_attachment;
+    GX_SET_ZERO(colour_blend_attachment);
+    colour_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    VkPipelineColorBlendStateCreateInfo colour_blend;
+    GX_SET_ZERO(colour_blend);
+    colour_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colour_blend.attachmentCount = 1;
+    colour_blend.pAttachments = &colour_blend_attachment;
+
+    VkPipelineRenderingCreateInfo rendering_info;
+    GX_SET_ZERO(rendering_info);
+    rendering_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    rendering_info.colorAttachmentCount = 1;
+    rendering_info.pColorAttachmentFormats = &colour_format;
+    rendering_info.depthAttachmentFormat = fixed_depth_format;
+
+    VkGraphicsPipelineCreateInfo create_info;
+    GX_SET_ZERO(create_info);
+    create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    create_info.pNext = &rendering_info;
+    create_info.stageCount = static_cast<std::uint32_t>(stages.size());
+    create_info.pStages = stages.data();
+    create_info.pVertexInputState = &vertex_input_info;
+    create_info.pInputAssemblyState = &input_assembly;
+    create_info.pViewportState = &viewport_state;
+    create_info.pRasterizationState = &rasterization;
+    create_info.pMultisampleState = &multisample;
+    create_info.pDepthStencilState = &depth_stencil;
+    create_info.pColorBlendState = &colour_blend;
+    create_info.pDynamicState = &dynamic_state;
+    create_info.layout = bindless.get_pipeline_layout();
+
+    return Pipeline::construct_graphics(std::shared_ptr(cache), create_info);
+}
+
+std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_skybox_cube_pipeline(const VkFormat colour_format)
+{
+    const auto& bindless = descriptor::Bindless::get();
+
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
+    GX_SET_ZERO(stages);
+    stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    stages[0].module = skybox_vert_sm->get_vulkan_data();
+    stages[0].pName = default_stage_entry;
+    stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    stages[1].module = skybox_cube_frag_sm->get_vulkan_data();
     stages[1].pName = default_stage_entry;
 
     VkVertexInputBindingDescription vertex_binding;
@@ -1061,6 +1184,7 @@ gearoenix::vulkan::pipeline::FormatPipelines gearoenix::vulkan::pipeline::Manage
     fp.unlit_forward = create_unlit_forward_pipeline(colour_format);
     fp.unlit_skinned_forward = create_unlit_skinned_forward_pipeline(colour_format);
     fp.skybox_equirectangular = create_skybox_equirectangular_pipeline(colour_format);
+    fp.skybox_cube = create_skybox_cube_pipeline(colour_format);
     return fp;
 }
 

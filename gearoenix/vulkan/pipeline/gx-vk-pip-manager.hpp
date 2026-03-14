@@ -41,8 +41,9 @@ struct Manager final : core::Singleton<Manager> {
     std::shared_ptr<shader::Module> pbr_frag_sm;
     std::shared_ptr<shader::Module> unlit_vert_sm;
     std::shared_ptr<shader::Module> unlit_frag_sm;
-    std::shared_ptr<shader::Module> skybox_equirectangular_vert_sm;
+    std::shared_ptr<shader::Module> skybox_vert_sm;
     std::shared_ptr<shader::Module> skybox_equirectangular_frag_sm;
+    std::shared_ptr<shader::Module> skybox_cube_frag_sm;
     std::shared_ptr<shader::Module> shadow_caster_vert_sm;
 
     GX_GET_CREF_PRV(std::shared_ptr<Pipeline>, shadow);
@@ -59,6 +60,7 @@ struct Manager final : core::Singleton<Manager> {
     [[nodiscard]] std::shared_ptr<Pipeline> create_unlit_forward_pipeline(VkFormat colour_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_unlit_skinned_forward_pipeline(VkFormat colour_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_skybox_equirectangular_pipeline(VkFormat colour_format);
+    [[nodiscard]] std::shared_ptr<Pipeline> create_skybox_cube_pipeline(VkFormat colour_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_shadow_pipeline(VkFormat depth_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_skinned_shadow_pipeline(VkFormat depth_format);
     [[nodiscard]] FormatPipelines create_format_pipelines(VkFormat colour_format);

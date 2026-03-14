@@ -31,15 +31,13 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
         GX_UNEXPECTED;
     }
 
-    GX_ASSERT_D(is_equirectangular);
 }
 
 gearoenix::vulkan::skybox::Skybox::~Skybox() = default;
 
 void gearoenix::vulkan::skybox::Skybox::render_forward(const VkCommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
 {
-    GX_ASSERT_D(is_equirectangular);
-    const auto vk_pipeline = fp.skybox_equirectangular->get_vulkan_data();
+    const auto vk_pipeline = (is_equirectangular ? fp.skybox_equirectangular : fp.skybox_cube)->get_vulkan_data();
     if (vk_pipeline != current_bound_pipeline) {
         current_bound_pipeline = vk_pipeline;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_pipeline);

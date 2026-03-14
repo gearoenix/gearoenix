@@ -17,6 +17,7 @@
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 #include <gearoenix/render/skybox/gx-rnd-sky-manager.hpp>
 
+namespace {
 template <typename T>
 using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
 
@@ -24,13 +25,9 @@ using GxCoreApp = gearoenix::core::Application;
 using GxEntityPtr = gearoenix::core::ecs::EntityPtr;
 using GxEndCaller = gearoenix::core::job::EndCaller<>;
 using GxEntityEndCaller = gearoenix::core::job::EndCaller<GxEntityPtr>;
-using GxAabb3 = gearoenix::math::Aabb3<double>;
-using GxVec3 = gearoenix::math::Vec3<double>;
 using GxConstraintManager = gearoenix::physics::constraint::Manager;
 using GxTransform = gearoenix::physics::Transformation;
 using GxPath = gearoenix::platform::stream::Path;
-using GxStream = gearoenix::platform::stream::Stream;
-using GxLocal = gearoenix::platform::stream::Local;
 using GxCameraManager = gearoenix::render::camera::Manager;
 using GxMaterialManager = gearoenix::render::material::Manager;
 using GxPbr = gearoenix::render::material::Pbr;
@@ -38,7 +35,6 @@ using GxMeshManager = gearoenix::render::mesh::Manager;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxModelManager = gearoenix::render::model::Manager;
 using GxReflectionManager = gearoenix::render::reflection::Manager;
-using GxReflectionRuntime = gearoenix::render::reflection::Runtime;
 using GxSceneManager = gearoenix::render::scene::Manager;
 using GxSkyboxManager = gearoenix::render::skybox::Manager;
 using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
@@ -86,8 +82,8 @@ public:
 
     void material_is_ready(GxPbrPtr&& material, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&& end)
     {
-        material->get_normal_metallic_factor().w = metallic;
-        material->get_emission_roughness_factor().w = roughness;
+        material->set_normal_metallic_factor({1.0f, 1.0f , 1.0f, metallic});
+        material->set_emission_roughness_factor({ 0.0f, 0.0f, 0.0f, roughness});
 
         GxMeshManager::get().build_icosphere(
             4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
@@ -101,5 +97,6 @@ public:
         entity->get_component<GxTransform>()->local_translate({ static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0 });
     }
 };
+}
 
 GEAROENIX_START(GameApp);
