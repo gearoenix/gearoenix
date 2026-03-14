@@ -30,7 +30,6 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
     } else {
         GX_UNEXPECTED;
     }
-
 }
 
 gearoenix::vulkan::skybox::Skybox::~Skybox() = default;
