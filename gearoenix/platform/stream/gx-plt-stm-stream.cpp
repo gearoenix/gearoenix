@@ -25,7 +25,7 @@ std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream
     if (path.is_absolute()) {
         return std::shared_ptr<Stream>(Local::open(path.get_raw_data(), true));
     }
-    return {};
+    return { };
 }
 
 void gearoenix::platform::stream::Stream::read(std::string& s)

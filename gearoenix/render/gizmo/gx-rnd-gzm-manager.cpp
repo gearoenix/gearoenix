@@ -151,7 +151,7 @@ bool gearoenix::render::gizmo::Manager::show(math::Aabb3<double>& box)
     const auto box_center = math::Vec3<float>(box.get_center());
     const auto box_radius = math::Vec3<float>(box.get_diameter()) * 0.5f;
     constexpr std::array<math::Vec3<float>, 6> unit_directions { { { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } } };
-    std::array<bool, 6> backs {};
+    std::array<bool, 6> backs { };
     for (auto i = 0; i < unit_directions.size(); ++i) {
         const auto& direction = unit_directions[i];
         const auto dir = (box_center + (direction * box_radius)) - current_camera_position;

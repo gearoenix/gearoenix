@@ -117,14 +117,14 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer v
 
     const auto& src_alloc = *src.get_allocated_memory()->get_allocator();
 
-    VkBufferCopy region {};
+    VkBufferCopy region { };
     region.srcOffset = static_cast<VkDeviceSize>(src.get_offset());
     region.dstOffset = static_cast<VkDeviceSize>(dst.get_offset());
     region.size = static_cast<VkDeviceSize>(src_alloc.get_size());
 
     vkCmdCopyBuffer(vk_cmd, src.get_vulkan_data(), dst.get_vulkan_data(), 1, &region);
 
-    VkBufferMemoryBarrier2 barrier {};
+    VkBufferMemoryBarrier2 barrier { };
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
     barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
     barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
@@ -142,7 +142,7 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const VkCommandBuffer v
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
-    VkDependencyInfo dep {};
+    VkDependencyInfo dep { };
     dep.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
     dep.bufferMemoryBarrierCount = 1;
     dep.pBufferMemoryBarriers = &barrier;

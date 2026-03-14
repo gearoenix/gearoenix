@@ -46,7 +46,7 @@ void open_world()
                 }
             }));
         },
-        [] {}, "Open the World", file_chooser_filter);
+        [] { }, "Open the World", file_chooser_filter);
 }
 }
 

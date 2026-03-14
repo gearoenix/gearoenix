@@ -15,8 +15,8 @@ gearoenix::d3d::Swapchain::Swapchain(Engine& e)
     : queue(e.get_queue())
     , device(e.get_device())
     , descriptor_manager(e.get_descriptor_manager())
-    , viewport {}
-    , scissor {}
+    , viewport { }
+    , scissor { }
     , clear_colour { 0.3f, 0.15f, 0.115f, 1.0f }
 {
     auto* const dev = device->get_device().Get();

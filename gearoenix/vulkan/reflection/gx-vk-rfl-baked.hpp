@@ -13,10 +13,12 @@ struct Baked final : Probe, render::reflection::Baked {
     constexpr static std::array all_parent_object_type_indices {
         render::reflection::Baked::object_type_index,
         vulkan::reflection::Probe::object_type_index,
-        render::reflection::Probe::object_type_index };
+        render::reflection::Probe::object_type_index
+    };
     constexpr static std::array immediate_parent_object_type_indices {
         render::reflection::Baked::object_type_index,
-        vulkan::reflection::Probe::object_type_index };
+        vulkan::reflection::Probe::object_type_index
+    };
 
     Baked(
         core::ecs::Entity* entity,

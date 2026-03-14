@@ -36,10 +36,10 @@ private:
         GammaCorrection gamma_correction;
         Multiply multiply;
         Unchanged unchanged;
-    } data = {};
+    } data = { };
 
 public:
-    constexpr ColourTuning() { data.gamma_correction = {}; }
+    constexpr ColourTuning() { data.gamma_correction = { }; }
 
     constexpr ColourTuning(const ColourTuning&) = default;
     constexpr ColourTuning(ColourTuning&&) noexcept = default;

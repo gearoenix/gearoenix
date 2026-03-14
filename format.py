@@ -21,7 +21,7 @@ def print_fatal(msg):
     print(f"\033[91m Error: {msg} \033[0m ", file=sys.stderr)
     sys.exit(1)
 
-CLANG_FORMAT_VERSION = 21
+CLANG_FORMAT_VERSION = 22
 
 def find_clang_format():
     try:

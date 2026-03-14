@@ -15,16 +15,16 @@ std::optional<std::pair<std::string, std::uint16_t>> gearoenix::net::parse_to_ad
             break;
         }
         if (c < '0' || c > '9') {
-            return {};
+            return { };
         }
         port = port * 10 + (c - '0');
         if (port > std::numeric_limits<std::uint16_t>::max()) {
-            return {};
+            return { };
         }
         no_port = false;
     }
     if (no_port) {
-        return {};
+        return { };
     }
     return std::make_pair(std::string(a.begin(), a.begin() + pos), static_cast<std::uint16_t>(port));
 }

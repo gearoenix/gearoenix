@@ -61,7 +61,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     }
 
     // Initialize ImGui Vulkan backend with dynamic rendering
-    ImGui_ImplVulkan_InitInfo info {};
+    ImGui_ImplVulkan_InitInfo info { };
     info.ApiVersion = api_version;
     info.Instance = Instance::get().get_vulkan_data();
     info.PhysicalDevice = device::Physical::get().get_vulkan_data();

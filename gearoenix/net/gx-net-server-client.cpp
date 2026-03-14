@@ -27,7 +27,7 @@ bool gearoenix::net::ServerClient::send(const std::span<const std::uint8_t> data
 
 gearoenix::net::uniform_ip_t gearoenix::net::ServerClient::get_ip() const
 {
-    uniform_ip_t ip {};
+    uniform_ip_t ip { };
 
     const auto ipv4 = peer->address.host;
 

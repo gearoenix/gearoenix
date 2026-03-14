@@ -18,7 +18,7 @@ using duration_t = std::chrono::nanoseconds;
 
 struct SvHash final {
     using is_transparent = void;
-    std::size_t operator()(const std::string_view sv) const { return std::hash<std::string_view> {}(sv); }
+    std::size_t operator()(const std::string_view sv) const { return std::hash<std::string_view> { }(sv); }
 };
 
 struct SvEqual final {
@@ -66,7 +66,7 @@ struct GlobalGuard final {
 };
 static GlobalGuard global_guard;
 
-static time_point_t frame_start = {};
+static time_point_t frame_start = { };
 static bool frame_active = false;
 static std::uint64_t frame_count = 0;
 static double min_frame_ms = std::numeric_limits<double>::max();

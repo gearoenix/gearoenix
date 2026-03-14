@@ -75,7 +75,7 @@ void gearoenix::render::texture::Attachment::write(std::shared_ptr<platform::str
 void gearoenix::render::texture::Attachment::read(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<Attachment>&& end)
 {
     core::job::send_job_to_pool([s = std::move(s), e = std::move(end)]() mutable {
-        e.set_return(Attachment {});
+        e.set_return(Attachment { });
         s->read(e.get_return().mipmap_level);
         switch (s->read<std::uint8_t>()) {
         case ATTACHMENT_2D_VARIANT_INDEX: {

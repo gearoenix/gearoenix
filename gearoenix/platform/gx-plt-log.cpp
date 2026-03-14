@@ -26,7 +26,7 @@ std::stringstream gearoenix::platform::Log::header(const char* const file_name, 
 {
     std::stringstream s;
     auto t = std::time(nullptr);
-    std::tm tm {};
+    std::tm tm { };
 #ifdef GX_PLATFORM_WINDOWS
     (void)localtime_s(&tm, &t);
 #else

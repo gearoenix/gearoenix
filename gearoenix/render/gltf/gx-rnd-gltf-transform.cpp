@@ -29,7 +29,7 @@ void gearoenix::render::gltf::apply_transform(const int node_index, const Contex
             node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]);
 
         if (!transform.get_local_matrix().equal(local_matrix)) {
-            GX_ASSERT_D(transform.get_local_matrix().equal({})); // The glTF implementation is sending unexpected transform data
+            GX_ASSERT_D(transform.get_local_matrix().equal({ })); // The glTF implementation is sending unexpected transform data
 
             transform.set_local_matrix(local_matrix);
         }

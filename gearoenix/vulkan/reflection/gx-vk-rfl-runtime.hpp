@@ -43,10 +43,12 @@ struct Runtime final : render::reflection::Runtime, Probe {
     constexpr static std::array all_parent_object_type_indices {
         render::reflection::Runtime::object_type_index,
         reflection::Probe::object_type_index,
-        render::reflection::Probe::object_type_index };
+        render::reflection::Probe::object_type_index
+    };
     constexpr static std::array immediate_parent_object_type_indices {
         render::reflection::Runtime::object_type_index,
-        reflection::Probe::object_type_index };
+        reflection::Probe::object_type_index
+    };
 
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, gapi_environment);
     GX_GET_CREF_PRV(std::shared_ptr<texture::TextureCube>, gapi_irradiance);

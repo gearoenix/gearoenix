@@ -193,7 +193,7 @@ void gearoenix::render::camera::Camera::update_projection()
     }
     if (engine::Engine::get().get_half_depth_clip()) {
         y_flipped = !target.has_cube();
-        const auto y_flip = y_flipped? -1.0f: 1.0f;
+        const auto y_flip = y_flipped ? -1.0f : 1.0f;
         // clang-format off
         projection = math::Mat4x4(
             1.0f,   0.0f,   0.0f,   0.0f,

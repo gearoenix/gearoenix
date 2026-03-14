@@ -6,7 +6,7 @@ gearoenix::vulkan::camera::Target::Target(const render::camera::Target& rt)
     : target([&] {
         if (rt.is_default()) {
             const auto& [main, targets] = rt.get_default();
-            Default d {};
+            Default d { };
             d.main = std::dynamic_pointer_cast<texture::Target>(main);
             for (std::uint32_t ti = 0; ti < targets.size(); ++ti) {
                 for (std::uint32_t mi = 0; mi < targets[ti].size(); ++mi) {

@@ -19,7 +19,7 @@ void gearoenix::gl::ctx::set_framebuffer(const uint framebuffer_object)
 
 void gearoenix::gl::ctx::set_viewport_scissor_clip(const math::Vec4<sizei>& viewport_clip)
 {
-    static std::remove_cvref_t<decltype(viewport_clip)> current_viewport_clip {};
+    static std::remove_cvref_t<decltype(viewport_clip)> current_viewport_clip { };
 
     if (current_viewport_clip == viewport_clip) {
         return;

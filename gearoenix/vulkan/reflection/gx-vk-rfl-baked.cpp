@@ -1,7 +1,7 @@
 #include "gx-vk-rfl-baked.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../texture/gx-vk-txt-cube.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../texture/gx-vk-txt-cube.hpp"
 
 gearoenix::vulkan::reflection::Baked::Baked(
     core::ecs::Entity* const entity,

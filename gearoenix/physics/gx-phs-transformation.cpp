@@ -245,8 +245,8 @@ void gearoenix::physics::Transformation::clear_change() { changed = false; }
 
 void gearoenix::physics::Transformation::reset()
 {
-    global_matrix = local_matrix = transposed_inverted_global_matrix = decltype(local_matrix) {};
-    rotation_matrix = {};
+    global_matrix = local_matrix = transposed_inverted_global_matrix = decltype(local_matrix) { };
+    rotation_matrix = { };
     rotation = Rotation();
     scale = decltype(scale)(1.0);
     changed = false;

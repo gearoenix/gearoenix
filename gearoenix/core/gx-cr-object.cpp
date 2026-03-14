@@ -8,7 +8,7 @@ gearoenix::core::Object::ObjectTypeInfos gearoenix::core::Object::object_type_in
 boost::container::flat_map<std::string, gearoenix::core::object_type_index_t> gearoenix::core::Object::object_type_name_to_index;
 std::atomic<gearoenix::core::object_id_t> gearoenix::core::Object::latest_id = 8;
 std::mutex gearoenix::core::Object::all_objects_lock;
-std::vector<std::weak_ptr<gearoenix::core::Object>> gearoenix::core::Object::all_objects = {};
+std::vector<std::weak_ptr<gearoenix::core::Object>> gearoenix::core::Object::all_objects = { };
 
 void gearoenix::core::Object::register_type(const object_type_index_t t, ObjectTypeInfo&& info)
 {

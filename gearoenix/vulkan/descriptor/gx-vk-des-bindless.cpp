@@ -21,7 +21,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(const buffer::Buffer& scenes_b
     const auto vk_dev = device::Logical::get().get_vulkan_data();
 
     // ========== Descriptor Set Layout (Bindless Textures, Samplers & Buffers) ==========
-    std::array<VkDescriptorSetLayoutBinding, 16> bindings {};
+    std::array<VkDescriptorSetLayoutBinding, 16> bindings { };
     GX_SET_ZERO(bindings);
 
     // Bindless texture bindings
@@ -161,7 +161,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(const buffer::Buffer& scenes_b
     GX_VK_CHK(vkCreatePipelineLayout(vk_dev, &pipeline_layout_info, nullptr, &pipeline_layout));
 
     // ========== Descriptor Pool ==========
-    std::array<VkDescriptorPoolSize, 3> pool_sizes {};
+    std::array<VkDescriptorPoolSize, 3> pool_sizes { };
     GX_SET_ZERO(pool_sizes);
 
     pool_sizes[0].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -228,10 +228,10 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(const buffer::Buffer& scenes_b
     const std::array buffers
         = { &scenes_buffer, &cameras_buffer, &models_buffer, &materials_buffer, &point_lights_buffer, &directional_lights_buffer, &shadow_caster_directional_lights_buffer, &bones_buffer, &reflection_probes_buffer, &cameras_joint_models_buffer };
 
-    std::array<VkDescriptorBufferInfo, 10> buffer_infos {};
+    std::array<VkDescriptorBufferInfo, 10> buffer_infos { };
     std::memset(buffer_infos.data(), 0, sizeof(VkDescriptorBufferInfo) * buffer_infos.size());
 
-    std::array<VkWriteDescriptorSet, 10> writes {};
+    std::array<VkWriteDescriptorSet, 10> writes { };
     std::memset(writes.data(), 0, sizeof(VkWriteDescriptorSet) * writes.size());
 
     for (std::uint32_t i = 0; i < buffers.size(); ++i) {

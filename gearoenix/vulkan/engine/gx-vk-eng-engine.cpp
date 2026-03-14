@@ -35,7 +35,7 @@
 void gearoenix::vulkan::engine::Engine::initialize_frame()
 {
     logical_device->wait_to_finish();
-    frames = {};
+    frames = { };
     swapchain->initialize();
     for (int frame_index = 0; frame_index < frames_count; ++frame_index) {
         auto& swapchain_frame = swapchain->get_frames()[frame_index];
@@ -117,7 +117,7 @@ gearoenix::vulkan::engine::Engine::~Engine()
     bindless_descriptor_manager = nullptr;
     imgui_manager = nullptr;
     logical_device->wait_to_finish();
-    frames = {};
+    frames = { };
 }
 
 void gearoenix::vulkan::engine::Engine::start_frame()

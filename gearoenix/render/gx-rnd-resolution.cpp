@@ -29,10 +29,10 @@ bool gearoenix::render::Resolution::show_debug_gui()
             index = static_cast<index_t>(type_index);
             switch (index) {
             case fixed_index:
-                data.fixed = {};
+                data.fixed = { };
                 break;
             case screen_based_index:
-                data.screen_based = {};
+                data.screen_based = { };
                 break;
             default:
                 GX_UNEXPECTED;

@@ -676,14 +676,14 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(co
             .set_has_mipmap(true);
 
     create_2d_from_pixels(
-        std::move(first_colour_name), {}, txt_info,
+        std::move(first_colour_name), { }, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->colours[0] = std::move(t);
         }),
         use_cache);
 
     create_2d_from_pixels(
-        std::move(second_colour_name), {}, txt_info,
+        std::move(second_colour_name), { }, txt_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->colours[1] = std::move(t);
         }),
@@ -695,7 +695,7 @@ void gearoenix::render::texture::Manager::create_default_camera_render_target(co
     depth_info.set_has_mipmap(false);
 
     create_2d_from_pixels(
-        std::move(depth_name), {}, depth_info,
+        std::move(depth_name), { }, depth_info,
         core::job::EndCallerShared<Texture2D>([texture_gatherer = std::move(texture_gatherer)](std::shared_ptr<Texture2D>&& t) {
             texture_gatherer->depth = std::move(t);
         }),

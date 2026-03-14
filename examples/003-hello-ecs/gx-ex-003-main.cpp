@@ -28,7 +28,7 @@ constexpr double cube_size = 0.05;
 constexpr double max_speed = cube_size * 2.5;
 constexpr std::uint32_t objects_count = 8000;
 
-std::random_device random_device {};
+std::random_device random_device { };
 std::default_random_engine random_engine { random_device() };
 std::uniform_real_distribution space_distribution(-position_limit, position_limit);
 std::uniform_real_distribution speed_distribution(-max_speed, max_speed);

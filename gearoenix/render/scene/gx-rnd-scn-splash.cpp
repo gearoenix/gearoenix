@@ -89,7 +89,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
         auto& camera = *ce->template get_component<camera::Camera>();
         camera.set_projection_data(camera::ProjectionData::construct_orthographic(1.0f));
         camera.disable_bloom();
-        camera.get_colour_tuning() = camera::ColourTuning::Unchanged {};
+        camera.get_colour_tuning() = camera::ColourTuning::Unchanged { };
     }));
 
     struct Values {
@@ -173,7 +173,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
         mesh::Manager::get().build_plate(std::move(m), core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) { values->bg_mesh = std::move(m); }));
     }));
 
-    texture::Manager::get().create_2d_from_file(platform::stream::Path::create_asset("gearoenix-splash/gear.png"), texture::TextureInfo {}, core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
+    texture::Manager::get().create_2d_from_file(platform::stream::Path::create_asset("gearoenix-splash/gear.png"), texture::TextureInfo { }, core::job::EndCallerShared<texture::Texture2D>([values](std::shared_ptr<texture::Texture2D>&& t) {
         material::Manager::get().get_unlit("gearoenix-splash-gear", core::job::EndCallerShared<material::Unlit>([values, t = std::move(t)](std::shared_ptr<material::Unlit>&& m) mutable {
             m->set_albedo(std::move(t));
             m->set_transparency(material::Transparency::Transparent);

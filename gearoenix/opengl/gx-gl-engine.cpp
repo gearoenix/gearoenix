@@ -136,7 +136,7 @@ bool gearoenix::gl::Engine::is_supported() { return load_library(); }
 std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct()
 {
     if (!is_supported()) {
-        return {};
+        return { };
     }
     return std::make_unique<Engine>();
 }

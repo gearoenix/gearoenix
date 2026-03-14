@@ -18,7 +18,7 @@ struct TypeIndexSet final {
     constexpr static element_t elements_and_mod = element_bits_count - 1;
 
 private:
-    std::array<element_t, ElementsCount> bits = {};
+    std::array<element_t, ElementsCount> bits = { };
 
 public:
     constexpr TypeIndexSet() = default;

@@ -39,8 +39,8 @@ concept ObjectTypeHasRead = requires(std::shared_ptr<T>&& self, std::shared_ptr<
 struct Object {
     friend struct ObjectStreamer;
 
-    constexpr static std::array<object_type_index_t, 0> all_parent_object_type_indices {};
-    constexpr static std::array<object_type_index_t, 0> immediate_parent_object_type_indices {};
+    constexpr static std::array<object_type_index_t, 0> all_parent_object_type_indices { };
+    constexpr static std::array<object_type_index_t, 0> immediate_parent_object_type_indices { };
 
     template <typename T>
     using ObjectAllocator = std::shared_ptr<allocator::SharedArray<T, T::max_count>>;

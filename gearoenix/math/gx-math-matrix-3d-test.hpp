@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_3d)
     using GxVec3 = gearoenix::math::Vec3<float>;
     using GxN = gearoenix::math::Numeric;
 
-    std::default_random_engine re(std::random_device {}());
+    std::default_random_engine re(std::random_device { }());
     std::uniform_real_distribution<float> dis(-1.0, 1.0);
 
     glm::mat3 glmm;
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_3d)
     };
 
     const auto random = [&] {
-        std::array<std::array<float, 3>, 3> values {};
+        std::array<std::array<float, 3>, 3> values { };
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
                 values[i][j] = dis(re);

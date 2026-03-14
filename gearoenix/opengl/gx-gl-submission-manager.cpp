@@ -80,37 +80,37 @@ void gearoenix::gl::submission::Manager::initialise_gbuffers()
             .set_depth(0)
             .set_type(render::texture::Type::Texture2D)
             .set_has_mipmap(false);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-position-depth", {}, position_depth_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-position-depth", { }, position_depth_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_position_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto albedo_metallic_txt_info = position_depth_txt_info;
     albedo_metallic_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-albedo-metallic", {}, albedo_metallic_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-albedo-metallic", { }, albedo_metallic_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_albedo_metallic_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto normal_ao_txt_info = position_depth_txt_info;
     normal_ao_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-normal-ao", {}, normal_ao_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-normal-ao", { }, normal_ao_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_normal_ao_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto emission_roughness_txt_info = position_depth_txt_info;
     emission_roughness_txt_info.set_format(render::texture::TextureFormat::RgbaFloat16);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-emission-roughness", {}, emission_roughness_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-emission-roughness", { }, emission_roughness_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_emission_roughness_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto irradiance_txt_info = position_depth_txt_info;
     irradiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-irradiance", {}, irradiance_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-irradiance", { }, irradiance_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_irradiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto radiance_txt_info = position_depth_txt_info;
     radiance_txt_info.set_format(render::texture::TextureFormat::RgbFloat16);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-radiance", {}, radiance_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-radiance", { }, radiance_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_radiance_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     auto depth_txt_info = position_depth_txt_info;
     depth_txt_info.set_format(render::texture::TextureFormat::D32);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-depth", {}, depth_txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-gbuffer-depth", { }, depth_txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { gbuffers_depth_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENTS_COUNT);
@@ -147,7 +147,7 @@ void gearoenix::gl::submission::Manager::initialise_ssao()
                               .set_depth(0)
                               .set_type(render::texture::Type::Texture2D)
                               .set_has_mipmap(false);
-    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-ssao-resolve", {}, txt_info,
+    txt_mgr.create_2d_from_pixels("gearoenix-opengl-texture-ssao-resolve", { }, txt_info,
         core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { ssao_resolve_texture = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
 
     std::vector<render::texture::Attachment> attachments(1);

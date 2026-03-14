@@ -250,17 +250,17 @@ void gearoenix::vulkan::device::Physical::initialize_properties()
 
 gearoenix::vulkan::device::Physical::Physical()
     : Singleton(this)
-    , features {}
-    , ray_query_features {}
-    , ray_tracing_pipeline_features {}
-    , shader_clock_features {}
-    , vulkan_12_features {}
-    , vulkan_13_features {}
-    , dynamic_rendering_features {}
-    , descriptor_indexing_properties {}
-    , properties {}
-    , memory_properties {}
-    , ray_tracing_pipeline_properties {}
+    , features { }
+    , ray_query_features { }
+    , ray_tracing_pipeline_features { }
+    , shader_clock_features { }
+    , vulkan_12_features { }
+    , vulkan_13_features { }
+    , dynamic_rendering_features { }
+    , descriptor_indexing_properties { }
+    , properties { }
+    , memory_properties { }
+    , ray_tracing_pipeline_properties { }
 {
     const auto gpus = get_available_devices(Instance::get().get_vulkan_data());
     int best_device_index = -1;

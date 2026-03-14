@@ -67,7 +67,7 @@ gearoenix::net::Client::Client(
             t();
         };
 
-        auto local_packets = decltype(packets) {};
+        auto local_packets = decltype(packets) { };
         while (true) {
             if (!connection_callback.has_value()) {
                 // as long as we are waiting for connection, we shouldn't release self.

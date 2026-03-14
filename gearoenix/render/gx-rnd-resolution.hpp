@@ -36,10 +36,10 @@ private:
     union {
         Fixed fixed;
         ScreenBased screen_based;
-    } data {};
+    } data { };
 
 public:
-    Resolution() { data.fixed = {}; }
+    Resolution() { data.fixed = { }; }
 
     Resolution& operator=(const Resolution&) = default;
     Resolution& operator=(Resolution&&) = default;

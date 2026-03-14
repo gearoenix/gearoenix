@@ -23,7 +23,7 @@ private:
     constexpr static std::uint32_t customised_var_index = 0;
     constexpr static std::uint32_t default_var_index = 1;
 
-    std::variant<Customised, texture::DefaultCameraTargets> target = texture::DefaultCameraTargets {};
+    std::variant<Customised, texture::DefaultCameraTargets> target = texture::DefaultCameraTargets { };
 
 public:
     Target();

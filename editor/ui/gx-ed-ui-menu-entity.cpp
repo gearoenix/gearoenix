@@ -88,7 +88,7 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
                 skybox_stream = std::move(stream);
                 create_skybox_file_path = std::move(path);
             },
-            [] {}, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
+            [] { }, "Import Skybox Image", ".hdr,.png,.jpg,.gx-cube-texture");
     }
 
     scene_selector->show<render::scene::Scene>();

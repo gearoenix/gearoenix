@@ -2,7 +2,9 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../platform/stream/gx-plt-stm-asset.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
@@ -13,13 +15,11 @@
 #include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-cache.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
-#include "../../platform/stream/gx-plt-stm-asset.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
 #include "gx-vk-rfl-baked.hpp"
 #include "gx-vk-rfl-runtime.hpp"
-#include "../../core/ecs/gx-cr-ecs-world.hpp"
 
 void gearoenix::vulkan::reflection::Manager::initialise_convolution_compute()
 {
@@ -31,15 +31,13 @@ void gearoenix::vulkan::reflection::Manager::initialise_convolution_compute()
             .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptorCount = 1,
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-            .pImmutableSamplers = nullptr
-        },
+            .pImmutableSamplers = nullptr },
         VkDescriptorSetLayoutBinding {
             .binding = 1,
             .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
             .descriptorCount = 1,
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-            .pImmutableSamplers = nullptr
-        },
+            .pImmutableSamplers = nullptr },
     };
 
     VkDescriptorSetLayoutCreateInfo dsl_info;
@@ -154,7 +152,7 @@ void gearoenix::vulkan::reflection::Manager::initialise_black()
         return;
     }
 
-    render::texture::Manager::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& irr) {
+    render::texture::Manager::get().create_cube_from_colour({ }, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& irr) {
         auto rad = irr;
         black = core::Object::construct<Baked>(
             nullptr, "reflection-default-black", std::move(irr), std::move(rad),

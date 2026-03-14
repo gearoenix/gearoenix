@@ -132,7 +132,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
 {
     const auto& bindless = descriptor::Bindless::get();
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -149,7 +149,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.stride = sizeof(render::PbrVertex);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -273,7 +273,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     spec_info.dataSize = sizeof(VkBool32);
     spec_info.pData = &spec_has_bones;
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -291,7 +291,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.stride = sizeof(render::PbrVertexAnimated);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -403,7 +403,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
 {
     const auto& bindless = descriptor::Bindless::get();
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -420,7 +420,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.stride = sizeof(render::PbrVertex);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -544,7 +544,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     spec_info.dataSize = sizeof(VkBool32);
     spec_info.pData = &spec_has_bones;
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -562,7 +562,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.stride = sizeof(render::PbrVertexAnimated);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 6> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -674,7 +674,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
 {
     const auto& bindless = descriptor::Bindless::get();
 
-    std::array<VkPipelineShaderStageCreateInfo, 2> stages {};
+    std::array<VkPipelineShaderStageCreateInfo, 2> stages { };
     GX_SET_ZERO(stages);
     stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -692,7 +692,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     // Skybox only uses locations 0-3 (position, normal, tangent, uv), no bone attributes
-    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -810,7 +810,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     // Shadow caster uses position(0), uv(3), dummy bone_weights(4), dummy bone_indices(5)
-    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;
@@ -936,7 +936,7 @@ std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeli
     vertex_binding.stride = sizeof(render::PbrVertexAnimated);
     vertex_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes {};
+    std::array<VkVertexInputAttributeDescription, 4> vertex_attributes { };
     GX_SET_ZERO(vertex_attributes);
     vertex_attributes[0].binding = 0;
     vertex_attributes[0].location = 0;

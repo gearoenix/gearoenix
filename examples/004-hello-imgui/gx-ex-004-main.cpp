@@ -6,7 +6,7 @@
 
 struct GameApp final : gearoenix::core::Application {
 private:
-    std::string opened_file_name = {};
+    std::string opened_file_name = { };
     bool file_browser_canceled = false;
 
 public:

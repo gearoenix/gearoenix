@@ -107,7 +107,7 @@ gearoenix::gl::ReflectionManager::ReflectionManager()
     core::ecs::ComponentType::add<BakedReflection>();
     core::ecs::ComponentType::add<RuntimeReflection>();
 
-    Singleton<TextureManager>::get().create_cube_from_colour({}, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
+    Singleton<TextureManager>::get().create_cube_from_colour({ }, core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
         auto gt1 = std::dynamic_pointer_cast<TextureCube>(std::move(t));
         auto gt2 = gt1;
         black = core::Object::construct<BakedReflection>(

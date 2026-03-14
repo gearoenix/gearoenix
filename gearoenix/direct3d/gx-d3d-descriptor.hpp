@@ -20,8 +20,8 @@ struct Device;
 struct DescriptorAllocator final {
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
     std::shared_ptr<core::Allocator> allocator;
-    D3D12_CPU_DESCRIPTOR_HANDLE cpu_starting_handle {};
-    D3D12_GPU_DESCRIPTOR_HANDLE gpu_starting_handle {};
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu_starting_handle { };
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu_starting_handle { };
     UINT size_increment = 0;
 
     explicit DescriptorAllocator(Device& d, UINT descriptors_count, D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* name);
@@ -31,7 +31,7 @@ struct DescriptorAllocator final {
 struct CpuDescriptorAllocator final {
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
     std::shared_ptr<core::Allocator> allocator;
-    D3D12_CPU_DESCRIPTOR_HANDLE cpu_starting_handle {};
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu_starting_handle { };
     UINT size_increment = 0;
 
     explicit CpuDescriptorAllocator(Device& d, UINT descriptors_count, D3D12_DESCRIPTOR_HEAP_TYPE descriptor_type, const wchar_t* name);

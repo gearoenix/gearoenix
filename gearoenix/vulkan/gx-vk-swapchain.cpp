@@ -34,7 +34,7 @@ namespace {
 
 gearoenix::vulkan::Swapchain::Swapchain()
     : Singleton(this)
-    , format {}
+    , format { }
 {
     initialize();
 }
@@ -65,7 +65,7 @@ void gearoenix::vulkan::Swapchain::acquire_next_image(const sync::Semaphore& sem
 
 void gearoenix::vulkan::Swapchain::initialize()
 {
-    frames = {};
+    frames = { };
 
     const auto& physical_device = device::Physical::get();
     const auto& logical_device = device::Logical::get();
@@ -116,7 +116,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     const auto mutable_format_supported = unorm_format.has_value() && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
 
     // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
-    std::array<VkFormat, 2> format_list_entries {};
+    std::array<VkFormat, 2> format_list_entries { };
     VkImageFormatListCreateInfo format_list_info;
     GX_SET_ZERO(format_list_info);
     format_list_info.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_LIST_CREATE_INFO;

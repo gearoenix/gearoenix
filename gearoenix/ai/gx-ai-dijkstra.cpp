@@ -21,7 +21,7 @@ gearoenix::ai::Graph<int, int> gearoenix::ai::Dijkstra::best_graph(const int sta
         bool not_best = true;
     };
     std::vector<SeenInfo> seen_vertices;
-    seen_vertices.resize(graph.size(), SeenInfo {});
+    seen_vertices.resize(graph.size(), SeenInfo { });
     seen_vertices[start].weight = 0;
     int idx = start;
     for (std::uint32_t i = 0; i < graph.size(); ++i) {

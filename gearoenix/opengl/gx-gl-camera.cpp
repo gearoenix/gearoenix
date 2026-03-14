@@ -30,7 +30,7 @@ gearoenix::gl::CameraTarget gearoenix::gl::CameraTarget::construct(const render:
 {
     if (target.is_default()) {
         const auto& d = target.get_default();
-        CameraTarget result { .target = Default {} };
+        CameraTarget result { .target = Default { } };
         auto& gd = std::get<default_var_index>(result.target);
         gd.main = std::dynamic_pointer_cast<Target>(d.main);
         for (std::uint32_t ti = 0; ti < d.targets.size(); ++ti) {

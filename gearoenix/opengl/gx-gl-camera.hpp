@@ -42,7 +42,7 @@ struct CameraTarget final {
     constexpr static std::uint32_t customised_var_index = 0;
     constexpr static std::uint32_t default_var_index = 1;
 
-    std::variant<Customised, Default> target = Default {};
+    std::variant<Customised, Default> target = Default { };
 
     ~CameraTarget();
     [[nodiscard]] static CameraTarget construct(const render::camera::Target& target);

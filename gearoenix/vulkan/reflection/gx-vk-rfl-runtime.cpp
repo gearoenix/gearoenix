@@ -2,14 +2,14 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
-#include <numbers>
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../gx-vk-check.hpp"
 #include "../image/gx-vk-img-view.hpp"
+#include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
 #include "gx-vk-rfl-manager.hpp"
-#include "../pipeline/gx-vk-pip-pipeline.hpp"
+#include <numbers>
 
 namespace {
 constexpr std::array face_uv_axis {
@@ -59,9 +59,12 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
         GX_VK_CHK(vkCreateDescriptorPool(dev, &dp_info, nullptr, &irradiance_descriptor_pool));
 
         const std::array layouts {
-            mgr.get_convolution_descriptor_set_layout(), mgr.get_convolution_descriptor_set_layout(),
-            mgr.get_convolution_descriptor_set_layout(), mgr.get_convolution_descriptor_set_layout(),
-            mgr.get_convolution_descriptor_set_layout(), mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
+            mgr.get_convolution_descriptor_set_layout(),
         };
         GX_ASSERT_D(layouts.size() == irradiance_descriptor_sets.size());
 
@@ -79,8 +82,8 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         };
 
-        std::array<VkDescriptorImageInfo, 6> irr_infos{};
-        std::array<std::array<VkWriteDescriptorSet, 2>, 6> writes{};
+        std::array<VkDescriptorImageInfo, 6> irr_infos { };
+        std::array<std::array<VkWriteDescriptorSet, 2>, 6> writes { };
 
         for (std::uint32_t fi = 0; fi < irr_infos.size(); ++fi) {
             auto& irr_info = irr_infos[fi];
@@ -268,7 +271,7 @@ void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkComman
     const auto ds = irradiance_descriptor_sets[fi];
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_irradiance_pipeline_layout(), 0, 1, &ds, 0, nullptr);
 
-    IrradiancePushConstants pc{};
+    IrradiancePushConstants pc { };
     const auto& axes = face_uv_axis[fi];
     pc.u_axis[0] = axes[0].x;
     pc.u_axis[1] = axes[0].y;
@@ -323,9 +326,9 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandB
     const auto roughness_p_2 = roughness * roughness;
     const auto roughness_p_4 = roughness_p_2 * roughness_p_2;
     const auto env_resolution = static_cast<double>(env_cube.get_view()->get_image()->get_image_width());
-    const auto sa_texel = std::numbers::pi / (1.5  * env_resolution * env_resolution);
+    const auto sa_texel = std::numbers::pi / (1.5 * env_resolution * env_resolution);
 
-    RadiancePushConstants pc{};
+    RadiancePushConstants pc { };
     const auto& axes = face_uv_axis[fi];
     pc.u_axis[0] = axes[0].x;
     pc.u_axis[1] = axes[0].y;

@@ -11,10 +11,10 @@
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
+#include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
 #include "gx-vk-scn-scene.hpp"
-#include "../reflection/gx-vk-rfl-manager.hpp"
 
 #include <boost/container/flat_set.hpp>
 

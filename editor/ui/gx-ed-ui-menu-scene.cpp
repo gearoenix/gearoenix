@@ -108,14 +108,14 @@ void gearoenix::editor::ui::MenuScene::update()
                         (void)progress_bar;
                     }));
                 },
-                [] {}, "Import GLTF file", ".glb" /*because of webassembly support we cant have gltf*/);
+                [] { }, "Import GLTF file", ".glb" /*because of webassembly support we cant have gltf*/);
         }
         if (ImGui::BeginMenu("Scenes")) {
             ImGui::Text("Active scenes: %zu", static_cast<std::size_t>(active_scenes.size()));
             ImGui::Separator();
 
             if (ImGui::MenuItem("Refresh list")) {
-                auto scenes = decltype(active_scenes) {};
+                auto scenes = decltype(active_scenes) { };
                 core::ecs::World::get().synchronised_system<render::scene::Scene>([&](const auto* const entity, auto* const) { scenes.emplace(entity->get_ptr()); });
                 if (!current_scene || !scenes.contains(current_scene->get_ptr())) {
                     if (scenes.empty()) {

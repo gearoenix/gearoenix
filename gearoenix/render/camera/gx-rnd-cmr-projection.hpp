@@ -25,10 +25,10 @@ private:
     union {
         Perspective perspective;
         Orthographic orthographic;
-    } data {};
+    } data { };
 
 public:
-    constexpr ProjectionData() { data.perspective = {}; }
+    constexpr ProjectionData() { data.perspective = { }; }
 
     constexpr ProjectionData(const ProjectionData&) = default;
 

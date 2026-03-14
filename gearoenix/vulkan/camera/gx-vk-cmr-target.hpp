@@ -29,7 +29,7 @@ struct Target final {
     constexpr static std::uint32_t customised_var_index = 0;
     constexpr static std::uint32_t default_var_index = 1;
 
-    target_t target = Default {};
+    target_t target = Default { };
 
     explicit Target(const render::camera::Target& rt);
     ~Target();

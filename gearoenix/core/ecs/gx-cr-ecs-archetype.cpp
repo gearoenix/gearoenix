@@ -95,7 +95,7 @@ void gearoenix::core::ecs::Archetype::write(std::shared_ptr<platform::stream::St
 
 void gearoenix::core::ecs::Archetype::read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<std::vector<EntityPtr>>&& end)
 {
-    end.set_return({});
+    end.set_return({ });
     const auto entity_count = stream->read<std::uint32_t>();
     for (auto i = decltype(entity_count) { 0 }; i < entity_count; ++i) {
         const auto object_id = stream->read<object_id_t>();
