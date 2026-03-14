@@ -1,7 +1,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
@@ -20,8 +19,8 @@
 #include <gearoenix/render/texture/gx-rnd-txt-texture-cube.hpp>
 
 namespace {
-constexpr auto EXPORT_ENVIRONMENT = false;
-constexpr auto EXPORT_REFLECTION = false;
+constexpr auto EXPORT_ENVIRONMENT = true;
+constexpr auto EXPORT_REFLECTION = true;
 constexpr auto EXPORT_ANY = EXPORT_ENVIRONMENT || EXPORT_REFLECTION;
 
 template <typename T>
@@ -93,7 +92,7 @@ public:
                     const auto rfl = entity->template get_component_shared_ptr<GxReflectionRuntime>();
                     rfl->set_on_rendered([wr = std::weak_ptr(rfl)] {
                         const auto r = wr.lock();
-                        GX_ASSERT(r);
+                        GX_ASSERT_D(r);
                         if constexpr (EXPORT_REFLECTION) {
                             const std::shared_ptr<GxStream> rl(new GxLocal("exported.gx-reflection", true));
                             r->export_baked(rl, GxEndCaller([] { }));
