@@ -15,13 +15,11 @@ layout(push_constant) uniform PushConstants {
 };
 
 const float PI = 3.14159265358979323846;
-const uint SAMPLE_COUNT = 4096u;
+const uint SAMPLE_COUNT = 4000u;
 
-float distribution_ggx(float NdotH2) {
-    float nom = roughness_p_4;
-    float denom = (NdotH2 * (roughness_p_4 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-    return nom / denom;
+float distribution_ggx(const float n_dot_h_2) {
+    const float denom = (n_dot_h_2 * (roughness_p_4 - 1.0) + 1.0);
+    return roughness_p_4 / (PI * denom * denom + 0.0001);
 }
 
 float radical_inverse_vdc(uint bits) {
@@ -33,8 +31,8 @@ float radical_inverse_vdc(uint bits) {
     return float(bits) * 2.3283064365386963e-10;
 }
 
-vec2 hammersley(uint i, uint N) {
-    return vec2(float(i) / float(N), radical_inverse_vdc(i));
+vec2 hammersley(const uint i) {
+    return vec2(float(i) / float(SAMPLE_COUNT), radical_inverse_vdc(i));
 }
 
 vec3 importance_sample_ggx(vec2 xi, vec3 n) {
@@ -64,19 +62,16 @@ void main() {
     vec3 prefiltered_colour = vec3(0.0);
     float total_weight = 0.0;
 
-    for (uint i = 0u; i < SAMPLE_COUNT; i++) {
-        vec2 xi = hammersley(i, SAMPLE_COUNT);
-        vec3 h = importance_sample_ggx(xi, nrm);
-        float n_dot_h = dot(nrm, h);
-        vec3 l = normalize(2.0 * n_dot_h * h - nrm);
-        float n_dot_l = dot(nrm, l);
+    for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
+        const vec2 xi = hammersley(i);
+        const vec3 h = importance_sample_ggx(xi, nrm);
+        const float n_dot_h = max(0.0, dot(nrm, h));
+        const vec3 l = normalize(2.0 * n_dot_h * h - nrm);
+        const float n_dot_l = dot(nrm, l);
         if (n_dot_l > 0.0) {
-            n_dot_h = max(n_dot_h, 0.0);
-            float n_dot_h_p_2 = n_dot_h * n_dot_h;
-            float d = distribution_ggx(n_dot_h_p_2);
-            float pdf = (d / 4.0) + 0.0001;
-            float sa_sample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
-            float mip_level = roughness == 0.0 ? 0.0 : max(0.0, 0.5 * log2(sa_sample / sa_texel));
+            const float d = distribution_ggx(n_dot_h * n_dot_h);
+            const float sa_sample = 1.0 / ((float(SAMPLE_COUNT) / 4.0) * d + 0.0001);
+            const float mip_level = roughness < 0.00001 ? 0.0 : max(0.0, 0.5 * log2(sa_sample / sa_texel));
             prefiltered_colour += textureLod(environment_map, l, mip_level).rgb * n_dot_l;
             total_weight += n_dot_l;
         }

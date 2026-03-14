@@ -15,6 +15,7 @@ void main() {
 
     vec3 v = normalize(in_pos);
     vec2 uv = vec2(atan(v.y, v.x), asin(v.z)) * inv_atan + 0.5;
+    uv.y = 1.0 - uv.y;
 
     frag_out = texture(sampler2D(
         textures_2d[nonuniformEXT(material.albedo_texture_index)],

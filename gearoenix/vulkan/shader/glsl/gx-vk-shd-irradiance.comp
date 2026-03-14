@@ -12,7 +12,7 @@ layout(push_constant) uniform PushConstants {
 };
 
 const float PI = 3.14159265358979323846;
-const float SAMPLE_DELTA = 0.005;
+const float SAMPLE_DELTA = 0.02;
 
 void main() {
     const uint image_size = floatBitsToUint(face_axis_and_image_size.w);

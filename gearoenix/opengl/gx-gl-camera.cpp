@@ -20,7 +20,9 @@
 #include "shader/gx-gl-shd-multiply.hpp"
 #include "shader/gx-gl-shd-skybox-cube.hpp"
 #include "shader/gx-gl-shd-skybox-equirectangular.hpp"
+
 #include <boost/mp11/algorithm.hpp>
+#include <ranges>
 
 gearoenix::gl::CameraTarget::~CameraTarget() = default;
 
@@ -105,8 +107,7 @@ void gearoenix::gl::Camera::render_shadow(const render::record::Camera& cmr, uin
     ctx::set_framebuffer(gl_target.get_customised().target->get_framebuffer());
     ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    for (auto& distance_model_data : cmr.all_models) {
-        auto& camera_model = distance_model_data.second;
+    for (const auto& camera_model : cmr.opaque_models | std::views::values) {
         auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_shadow(cmr, camera_model, current_shader);
     }
@@ -133,17 +134,21 @@ void gearoenix::gl::Camera::render_forward(const Scene& scene, const render::rec
     }
     ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    render_forward_skyboxes(scene, cmr, current_shader);
-    GX_GL_CHECK_D;
-    glEnable(GL_BLEND); /// TODO: take it into a context and material must decide
-    // Rendering forward pbr
-    for (auto& distance_model_data : cmr.all_models) {
-        auto& camera_model = distance_model_data.second;
+    for (const auto& camera_model : cmr.opaque_models | std::views::values) {
         auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_forward(scene, cmr, camera_model, current_shader);
         GX_GL_CHECK_D;
     }
-    glDisable(GL_BLEND); /// TODO: take it into a context and material must decide
+    render_forward_skyboxes(scene, cmr, current_shader);
+    GX_GL_CHECK_D;
+    glEnable(GL_BLEND);
+    // Rendering forward pbr
+    for (const auto& camera_model : cmr.translucent_models | std::views::values) {
+        auto& model = *core::cast_ptr<Model>(camera_model.model->model);
+        model.render_forward(scene, cmr, camera_model, current_shader);
+        GX_GL_CHECK_D;
+    }
+    glDisable(GL_BLEND);
     pop_debug_group();
 }
 

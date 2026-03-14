@@ -72,6 +72,8 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
 
     pc.camera_index = shader_data_index;
 
+    vkCmdSetFrontFace(cmd, y_flipped? VK_FRONT_FACE_COUNTER_CLOCKWISE: VK_FRONT_FACE_CLOCKWISE);
+
     // Shadow's camera must always have a customised target.
     GX_ASSERT_D(target.is_customised());
     const auto render_scope = gapi_target.get_customised().target->create_rendering_scope(cmd);
@@ -95,6 +97,8 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 
     pc.camera_index = shader_data_index;
+
+    vkCmdSetFrontFace(cmd, y_flipped? VK_FRONT_FACE_COUNTER_CLOCKWISE: VK_FRONT_FACE_CLOCKWISE);
 
     const auto render_scope = [&] {
         if (target.is_customised()) {

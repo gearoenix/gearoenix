@@ -16,7 +16,7 @@ struct TextureCube;
 
 struct ReflectionProbe {
     constexpr static auto max_count = render::reflection::Probe::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_probe_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_probe_type_index;
     constexpr static auto all_parent_object_type_indices = core::Object::all_parent_object_type_indices;
     constexpr static auto immediate_parent_object_type_indices = core::Object::immediate_parent_object_type_indices;
 
@@ -33,7 +33,7 @@ struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
     constexpr static auto max_count = Baked::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_baked_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_baked_type_index;
     constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index };
 
@@ -50,7 +50,7 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTargetV;
 
     constexpr static auto max_count = Runtime::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_runtime_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_runtime_type_index;
     constexpr static std::array all_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index };
 

@@ -20,7 +20,7 @@ struct Model final : render::model::Model {
 
     typedef core::static_flat_set<std::shared_ptr<Mesh>, render::model::max_meshes_count_per_model> gl_meshes_set_t;
 
-    constexpr static auto object_type_index = gearoenix_gl_model_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_model_type_index;
     constexpr static std::array all_parent_object_type_indices { render::model::Model::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::model::Model::object_type_index };
 

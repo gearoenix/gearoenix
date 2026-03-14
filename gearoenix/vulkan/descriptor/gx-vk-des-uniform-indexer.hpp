@@ -124,7 +124,10 @@ public:
         policy_holder.second.push_back(index);
     }
 
-    void update() { uniform_buffer->update(shader_datas.data()); }
+    void update()
+    {
+        uniform_buffer->update(shader_datas.data());
+    }
 
     [[nodiscard]] std::uint32_t get_current_index() const
         requires(!IsAllocator)
@@ -135,10 +138,13 @@ public:
             return policy_holder;
         }
         static_assert(IsAtomic || IsDefault);
-        return 0;
+        std::unreachable();
     }
 
-    [[nodiscard]] buffer::Buffer& get_gpu_buffer() const { return *uniform_buffer->get_gpu(); }
+    [[nodiscard]] buffer::Buffer& get_gpu_buffer() const
+    {
+        return *uniform_buffer->get_gpu();
+    }
 };
 }
 

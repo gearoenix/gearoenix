@@ -112,7 +112,7 @@ void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3
             return std::make_pair(s, (static_cast<double>(far) + static_cast<double>(near)) * s / static_cast<double>(near));
         }
         if (projection_data.is_orthographic()) {
-            const auto& [scale] = projection_data.get_orthographic();
+            const auto [scale] = projection_data.get_orthographic();
             const auto s = static_cast<double>(scale * 0.5f);
             return std::make_pair(s, s);
         }
@@ -168,9 +168,15 @@ void gearoenix::render::camera::Camera::set_projection_data(const ProjectionData
     update_projection();
 }
 
-bool gearoenix::render::camera::Camera::is_perspective() const { return projection_data.is_perspective(); }
+bool gearoenix::render::camera::Camera::is_perspective() const
+{
+    return projection_data.is_perspective();
+}
 
-bool gearoenix::render::camera::Camera::is_orthographic() const { return projection_data.is_orthographic(); }
+bool gearoenix::render::camera::Camera::is_orthographic() const
+{
+    return projection_data.is_orthographic();
+}
 
 void gearoenix::render::camera::Camera::update_projection()
 {
@@ -186,7 +192,15 @@ void gearoenix::render::camera::Camera::update_projection()
         GX_UNEXPECTED;
     }
     if (engine::Engine::get().get_half_depth_clip()) {
-        projection = math::Mat4x4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f) * projection;
+        y_flipped = !target.has_cube();
+        const auto y_flip = y_flipped? -1.0f: 1.0f;
+        // clang-format off
+        projection = math::Mat4x4(
+            1.0f,   0.0f,   0.0f,   0.0f,
+            0.0f, y_flip,   0.0f,   0.0f,
+            0.0f,   0.0f,   0.5f,   0.0f,
+            0.0f,   0.0f,   0.5f,   1.0f) * projection;
+        // clang-format on
     }
     view_projection = projection * view;
 }

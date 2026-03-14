@@ -232,6 +232,8 @@
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteAccelerationStructuresPropertiesKHR);  \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdWriteTimestamp);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdPipelineBarrier2);                          \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetFrontFace);                              \
+    GX_VULKAN_LOADER_MAPPED_FUNCTION(vkCmdSetCullMode);                               \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkDestroySurfaceKHR);                            \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetAccelerationStructureBuildSizesKHR);        \
     GX_VULKAN_LOADER_MAPPED_FUNCTION(vkGetBufferDeviceAddress);                       \

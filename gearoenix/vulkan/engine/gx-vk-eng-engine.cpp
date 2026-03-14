@@ -172,6 +172,10 @@ void gearoenix::vulkan::engine::Engine::submit()
     auto& cmd = *frame.cmd;
     const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
+
+    vkCmdSetFrontFace(cmd.get_vulkan_data(), VK_FRONT_FACE_COUNTER_CLOCKWISE);
+    vkCmdSetCullMode(cmd.get_vulkan_data(), VK_CULL_MODE_BACK_BIT);
+
     upload_uniforms();
     buffer_manager->upload_dynamics(vk_cmd);
     bindless_descriptor_manager->bind(vk_cmd);

@@ -1,6 +1,7 @@
 #pragma once
 #include "../../math/gx-math-vector-2d.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
+
 #include <memory>
 #include <variant>
 
@@ -37,6 +38,7 @@ public:
     [[nodiscard]] static Target construct_default(texture::DefaultCameraTargets&& targets);
     [[nodiscard]] bool is_customised() const;
     [[nodiscard]] bool is_default() const;
+    [[nodiscard]] bool has_cube() const;
     void set_customised(std::shared_ptr<texture::Target>&& customised_target);
     [[nodiscard]] double get_aspect_ratio() const;
     [[nodiscard]] math::Vec2<std::uint32_t> get_dimension() const;

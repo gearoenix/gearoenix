@@ -174,7 +174,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     std::vector<VkImage> images(count);
     GX_VK_CHK(vkGetSwapchainImagesKHR(logical_device.get_vulkan_data(), vulkan_data, &count, images.data()));
 
-    for (auto i = 0; i < count; ++i) {
+    for (std::uint32_t i = 0; i < count; ++i) {
         auto img = std::make_shared<image::Image>("swapchain-img-" + std::to_string(i), static_cast<std::uint32_t>(info.imageExtent.width), static_cast<std::uint32_t>(info.imageExtent.height), static_cast<std::uint32_t>(1), VK_IMAGE_TYPE_2D,
             static_cast<std::uint32_t>(1), static_cast<std::uint32_t>(1), info.imageFormat, mutable_format_supported ? VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT : static_cast<VkImageCreateFlags>(0), info.imageUsage, images[i]);
         img->set_owned(false);

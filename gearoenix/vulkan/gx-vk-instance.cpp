@@ -57,6 +57,9 @@ static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessage
     const auto msg_str = msg.str();
     if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
         if constexpr (GX_DEBUG_MODE) {
+            if (msg_str.contains("VK_LAYER_AMD_switchable_graphics")) {
+                return VK_FALSE;
+            }
             GX_LOG_F(msg_str);
         } else {
             GX_LOG_E(msg_str);

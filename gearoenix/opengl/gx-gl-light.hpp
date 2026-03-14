@@ -10,7 +10,7 @@ struct Texture2D;
 struct Target;
 
 struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirectional {
-    constexpr static auto object_type_index = gearoenix_gl_light_shadow_caster_directional_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_light_shadow_caster_directional_type_index;
     constexpr static std::array all_parent_object_type_indices { ShadowCasterDirectional::object_type_index, Light::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { ShadowCasterDirectional::object_type_index };
 

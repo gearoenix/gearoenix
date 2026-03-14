@@ -4,7 +4,10 @@
 #include "../core/gx-cr-singleton.hpp"
 #include "../math/gx-math-vector-4d.hpp"
 #include "gx-gl-types.hpp"
+
 #include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
+
 #include <memory>
 
 namespace gearoenix::gl {

@@ -14,7 +14,7 @@ struct Unlit final : render::material::Unlit, Material {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
     constexpr static auto max_count = render::material::Unlit::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_material_unlit_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_material_unlit_type_index;
     constexpr static std::array all_parent_object_type_indices { render::material::Material::object_type_index, render::material::Unlit::object_type_index, gl::material::Material::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::material::Unlit::object_type_index, gl::material::Material::object_type_index };
 

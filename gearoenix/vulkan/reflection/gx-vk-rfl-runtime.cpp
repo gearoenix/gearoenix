@@ -53,7 +53,7 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
         VkDescriptorPoolCreateInfo dp_info;
         GX_SET_ZERO(dp_info);
         dp_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        dp_info.maxSets = irradiance_descriptor_sets.size();
+        dp_info.maxSets = static_cast<std::uint32_t>(irradiance_descriptor_sets.size());
         dp_info.poolSizeCount = static_cast<std::uint32_t>(pool_sizes.size());
         dp_info.pPoolSizes = pool_sizes.data();
         GX_VK_CHK(vkCreateDescriptorPool(dev, &dp_info, nullptr, &irradiance_descriptor_pool));
@@ -69,7 +69,7 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
         GX_SET_ZERO(ds_info);
         ds_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         ds_info.descriptorPool = irradiance_descriptor_pool;
-        ds_info.descriptorSetCount = layouts.size();
+        ds_info.descriptorSetCount = static_cast<std::uint32_t>(layouts.size());
         ds_info.pSetLayouts = layouts.data();
         GX_VK_CHK(vkAllocateDescriptorSets(dev, &ds_info, irradiance_descriptor_sets.data()));
 

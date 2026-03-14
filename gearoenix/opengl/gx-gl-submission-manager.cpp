@@ -1,7 +1,6 @@
 #include "gx-gl-submission-manager.hpp"
 #if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
-#include "../core/macro/gx-cr-mcr-profiler.hpp"
 #include "../physics/animation/gx-phs-anm-armature.hpp"
 #include "../physics/animation/gx-phs-anm-manager.hpp"
 #include "../physics/gx-phs-transformation.hpp"

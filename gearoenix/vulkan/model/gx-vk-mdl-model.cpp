@@ -91,7 +91,7 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
     sd.directional_light_begin_index = 0;
     sd.directional_light_end_index = 0;
 
-    sd.shadow_caster_directional_lights_count = lights.shadow_caster_directionals.size();
+    sd.shadow_caster_directional_lights_count = static_cast<std::uint32_t>(lights.shadow_caster_directionals.size());
     for (std::uint32_t li = 0; li < sd.shadow_caster_directional_lights_count; ++li) {
         auto& rl = *lights.shadow_caster_directionals[li];
         auto& l = *core::cast_ptr<light::ShadowCasterDirectional>(rl.shadow_caster_directional);
