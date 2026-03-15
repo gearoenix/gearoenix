@@ -1,0 +1,55 @@
+#version 460
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D source_texture;
+layout(set = 0, binding = 1) writeonly uniform image2D output_image;
+
+layout(push_constant) uniform PushConstants {
+    vec4 texel_size_src_mip_value;
+    vec4 scatter_clamp_max_threshold_threshold_knee;
+};
+
+void main() {
+    const ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    const ivec2 size = imageSize(output_image);
+    if (pixel.x >= size.x || pixel.y >= size.y) {
+        return;
+    }
+    const vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    const vec2 texel_size = texel_size_src_mip_value.xy;
+    const float src_mip = texel_size_src_mip_value.z;
+
+    // 13-tap downsampling filter
+    vec4 a = textureLod(source_texture, uv + texel_size * vec2(-1.0, -1.0), src_mip);
+    vec4 b = textureLod(source_texture, uv + texel_size * vec2(0.0, -1.0), src_mip);
+    vec4 c = textureLod(source_texture, uv + texel_size * vec2(1.0, -1.0), src_mip);
+    vec4 d = textureLod(source_texture, uv + texel_size * vec2(-0.5, -0.5), src_mip);
+    vec4 e = textureLod(source_texture, uv + texel_size * vec2(0.5, -0.5), src_mip);
+    vec4 f = textureLod(source_texture, uv + texel_size * vec2(-1.0, 0.0), src_mip);
+    vec4 g = textureLod(source_texture, uv, src_mip);
+    vec4 h = textureLod(source_texture, uv + texel_size * vec2(1.0, 0.0), src_mip);
+    vec4 i = textureLod(source_texture, uv + texel_size * vec2(-0.5, 0.5), src_mip);
+    vec4 j = textureLod(source_texture, uv + texel_size * vec2(0.5, 0.5), src_mip);
+    vec4 k = textureLod(source_texture, uv + texel_size * vec2(-1.0, 1.0), src_mip);
+    vec4 l = textureLod(source_texture, uv + texel_size * vec2(0.0, 1.0), src_mip);
+    vec4 m = textureLod(source_texture, uv + texel_size * vec2(1.0, 1.0), src_mip);
+
+    const vec2 div = (1.0 / 4.0) * vec2(0.5, 0.125);
+    vec4 colour = (d + e + i + j) * div.x;
+    colour += (a + b + g + f) * div.y;
+    colour += (b + c + h + g) * div.y;
+    colour += (f + g + l + k) * div.y;
+    colour += (g + h + m + l) * div.y;
+
+    // Threshold
+    colour = min(vec4(scatter_clamp_max_threshold_threshold_knee.y), colour);
+    float brightness = max(colour.x, max(colour.y, colour.z));
+    float softness = clamp(brightness - scatter_clamp_max_threshold_threshold_knee.z + scatter_clamp_max_threshold_threshold_knee.w, 0.0, 2.0 * scatter_clamp_max_threshold_threshold_knee.w);
+    softness = (softness * softness) / (4.0 * scatter_clamp_max_threshold_threshold_knee.w + 1e-4);
+    float multiplier = max(brightness - scatter_clamp_max_threshold_threshold_knee.z, softness) / max(brightness, 1e-4);
+    colour *= multiplier;
+    colour = max(colour, vec4(0.0));
+
+    imageStore(output_image, pixel, colour);
+}

@@ -1,0 +1,29 @@
+#version 460
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform sampler2D source_texture;
+layout(set = 0, binding = 1) writeonly uniform image2D output_image;
+
+layout(push_constant) uniform PushConstants {
+    vec4 texel_size_src_mip_value;
+    vec4 scatter_clamp_max_threshold_threshold_knee;
+};
+
+void main() {
+    const ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    const ivec2 size = imageSize(output_image);
+    if (pixel.x >= size.x || pixel.y >= size.y) {
+        return;
+    }
+    const vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    const float src_mip = texel_size_src_mip_value.z;
+
+    vec4 src = textureLod(source_texture, uv, src_mip);
+    vec4 low = textureLod(source_texture, uv, src_mip + 1.0);
+    float scatter = texel_size_src_mip_value.w;
+    vec4 colour = mix(src, low, scatter);
+    colour.w = max(colour.w, src.w);
+
+    imageStore(output_image, pixel, colour);
+}

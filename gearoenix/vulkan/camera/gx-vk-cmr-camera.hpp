@@ -12,12 +12,7 @@ struct Model;
 }
 
 namespace gearoenix::vulkan::pipeline {
-struct BloomPrefilter;
-struct BloomHorizontal;
-struct BloomVertical;
-struct BloomUpsampler;
 struct FormatPipelines;
-struct Multiply;
 struct Pipeline;
 struct PushConstants;
 struct SkyboxCube;
@@ -39,15 +34,17 @@ struct Camera final : render::camera::Camera {
 
     GX_GET_CREF_PRV(Target, gapi_target);
 
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::BloomPrefilter>, bloom_prefilter);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::BloomHorizontal>, bloom_horizontal);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::BloomVertical>, bloom_vertical);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::BloomUpsampler>, bloom_upsampler);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Multiply>, multiply);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::SkyboxCube>, skybox_cube);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::SkyboxEquirectangular>, skybox_equirectangular);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::ColourTuningAntiAliasingCombination>, colour_tuning_anti_aliasing_combination);
     GX_GET_VAL_PRV(std::uint64_t, last_update_frame_number, static_cast<std::uint64_t>(-1));
+
+    VkDescriptorPool bloom_descriptor_pool = nullptr;
+    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex0_to_tex1 {};
+    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex1_to_tex0 {};
+
+    void initialise_bloom_descriptors();
+    void destroy_bloom_descriptors();
 
     VkFormat rendering_colour_format = VK_FORMAT_UNDEFINED;
     std::vector<std::uint32_t> cameras_joint_model_indices; // MVPs

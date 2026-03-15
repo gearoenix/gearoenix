@@ -23,7 +23,7 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureI
     : render::texture::Texture2D(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), info.get_depth(), convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 1u,
           convert_image_format(info.get_format()), 0u,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
+          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)))))
     , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
     , mips([this] {
         std::vector<std::shared_ptr<image::View>> result;

@@ -21,7 +21,11 @@ void initialize_brdflut()
         return;
     }
 
-    gearoenix::render::texture::Manager::get().get_brdflut(gearoenix::core::job::EndCallerShared<gearoenix::render::texture::Texture2D>([](auto&& t) { brdflut = gearoenix::core::cast_ptr<gearoenix::vulkan::texture::Texture2D>(t.get()); }));
+    gearoenix::render::texture::Manager::get().get_brdflut(
+        gearoenix::core::job::EndCallerShared<gearoenix::render::texture::Texture2D>(
+            [](auto&& t) {
+                brdflut = gearoenix::core::cast_ptr<gearoenix::vulkan::texture::Texture2D>(t.get());
+            }));
 }
 }
 
@@ -37,14 +41,21 @@ gearoenix::vulkan::scene::Scene::Scene(const core::object_id_t id, std::string&&
     initialize_brdflut();
 }
 
-void gearoenix::vulkan::scene::Scene::read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end)
+void gearoenix::vulkan::scene::Scene::read(
+    std::shared_ptr<Scene>&& self,
+    std::shared_ptr<platform::stream::Stream>&& stream,
+    std::shared_ptr<core::ObjectStreamer>&& object_streamer,
+    core::job::EndCaller<>&& end)
 {
     render::scene::Scene::read(std::shared_ptr<render::scene::Scene>(std::move(self)), std::move(stream), std::move(object_streamer), std::move(end));
 }
 
 gearoenix::vulkan::scene::Scene::~Scene() = default;
 
-void gearoenix::vulkan::scene::Scene::update() { render::scene::Scene::update(); }
+void gearoenix::vulkan::scene::Scene::update()
+{
+    render::scene::Scene::update();
+}
 
 void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
 {
@@ -82,8 +93,8 @@ void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cm
         auto& rc = record.cameras.cameras[camera_index];
         auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
         cam.render_forward(rc, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
-        // cam.render_bloom(*this, camera, vk_cmd); // TODO
-        // cam.render_colour_correction_anti_aliasing(*this, camera, vk_cmd); // TODO
+        cam.render_bloom(*this, rc, vk_cmd);
+        cam.render_colour_correction_anti_aliasing(*this, rc, vk_cmd);
     }
 }
 

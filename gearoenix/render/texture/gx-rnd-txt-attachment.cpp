@@ -127,5 +127,4 @@ bool gearoenix::render::texture::Attachment::shallow_equal(const Attachment& o) 
         GX_UNEXPECTED;
     }
     }
-    std::unreachable();
 }

@@ -138,7 +138,6 @@ public:
             return policy_holder;
         }
         static_assert(IsAtomic || IsDefault);
-        std::unreachable();
     }
 
     [[nodiscard]] buffer::Buffer& get_gpu_buffer() const
