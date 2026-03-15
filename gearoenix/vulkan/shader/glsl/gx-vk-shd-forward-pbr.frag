@@ -33,6 +33,11 @@ vec3 fresnel_schlick(const float cos_theta, const vec3 f0, const float f90) {
     return f0 + (vec3(f90) - f0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);
 }
 
+// Roughness-damped Fresnel for IBL (avoids overly bright edges on rough surfaces)
+vec3 fresnel_schlick_roughness(const float cos_theta, const vec3 f0, const float roughness) {
+    return f0 + (max(vec3(1.0 - roughness), f0) - f0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);
+}
+
 // Compute direct lighting contribution for a single light
 vec3 compute_light(
         const vec3 light_direction,
@@ -112,7 +117,7 @@ void main() {
     vec3 reflection = reflect(eye, nrm);
 
     float normal_dot_view = max(dot(nrm, view), 0.0001);
-    vec3 fresnel = fresnel_schlick(normal_dot_view, f0, f90);
+    vec3 fresnel = fresnel_schlick_roughness(normal_dot_view, f0, roughness);
 
     vec3 illumination = vec3(0.0001);
 
@@ -122,11 +127,11 @@ void main() {
 
         vec3 light_vec = light.position.xyz - in_pos;
         float distance_sq = dot(light_vec, light_vec);
-        float distance = sqrt(distance_sq);
-        vec3 light_dir = light_vec / distance;
+        float inv_dist = inversesqrt(max(distance_sq, 0.0001));
+        vec3 light_dir = light_vec * inv_dist;
 
         // Inverse square falloff with range cutoff
-        float attenuation = 1.0 / max(distance_sq, 0.0001);
+        float attenuation = inv_dist * inv_dist;
 
         illumination += compute_light(
             light_dir,
@@ -169,10 +174,12 @@ void main() {
         float shadow_w = in_shadow_map * (1.0 - shadow_sample);
         float light_w = 1.0 - shadow_w;
 
-        illumination += light_w * compute_light(
-            light.direction_bit_shadow_map_texture_index.xyz,
-            light.colour.rgb,
-            view, nrm, normal_dot_view, roughness, metallic, f0, f90, alb.rgb);
+        if (light_w > 0.0001) {
+            illumination += light_w * compute_light(
+                light.direction_bit_shadow_map_texture_index.xyz,
+                light.colour.rgb,
+                view, nrm, normal_dot_view, roughness, metallic, f0, f90, alb.rgb);
+        }
     }
 
     // ========== Image-Based Lighting (IBL) ==========
