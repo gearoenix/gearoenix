@@ -17,7 +17,6 @@ struct Pipeline;
 struct PushConstants;
 struct SkyboxCube;
 struct SkyboxEquirectangular;
-struct ColourTuningAntiAliasingCombination;
 }
 
 namespace gearoenix::vulkan::scene {
@@ -36,7 +35,6 @@ struct Camera final : render::camera::Camera {
 
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::SkyboxCube>, skybox_cube);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::SkyboxEquirectangular>, skybox_equirectangular);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::ColourTuningAntiAliasingCombination>, colour_tuning_anti_aliasing_combination);
     GX_GET_VAL_PRV(std::uint64_t, last_update_frame_number, static_cast<std::uint64_t>(-1));
 
     VkDescriptorPool bloom_descriptor_pool = nullptr;
@@ -61,8 +59,8 @@ public:
     void render_shadow(const render::record::Camera&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
     void render_forward(const render::record::Camera&, const render::record::Skyboxes&, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
     void render_forward_skyboxes(const render::record::Skyboxes&, const pipeline::FormatPipelines& fp, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
-    void render_bloom(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
-    void render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera&, VkCommandBuffer cmd) const;
+    void render_bloom(const scene::Scene& scene, VkCommandBuffer cmd) const;
+    void render_colour_correction_anti_aliasing(const scene::Scene& scene, VkCommandBuffer cmd) const;
     void after_record(std::uint64_t frame_number, const render::record::Camera& rc);
     static void record_viewport(const render::record::Camera&, VkCommandBuffer);
 };

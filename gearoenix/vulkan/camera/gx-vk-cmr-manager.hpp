@@ -28,6 +28,13 @@ struct BloomPushConstants final {
 
 static_assert(sizeof(BloomPushConstants) == 32);
 
+struct ColourCorrectionPushConstants final {
+    float mode;
+    float param_x, param_y, param_z;
+};
+
+static_assert(sizeof(ColourCorrectionPushConstants) == 16);
+
 struct Manager final : render::camera::Manager, core::Singleton<Manager> {
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCamera>, camera_uniform_indexer);
     GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCameraJointModel>, cameras_joint_models_uniform_indexer);
@@ -41,15 +48,21 @@ struct Manager final : render::camera::Manager, core::Singleton<Manager> {
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_vertical_pipeline);
     GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_upsampler_pipeline);
 
+    GX_GET_VAL_PRV(VkPipelineLayout, ctaa_pipeline_layout, nullptr);
+    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, ctaa_pipeline);
+
     std::shared_ptr<pipeline::Cache> bloom_pipeline_cache;
     std::shared_ptr<shader::Module> bloom_multiply_shader_module;
     std::shared_ptr<shader::Module> bloom_prefilter_shader_module;
     std::shared_ptr<shader::Module> bloom_horizontal_shader_module;
     std::shared_ptr<shader::Module> bloom_vertical_shader_module;
     std::shared_ptr<shader::Module> bloom_upsampler_shader_module;
+    std::shared_ptr<shader::Module> ctaa_shader_module;
 
     void initialise_bloom();
     void terminate_bloom();
+    void initialise_ctaa();
+    void terminate_ctaa();
 
 public:
     Manager();

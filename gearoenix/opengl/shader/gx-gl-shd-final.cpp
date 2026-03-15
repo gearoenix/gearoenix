@@ -20,18 +20,25 @@ in vec2 out_uv;
 
 out vec4 frag_colour;
 
+vec3 linear_to_srgb(vec3 c) {
+    vec3 lo = c * 12.92;
+    vec3 hi = 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055;
+    return mix(lo, hi, step(0.0031308, c));
+}
+
 void main() {
     frag_colour = textureLod(albedo, out_uv, 0.0);
+    frag_colour.rgb = linear_to_srgb(frag_colour.rgb);
 }
 )SHADER";
 }
 
 gearoenix::gl::shader::Final::Final()
 {
-    auto vertex_shader_src = get_common_shader_starter() + vertex_shader_body;
+    const auto vertex_shader_src = get_common_shader_starter() + vertex_shader_body;
     set_vertex_shader(vertex_shader_src);
 
-    auto fragment_shader_src = get_common_shader_starter() + fragment_shader_body;
+    const auto fragment_shader_src = get_common_shader_starter() + fragment_shader_body;
     set_fragment_shader(fragment_shader_src);
 
     link();

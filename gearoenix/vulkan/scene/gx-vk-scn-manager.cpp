@@ -117,7 +117,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
                     continue;
                 }
 
-                const auto& gapi_attachments = default_target.main->get_gapi_attachments();
+                const auto& gapi_attachments = default_target.targets[1][0]->get_gapi_attachments();
                 if (gapi_attachments.empty()) {
                     continue;
                 }

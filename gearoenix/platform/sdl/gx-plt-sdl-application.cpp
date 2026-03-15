@@ -71,7 +71,6 @@ void gearoenix::platform::Application::initialize_window()
     if (available_engines.contains(render::engine::Type::OpenGL)) {
         const std::uint32_t flags = core_flags | SDL_WINDOW_OPENGL;
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-        SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);

@@ -146,6 +146,39 @@ void gearoenix::vulkan::camera::Manager::terminate_bloom()
     }
 }
 
+void gearoenix::vulkan::camera::Manager::initialise_ctaa()
+{
+    VkPushConstantRange push_range;
+    GX_SET_ZERO(push_range);
+    push_range.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+    push_range.offset = 0;
+    push_range.size = sizeof(ColourCorrectionPushConstants);
+
+    VkPipelineLayoutCreateInfo pl_info;
+    GX_SET_ZERO(pl_info);
+    pl_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pl_info.setLayoutCount = 1;
+    pl_info.pSetLayouts = &bloom_descriptor_set_layout;
+    pl_info.pushConstantRangeCount = 1;
+    pl_info.pPushConstantRanges = &push_range;
+    GX_VK_CHK(vkCreatePipelineLayout(device::Logical::get().get_vulkan_data(), &pl_info, nullptr, &ctaa_pipeline_layout));
+
+    ctaa_pipeline = create_bloom_compute_pipeline(bloom_pipeline_cache, ctaa_pipeline_layout,
+        "vulkan/shader/ctaa.comp.spv", ctaa_shader_module);
+}
+
+void gearoenix::vulkan::camera::Manager::terminate_ctaa()
+{
+    ctaa_pipeline = nullptr;
+    ctaa_shader_module = nullptr;
+
+    const auto dev = device::Logical::get().get_vulkan_data();
+    if (nullptr != ctaa_pipeline_layout) {
+        vkDestroyPipelineLayout(dev, ctaa_pipeline_layout, nullptr);
+        ctaa_pipeline_layout = nullptr;
+    }
+}
+
 gearoenix::vulkan::camera::Manager::Manager()
     : Singleton<Manager>(this)
     , camera_uniform_indexer(Camera::max_count)
@@ -153,10 +186,12 @@ gearoenix::vulkan::camera::Manager::Manager()
 {
     core::ecs::ComponentType::add<Camera>();
     initialise_bloom();
+    initialise_ctaa();
 }
 
 gearoenix::vulkan::camera::Manager::~Manager()
 {
+    terminate_ctaa();
     terminate_bloom();
 }
 

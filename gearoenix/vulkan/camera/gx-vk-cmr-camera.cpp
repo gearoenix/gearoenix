@@ -149,10 +149,8 @@ void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const render::record::Camera& record_cam, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const VkCommandBuffer cmd) const
 {
-    (void)record_cam;
-
     if (!bloom_data.has_value() || !target.is_default() || nullptr == bloom_descriptor_pool) {
         return;
     }
@@ -407,41 +405,57 @@ void gearoenix::vulkan::camera::Camera::destroy_bloom_descriptors()
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const render::record::Camera& rc, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const VkCommandBuffer cmd) const
 {
-    if (!target.is_default()) {
+    if (!target.is_default() || nullptr == bloom_descriptor_pool) {
         return;
     }
 
-#if GX_GL_LABELING_ENABLED
-    static std::string debug_group;
-    debug_group.clear();
-    debug_group += "render-colour-correction-anti-aliasing for scene: ";
-    debug_group += scene.get_object_name();
-    debug_group += ", and for camera: ";
-    debug_group += object_name;
-#endif
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.6f, 0.8f, 0.7f, "render-ctaa in scene: {}, camera: {}", scene.get_object_name(), object_name);
 
-    // push_debug_group(debug_group);
-    //
-    // glDisable(GL_BLEND);
-    // const auto texel_size = math::Vec2(1.0f) / (rc.viewport_clip.zw() - rc.viewport_clip.xy());
-    // const auto viewport_clip = math::Vec4<sizei>(rc.viewport_clip);
-    //
-    // ctx::set_framebuffer(gl_target.get_default().framebuffers[1][0]);
-    // ctx::set_viewport_scissor_clip(viewport_clip);
-    // auto& shader = colour_tuning_anti_aliasing_shader_combination->get(colour_tuning);
-    // shader.bind(current_shader);
-    // shader.set(colour_tuning);
-    // shader.set_screen_space_uv_data(texel_size.data());
-    // glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_source_texture_index()));
-    // glBindTexture(GL_TEXTURE_2D, gl_target.get_default().colour_attachments[0]);
-    // glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_depth_texture_index()));
-    // glBindTexture(GL_TEXTURE_2D, gl_target.get_default().colour_attachments[0]);
-    // glBindVertexArray(submission::Manager::get().get_screen_vertex_object());
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    // pop_debug_group();
-    // GX_GL_CHECK_D;
+    const auto& mgr = core::Singleton<Manager>::get();
+    const auto& def = gapi_target.get_default();
+    const auto& tex0 = get_bloom_tex(def, 0);
+    const auto& tex1 = get_bloom_tex(def, 1);
+    auto* const tex0_img = tex0->get_view()->get_image().get();
+    auto* const tex1_img = tex1->get_view()->get_image().get();
+
+    tex0_img->transit(cmd, image::TransitionRequest::shader_read(VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT));
+    {
+        image::TransitionRequest req;
+        req.layout = VK_IMAGE_LAYOUT_GENERAL;
+        req.access = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
+        req.stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        tex1_img->transit(cmd, req.with_mips(0, 1));
+    }
+
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline()->get_vulkan_data());
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[0], 0, nullptr);
+
+    ColourCorrectionPushConstants pc {};
+    switch (colour_tuning.get_index()) {
+    case render::camera::ColourTuning::gamma_correction_index:
+        pc.mode = 0.0f;
+        pc.param_x = colour_tuning.get_gamma_correction().gamma_exponent.x;
+        pc.param_y = colour_tuning.get_gamma_correction().gamma_exponent.y;
+        pc.param_z = colour_tuning.get_gamma_correction().gamma_exponent.z;
+        break;
+    case render::camera::ColourTuning::multiply_index:
+        pc.mode = 1.0f;
+        pc.param_x = colour_tuning.get_multiply().scale.x;
+        pc.param_y = colour_tuning.get_multiply().scale.y;
+        pc.param_z = colour_tuning.get_multiply().scale.z;
+        break;
+    default:
+        pc.mode = 2.0f;
+        break;
+    }
+
+    vkCmdPushConstants(cmd, mgr.get_ctaa_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+
+    const auto w = tex1_img->get_image_width();
+    const auto h = tex1_img->get_image_height();
+    vkCmdDispatch(cmd, (w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
 }
 
 void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_number, const render::record::Camera& rc)

@@ -31,7 +31,7 @@ struct ColourTuning final {
     constexpr static index_t types_count = 3;
 
 private:
-    index_t index = gamma_correction_index;
+    index_t index = unchanged_index;
     union {
         GammaCorrection gamma_correction;
         Multiply multiply;
