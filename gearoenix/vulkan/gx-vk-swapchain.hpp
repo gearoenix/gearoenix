@@ -44,6 +44,7 @@ public:
     /// If the frame is valid, it returns true otherwise false.
     void acquire_next_image(const sync::Semaphore& semaphore);
     void initialize();
+    [[nodiscard]] const Frame& get_frame() const { return frames[image_index]; }
     [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const;
     void present();
     [[nodiscard]] const sync::Semaphore& get_present_semaphore() const;

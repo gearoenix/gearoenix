@@ -109,9 +109,10 @@ void gearoenix::vulkan::ImGuiManager::update()
 {
     auto& e = core::Singleton<engine::Engine>::get();
     const auto& frame = e.get_current_frame();
-    const auto& swapchain_view = *frame.view;
+    const auto& swapchain_frame = Swapchain::get().get_frame();
+    const auto& swapchain_view = *swapchain_frame.view;
     // Use the UNORM view for ImGui rendering if available, to avoid double gamma correction
-    const auto& imgui_render_view = frame.imgui_view ? *frame.imgui_view : swapchain_view;
+    const auto& imgui_render_view = swapchain_frame.imgui_view ? *swapchain_frame.imgui_view : swapchain_view;
     auto& swapchain_image = *swapchain_view.get_image();
     const auto vk_cmd = frame.cmd->get_vulkan_data();
 

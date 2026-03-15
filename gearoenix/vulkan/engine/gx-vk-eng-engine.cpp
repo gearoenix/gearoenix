@@ -38,12 +38,15 @@ void gearoenix::vulkan::engine::Engine::initialize_frame()
     frames = { };
     swapchain->initialize();
     for (int frame_index = 0; frame_index < frames_count; ++frame_index) {
-        auto& swapchain_frame = swapchain->get_frames()[frame_index];
-        frames[frame_index] = std::make_unique<Frame>(std::shared_ptr(swapchain_frame.view), std::shared_ptr(swapchain_frame.imgui_view), frame_index);
+        frames[frame_index] = std::make_unique<Frame>(frame_index);
     }
 }
 
-void gearoenix::vulkan::engine::Engine::window_resized() { GX_UNIMPLEMENTED; }
+void gearoenix::vulkan::engine::Engine::window_resized()
+{
+    render::engine::Engine::window_resized();
+    initialize_frame();
+}
 
 gearoenix::vulkan::engine::Engine::Engine()
     : render::engine::Engine(render::engine::Type::Vulkan)
@@ -128,12 +131,14 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     core::job::execute_current_thread_jobs();
 
+    if (!swapchain->get_is_valid() && !platform::BaseApplication::get().get_window_resizing()) {
+        initialize_frame();
+    }
+
     if (swapchain->get_is_valid()) {
         GX_PROFILE_BEGIN(vulkan - start - frame - fence - wait);
         frames[frame_number]->start();
         GX_PROFILE_END(vulkan - start - frame - fence - wait);
-    } else if (!platform::BaseApplication::get().get_window_resizing()) {
-        initialize_frame();
     }
 
     core::job::execute_current_thread_jobs();
@@ -164,7 +169,10 @@ void gearoenix::vulkan::engine::Engine::end_frame()
     core::job::execute_current_thread_jobs();
 }
 
-void gearoenix::vulkan::engine::Engine::upload_imgui_fonts() { imgui_manager->upload_fonts(); }
+void gearoenix::vulkan::engine::Engine::upload_imgui_fonts()
+{
+    imgui_manager->upload_fonts();
+}
 
 void gearoenix::vulkan::engine::Engine::submit()
 {

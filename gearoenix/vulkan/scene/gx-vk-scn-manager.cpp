@@ -7,8 +7,8 @@
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../engine/gx-vk-eng-frame.hpp"
 #include "../gx-vk-marker.hpp"
+#include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
@@ -83,12 +83,9 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
 
     // Combine all cameras to swapchain
     {
-        auto& e = Singleton<engine::Engine>::get();
-
         GX_VK_PUSH_DEBUG_GROUP(cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
 
-        const auto& frame = e.get_current_frame();
-        const auto& swapchain_view = *frame.view;
+        const auto& swapchain_view = *Singleton<Swapchain>::get().get_frame().view;
         auto& swapchain_image = *swapchain_view.get_image();
 
         // Check if the swapchain supports being a blit destination
