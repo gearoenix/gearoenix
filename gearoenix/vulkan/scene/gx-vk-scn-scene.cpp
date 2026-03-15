@@ -93,8 +93,8 @@ void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cm
         auto& rc = record.cameras.cameras[camera_index];
         auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
         cam.render_forward(rc, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
-        cam.render_bloom(*this, rc, vk_cmd);
-        cam.render_colour_correction_anti_aliasing(*this, rc, vk_cmd);
+        cam.render_bloom(*this, vk_cmd);
+        cam.render_colour_correction_anti_aliasing(*this, vk_cmd);
     }
 }
 
