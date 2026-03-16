@@ -35,7 +35,7 @@ RUN git clone --depth 1 https://github.com/emscripten-core/emsdk.git /root/emsdk
     ./emsdk activate latest
 ENV EMSDK="/root/emsdk"
 
-RUN git clone --depth 1 https://github.com/microsoft/vcpkg.git /root/vcpkg && \
+RUN git clone https://github.com/microsoft/vcpkg.git /root/vcpkg && \
     cd /root/vcpkg && \
     ./bootstrap-vcpkg.sh
 ENV VCPKG_ROOT="/root/vcpkg"
