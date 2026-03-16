@@ -4,12 +4,14 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install -y --no-install-recommends build-essential cmake ninja-build clang-22 llvm-22 pkg-config ccache \
-    automake autoconf autoconf-archive libtool perl python3 python3-venv python3-pip git curl tar zip unzip xz-utils \
-    patch ca-certificates libx11-dev libxft-dev libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev libxext-dev \
-    libxfixes-dev libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev libegl1-mesa-dev libibus-1.0-dev \
-    libasound2-dev libpulse-dev pipewire-audio-client-libraries libdbus-1-dev libudev-dev libdrm-dev libgbm-dev \
-    libssl-dev zlib1g-dev libltdl-dev \
+    apt-get install -y build-essential cmake ninja-build clang-22 llvm-22 pkg-config ccache automake autoconf \
+    autoconf-archive libtool perl python3 python3-venv python3-pip git curl tar zip unzip xz-utils patch \
+    ca-certificates libx11-dev libxft-dev libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev libxext-dev \
+    libxfixes-dev libxtst-dev libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev libegl1-mesa-dev \
+    libibus-1.0-dev libasound2-dev libpulse-dev pipewire-audio-client-libraries libdbus-1-dev libudev-dev libdrm-dev \
+    libgbm-dev libssl-dev zlib1g-dev libltdl-dev perl-modules bash libsdl3-dev libunwind-dev rsync libicu-dev \
+    libbz2-dev liblzma-dev libzstd-dev liblz4-dev uuid-dev libcap-dev libmount-dev meson libsystemd-dev valgrind \
+    libcryptsetup-dev linux-libc-dev libqrencode-dev python3-jinja2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
