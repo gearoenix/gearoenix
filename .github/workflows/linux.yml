@@ -1,4 +1,4 @@
-name: 'Ubuntu-25.10  '
+name: 'Ubuntu-26.04  '
 on:
   push:
     branches: [ master ]
@@ -40,8 +40,8 @@ jobs:
           cmake --build --preset linux-debug &&
           cd build/linux/debug/tests &&
           ctest &&
-          llvm-profdata-20 merge -sparse gearoenix.profraw -o gearoenix.profdata &&
-          llvm-cov-20 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
+          llvm-profdata-22 merge -sparse gearoenix.profraw -o gearoenix.profdata &&
+          llvm-cov-22 show ./GearoenixGameEngineTests -instr-profile=gearoenix.profdata > coverage.txt
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

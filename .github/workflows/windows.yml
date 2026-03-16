@@ -1,4 +1,4 @@
-name: 'Windows-2022  '
+name: 'Visual Studio 2026  '
 on:
   push:
     branches: [ master ]
@@ -8,18 +8,26 @@ on:
 jobs:
   build:
     name: Build and Test
-    runs-on: windows-2022
+    runs-on: windows-2025-vs2026
     defaults:
       run:
         shell: powershell
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
     steps:
+      - name: Export GitHub Actions cache variables
+        uses: actions/github-script@v8
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
       - name: Setup cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache
         with:
           path: |
@@ -29,21 +37,30 @@ jobs:
       - name: Install CMake
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v4.1.2/cmake-4.1.2-windows-x86_64.zip" -OutFile "cmake.zip"
+          Invoke-WebRequest "https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-windows-x86_64.zip" -OutFile "cmake.zip"
           Expand-Archive "cmake.zip" -DestinationPath "cmake"
           Remove-Item -Path "cmake.zip"
       - name: Setup CMake
         run: |
-          $NewPath = (Get-Location).Path + "\cmake\cmake-4.1.2-windows-x86_64\bin"
+          $NewPath = (Get-Location).Path + "\cmake\cmake-4.2.3-windows-x86_64\bin"
           Write-Host "CMake Path: $NewPath"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$NewPath"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "CMAKE_BUILD_PARALLEL_LEVEL=$((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 8)"
+      - name: Cache vcpkg
+        uses: actions/cache@v5
+        id: vcpkg-cache
+        with:
+          path: vcpkg/
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', '.github/workflows/windows.yml') }}
       - name: Install vcpkg
+        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
           .\bootstrap-vcpkg.bat
           cd ..
+      - name: Setup vcpkg
+        run: |
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\vcpkg"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "VCPKG_ROOT=$Env:GITHUB_WORKSPACE\vcpkg"
       - name: Install Ninja
@@ -53,14 +70,32 @@ jobs:
           Expand-Archive "ninja.zip" -DestinationPath "ninja"
           Remove-Item -Path "ninja.zip"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "$Env:GITHUB_WORKSPACE\ninja"
+      - name: Cache VC Redist
+        uses: actions/cache@v5
+        id: vcredist-cache
+        with:
+          path: vc_redist/
+          key: ${{ runner.os }}-vcredist-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install VC Redist
+        if: steps.vcredist-cache.outputs.cache-hit != 'true'
         run: |
-          Invoke-WebRequest "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.exe"
-          ./vc_redist.exe /install /quiet /norestart
+          New-Item -ItemType Directory -Force -Path vc_redist
+          Invoke-WebRequest "https://aka.ms/vs/18/release/vc_redist.x64.exe" -OutFile "vc_redist/vc_redist.exe"
+      - name: Setup VC Redist
+        run: ./vc_redist/vc_redist.exe /install /quiet /norestart
+      - name: Cache Vulkan SDK
+        uses: actions/cache@v5
+        id: vulkan-cache
+        with:
+          path: C:\vulkan
+          key: ${{ runner.os }}-vulkan-${{ hashFiles('.github/workflows/windows.yml') }}
       - name: Install Vulkan
+        if: steps.vulkan-cache.outputs.cache-hit != 'true'
         run: |
           Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe" -OutFile "vulkan.exe"
           ./vulkan.exe --root C:\vulkan --accept-licenses --default-answer --confirm-command install
+      - name: Setup Vulkan
+        run: |
           Write-Host "Vulkan Path: $Env:VULKAN_SDK"
           Add-Content -Path "$Env:GITHUB_PATH" -Value "C:\vulkan\Bin"
           Add-Content -Path "$Env:GITHUB_ENV" -Value "VULKAN_SDK=C:\vulkan"
@@ -74,11 +109,11 @@ jobs:
           vs-prerelease: true
       - name: Release Build
         run: |
-          cmake --fresh --preset windows-release -G "Visual Studio 17 2022"
+          cmake --fresh --preset windows-release -G "Visual Studio 18 2026"
           cmake --build --preset windows-release
       - name: Building Debug and Tests
         run: |
-          cmake --fresh --preset windows-debug -G "Visual Studio 17 2022"
+          cmake --fresh --preset windows-debug -G "Visual Studio 18 2026"
           cmake --build --preset windows-debug
           Set-Location -Path build/windows/debug/tests/Debug
           .\GearoenixGameEngineTests.exe
