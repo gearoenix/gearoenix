@@ -13,7 +13,7 @@ RUN apt-get update && \
     libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev \
     libasound2-dev libpulse-dev pipewire-audio-client-libraries \
     libdbus-1-dev libudev-dev libdrm-dev libgbm-dev \
-    libssl-dev zlib1g-dev \
+    libssl-dev zlib1g-dev libltdl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
