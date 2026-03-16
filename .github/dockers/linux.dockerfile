@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get dist-upgrade -y && \
     apt-get install -y --no-install-recommends \
     build-essential cmake ninja-build clang-22 llvm-22 pkg-config ccache \
-    automake autoconf libtool perl python3 \
+    automake autoconf autoconf-archive libtool perl python3 \
     git curl tar zip unzip xz-utils patch ca-certificates \
     libxi-dev libxrandr-dev libxcursor-dev libxinerama-dev \
     libxext-dev libxfixes-dev \
