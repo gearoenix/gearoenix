@@ -15,13 +15,7 @@
 #include "gx-d3d-uploader.hpp"
 #include <vector>
 
-gearoenix::d3d::Texture2D::Texture2D(
-    std::string name,
-    const render::texture::TextureInfo& info,
-    Engine& e,
-    const UINT sampler_index,
-    Microsoft::WRL::ComPtr<ID3D12Resource>&& r,
-    Descriptor&& d)
+gearoenix::d3d::Texture2D::Texture2D(std::string name, const render::texture::TextureInfo& info, Engine& e, const UINT sampler_index, Microsoft::WRL::ComPtr<ID3D12Resource>&& r, Descriptor&& d)
     : render::texture::Texture2D(std::move(name), info, e)
     , sampler_index(sampler_index)
     , resource(std::move(r))
@@ -31,16 +25,15 @@ gearoenix::d3d::Texture2D::Texture2D(
 
 gearoenix::d3d::Texture2D::~Texture2D() = default;
 
-const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::d3d::TextureManager::samplers_indices {
-    { render::texture::SamplerInfo {
-          .min_filter = render::texture::Filter::Linear,
-          .mag_filter = render::texture::Filter::Linear,
-          .wrap_s = render::texture::Wrap::Repeat,
-          .wrap_t = render::texture::Wrap::Repeat,
-          .wrap_r = render::texture::Wrap::Repeat,
-          .anisotropic_level = 0,
-      },
-        0u },
+const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::d3d::TextureManager::samplers_indices { { render::texture::SamplerInfo {
+                                                                                                                       .min_filter = render::texture::Filter::Linear,
+                                                                                                                       .mag_filter = render::texture::Filter::Linear,
+                                                                                                                       .wrap_s = render::texture::Wrap::Repeat,
+                                                                                                                       .wrap_t = render::texture::Wrap::Repeat,
+                                                                                                                       .wrap_r = render::texture::Wrap::Repeat,
+                                                                                                                       .anisotropic_level = 0,
+                                                                                                                   },
+                                                                                                                     0u },
     { render::texture::SamplerInfo {
           .min_filter = render::texture::Filter::Nearest,
           .mag_filter = render::texture::Filter::Nearest,
@@ -58,8 +51,7 @@ const std::map<gearoenix::render::texture::SamplerInfo, UINT> gearoenix::d3d::Te
           .wrap_r = render::texture::Wrap::Repeat,
           .anisotropic_level = 0,
       },
-        2u }
-};
+        2u } };
 
 void gearoenix::d3d::TextureManager::wait(const UINT64 fv)
 {
@@ -72,8 +64,7 @@ void gearoenix::d3d::TextureManager::wait(const UINT64 fv)
     GX_ASSERT_D(0 != close_handle);
 }
 
-gearoenix::d3d::TextureManager::TextureManager(
-    Engine& e)
+gearoenix::d3d::TextureManager::TextureManager(Engine& e)
     : e(e)
     , descriptor_manager(e.get_descriptor_manager())
     , uploader(e.get_uploader())
@@ -85,11 +76,7 @@ gearoenix::d3d::TextureManager::TextureManager(
 
 gearoenix::d3d::TextureManager::~TextureManager() = default;
 
-std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureManager::create_2d_from_pixels(
-    std::string name,
-    std::vector<std::vector<std::uint8_t>> pixels,
-    const render::texture::TextureInfo& info,
-    const core::job::EndCaller& c)
+std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureManager::create_2d_from_pixels(std::string name, std::vector<std::vector<std::uint8_t>> pixels, const render::texture::TextureInfo& info, const core::job::EndCaller& c)
 {
     GX_GUARD_LOCK(textures_2d);
     if (auto textures_2d_search = textures_2d.find(name); textures_2d.end() != textures_2d_search)
@@ -104,9 +91,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     bool needs_mipmap_generator = false;
     if (info.has_mipmap) {
         if (pixels.size() == 1) {
-            desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(
-                static_cast<std::uint32_t>(info.width),
-                static_cast<std::uint32_t>(info.height)));
+            desc.MipLevels = static_cast<UINT16>(render::texture::Texture::compute_mipmaps_count(static_cast<std::uint32_t>(info.width), static_cast<std::uint32_t>(info.height)));
             needs_mipmap_generator = true;
         } else {
             desc.MipLevels = static_cast<UINT16>(pixels.size());
@@ -177,19 +162,12 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
                 descriptor_manager->get_sampler_allocator().heap.Get(),
             };
             cmd->SetDescriptorHeaps(GX_COUNT_OF(heaps), heaps);
-            const auto b1 = CD3DX12_RESOURCE_BARRIER::Transition(
-                txt,
-                D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,
-                D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+            const auto b1 = CD3DX12_RESOURCE_BARRIER::Transition(txt, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
             const auto b2 = CD3DX12_RESOURCE_BARRIER::UAV(txt);
             cmd->ResourceBarrier(1, &b1);
             auto descriptors = std::make_shared<std::vector<Descriptor>>(); // It is for preventing stupid MSVC's copy-on-cast-of-lambda
             for (UINT mip_level = 0, dst_mip_level = 1; dst_mip_level < desc.MipLevels; ++mip_level, ++dst_mip_level) {
-                const auto src_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-                    txt,
-                    D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-                    D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,
-                    mip_level);
+                const auto src_barrier = CD3DX12_RESOURCE_BARRIER::Transition(txt, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE, mip_level);
                 cmd->ResourceBarrier(1, &src_barrier);
                 const auto dst_width = math::Numeric::safe_maximum(static_cast<UINT>(desc.Width >> dst_mip_level), static_cast<UINT>(1));
                 const auto dst_height = math::Numeric::safe_maximum(static_cast<UINT>(desc.Height >> dst_mip_level), static_cast<UINT>(1));
@@ -213,23 +191,14 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
                 descriptors->push_back(std::move(src_descriptor));
                 descriptors->push_back(std::move(dst_descriptor));
             }
-            const auto last_dst_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-                txt,
-                D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-                D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,
-                desc.MipLevels - 1);
+            const auto last_dst_barrier = CD3DX12_RESOURCE_BARRIER::Transition(txt, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE, desc.MipLevels - 1);
             cmd->ResourceBarrier(1, &last_dst_barrier);
             command->close();
             queue->exe(cmd);
             const auto current_fence_value = fence_value;
             ++fence_value;
             GX_D3D_CHECK(queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
-            worker.push([this,
-                            t = std::move(t),
-                            command = std::move(command),
-                            on_mipmap_complete = std::move(on_mipmap_complete),
-                            descriptors = std::move(descriptors),
-                            current_fence_value]() {
+            worker.push([this, t = std::move(t), command = std::move(command), on_mipmap_complete = std::move(on_mipmap_complete), descriptors = std::move(descriptors), current_fence_value]() {
                 wait(current_fence_value);
                 (void)t;
                 (void)command;
@@ -240,11 +209,7 @@ std::shared_ptr<gearoenix::render::texture::Texture2D> gearoenix::d3d::TextureMa
     });
 
     for (std::uint32_t mipmap_index = 0; mipmap_index < pixels.size(); ++mipmap_index) {
-        uploader->upload(
-            std::move(pixels[mipmap_index]),
-            std::shared_ptr<Texture2D>(t),
-            static_cast<UINT>(mipmap_index),
-            core::job::EndCaller(on_upload_complete));
+        uploader->upload(std::move(pixels[mipmap_index]), std::shared_ptr<Texture2D>(t), static_cast<UINT>(mipmap_index), core::job::EndCaller(on_upload_complete));
     }
     textures_2d.emplace(std::move(name), t);
     return t;

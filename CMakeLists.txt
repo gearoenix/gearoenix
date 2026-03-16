@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
 project(Gearoenix LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -57,6 +57,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
         set(CMAKE_CXX_FLAGS "/std:c++latest /MP /arch:AVX2 /fp:fast /Oi ${CMAKE_CXX_FLAGS}")
         add_compile_options("$<$<CONFIG:RELEASE>:/Ot>")
         add_compile_options("$<$<CONFIG:RELEASE>:/Ox>")
+        add_compile_options(/external:W0)
         set(GEAROENIX_EXE_TARGET "WIN32")
     endif ()
 elseif (APPLE)

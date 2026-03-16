@@ -104,15 +104,9 @@ gearoenix::gl::uint gearoenix::gl::shader::Shader::add_shader_to_program(const s
     return shader_obj;
 }
 
-void gearoenix::gl::shader::Shader::set_vertex_shader(const std::string& shd)
-{
-    vertex_object = add_shader_to_program(shd, GL_VERTEX_SHADER);
-}
+void gearoenix::gl::shader::Shader::set_vertex_shader(const std::string& shd) { vertex_object = add_shader_to_program(shd, GL_VERTEX_SHADER); }
 
-void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd)
-{
-    fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER);
-}
+void gearoenix::gl::shader::Shader::set_fragment_shader(const std::string& shd) { fragment_object = add_shader_to_program(shd, GL_FRAGMENT_SHADER); }
 
 gearoenix::gl::shader::Shader::Shader()
     : shader_program(glCreateProgram())
@@ -162,10 +156,7 @@ gearoenix::gl::shader::Shader::~Shader()
     vertex_object = fragment_object = shader_program = static_cast<uint>(-1);
 }
 
-gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const
-{
-    return glGetUniformLocation(shader_program, &(uname[0]));
-}
+gearoenix::gl::sint gearoenix::gl::shader::Shader::get_uniform_location(const std::string& uname) const { return glGetUniformLocation(shader_program, &(uname[0])); }
 
 void gearoenix::gl::shader::Shader::bind(uint& current_shader) const
 {
@@ -204,14 +195,8 @@ void gearoenix::gl::shader::Shader::set_profile(const bool is_es, const int majo
     shader_common_starter += shader_common_constants;
 }
 
-const std::string& gearoenix::gl::shader::Shader::get_shader_version()
-{
-    return shader_version;
-}
+const std::string& gearoenix::gl::shader::Shader::get_shader_version() { return shader_version; }
 
-const std::string& gearoenix::gl::shader::Shader::get_common_shader_starter()
-{
-    return shader_common_starter;
-}
+const std::string& gearoenix::gl::shader::Shader::get_common_shader_starter() { return shader_common_starter; }
 
 #endif

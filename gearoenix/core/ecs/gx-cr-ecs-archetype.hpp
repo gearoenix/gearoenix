@@ -16,34 +16,22 @@ struct Archetype final {
 
     template <typename T>
     struct ConditionCheck final {
-        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
-        {
-            return id.contains(T::object_type_index);
-        }
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id) { return id.contains(T::object_type_index); }
     };
 
     template <typename Condition>
     struct ConditionCheck<Not<Condition>> final {
-        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
-        {
-            return !ConditionCheck<Condition>::match(id);
-        }
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id) { return !ConditionCheck<Condition>::match(id); }
     };
 
     template <typename... Conditions>
     struct ConditionCheck<All<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
-        {
-            return (ConditionCheck<Conditions>::match(id) && ...);
-        }
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id) { return (ConditionCheck<Conditions>::match(id) && ...); }
     };
 
     template <typename... Conditions>
     struct ConditionCheck<Any<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const component_index_set_t& id)
-        {
-            return (ConditionCheck<Conditions>::match(id) || ...);
-        }
+        [[nodiscard]] constexpr static bool match(const component_index_set_t& id) { return (ConditionCheck<Conditions>::match(id) || ...); }
     };
 
     const id_t id;
@@ -120,10 +108,7 @@ private:
 
 public:
     template <typename Condition>
-    [[nodiscard]] constexpr bool satisfy() const
-    {
-        return ConditionCheck<Condition>::match(id);
-    }
+    [[nodiscard]] constexpr bool satisfy() const { return ConditionCheck<Condition>::match(id); }
 
     Archetype(const Archetype&) = delete;
     Archetype(Archetype&&) = delete;

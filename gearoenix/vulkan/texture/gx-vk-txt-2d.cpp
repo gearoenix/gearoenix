@@ -1,60 +1,51 @@
 #include "gx-vk-txt-2d.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/gx-cr-allocator.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/allocator/gx-cr-alc-range.hpp"
+#include "../../core/job/gx-cr-job-manager.hpp"
+#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
+#include "../command/gx-vk-cmd-manager.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-image.hpp"
-#include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
+#include "../memory/gx-vk-mem-manager.hpp"
+#include "../queue/gx-vk-qu-queue.hpp"
+#include "../sampler/gx-vk-smp-manager.hpp"
+#include "../sampler/gx-vk-smp-sampler.hpp"
+#include "../sync/gx-vk-sync-fence.hpp"
+#include "gx-vk-txt-util.hpp"
 
-gearoenix::vulkan::texture::Texture2D::Texture2D(
-    const core::Id id,
-    std::string name,
-    engine::Engine* const e,
-    const std::vector<std::vector<std::uint8_t>>& data,
-    const render::texture::TextureInfo& info,
-    const std::uint64_t img_width,
-    const std::uint64_t img_height,
-    const core::job::EndCaller<core::job::EndCallerIgnore>& call)
-    : render::texture::Texture2D(id, std::move(name), info.format, info.sampler_info, e)
-    , view(new image::View(std::make_shared<image::Image>(
-          static_cast<std::uint32_t>(img_width), static_cast<std::uint32_t>(img_height), 1u,
-          static_cast<std::uint32_t>(compute_mipmaps_count(img_width, img_height)), 1u,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 0,
-          convert(info.format), *e->get_memory_manager())))
+gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& in_name)
+    : render::texture::Texture2D(std::move(in_name), info)
+    , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), info.get_depth(), convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 1u,
+          convert_image_format(info.get_format()), 0u,
+          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT)))))
+    , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
+    , mips([this] {
+        std::vector<std::shared_ptr<image::View>> result;
+        const auto mip_count = view->get_image()->get_mipmap_levels();
+        result.reserve(mip_count);
+        for (std::uint32_t mip = 0; mip < mip_count; ++mip) {
+            result.push_back(std::make_shared<image::View>(std::shared_ptr(view->get_image()), mip, 1));
+        }
+        return result;
+    }())
+    , sampler_index(sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index())
 {
-    const auto sz = view->get_image()->get_allocated_memory()->get_allocator()->get_size();
-    auto buff = e->get_vulkan_buffer_manager()->create_upload_buffer(sz);
-    std::vector<std::uint8_t> gathered_data;
-    gathered_data.reserve(sz);
-    for (const auto& d : data) {
-        gathered_data.insert(gathered_data.end(), d.begin(), d.end());
-    }
-    std::memcpy(buff->get_allocated_memory()->get_data(), gathered_data.data(), gathered_data.size());
-    e->get_image_manager()->upload(view->get_image(), std::move(buff), call);
 }
 
 gearoenix::vulkan::texture::Texture2D::~Texture2D() = default;
 
-void gearoenix::vulkan::texture::Texture2D::write_gx3d(
-    const std::shared_ptr<platform::stream::Stream>&,
-    const core::job::EndCaller<core::job::EndCallerIgnore>&) {
-    GX_UNEXPECTED
-}
-
-VkFormat gearoenix::vulkan::texture::Texture2D::convert(const render::texture::TextureFormat format)
+void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& e, const bool c) const
 {
-    switch (format) {
-    case render::texture::TextureFormat::RgbaUint8:
-        return VK_FORMAT_R8G8B8A8_UNORM;
-    case render::texture::TextureFormat::RgbaFloat32:
-        return VK_FORMAT_R32G32B32A32_SFLOAT;
-    default:
-        GX_UNEXPECTED
+    render::texture::Texture2D::write(s, e, c);
+    if (!c) {
+        return;
     }
+    write_gpu_texture_data(*view->get_image(), info, static_cast<std::uint32_t>(get_mipmaps_count()), 1, s, e);
 }
-
 #endif

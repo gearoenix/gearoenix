@@ -1,7 +1,7 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
-#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
@@ -95,8 +95,7 @@ public:
     void set_camera(const GxEntity* const e)
     {
         [[maybe_unused]] auto entity = GxConstraintManager::get().create_jet_controller(
-            e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(),
-            scene_entities[0].get());
+            e->get_object_name() + "-controller", e->get_component_shared_ptr<GxTransform>(), scene_entities[0].get());
         entity->get_component<GxConstraintJet>()->set_movement_speed(3.0);
         scene_entities[0]->add_to_world();
     }
@@ -133,10 +132,7 @@ public:
         light->colour = { 2.0f, 2.0f, 2.0f };
     }
 
-    void update() override
-    {
-        GxRndEngine::get().show_debug_gui();
-    }
+    void update() override { GxRndEngine::get().show_debug_gui(); }
 };
 
 GEAROENIX_START(GameApp);

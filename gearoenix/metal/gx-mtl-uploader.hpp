@@ -22,16 +22,9 @@ public:
     ~Uploader();
 
     template <typename T>
-    void upload(id<MTLBuffer> destination, const std::vector<T>& data, core::job::EndCaller&& c)
-    {
-        upload(destination, data.data(), data.size() * sizeof(T), std::move(c));
-    }
+    void upload(id<MTLBuffer> destination, const std::vector<T>& data, core::job::EndCaller&& c) { upload(destination, data.data(), data.size() * sizeof(T), std::move(c)); }
 
-    void upload(
-        id<MTLTexture> destination,
-        MTLTextureDescriptor* texture_descriptor,
-        std::vector<std::vector<std::uint8_t>>&& pixels,
-        core::job::EndCaller&& c);
+    void upload(id<MTLTexture> destination, MTLTextureDescriptor* texture_descriptor, std::vector<std::vector<std::uint8_t>>&& pixels, core::job::EndCaller&& c);
 };
 }
 

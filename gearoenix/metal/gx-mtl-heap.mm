@@ -17,9 +17,6 @@ gearoenix::metal::HeapManager::HeapManager(Engine& e)
 {
 }
 
-gearoenix::metal::HeapManager::~HeapManager()
-{
-    [gpu release];
-}
+gearoenix::metal::HeapManager::~HeapManager() { [gpu release]; }
 
 #endif

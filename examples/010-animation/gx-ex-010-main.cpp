@@ -41,7 +41,7 @@ public:
     GameApp()
     {
         gearoenix::render::gltf::load(
-            GxPath::create_absolute("../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
+            GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
             GxEndCaller<std::vector<GxEntityPtr>>([this](auto&& entities) {
                 scene_entity = std::move(entities[0]);
                 gltf_is_ready();
@@ -52,9 +52,13 @@ public:
     {
         const GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
 
-        GxSkyboxManager::get().build("sky", scene_entity.get(), GxPath::create_asset("sky.gx-cube-texture"), GxEntityEndCaller([end](auto&&) { (void)end; }));
+        GxSkyboxManager::get().build(
+            "sky", scene_entity.get(), GxPath::create_asset("sky.gx-cube-texture"),
+            GxEntityEndCaller([end](auto&&) { (void)end; }));
 
-        GxReflectionManager::get().build_baked("reflection", scene_entity.get(), GxPath::create_asset("exported.gx-reflection"), GxEntityEndCaller([end](auto&&) { (void)end; }));
+        GxReflectionManager::get().build_baked(
+            "reflection", scene_entity.get(), GxPath::create_asset("exported.gx-reflection"),
+            GxEntityEndCaller([end](auto&&) { (void)end; }));
 
         auto camera_entities = gearoenix::core::ecs::find<GxCamera>(scene_entity);
         const GxEntity* camera_entity = nullptr;
@@ -67,9 +71,11 @@ public:
         if (camera_entity) {
             camera_is_ready(camera_entity, end);
         } else {
-            GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) {
-                camera_is_ready(entity.get(), end);
-            }));
+            GxCameraManager::get().build(
+                "camera", scene_entity.get(),
+                GxEntityEndCaller([this, end](auto&& entity) {
+                    camera_is_ready(entity.get(), end);
+                }));
         }
     }
 

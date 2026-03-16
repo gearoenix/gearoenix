@@ -102,11 +102,6 @@ gearoenix::metal::UniformBuffer gearoenix::metal::BufferManager::create_uniform(
 
 void gearoenix::metal::BufferManager::update(id<MTLBlitCommandEncoder> blit, std::uint32_t frame_number)
 {
-    [blit
-           copyFromBuffer:uniforms_cpu
-             sourceOffset:static_cast<NSUInteger>(uniforms_cpu_ranges[frame_number]->get_offset())
-                 toBuffer:uniforms_gpu
-        destinationOffset:0
-                     size:uniforms_gpu.length];
+    [blit copyFromBuffer:uniforms_cpu sourceOffset:static_cast<NSUInteger>(uniforms_cpu_ranges[frame_number]->get_offset()) toBuffer:uniforms_gpu destinationOffset:0 size:uniforms_gpu.length];
 }
 #endif

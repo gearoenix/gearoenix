@@ -36,8 +36,9 @@ struct Mesh final : render::mesh::Mesh {
     GX_GET_VAL_PRV(sizei, cached_indices_count, 0);
 
 public:
-    Mesh(std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material);
+    Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material);
     static void construct(
+        std::string&& name,
         std::shared_ptr<render::mesh::Buffer>&& buffer,
         std::shared_ptr<render::material::Material>&& material,
         const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
@@ -55,6 +56,7 @@ struct MeshManager final : render::mesh::Manager {
         const math::Aabb3<double>& occlusion_box,
         core::job::EndCallerShared<render::mesh::Buffer>&& end_callback) override;
     void build(
+        std::string&& name,
         std::shared_ptr<render::mesh::Buffer>&& buffer,
         std::shared_ptr<render::material::Material>&& material,
         core::job::EndCallerShared<render::mesh::Mesh>&& end_callback) override;

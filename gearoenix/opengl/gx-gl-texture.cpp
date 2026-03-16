@@ -37,12 +37,6 @@ void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::uint32_t 
         height >>= 1;
     }
 }
-
-void flip_texture(std::vector<std::vector<std::vector<std::uint8_t>>>& pixels, const std::uint32_t height)
-{
-    for (auto& p : pixels)
-        flip_texture(p, height);
-}
 }
 
 gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture::TextureFormat f)
@@ -183,8 +177,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert(render::texture::Face f)
     }
 }
 
-void gearoenix::gl::Texture2D::write(
-    const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
+void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
 {
     render::texture::Texture2D::write(s, c, content);
     if (!content) {
@@ -230,10 +223,7 @@ void gearoenix::gl::Texture2D::write(
     });
 }
 
-void* gearoenix::gl::Texture2D::get_imgui_ptr() const
-{
-    return reinterpret_cast<void*>(static_cast<std::uintptr_t>(object));
-}
+void* gearoenix::gl::Texture2D::get_imgui_ptr() const { return reinterpret_cast<void*>(static_cast<std::uintptr_t>(object)); }
 
 gearoenix::gl::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& name)
     : render::texture::Texture2D(std::move(name), info)
@@ -244,7 +234,8 @@ gearoenix::gl::Texture2D::~Texture2D()
 {
     core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object] {
         glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &o); });
+        glDeleteTextures(1, &o);
+    });
 }
 
 void gearoenix::gl::Texture2D::bind(const enumerated texture_unit) const
@@ -260,8 +251,7 @@ void gearoenix::gl::Texture2D::generate_mipmaps()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void gearoenix::gl::TextureCube::write(
-    const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
+void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
 {
     render::texture::TextureCube::write(s, c, content);
     if (!content) {
@@ -291,11 +281,9 @@ void gearoenix::gl::TextureCube::write(
                 data.resize(static_cast<std::uint32_t>(level_aspect * level_aspect) * pixel_element_size);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, convert(face), object, mipmap_index);
                 glReadPixels(0, 0, level_aspect, level_aspect, convert_format(info.get_format()), convert_data_format(info.get_format()), data.data());
-                flip_texture(data, level_aspect);
 #if GX_DEBUG_TEXTURE_WRITE
                 const auto ext = render::texture::format_has_float_component(info.format) ? "hdr" : "png";
-                platform::stream::Local l(e.get_platform_application(),
-                    "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
+                platform::stream::Local l(e.get_platform_application(), "texture-cube-gl-name-" + name + "-face-" + std::to_string(face) + "-level-" + std::to_string(mipmap_index) + "." + ext, true);
                 write_image(l, data.data(), level_aspect, level_aspect, info.format);
 #endif
                 auto ms = std::make_shared<platform::stream::Memory>();
@@ -318,7 +306,8 @@ gearoenix::gl::TextureCube::~TextureCube()
 {
     core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object]() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-        glDeleteTextures(1, &o); });
+        glDeleteTextures(1, &o);
+    });
 }
 
 void gearoenix::gl::TextureCube::bind(const enumerated texture_unit) const
@@ -335,10 +324,7 @@ gearoenix::gl::TextureManager::TextureManager()
 gearoenix::gl::TextureManager::~TextureManager() = default;
 
 void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
-    std::string&& name,
-    std::vector<std::vector<std::uint8_t>>&& pixels,
-    const render::texture::TextureInfo& info,
-    core::job::EndCallerShared<render::texture::Texture2D>&& c)
+    std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
     flip_texture(pixels, info.get_height());
     std::shared_ptr<Texture2D> result(new Texture2D(info, std::move(name)));
@@ -389,14 +375,12 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
         }
         glBindTexture(GL_TEXTURE_2D, 0);
         set_texture_label(result->object, result->name);
-        GX_GL_CHECK_D; });
+        GX_GL_CHECK_D;
+    });
 }
 
 void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
-    std::string&& name,
-    std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels,
-    const render::texture::TextureInfo& info,
-    core::job::EndCallerShared<render::texture::TextureCube>&& c)
+    std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::TextureCube>&& c)
 {
     std::shared_ptr<TextureCube> result(new TextureCube(info, std::move(name)));
     const bool needs_mipmap_generation = info.get_has_mipmap() && (pixels.empty() || pixels[0].size() < 2);
@@ -405,7 +389,6 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     const auto data_format = convert_data_format(info.get_format());
     const auto gl_img_width = static_cast<gl::sizei>(info.get_width());
     const auto gl_img_height = static_cast<gl::sizei>(info.get_height());
-    flip_texture(pixels, info.get_height());
     c.set_return(result);
     core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
@@ -449,13 +432,11 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
         }
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         set_texture_label(result->object, result->name);
-        GX_GL_CHECK_D; });
+        GX_GL_CHECK_D;
+    });
 }
 
-void gearoenix::gl::TextureManager::create_target_v(
-    std::string&& name,
-    std::vector<render::texture::Attachment>&& attachments,
-    core::job::EndCallerShared<render::texture::Target>&& c)
+void gearoenix::gl::TextureManager::create_target_v(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& c)
 {
     Target::construct(std::move(name), std::move(attachments), std::move(c));
 }

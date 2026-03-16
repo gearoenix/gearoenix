@@ -25,23 +25,10 @@ protected:
 public:
     ~Manager() override;
 
-    [[nodiscard]] virtual core::ecs::EntityPtr build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<texture::Texture>&& bound_texture,
-        std::shared_ptr<mesh::Mesh>&& bound_mesh)
-        = 0;
+    [[nodiscard]] virtual core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<texture::Texture>&& bound_texture, std::shared_ptr<mesh::Mesh>&& bound_mesh) = 0;
 
-    void build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        const platform::stream::Path& texture_path,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+    void build(std::string&& name, core::ecs::Entity* parent, const platform::stream::Path& texture_path, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 
-    void build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<texture::Texture>&& bound_texture,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+    void build(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<texture::Texture>&& bound_texture, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 };
 }

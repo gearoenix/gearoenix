@@ -5,8 +5,8 @@
 #extension GL_GOOGLE_include_directive : enable
 
 #include "../gx-vk-shd-bindings.hpp"
-#include "gx-vk-shd-common.glsl"
-#include "gx-vk-shd-sampling.glsl"
+#include "gx-vk-shd-common.glslh"
+#include "gx-vk-shd-sampling.glslh"
 
 struct Vertex {
     vec3 position;

@@ -64,66 +64,30 @@ struct Pixel {
             return o;
         }
 
-        [[nodiscard]] constexpr difference_type operator-(const ConstIterator& o) const
-        {
-            return pixel_index - o.pixel_index;
-        }
+        [[nodiscard]] constexpr difference_type operator-(const ConstIterator& o) const { return pixel_index - o.pixel_index; }
 
         template <typename I>
-        constexpr const Element& operator[](const I i) const
-        {
-            return reinterpret_cast<const Element*>(current_ptr)[i];
-        }
+        constexpr const Element& operator[](const I i) const { return reinterpret_cast<const Element*>(current_ptr)[i]; }
 
-        [[nodiscard]] constexpr reference operator*()
-        {
-            return *reinterpret_cast<const Element*>(current_ptr);
-        }
+        [[nodiscard]] constexpr reference operator*() { return *reinterpret_cast<const Element*>(current_ptr); }
 
-        [[nodiscard]] constexpr pointer operator->()
-        {
-            return reinterpret_cast<const Element*>(current_ptr);
-        }
+        [[nodiscard]] constexpr pointer operator->() { return reinterpret_cast<const Element*>(current_ptr); }
 
-        [[nodiscard]] constexpr bool operator==(const ConstIterator& rhs) const
-        {
-            return current_ptr == rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator==(const ConstIterator& rhs) const { return current_ptr == rhs.current_ptr; }
 
-        [[nodiscard]] constexpr bool operator!=(const ConstIterator& rhs) const
-        {
-            return current_ptr != rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator!=(const ConstIterator& rhs) const { return current_ptr != rhs.current_ptr; }
 
-        [[nodiscard]] constexpr bool operator<(const ConstIterator& rhs) const
-        {
-            return current_ptr < rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator<(const ConstIterator& rhs) const { return current_ptr < rhs.current_ptr; }
 
-        [[nodiscard]] constexpr bool operator<=(const ConstIterator& rhs) const
-        {
-            return current_ptr <= rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator<=(const ConstIterator& rhs) const { return current_ptr <= rhs.current_ptr; }
 
-        [[nodiscard]] constexpr bool operator>(const ConstIterator& rhs) const
-        {
-            return current_ptr > rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator>(const ConstIterator& rhs) const { return current_ptr > rhs.current_ptr; }
 
-        [[nodiscard]] constexpr bool operator>=(const ConstIterator& rhs) const
-        {
-            return current_ptr > rhs.current_ptr;
-        }
+        [[nodiscard]] constexpr bool operator>=(const ConstIterator& rhs) const { return current_ptr > rhs.current_ptr; }
 
-        [[nodiscard]] constexpr std::uint64_t get_pixel_index() const
-        {
-            return pixel_index;
-        }
+        [[nodiscard]] constexpr std::uint64_t get_pixel_index() const { return pixel_index; }
 
-        [[nodiscard]] constexpr const Element* get_data() const
-        {
-            return data;
-        }
+        [[nodiscard]] constexpr const Element* get_data() const { return data; }
 
     private:
         const Element* data = nullptr;

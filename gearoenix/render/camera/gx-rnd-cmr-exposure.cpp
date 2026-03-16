@@ -11,10 +11,7 @@ void gearoenix::render::camera::Exposure::update()
     value = (aperture * aperture * sensitivity) / (shutter_speed * 120.0f);
 }
 
-gearoenix::render::camera::Exposure::Exposure()
-{
-    update();
-}
+gearoenix::render::camera::Exposure::Exposure() { update(); }
 
 void gearoenix::render::camera::Exposure::set_aperture(const float a)
 {
@@ -67,10 +64,7 @@ void gearoenix::render::camera::Exposure::enable()
     update();
 }
 
-void gearoenix::render::camera::Exposure::disable()
-{
-    enabled = false;
-}
+void gearoenix::render::camera::Exposure::disable() { enabled = false; }
 
 void gearoenix::render::camera::Exposure::show_debug_gui()
 {

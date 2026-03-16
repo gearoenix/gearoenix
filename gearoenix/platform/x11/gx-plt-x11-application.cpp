@@ -61,23 +61,11 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     , screen(XDefaultScreenOfDisplay(display))
     , root_window(XRootWindowOfScreen(screen))
     , black_pixel(XBlackPixelOfScreen(screen))
-    , window(XCreateSimpleWindow(
-          display,
-          root_window,
-          0,
-          0,
-          config.get_window_width(),
-          config.get_window_height(),
-          0,
-          black_pixel,
-          black_pixel))
+    , window(XCreateSimpleWindow(display, root_window, 0, 0, config.get_window_width(), config.get_window_height(), 0, black_pixel, black_pixel))
     , close_message(XInternAtom(display, "WM_DELETE_WINDOW", False))
 {
-    base.initialize_window_position(
-        (screen->width - static_cast<int>(config.get_window_width())) / 2,
-        (screen->height - static_cast<int>(config.get_window_height())) / 2);
-    XSelectInput(display, window,
-        KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ExposureMask | StructureNotifyMask);
+    base.initialize_window_position((screen->width - static_cast<int>(config.get_window_width())) / 2, (screen->height - static_cast<int>(config.get_window_height())) / 2);
+    XSelectInput(display, window, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ExposureMask | StructureNotifyMask);
     XSetWMProtocols(display, window, &close_message, 1);
     XMapWindow(display, window);
     XMoveWindow(display, window, base.window_size.x, base.window_size.y);
@@ -92,9 +80,7 @@ gearoenix::platform::Application::Application(GX_MAIN_ENTRY_ARGS_DEF, const Runt
     }
     Window ignored_window;
     int ignored_int, pointer_x, pointer_y;
-    if (XQueryPointer(
-            display, root_window, &ignored_window, &ignored_window,
-            &ignored_int, &ignored_int, &pointer_x, &pointer_y, reinterpret_cast<unsigned int*>(&ignored_int))) {
+    if (XQueryPointer(display, root_window, &ignored_window, &ignored_window, &ignored_int, &ignored_int, &pointer_x, &pointer_y, reinterpret_cast<unsigned int*>(&ignored_int))) {
         base.initialize_mouse_position(pointer_x, pointer_y);
     }
 
@@ -117,10 +103,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app)
 }
 
 #ifdef GX_RENDER_VULKAN_ENABLED
-std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const
-{
-    return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME };
-}
+std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const { return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME }; }
 #endif
 
 #endif

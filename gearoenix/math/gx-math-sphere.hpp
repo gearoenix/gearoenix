@@ -30,10 +30,7 @@ public:
         radius = r;
     }
 
-    constexpr void set_center(const Vec3<Element>& c)
-    {
-        center = c;
-    }
+    constexpr void set_center(const Vec3<Element>& c) { center = c; }
 
     constexpr void insert(const Element r)
     {

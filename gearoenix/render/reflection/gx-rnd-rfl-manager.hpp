@@ -27,30 +27,13 @@ public:
     Manager& operator=(Manager&&) = delete;
     Manager& operator=(const Manager&) = delete;
 
-    void build_baked(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        const platform::stream::Path& path,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
+    void build_baked(std::string&& name, core::ecs::Entity* parent, const platform::stream::Path& path, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback);
 
-    [[nodiscard]] virtual core::ecs::EntityPtr build_baked(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<texture::TextureCube>&& irradiance,
-        std::shared_ptr<texture::TextureCube>&& radiance,
-        const math::Aabb3<double>& include_box)
+    [[nodiscard]] virtual core::ecs::EntityPtr build_baked(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<texture::TextureCube>&& irradiance, std::shared_ptr<texture::TextureCube>&& radiance, const math::Aabb3<double>& include_box)
         = 0;
 
-    virtual void build_runtime(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
+    virtual void build_runtime(std::string&& name, core::ecs::Entity* parent, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback)
         = 0;
 
     virtual void update();

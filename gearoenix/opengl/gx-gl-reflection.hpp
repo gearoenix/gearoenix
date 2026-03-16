@@ -16,7 +16,7 @@ struct TextureCube;
 
 struct ReflectionProbe {
     constexpr static auto max_count = render::reflection::Probe::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_probe_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_probe_type_index;
     constexpr static auto all_parent_object_type_indices = core::Object::all_parent_object_type_indices;
     constexpr static auto immediate_parent_object_type_indices = core::Object::immediate_parent_object_type_indices;
 
@@ -33,7 +33,7 @@ struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
     constexpr static auto max_count = Baked::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_baked_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_baked_type_index;
     constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index };
 
@@ -50,7 +50,7 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
     typedef std::array<boost::container::static_vector<uint, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> GlMippedCubeTargetV;
 
     constexpr static auto max_count = Runtime::max_count;
-    constexpr static auto object_type_index = gearoenix_gl_reflection_runtime_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_reflection_runtime_type_index;
     constexpr static std::array all_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Runtime::object_type_index, ReflectionProbe::object_type_index };
 
@@ -66,45 +66,25 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
 
     void initialise_gl();
 
-    RuntimeReflection(
-        core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::string&& name);
+    RuntimeReflection(core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name);
 
 public:
     static void construct(
-        core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::string&& name,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
-        core::job::EndCallerShared<RuntimeReflection>&& end_callback);
+        core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        std::string&& name, std::uint32_t environment_resolution,
+        std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCallerShared<RuntimeReflection>&& end_callback);
     ~RuntimeReflection() override;
 };
 
 struct ReflectionManager final : render::reflection::Manager, core::Singleton<ReflectionManager> {
 private:
     [[nodiscard]] core::ecs::EntityPtr build_baked(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<render::texture::TextureCube>&& irradiance,
-        std::shared_ptr<render::texture::TextureCube>&& radiance,
+        std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::TextureCube>&& irradiance, std::shared_ptr<render::texture::TextureCube>&& radiance,
         const math::Aabb3<double>& include_box) override;
 
-    void build_runtime(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
-        std::uint32_t environment_resolution,
-        std::uint32_t irradiance_resolution,
-        std::uint32_t radiance_resolution,
+    void build_runtime(std::string&& name, core::ecs::Entity* parent,
+        const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        std::uint32_t environment_resolution, std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:

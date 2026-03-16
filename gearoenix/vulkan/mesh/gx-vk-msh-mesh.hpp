@@ -1,46 +1,44 @@
-#ifndef GEAROENIX_VULKAN_MESH_ACCEL_HPP
-#define GEAROENIX_VULKAN_MESH_ACCEL_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/sync/gx-cr-job-end-caller.hpp"
-#include "../../render/gx-rnd-vertex.hpp"
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../render/mesh/gx-rnd-msh-mesh.hpp"
 #include "../gx-vk-loader.hpp"
 
-namespace gearoenix::vulkan::buffer {
-struct Buffer;
+namespace gearoenix::render::record {
+struct Camera;
+struct CameraModel;
 }
 
-namespace gearoenix::vulkan::engine {
-struct Engine;
+namespace gearoenix::vulkan::material {
+struct Material;
+}
+
+namespace gearoenix::vulkan::pipeline {
+struct PushConstants;
 }
 
 namespace gearoenix::vulkan::mesh {
-struct Manager;
-struct Mesh final : public render::mesh::Mesh {
-    friend struct Manager;
+struct Buffer;
+struct Mesh final : render::mesh::Mesh {
+    GEAROENIX_OBJECT_STRUCT_DEF;
 
-    GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, vertex);
-    GX_GET_REFC_PRV(std::shared_ptr<buffer::Buffer>, index);
-    GX_GET_CREF_PRV(std::shared_ptr<buffer::Buffer>, accel_buff);
-    GX_GET_VAL_PRV(VkAccelerationStructureKHR, vulkan_data, nullptr);
-    GX_GET_VAL_PRV(VkDeviceAddress, acceleration_address, 0);
+    constexpr static auto object_type_index = gearoenix_gapi_mesh_type_index;
+    constexpr static std::array all_parent_object_type_indices { render::mesh::Mesh::object_type_index };
+    constexpr static std::array immediate_parent_object_type_indices { render::mesh::Mesh::object_type_index };
 
-private:
-    void initialize_blas();
+    GX_GET_CREF_PRV(std::shared_ptr<Buffer>, gapi_buffer);
+    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, gapi_material);
 
 public:
-    Mesh(
-        engine::Engine& e,
-        const std::string& name,
-        const render::Vertices& vertices,
-        const std::vector<std::uint32_t>& indices,
-        math::Aabb3<double>&& occlusion_box,
-        const core::job::EndCaller& end);
+    Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material);
+    static void construct(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
     ~Mesh() override;
-    [[nodiscard]] std::pair<VkDeviceAddress, VkDeviceAddress> get_buffers_address() const;
+    Mesh(const Mesh&) = delete;
+
+    void draw(VkCommandBuffer cmd, pipeline::PushConstants& pc) const;
+    void set_material(std::shared_ptr<render::material::Material>&& material) override;
 };
 }
 
-#endif
 #endif

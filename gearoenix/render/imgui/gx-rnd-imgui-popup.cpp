@@ -17,9 +17,7 @@ void gearoenix::render::imgui::show_sure_popup(const char* const name, bool& is_
     if (!ImGui::BeginPopupModal(name, &is_open, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
         return;
     }
-    warning_text([&] {
-        ImGui::Text("%s", body_text);
-    });
+    warning_text([&] { ImGui::Text("%s", body_text); });
     const float window_width = ImGui::GetWindowSize().x;
 
     constexpr auto button_width_ratio = 0.35f;

@@ -139,25 +139,13 @@ gearoenix::render::widget::Widget::~Widget()
     }
 }
 
-void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun)
-{
-    on_press = fun;
-}
+void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) { on_press = fun; }
 
-void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun)
-{
-    on_release = fun;
-}
+void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) { on_release = fun; }
 
-void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun)
-{
-    on_cancel = fun;
-}
+void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun) { on_cancel = fun; }
 
-void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun)
-{
-    on_click = fun;
-}
+void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun) { on_click = fun; }
 
 void gearoenix::render::widget::Widget::set_sensitivity(const bool b)
 {
@@ -167,15 +155,9 @@ void gearoenix::render::widget::Widget::set_sensitivity(const bool b)
     }
 }
 
-void gearoenix::render::widget::Widget::set_model_entity(core::ecs::EntityPtr&& e)
-{
-    model_entity = std::move(e);
-}
+void gearoenix::render::widget::Widget::set_model_entity(core::ecs::EntityPtr&& e) { model_entity = std::move(e); }
 
-void gearoenix::render::widget::Widget::set_camera_entity(core::ecs::Entity* const e)
-{
-    camera_entity = e;
-}
+void gearoenix::render::widget::Widget::set_camera_entity(core::ecs::Entity* const e) { camera_entity = e; }
 
 void gearoenix::render::widget::Widget::register_for_events()
 {
@@ -185,10 +167,7 @@ void gearoenix::render::widget::Widget::register_for_events()
     }
 }
 
-void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l)
-{
-    layout = std::move(l);
-}
+void gearoenix::render::widget::Widget::set_layout(std::shared_ptr<Layout> l) { layout = std::move(l); }
 
 void gearoenix::render::widget::Widget::show()
 {
@@ -212,18 +191,11 @@ void gearoenix::render::widget::Widget::hide()
     set_sensitivity(false);
 }
 
-void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority)
-{
-    children[std::make_pair(priority, child->name)] = std::move(child);
-}
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority) { children[std::make_pair(priority, child->name)] = std::move(child); }
 
-void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child)
-{
-    add_child(std::move(child), 0.0);
-}
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child) { add_child(std::move(child), 0.0); }
 
-gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(
-    const core::event::Data& event_data)
+gearoenix::core::event::Listener::Response gearoenix::render::widget::Widget::on_event(const core::event::Data& event_data)
 {
     switch (event_data.get_source()) {
     case core::event::Id::GestureClick: {

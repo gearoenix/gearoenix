@@ -71,13 +71,8 @@ void gearoenix::gl::shader::ShadowCaster::bind(uint& current_shader) const
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
 }
 
-void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const float* const data) const
-{
-    glUniformMatrix4fv(mvp, mvp_count, GL_FALSE, data);
-}
+void gearoenix::gl::shader::ShadowCaster::set_mvp_data(const float* const data) const { glUniformMatrix4fv(mvp, mvp_count, GL_FALSE, data); }
 
-gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination()
-{
-}
+gearoenix::gl::shader::ShadowCasterCombination::ShadowCasterCombination() { }
 
 #endif

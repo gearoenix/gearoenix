@@ -1,28 +1,21 @@
-#ifndef GEAROENIX_VULKAN_MODEL_MANAGER_HPP
-#define GEAROENIX_VULKAN_MODEL_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../render/model/gx-rnd-mdl-manager.hpp"
-
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
+#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 
 namespace gearoenix::vulkan::model {
-struct Manager final : public render::model::Manager {
-    engine::Engine& vk_e;
-
-private:
-    [[nodiscard]] std::shared_ptr<render::model::Builder> build(
-        std::string&& name,
-        std::shared_ptr<render::mesh::Mesh>&& mesh,
-        const core::job::EndCaller& c,
-        bool is_transformable) override;
+struct Manager final : render::model::Manager, core::Singleton<Manager> {
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataModel>, model_uniform_indexer);
+    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataBone>, bone_uniform_indexer);
 
 public:
-    explicit Manager(engine::Engine& e);
+    Manager();
     ~Manager() override;
+
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable) override;
+    void update() override;
+    void upload_uniforms();
 };
 }
-#endif
 #endif

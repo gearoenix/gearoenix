@@ -95,10 +95,8 @@ void gearoenix::gl::Buffer::construct(
     });
 }
 
-gearoenix::gl::Mesh::Mesh(
-    std::shared_ptr<render::mesh::Buffer>&& buffer,
-    std::shared_ptr<render::material::Material>&& material)
-    : render::mesh::Mesh(std::move(buffer), std::move(material))
+gearoenix::gl::Mesh::Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material)
+    : render::mesh::Mesh(std::move(name), std::move(buffer), std::move(material))
     , gl_buffer(std::dynamic_pointer_cast<Buffer>(this->buffer))
     , gl_material(std::dynamic_pointer_cast<material::Material>(bound_material))
     , cached_vertex_object(gl_buffer->get_vertex_object())
@@ -111,11 +109,12 @@ gearoenix::gl::Mesh::Mesh(
 gearoenix::gl::Mesh::~Mesh() = default;
 
 void gearoenix::gl::Mesh::construct(
+    std::string&& name,
     std::shared_ptr<render::mesh::Buffer>&& buffer,
     std::shared_ptr<render::material::Material>&& material,
     const core::job::EndCallerShared<render::mesh::Mesh>& end_callback)
 {
-    end_callback.set_return(mesh_allocator->make_shared(std::move(buffer), std::move(material)));
+    end_callback.set_return(mesh_allocator->make_shared(std::move(name), std::move(buffer), std::move(material)));
 }
 
 gearoenix::gl::MeshManager::MeshManager() = default;
@@ -133,11 +132,12 @@ void gearoenix::gl::MeshManager::build(
 }
 
 void gearoenix::gl::MeshManager::build(
+    std::string&& name,
     std::shared_ptr<render::mesh::Buffer>&& buffer,
     std::shared_ptr<render::material::Material>&& material,
     core::job::EndCallerShared<render::mesh::Mesh>&& end_callback)
 {
-    Mesh::construct(std::move(buffer), std::move(material), end_callback);
+    Mesh::construct(std::move(name), std::move(buffer), std::move(material), end_callback);
 }
 
 #endif

@@ -35,22 +35,13 @@ struct String final {
         return hex_string;
     }
 
-    [[nodiscard]] static auto ptr_to_hex_string(const void* const ptr)
-    {
-        return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr));
-    }
+    [[nodiscard]] static auto ptr_to_hex_string(const void* const ptr) { return to_hex_string(reinterpret_cast<std::uintptr_t>(ptr)); }
 
     template <typename T>
-    [[nodiscard]] static auto type_name()
-    {
-        return boost::core::demangle(typeid(std::remove_cv_t<T>).name());
-    }
+    [[nodiscard]] static auto type_name() { return boost::core::demangle(typeid(std::remove_cv_t<T>).name()); }
 
     template <typename T>
-    [[nodiscard]] static auto type_name(const T* const)
-    {
-        return type_name<T>();
-    }
+    [[nodiscard]] static auto type_name(const T* const) { return type_name<T>(); }
 
     template <typename T>
     [[nodiscard]] static const std::string& ptr_name(const T* const ptr)

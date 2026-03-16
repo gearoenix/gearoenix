@@ -2,14 +2,7 @@
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 #include <boost/functional/hash.hpp>
 
-gearoenix::render::texture::TextureInfo::TextureInfo(
-    const TextureFormat format,
-    const SamplerInfo& sampler_info,
-    const std::uint32_t width,
-    const std::uint32_t height,
-    const std::uint32_t depth,
-    const Type type,
-    const bool has_mipmap)
+gearoenix::render::texture::TextureInfo::TextureInfo(const TextureFormat format, const SamplerInfo& sampler_info, const std::uint32_t width, const std::uint32_t height, const std::uint32_t depth, const Type type, const bool has_mipmap)
     : format(format)
     , sampler_info(sampler_info)
     , width(width)

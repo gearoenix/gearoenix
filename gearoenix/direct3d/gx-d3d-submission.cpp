@@ -50,10 +50,7 @@ bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::uint32_t camera
 {
     auto& camera = camera_pool[camera_pool_index];
     auto& frame = camera.frames[e.get_frame_number()];
-    std::array<ID3D12DescriptorHeap*, 2> heaps {
-        descriptor_manager->get_allocator().heap.Get(),
-        descriptor_manager->get_sampler_allocator().heap.Get()
-    };
+    std::array<ID3D12DescriptorHeap*, 2> heaps { descriptor_manager->get_allocator().heap.Get(), descriptor_manager->get_sampler_allocator().heap.Get() };
     bool first_command = true;
     for (auto& command : frame.threads_g_buffer_filler_commands) {
         command.begin(pipeline_manager->get_g_buffer_filler_pipeline_state().Get());
@@ -78,14 +75,13 @@ bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::uint32_t camera
         cmd->SetGraphicsRootConstantBufferView(0, model_data.current_frame_uniform_address);
         cmd->IASetVertexBuffers(0, 1, model_data.vertex_view);
         cmd->IASetIndexBuffer(model_data.index_view);
-        cmd->DrawIndexedInstanced(model_data.indices_count, 1, 0, 0, 0); });
+        cmd->DrawIndexedInstanced(model_data.indices_count, 1, 0, 0, 0);
+    });
 
     swapchain->transit_to_present(frame.threads_g_buffer_filler_commands.back().get_list());
     for (auto& command : frame.threads_g_buffer_filler_commands)
         command.close();
-    queue->exe(
-        frame.threads_g_buffer_filler_command_lists_raw.data(),
-        static_cast<UINT>(frame.threads_g_buffer_filler_command_lists_raw.size()));
+    queue->exe(frame.threads_g_buffer_filler_command_lists_raw.data(), static_cast<UINT>(frame.threads_g_buffer_filler_command_lists_raw.size()));
 
     return false;
 }
@@ -123,11 +119,10 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                 return;
             if (camera.get_scene_id() != scene_id)
                 return;
-            scene_pool_ref.cameras.emplace(
-                std::make_pair(camera.get_layer(), camera_id),
-                camera_pool.emplace([&] { return CameraData(*e.get_device()); }));
+            scene_pool_ref.cameras.emplace(std::make_pair(camera.get_layer(), camera_id), camera_pool.emplace([&] { return CameraData(*e.get_device()); }));
         });
-        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index); });
+        scenes.emplace(std::make_pair(scene.get_layer(), scene_id), scene_pool_index);
+    });
 
     world->parallel_system<render::scene::Scene>([&](const core::ecs::entity_id_t scene_id, render::scene::Scene& scene, const unsigned int) {
         if (!scene.enabled)
@@ -136,12 +131,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
         auto& bvh = bvh_pool[scene_data.bvh_pool_index];
         bvh.reset();
         world->synchronised_system<physics::collider::Aabb3, render::model::Model, Model, physics::Transformation>(
-            [&](
-                const core::ecs::entity_id_t,
-                physics::collider::Aabb3& collider,
-                render::model::Model& render_model,
-                Model& model,
-                physics::Transformation& model_transform) {
+            [&](const core::ecs::entity_id_t, physics::collider::Aabb3& collider, render::model::Model& render_model, Model& model, physics::Transformation& model_transform) {
                 if (!render_model.enabled)
                     return;
                 if (render_model.scene_id != scene_id)
@@ -164,13 +154,7 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
             });
         bvh.create_nodes();
         world->parallel_system<render::camera::Camera, physics::collider::Frustum, physics::Transformation, Camera>(
-            [&](
-                const core::ecs::entity_id_t camera_id,
-                render::camera::Camera& camera,
-                physics::collider::Frustum& frustum,
-                physics::Transformation& transform,
-                Camera& d3d_camera,
-                const unsigned int) {
+            [&](const core::ecs::entity_id_t camera_id, render::camera::Camera& camera, physics::collider::Frustum& frustum, physics::Transformation& transform, Camera& d3d_camera, const unsigned int) {
                 if (!camera.get_is_enabled())
                     return;
                 if (scene_id != camera.get_scene_id())
@@ -191,17 +175,10 @@ bool gearoenix::d3d::SubmissionManager::render_frame()
                     camera_data.opaque_models_data.push_back({ dis, bvh_node_data.user_data });
                     // TODO opaque/translucent in ModelBvhData
                 });
-                std::sort(
-                    std::execution::par_unseq,
-                    camera_data.opaque_models_data.begin(),
-                    camera_data.opaque_models_data.end(),
-                    [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-                std::sort(
-                    std::execution::par_unseq,
-                    camera_data.tranclucent_models_data.begin(),
-                    camera_data.tranclucent_models_data.end(),
-                    [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-            }); });
+                std::sort(std::execution::par_unseq, camera_data.opaque_models_data.begin(), camera_data.opaque_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+                std::sort(std::execution::par_unseq, camera_data.tranclucent_models_data.begin(), camera_data.tranclucent_models_data.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+            });
+    });
 
     for (auto& scene_layer_entity_id_pool_index : scenes) {
         auto& scene = scene_pool[scene_layer_entity_id_pool_index.second];

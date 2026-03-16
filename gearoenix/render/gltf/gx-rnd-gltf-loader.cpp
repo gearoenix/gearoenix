@@ -6,16 +6,17 @@
 #include "gx-rnd-gltf-context.hpp"
 
 namespace gearoenix::render::gltf {
-void load_scenes(
-    const std::shared_ptr<Context>& ctx,
-    const core::job::EndCaller<std::vector<core::ecs::EntityPtr>>& scenes_end_callback)
+void load_scenes(const std::shared_ptr<Context>& ctx, const core::job::EndCaller<std::vector<core::ecs::EntityPtr>>& scenes_end_callback)
 {
     scenes_end_callback.set_return(std::vector<core::ecs::EntityPtr>(ctx->data.scenes.size()));
 
     ctx->animations.load();
 
     core::job::EndCaller meshes_ready([ctx, scenes_end_callback] {
-        const core::job::EndCaller gpu_end_callback([ctx, s = scenes_end_callback] { (void)s; (void)ctx; });
+        const core::job::EndCaller gpu_end_callback([ctx, s = scenes_end_callback] {
+            (void)s;
+            (void)ctx;
+        });
         for (int index = 0; index < ctx->data.scenes.size(); ++index) {
             const auto& scn = ctx->data.scenes[index];
             GX_LOG_D("Loading scene: " << scn.name);

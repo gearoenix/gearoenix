@@ -36,7 +36,8 @@ void main() {
 }
 )SHADER";
 
-constexpr auto fragment_shader_body = R"SHADER(
+constexpr auto fragment_shader_body
+    = R"SHADER(
 uniform vec4 albedo_factor;
 uniform vec4 normal_metallic_factor;
 uniform vec4 emission_roughness_factor;
@@ -59,7 +60,7 @@ in vec3 out_btg;
 in vec2 out_uv;
 )SHADER"
 
-                                      // clang-format off
+      // clang-format off
 "layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_ALBEDO_METALLIC) ") out vec4 frag_out_albedo_metallic;\n"
 "layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_POSITION_DEPTH) ") out vec4 frag_out_position_depth;\n"
 "layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFERS_FRAMEBUFFER_ATTACHMENT_INDEX_NORMAL_AO) ") out vec4 frag_out_normal_ao;\n"

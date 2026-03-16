@@ -28,7 +28,7 @@ gearoenix::render::record::Camera::Camera()
 void gearoenix::render::record::Camera::clear()
 {
     translucent_models.clear();
-    all_models.clear();
+    opaque_models.clear();
 }
 
 void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh<Model>& bvh)
@@ -51,7 +51,7 @@ void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh<
         if (m.model->has_transparent_material()) {
             translucent_models.emplace_back(dis, &m);
         } else {
-            all_models.emplace_back(dis, &m);
+            opaque_models.emplace_back(dis, &m);
         }
     });
 }
@@ -70,46 +70,47 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     update_models(models.static_models_bvh);
     update_models(models.dynamic_models_bvh);
 
-    std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(),
-        [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(),
-        [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
-
-    all_models.insert(
-        all_models.end(),
-        std::make_move_iterator(translucent_models.begin()),
-        std::make_move_iterator(translucent_models.end()));
-
-    core::sync::parallel_for_i(all_models, [&](const auto& d_m, const auto i, const auto ki) {
-        const auto& rm = *d_m.second.model;
-        const auto& m = *rm.model;
-        if (!m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
-            return;
-        }
-        if (rm.armature) {
-            for (auto* const bone : rm.armature->get_all_bones()) {
-                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
-            }
-        } else {
-            threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
-        }
-    });
+    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
+    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
 
     mvps.clear();
-    auto current_model_index = static_cast<std::uint32_t>(-1);
-    for (auto& ms : threads_mvps) {
-        for (auto& [i, m] : ms) {
-            auto& cam_model = all_models[i].second;
-            if (current_model_index != i) {
-                cam_model.first_mvp_index = static_cast<std::uint32_t>(mvps.size());
-                cam_model.mvps_count = 1;
-                current_model_index = i;
-            } else {
-                ++cam_model.mvps_count;
-            }
-            mvps.push_back(m);
+    auto gather_mvps = [&](auto& trn_opq_models) {
+        for (auto& t : threads_mvps) {
+            t.clear();
         }
-    }
+        core::sync::parallel_for_i(trn_opq_models, [&](const auto& d_m, const auto i, const auto ki) {
+            const auto& rm = *d_m.second.model;
+            if (const auto& m = *rm.model; !m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
+                return;
+            }
+            if (rm.armature) {
+                for (auto* const bone : rm.armature->get_all_bones()) {
+                    threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
+                }
+            } else {
+                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
+            }
+        });
+        auto current_model_index = static_cast<std::uint32_t>(-1);
+        for (auto& ms : threads_mvps) {
+            for (auto& [i, m] : ms) {
+                auto& cam_model = trn_opq_models[i].second;
+                if (current_model_index != i) {
+                    cam_model.first_mvp_index = static_cast<std::uint32_t>(mvps.size());
+                    cam_model.mvps_count = 1;
+                    current_model_index = i;
+                } else {
+                    ++cam_model.mvps_count;
+                }
+                mvps.push_back(m);
+            }
+        }
+    };
+
+    mvps.clear();
+
+    gather_mvps(opaque_models);
+    gather_mvps(translucent_models);
 }
 
 void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_entity)
@@ -125,46 +126,43 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
     reflections.clear();
 
     std::uint64_t flag = 1;
-    core::ecs::World::get().synchronised_system<core::ecs::All<camera::Camera, physics::Transformation, physics::collider::Collider>>(
-        [&](auto* const e, auto* const cam, auto* const trn, auto* const cld) {
-            if (!cam->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
-                return;
-            }
-            auto& cam_ref = cameras[last_camera_index];
-            cam_ref.entity = e;
-            cam_ref.camera = cam;
-            cam_ref.transform = trn;
-            cam_ref.collider = cld;
+    core::ecs::World::get().synchronised_system<core::ecs::All<camera::Camera, physics::Transformation, physics::collider::Collider>>([&](auto* const e, auto* const cam, auto* const trn, auto* const cld) {
+        if (!cam->get_enabled() || !trn->get_enabled() || !cld->get_enabled() || !e->contains_in_parents(scene_entity)) {
+            return;
+        }
+        auto& cam_ref = cameras[last_camera_index];
+        cam_ref.entity = e;
+        cam_ref.camera = cam;
+        cam_ref.transform = trn;
+        cam_ref.collider = cld;
 
-            indices_map.emplace(e, last_camera_index);
-            switch (cam->get_usage()) {
-            case camera::Camera::Usage::Main: {
-                mains.emplace(e, last_camera_index);
-                break;
-            }
-            case camera::Camera::Usage::Shadow: {
-                shadow_casters.emplace(e, last_camera_index);
-                break;
-            }
-            case camera::Camera::Usage::ReflectionProbe: {
-                reflections.emplace(e, last_camera_index);
-                break;
-            }
-            default:
-                GX_UNEXPECTED;
-            }
-            cam->set_flag(flag);
+        indices_map.emplace(e, last_camera_index);
+        switch (cam->get_usage()) {
+        case camera::Camera::Usage::Main: {
+            mains.emplace(e, last_camera_index);
+            break;
+        }
+        case camera::Camera::Usage::Shadow: {
+            shadow_casters.emplace(e, last_camera_index);
+            break;
+        }
+        case camera::Camera::Usage::ReflectionProbe: {
+            reflections.emplace(e, last_camera_index);
+            break;
+        }
+        default:
+            GX_UNEXPECTED;
+        }
+        cam->set_flag(flag);
 
-            flag <<= 1;
-            ++last_camera_index;
-        });
+        flag <<= 1;
+        ++last_camera_index;
+    });
 }
 
 void gearoenix::render::record::Cameras::update_models(Models& models)
 {
     if (last_camera_index > 0) {
-        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
-            c.update_models(models);
-        });
+        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) { c.update_models(models); });
     }
 }

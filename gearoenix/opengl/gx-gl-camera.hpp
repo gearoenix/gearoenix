@@ -42,7 +42,7 @@ struct CameraTarget final {
     constexpr static std::uint32_t customised_var_index = 0;
     constexpr static std::uint32_t default_var_index = 1;
 
-    std::variant<Customised, Default> target = Default {};
+    std::variant<Customised, Default> target = Default { };
 
     ~CameraTarget();
     [[nodiscard]] static CameraTarget construct(const render::camera::Target& target);
@@ -53,7 +53,7 @@ struct CameraTarget final {
 struct Camera final : render::camera::Camera {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
-    constexpr static auto object_type_index = gearoenix_gl_camera_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_camera_type_index;
     constexpr static std::array all_parent_object_type_indices { render::camera::Camera::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::camera::Camera::object_type_index };
 
@@ -86,14 +86,11 @@ public:
 
 struct CameraManager final : render::camera::Manager {
 private:
-    void build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
+    void build(std::string&& name, core::ecs::Entity* parent, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void window_resized() override;
 
 public:
-    explicit CameraManager();
+    CameraManager();
     ~CameraManager() override;
 };
 }

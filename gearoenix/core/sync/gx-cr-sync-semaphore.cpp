@@ -8,9 +8,7 @@ gearoenix::core::sync::Semaphore::Semaphore(const int count)
 void gearoenix::core::sync::Semaphore::lock()
 {
     std::unique_lock lock(m);
-    c.wait(lock, [this] {
-        return count > 0;
-    });
+    c.wait(lock, [this] { return count > 0; });
     --count;
 }
 

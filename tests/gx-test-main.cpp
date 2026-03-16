@@ -20,15 +20,9 @@
 struct GlobalFixture final {
     gearoenix::net::Manager net_manager;
 
-    GlobalFixture()
-    {
-        gearoenix::core::job::initialise();
-    }
+    GlobalFixture() { gearoenix::core::job::initialise(); }
 
-    ~GlobalFixture()
-    {
-        gearoenix::core::job::terminate();
-    }
+    ~GlobalFixture() { gearoenix::core::job::terminate(); }
 };
 
 BOOST_TEST_GLOBAL_FIXTURE(GlobalFixture);

@@ -36,13 +36,10 @@ private:
     union {
         Fixed fixed;
         ScreenBased screen_based;
-    } data {};
+    } data { };
 
 public:
-    Resolution()
-    {
-        data.fixed = {};
-    }
+    Resolution() { data.fixed = { }; }
 
     Resolution& operator=(const Resolution&) = default;
     Resolution& operator=(Resolution&&) = default;
@@ -61,10 +58,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] index_t get_index() const
-    {
-        return index;
-    }
+    [[nodiscard]] index_t get_index() const { return index; }
 
     [[nodiscard]] const Fixed& get_fixed() const;
     [[nodiscard]] const ScreenBased& get_screen_based() const;

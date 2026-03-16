@@ -16,25 +16,14 @@ struct Mesh final : public render::mesh::Mesh {
     const D3D12_VERTEX_BUFFER_VIEW vv;
     const D3D12_INDEX_BUFFER_VIEW iv;
 
-    Mesh(
-        std::shared_ptr<GpuBuffer>&& vb,
-        std::shared_ptr<GpuBuffer>&& ib,
-        math::Aabb3<double>&& box,
-        UINT vertex_size,
-        UINT vertices_size,
-        UINT indices_count);
+    Mesh(std::shared_ptr<GpuBuffer>&& vb, std::shared_ptr<GpuBuffer>&& ib, math::Aabb3<double>&& box, UINT vertex_size, UINT vertices_size, UINT indices_count);
     ~Mesh() override;
 };
 
 struct MeshManager final : render::mesh::Manager {
     explicit MeshManager(Engine& e);
     ~MeshManager() override;
-    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(
-        std::string&& name,
-        std::vector<render::PbrVertex>&& vertices,
-        std::vector<std::uint32_t>&& indices,
-        math::Aabb3<double>&& occlusion_box,
-        core::job::EndCaller&& end_callback) override;
+    [[nodiscard]] std::shared_ptr<render::mesh::Mesh> build(std::string&& name, std::vector<render::PbrVertex>&& vertices, std::vector<std::uint32_t>&& indices, math::Aabb3<double>&& occlusion_box, core::job::EndCaller&& end_callback) override;
 };
 }
 

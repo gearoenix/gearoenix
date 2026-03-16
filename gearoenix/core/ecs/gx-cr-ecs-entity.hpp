@@ -42,41 +42,27 @@ struct Entity final : Object {
 
     template <typename T>
     struct ConditionCheck final {
-        [[nodiscard]] constexpr static bool match(const components_t& id)
-        {
-            return id.contains(T::object_type_index);
-        }
+        [[nodiscard]] constexpr static bool match(const components_t& id) { return id.contains(T::object_type_index); }
     };
 
     template <typename Condition>
     struct ConditionCheck<Not<Condition>> final {
-        [[nodiscard]] constexpr static bool match(const components_t& id)
-        {
-            return !ConditionCheck<Condition>::match(id);
-        }
+        [[nodiscard]] constexpr static bool match(const components_t& id) { return !ConditionCheck<Condition>::match(id); }
     };
 
     template <typename... Conditions>
     struct ConditionCheck<All<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const components_t& id)
-        {
-            return (ConditionCheck<Conditions>::match(id) && ...);
-        }
+        [[nodiscard]] constexpr static bool match(const components_t& id) { return (ConditionCheck<Conditions>::match(id) && ...); }
     };
 
     template <typename... Conditions>
     struct ConditionCheck<Any<Conditions...>> final {
-        [[nodiscard]] constexpr static bool match(const components_t& id)
-        {
-            return (ConditionCheck<Conditions>::match(id) || ...);
-        }
+        [[nodiscard]] constexpr static bool match(const components_t& id) { return (ConditionCheck<Conditions>::match(id) || ...); }
     };
 
     explicit Entity(std::string&& name);
     Entity(object_id_t id, std::string&& name);
-    static void read(
-        std::shared_ptr<Entity>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
-        std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end);
+    static void read(std::shared_ptr<Entity>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& object_streamer, job::EndCaller<>&& end);
 
 public:
     [[nodiscard]] static EntityPtr construct(std::string&& name, Entity* parent);
@@ -93,10 +79,7 @@ public:
     [[nodiscard]] EntityPtr get_ptr() const;
 
     template <typename ComponentType>
-    [[nodiscard]] ComponentType* get_component() const
-    {
-        return static_cast<ComponentType*>(get_component(ComponentType::object_type_index).get());
-    }
+    [[nodiscard]] ComponentType* get_component() const { return static_cast<ComponentType*>(get_component(ComponentType::object_type_index).get()); }
 
     template <typename ComponentType>
     [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr() const
@@ -106,9 +89,6 @@ public:
     }
 
     template <typename Condition>
-    [[nodiscard]] constexpr bool satisfy() const
-    {
-        return ConditionCheck<Condition>::match(all_types_to_components);
-    }
+    [[nodiscard]] constexpr bool satisfy() const { return ConditionCheck<Condition>::match(all_types_to_components); }
 };
 }

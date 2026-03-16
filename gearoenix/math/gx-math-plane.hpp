@@ -31,10 +31,7 @@ struct Plane {
         normal_d.w = -(point.dot(normal_d.xyz()));
     }
 
-    [[nodiscard]] constexpr Element get_distance(const Vec3<Element>& p) const
-    {
-        return normal_d.dot(Vec4<Element>(p, static_cast<Element>(1)));
-    }
+    [[nodiscard]] constexpr Element get_distance(const Vec3<Element>& p) const { return normal_d.dot(Vec4<Element>(p, static_cast<Element>(1))); }
 
     void write(platform::stream::Stream& s) const
     {

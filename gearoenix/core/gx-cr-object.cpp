@@ -8,7 +8,7 @@ gearoenix::core::Object::ObjectTypeInfos gearoenix::core::Object::object_type_in
 boost::container::flat_map<std::string, gearoenix::core::object_type_index_t> gearoenix::core::Object::object_type_name_to_index;
 std::atomic<gearoenix::core::object_id_t> gearoenix::core::Object::latest_id = 8;
 std::mutex gearoenix::core::Object::all_objects_lock;
-std::vector<std::weak_ptr<gearoenix::core::Object>> gearoenix::core::Object::all_objects = {};
+std::vector<std::weak_ptr<gearoenix::core::Object>> gearoenix::core::Object::all_objects = { };
 
 void gearoenix::core::Object::register_type(const object_type_index_t t, ObjectTypeInfo&& info)
 {
@@ -91,10 +91,7 @@ const gearoenix::core::Object::ObjectTypeInfo& gearoenix::core::Object::get_type
     return object_type_infos[ti];
 }
 
-bool gearoenix::core::Object::is_registered(const object_type_index_t ti)
-{
-    return ti < static_cast<object_type_index_t>(object_type_infos.size()) && !object_type_infos[ti].get_name().empty();
-}
+bool gearoenix::core::Object::is_registered(const object_type_index_t ti) { return ti < static_cast<object_type_index_t>(object_type_infos.size()) && !object_type_infos[ti].get_name().empty(); }
 
 std::optional<gearoenix::core::object_type_index_t> gearoenix::core::Object::get_index(const std::string& type_name)
 {
@@ -139,10 +136,7 @@ bool gearoenix::core::Object::check_object_type_registration_state(const object_
     return true;
 }
 
-const gearoenix::core::ObjectTypeIndexSet& gearoenix::core::Object::get_all_parent_types() const
-{
-    return get_type_info(object_final_type_index).get_all_parents();
-}
+const gearoenix::core::ObjectTypeIndexSet& gearoenix::core::Object::get_all_parent_types() const { return get_type_info(object_final_type_index).get_all_parents(); }
 
 std::shared_ptr<gearoenix::core::Object> gearoenix::core::Object::find_object(const object_id_t id)
 {
@@ -160,10 +154,7 @@ bool gearoenix::core::Object::is_castable_to(const object_type_index_t ti) const
     return get_all_parent_types().contains(ti);
 }
 
-void gearoenix::core::Object::read(
-    std::shared_ptr<platform::stream::Stream>&& stream,
-    std::shared_ptr<ObjectStreamer>&& stream_context,
-    job::EndCallerShared<Object>&& end_callback)
+void gearoenix::core::Object::read(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<ObjectStreamer>&& stream_context, job::EndCallerShared<Object>&& end_callback)
 {
     const auto fti = stream->read<object_type_index_t>();
     const auto id = stream->read<object_id_t>();

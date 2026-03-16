@@ -4,7 +4,10 @@
 #include "../core/gx-cr-singleton.hpp"
 #include "../math/gx-math-vector-4d.hpp"
 #include "gx-gl-types.hpp"
+
 #include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
+
 #include <memory>
 
 namespace gearoenix::gl {
@@ -66,7 +69,7 @@ private:
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
     std::uint32_t resolution_cfg_listener_id = static_cast<std::uint32_t>(-1);
-    boost::container::flat_map<double /*layer*/, Scene*> scenes;
+    boost::container::flat_set<std::pair<double /*layer*/, Scene*>> scenes;
 
     void initialise_back_buffer_sizes();
     void back_buffer_size_changed();

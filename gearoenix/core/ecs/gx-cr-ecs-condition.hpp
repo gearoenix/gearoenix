@@ -27,8 +27,7 @@ template <typename T>
 using not_t = typename IsNot<T>::type;
 
 template <typename...>
-struct CountNot final {
-};
+struct CountNot final { };
 
 template <typename T, typename... Args>
 struct CountNot<T, Args...> final {
@@ -103,8 +102,7 @@ template <typename... T>
 inline constexpr bool is_tuple_v<std::tuple<T...>> = true;
 
 template <typename, typename>
-struct unique_merge final {
-};
+struct unique_merge final { };
 
 template <typename... Ts>
 struct unique_merge<std::tuple<Ts...>, std::tuple<>> final {

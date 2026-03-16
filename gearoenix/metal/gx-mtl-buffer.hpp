@@ -24,10 +24,7 @@ struct UniformBuffer final {
     const NSUInteger size;
     const std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT> data;
 
-    UniformBuffer(
-        std::shared_ptr<const core::Allocator>&& gpu_range,
-        std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT>&& cpu_ranges,
-        std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT>&& data);
+    UniformBuffer(std::shared_ptr<const core::Allocator>&& gpu_range, std::array<std::shared_ptr<const core::Allocator>, GEAROENIX_METAL_FRAMES_COUNT>&& cpu_ranges, std::array<std::uint8_t*, GEAROENIX_METAL_FRAMES_COUNT>&& data);
     ~UniformBuffer();
     UniformBuffer(UniformBuffer&&);
 };

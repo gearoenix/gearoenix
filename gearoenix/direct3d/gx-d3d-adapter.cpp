@@ -51,8 +51,7 @@ gearoenix::d3d::Adapter::Adapter()
         }
         D3D12_FEATURE_DATA_D3D12_OPTIONS5 feature_support_data;
         GX_SET_ZERO(feature_support_data);
-        if (FAILED(test_device->CheckFeatureSupport(
-                D3D12_FEATURE_D3D12_OPTIONS5, &feature_support_data, sizeof(feature_support_data)))) {
+        if (FAILED(test_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &feature_support_data, sizeof(feature_support_data)))) {
             GX_LOG_D("Device doesn't support feature option 5.");
             continue;
         }

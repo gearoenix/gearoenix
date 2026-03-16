@@ -40,40 +40,19 @@ struct Vec2 final {
         static_assert(!std::is_same_v<Element, T>, "Only different type can be constructed by this constructor.");
     }
 
-    [[nodiscard]] constexpr Vec2 operator+(const Vec2& o) const
-    {
-        return { x + o.x, y + o.y };
-    }
+    [[nodiscard]] constexpr Vec2 operator+(const Vec2& o) const { return { x + o.x, y + o.y }; }
 
-    [[nodiscard]] constexpr Vec2 operator-(const Vec2& o) const
-    {
-        return { x - o.x, y - o.y };
-    }
+    [[nodiscard]] constexpr Vec2 operator-(const Vec2& o) const { return { x - o.x, y - o.y }; }
 
-    [[nodiscard]] constexpr Vec2 operator*(const Vec2& o) const
-    {
-        return { x * o.x, y * o.y };
-    }
+    [[nodiscard]] constexpr Vec2 operator*(const Vec2& o) const { return { x * o.x, y * o.y }; }
 
-    [[nodiscard]] constexpr Vec2 operator/(const Vec2& o) const
-    {
-        return { x / o.x, y / o.y };
-    }
+    [[nodiscard]] constexpr Vec2 operator/(const Vec2& o) const { return { x / o.x, y / o.y }; }
 
-    [[nodiscard]] constexpr Vec2 operator+(const Element e) const
-    {
-        return { x + e, y + e };
-    }
+    [[nodiscard]] constexpr Vec2 operator+(const Element e) const { return { x + e, y + e }; }
 
-    [[nodiscard]] constexpr Vec2 operator-(const Element e) const
-    {
-        return { x - e, y - e };
-    }
+    [[nodiscard]] constexpr Vec2 operator-(const Element e) const { return { x - e, y - e }; }
 
-    [[nodiscard]] constexpr Vec2 operator*(const Element e) const
-    {
-        return { x * e, y * e };
-    }
+    [[nodiscard]] constexpr Vec2 operator*(const Element e) const { return { x * e, y * e }; }
 
     [[nodiscard]] constexpr Vec2 operator/(const Element e) const
     {
@@ -148,48 +127,24 @@ struct Vec2 final {
     }
 
     template <typename T>
-    [[nodiscard]] constexpr Element operator[](const T i) const
-    {
-        return data()[i];
-    }
+    [[nodiscard]] constexpr Element operator[](const T i) const { return data()[i]; }
 
     template <typename T>
-    [[nodiscard]] constexpr Element& operator[](const T i)
-    {
-        return data()[i];
-    }
+    [[nodiscard]] constexpr Element& operator[](const T i) { return data()[i]; }
 
     /// Y is the most valuable part then X
-    [[nodiscard]] constexpr bool operator<(const Vec2& o) const
-    {
-        return y < o.y || (y == o.y && x < o.x);
-    }
+    [[nodiscard]] constexpr bool operator<(const Vec2& o) const { return y < o.y || (y == o.y && x < o.x); }
 
     /// Y is the most valuable part then X
-    [[nodiscard]] constexpr bool operator<=(const Vec2& o) const
-    {
-        return y < o.y || (y == o.y && x <= o.x);
-    }
+    [[nodiscard]] constexpr bool operator<=(const Vec2& o) const { return y < o.y || (y == o.y && x <= o.x); }
 
-    [[nodiscard]] constexpr bool operator==(const Vec2& o) const
-    {
-        return x == o.x && y == o.y;
-    }
+    [[nodiscard]] constexpr bool operator==(const Vec2& o) const { return x == o.x && y == o.y; }
 
-    [[nodiscard]] constexpr bool operator==(const Element v) const
-    {
-        return x == v && y == v;
-    }
+    [[nodiscard]] constexpr bool operator==(const Element v) const { return x == v && y == v; }
 
-    [[nodiscard]] constexpr bool operator>(const Vec2& o) const
-    {
-        return y > o.y || (y == o.y && x > o.x);
-    }
+    [[nodiscard]] constexpr bool operator>(const Vec2& o) const { return y > o.y || (y == o.y && x > o.x); }
 
-    [[nodiscard]] constexpr bool operator>=(const Vec2& o) const
-    {
-        return y > o.y || (y == o.y && x >= o.x);
-    }
+    [[nodiscard]] constexpr bool operator>=(const Vec2& o) const { return y > o.y || (y == o.y && x >= o.x); }
 
     [[nodiscard]] constexpr bool equal(const Element v, const Element tolerance = Numeric::epsilon<Element>) const
     {
@@ -209,95 +164,41 @@ struct Vec2 final {
         return b.x && b.y;
     }
 
-    [[nodiscard]] constexpr Vec2 abs() const
-    {
-        return { std::abs(x), std::abs(y) };
-    }
+    [[nodiscard]] constexpr Vec2 abs() const { return { std::abs(x), std::abs(y) }; }
 
-    [[nodiscard]] constexpr Vec2<bool> less(const Element v) const
-    {
-        return { x < v, y < v };
-    }
+    [[nodiscard]] constexpr Vec2<bool> less(const Element v) const { return { x < v, y < v }; }
 
-    [[nodiscard]] constexpr Vec2<bool> less(const Vec2& v) const
-    {
-        return { x < v.x, y < v.y };
-    }
+    [[nodiscard]] constexpr Vec2<bool> less(const Vec2& v) const { return { x < v.x, y < v.y }; }
 
-    [[nodiscard]] constexpr bool and_all() const
-    {
-        return x && y;
-    }
+    [[nodiscard]] constexpr bool and_all() const { return x && y; }
 
-    [[nodiscard]] constexpr Element dot(const Vec2& o) const
-    {
-        return x * o.x + y * o.y;
-    }
+    [[nodiscard]] constexpr Element dot(const Vec2& o) const { return x * o.x + y * o.y; }
 
-    [[nodiscard]] constexpr Element cross(const Vec2& o) const
-    {
-        return x * o.y - y * o.x;
-    }
+    [[nodiscard]] constexpr Element cross(const Vec2& o) const { return x * o.y - y * o.x; }
 
-    [[nodiscard]] constexpr Vec2 maximum(const Vec2& o) const
-    {
-        return { x > o.x ? x : o.x, y > o.y ? y : o.y };
-    }
+    [[nodiscard]] constexpr Vec2 maximum(const Vec2& o) const { return { x > o.x ? x : o.x, y > o.y ? y : o.y }; }
 
-    [[nodiscard]] constexpr Vec2 safe_maximum(const Vec2& o) const
-    {
-        return { Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y) };
-    }
+    [[nodiscard]] constexpr Vec2 safe_maximum(const Vec2& o) const { return { Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y) }; }
 
-    [[nodiscard]] constexpr Vec2 minimum(const Vec2& o) const
-    {
-        return { x < o.x ? x : o.x, y < o.y ? y : o.y };
-    }
+    [[nodiscard]] constexpr Vec2 minimum(const Vec2& o) const { return { x < o.x ? x : o.x, y < o.y ? y : o.y }; }
 
-    [[nodiscard]] constexpr Vec2 safe_minimum(const Vec2& o) const
-    {
-        return { Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y) };
-    }
+    [[nodiscard]] constexpr Vec2 safe_minimum(const Vec2& o) const { return { Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y) }; }
 
-    [[nodiscard]] constexpr Element length() const
-    {
-        return static_cast<Element>(std::sqrt(square_length()));
-    }
+    [[nodiscard]] constexpr Element length() const { return static_cast<Element>(std::sqrt(square_length())); }
 
-    [[nodiscard]] constexpr Element square_length() const
-    {
-        return dot(*this);
-    }
+    [[nodiscard]] constexpr Element square_length() const { return dot(*this); }
 
-    [[nodiscard]] constexpr Element distance(const Vec2& o) const
-    {
-        return static_cast<Element>(std::sqrt(square_distance(o)));
-    }
+    [[nodiscard]] constexpr Element distance(const Vec2& o) const { return static_cast<Element>(std::sqrt(square_distance(o))); }
 
-    [[nodiscard]] constexpr Element square_distance(const Vec2& o) const
-    {
-        return (*this - o).square_length();
-    }
+    [[nodiscard]] constexpr Element square_distance(const Vec2& o) const { return (*this - o).square_length(); }
 
-    [[nodiscard]] constexpr Vec2 normalized() const
-    {
-        return *this / length();
-    }
+    [[nodiscard]] constexpr Vec2 normalized() const { return *this / length(); }
 
-    [[nodiscard]] constexpr const Element* data() const
-    {
-        return &x;
-    }
+    [[nodiscard]] constexpr const Element* data() const { return &x; }
 
-    [[nodiscard]] constexpr Element* data()
-    {
-        return &x;
-    }
+    [[nodiscard]] constexpr Element* data() { return &x; }
 
-    constexpr void normalize()
-    {
-        *this /= length();
-    }
+    constexpr void normalize() { *this /= length(); }
 
     void read(platform::stream::Stream& f)
     {
@@ -311,16 +212,9 @@ struct Vec2 final {
         s.write_fail_debug(y);
     }
 
-    [[nodiscard]] constexpr static std::optional<Vec2> intersect(
-        const Vec2& s11,
-        const Vec2& s12,
-        const Vec2& s21,
-        const Vec2& s22);
+    [[nodiscard]] constexpr static std::optional<Vec2> intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22);
 
-    [[nodiscard]] constexpr static Vec2 hammersley(const std::uint32_t i, const std::uint32_t n)
-    {
-        return { static_cast<Element>(i) / static_cast<Element>(n), Numeric::radical_inverse_vdc(i) };
-    }
+    [[nodiscard]] constexpr static Vec2 hammersley(const std::uint32_t i, const std::uint32_t n) { return { static_cast<Element>(i) / static_cast<Element>(n), Numeric::radical_inverse_vdc(i) }; }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec2& v)
     {
@@ -333,11 +227,7 @@ struct Vec2 final {
 #include "gx-math-matrix-2d.hpp"
 
 template <typename Element>
-constexpr std::optional<gearoenix::math::Vec2<Element>> gearoenix::math::Vec2<Element>::intersect(
-    const Vec2& s11,
-    const Vec2& s12,
-    const Vec2& s21,
-    const Vec2& s22)
+constexpr std::optional<gearoenix::math::Vec2<Element>> gearoenix::math::Vec2<Element>::intersect(const Vec2& s11, const Vec2& s12, const Vec2& s21, const Vec2& s22)
 {
     const auto max1 = s11.maximum(s12);
     const auto min1 = s11.minimum(s12);

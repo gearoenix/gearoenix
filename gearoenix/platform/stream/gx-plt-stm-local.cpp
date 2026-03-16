@@ -11,10 +11,7 @@
 #endif
 
 namespace {
-std::ios::openmode create_open_mode(const bool writable)
-{
-    return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in;
-}
+std::ios::openmode create_open_mode(const bool writable) { return std::ios::binary | (writable ? std::ios::out : static_cast<std::ios::openmode>(0)) | std::ios::in; }
 }
 
 gearoenix::platform::stream::Local::Local(std::fstream file)
@@ -69,10 +66,7 @@ void gearoenix::platform::stream::Local::seek(const stream_size_t offset)
     file.seekp(static_cast<std::streamoff>(offset));
 }
 
-gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::tell()
-{
-    return static_cast<stream_size_t>(file.tellg());
-}
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::tell() { return static_cast<stream_size_t>(file.tellg()); }
 
 bool gearoenix::platform::stream::Local::exist(const std::string& name)
 {
@@ -83,9 +77,7 @@ bool gearoenix::platform::stream::Local::exist(const std::string& name)
 std::string gearoenix::platform::stream::Local::create_path(const std::string_view name)
 {
 #if GX_PLATFORM_INTERFACE_SDL
-    const auto* const path_ptr = SDL_GetPrefPath(
-        core::Application::get_organization_url().c_str(),
-        core::Application::get_application_name().c_str());
+    const auto* const path_ptr = SDL_GetPrefPath(core::Application::get_organization_url().c_str(), core::Application::get_application_name().c_str());
     if (!path_ptr) {
         GX_LOG_F("Can not get SDL write path, error: " << SDL_GetError());
     }
@@ -128,7 +120,4 @@ gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::
     return static_cast<stream_size_t>(s);
 }
 
-void gearoenix::platform::stream::Local::flush()
-{
-    file.flush();
-}
+void gearoenix::platform::stream::Local::flush() { file.flush(); }

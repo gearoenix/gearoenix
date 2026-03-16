@@ -30,23 +30,9 @@ private:
     explicit Text(std::string&& name);
 
 public:
-    static void construct(
-        std::string&& name,
-        core::ecs::Entity* camera_entity,
-        std::shared_ptr<Widget>&& parent,
-        core::job::EndCallerShared<Text>&& end_callback);
-    static void construct(
-        std::string&& name,
-        core::ecs::Entity* camera_entity,
-        std::shared_ptr<material::Unlit>&& mat,
-        std::shared_ptr<Widget>&& parent,
-        core::job::EndCallerShared<Text>&& end_callback);
-    static void construct(
-        std::string&& name,
-        core::ecs::Entity* camera_entity,
-        std::shared_ptr<mesh::Mesh>&& msh,
-        std::shared_ptr<Widget>&& parent,
-        core::job::EndCallerShared<Text>&& end_callback);
+    static void construct(std::string&& name, core::ecs::Entity* camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Text>&& end_callback);
+    static void construct(std::string&& name, core::ecs::Entity* camera_entity, std::shared_ptr<material::Unlit>&& mat, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Text>&& end_callback);
+    static void construct(std::string&& name, core::ecs::Entity* camera_entity, std::shared_ptr<mesh::Mesh>&& msh, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Text>&& end_callback);
     ~Text() override;
     [[nodiscard]] math::Vec2<double> get_text_size() const;
     void update_text(const core::job::EndCaller<>& c) const;

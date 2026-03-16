@@ -18,21 +18,11 @@ struct Modal final : Widget {
     GX_GET_CREF_PRV(std::shared_ptr<Button>, ok);
 
 public:
-    Modal(
-        std::string&& name,
-        std::shared_ptr<Button>&& close,
-        std::shared_ptr<Button>&& cancel,
-        std::shared_ptr<Button>&& ok);
+    Modal(std::string&& name, std::shared_ptr<Button>&& close, std::shared_ptr<Button>&& cancel, std::shared_ptr<Button>&& ok);
 
-    static void construct(
-        std::string&& name,
-        std::string&& background_texture_asset,
-        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& close_button_texture_asset,
-        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& cancel_button_texture_asset,
-        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& ok_button_texture_asset,
-        core::ecs::Entity* camera_entity,
-        std::shared_ptr<Widget>&& parent,
-        core::job::EndCaller<ConstructorReturn>&& end_callback);
+    static void construct(std::string&& name, std::string&& background_texture_asset, const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& close_button_texture_asset,
+        const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& cancel_button_texture_asset, const std::optional<std::pair<std::string /*pressed-texture-asset*/, std::string /*rest*/>>& ok_button_texture_asset,
+        core::ecs::Entity* camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCaller<ConstructorReturn>&& end_callback);
     ~Modal() override;
 };
 }

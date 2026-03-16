@@ -36,25 +36,13 @@ gearoenix::platform::stream::Path::Path(AssetPath&& data)
 {
 }
 
-gearoenix::platform::stream::Path gearoenix::platform::stream::Path::create_absolute(std::string&& data)
-{
-    return Path(AbsolutePath(std::move(data)));
-}
+gearoenix::platform::stream::Path gearoenix::platform::stream::Path::create_absolute(std::string&& data) { return Path(AbsolutePath(std::move(data))); }
 
-gearoenix::platform::stream::Path gearoenix::platform::stream::Path::create_asset(std::string&& data)
-{
-    return Path(AssetPath(std::move(data)));
-}
+gearoenix::platform::stream::Path gearoenix::platform::stream::Path::create_asset(std::string&& data) { return Path(AssetPath(std::move(data))); }
 
-bool gearoenix::platform::stream::Path::is_absolute() const
-{
-    return absolute_index == data.index();
-}
+bool gearoenix::platform::stream::Path::is_absolute() const { return absolute_index == data.index(); }
 
-bool gearoenix::platform::stream::Path::is_asset() const
-{
-    return asset_index == data.index();
-}
+bool gearoenix::platform::stream::Path::is_asset() const { return asset_index == data.index(); }
 
 const std::string& gearoenix::platform::stream::Path::get_raw_data() const
 {

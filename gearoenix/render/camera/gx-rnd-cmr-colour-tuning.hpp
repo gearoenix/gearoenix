@@ -31,18 +31,15 @@ struct ColourTuning final {
     constexpr static index_t types_count = 3;
 
 private:
-    index_t index = gamma_correction_index;
+    index_t index = unchanged_index;
     union {
         GammaCorrection gamma_correction;
         Multiply multiply;
         Unchanged unchanged;
-    } data = {};
+    } data = { };
 
 public:
-    constexpr ColourTuning()
-    {
-        data.gamma_correction = {};
-    }
+    constexpr ColourTuning() { data.gamma_correction = { }; }
 
     constexpr ColourTuning(const ColourTuning&) = default;
     constexpr ColourTuning(ColourTuning&&) noexcept = default;
@@ -70,25 +67,13 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr index_t get_index() const
-    {
-        return index;
-    }
+    [[nodiscard]] constexpr index_t get_index() const { return index; }
 
-    [[nodiscard]] constexpr bool is_gamma_correction() const
-    {
-        return index == gamma_correction_index;
-    }
+    [[nodiscard]] constexpr bool is_gamma_correction() const { return index == gamma_correction_index; }
 
-    [[nodiscard]] constexpr bool is_multiply() const
-    {
-        return index == multiply_index;
-    }
+    [[nodiscard]] constexpr bool is_multiply() const { return index == multiply_index; }
 
-    [[nodiscard]] constexpr bool is_unchanged() const
-    {
-        return index == unchanged_index;
-    }
+    [[nodiscard]] constexpr bool is_unchanged() const { return index == unchanged_index; }
 
     [[nodiscard]] const GammaCorrection& get_gamma_correction() const;
     [[nodiscard]] const Multiply& get_multiply() const;

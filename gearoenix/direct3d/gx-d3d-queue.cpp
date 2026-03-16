@@ -32,8 +32,5 @@ void gearoenix::d3d::Queue::exe(const Microsoft::WRL::ComPtr<ID3D12GraphicsComma
     command_queue->ExecuteCommandLists(1, cmds);
 }
 
-void gearoenix::d3d::Queue::exe(ID3D12CommandList** cmds, UINT count)
-{
-    command_queue->ExecuteCommandLists(count, cmds);
-}
+void gearoenix::d3d::Queue::exe(ID3D12CommandList** cmds, UINT count) { command_queue->ExecuteCommandLists(count, cmds); }
 #endif

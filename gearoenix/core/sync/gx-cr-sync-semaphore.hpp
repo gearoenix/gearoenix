@@ -5,8 +5,8 @@
 namespace gearoenix::core::sync {
 struct Semaphore final {
 private:
-    std::mutex m {};
-    std::condition_variable c {};
+    std::mutex m { };
+    std::condition_variable c { };
     int count = 0;
 
 public:

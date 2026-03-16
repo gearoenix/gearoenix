@@ -1,7 +1,6 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
@@ -68,9 +67,10 @@ public:
                 const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
                 const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "-metallic:" + std::to_string(metallic) + "-roughness:" + std::to_string(roughness);
-                GxMaterialManager::get().get_pbr("material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
-                    material_is_ready(std::move(material), metallic, roughness, std::move(p), std::move(e));
-                }));
+                GxMaterialManager::get().get_pbr(
+                    "material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
+                        material_is_ready(std::move(material), metallic, roughness, std::move(p), std::move(e));
+                    }));
             }
         }
 
@@ -85,17 +85,14 @@ public:
         }));
 
         GxReflectionManager::get().build_runtime(
-            "runtime-reflection-probe", scene_entity.get(),
-            GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
-            GxAabb3(GxVec3(20.0), GxVec3(-20.0)),
-            GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
-            1024, 256, 512,
-            GxEntityEndCaller([end](auto&& entity) {
+            "runtime-reflection-probe", scene_entity.get(), GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
+            GxAabb3(GxVec3(20.0), GxVec3(-20.0)), GxAabb3(GxVec3(100.0), GxVec3(-100.0)),
+            1024, 256, 512, GxEntityEndCaller([end](auto&& entity) {
                 if constexpr (EXPORT_ANY) {
                     const auto rfl = entity->template get_component_shared_ptr<GxReflectionRuntime>();
                     rfl->set_on_rendered([wr = std::weak_ptr(rfl)] {
                         const auto r = wr.lock();
-                        GX_ASSERT(r);
+                        GX_ASSERT_D(r);
                         if constexpr (EXPORT_REFLECTION) {
                             const std::shared_ptr<GxStream> rl(new GxLocal("exported.gx-reflection", true));
                             r->export_baked(rl, GxEndCaller([] { }));
@@ -114,12 +111,13 @@ public:
 
     void material_is_ready(GxPbrPtr&& material, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&& end)
     {
-        material->get_normal_metallic_factor().w = metallic;
-        material->get_emission_roughness_factor().w = roughness;
+        material->set_normal_metallic_factor({ 1.0f, 1.0f, 1.0f, metallic });
+        material->set_emission_roughness_factor({ 1.0f, 1.0f, 1.0f, roughness });
 
-        GxMeshManager::get().build_icosphere(4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
-            mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(e));
-        }));
+        GxMeshManager::get().build_icosphere(
+            4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
+                mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(e));
+            }));
     }
 
     void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&&)

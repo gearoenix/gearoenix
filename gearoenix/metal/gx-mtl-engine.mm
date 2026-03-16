@@ -29,10 +29,7 @@ gearoenix::metal::Engine::Engine(platform::Application& platform_application)
 
 gearoenix::metal::Engine::~Engine() = default;
 
-void gearoenix::metal::Engine::start_frame()
-{
-    render::engine::Engine::start_frame();
-}
+void gearoenix::metal::Engine::start_frame() { render::engine::Engine::start_frame(); }
 
 void gearoenix::metal::Engine::end_frame()
 {
@@ -40,22 +37,12 @@ void gearoenix::metal::Engine::end_frame()
     submission_manager->update();
 }
 
-void gearoenix::metal::Engine::window_resized()
-{
-}
+void gearoenix::metal::Engine::window_resized() { }
 
-void gearoenix::metal::Engine::upload_imgui_fonts()
-{
-}
+void gearoenix::metal::Engine::upload_imgui_fonts() { }
 
-bool gearoenix::metal::Engine::is_supported()
-{
-    return true;
-}
+bool gearoenix::metal::Engine::is_supported() { return true; }
 
-std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application)
-{
-    return std::make_unique<gearoenix::metal::Engine>(platform_application);
-}
+std::unique_ptr<gearoenix::metal::Engine> gearoenix::metal::Engine::construct(platform::Application& platform_application) { return std::make_unique<gearoenix::metal::Engine>(platform_application); }
 
 #endif

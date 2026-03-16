@@ -93,13 +93,13 @@ if (GX_IN_WINDOWS)
     target_link_libraries(GearoenixGameEngine PUBLIC Ws2_32 winmm)
 endif ()
 
-target_include_directories(GearoenixGameEngine PUBLIC ${GX_IMGUI_PATH})
-target_include_directories(GearoenixGameEngine PUBLIC ${GX_SUBMODULES_DIR})
+target_include_directories(GearoenixGameEngine SYSTEM PUBLIC ${GX_IMGUI_PATH})
+target_include_directories(GearoenixGameEngine SYSTEM PUBLIC ${GX_SUBMODULES_DIR})
 gx_common_target_config(GearoenixGameEngine)
 
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial::enet::enet)
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial-sodium::sodium)
-target_include_directories(GearoenixGameEngine PUBLIC ${SQLITE_MODERN_CPP_INCLUDE_DIRS})
+target_include_directories(GearoenixGameEngine SYSTEM PUBLIC ${SQLITE_MODERN_CPP_INCLUDE_DIRS})
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial::sqlite3::sqlite3)
 
 foreach (GX_LIB ${GX_DEBUG_LIBS})
@@ -111,6 +111,11 @@ foreach (GX_LIB ${GX_RELEASE_LIBS})
 endforeach ()
 
 add_custom_target(GearoenixAssets)
+
+if(NOT GX_IN_WASM)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/vulkan/gx-vk-shader-compile.cmake)
+    add_dependencies(GearoenixAssets GearoenixVulkanShaders)
+endif()
 
 function(gx_prepare_target GX_CURRENT_TARGET)
     message(STATUS "Preparing target ${GX_CURRENT_TARGET}")

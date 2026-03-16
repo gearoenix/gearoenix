@@ -7,6 +7,4 @@ gearoenix::physics::constraint::Constraint::Constraint(core::ecs::Entity* const 
 
 gearoenix::physics::constraint::Constraint::~Constraint() = default;
 
-void gearoenix::physics::constraint::Constraint::update()
-{
-}
+void gearoenix::physics::constraint::Constraint::update() { }

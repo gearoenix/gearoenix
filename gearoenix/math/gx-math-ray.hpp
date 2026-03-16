@@ -17,9 +17,6 @@ public:
     {
     }
 
-    [[nodiscard]] Vec3<Element> get_point(const Element d) const
-    {
-        return (normalized_direction * d) + origin;
-    }
+    [[nodiscard]] Vec3<Element> get_point(const Element d) const { return (normalized_direction * d) + origin; }
 };
 }

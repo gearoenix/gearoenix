@@ -66,6 +66,7 @@ struct Camera : core::ecs::Component {
     GX_GET_VAL_PRT(std::uint32_t, resolution_cfg_observer, 0);
     GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
     GX_GET_CVAL_PRT(std::string, render_pass_name);
+    GX_GET_VAL_PRT(bool, y_flipped, false);
 
     Camera(core::ecs::Entity* entity, core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
 
@@ -77,12 +78,7 @@ struct Camera : core::ecs::Component {
 
 public:
     ~Camera() override;
-    void generate_frustum_points(
-        const math::Vec3<double>& location,
-        const math::Vec3<double>& x,
-        const math::Vec3<double>& y,
-        const math::Vec3<double>& z,
-        std::array<math::Vec3<double>, 8>& points) const;
+    void generate_frustum_points(const math::Vec3<double>& location, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, std::array<math::Vec3<double>, 8>& points) const;
     void set_view(const math::Mat4x4<float>& view);
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
     void disable_customised_target_aspect_ratio();

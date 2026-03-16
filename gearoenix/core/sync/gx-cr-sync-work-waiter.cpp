@@ -5,10 +5,11 @@
 void gearoenix::core::sync::WorkWaiter::wait_loop()
 {
     state = State::Working;
-    while (State::Working == state) {
+    while (State::Working == state.load(std::memory_order_relaxed)) {
         semaphore.lock();
-        if (State::Working != state)
+        if (State::Working != state.load(std::memory_order_relaxed)) {
             break;
+        }
         function_loader.unload();
     }
     state = State::Terminated;
@@ -23,10 +24,9 @@ gearoenix::core::sync::WorkWaiter::WorkWaiter()
 gearoenix::core::sync::WorkWaiter::~WorkWaiter()
 {
     GX_CHECK_NOT_EQUAL_D(state, State::Terminated);
-    do {
-        state = State::Finished;
+    while (State::Terminated != state.exchange(State::Finished, std::memory_order_relaxed)) {
         semaphore.release();
-    } while (State::Terminated != state);
+    }
     thread.join();
 }
 

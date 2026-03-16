@@ -3,9 +3,11 @@
 #include "../gx-rnd-runtime-configuration.hpp"
 #include "gx-rnd-eng-specification.hpp"
 #include "gx-rnd-eng-type.hpp"
+
+#include <boost/container/flat_set.hpp>
+
 #include <chrono>
 #include <memory>
-#include <set>
 #include <thread>
 
 namespace gearoenix::core::ecs {
@@ -92,13 +94,14 @@ struct Engine : core::Singleton<Engine> {
     GX_GET_UPTR_PRT(light::Manager, light_manager);
     GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
     GX_GET_CREF_PRT(std::chrono::time_point<clock_t>, last_frame_time);
+    GX_GET_VAL_PRT(bool, half_depth_clip, false);
 
     explicit Engine(Type engine_type);
 
 public:
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
-    [[nodiscard]] static std::set<Type> get_available_engines();
+    [[nodiscard]] static const boost::container::flat_set<Type>& get_available_engines();
     [[nodiscard]] static std::unique_ptr<Engine> construct();
     ~Engine() override;
     virtual void start_frame();
@@ -106,5 +109,6 @@ public:
     virtual void window_resized();
     virtual void upload_imgui_fonts() = 0;
     virtual void show_debug_gui();
+    virtual void flush();
 };
 }

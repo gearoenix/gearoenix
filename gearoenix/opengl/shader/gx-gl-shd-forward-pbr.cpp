@@ -4,10 +4,7 @@
 #include <sstream>
 #include <string>
 
-gearoenix::gl::shader::ForwardPbr::ForwardPbr(
-    const std::uint32_t directional_lights_count,
-    const std::uint32_t shadow_casters_directional_lights_count,
-    const std::uint32_t bones_count)
+gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_lights_count, const std::uint32_t shadow_casters_directional_lights_count, const std::uint32_t bones_count)
     : directional_lights_count(static_cast<sizei>(directional_lights_count))
     , shadow_caster_directional_light_shadow_map_indices(shadow_casters_directional_lights_count)
     , bones_matrices_count(static_cast<sizei>(bones_count * 2))
@@ -108,11 +105,15 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "float geometry_smith(const float normal_dot_light, const float normal_dot_view, const float roughness) {\n";
     fs << "    float v = normal_dot_light * (normal_dot_view * (1.0 - roughness) + roughness);\n";
     fs << "    float l = normal_dot_view * (normal_dot_light * (1.0 - roughness) + roughness);\n";
-    fs << "    return 0.5 / (v + l);\n";
+    fs << "    return 0.5 / max(v + l, 0.0001);\n";
     fs << "}\n";
     fs << "\n";
-    fs << "vec3 fresnel_schlick(const float normal_dot_half, const vec3 f0, const float f90) {\n";
-    fs << "    return f0 + (vec3(f90) - f0) * pow(1.0 - normal_dot_half, 5.0);\n";
+    fs << "vec3 fresnel_schlick(const float cos_theta, const vec3 f0, const float f90) {\n";
+    fs << "    return f0 + (vec3(f90) - f0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);\n";
+    fs << "}\n";
+    fs << "\n";
+    fs << "vec3 fresnel_schlick_roughness(const float cos_theta, const vec3 f0, const float roughness) {\n";
+    fs << "    return f0 + (max(vec3(1.0 - roughness), f0) - f0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);\n";
     fs << "}\n";
     fs << "\n";
     fs << "vec3 compute_light(\n";
@@ -131,7 +132,8 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    float normal_dot_half = max(dot(normal, half_vec), 0.0001);\n";
     fs << "    float ndf = distribution_ggx(normal_dot_half, roughness);\n";
     fs << "    float geo = geometry_smith(normal_dot_light, normal_dot_view, roughness);\n";
-    fs << "    vec3 fresnel = fresnel_schlick(dot(half_vec, view), f0, f90);\n";
+    fs << "    float half_dot_view = max(dot(half_vec, view), 0.0001);\n";
+    fs << "    vec3 fresnel = fresnel_schlick(half_dot_view, f0, f90);\n";
     fs << "    vec3 specular = (ndf * geo) * fresnel;\n";
     fs << "    vec3 diffuse = albedo * ( 1.0 / gx_pi);\n";
     fs << "    vec3 kd = (vec3(1.0) - fresnel) * (1.0 - metallic);\n";
@@ -145,7 +147,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    vec2 mtr = texture(metallic_roughness, out_uv).xy * vec2(normal_metallic_factor.w, emission_roughness_factor.w);\n";
     fs << "    float metallic = clamp(mtr.x, 0.0001, 0.9999);\n";
     fs << "    float roughness = clamp(mtr.y * mtr.y, 0.0001, 0.9999);\n";
-    fs << "    float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;\n";
+    fs << "    float ao = mix(1.0, texture(occlusion, out_uv).x, alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y);\n";
     fs << "    vec3 nrm = normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz));\n";
     fs << "    vec3 ems = texture(emission, out_uv).xyz * emission_roughness_factor.xyz;\n";
     fs << "    vec3 f0 = mix(vec3(0.04), alb.xyz, metallic);\n";
@@ -153,7 +155,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
     fs << "    vec3 eye = normalize(out_pos - camera_position_reserved.xyz);\n";
     fs << "    vec3 reflection = reflect(eye, nrm);\n";
     fs << "    float normal_dot_view = max(-dot(nrm, eye), 0.0001);\n";
-    fs << "    vec3 fresnel = fresnel_schlick(normal_dot_view, f0, f90);\n";
+    fs << "    vec3 fresnel = fresnel_schlick_roughness(normal_dot_view, f0, roughness);\n";
     fs << "    vec3 illumination = vec3(0.0001);\n";
     fs << "\n";
     for (int dir_i = 0; dir_i < static_cast<int>(directional_lights_count); ++dir_i) {
@@ -177,25 +179,27 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(
         fs << "        float shadow_w = uv_bounds.x * uv_bounds.y * uv_bounds.z;\n";
         fs << "        shadow_w *= 1.0 - texture(shadow_caster_directional_light_shadow_map[" << dir_i << "], light_uv_depth.xyz, 0.0);\n";
         fs << "        float light_w = 1.0 - shadow_w;\n";
-        fs << "        illumination += light_w * compute_light(\n";
-        fs << "            shadow_caster_directional_light_direction[" << dir_i << "],\n";
-        fs << "            shadow_caster_directional_light_colour[" << dir_i << "],\n";
-        fs << "            -eye,\n";
-        fs << "            nrm,\n";
-        fs << "            normal_dot_view,\n";
-        fs << "            roughness,\n";
-        fs << "            metallic,\n";
-        fs << "            f0,\n";
-        fs << "            f90,\n";
-        fs << "            alb.xyz);\n";
+        fs << "        if (light_w > 0.0001) {\n";
+        fs << "            illumination += light_w * compute_light(\n";
+        fs << "                shadow_caster_directional_light_direction[" << dir_i << "],\n";
+        fs << "                shadow_caster_directional_light_colour[" << dir_i << "],\n";
+        fs << "                -eye,\n";
+        fs << "                nrm,\n";
+        fs << "                normal_dot_view,\n";
+        fs << "                roughness,\n";
+        fs << "                metallic,\n";
+        fs << "                f0,\n";
+        fs << "                f90,\n";
+        fs << "                alb.xyz);\n";
+        fs << "        }\n";
         fs << "    }\n";
     }
     fs << "\n";
     fs << "    vec3 irr = texture(irradiance, nrm).xyz;\n";
     fs << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
-    fs << "    vec3 ambient = irr * alb.xyz * (vec3(f90) - fresnel) * (f90 - metallic);\n";
+    fs << "    vec3 ambient = irr * alb.xyz * (vec3(1.0) - fresnel) * (1.0 - metallic);\n";
     fs << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, roughness)).rg;\n";
-    fs << "    ambient += rad * ((fresnel * brdf.x) + (f90 * brdf.y));\n";
+    fs << "    ambient += rad * ((f0 * brdf.x) + brdf.y);\n";
     fs << "    ambient *= ao;\n";
     fs << "    vec3 frag_colour = ambient + ems + illumination;\n";
     fs << "    frag_out = vec4(frag_colour, 1.0);\n";
@@ -263,43 +267,21 @@ void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_normalised_vp_data(const void* const data)
 {
-    glUniformMatrix4fv(
-        shadow_caster_directional_light_normalised_vp,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        GL_FALSE,
-        reinterpret_cast<const float*>(data));
+    glUniformMatrix4fv(shadow_caster_directional_light_normalised_vp, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data)
-{
-    glUniform3fv(
-        directional_light_direction,
-        directional_lights_count,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data) { glUniform3fv(directional_light_direction, directional_lights_count, reinterpret_cast<const float*>(data)); }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data)
-{
-    glUniform3fv(
-        directional_light_colour,
-        directional_lights_count,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data) { glUniform3fv(directional_light_colour, directional_lights_count, reinterpret_cast<const float*>(data)); }
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data)
 {
-    glUniform3fv(
-        shadow_caster_directional_light_direction,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        reinterpret_cast<const float*>(data));
+    glUniform3fv(shadow_caster_directional_light_direction, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), reinterpret_cast<const float*>(data));
 }
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_colour_data(const void* const data)
 {
-    glUniform3fv(
-        shadow_caster_directional_light_colour,
-        static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()),
-        reinterpret_cast<const float*>(data));
+    glUniform3fv(shadow_caster_directional_light_colour, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), reinterpret_cast<const float*>(data));
 }
 
 const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_directional_light_shadow_map_indices() const
@@ -309,13 +291,6 @@ const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_
     return shadow_caster_directional_light_shadow_map_indices.data();
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data)
-{
-    glUniformMatrix4fv(
-        bones_m_inv_m,
-        bones_matrices_count,
-        GL_FALSE,
-        reinterpret_cast<const float*>(data));
-}
+void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data) { glUniformMatrix4fv(bones_m_inv_m, bones_matrices_count, GL_FALSE, reinterpret_cast<const float*>(data)); }
 
 #endif

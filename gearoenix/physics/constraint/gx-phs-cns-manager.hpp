@@ -13,8 +13,7 @@ struct Constraint;
 struct Manager final : core::Singleton<Manager> {
     Manager();
     ~Manager() override;
-    [[nodiscard]] core::ecs::EntityPtr create_jet_controller(
-        std::string&& name, std::shared_ptr<Transformation>&& transform, core::ecs::Entity* parent) const;
+    [[nodiscard]] core::ecs::EntityPtr create_jet_controller(std::string&& name, std::shared_ptr<Transformation>&& transform, core::ecs::Entity* parent) const;
     void update();
 };
 }

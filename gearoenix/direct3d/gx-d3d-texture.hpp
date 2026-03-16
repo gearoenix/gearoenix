@@ -22,13 +22,7 @@ struct Texture2D final : public render::texture::Texture2D {
     GX_GET_REFC_PRV(Microsoft::WRL::ComPtr<ID3D12Resource>, resource)
     GX_GET_REFC_PRV(Descriptor, descriptor)
 
-    Texture2D(
-        std::string name,
-        const render::texture::TextureInfo& info,
-        Engine& e,
-        UINT sampler_index,
-        Microsoft::WRL::ComPtr<ID3D12Resource>&& resource,
-        Descriptor&& descriptor);
+    Texture2D(std::string name, const render::texture::TextureInfo& info, Engine& e, UINT sampler_index, Microsoft::WRL::ComPtr<ID3D12Resource>&& resource, Descriptor&& descriptor);
     ~Texture2D() override;
 };
 
@@ -51,11 +45,7 @@ private:
 public:
     TextureManager(Engine& e);
     ~TextureManager() override;
-    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(
-        std::string name,
-        std::vector<std::vector<std::uint8_t>> pixels,
-        const render::texture::TextureInfo& info,
-        const core::job::EndCaller& c) override;
+    [[nodiscard]] std::shared_ptr<render::texture::Texture2D> create_2d_from_pixels(std::string name, std::vector<std::vector<std::uint8_t>> pixels, const render::texture::TextureInfo& info, const core::job::EndCaller& c) override;
 
     static void convert(const render::texture::SamplerInfo& in, D3D12_SAMPLER_DESC& out);
 };

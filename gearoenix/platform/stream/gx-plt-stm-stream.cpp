@@ -25,7 +25,7 @@ std::shared_ptr<gearoenix::platform::stream::Stream> gearoenix::platform::stream
     if (path.is_absolute()) {
         return std::shared_ptr<Stream>(Local::open(path.get_raw_data(), true));
     }
-    return {};
+    return { };
 }
 
 void gearoenix::platform::stream::Stream::read(std::string& s)
@@ -53,10 +53,7 @@ std::vector<std::uint8_t> gearoenix::platform::stream::Stream::get_file_content(
     return result;
 }
 
-void gearoenix::platform::stream::Stream::write(Stream& s)
-{
-    write(s.get_file_content());
-}
+void gearoenix::platform::stream::Stream::write(Stream& s) { write(s.get_file_content()); }
 
 bool gearoenix::platform::stream::Stream::write(const std::string& s)
 {

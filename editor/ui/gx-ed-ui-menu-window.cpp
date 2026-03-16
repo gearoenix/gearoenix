@@ -10,12 +10,10 @@ gearoenix::editor::ui::MenuWindow::MenuWindow() = default;
 void gearoenix::editor::ui::MenuWindow::update()
 {
     if (ImGui::BeginMenu("Window")) {
-        if (const auto is_fullscreen = platform::RuntimeConfiguration::get().get_fullscreen();
-            ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
+        if (const auto is_fullscreen = platform::RuntimeConfiguration::get().get_fullscreen(); ImGui::MenuItem(is_fullscreen ? "Unset Fullscreen" : "Set Fullscreen", "F11")) {
             platform::Application::get().set_window_fullscreen(!is_fullscreen);
         }
-        if (ImGui::Checkbox("Show Project Inspector", &show_engine_inspector)) {
-        }
+        if (ImGui::Checkbox("Show Project Inspector", &show_engine_inspector)) { }
         ImGui::EndMenu();
     }
 
@@ -27,7 +25,4 @@ void gearoenix::editor::ui::MenuWindow::update()
     }
 }
 
-void gearoenix::editor::ui::MenuWindow::renew()
-{
-    GX_TODO;
-}
+void gearoenix::editor::ui::MenuWindow::renew() { GX_TODO; }

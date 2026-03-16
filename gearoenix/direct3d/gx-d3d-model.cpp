@@ -32,11 +32,7 @@ gearoenix::d3d::Model::~Model() = default;
 
 gearoenix::d3d::Model::Model(Model&&) = default;
 
-gearoenix::d3d::ModelBuilder::ModelBuilder(
-    Engine& e,
-    const std::string& name,
-    std::shared_ptr<render::mesh::Mesh>&& bound_mesh,
-    bool is_transformable)
+gearoenix::d3d::ModelBuilder::ModelBuilder(Engine& e, const std::string& name, std::shared_ptr<render::mesh::Mesh>&& bound_mesh, bool is_transformable)
     : render::model::Builder(e, name, std::move(bound_mesh), is_transformable)
     , e(e)
 {
@@ -46,21 +42,14 @@ void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat
 {
     render::model::Builder::set_material(mat);
     auto& b = entity_builder->get_builder();
-    Model m(
-        e,
-        std::dynamic_pointer_cast<Mesh>(b.get_component<render::model::Model>()->bound_mesh),
-        sizeof(ModelUniform),
-        *b.get_name());
+    Model m(e, std::dynamic_pointer_cast<Mesh>(b.get_component<render::model::Model>()->bound_mesh), sizeof(ModelUniform), *b.get_name());
     for (auto& uniform : m.uniforms) {
         auto& u = *reinterpret_cast<ModelUniform*>(uniform.get_buffer().get_pointer());
         u.colour_factor = mat.get_albedo_factor();
         // TODO use the layout of the material structure
         u.emission_factor__alpha_cutoff = math::Vec4(mat.get_emission_roughness_factor().xyz(), mat.get_alpha_cutoff());
         u.normal_scale__occlusion_strength = math::Vec4(mat.get_normal_metallic_factor().xyz(), mat.get_occlusion_strength());
-        u.metallic_factor__roughness_factor__radiance_lod_coefficient = math::Vec4(
-            mat.get_normal_metallic_factor().w,
-            mat.get_emission_roughness_factor().w,
-            mat.get_radiance_lod_coefficient(), 0.0f);
+        u.metallic_factor__roughness_factor__radiance_lod_coefficient = math::Vec4(mat.get_normal_metallic_factor().w, mat.get_emission_roughness_factor().w, mat.get_radiance_lod_coefficient(), 0.0f);
         const auto& at = *dynamic_cast<const Texture2D*>(mat.get_albedo().get());
         u.sampler_albedo_normal_emission.x = at.get_sampler_index();
         u.sampler_albedo_normal_emission.y = at.get_descriptor().resource_index;
@@ -72,14 +61,9 @@ void gearoenix::d3d::ModelBuilder::set_material(const render::material::Pbr& mat
 
 gearoenix::d3d::ModelBuilder::~ModelBuilder() = default;
 
-std::shared_ptr<gearoenix::render::model::Builder> gearoenix::d3d::ModelManager::build(
-    std::string&& name,
-    std::shared_ptr<render::mesh::Mesh>&& mesh,
-    core::job::EndCaller&&,
-    const bool is_transformable)
+std::shared_ptr<gearoenix::render::model::Builder> gearoenix::d3d::ModelManager::build(std::string&& name, std::shared_ptr<render::mesh::Mesh>&& mesh, core::job::EndCaller&&, const bool is_transformable)
 {
-    return std::shared_ptr<render::model::Builder>(new ModelBuilder(
-        dynamic_cast<Engine&>(e), name, std::move(mesh), is_transformable));
+    return std::shared_ptr<render::model::Builder>(new ModelBuilder(dynamic_cast<Engine&>(e), name, std::move(mesh), is_transformable));
 }
 
 gearoenix::d3d::ModelManager::ModelManager(Engine& e)

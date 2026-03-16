@@ -109,10 +109,7 @@ void gearoenix::math::CubicBezierCurve2D::normalize(const double scale)
     }
 }
 
-void gearoenix::math::CubicBezierCurve2D::set_point(const int index, const Point& p)
-{
-    points[index] = p;
-}
+void gearoenix::math::CubicBezierCurve2D::set_point(const int index, const Point& p) { points[index] = p; }
 
 void gearoenix::math::CubicBezierCurve2D::render(std::uint32_t* pixels, const int img_width, const int img_height, const std::uint32_t color)
 {

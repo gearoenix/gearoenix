@@ -2,12 +2,11 @@
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include <algorithm>
 
-gearoenix::core::allocator::Range::Range(
-    const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
+gearoenix::core::allocator::Range::Range(const std::int64_t size, const std::int64_t offset, std::shared_ptr<Range> parent)
     : size(size)
     , offset(offset)
-    , parent(std::move(parent))
     , ranges { { { size, offset }, { nullptr, nullptr } } }
+    , parent(std::move(parent))
 {
 }
 
@@ -50,36 +49,62 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
 
 gearoenix::core::allocator::Range::~Range()
 {
-    if (nullptr != parent)
+    if (nullptr != parent) {
         parent->deallocate(this);
+    }
 }
 
-std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz)
+std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz, const std::int64_t alignment)
 {
-    std::lock_guard<std::mutex> _lg(this_lock);
-    auto search = std::upper_bound(
-        ranges.begin(), ranges.end(), sz,
-        [](const std::int64_t a, const decltype(ranges)::value_type& b) {
-            return a <= b.first.first;
-        });
+    GX_ASSERT_D(sz > 0);
+    std::lock_guard _lg(this_lock);
+    auto search = std::upper_bound(ranges.begin(), ranges.end(), sz, [](const std::int64_t a, const decltype(ranges)::value_type& b) {
+        return a <= b.first.first;
+    });
+    std::int64_t padding = 0;
+    while (search != ranges.end()) {
+        const auto found_offset = search->first.second;
+        const auto aligned_offset = alignment <= 1 ? found_offset : ((found_offset + alignment - 1) / alignment) * alignment;
+        padding = aligned_offset - found_offset;
+        if (padding + sz <= search->first.first) {
+            break;
+        }
+        ++search;
+    }
     if (ranges.end() == search) {
         GX_LOG_D("Not enough space left to allocate: " << sz);
         return nullptr;
     }
     const auto found_size = search->first.first;
     const auto found_offset = search->first.second;
-    std::shared_ptr<Range> result(new Range(sz, found_offset, self.lock()));
+    const auto aligned_offset = found_offset + padding;
+    const auto remaining = found_size - padding - sz;
+    GX_ASSERT_D(!self.expired());
+    std::shared_ptr<Range> result(new Range(sz, aligned_offset, self.lock()));
+    result->self = result;
     const auto del_range = search->second;
     ranges.erase(search);
     auto* const result_previous = del_range.first;
-    if (nullptr != result_previous) {
-        result_previous->next_key = std::nullopt;
-        result_previous->next = result.get();
+    auto* const result_next = del_range.second;
+    // Handle pre-padding free space [found_offset, aligned_offset)
+    if (padding > 0) {
+        const SizeOffset pre_key { padding, found_offset };
+        ranges[pre_key] = { result_previous, result.get() };
+        if (nullptr != result_previous) {
+            result_previous->next_key = pre_key;
+            result_previous->next = result.get();
+        }
+        result->previous = result_previous;
+        result->previous_key = pre_key;
+    } else {
+        if (nullptr != result_previous) {
+            result_previous->next_key = std::nullopt;
+            result_previous->next = result.get();
+        }
         result->previous = result_previous;
     }
-    auto* const result_next = del_range.second;
-    const auto new_size = found_size - sz;
-    const auto new_key = new_size == 0 ? std::nullopt : std::make_optional(std::make_pair(new_size, found_offset + sz));
+    // Handle post-allocation free space [aligned_offset + sz, found_offset + found_size)
+    const auto new_key = remaining == 0 ? std::nullopt : std::make_optional(std::make_pair(remaining, aligned_offset + sz));
     if (new_key.has_value()) {
         result->next_key = new_key;
         ranges[*new_key] = std::make_pair(result.get(), result_next);

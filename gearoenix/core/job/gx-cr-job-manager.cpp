@@ -5,11 +5,9 @@
 #include "../sync/gx-cr-sync-thread.hpp"
 
 #include <boost/container/flat_map.hpp>
-#include <boost/lockfree/queue.hpp>
 
 #include <optional>
 #include <queue>
-#include <ranges>
 #include <thread>
 
 namespace {
@@ -19,39 +17,38 @@ enum struct ThreadState {
     Terminated,
 };
 
-struct ThreadData {
-    ThreadState state = ThreadState::Working;
-    gearoenix::core::sync::Semaphore signal;
-};
-
-struct WorkerData {
+struct RegisteredWorkerData {
     gearoenix::core::FunctionLoader function_loader;
     std::optional<std::thread> thread;
-    std::optional<ThreadData> thread_data;
 };
 
-std::mutex workers_lock;
-boost::container::flat_map<std::thread::id, std::unique_ptr<WorkerData>> workers;
+struct PoolWorkerData {
+    std::thread thread;
+    ThreadState state = ThreadState::Working;
+};
+
+std::mutex registered_workers_lock;
+boost::container::flat_map<std::thread::id, std::unique_ptr<RegisteredWorkerData>> registered_workers;
 
 std::mutex tasks_lock;
 std::queue<std::function<void()>> tasks;
 
-std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
+std::vector<PoolWorkerData> pool_workers;
 
-[[nodiscard]] std::thread::id register_new_thread()
+gearoenix::core::sync::Semaphore pool_signal;
+
+void create_new_thread_for_pool()
 {
-    auto worker = std::make_unique<WorkerData>();
-    worker->thread_data.emplace();
-    worker->thread.emplace([data = worker.get()] {
-        data->thread_data->state = ThreadState::Working;
-        while (ThreadState::Working == data->thread_data->state) {
-            if (tasks.empty() && data->function_loader.empty()) {
-                data->thread_data->signal.lock();
+    const auto index = pool_workers.size();
+    pool_workers.emplace_back(std::thread([index] {
+        pool_workers[index].state = ThreadState::Working;
+        while (ThreadState::Working == pool_workers[index].state) {
+            if (tasks.empty()) {
+                pool_signal.lock();
             }
-            if (ThreadState::Working != data->thread_data->state) {
+            if (ThreadState::Working != pool_workers[index].state) {
                 break;
             }
-            data->function_loader.unload();
             std::function<void()> task;
             {
                 const std::lock_guard _lg(tasks_lock);
@@ -63,34 +60,23 @@ std::vector<gearoenix::core::sync::Semaphore*> pool_signals;
             }
             task();
         }
-        data->thread_data->state = ThreadState::Terminated;
-    });
-
-    const auto return_value = worker->thread->get_id();
-
-    const std::lock_guard _lg(workers_lock);
-    pool_signals.push_back(&(worker->thread_data->signal));
-    workers[return_value] = std::move(worker);
-
-    return return_value;
+        pool_workers[index].state = ThreadState::Terminated;
+    }));
 }
-
-bool initialised = false;
 }
 
 void gearoenix::core::job::initialise()
 {
-    if (initialised) {
+    static std::atomic initialised = false;
+    if (initialised.exchange(true, std::memory_order_relaxed)) {
         return;
     }
-    initialised = true;
 
     const auto count = sync::threads_count() * 2;
+    pool_workers.reserve(count);
     for (auto i = 0; i < count; ++i) {
-        (void)register_new_thread();
+        create_new_thread_for_pool();
     }
-
-    pool_signals.shrink_to_fit();
 }
 
 void gearoenix::core::job::register_current_thread()
@@ -100,11 +86,11 @@ void gearoenix::core::job::register_current_thread()
 
 void gearoenix::core::job::register_thread(const std::thread::id thread_id, std::optional<std::thread>&& thread)
 {
-    auto worker = std::make_unique<WorkerData>();
+    auto worker = std::make_unique<RegisteredWorkerData>();
     worker->thread = std::move(thread);
 
-    const std::lock_guard _lg(workers_lock);
-    workers[thread_id] = std::move(worker);
+    const std::lock_guard _lg(registered_workers_lock);
+    registered_workers[thread_id] = std::move(worker);
 }
 
 void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, std::function<void()>&& job)
@@ -113,17 +99,12 @@ void gearoenix::core::job::send_job(const std::thread::id receiver_thread_id, st
         job();
         return;
     }
-    const auto& search = workers.find(receiver_thread_id);
-    if (workers.end() == search) {
-        GX_LOG_I("Worker job thread hasn't found for thread-id: " << receiver_thread_id);
-        job();
+    const auto& search = registered_workers.find(receiver_thread_id);
+    if (registered_workers.end() == search) {
+        send_job_to_pool(std::move(job));
         return;
     }
-    auto& worker = *search->second;
-    worker.function_loader.load(std::move(job));
-    if (worker.thread_data.has_value()) {
-        worker.thread_data->signal.release();
-    }
+    search->second->function_loader.load(std::move(job));
 }
 
 void gearoenix::core::job::send_job_to_pool(std::function<void()>&& job)
@@ -132,32 +113,27 @@ void gearoenix::core::job::send_job_to_pool(std::function<void()>&& job)
         std::lock_guard _lg(tasks_lock);
         tasks.push(std::move(job));
     }
-    for (auto* const s : pool_signals) {
-        s->release();
-    }
+    pool_signal.release();
 }
 
 void gearoenix::core::job::execute_current_thread_jobs()
 {
-    const auto& search = workers.find(std::this_thread::get_id());
-    GX_ASSERT(workers.end() != search);
+    const auto& search = registered_workers.find(std::this_thread::get_id());
+    GX_ASSERT(registered_workers.end() != search);
     search->second->function_loader.unload();
 }
 
 void gearoenix::core::job::terminate()
 {
-    for (const auto& worker : workers | std::views::values) {
-        if (worker->thread_data.has_value()) {
-            if (ThreadState::Terminated != worker->thread_data->state) {
-                worker->thread_data->state = ThreadState::Finished;
-                while (worker->thread_data->state != ThreadState::Terminated) {
-                    worker->thread_data->signal.release();
-                }
+    for (auto& [thread, state] : pool_workers) {
+        if (ThreadState::Terminated != state) {
+            state = ThreadState::Finished;
+            while (state != ThreadState::Terminated) {
+                pool_signal.release();
             }
         }
-        if (worker->thread.has_value()) {
-            worker->thread->join();
-        }
+        thread.join();
     }
-    workers.clear();
+    pool_workers.clear();
+    registered_workers.clear();
 }

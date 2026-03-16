@@ -31,7 +31,4 @@ void gearoenix::core::FunctionLoader::unload()
     }
 }
 
-bool gearoenix::core::FunctionLoader::empty() const
-{
-    return load_functions.empty();
-}
+bool gearoenix::core::FunctionLoader::empty() const { return load_functions.empty(); }

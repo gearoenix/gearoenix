@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_matrix_4d)
     using GxMat4 = gearoenix::math::Mat4x4<float>;
     using GxVec3 = gearoenix::math::Vec3<float>;
 
-    std::default_random_engine re(std::random_device {}());
+    std::default_random_engine re(std::random_device { }());
     std::uniform_real_distribution<float> dis(-1.0, 1.0);
 
     glm::mat4 glmm;

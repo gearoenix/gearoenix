@@ -10,7 +10,7 @@ struct Texture2D;
 struct Target;
 
 struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirectional {
-    constexpr static auto object_type_index = gearoenix_gl_light_shadow_caster_directional_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_light_shadow_caster_directional_type_index;
     constexpr static std::array all_parent_object_type_indices { ShadowCasterDirectional::object_type_index, Light::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { ShadowCasterDirectional::object_type_index };
 
@@ -32,12 +32,8 @@ struct LightManager final : render::light::Manager {
 private:
     [[nodiscard]] core::ecs::EntityPtr build_directional(std::string&&, core::ecs::Entity*) override;
     void build_shadow_caster_directional(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::uint32_t shadow_map_resolution,
-        float camera_far,
-        float camera_near,
-        float camera_aspect,
+        std::string&& name, core::ecs::Entity* parent, std::uint32_t shadow_map_resolution,
+        float camera_far, float camera_near, float camera_aspect,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 
 public:

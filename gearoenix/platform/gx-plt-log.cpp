@@ -26,14 +26,13 @@ std::stringstream gearoenix::platform::Log::header(const char* const file_name, 
 {
     std::stringstream s;
     auto t = std::time(nullptr);
-    std::tm tm {};
+    std::tm tm { };
 #ifdef GX_PLATFORM_WINDOWS
     (void)localtime_s(&tm, &t);
 #else
     tm = *std::localtime(&t);
 #endif
-    s << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "."
-      << (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() % 1000000000)
+    s << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() % 1000000000)
 #ifndef GX_PLATFORM_WEBASSEMBLY
       << " [thread:" << std::this_thread::get_id() << "]"
 #endif

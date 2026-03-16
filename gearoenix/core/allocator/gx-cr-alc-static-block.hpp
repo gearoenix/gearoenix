@@ -14,10 +14,7 @@ struct StaticBlock final {
     struct std_deleter {
         StaticBlock& ref;
 
-        void operator()(T const* p)
-        {
-            ref.free(p);
-        }
+        void operator()(T const* p) { ref.free(p); }
     };
 
 private:
@@ -29,10 +26,7 @@ private:
 
 public:
 #if GX_DEBUG_MODE
-    StaticBlock()
-    {
-        std::memset(memory.data(), 0, memory.size());
-    }
+    StaticBlock() { std::memset(memory.data(), 0, memory.size()); }
 
     ~StaticBlock()
     {

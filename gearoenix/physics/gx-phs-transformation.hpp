@@ -33,10 +33,7 @@ struct Transformation final : core::ecs::Component, render::gizmo::Drawer {
             return *this;
         }
 
-        explicit constexpr operator const math::Quat<double>&() const
-        {
-            return quat;
-        }
+        explicit constexpr operator const math::Quat<double>&() const { return quat; }
     };
 
     constexpr static auto max_count = 8192;
@@ -91,12 +88,7 @@ public:
     void reset();
     void reset(const math::Vec3<double>& s, const Rotation& r, const math::Vec3<double>& p);
     void reset(const math::Vec3<double>& s, const math::Quat<double>& r, const math::Vec3<double>& p);
-    void reset(
-        const math::Vec3<double>& s,
-        const math::Vec3<double>& x,
-        const math::Vec3<double>& y,
-        const math::Vec3<double>& z,
-        const math::Vec3<double>& p);
+    void reset(const math::Vec3<double>& s, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, const math::Vec3<double>& p);
     void show_debug_gui() override;
     void draw_gizmo() override;
     static void update();

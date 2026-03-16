@@ -7,9 +7,7 @@ gearoenix::core::Application::Application()
 
 gearoenix::core::Application::~Application() = default;
 
-void gearoenix::core::Application::update()
-{
-}
+void gearoenix::core::Application::update() { }
 
 std::string& gearoenix::core::Application::get_organization_url_ref()
 {

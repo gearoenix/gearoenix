@@ -31,20 +31,8 @@ public:
     /// This function returns n+1 horizontal length from start
     void compute_text_widths(const std::wstring& text, double text_height, std::vector<double>& widths) const;
     /// This function is a simple and fast way to only render a one-line text to a texture.
-    void bake(
-        const std::wstring& text,
-        const std::vector<double>& txt_widths,
-        const math::Vec4<double>& color,
-        double img_width,
-        double img_height,
-        double img_start_skip,
-        core::job::EndCallerShared<texture::Texture2D>&& end) const;
+    void bake(const std::wstring& text, const std::vector<double>& txt_widths, const math::Vec4<double>& color, double img_width, double img_height, double img_start_skip, core::job::EndCallerShared<texture::Texture2D>&& end) const;
     /// This function is a simple and fast way to only render a one-line text to a texture.
-    void bake(
-        const std::wstring& text,
-        const math::Vec4<double>& color,
-        double img_height,
-        double& img_width,
-        core::job::EndCallerShared<texture::Texture2D>&& end) const;
+    void bake(const std::wstring& text, const math::Vec4<double>& color, double img_height, double& img_width, core::job::EndCallerShared<texture::Texture2D>&& end) const;
 };
 }

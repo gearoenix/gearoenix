@@ -13,7 +13,7 @@ struct Mesh;
 struct Skybox final : render::skybox::Skybox {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
-    constexpr static auto object_type_index = gearoenix_gl_skybox_type_index;
+    constexpr static auto object_type_index = gearoenix_gapi_skybox_type_index;
     constexpr static std::array all_parent_object_type_indices { render::skybox::Skybox::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::skybox::Skybox::object_type_index };
 
@@ -32,11 +32,7 @@ struct SkyboxManager final : render::skybox::Manager {
     SkyboxManager();
     ~SkyboxManager() override;
 
-    [[nodiscard]] core::ecs::EntityPtr build(
-        std::string&& name,
-        core::ecs::Entity* parent,
-        std::shared_ptr<render::texture::Texture>&& texture,
-        std::shared_ptr<render::mesh::Mesh>&& mesh) override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::Texture>&& texture, std::shared_ptr<render::mesh::Mesh>&& mesh) override;
 };
 }
 

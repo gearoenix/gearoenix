@@ -9,12 +9,11 @@ void gearoenix::render::record::Skyboxes::update(core::ecs::Entity* const scene_
         if (!skybox->get_enabled() || !entity->contains_in_parents(scene_entity)) {
             return;
         }
-        skyboxes.emplace(
-            skybox->get_layer(),
+        skyboxes.emplace(skybox->get_layer(),
             Data {
                 .entity = entity,
                 .skybox = skybox,
-                .equirectangular = skybox->is_equirectangular(),
+                .equirectangular = skybox->is_equirectangular,
             });
     });
 }

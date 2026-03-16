@@ -23,20 +23,14 @@ namespace {
 #endif
 }
 
-[[nodiscard]] bool is_key(const std::string& s)
-{
-    return s.size() > 2 && s[0] == '-' && s[1] == '-';
-}
+[[nodiscard]] bool is_key(const std::string& s) { return s.size() > 2 && s[0] == '-' && s[1] == '-'; }
 
 gearoenix::platform::Arguments instance;
 }
 
 gearoenix::platform::Arguments::Arguments() = default;
 
-gearoenix::platform::Arguments& gearoenix::platform::Arguments::get()
-{
-    return instance;
-}
+gearoenix::platform::Arguments& gearoenix::platform::Arguments::get() { return instance; }
 
 void gearoenix::platform::Arguments::parse(const int argc, const char* const* const argv)
 {

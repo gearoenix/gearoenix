@@ -4,18 +4,13 @@
 namespace gearoenix::core {
 template <typename Target>
 struct Singleton {
-private:
-    [[nodiscard]] constexpr static Target*& get_singleton_instance()
-    {
-        static Target* singleton_instance = nullptr;
-        return singleton_instance;
-    }
-
 protected:
+    inline static Target* singleton_instance_ptr = nullptr;
+
     explicit Singleton(Target* const ptr)
     {
-        GX_ASSERT_D(get_singleton_instance() == nullptr);
-        get_singleton_instance() = ptr;
+        GX_ASSERT_D(singleton_instance_ptr == nullptr);
+        singleton_instance_ptr = ptr;
     }
 
 public:
@@ -24,14 +19,10 @@ public:
     Singleton& operator=(Singleton&&) = delete;
     Singleton& operator=(const Singleton&) = delete;
 
-    virtual ~Singleton()
-    {
-        get_singleton_instance() = nullptr;
-    }
+    virtual ~Singleton() { singleton_instance_ptr = nullptr; }
 
-    [[nodiscard]] static Target& get()
-    {
-        return *get_singleton_instance();
-    }
+    [[nodiscard]] static Target& get() { return *singleton_instance_ptr; }
+    [[nodiscard]] static bool singleton_is_valid() { return nullptr != singleton_instance_ptr; }
+    [[nodiscard]] static bool singleton_is_invalid() { return nullptr == singleton_instance_ptr; }
 };
 }

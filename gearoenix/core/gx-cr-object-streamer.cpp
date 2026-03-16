@@ -23,7 +23,7 @@ void gearoenix::core::ObjectStreamer::read()
     std::vector<id_t> ids(shared_asset_map_size);
     for (id_t i = 0; i < shared_asset_map_size; ++i) {
         const auto id = stream->read<id_t>();
-        objects[id] = {};
+        objects[id] = { };
         ids[i] = id;
     }
     for (id_t i = 0; i < shared_asset_map_size; ++i) {

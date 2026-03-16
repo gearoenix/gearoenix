@@ -22,11 +22,7 @@ struct Mouse final {
     GX_GET_CREF_PRV(math::Vec2<double>, position);
 
 public:
-    Mouse(
-        const platform::key::Action action,
-        const platform::key::Id key,
-        const math::Vec2<double>& position_normalised,
-        const math::Vec2<double>& position)
+    Mouse(const platform::key::Action action, const platform::key::Id key, const math::Vec2<double>& position_normalised, const math::Vec2<double>& position)
         : action(action)
         , key(key)
         , position_normalised(position_normalised)

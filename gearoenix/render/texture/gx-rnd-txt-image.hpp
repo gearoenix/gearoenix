@@ -16,38 +16,12 @@ public:
     Image() = delete;
     ~Image() = delete;
 
+    static void decode(platform::stream::Stream* file, std::vector<unsigned char>& encoded_data, std::uint32_t& img_width, std::uint32_t& img_height);
     static void decode(
-        platform::stream::Stream* file,
-        std::vector<unsigned char>& encoded_data,
-        std::uint32_t& img_width,
-        std::uint32_t& img_height);
+        const unsigned char* formatted_data, std::uint32_t formatted_size, std::optional<std::uint32_t> requested_channels, std::vector<unsigned char>& decoded_data, std::uint32_t& img_width, std::uint32_t& img_height, std::uint32_t& img_channels);
     static void decode(
-        const unsigned char* formatted_data,
-        std::uint32_t formatted_size,
-        std::optional<std::uint32_t> requested_channels,
-        std::vector<unsigned char>& decoded_data,
-        std::uint32_t& img_width,
-        std::uint32_t& img_height,
-        std::uint32_t& img_channels);
-    static void decode(
-        const unsigned char* formatted_data,
-        std::uint32_t formatted_size,
-        std::optional<std::uint32_t> requested_channels,
-        std::vector<float>& decoded_data,
-        std::uint32_t& img_width,
-        std::uint32_t& img_height,
-        std::uint32_t& img_channels);
-    static void encode_png(
-        platform::stream::Stream& file,
-        const std::uint8_t* data,
-        std::uint32_t img_width,
-        std::uint32_t img_height,
-        std::uint32_t components_count);
-    static void encode_hdr(
-        platform::stream::Stream& file,
-        const void* data,
-        std::uint32_t img_width,
-        std::uint32_t img_height,
-        std::uint32_t components_count);
+        const unsigned char* formatted_data, std::uint32_t formatted_size, std::optional<std::uint32_t> requested_channels, std::vector<float>& decoded_data, std::uint32_t& img_width, std::uint32_t& img_height, std::uint32_t& img_channels);
+    static void encode_png(platform::stream::Stream& file, const std::uint8_t* data, std::uint32_t img_width, std::uint32_t img_height, std::uint32_t components_count);
+    static void encode_hdr(platform::stream::Stream& file, const void* data, std::uint32_t img_width, std::uint32_t img_height, std::uint32_t components_count);
 };
 }

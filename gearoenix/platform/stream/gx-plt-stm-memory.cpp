@@ -38,24 +38,12 @@ gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::
     return length;
 }
 
-void gearoenix::platform::stream::Memory::seek(const stream_size_t offset)
-{
-    index = offset;
-}
+void gearoenix::platform::stream::Memory::seek(const stream_size_t offset) { index = offset; }
 
-gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::tell()
-{
-    return index;
-}
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::tell() { return index; }
 
-gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::size()
-{
-    return mem_data.size();
-}
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Memory::size() { return mem_data.size(); }
 
 void gearoenix::platform::stream::Memory::flush() { }
 
-std::vector<std::uint8_t> gearoenix::platform::stream::Memory::get_file_content()
-{
-    return mem_data;
-}
+std::vector<std::uint8_t> gearoenix::platform::stream::Memory::get_file_content() { return mem_data; }

@@ -30,10 +30,7 @@ gearoenix::d3d::CameraBuilder::CameraBuilder(Engine& e, const std::string& name)
 
 gearoenix::d3d::CameraBuilder::~CameraBuilder() = default;
 
-std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::d3d::CameraManager::build(const std::string& name)
-{
-    return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name));
-}
+std::shared_ptr<gearoenix::render::camera::Builder> gearoenix::d3d::CameraManager::build(const std::string& name) { return std::shared_ptr<render::camera::Builder>(new CameraBuilder(dynamic_cast<Engine&>(e), name)); }
 
 gearoenix::d3d::CameraManager::CameraManager(Engine& e)
     : render::camera::Manager(e)

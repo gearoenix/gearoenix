@@ -50,8 +50,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         const auto gx_quat = GxQuat::from_euler(x, y, z);
         const auto glm_quat = glm::quat(glm::vec3(x, y, z));
 
-        BOOST_TEST(gx_quat.safe_equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)),
-            "Quaternion from Euler comparison failed Q { " << x << ", " << y << ", " << z << " }");
+        BOOST_TEST(gx_quat.safe_equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)), "Quaternion from Euler comparison failed Q { " << x << ", " << y << ", " << z << " }");
     }
 
     for (auto ti = 0; ti < 100; ++ti) {
@@ -63,8 +62,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         const auto gx_ang = GxQuat(x, y, z, w).to_euler();
         const auto glm_ang = glm::eulerAngles(glm::quat(w, x, y, z));
 
-        BOOST_TEST(gx_ang.equal({ glm_ang.x, glm_ang.y, glm_ang.z }),
-            "Quaternion to Euler comparison failed Q { " << x << ", " << y << ", " << z << ", " << w << " }");
+        BOOST_TEST(gx_ang.equal({ glm_ang.x, glm_ang.y, glm_ang.z }), "Quaternion to Euler comparison failed Q { " << x << ", " << y << ", " << z << ", " << w << " }");
     }
 
     for (auto ti = 0; ti < 100; ++ti) {
@@ -91,18 +89,12 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         m = glm::rotate(m, glm::radians(w2), glm::vec3(x2, y2, z2));
         m = glm::rotate(m, glm::radians(w3), glm::vec3(x3, y3, z3));
 
-        const auto gx_m = GxMat4(
-            m[0][0], m[0][1], m[0][2], m[0][3],
-            m[1][0], m[1][1], m[1][2], m[1][3],
-            m[2][0], m[2][1], m[2][2], m[2][3],
-            m[3][0], m[3][1], m[3][2], m[3][3]);
+        const auto gx_m = GxMat4(m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2], m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1], m[3][2], m[3][3]);
 
         const auto gx_quat = GxQuat::from(gx_m);
         const auto glm_quat = glm::quat_cast(glm::mat4(m));
 
-        BOOST_TEST(
-            gx_quat.safe_equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)),
-            "Quaternion from matrix comparison failed. " << ti);
+        BOOST_TEST(gx_quat.safe_equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)), "Quaternion from matrix comparison failed. " << ti);
     }
 
     for (auto ti = 0; ti < 100; ++ti) {
@@ -126,9 +118,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         const auto gx_quat = GxQuat::from(GxMat4(x0, y0, z0, w0, x1, y1, z1, w1, x2, y2, z2, w2, x3, y3, z3, w3));
         const auto glm_quat = glm::quat_cast(glm::mat4(x0, y0, z0, w0, x1, y1, z1, w1, x2, y2, z2, w2, x3, y3, z3, w3));
 
-        BOOST_TEST(
-            gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)),
-            "Quaternion from matrix comparison failed.");
+        BOOST_TEST(gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)), "Quaternion from matrix comparison failed.");
     }
     for (auto ti = 0; ti < 100; ++ti) {
         const auto x0 = dis(re);
@@ -143,9 +133,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         const auto gx_quat = GxQuat(x0, y0, z0, w0) * GxQuat(x1, y1, z1, w1);
         const auto glm_quat = glm::quat(w0, x0, y0, z0) * glm::quat(w1, x1, y1, z1);
 
-        BOOST_TEST(
-            gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)),
-            "Quaternion from matrix comparison failed.");
+        BOOST_TEST(gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)), "Quaternion from matrix comparison failed.");
     }
 
     for (auto ti = 0; ti < 100; ++ti) {
@@ -157,9 +145,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_math_quaternion)
         const auto gx_quat = GxQuat::angle_axis(w0, { x0, y0, z0 });
         const auto glm_quat = glm::angleAxis(w0, glm::vec3(x0, y0, z0));
 
-        BOOST_TEST(
-            gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)),
-            "Quaternion from matrix comparison failed.");
+        BOOST_TEST(gx_quat.equal(GxQuat(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w)), "Quaternion from matrix comparison failed.");
     }
 
     for (auto ti = 0; ti < 100; ++ti) {

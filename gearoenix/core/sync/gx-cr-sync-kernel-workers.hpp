@@ -40,14 +40,8 @@ private:
 public:
     KernelWorkers();
     ~KernelWorkers();
-    void add_step(
-        std::function<void(const unsigned int)> worker,
-        std::function<void()> receiver = [] { });
-    void add_step(
-        std::function<void()> sender,
-        std::function<void(const unsigned int)> worker,
-        std::function<void()> meanwhile,
-        std::function<void()> receiver);
+    void add_step(std::function<void(unsigned int)> worker, std::function<void()> receiver = [] { });
+    void add_step(std::function<void()> sender, std::function<void(unsigned int)> worker, std::function<void()> meanwhile, std::function<void()> receiver);
     void do_steps();
     [[nodiscard]] unsigned int get_threads_count() const;
 };

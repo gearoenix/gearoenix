@@ -1,9 +1,6 @@
 #include "gx-rnd-vertex.hpp"
 
-gearoenix::render::PbrVertex::PbrVertex(platform::stream::Stream& f)
-{
-    read(f);
-}
+gearoenix::render::PbrVertex::PbrVertex(platform::stream::Stream& f) { read(f); }
 
 void gearoenix::render::PbrVertex::read(platform::stream::Stream& f)
 {
@@ -15,10 +12,7 @@ void gearoenix::render::PbrVertex::read(platform::stream::Stream& f)
 
 std::ostream& operator<<(std::ostream& os, const gearoenix::render::PbrVertex& v)
 {
-    os << R"({ "type": "PbrVertex", "position": )" << v.position
-       << ", \"normal\": " << v.normal
-       << ", \"tangent\": " << v.tangent
-       << ", \"uv\": " << v.uv << "}";
+    os << R"({ "type": "PbrVertex", "position": )" << v.position << ", \"normal\": " << v.normal << ", \"tangent\": " << v.tangent << ", \"uv\": " << v.uv << "}";
     return os;
 }
 
@@ -151,15 +145,9 @@ void gearoenix::render::calculate_tangents(PbrVertices& vertices, const std::vec
         const auto dom_r = uv1.x * uv2.y - uv1.y * uv2.x;
         const auto r = 1.0f / (dom_r > math::Numeric::epsilon<float> || dom_r < -math::Numeric::epsilon<float> ? dom_r : math::Numeric::epsilon<float>);
 
-        const math::Vec3 tangent(
-            ((edge1.x * uv2.y) - (edge2.x * uv1.y)) * r,
-            ((edge1.y * uv2.y) - (edge2.y * uv1.y)) * r,
-            ((edge1.z * uv2.y) - (edge2.z * uv1.y)) * r);
+        const math::Vec3 tangent(((edge1.x * uv2.y) - (edge2.x * uv1.y)) * r, ((edge1.y * uv2.y) - (edge2.y * uv1.y)) * r, ((edge1.z * uv2.y) - (edge2.z * uv1.y)) * r);
 
-        const math::Vec3 bitangent(
-            ((edge1.x * uv2.x) - (edge2.x * uv1.x)) * r,
-            ((edge1.y * uv2.x) - (edge2.y * uv1.x)) * r,
-            ((edge1.z * uv2.x) - (edge2.z * uv1.x)) * r);
+        const math::Vec3 bitangent(((edge1.x * uv2.x) - (edge2.x * uv1.x)) * r, ((edge1.y * uv2.x) - (edge2.y * uv1.x)) * r, ((edge1.z * uv2.x) - (edge2.z * uv1.x)) * r);
 
         tan_a[i0] += tangent;
         tan_a[i1] += tangent;

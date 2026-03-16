@@ -97,9 +97,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(pos_max.size() == 3);
     GX_ASSERT_D(pos_min.size() == 3);
 
-    const math::Aabb3 box(
-        math::Vec3(pos_max[0], pos_max[1], pos_max[2]),
-        math::Vec3(pos_min[0], pos_min[1], pos_min[2]));
+    const math::Aabb3 box(math::Vec3(pos_max[0], pos_max[1], pos_max[2]), math::Vec3(pos_min[0], pos_min[1], pos_min[2]));
 
     std::vector<PbrVertex> vertices(pos_a.count);
     std::vector<PbrVertexAnimated> animated_vertices(is_animated ? pos_a.count : 0);
@@ -273,11 +271,9 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
 
     auto name = msh.name + "-primitive:" + std::to_string(primitive_index);
     if (is_animated) {
-        mesh::Manager::get().build(
-            std::move(name), std::move(animated_vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
+        mesh::Manager::get().build(std::move(name), std::move(animated_vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
     } else {
-        mesh::Manager::get().build(
-            std::move(name), std::move(vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
+        mesh::Manager::get().build(std::move(name), std::move(vertices), std::move(indices), box, std::move(material), std::move(mesh_end_callback));
     }
 }
 
@@ -287,9 +283,7 @@ void load_mesh(const Context& context, const int mesh_index, const core::job::En
     GX_LOG_D("Loading mesh: " << msh.name);
     context.meshes.meshes[mesh_index]->meshes.resize(msh.primitives.size());
     for (int primitive_index = 0; primitive_index < msh.primitives.size(); ++primitive_index) {
-        core::job::send_job_to_pool([&context, mesh_index, primitive_index, end_callback] {
-            load_mesh(context, mesh_index, primitive_index, end_callback);
-        });
+        core::job::send_job_to_pool([&context, mesh_index, primitive_index, end_callback] { load_mesh(context, mesh_index, primitive_index, end_callback); });
     }
 }
 }

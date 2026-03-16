@@ -13,5 +13,6 @@ public:
     ~Manager() override;
 
     [[nodiscard]] virtual core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, meshes_set_t&& meshes, bool is_transformable);
+    virtual void update();
 };
 }

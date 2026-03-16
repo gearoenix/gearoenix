@@ -17,59 +17,33 @@ gearoenix::render::widget::Label::Label(std::string&& name)
 
 gearoenix::render::widget::Label::~Label() = default;
 
-void gearoenix::render::widget::Label::construct(
-    std::string&& name,
-    std::string&& background_texture_asset,
-    core::ecs::Entity* const camera_entity,
-    std::shared_ptr<Widget>&& parent,
-    core::job::EndCallerShared<Label>&& end_callback)
+void gearoenix::render::widget::Label::construct(std::string&& name, std::string&& background_texture_asset, core::ecs::Entity* const camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
 {
     const auto path = platform::stream::Path::create_asset(std::move(background_texture_asset));
-    texture::Manager::get().create_2d_from_file(
-        path, texture::TextureInfo(),
+    texture::Manager::get().create_2d_from_file(path, texture::TextureInfo(),
         core::job::EndCallerShared<texture::Texture2D>(
-            [n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& t) mutable {
-                construct(std::move(n), std::move(t), c, std::move(p), std::move(e));
-            }));
+            [n = std::move(name), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<texture::Texture2D>&& t) mutable { construct(std::move(n), std::move(t), c, std::move(p), std::move(e)); }));
 }
 
-void gearoenix::render::widget::Label::construct(
-    std::string&& name,
-    std::shared_ptr<texture::Texture2D>&& background_texture,
-    core::ecs::Entity* const camera_entity,
-    std::shared_ptr<Widget>&& parent,
-    core::job::EndCallerShared<Label>&& end_callback)
+void gearoenix::render::widget::Label::construct(std::string&& name, std::shared_ptr<texture::Texture2D>&& background_texture, core::ecs::Entity* const camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
 {
-    material::Manager::get().get_unlit(name + "-material", core::job::EndCallerShared<material::Unlit>([n = std::move(name), t = std::move(background_texture), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
-        construct(std::move(n), std::move(t), std::move(m), c, std::move(p), std::move(e));
-    }));
+    material::Manager::get().get_unlit(
+        name + "-material", core::job::EndCallerShared<material::Unlit>([n = std::move(name), t = std::move(background_texture), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<material::Unlit>&& m) mutable {
+            construct(std::move(n), std::move(t), std::move(m), c, std::move(p), std::move(e));
+        }));
 }
 
 void gearoenix::render::widget::Label::construct(
-    std::string&& name,
-    std::shared_ptr<texture::Texture2D>&& background_texture,
-    std::shared_ptr<material::Material>&& mat,
-    core::ecs::Entity* const camera_entity,
-    std::shared_ptr<Widget>&& parent,
-    core::job::EndCallerShared<Label>&& end_callback)
+    std::string&& name, std::shared_ptr<texture::Texture2D>&& background_texture, std::shared_ptr<material::Material>&& mat, core::ecs::Entity* const camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
 {
     auto copy_mat = std::shared_ptr(mat);
-    mesh::Manager::get().build_plate(
-        std::move(copy_mat),
-        core::job::EndCallerShared<mesh::Mesh>(
-            [n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
-                construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(e));
-            }));
+    mesh::Manager::get().build_plate(std::move(copy_mat),
+        core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](
+                                                   std::shared_ptr<mesh::Mesh>&& msh) mutable { construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(e)); }));
 }
 
-void gearoenix::render::widget::Label::construct(
-    std::string&& name,
-    std::shared_ptr<texture::Texture2D>&& background_texture,
-    std::shared_ptr<material::Material>&& mat,
-    std::shared_ptr<mesh::Mesh>&& msh,
-    core::ecs::Entity* const camera_entity,
-    std::shared_ptr<Widget>&& parent,
-    core::job::EndCallerShared<Label>&& end_callback)
+void gearoenix::render::widget::Label::construct(std::string&& name, std::shared_ptr<texture::Texture2D>&& background_texture, std::shared_ptr<material::Material>&& mat, std::shared_ptr<mesh::Mesh>&& msh, core::ecs::Entity* const camera_entity,
+    std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::move(background_texture));

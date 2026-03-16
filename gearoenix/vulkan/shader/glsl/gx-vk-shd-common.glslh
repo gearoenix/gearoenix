@@ -1,0 +1,147 @@
+#ifndef GX_VK_SHD_COMMON_GLSLH
+#define GX_VK_SHD_COMMON_GLSLH
+
+#ifdef __cplusplus
+
+#include "../../../math/gx-math-matrix-4d.hpp"
+
+using vec2 = gearoenix::math::Vec2<float>;
+using vec3 = gearoenix::math::Vec3<float>;
+using vec4 = gearoenix::math::Vec4<float>;
+using mat4 = gearoenix::math::Mat4x4<float>;
+using uint = std::uint32_t;
+
+#endif
+
+#define GX_VK_SHD_MAX_SHADOW_CASTER_DIRECTIONAL_LIGHTS 8
+
+#ifndef GX_PI
+#define GX_PI 3.141592653589793238
+#endif
+
+#ifndef GX_INVALID_INDEX32
+#define GX_INVALID_INDEX32 0xFFFFFFFF
+#endif
+
+#ifndef GX_INVALID_INDEX16
+#define GX_INVALID_INDEX16 0xFFFF
+#endif
+
+struct hitPayload
+{
+    vec3 hitValue;
+    uint seed;
+    int depth;
+    vec3 rayOrigin;
+    vec3 rayDirection;
+    vec3 weight;
+};
+
+struct GxShaderDataScene
+{
+    vec4 ambient_light;
+
+    uint brdflut_texture_index;
+    uint brdflut_sampler_index;
+
+    uint sheen_lut_texture_index;
+    uint sheen_lut_sampler_index;
+
+    uint clearcoat_lut_texture_index;
+    uint clearcoat_lut_sampler_index;
+
+    uint sss_lut_texture_index;
+    uint sss_lut_sampler_index;
+};
+
+struct GxShaderDataCamera {
+    mat4 view_projection;
+    vec4 position_far;
+};
+
+struct GxShaderDataCameraJointModel {
+    mat4 mvp;
+};
+
+struct GxShaderDataModel {
+    mat4 m;
+    mat4 inv_transpose_m;
+
+    uint bones_begin_index;
+    uint bones_end_index;
+
+    uint point_light_begin_index;
+    uint point_light_end_index;
+
+    uint directional_light_begin_index;
+    uint directional_light_end_index;
+
+    uint shadow_caster_directional_lights_count;
+    uint shadow_caster_directional_lights[GX_VK_SHD_MAX_SHADOW_CASTER_DIRECTIONAL_LIGHTS];
+
+    uint reflection_probe_index;
+};
+
+struct GxShaderDataReflectionProbe {
+    vec4 position_radius;
+
+    uint irradiance_texture_index;
+    uint irradiance_sampler_index;
+
+    uint radiance_texture_index;
+    uint radiance_sampler_index;
+
+    float radiance_lod_coefficient;
+
+    float _reserved;
+    float _reserved2;
+    float _reserved3;
+};
+
+struct GxShaderDataMaterial {
+    vec4 albedo_factor;
+    vec4 normal_metallic_factor;
+    vec4 emission_roughness_factor;
+    vec4 alpha_cutoff_occlusion_strength_reserved;
+
+    uint albedo_texture_index;
+    uint albedo_sampler_index;
+
+    uint normal_texture_index;
+    uint normal_sampler_index;
+
+    uint metallic_roughness_texture_index;
+    uint metallic_roughness_sampler_index;
+
+    uint emission_texture_index;
+    uint emission_sampler_index;
+
+    uint occlusion_texture_index;
+    uint occlusion_sampler_index;
+
+    uint _padding0;
+    uint _padding1;
+};
+
+struct GxShaderDataPointLight {
+    vec4 position;
+    vec4 colour;
+};
+
+struct GxShaderDataDirectionalLight {
+    vec4 direction;
+    vec4 colour;
+};
+
+struct GxShaderDataShadowCasterDirectionalLight {
+    vec4 direction_bit_shadow_map_texture_index;
+    vec4 colour;
+    mat4 normalised_vp;
+};
+
+struct GxShaderDataBone {
+    mat4 m;
+    mat4 inv_transpose_m;
+};
+
+#endif

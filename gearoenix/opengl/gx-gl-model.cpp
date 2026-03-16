@@ -19,39 +19,28 @@ gearoenix::gl::Model::Model(core::ecs::Entity* const entity, render::model::mesh
 
 gearoenix::gl::Model::~Model() = default;
 
-void gearoenix::gl::Model::render_shadow(
-    const render::record::Camera& camera,
-    const render::record::CameraModel& camera_model,
-    uint& current_shader)
+void gearoenix::gl::Model::render_shadow(const render::record::Camera& camera, const render::record::CameraModel& camera_model, uint& current_shader)
 {
     for (const auto& msh : gl_meshes) {
         msh->get_gl_material()->shadow(*msh, camera, camera_model, current_shader);
     }
 }
 
-void gearoenix::gl::Model::render_forward(const Scene& scene, const render::record::Camera& camera,
-    const render::record::CameraModel& camera_model, uint& current_shader)
+void gearoenix::gl::Model::render_forward(const Scene& scene, const render::record::Camera& camera, const render::record::CameraModel& camera_model, uint& current_shader)
 {
     for (const auto& msh : gl_meshes) {
         msh->get_gl_material()->render_forward(scene, camera, camera_model, *msh, current_shader);
     }
 }
 
-gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(
-    std::string&& name,
-    core::ecs::Entity* const parent,
-    render::model::meshes_set_t&& meshes,
-    const bool is_transformable)
+gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(std::string&& name, core::ecs::Entity* const parent, render::model::meshes_set_t&& meshes, const bool is_transformable)
 {
     auto entity = Manager::build(std::move(name), parent, std::move(meshes), is_transformable);
     entity->add_component(core::Object::construct<Model>(entity.get(), std::move(meshes), std::move(name), is_transformable));
     return entity;
 }
 
-gearoenix::gl::ModelManager::ModelManager()
-{
-    core::ecs::ComponentType::add<Model>();
-}
+gearoenix::gl::ModelManager::ModelManager() { core::ecs::ComponentType::add<Model>(); }
 
 gearoenix::gl::ModelManager::~ModelManager() = default;
 

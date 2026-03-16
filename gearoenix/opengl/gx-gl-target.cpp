@@ -12,10 +12,7 @@ gearoenix::gl::Target::Target(std::string&& in_name, std::vector<render::texture
 {
 }
 
-void gearoenix::gl::Target::construct(
-    std::string&& name,
-    std::vector<render::texture::Attachment>&& attachments,
-    core::job::EndCallerShared<render::texture::Target>&& end_callback)
+void gearoenix::gl::Target::construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback)
 {
     std::shared_ptr<Target> self(new Target(std::string(name), std::move(attachments)));
     GX_ASSERT_D(!self->attachments.empty());
@@ -101,14 +98,9 @@ void gearoenix::gl::Target::construct(
 gearoenix::gl::Target::~Target()
 {
     attachments.clear();
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [f = framebuffer] {
-        glDeleteFramebuffers(1, &f);
-    });
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [f = framebuffer] { glDeleteFramebuffers(1, &f); });
 }
 
-void gearoenix::gl::Target::bind() const
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-}
+void gearoenix::gl::Target::bind() const { glBindFramebuffer(GL_FRAMEBUFFER, framebuffer); }
 
 #endif

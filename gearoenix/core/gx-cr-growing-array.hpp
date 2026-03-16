@@ -39,25 +39,13 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*()
-        {
-            return ref.array[index];
-        }
+        [[nodiscard]] constexpr reference operator*() const { return ref.array[index]; }
 
-        [[nodiscard]] constexpr pointer operator->()
-        {
-            return &ref.array[index];
-        }
+        [[nodiscard]] constexpr pointer operator->() const { return &ref.array[index]; }
 
-        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const
-        {
-            return index == rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const { return index == rhs.index; }
 
-        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const
-        {
-            return index != rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const { return index != rhs.index; }
     };
 
     constexpr void push_back(T&& value)
@@ -68,41 +56,23 @@ public:
 
     constexpr void clear()
     {
-        for (auto i = 0; i < index; ++i) {
+        for (auto i = decltype(index) { 0 }; i < index; ++i) {
             array[i].~T();
         }
         index = 0;
     }
 
     template <typename I>
-    [[nodiscard]] constexpr const T& operator[](const I i) const
-    {
-        return array[i];
-    }
+    [[nodiscard]] constexpr const T& operator[](const I i) const { return array[i]; }
 
-    [[nodiscard]] constexpr std::size_t size() const
-    {
-        return index;
-    }
+    [[nodiscard]] constexpr std::size_t size() const { return index; }
 
-    [[nodiscard]] constexpr bool empty() const
-    {
-        return index == 0;
-    }
+    [[nodiscard]] constexpr bool empty() const { return index == 0; }
 
-    [[nodiscard]] constexpr std::uintptr_t max_size()
-    {
-        return array.size();
-    }
+    [[nodiscard]] constexpr std::uintptr_t max_size() const { return array.size(); }
 
-    [[nodiscard]] constexpr const_iterator begin() const
-    {
-        return const_iterator(0, *this);
-    }
+    [[nodiscard]] constexpr const_iterator begin() const { return const_iterator(0, *this); }
 
-    [[nodiscard]] constexpr const_iterator end() const
-    {
-        return const_iterator(index, *this);
-    }
+    [[nodiscard]] constexpr const_iterator end() const { return const_iterator(index, *this); }
 };
 }

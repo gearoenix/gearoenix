@@ -1,39 +1,37 @@
-#ifndef GEAROENIX_VULKAN_COMMAND_MANAGER_HPP
-#define GEAROENIX_VULKAN_COMMAND_MANAGER_HPP
+#pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-singleton.hpp"
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-cmd-buffer.hpp"
 #include "gx-vk-cmd-pool.hpp"
 #include "gx-vk-cmd-type.hpp"
-#include <map>
+
+#include <boost/container/flat_map.hpp>
+
 #include <memory>
 #include <optional>
 #include <thread>
 
-namespace gearoenix::vulkan::engine {
-struct Engine;
-}
-
 namespace gearoenix::vulkan::command {
-struct Manager final {
-    GX_GET_CRRF_PRV(engine::Engine, e);
-
+struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex this_lock;
-    std::map<std::uint64_t, Pool> indexed_pools;
-    std::map<std::thread::id, Pool> threads_pools;
+    boost::container::flat_map<std::uint64_t, PoolPtr> indexed_pools;
+    boost::container::flat_map<std::thread::id, PoolPtr> threads_pools;
 
 public:
-    Manager(const Manager&) = delete;
+    Manager();
     Manager(Manager&&) = delete;
-    explicit Manager(const engine::Engine& e);
-    ~Manager();
-    Manager& operator=(const Manager&) = delete;
+    Manager(const Manager&) = delete;
     Manager& operator=(Manager&&) = delete;
-    [[nodiscard]] Buffer create(Type buffer_type, std::optional<std::uint64_t> thread_index = std::nullopt);
-    [[nodiscard]] std::vector<std::shared_ptr<Buffer>> create_frame_based();
+    Manager& operator=(const Manager&) = delete;
+    ~Manager() override;
+
+    [[nodiscard]] std::shared_ptr<Buffer> create(Type buffer_type = Type::Primary, std::optional<std::uint64_t> thread_index = std::nullopt);
+
+    /// The created command buffer will have its own dedicated pool so it can be passed between threads.
+    [[nodiscard]] static std::shared_ptr<Buffer> create_thread_independent();
 };
 }
-#endif
 #endif

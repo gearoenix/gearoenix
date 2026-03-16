@@ -1,5 +1,7 @@
 #include "gx-rnd-eng-engine.hpp"
+
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-runtime-configuration.hpp"
@@ -16,21 +18,22 @@
 #include "../scene/gx-rnd-scn-manager.hpp"
 #include "../skybox/gx-rnd-sky-manager.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
+
 #include <cinttypes>
 
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/engine/gx-vk-eng-engine.hpp"
 #endif
 
-#ifdef GX_RENDER_DIRECT3D_ENABLED
+#if GX_RENDER_DIRECT3D_ENABLED
 #include "../../direct3d/gx-d3d-engine.hpp"
 #endif
 
-#ifdef GX_RENDER_METAL_ENABLED
+#if GX_RENDER_METAL_ENABLED
 #include "../../metal/gx-mtl-engine.hpp"
 #endif
 
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
@@ -47,50 +50,61 @@ gearoenix::render::engine::Engine::Engine(const Type engine_type)
     core::job::register_current_thread();
 }
 
-std::set<gearoenix::render::engine::Type> gearoenix::render::engine::Engine::get_available_engines()
+const boost::container::flat_set<gearoenix::render::engine::Type>& gearoenix::render::engine::Engine::get_available_engines()
 {
-    std::set<Type> result;
-#ifdef GX_RENDER_DIRECT3D_ENABLED
-    result.insert(Type::Direct3D);
+    static const auto available_engines = [] {
+        boost::container::flat_set<Type> result;
+#if GX_RENDER_DIRECT3D_ENABLED
+        result.insert(Type::Direct3D);
 #endif
-#ifdef GX_RENDER_METAL_ENABLED
-    result.insert(Type::Metal);
+
+#if GX_RENDER_METAL_ENABLED
+        result.insert(Type::Metal);
 #endif
-#ifdef GX_RENDER_VULKAN_ENABLED
-    if (vulkan::engine::Engine::is_supported()) {
-        result.insert(Type::Vulkan);
-    }
+
+#if GX_RENDER_VULKAN_ENABLED
+        if (vulkan::engine::Engine::is_supported()) {
+            result.insert(Type::Vulkan);
+        }
 #endif
-#ifdef GX_RENDER_OPENGL_ENABLED
-    result.insert(Type::OpenGL);
+
+#if GX_RENDER_OPENGL_ENABLED
+        result.insert(Type::OpenGL);
 #endif
-    return result;
+        return result;
+    }();
+    return available_engines;
 }
 
 std::unique_ptr<gearoenix::render::engine::Engine> gearoenix::render::engine::Engine::construct()
 {
     std::unique_ptr<Engine> result;
     const auto& configuration = platform::RuntimeConfiguration::get();
-#ifdef GX_RENDER_VULKAN_ENABLED
-    if (configuration.get_vulkan_render_backend_enabled() && vulkan::engine::Engine::is_supported()) {
-        result = std::make_unique<vulkan::engine::Engine>(platform_application);
+
+#if GX_RENDER_VULKAN_ENABLED
+    if (configuration.get_vulkan_render_backend_enabled() && get_available_engines().contains(Type::Vulkan)) {
+        result = std::make_unique<vulkan::engine::Engine>();
     }
 #endif
-#ifdef GX_RENDER_DIRECT3D_ENABLED
-    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && d3d::Engine::is_supported()) {
+
+#if GX_RENDER_DIRECT3D_ENABLED
+    if (result == nullptr && configuration.get_direct3dx_render_backend_enabled() && get_available_engines().contains(Type::Direct3D)) {
         result = d3d::Engine::construct(platform_application);
     }
 #endif
-#ifdef GX_RENDER_METAL_ENABLED
-    if (result == nullptr && configuration.get_metal_render_backend_enabled() && metal::Engine::is_supported()) {
+
+#if GX_RENDER_METAL_ENABLED
+    if (result == nullptr && configuration.get_metal_render_backend_enabled() && get_available_engines().contains(Type::Metal)) {
         result = metal::Engine::construct(platform_application);
     }
 #endif
-#ifdef GX_RENDER_OPENGL_ENABLED
-    if (result == nullptr && configuration.get_opengl_render_backend_enabled() && gl::Engine::is_supported()) {
+
+#if GX_RENDER_OPENGL_ENABLED
+    if (result == nullptr && configuration.get_opengl_render_backend_enabled() && get_available_engines().contains(Type::OpenGL)) {
         result = gl::Engine::construct();
     }
 #endif
+
     GX_CHECK_NOT_EQUAL(result, nullptr);
     return result;
 }
@@ -99,6 +113,7 @@ gearoenix::render::engine::Engine::~Engine() = default;
 
 void gearoenix::render::engine::Engine::start_frame()
 {
+    GX_PROFILE_NEW_FRAME;
     if (const auto diff = minimum_frame_time - std::chrono::duration<double>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
         std::this_thread::sleep_for(std::chrono::duration<double>(diff));
     }
@@ -128,11 +143,39 @@ void gearoenix::render::engine::Engine::start_frame()
 
 void gearoenix::render::engine::Engine::end_frame()
 {
-    physics_engine->start_frame(); // Don't mistake this with the actual start of frame; in start_frame of Engine, we prepare everything for user interaction.
+    GX_PROFILE_BEGIN(render - engine - end - frame);
+    // Don't mistake the following with the actual start of a frame.
+    // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
+
+    GX_PROFILE_BEGIN(render - engine - physics_engine->start_frame);
+    physics_engine->start_frame();
+    GX_PROFILE_END(render - engine - physics_engine->start_frame);
+
+    GX_PROFILE_BEGIN(render - engine - model_manager->update);
+    model_manager->update();
+    GX_PROFILE_END(render - engine - model_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - camera_manager->update);
     camera_manager->update();
+    GX_PROFILE_END(render - engine - camera_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - light_manager->update);
+    light_manager->update();
+    GX_PROFILE_END(render - engine - light_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - reflection_manager->update);
     reflection_manager->update();
+    GX_PROFILE_END(render - engine - reflection_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - scene_manager->update);
     scene_manager->update();
+    GX_PROFILE_END(render - engine - scene_manager->update);
+
+    GX_PROFILE_BEGIN(render - engine - physics_engine->end_frame);
     physics_engine->end_frame();
+    GX_PROFILE_END(render - engine - physics_engine->end_frame);
+
+    GX_PROFILE_END(render - engine - end - frame);
 }
 
 void gearoenix::render::engine::Engine::window_resized()
@@ -149,3 +192,5 @@ void gearoenix::render::engine::Engine::show_debug_gui()
         // TODO: I have to show all other things
     });
 }
+
+void gearoenix::render::engine::Engine::flush() { }

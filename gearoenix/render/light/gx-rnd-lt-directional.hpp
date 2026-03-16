@@ -56,12 +56,7 @@ struct ShadowCasterDirectional : Light {
 
 public:
     ~ShadowCasterDirectional() override;
-    virtual void initialise(
-        std::uint32_t resolution,
-        float camera_far,
-        float camera_near,
-        float camera_aspect,
-        core::job::EndCaller<>&& end_callback);
+    virtual void initialise(std::uint32_t resolution, float camera_far, float camera_near, float camera_aspect, core::job::EndCaller<>&& end_callback);
     virtual void initialise_camera(float camera_far, float camera_near, float camera_aspect);
     virtual void set_shadow_map(std::uint32_t resolution, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map(std::shared_ptr<texture::Texture2D>&&, core::job::EndCaller<>&& end_callback);

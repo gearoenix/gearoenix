@@ -4,9 +4,9 @@
 
 Gearoenix game engine.
 
-[![Ubuntu-24.04  ](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml)
-[![Windows-2022  ](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml)
-[![WASM  ](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml)
+[![Ubuntu](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/linux.yml)
+[![Windows](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/windows.yml)
+[![WASM](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml/badge.svg)](https://github.com/gearoenix/gearoenix/actions/workflows/wasm.yml)
 [![codecov](https://codecov.io/gh/gearoenix/gearoenix/branch/master/graph/badge.svg?token=48NJY46U15)](https://codecov.io/gh/gearoenix/gearoenix)
 [![Discord](https://img.shields.io/discord/700169912605474856.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/uGs66W6AM3)
 

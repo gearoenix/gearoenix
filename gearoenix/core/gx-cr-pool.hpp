@@ -34,25 +34,13 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*()
-        {
-            return pool->objects[index];
-        }
+        [[nodiscard]] constexpr reference operator*() { return pool->objects[index]; }
 
-        [[nodiscard]] constexpr pointer operator->()
-        {
-            return &pool->objects[index];
-        }
+        [[nodiscard]] constexpr pointer operator->() { return &pool->objects[index]; }
 
-        [[nodiscard]] constexpr bool operator==(const iterator& rhs) const
-        {
-            return index == rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator==(const iterator& rhs) const { return index == rhs.index; }
 
-        [[nodiscard]] constexpr bool operator!=(const iterator& rhs) const
-        {
-            return index != rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator!=(const iterator& rhs) const { return index != rhs.index; }
 
     private:
         std::uintptr_t index = 0;
@@ -81,25 +69,13 @@ public:
             return *this;
         }
 
-        [[nodiscard]] constexpr reference operator*()
-        {
-            return pool->objects[index];
-        }
+        [[nodiscard]] constexpr reference operator*() { return pool->objects[index]; }
 
-        [[nodiscard]] constexpr pointer operator->()
-        {
-            return &pool->objects[index];
-        }
+        [[nodiscard]] constexpr pointer operator->() { return &pool->objects[index]; }
 
-        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const
-        {
-            return index == rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator==(const const_iterator& rhs) const { return index == rhs.index; }
 
-        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const
-        {
-            return index != rhs.index;
-        }
+        [[nodiscard]] constexpr bool operator!=(const const_iterator& rhs) const { return index != rhs.index; }
 
     private:
         std::uintptr_t index = 0;
@@ -115,46 +91,22 @@ public:
         return size++;
     }
 
-    constexpr void clear()
-    {
-        size = 0;
-    }
+    constexpr void clear() { size = 0; }
 
-    [[nodiscard]] constexpr std::uint32_t get_size()
-    {
-        return size;
-    }
+    [[nodiscard]] constexpr std::uint32_t get_size() const { return size; }
 
-    [[nodiscard]] constexpr iterator begin()
-    {
-        return iterator(0, this);
-    }
+    [[nodiscard]] constexpr iterator begin() { return iterator(0, this); }
 
-    [[nodiscard]] constexpr iterator end()
-    {
-        return iterator(size, this);
-    }
+    [[nodiscard]] constexpr iterator end() { return iterator(size, this); }
 
-    [[nodiscard]] constexpr const_iterator begin() const
-    {
-        return const_iterator(0, this);
-    }
+    [[nodiscard]] constexpr const_iterator begin() const { return const_iterator(0, this); }
 
-    [[nodiscard]] constexpr const_iterator end() const
-    {
-        return const_iterator(size, this);
-    }
+    [[nodiscard]] constexpr const_iterator end() const { return const_iterator(size, this); }
 
     template <typename I>
-    [[nodiscard]] constexpr const T& operator[](const I index) const
-    {
-        return objects[static_cast<std::uint32_t>(index)];
-    }
+    [[nodiscard]] constexpr const T& operator[](const I index) const { return objects[static_cast<std::uint32_t>(index)]; }
 
     template <typename I>
-    [[nodiscard]] constexpr T& operator[](const I index)
-    {
-        return objects[static_cast<std::uint32_t>(index)];
-    }
+    [[nodiscard]] constexpr T& operator[](const I index) { return objects[static_cast<std::uint32_t>(index)]; }
 };
 }

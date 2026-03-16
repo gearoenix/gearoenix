@@ -2,7 +2,6 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 #include "gx-rnd-gltf-context.hpp"
-#include <unordered_set>
 
 namespace {
 auto convert_wrap(const int w)
@@ -131,8 +130,7 @@ void gearoenix::render::gltf::Textures::load(core::job::EndCaller<>&& end)
     }
 }
 
-const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::gltf::Textures::get(
-    const int index, const std::shared_ptr<texture::Texture2D>& default_value) const
+const std::shared_ptr<gearoenix::render::texture::Texture2D>& gearoenix::render::gltf::Textures::get(const int index, const std::shared_ptr<texture::Texture2D>& default_value) const
 {
     if (index < 0) {
         return default_value;

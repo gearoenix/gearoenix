@@ -17,12 +17,10 @@ struct Layout : core::event::Listener {
 };
 
 struct LayoutWindowBasedPlacer final : Layout {
-    enum struct Side {
-        Left,
+    enum struct Side { Left,
         Right,
         Bottom,
-        Top
-    };
+        Top };
 
     const Size distance;
     const Side side;

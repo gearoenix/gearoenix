@@ -12,7 +12,7 @@ template <typename F>
 {
     [[maybe_unused]] const struct StylesPopper final {
         ~StylesPopper() { ImGui::PopStyleColor(); }
-    } _style_popper {};
+    } _style_popper { };
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.00f, 0.84f, 0.20f, 1.00f));
 
@@ -24,7 +24,7 @@ template <typename F>
 {
     [[maybe_unused]] const struct StylesPopper final {
         ~StylesPopper() { ImGui::PopStyleColor(3); }
-    } _style_popper {};
+    } _style_popper { };
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45f, 0.15f, 0.15f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.90f, 0.30f, 0.30f, 1.00f));
@@ -38,7 +38,7 @@ template <typename F>
 {
     [[maybe_unused]] const struct StylesPopper final {
         ~StylesPopper() { ImGui::PopStyleColor(3); }
-    } _style_popper {};
+    } _style_popper { };
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.45f, 0.15f, 1.00f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.80f, 0.30f, 1.00f));

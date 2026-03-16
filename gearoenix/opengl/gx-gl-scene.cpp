@@ -5,6 +5,7 @@
 #include "gx-gl-camera.hpp"
 #include "gx-gl-context.hpp"
 #include "gx-gl-label.hpp"
+
 #include <ranges>
 
 gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const double layer)
@@ -17,19 +18,14 @@ gearoenix::gl::Scene::Scene(const core::object_id_t id, std::string&& name)
 {
 }
 
-void gearoenix::gl::Scene::read(
-    std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream,
-    std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end)
+void gearoenix::gl::Scene::read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end)
 {
     render::scene::Scene::read(std::shared_ptr<render::scene::Scene>(std::move(self)), std::move(stream), std::move(object_streamer), std::move(end));
 }
 
 gearoenix::gl::Scene::~Scene() = default;
 
-void gearoenix::gl::Scene::update()
-{
-    render::scene::Scene::update();
-}
+void gearoenix::gl::Scene::update() { render::scene::Scene::update(); }
 
 void gearoenix::gl::Scene::render_shadows(uint& current_shader)
 {
@@ -63,10 +59,7 @@ void gearoenix::gl::Scene::render_forward(uint& current_shader)
     }
 }
 
-gearoenix::gl::SceneManager::SceneManager()
-{
-    core::ecs::ComponentType::add<Scene>();
-}
+gearoenix::gl::SceneManager::SceneManager() { core::ecs::ComponentType::add<Scene>(); }
 
 gearoenix::gl::SceneManager::~SceneManager() = default;
 

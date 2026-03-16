@@ -29,10 +29,7 @@ gearoenix::d3d::Uploader::Uploader(std::shared_ptr<Device> _device)
 
 gearoenix::d3d::Uploader::~Uploader() = default;
 
-void gearoenix::d3d::Uploader::upload(
-    std::vector<std::uint8_t>&& data,
-    std::shared_ptr<GpuBuffer>&& buffer,
-    core::job::EndCaller&& end)
+void gearoenix::d3d::Uploader::upload(std::vector<std::uint8_t>&& data, std::shared_ptr<GpuBuffer>&& buffer, core::job::EndCaller&& end)
 {
     uploader.push([this, data = std::move(data), buffer = std::move(buffer), end = std::move(end)]() {
         const auto& dev = device->get_device();
@@ -51,13 +48,7 @@ void gearoenix::d3d::Uploader::upload(
         const auto current_fence_value = fence_value;
         ++fence_value;
         GX_D3D_CHECK(copy_queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
-        uploader.push([this,
-                          buffer = std::move(buffer),
-                          cb = std::move(cb),
-                          end = std::move(end),
-                          cmd = std::move(cmd),
-                          cal = std::move(cal),
-                          current_fence_value]() {
+        uploader.push([this, buffer = std::move(buffer), cb = std::move(cb), end = std::move(end), cmd = std::move(cmd), cal = std::move(cal), current_fence_value]() {
             wait(current_fence_value);
             (void)buffer;
             (void)end;
@@ -68,11 +59,7 @@ void gearoenix::d3d::Uploader::upload(
     });
 }
 
-void gearoenix::d3d::Uploader::upload(
-    std::vector<std::uint8_t>&& data,
-    std::shared_ptr<Texture2D>&& texture,
-    const UINT subresource_index,
-    core::job::EndCaller&& end)
+void gearoenix::d3d::Uploader::upload(std::vector<std::uint8_t>&& data, std::shared_ptr<Texture2D>&& texture, const UINT subresource_index, core::job::EndCaller&& end)
 {
     uploader.push([this, data = std::move(data), texture = std::move(texture), end = std::move(end), subresource_index]() {
         const auto desc = texture->get_resource()->GetDesc();
@@ -105,15 +92,7 @@ void gearoenix::d3d::Uploader::upload(
         const auto current_fence_value = fence_value;
         ++fence_value;
         GX_D3D_CHECK(direct_queue->get_command_queue()->Signal(fence.Get(), current_fence_value));
-        uploader.push([this,
-                          texture = std::move(texture),
-                          cb = std::move(cb),
-                          end = std::move(end),
-                          cmd = std::move(cmd),
-                          cal = std::move(cal),
-                          gcmd = std::move(gcmd),
-                          gcal = std::move(gcal),
-                          current_fence_value]() {
+        uploader.push([this, texture = std::move(texture), cb = std::move(cb), end = std::move(end), cmd = std::move(cmd), cal = std::move(cal), gcmd = std::move(gcmd), gcal = std::move(gcal), current_fence_value]() {
             wait(current_fence_value);
             (void)texture;
             (void)end;
