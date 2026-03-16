@@ -2,6 +2,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/gx-cr-profiler.hpp"
+#include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
@@ -30,7 +31,6 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
-#include "../../physics/gx-phs-engine.hpp"
 #include "gx-vk-eng-frame.hpp"
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
