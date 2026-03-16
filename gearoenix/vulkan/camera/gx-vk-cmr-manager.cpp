@@ -11,8 +11,8 @@
 #include "../gx-vk-check.hpp"
 #include "../pipeline/gx-vk-pip-cache.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
-#include "../shader/gx-vk-shd-module.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
+#include "../shader/gx-vk-shd-module.hpp"
 #include "gx-vk-cmr-camera.hpp"
 
 #include <array>

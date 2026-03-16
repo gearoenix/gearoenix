@@ -8,6 +8,10 @@ namespace gearoenix::vulkan::pipeline {
 struct PushConstants;
 }
 
+namespace gearoenix::vulkan::texture {
+struct Texture2D;
+}
+
 namespace gearoenix::vulkan::scene {
 struct Scene final : render::scene::Scene {
     GEAROENIX_OBJECT_STRUCT_DEF;
@@ -17,10 +21,12 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
     GX_GET_VAL_PRV(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
+    std::shared_ptr<texture::Texture2D> brdflut;
 
     Scene(core::ecs::Entity* e, std::string&& name, double layer);
     Scene(core::object_id_t id, std::string&& name);
     static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
+    void initialise_brdflut();
 
 public:
     ~Scene() override;

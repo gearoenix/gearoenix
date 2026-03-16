@@ -194,6 +194,7 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
                 *stream,
                 core::job::EndCallerShared<Texture>([this, c = std::move(c)](std::shared_ptr<Texture>&& t) {
                     brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+                    textures_2d.set(file_name, brdflut);
                     // c is needed because it is possible that the texture name is difference when it got loaded by GX3D.
                     if (!c.has_return()) {
                         c.set_return(std::shared_ptr(brdflut));
@@ -225,6 +226,7 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
     create_2d_from_pixels(
         file_name, std::move(pixels), texture_info,
         core::job::EndCallerShared<Texture2D>([this](std::shared_ptr<Texture2D>&& t) {
+            textures_2d.set(file_name, t);
             if (brdflut) {
                 return;
             }
@@ -283,7 +285,9 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
         return false;
     }
     case Type::TextureCube: {
-        core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) { c.set_return(std::move(t)); });
+        core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) {
+            c.set_return(std::move(t));
+        });
         end.set_ignore_empty_value(true);
         if (get_from_cache(name, end, &info)) {
             return true;
@@ -304,7 +308,9 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     return textures_2d.get(name, core::job::EndCallerShared<Texture2D>([c GX_DEBUG_TXT_INFO](std::shared_ptr<Texture2D>&& t) {
         GX_ASSERT_D(!info.has_value() || info->get_type() == Type::Unknown || *info == t->get_info());
         GX_ASSERT_D(Type::Texture2D == t->get_info().get_type());
-        c.set_return(std::move(t));
+        if (!c.has_return()) {
+            c.set_return(std::move(t));
+        }
     }));
 }
 
@@ -313,7 +319,9 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     return textures_cube.get(name, core::job::EndCallerShared<TextureCube>([c GX_DEBUG_TXT_INFO](std::shared_ptr<TextureCube>&& t) {
         GX_ASSERT_D(!info.has_value() || *info == t->get_info());
         GX_ASSERT_D(Type::TextureCube == t->get_info().get_type());
-        c.set_return(std::move(t));
+        if (!c.has_return()) {
+            c.set_return(std::move(t));
+        }
     }));
 }
 

@@ -28,9 +28,13 @@ void load_scenes(const std::shared_ptr<Context>& ctx, const core::job::EndCaller
         }
     });
 
-    core::job::EndCaller materials_ready([ctx, end = std::move(meshes_ready)]() mutable { ctx->meshes.load(std::move(end)); });
+    core::job::EndCaller materials_ready([ctx, end = std::move(meshes_ready)]() mutable {
+        ctx->meshes.load(std::move(end));
+    });
 
-    core::job::EndCaller textures_ready([ctx, end = std::move(materials_ready)]() mutable { ctx->materials.load(std::move(end)); });
+    core::job::EndCaller textures_ready([ctx, end = std::move(materials_ready)]() mutable {
+        ctx->materials.load(std::move(end));
+    });
 
     ctx->textures.load(std::move(textures_ready));
 }

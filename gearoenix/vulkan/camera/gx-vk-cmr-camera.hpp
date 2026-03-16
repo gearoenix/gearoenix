@@ -38,8 +38,8 @@ struct Camera final : render::camera::Camera {
     GX_GET_VAL_PRV(std::uint64_t, last_update_frame_number, static_cast<std::uint64_t>(-1));
 
     VkDescriptorPool bloom_descriptor_pool = nullptr;
-    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex0_to_tex1 {};
-    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex1_to_tex0 {};
+    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex0_to_tex1 { };
+    std::array<VkDescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex1_to_tex0 { };
 
     void initialise_bloom_descriptors();
     void destroy_bloom_descriptors();

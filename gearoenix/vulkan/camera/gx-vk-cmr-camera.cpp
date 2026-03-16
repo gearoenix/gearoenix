@@ -3,7 +3,6 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "gx-vk-cmr-manager.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
@@ -19,6 +18,7 @@
 #include "../skybox/gx-vk-sky-skybox.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
+#include "gx-vk-cmr-manager.hpp"
 
 #include <cstring>
 #include <ranges>
@@ -184,7 +184,7 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
         img->transit(cmd, req.with_mips(mip, 1));
     };
 
-    BloomPushConstants pc {};
+    BloomPushConstants pc { };
 
     // Step 1: Multiply (tex0 mip 0 -> tex1 mip 0)
     {
@@ -323,7 +323,7 @@ void gearoenix::vulkan::camera::Camera::initialise_bloom_descriptors()
     std::array<VkDescriptorSetLayout, total_sets> layouts;
     layouts.fill(mgr.get_bloom_descriptor_set_layout());
 
-    std::array<VkDescriptorSet, total_sets> all_sets {};
+    std::array<VkDescriptorSet, total_sets> all_sets { };
     VkDescriptorSetAllocateInfo ds_info;
     GX_SET_ZERO(ds_info);
     ds_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -348,14 +348,14 @@ void gearoenix::vulkan::camera::Camera::initialise_bloom_descriptors()
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     };
 
-    std::array<VkDescriptorImageInfo, mips> tex1_mip_infos {};
-    std::array<VkDescriptorImageInfo, mips> tex0_mip_infos {};
+    std::array<VkDescriptorImageInfo, mips> tex1_mip_infos { };
+    std::array<VkDescriptorImageInfo, mips> tex0_mip_infos { };
     for (std::uint32_t i = 0; i < mips; ++i) {
         tex1_mip_infos[i] = { .imageView = tex1->get_mips()[i]->get_vulkan_data(), .imageLayout = VK_IMAGE_LAYOUT_GENERAL };
         tex0_mip_infos[i] = { .imageView = tex0->get_mips()[i]->get_vulkan_data(), .imageLayout = VK_IMAGE_LAYOUT_GENERAL };
     }
 
-    std::array<std::array<VkWriteDescriptorSet, 2>, total_sets> writes {};
+    std::array<std::array<VkWriteDescriptorSet, 2>, total_sets> writes { };
     GX_SET_ZERO(writes);
     for (std::uint32_t i = 0; i < mips; ++i) {
         auto& w0 = writes[i];
@@ -400,8 +400,8 @@ void gearoenix::vulkan::camera::Camera::destroy_bloom_descriptors()
         const auto dev = device::Logical::get().get_vulkan_data();
         vkDestroyDescriptorPool(dev, bloom_descriptor_pool, nullptr);
         bloom_descriptor_pool = nullptr;
-        bloom_ds_tex0_to_tex1 = {};
-        bloom_ds_tex1_to_tex0 = {};
+        bloom_ds_tex0_to_tex1 = { };
+        bloom_ds_tex1_to_tex0 = { };
     }
 }
 
@@ -432,7 +432,7 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(c
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline()->get_vulkan_data());
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[0], 0, nullptr);
 
-    ColourCorrectionPushConstants pc {};
+    ColourCorrectionPushConstants pc { };
     switch (colour_tuning.get_index()) {
     case render::camera::ColourTuning::gamma_correction_index:
         pc.mode = 0.0f;

@@ -119,7 +119,10 @@ public:
         return caller->value.has_value();
     }
 
-    void set_ignore_empty_value(const bool ignore_empty_value) const { caller->ignore_empty_value = ignore_empty_value; }
+    void set_ignore_empty_value(const bool ignore_empty_value) const
+    {
+        caller->ignore_empty_value = ignore_empty_value;
+    }
 };
 
 template <typename T>

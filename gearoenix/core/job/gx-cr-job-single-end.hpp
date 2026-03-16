@@ -22,6 +22,8 @@ public:
 
     void set(const Key& k, const std::shared_ptr<T>& v)
     {
+        GX_ASSERT_D(v);
+
         std::vector<EndCallerShared<T>> vec;
         {
             const std::lock_guard _lg(lock);

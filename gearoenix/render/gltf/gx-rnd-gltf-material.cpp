@@ -41,17 +41,21 @@ void gearoenix::render::gltf::Materials::initialise(const int index) const
 
 void gearoenix::render::gltf::Materials::load(const int index, core::job::EndCaller<>&& end)
 {
-    material::Manager::get().get_pbr(std::string(context.data.materials[index].name), core::job::EndCallerShared<material::Pbr>([this, end = std::move(end), index](std::shared_ptr<material::Pbr>&& m) {
-        materials[index] = std::move(m);
-        initialise(index);
-        (void)end;
-    }));
+    material::Manager::get().get_pbr(
+        std::string(context.data.materials[index].name),
+        core::job::EndCallerShared<material::Pbr>([this, end = std::move(end), index](std::shared_ptr<material::Pbr>&& m) {
+            materials[index] = std::move(m);
+            initialise(index);
+            (void)end;
+        }));
 }
 
 void gearoenix::render::gltf::Materials::load(core::job::EndCaller<>&& end)
 {
     materials.resize(context.data.materials.size());
     for (int material_id = 0; material_id < context.data.materials.size(); ++material_id) {
-        core::job::send_job_to_pool([this, material_id, end]() mutable { load(material_id, std::move(end)); });
+        core::job::send_job_to_pool([this, material_id, end]() mutable {
+            load(material_id, std::move(end));
+        });
     }
 }

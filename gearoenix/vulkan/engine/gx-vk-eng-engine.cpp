@@ -30,6 +30,7 @@
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 #include "../texture/gx-vk-txt-manager.hpp"
+#include "../../physics/gx-phs-engine.hpp"
 #include "gx-vk-eng-frame.hpp"
 
 void gearoenix::vulkan::engine::Engine::initialize_frame()
@@ -111,6 +112,7 @@ gearoenix::vulkan::engine::Engine::~Engine()
     render_queue = nullptr;
     mesh_manager = nullptr;
     texture_manager = nullptr;
+    physics_engine = nullptr;
     material_manager = nullptr;
     model_manager = nullptr;
     camera_manager = nullptr;
