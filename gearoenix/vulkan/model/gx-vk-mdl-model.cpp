@@ -75,9 +75,6 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
             inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
         }
         sd.bones_end_index = bone_indexer.get_current_index();
-        if (sd.bones_begin_index != sd.bones_end_index) {
-            ++sd.bones_begin_index;
-        }
     } else {
         sd.bones_begin_index = 0;
         sd.bones_end_index = 0;
