@@ -19,8 +19,12 @@ bool gearoenix::vulkan::Loader::load()
         return true;
     }
 
+    auto loaded = SDL_Vulkan_LoadLibrary(nullptr);
+
 #if GX_PLATFORM_APPLE
-    auto loaded = SDL_Vulkan_LoadLibrary("libvulkan.dylib");
+    if (!loaded) {
+        loaded = SDL_Vulkan_LoadLibrary("libvulkan.dylib");
+    }
 
     if (!loaded) {
         if (const auto* const env_str = std::getenv("VULKAN_SDK"); env_str != nullptr) {
@@ -28,8 +32,23 @@ bool gearoenix::vulkan::Loader::load()
             loaded = SDL_Vulkan_LoadLibrary(lib_path.c_str());
         }
     }
-#else
-    auto loaded = SDL_Vulkan_LoadLibrary(nullptr);
+
+    // Xcode strips environment variables (SIP), so try common SDK install paths
+    if (!loaded) {
+        loaded = SDL_Vulkan_LoadLibrary("/usr/local/lib/libvulkan.dylib");
+    }
+
+    if (!loaded) {
+        if (const auto* const home = std::getenv("HOME"); home != nullptr) {
+            const auto lib_path = std::string(home) + "/VulkanSDK/lib/libvulkan.dylib";
+            loaded = SDL_Vulkan_LoadLibrary(lib_path.c_str());
+        }
+    }
+
+    // Last resort: try MoltenVK directly
+    if (!loaded) {
+        loaded = SDL_Vulkan_LoadLibrary("libMoltenVK.dylib");
+    }
 #endif
 
     if (!loaded) {
@@ -59,6 +78,9 @@ void gearoenix::vulkan::Loader::load(const vk::Device& device)
     VULKAN_HPP_DEFAULT_DISPATCHER.init(device);
 }
 
-void gearoenix::vulkan::Loader::unload() { SDL_Vulkan_UnloadLibrary(); }
+void gearoenix::vulkan::Loader::unload()
+{
+    SDL_Vulkan_UnloadLibrary();
+}
 
 #endif
