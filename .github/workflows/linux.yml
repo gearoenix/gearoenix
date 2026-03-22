@@ -1,9 +1,9 @@
-name: 'Ubuntu-26.04  '
+name: 'Ubuntu-26.04       '
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:

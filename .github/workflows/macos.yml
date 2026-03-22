@@ -1,0 +1,115 @@
+name: 'macOS-26  '
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: macos-26
+    defaults:
+      run:
+        shell: bash
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+    steps:
+      - name: Export GitHub Actions cache variables
+        uses: actions/github-script@v8
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Setup cache
+        uses: actions/cache@v5
+        id: cache
+        with:
+          path: |
+            cmake/
+            ninja/
+          key: ${{ runner.os }}-macos-gearoenix-${{ hashFiles('.github/workflows/macos.yml') }}
+      - name: Install CMake
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -LS -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v4.3.0/cmake-4.3.0-macos-universal.tar.gz
+          mkdir -p cmake
+          tar xzf cmake.tar.gz -C cmake
+          rm cmake.tar.gz
+      - name: Setup CMake
+        run: |
+          echo "$GITHUB_WORKSPACE/cmake/cmake-4.3.0-macos-universal/CMake.app/Contents/bin" >> $GITHUB_PATH
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$(sysctl -n hw.logicalcpu)" >> $GITHUB_ENV
+      - name: Install Ninja
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -LS -o ninja.zip https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-mac.zip
+          mkdir -p ninja
+          unzip ninja.zip -d ninja
+          rm ninja.zip
+      - name: Setup Ninja
+        run: echo "$GITHUB_WORKSPACE/ninja" >> $GITHUB_PATH
+      - name: Cache vcpkg
+        uses: actions/cache@v5
+        id: vcpkg-cache
+        with:
+          path: vcpkg/
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', '.github/workflows/macos.yml') }}
+      - name: Install vcpkg
+        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.sh
+      - name: Setup vcpkg
+        run: |
+          echo "$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_PATH
+          echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
+      - name: Cache Vulkan SDK
+        uses: actions/cache@v5
+        id: vulkan-cache
+        with:
+          path: ~/VulkanSDK
+          key: ${{ runner.os }}-vulkan-${{ hashFiles('.github/workflows/macos.yml') }}
+      - name: Install Vulkan SDK
+        if: steps.vulkan-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -LS -o vulkan-sdk.zip https://sdk.lunarg.com/sdk/download/latest/mac/vulkan-sdk.dmg
+          unzip -q vulkan-sdk.zip -d /tmp/VulkanSDK
+          sudo /tmp/VulkanSDK/vulkansdk-macOS-*.app/Contents/MacOS/vulkansdk-macOS-* \
+            --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+          rm vulkan-sdk.zip
+      - name: Setup Vulkan SDK
+        run: |
+          VULKAN_SDK=$(find ~/VulkanSDK -path "*/macOS" -type d | head -1)
+          if [ -z "$VULKAN_SDK" ]; then
+            echo "Could not find Vulkan SDK macOS directory. Contents:"
+            ls -laR ~/VulkanSDK
+            exit 1
+          fi
+          echo "Found VULKAN_SDK=$VULKAN_SDK"
+          echo "VULKAN_SDK=$VULKAN_SDK" >> $GITHUB_ENV
+          echo "$VULKAN_SDK/bin" >> $GITHUB_PATH
+      - name: Install system dependencies
+        run: brew install autoconf automake libtool
+      - name: Echo settings
+        run: |
+          echo "PATH=$PATH"
+          echo "CMAKE_BUILD_PARALLEL_LEVEL=$CMAKE_BUILD_PARALLEL_LEVEL"
+          echo "VCPKG_ROOT=$VCPKG_ROOT"
+          echo "VULKAN_SDK=$VULKAN_SDK"
+      - name: Release Build
+        run: |
+          cmake --fresh --preset macos-release
+          cmake --build --preset macos-release
+      - name: Building Debug and Tests
+        run: |
+          cmake --fresh --preset macos-debug
+          cmake --build --preset macos-debug
+          cd build/macos/debug/tests
+          ctest
