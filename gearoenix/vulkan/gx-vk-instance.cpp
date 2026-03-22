@@ -1,40 +1,44 @@
 #include "gx-vk-instance.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-application.hpp"
-#include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../platform/gx-plt-application.hpp"
-#include "gx-vk-check.hpp"
+#include "../platform/gx-plt-log.hpp"
 
 #include <set>
 #include <sstream>
 #include <vector>
+#include <vulkan/vulkan_to_string.hpp>
 
 namespace gearoenix::vulkan {
 #if GX_VULKAN_INSTANCE_DEBUG
-static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessageSeverityFlagBitsEXT severity, const VkDebugUtilsMessageTypeFlagsEXT types, const VkDebugUtilsMessengerCallbackDataEXT* const callback_data, void* const)
+static vk::Bool32 VKAPI_PTR impl_vk_debug_utils_callback(
+    const vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
+    const vk::DebugUtilsMessageTypeFlagsEXT types,
+    const vk::DebugUtilsMessengerCallbackDataEXT* const callback_data,
+    void* const)
 {
     thread_local std::stringstream msg;
     msg.clear();
     msg.str(std::string());
 
     msg << "Vulkan ";
-    if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+    if (severity == vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose) {
         msg << "Verbose";
-    } else if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+    } else if (severity == vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo) {
         msg << "Info";
-    } else if (severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+    } else if (severity == vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
         msg << "Warning";
     } else {
         msg << "Error";
     }
     msg << " |";
-    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
+    if (types & vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral) {
         msg << " General";
     }
-    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
+    if (types & vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation) {
         msg << " Validation";
     }
-    if (types & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+    if (types & vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance) {
         msg << " Performance";
     }
     if (callback_data->pMessageIdName != nullptr) {
@@ -47,7 +51,7 @@ static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessage
         msg << " | Objects:";
         for (std::uint32_t i = 0; i < callback_data->objectCount; ++i) {
             const auto& info = callback_data->pObjects[i];
-            msg << " (" << info.objectHandle << ":" << info.objectType;
+            msg << " (" << info.objectHandle << ":" << vk::to_string(info.objectType);
             if (info.pObjectName != nullptr) {
                 msg << "-" << info.pObjectName;
             }
@@ -55,10 +59,10 @@ static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessage
         }
     }
     const auto msg_str = msg.str();
-    if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+    if (severity >= vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
         if constexpr (GX_DEBUG_MODE) {
             if (msg_str.contains("VK_LAYER_AMD_switchable_graphics")) {
-                return VK_FALSE;
+                return vk::False;
             }
             GX_LOG_F(msg_str);
         } else {
@@ -67,41 +71,42 @@ static VkBool32 VKAPI_PTR impl_vk_debug_utils_callback(const VkDebugUtilsMessage
     } else {
         GX_LOG_D(msg_str);
     }
-    return VK_FALSE;
+    return vk::False;
 }
 #endif
 
-static std::uint32_t find_api_version()
+static std::uint32_t find_api_version(const vk::raii::Context& context)
 {
-    constexpr auto min_version = VK_MAKE_VERSION(1u, 4u, 0u);
-    std::uint32_t result = 0;
-    if (nullptr != vkEnumerateInstanceVersion) {
-        GX_VK_CHK(vkEnumerateInstanceVersion(&result));
-    }
-    result = std::max(result, min_version);
-    GX_LOG_D("Instance version is: " << VK_VERSION_MAJOR(result) << "." << VK_VERSION_MINOR(result));
-    return result;
+    constexpr auto min_version = vk::makeApiVersion(0, 1, 4, 0);
+    const auto result = context.enumerateInstanceVersion();
+    const auto final_version = std::max(result, min_version);
+    GX_LOG_D("Instance version is: " << vk::apiVersionMajor(final_version) << "." << vk::apiVersionMinor(final_version));
+    return final_version;
 }
 }
 
 gearoenix::vulkan::Instance::Instance()
     : Singleton(this)
-    , api_version(find_api_version())
+    , vulkan_instance(nullptr)
+#if GX_VULKAN_INSTANCE_DEBUG
+    , debug_messenger(nullptr)
+#endif
 {
 }
+
+gearoenix::vulkan::Instance::~Instance() = default;
 
 std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::construct()
 {
     std::unique_ptr<Instance> instance(new Instance());
+    instance->api_version = find_api_version(instance->context);
 
-    VkApplicationInfo app_info;
-    GX_SET_ZERO(app_info);
-    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.apiVersion = find_api_version();
-    app_info.applicationVersion = VK_MAKE_VERSION(1u, 0u, 0u);
-    app_info.engineVersion = VK_MAKE_VERSION(1u, 0u, 0u);
-    app_info.pApplicationName = core::Application::get_application_name().c_str();
-    app_info.pEngineName = GX_ENGINE_NAME;
+    const vk::ApplicationInfo app_info(
+        core::Application::get_application_name().c_str(),
+        vk::makeApiVersion(0, 1, 0, 0),
+        GX_ENGINE_NAME,
+        vk::makeApiVersion(0, 1, 0, 0),
+        instance->api_version);
 
     std::set<std::string> instance_extensions_set;
     instance_extensions_set.insert(VK_KHR_SURFACE_EXTENSION_NAME);
@@ -114,21 +119,18 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
     auto sdl_extensions = platform::Application::get().get_vulkan_extensions();
     instance_extensions_set.insert(std::make_move_iterator(sdl_extensions.begin()), std::make_move_iterator(sdl_extensions.end()));
 
+    std::vector<const char*> instance_layers;
 #if GX_VULKAN_INSTANCE_DEBUG
     instance_extensions_set.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
-    std::uint32_t layers_count = 0;
-    vkEnumerateInstanceLayerProperties(&layers_count, nullptr);
-    std::vector<VkLayerProperties> properties(static_cast<std::uint64_t>(layers_count));
-    std::set<std::string> available_layers;
-    vkEnumerateInstanceLayerProperties(&layers_count, properties.data());
-    for (const auto& prop : properties) {
-        GX_LOG_D("Available layer: " << prop.layerName);
-        available_layers.emplace(prop.layerName);
+    const auto available_layers = instance->context.enumerateInstanceLayerProperties();
+    std::set<std::string> available_layer_names;
+    for (const auto& prop : available_layers) {
+        GX_LOG_D("Available layer: " << prop.layerName.data());
+        available_layer_names.emplace(prop.layerName.data());
     }
-    std::vector<const char*> instance_layers;
     const auto insert_layer = [&](const char* const layer_name) {
-        if (available_layers.contains(layer_name)) {
+        if (available_layer_names.contains(layer_name)) {
             instance_layers.emplace_back(layer_name);
         }
     };
@@ -148,57 +150,47 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
     }
 
 #if GX_VULKAN_INSTANCE_DEBUG
-    VkDebugUtilsMessengerCreateInfoEXT debug_info;
-    GX_SET_ZERO(debug_info);
-    debug_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    debug_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    debug_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    debug_info.pfnUserCallback = impl_vk_debug_utils_callback;
-    debug_info.pUserData = nullptr;
+    constexpr vk::DebugUtilsMessengerCreateInfoEXT debug_info(
+        { },
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose
+            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo
+            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning
+            | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral
+            | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation
+            | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+        impl_vk_debug_utils_callback,
+        nullptr);
 #endif
 
-    VkInstanceCreateInfo instance_create_info;
-    GX_SET_ZERO(instance_create_info);
-    instance_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    vk::InstanceCreateFlags instance_create_flags;
 #if GX_PLATFORM_APPLE
-    instance_create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-#endif
-    instance_create_info.pApplicationInfo = &app_info;
-    instance_create_info.enabledExtensionCount = static_cast<std::uint32_t>(instance_extensions.size());
-    instance_create_info.ppEnabledExtensionNames = instance_extensions.data();
-#if GX_VULKAN_INSTANCE_DEBUG
-    instance_create_info.enabledLayerCount = static_cast<uint32_t>(instance_layers.size());
-    instance_create_info.ppEnabledLayerNames = instance_layers.data();
-    instance_create_info.pNext = &debug_info;
+    instance_create_flags = vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR;
 #endif
 
-    if (const auto create_result = vkCreateInstance(&instance_create_info, nullptr, &instance->vulkan_data); VK_SUCCESS != create_result || nullptr == instance->vulkan_data) {
+    vk::InstanceCreateInfo create_info(
+        instance_create_flags,
+        &app_info,
+        instance_layers,
+        instance_extensions);
+#if GX_VULKAN_INSTANCE_DEBUG
+    create_info.setPNext(&debug_info);
+#endif
+
+    try {
+        instance->vulkan_instance = instance->context.createInstance(create_info);
+    } catch (const vk::SystemError& e) {
+        GX_LOG_D("Failed to create Vulkan instance: " << e.what());
         return nullptr;
     }
 
-    Loader::load(instance->vulkan_data);
+    Loader::load(*instance->vulkan_instance);
 
 #if GX_VULKAN_INSTANCE_DEBUG
-    GX_VK_CHK(vkCreateDebugUtilsMessengerEXT(instance->vulkan_data, &debug_info, nullptr, &instance->debug_messenger));
+    instance->debug_messenger = instance->vulkan_instance.createDebugUtilsMessengerEXT(debug_info);
 #endif
 
     return instance;
-}
-
-gearoenix::vulkan::Instance::~Instance()
-{
-    if (nullptr != vulkan_data) {
-
-#if GX_VULKAN_INSTANCE_DEBUG
-        if (nullptr != debug_messenger) {
-            vkDestroyDebugUtilsMessengerEXT(vulkan_data, debug_messenger, nullptr);
-            debug_messenger = nullptr;
-        }
-#endif
-
-        vkDestroyInstance(vulkan_data, nullptr);
-        vulkan_data = nullptr;
-    }
 }
 
 #endif

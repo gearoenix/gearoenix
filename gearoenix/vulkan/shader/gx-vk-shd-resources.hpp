@@ -28,7 +28,7 @@ private:
     unsigned int descriptors_count;
 
 public:
-    Resources(pipeline::Pipeline* pip, buffer::Uniform* u);
+    Resources(pipeline::Pipeline* pip, const buffer::Uniform* u);
     Resources(pipeline::Pipeline* pip, buffer::Uniform* u, texture::Texture2D* t);
     ~Resources();
     void bind(pipeline::Pipeline& pip);

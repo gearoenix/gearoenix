@@ -1,79 +1,60 @@
 #include "gx-vk-dev-physical.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-assert.hpp"
-#include "../../core/macro/gx-cr-mcr-flagger.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../math/gx-math-numeric.hpp"
-#include "../gx-vk-check.hpp"
+#include "../../platform/gx-plt-log.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
 
 #include <algorithm>
 
-int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
+int gearoenix::vulkan::device::Physical::is_good(const vk::raii::PhysicalDevice& gpu)
 {
     graphics_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     transfer_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     compute_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     present_queue_node_index = std::numeric_limits<std::uint32_t>::max();
 
-    VkPhysicalDeviceProperties candidate_properties;
-    vkGetPhysicalDeviceProperties(gpu, &candidate_properties);
-    if (VK_VERSION_MAJOR(candidate_properties.apiVersion) < 1 || (VK_VERSION_MAJOR(candidate_properties.apiVersion) == 1 && VK_VERSION_MINOR(candidate_properties.apiVersion) < 3)) {
-        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName << " because it does not meet the Vulkan 1.3 requirement.");
+    const auto candidate_properties = gpu.getProperties();
+    if (vk::apiVersionMajor(candidate_properties.apiVersion) < 1 || (vk::apiVersionMajor(candidate_properties.apiVersion) == 1 && vk::apiVersionMinor(candidate_properties.apiVersion) < 3)) {
+        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName.data() << " because it does not meet the Vulkan 1.3 requirement.");
         return -1;
     }
 
-    VkPhysicalDeviceFeatures2 features_info;
-    GX_SET_ZERO(features_info);
-    features_info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    const auto features_chain = gpu.getFeatures2<
+        vk::PhysicalDeviceFeatures2,
+        vk::PhysicalDeviceVulkan12Features,
+        vk::PhysicalDeviceVulkan13Features,
+        vk::PhysicalDeviceDynamicRenderingFeatures>();
 
-    VkPhysicalDeviceVulkan12Features v12_features;
-    GX_SET_ZERO(v12_features);
-    v12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    const auto& v12_features = features_chain.get<vk::PhysicalDeviceVulkan12Features>();
+    const auto& v13_features = features_chain.get<vk::PhysicalDeviceVulkan13Features>();
+    const auto& dynamic_features = features_chain.get<vk::PhysicalDeviceDynamicRenderingFeatures>();
 
-    VkPhysicalDeviceVulkan13Features v13_features;
-    GX_SET_ZERO(v13_features);
-    v13_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-
-    VkPhysicalDeviceDynamicRenderingFeatures dynamic_features;
-    GX_SET_ZERO(dynamic_features);
-    dynamic_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
-
-    v13_features.pNext = &dynamic_features;
-    v12_features.pNext = &v13_features;
-    features_info.pNext = &v12_features;
-
-    vkGetPhysicalDeviceFeatures2(gpu, &features_info);
-
-    const bool dynamic_supported = v13_features.dynamicRendering == VK_TRUE || dynamic_features.dynamicRendering == VK_TRUE;
-    if (!dynamic_supported) {
-        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName << " because dynamic rendering is not supported.");
+    if (v13_features.dynamicRendering == vk::False && dynamic_features.dynamicRendering == vk::False) {
+        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName.data() << " because dynamic rendering is not supported.");
         return -1;
     }
 
-    bool descriptor_indexing_supported = v12_features.descriptorIndexing == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.runtimeDescriptorArray == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingPartiallyBound == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingVariableDescriptorCount == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+    bool descriptor_indexing_supported = v12_features.descriptorIndexing == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.runtimeDescriptorArray == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingPartiallyBound == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingSampledImageUpdateAfterBind == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.descriptorBindingVariableDescriptorCount == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && v12_features.shaderSampledImageArrayNonUniformIndexing == vk::True;
     if (!descriptor_indexing_supported) {
-        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName << " because required descriptor indexing features are missing.");
+        GX_LOG_D("Skipping GPU " << candidate_properties.deviceName.data() << " because required descriptor indexing features are missing.");
         return -1;
     }
 
-    std::uint32_t queue_count = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, nullptr);
+    const auto queue_props = gpu.getQueueFamilyProperties();
+    const auto queue_count = static_cast<std::uint32_t>(queue_props.size());
     if (queue_count == 0) {
         return -1;
     }
-    std::vector<VkQueueFamilyProperties> queue_props(queue_count);
-    vkGetPhysicalDeviceQueueFamilyProperties(gpu, &queue_count, queue_props.data());
 
-    std::vector<VkBool32> supports_present(queue_count);
+    std::vector<vk::Bool32> supports_present(queue_count);
     for (uint32_t i = 0; i < queue_count; ++i) {
-        vkGetPhysicalDeviceSurfaceSupportKHR(gpu, i, Surface::get().get_vulkan_data(), &supports_present[i]);
+        supports_present[i] = gpu.getSurfaceSupportKHR(i, Surface::get().get_vulkan_data());
     }
 
     std::uint32_t graphics_candidate = std::numeric_limits<std::uint32_t>::max();
@@ -93,19 +74,19 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
         const auto qf = queue_props[i].queueFlags;
         const auto sp = supports_present[i];
 
-        if (GX_FLAG_CHECK(qf, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(qf, VK_QUEUE_TRANSFER_BIT) && GX_FLAG_CHECK(qf, VK_QUEUE_COMPUTE_BIT) && sp == VK_TRUE) {
+        if ((qf & vk::QueueFlagBits::eGraphics) && (qf & vk::QueueFlagBits::eTransfer) && (qf & vk::QueueFlagBits::eCompute) && sp == vk::True) {
             return commit_and_return(i, i, i, i, 100);
         }
-        if GX_FLAG_CHECK (qf, VK_QUEUE_GRAPHICS_BIT) {
+        if (qf & vk::QueueFlagBits::eGraphics) {
             graphics_candidate = i;
         }
-        if GX_FLAG_CHECK (qf, VK_QUEUE_TRANSFER_BIT) {
+        if (qf & vk::QueueFlagBits::eTransfer) {
             transfer_candidate = i;
         }
-        if GX_FLAG_CHECK (qf, VK_QUEUE_COMPUTE_BIT) {
+        if (qf & vk::QueueFlagBits::eCompute) {
             compute_candidate = i;
         }
-        if (sp == VK_TRUE) {
+        if (sp == vk::True) {
             present_candidate = i;
         }
     }
@@ -114,7 +95,7 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
         const auto qf = queue_props[i].queueFlags;
         const auto sp = supports_present[i];
 
-        if (GX_FLAG_CHECK(qf, VK_QUEUE_GRAPHICS_BIT) && GX_FLAG_CHECK(qf, VK_QUEUE_TRANSFER_BIT) && sp == VK_TRUE) {
+        if ((qf & vk::QueueFlagBits::eGraphics) && (qf & vk::QueueFlagBits::eTransfer) && sp == vk::True) {
             graphics_candidate = i;
             transfer_candidate = i;
             present_candidate = i;
@@ -129,7 +110,7 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
         const auto qf = queue_props[i].queueFlags;
         const auto sp = supports_present[i];
 
-        if (GX_FLAG_CHECK(qf, VK_QUEUE_GRAPHICS_BIT) && sp == VK_TRUE) {
+        if ((qf & vk::QueueFlagBits::eGraphics) && sp == vk::True) {
             graphics_candidate = i;
             present_candidate = i;
             if (compute_candidate != UINT32_MAX && transfer_candidate != UINT32_MAX) {
@@ -147,15 +128,9 @@ int gearoenix::vulkan::device::Physical::is_good(const VkPhysicalDevice gpu)
 
 void gearoenix::vulkan::device::Physical::initialize_extensions()
 {
-    std::uint32_t ext_count = 0;
-    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, nullptr));
-    if (ext_count <= 0) {
-        return;
-    }
-    std::vector<VkExtensionProperties> extensions(static_cast<std::uint64_t>(ext_count));
-    GX_VK_CHK(vkEnumerateDeviceExtensionProperties(vulkan_data, nullptr, &ext_count, extensions.data()));
-    for (const auto& [extension_name, _] : extensions) {
-        supported_extensions.emplace(extension_name);
+    const auto extensions = vulkan_data.enumerateDeviceExtensionProperties();
+    for (const auto& [extensionName, specVersion] : extensions) {
+        supported_extensions.emplace(extensionName.data());
     }
 
     rtx_supported = supported_extensions.contains(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
@@ -171,51 +146,34 @@ void gearoenix::vulkan::device::Physical::initialize_extensions()
 
 void gearoenix::vulkan::device::Physical::initialize_features()
 {
-    vkGetPhysicalDeviceFeatures(vulkan_data, &features);
-    VkPhysicalDeviceFeatures2 info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    features = vulkan_data.getFeatures();
 
-    GX_SET_ZERO(vulkan_12_features);
-    vulkan_12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    const auto features_chain = vulkan_data.getFeatures2<
+        vk::PhysicalDeviceFeatures2,
+        vk::PhysicalDeviceVulkan12Features,
+        vk::PhysicalDeviceVulkan13Features,
+        vk::PhysicalDeviceDynamicRenderingFeatures,
+        vk::PhysicalDeviceRayTracingPipelineFeaturesKHR,
+        vk::PhysicalDeviceRayQueryFeaturesKHR,
+        vk::PhysicalDeviceShaderClockFeaturesKHR>();
+    features = features_chain.get<vk::PhysicalDeviceFeatures2>().features;
+    vulkan_12_features = features_chain.get<vk::PhysicalDeviceVulkan12Features>();
+    vulkan_13_features = features_chain.get<vk::PhysicalDeviceVulkan13Features>();
+    dynamic_rendering_features = features_chain.get<vk::PhysicalDeviceDynamicRenderingFeatures>();
+    ray_tracing_pipeline_features = features_chain.get<vk::PhysicalDeviceRayTracingPipelineFeaturesKHR>();
+    ray_query_features = features_chain.get<vk::PhysicalDeviceRayQueryFeaturesKHR>();
+    shader_clock_features = features_chain.get<vk::PhysicalDeviceShaderClockFeaturesKHR>();
 
-    GX_SET_ZERO(vulkan_13_features);
-    vulkan_13_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-
-    GX_SET_ZERO(dynamic_rendering_features);
-    dynamic_rendering_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
-
-    GX_SET_ZERO(shader_clock_features);
-    shader_clock_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR;
-
-    GX_SET_ZERO(ray_query_features);
-    ray_query_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
-    ray_query_features.pNext = &shader_clock_features;
-
-    GX_SET_ZERO(ray_tracing_pipeline_features);
-    ray_tracing_pipeline_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-    ray_tracing_pipeline_features.pNext = &ray_query_features;
-
-    dynamic_rendering_features.pNext = rtx_supported ? static_cast<void*>(&ray_tracing_pipeline_features) : nullptr;
-    vulkan_13_features.pNext = &dynamic_rendering_features;
-    vulkan_12_features.pNext = &vulkan_13_features;
-    info.pNext = &vulkan_12_features;
-
-    vkGetPhysicalDeviceFeatures2(vulkan_data, &info);
-    features = info.features;
-
-    const bool dynamic_supported = vulkan_13_features.dynamicRendering == VK_TRUE || dynamic_rendering_features.dynamicRendering == VK_TRUE;
-    if (!dynamic_supported) {
+    if (vulkan_13_features.dynamicRendering == vk::False && dynamic_rendering_features.dynamicRendering == vk::False) {
         GX_LOG_F("Dynamic rendering feature is required but not supported by the selected physical device.");
     }
 
-    const auto& v12 = vulkan_12_features;
-    bool descriptor_indexing_supported = v12.descriptorIndexing == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12.runtimeDescriptorArray == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingPartiallyBound == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingSampledImageUpdateAfterBind == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12.descriptorBindingVariableDescriptorCount == VK_TRUE;
-    descriptor_indexing_supported = descriptor_indexing_supported && v12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
+    bool descriptor_indexing_supported = vulkan_12_features.descriptorIndexing == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && vulkan_12_features.runtimeDescriptorArray == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && vulkan_12_features.descriptorBindingPartiallyBound == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && vulkan_12_features.descriptorBindingSampledImageUpdateAfterBind == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && vulkan_12_features.descriptorBindingVariableDescriptorCount == vk::True;
+    descriptor_indexing_supported = descriptor_indexing_supported && vulkan_12_features.shaderSampledImageArrayNonUniformIndexing == vk::True;
     if (!descriptor_indexing_supported) {
         GX_LOG_F("Bindless descriptor indexing requirements are not fully supported by the selected physical device.");
     }
@@ -223,53 +181,34 @@ void gearoenix::vulkan::device::Physical::initialize_features()
 
 void gearoenix::vulkan::device::Physical::initialize_properties()
 {
-    vkGetPhysicalDeviceProperties(vulkan_data, &properties);
-    GX_LOG_D("Physical device name is: " << properties.deviceName);
-    vkGetPhysicalDeviceMemoryProperties(vulkan_data, &memory_properties);
+    properties = vulkan_data.getProperties();
+    GX_LOG_D("Physical device name is: " << properties.deviceName.data());
+    memory_properties = vulkan_data.getMemoryProperties();
 
-    std::uint32_t count = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, nullptr);
-    GX_CHECK_NOT_EQUAL_D(0, count);
-    queue_family_properties.resize(count);
-    vkGetPhysicalDeviceQueueFamilyProperties(vulkan_data, &count, queue_family_properties.data());
+    queue_family_properties = vulkan_data.getQueueFamilyProperties();
+    GX_CHECK_NOT_EQUAL_D(static_cast<std::size_t>(0), queue_family_properties.size());
 
-    VkPhysicalDeviceProperties2 info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-
-    GX_SET_ZERO(ray_tracing_pipeline_properties);
-    ray_tracing_pipeline_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-
-    GX_SET_ZERO(descriptor_indexing_properties);
-    descriptor_indexing_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
-
-    descriptor_indexing_properties.pNext = rtx_supported ? static_cast<void*>(&ray_tracing_pipeline_properties) : nullptr;
-    info.pNext = &descriptor_indexing_properties;
-    vkGetPhysicalDeviceProperties2(vulkan_data, &info);
+    auto chain = vulkan_data.getProperties2<
+        vk::PhysicalDeviceProperties2,
+        vk::PhysicalDeviceDescriptorIndexingProperties,
+        vk::PhysicalDeviceRayTracingPipelinePropertiesKHR>();
+    descriptor_indexing_properties = chain.get<vk::PhysicalDeviceDescriptorIndexingProperties>();
+    ray_tracing_pipeline_properties = chain.get<vk::PhysicalDeviceRayTracingPipelinePropertiesKHR>();
 }
 
 gearoenix::vulkan::device::Physical::Physical()
     : Singleton(this)
-    , features { }
-    , ray_query_features { }
-    , ray_tracing_pipeline_features { }
-    , shader_clock_features { }
-    , vulkan_12_features { }
-    , vulkan_13_features { }
-    , dynamic_rendering_features { }
-    , descriptor_indexing_properties { }
-    , properties { }
-    , memory_properties { }
-    , ray_tracing_pipeline_properties { }
+    , vulkan_data(nullptr)
 {
-    const auto gpus = get_available_devices(Instance::get().get_vulkan_data());
+    const auto& instance = Instance::get();
+    const auto gpus = instance.get_instance().enumeratePhysicalDevices();
     int best_device_index = -1;
     int best_device_point = -1;
 
     for (std::uint32_t i = 0; i < gpus.size(); ++i) {
-        vkGetPhysicalDeviceProperties(gpus[i], &properties);
-        GX_LOG_D("GPU device " << i << ": " << properties.deviceName);
-        if (VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU != properties.deviceType)
+        const auto props = gpus[i].getProperties();
+        GX_LOG_D("GPU device " << i << ": " << props.deviceName.data());
+        if (vk::PhysicalDeviceType::eDiscreteGpu != props.deviceType)
             continue;
         const auto device_point = is_good(gpus[i]);
         if (device_point > best_device_point) {
@@ -291,43 +230,39 @@ gearoenix::vulkan::device::Physical::Physical()
     if (best_device_index == -1 || best_device_point == -1) {
         GX_LOG_F("Physical device minimum requirement is not satisfied.");
     }
-    vulkan_data = gpus[best_device_index];
+
+    // Re-enumerate to get a fresh handle for the selected device
+    auto selected_gpus = instance.get_instance().enumeratePhysicalDevices();
+    vulkan_data = std::move(selected_gpus[best_device_index]);
+
     GX_LOG_D("Physical device point is: " << is_good(vulkan_data));
 
     initialize_extensions();
     initialize_features();
     initialize_properties();
 
-    std::uint32_t count = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, Surface::get().get_vulkan_data(), &count, nullptr);
-    surface_formats.resize(static_cast<std::uint64_t>(count));
-    vkGetPhysicalDeviceSurfaceFormatsKHR(vulkan_data, Surface::get().get_vulkan_data(), &count, surface_formats.data());
+    const auto& surface = Surface::get();
+    surface_formats = vulkan_data.getSurfaceFormatsKHR(surface.get_vulkan_data());
 
-    VkFormatProperties format_props;
     for (auto format : acceptable_depth_formats) {
-        vkGetPhysicalDeviceFormatProperties(vulkan_data, format, &format_props);
-        if GX_FLAG_CHECK (format_props.optimalTilingFeatures, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+        const auto format_props = vulkan_data.getFormatProperties(format);
+        if (format_props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) {
             supported_depth_format = format;
             break;
         }
     }
-    if (VK_FORMAT_UNDEFINED == supported_depth_format) {
+    if (vk::Format::eUndefined == supported_depth_format) {
         GX_LOG_F("Error required depth format not found.");
     }
-
-    auto& limits = properties.limits;
-    max_memory_alignment = std::max(std::max(std::max(static_cast<std::uint32_t>(limits.minMemoryMapAlignment), static_cast<std::uint32_t>(limits.minStorageBufferOffsetAlignment)),
-                                        std::max(static_cast<std::uint32_t>(limits.minTexelBufferOffsetAlignment), static_cast<std::uint32_t>(limits.minUniformBufferOffsetAlignment))),
-        std::max(std::max(static_cast<std::uint32_t>(limits.optimalBufferCopyOffsetAlignment), static_cast<std::uint32_t>(limits.optimalBufferCopyRowPitchAlignment)), static_cast<std::uint32_t>(limits.bufferImageGranularity)));
 }
 
 gearoenix::vulkan::device::Physical::~Physical() = default;
 
-std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(std::uint32_t type_bits, const std::uint32_t mem_properties) const
+std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(std::uint32_t type_bits, const vk::MemoryPropertyFlags mem_properties) const
 {
     for (uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
         if ((type_bits & 1u) == 1u) {
-            if (((memory_properties.memoryTypes[i].propertyFlags) & mem_properties) == mem_properties) {
+            if ((memory_properties.memoryTypes[i].propertyFlags & mem_properties) == mem_properties) {
                 return i;
             }
         }
@@ -336,23 +271,9 @@ std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(std::ui
     GX_LOG_F("Could not find the requested memory type.");
 }
 
-std::int64_t gearoenix::vulkan::device::Physical::align_size(const std::int64_t size) const { return math::Numeric::align(size, static_cast<std::int64_t>(max_memory_alignment)); }
-
-VkSurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
+vk::SurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
 {
-    VkSurfaceCapabilitiesKHR info;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_data, Surface::get().get_vulkan_data(), &info);
-    return info;
-}
-
-std::vector<VkPhysicalDevice> gearoenix::vulkan::device::Physical::get_available_devices(VkInstance instance)
-{
-    std::uint32_t gpu_count = 0;
-    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, nullptr));
-    std::vector<VkPhysicalDevice> gpus(static_cast<std::uint64_t>(gpu_count));
-    GX_LOG_D(gpu_count << " GPU(s) are available.");
-    GX_VK_CHK(vkEnumeratePhysicalDevices(instance, &gpu_count, gpus.data()));
-    return gpus;
+    return vulkan_data.getSurfaceCapabilitiesKHR(Surface::get().get_vulkan_data());
 }
 
 #endif

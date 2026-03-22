@@ -1,6 +1,5 @@
 #include "gx-vk-imgui-manager.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "command/gx-vk-cmd-buffer.hpp"
 #include "device/gx-vk-dev-logical.hpp"
 #include "device/gx-vk-dev-physical.hpp"
@@ -24,18 +23,14 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     // Create a dedicated descriptor pool for ImGui
     constexpr std::uint32_t pool_size = 100;
     constexpr std::array pool_sizes {
-        VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, pool_size },
+        vk::DescriptorPoolSize { vk::DescriptorType::eCombinedImageSampler, pool_size },
     };
 
-    VkDescriptorPoolCreateInfo pool_info;
-    GX_SET_ZERO(pool_info);
-    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    pool_info.maxSets = pool_size;
-    pool_info.poolSizeCount = static_cast<std::uint32_t>(pool_sizes.size());
-    pool_info.pPoolSizes = pool_sizes.data();
+    const vk::DescriptorPoolCreateInfo pool_info {
+        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, pool_size, pool_sizes
+    };
 
-    GX_VK_CHK(vkCreateDescriptorPool(vk_dev, &pool_info, nullptr, &descriptor_pool));
+    descriptor_pool = vk::raii::DescriptorPool(device::Logical::get().get_device(), pool_info);
 
     const auto api_version = Instance::get().get_api_version();
 
@@ -46,11 +41,11 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     const auto& swapchain_format = swapchain.get_format().format;
     if (swapchain.get_frames()[0].imgui_view) {
         switch (swapchain_format) {
-        case VK_FORMAT_R8G8B8A8_SRGB:
-            imgui_colour_format = VK_FORMAT_R8G8B8A8_UNORM;
+        case vk::Format::eR8G8B8A8Srgb:
+            imgui_colour_format = vk::Format::eR8G8B8A8Unorm;
             break;
-        case VK_FORMAT_B8G8R8A8_SRGB:
-            imgui_colour_format = VK_FORMAT_B8G8R8A8_UNORM;
+        case vk::Format::eB8G8R8A8Srgb:
+            imgui_colour_format = vk::Format::eB8G8R8A8Unorm;
             break;
         default:
             imgui_colour_format = swapchain_format;
@@ -63,24 +58,29 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     // Initialize ImGui Vulkan backend with dynamic rendering
     ImGui_ImplVulkan_InitInfo info { };
     info.ApiVersion = api_version;
-    info.Instance = Instance::get().get_vulkan_data();
-    info.PhysicalDevice = device::Physical::get().get_vulkan_data();
-    info.Device = vk_dev;
+    info.Instance = static_cast<VkInstance>(Instance::get().get_vulkan_data());
+    info.PhysicalDevice = static_cast<VkPhysicalDevice>(device::Physical::get().get_vulkan_data());
+    info.Device = static_cast<VkDevice>(vk_dev);
     info.QueueFamily = device::Physical::get().get_graphics_queue_node_index();
-    info.Queue = queue::Queue::get().get_vulkan_data();
-    info.DescriptorPool = descriptor_pool;
+    info.Queue = static_cast<VkQueue>(queue::Queue::get().get_vulkan_data());
+    info.DescriptorPool = static_cast<VkDescriptorPool>(*descriptor_pool);
     info.MinImageCount = static_cast<decltype(info.MinImageCount)>(frames_in_flight);
     info.ImageCount = info.MinImageCount;
-    info.PipelineCache = pipeline::Manager::get().get_cache()->get_vulkan_data();
+    info.PipelineCache = static_cast<VkPipelineCache>(pipeline::Manager::get().get_cache()->get_vulkan_data());
     info.UseDynamicRendering = true;
     info.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
     info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
-    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &imgui_colour_format;
+    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = reinterpret_cast<const VkFormat*>(&imgui_colour_format);
 #if GX_DEBUG_MODE
-    info.CheckVkResultFn = +[](const VkResult result) { GX_VK_CHK(result); };
+    info.CheckVkResultFn = +[](const VkResult result) { GX_VK_CHK_L(result); };
 #endif
 
-    ImGui_ImplVulkan_LoadFunctions(api_version, +[](const char* const name, void*) { return Loader::get(name); }, nullptr);
+    ImGui_ImplVulkan_LoadFunctions(
+        api_version,
+        +[](const char* const name, void* user_data) {
+            return VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(static_cast<VkInstance>(user_data), name);
+        },
+        static_cast<VkInstance>(Instance::get().get_vulkan_data()));
     ImGui_ImplVulkan_Init(&info);
 }
 
@@ -88,7 +88,6 @@ gearoenix::vulkan::ImGuiManager::~ImGuiManager()
 {
     device::Logical::get().wait_to_finish();
     ImGui_ImplVulkan_Shutdown();
-    vkDestroyDescriptorPool(device::Logical::get().get_vulkan_data(), descriptor_pool, nullptr);
 }
 
 void gearoenix::vulkan::ImGuiManager::upload_fonts()
@@ -117,36 +116,32 @@ void gearoenix::vulkan::ImGuiManager::update()
     const auto vk_cmd = frame.cmd->get_vulkan_data();
 
     // Capture if scene content is present before any transitions to determine the load operation
-    const bool scene_content_present = swapchain_image.get_layout() == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    const bool scene_content_present = swapchain_image.get_layout() == vk::ImageLayout::eColorAttachmentOptimal;
 
     if (auto* const draw_data = ImGui::GetDrawData(); nullptr != draw_data && draw_data->TotalVtxCount > 0) {
         // Transition swapchain image to colour attachment optimal if needed
         swapchain_image.transit(vk_cmd, image::TransitionRequest::color_attachment());
 
         // Begin dynamic rendering
-        VkRenderingAttachmentInfo color_attachment;
-        GX_SET_ZERO(color_attachment);
-        color_attachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+        vk::RenderingAttachmentInfo color_attachment;
         color_attachment.imageView = imgui_render_view.get_vulkan_data();
-        color_attachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        color_attachment.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
         // If a scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content.
-        color_attachment.loadOp = scene_content_present ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
-        color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        color_attachment.clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
+        color_attachment.loadOp = scene_content_present ? vk::AttachmentLoadOp::eLoad : vk::AttachmentLoadOp::eClear;
+        color_attachment.storeOp = vk::AttachmentStoreOp::eStore;
+        color_attachment.clearValue.color = vk::ClearColorValue { std::array { 0.0f, 0.0f, 0.0f, 1.0f } };
 
-        VkRenderingInfo rendering_info;
-        GX_SET_ZERO(rendering_info);
-        rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-        rendering_info.renderArea.extent = { swapchain_view.get_extent().width, swapchain_view.get_extent().height };
+        vk::RenderingInfo rendering_info;
+        rendering_info.renderArea.extent.width = swapchain_view.get_extent().width;
+        rendering_info.renderArea.extent.height = swapchain_view.get_extent().height;
         rendering_info.layerCount = 1;
-        rendering_info.colorAttachmentCount = 1;
-        rendering_info.pColorAttachments = &color_attachment;
+        rendering_info.setColorAttachments(color_attachment);
 
-        vkCmdBeginRendering(vk_cmd, &rendering_info);
+        vk_cmd.beginRendering(rendering_info);
 
-        ImGui_ImplVulkan_RenderDrawData(draw_data, vk_cmd);
+        ImGui_ImplVulkan_RenderDrawData(draw_data, static_cast<VkCommandBuffer>(vk_cmd));
 
-        vkCmdEndRendering(vk_cmd);
+        vk_cmd.endRendering();
     }
 
     // Transition swapchain image to present

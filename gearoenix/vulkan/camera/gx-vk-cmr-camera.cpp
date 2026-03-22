@@ -1,12 +1,10 @@
 #include "gx-vk-cmr-camera.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -20,7 +18,6 @@
 #include "../texture/gx-vk-txt-target.hpp"
 #include "gx-vk-cmr-manager.hpp"
 
-#include <cstring>
 #include <ranges>
 
 #ifdef far
@@ -83,13 +80,13 @@ gearoenix::vulkan::camera::Camera::~Camera()
     destroy_bloom_descriptors();
 }
 
-void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.3f, 0.5f, 0.9f, "render-shadow-camera for camera: {}", object_name);
 
     pc.camera_index = shader_data_index;
 
-    vkCmdSetFrontFace(cmd, y_flipped ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE);
+    cmd.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
     // Shadow's camera must always have a customised target.
     GX_ASSERT_D(target.is_customised());
@@ -109,13 +106,13 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
     render_models(cmr.translucent_models);
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const render::record::Skyboxes& skyboxes, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const render::record::Skyboxes& skyboxes, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 
     pc.camera_index = shader_data_index;
 
-    vkCmdSetFrontFace(cmd, y_flipped ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE);
+    cmd.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
     const auto render_scope = [&] {
         if (target.is_customised()) {
@@ -141,7 +138,7 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
 }
 
 void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
-    const render::record::Skyboxes& skyboxes, const pipeline::FormatPipelines& fp, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+    const render::record::Skyboxes& skyboxes, const pipeline::FormatPipelines& fp, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
     for (const auto& skybox_data : skyboxes.skyboxes | std::views::values) {
@@ -149,9 +146,9 @@ void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const vk::CommandBuffer cmd) const
 {
-    if (!bloom_data.has_value() || !target.is_default() || nullptr == bloom_descriptor_pool) {
+    if (!bloom_data.has_value() || !target.is_default() || !*bloom_descriptor_pool) {
         return;
     }
 
@@ -169,18 +166,18 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
     const auto base_h = tex0_img->get_image_height();
 
     const auto dispatch = [&](const std::uint32_t w, const std::uint32_t h) {
-        vkCmdDispatch(cmd, (w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
+        cmd.dispatch((w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
     };
 
     const auto transit_read = [&](image::Image* const img) {
-        img->transit(cmd, image::TransitionRequest::shader_read(VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT));
+        img->transit(cmd, image::TransitionRequest::shader_read(vk::PipelineStageFlagBits2::eComputeShader));
     };
 
     const auto transit_general = [&](image::Image* const img, const std::uint32_t mip) {
         image::TransitionRequest req;
-        req.layout = VK_IMAGE_LAYOUT_GENERAL;
-        req.access = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
-        req.stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        req.layout = vk::ImageLayout::eGeneral;
+        req.access = vk::AccessFlagBits2::eShaderStorageWrite;
+        req.stage = vk::PipelineStageFlagBits2::eComputeShader;
         img->transit(cmd, req.with_mips(mip, 1));
     };
 
@@ -191,11 +188,11 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
         GX_VK_PUSH_DEBUG_GROUP(cmd, 0.7f, 0.5f, 0.8f, "bloom-multiply");
         transit_read(tex0_img);
         transit_general(tex1_img, 0);
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_multiply_pipeline()->get_vulkan_data());
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[0], 0, nullptr);
+        cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_multiply_pipeline()->get_vulkan_data());
+        cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex0_to_tex1[0], { });
         pc.src_mip = 0.0f;
         pc.value = exposure.get_enabled() ? exposure.get_value() : 1.0f;
-        vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+        cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
         dispatch(mip_aspect(base_w, 0), mip_aspect(base_h, 0));
     }
 
@@ -204,14 +201,14 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
         GX_VK_PUSH_DEBUG_GROUP(cmd, 0.7f, 0.5f, 0.8f, "bloom-prefilter");
         transit_read(tex1_img);
         transit_general(tex0_img, 1);
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_prefilter_pipeline()->get_vulkan_data());
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex1_to_tex0[1], 0, nullptr);
+        cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_prefilter_pipeline()->get_vulkan_data());
+        cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex1_to_tex0[1], { });
         pc.texel_size_x = 1.0f / static_cast<float>(base_w);
         pc.texel_size_y = 1.0f / static_cast<float>(base_h);
         pc.src_mip = 0.0f;
         pc.value = 0.0f;
         std::memcpy(pc.scatter_clamp_max_threshold_threshold_knee, b.get_scatter_clamp_max_threshold_threshold_knee().data(), 4 * sizeof(float));
-        vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+        cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
         dispatch(mip_aspect(base_w, 1), mip_aspect(base_h, 1));
     }
 
@@ -227,13 +224,13 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
             GX_VK_PUSH_DEBUG_GROUP(cmd, 0.6f, 0.5f, 0.9f, "bloom-horizontal-{}", blur_layer);
             transit_read(tex0_img);
             transit_general(tex1_img, src_mip);
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_horizontal_pipeline()->get_vulkan_data());
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[src_mip], 0, nullptr);
+            cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_horizontal_pipeline()->get_vulkan_data());
+            cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex0_to_tex1[src_mip], { });
             pc.texel_size_x = 1.0f / static_cast<float>(sw);
             pc.texel_size_y = 1.0f / static_cast<float>(sh);
             pc.src_mip = static_cast<float>(src_mip);
             pc.value = 0.0f;
-            vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+            cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
             dispatch(sw, sh);
         }
 
@@ -242,13 +239,13 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
             GX_VK_PUSH_DEBUG_GROUP(cmd, 0.5f, 0.6f, 0.9f, "bloom-vertical-{}", blur_layer);
             transit_read(tex1_img);
             transit_general(tex0_img, dst_mip);
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_vertical_pipeline()->get_vulkan_data());
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex1_to_tex0[dst_mip], 0, nullptr);
+            cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_vertical_pipeline()->get_vulkan_data());
+            cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex1_to_tex0[dst_mip], { });
             pc.texel_size_x = 1.0f / static_cast<float>(sw);
             pc.texel_size_y = 1.0f / static_cast<float>(sh);
             pc.src_mip = static_cast<float>(src_mip);
             pc.value = 0.0f;
-            vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+            cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
             dispatch(mip_aspect(base_w, dst_mip), mip_aspect(base_h, dst_mip));
         }
     }
@@ -263,14 +260,14 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
             GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.5f, 0.7f, "bloom-copy-{}", copy_index);
             transit_read(tex0_img);
             transit_general(tex1_img, copy_index);
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_multiply_pipeline()->get_vulkan_data());
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[copy_index], 0, nullptr);
+            cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_multiply_pipeline()->get_vulkan_data());
+            cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex0_to_tex1[copy_index], { });
             pc.texel_size_x = 0.0f;
             pc.texel_size_y = 0.0f;
             pc.src_mip = static_cast<float>(copy_index);
             pc.value = 1.0001f;
             std::memset(pc.scatter_clamp_max_threshold_threshold_knee, 0, sizeof(pc.scatter_clamp_max_threshold_threshold_knee));
-            vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+            cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
             dispatch(mip_aspect(base_w, copy_index), mip_aspect(base_h, copy_index));
         }
 
@@ -279,13 +276,13 @@ void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, 
             GX_VK_PUSH_DEBUG_GROUP(cmd, 0.9f, 0.5f, 0.6f, "bloom-upsampler-{}", mip_index);
             transit_read(tex1_img);
             transit_general(tex0_img, mip_index);
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_upsampler_pipeline()->get_vulkan_data());
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_bloom_pipeline_layout(), 0, 1, &bloom_ds_tex1_to_tex0[mip_index], 0, nullptr);
+            cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_bloom_upsampler_pipeline()->get_vulkan_data());
+            cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_bloom_pipeline_layout(), 0, bloom_ds_tex1_to_tex0[mip_index], { });
             pc.texel_size_x = 0.0f;
             pc.texel_size_y = 0.0f;
             pc.src_mip = static_cast<float>(mip_index);
             pc.value = b.get_scatter_clamp_max_threshold_threshold_knee().x;
-            vkCmdPushConstants(cmd, mgr.get_bloom_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+            cmd.pushConstants(mgr.get_bloom_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
             dispatch(mip_aspect(base_w, mip_index), mip_aspect(base_h, mip_index));
         }
     }
@@ -309,105 +306,88 @@ void gearoenix::vulkan::camera::Camera::initialise_bloom_descriptors()
     constexpr auto total_sets = static_cast<std::uint32_t>(mips * 2);
 
     constexpr std::array pool_sizes {
-        VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = total_sets },
-        VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = total_sets },
+        vk::DescriptorPoolSize { vk::DescriptorType::eCombinedImageSampler, total_sets },
+        vk::DescriptorPoolSize { vk::DescriptorType::eStorageImage, total_sets },
     };
-    VkDescriptorPoolCreateInfo dp_info;
-    GX_SET_ZERO(dp_info);
-    dp_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    dp_info.maxSets = total_sets;
-    dp_info.poolSizeCount = static_cast<std::uint32_t>(pool_sizes.size());
-    dp_info.pPoolSizes = pool_sizes.data();
-    GX_VK_CHK(vkCreateDescriptorPool(dev, &dp_info, nullptr, &bloom_descriptor_pool));
+    const vk::DescriptorPoolCreateInfo dp_info { { }, total_sets, pool_sizes };
+    bloom_descriptor_pool = vk::raii::DescriptorPool(device::Logical::get().get_device(), dp_info);
 
-    std::array<VkDescriptorSetLayout, total_sets> layouts;
+    std::array<vk::DescriptorSetLayout, total_sets> layouts;
     layouts.fill(mgr.get_bloom_descriptor_set_layout());
 
-    std::array<VkDescriptorSet, total_sets> all_sets { };
-    VkDescriptorSetAllocateInfo ds_info;
-    GX_SET_ZERO(ds_info);
-    ds_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    ds_info.descriptorPool = bloom_descriptor_pool;
-    ds_info.descriptorSetCount = total_sets;
-    ds_info.pSetLayouts = layouts.data();
-    GX_VK_CHK(vkAllocateDescriptorSets(dev, &ds_info, all_sets.data()));
+    vk::DescriptorSetAllocateInfo ds_info { *bloom_descriptor_pool, layouts };
+    const auto allocated = dev.allocateDescriptorSets(ds_info);
 
     for (std::uint32_t i = 0; i < mips; ++i) {
-        bloom_ds_tex0_to_tex1[i] = all_sets[i];
-        bloom_ds_tex1_to_tex0[i] = all_sets[mips + i];
+        bloom_ds_tex0_to_tex1[i] = allocated[i];
+        bloom_ds_tex1_to_tex0[i] = allocated[mips + i];
     }
 
-    const VkDescriptorImageInfo tex0_full {
+    const vk::DescriptorImageInfo tex0_full {
         mgr.get_bloom_sampler(),
         tex0->get_view()->get_vulkan_data(),
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        vk::ImageLayout::eShaderReadOnlyOptimal,
     };
-    const VkDescriptorImageInfo tex1_full {
+    const vk::DescriptorImageInfo tex1_full {
         mgr.get_bloom_sampler(),
         tex1->get_view()->get_vulkan_data(),
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        vk::ImageLayout::eShaderReadOnlyOptimal,
     };
 
-    std::array<VkDescriptorImageInfo, mips> tex1_mip_infos { };
-    std::array<VkDescriptorImageInfo, mips> tex0_mip_infos { };
+    std::array<vk::DescriptorImageInfo, mips> tex1_mip_infos { };
+    std::array<vk::DescriptorImageInfo, mips> tex0_mip_infos { };
     for (std::uint32_t i = 0; i < mips; ++i) {
-        tex1_mip_infos[i] = { .imageView = tex1->get_mips()[i]->get_vulkan_data(), .imageLayout = VK_IMAGE_LAYOUT_GENERAL };
-        tex0_mip_infos[i] = { .imageView = tex0->get_mips()[i]->get_vulkan_data(), .imageLayout = VK_IMAGE_LAYOUT_GENERAL };
+        tex1_mip_infos[i] = { { }, tex1->get_mips()[i]->get_vulkan_data(), vk::ImageLayout::eGeneral };
+        tex0_mip_infos[i] = { { }, tex0->get_mips()[i]->get_vulkan_data(), vk::ImageLayout::eGeneral };
     }
 
-    std::array<std::array<VkWriteDescriptorSet, 2>, total_sets> writes { };
-    GX_SET_ZERO(writes);
+    std::array<std::array<vk::WriteDescriptorSet, 2>, total_sets> writes { };
     for (std::uint32_t i = 0; i < mips; ++i) {
         auto& w0 = writes[i];
 
-        w0[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         w0[0].dstSet = bloom_ds_tex0_to_tex1[i];
         w0[0].dstBinding = 0;
-        w0[0].descriptorCount = 1;
-        w0[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        w0[0].pImageInfo = &tex0_full;
+        w0[0].descriptorType = vk::DescriptorType::eCombinedImageSampler;
+        w0[0].setImageInfo(tex0_full);
 
-        w0[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         w0[1].dstSet = bloom_ds_tex0_to_tex1[i];
         w0[1].dstBinding = 1;
-        w0[1].descriptorCount = 1;
-        w0[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        w0[1].pImageInfo = &tex1_mip_infos[i];
+        w0[1].descriptorType = vk::DescriptorType::eStorageImage;
+        w0[1].setImageInfo(tex1_mip_infos[i]);
 
         auto& w1 = writes[mips + i];
 
-        w1[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         w1[0].dstSet = bloom_ds_tex1_to_tex0[i];
         w1[0].dstBinding = 0;
-        w1[0].descriptorCount = 1;
-        w1[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        w1[0].pImageInfo = &tex1_full;
+        w1[0].descriptorType = vk::DescriptorType::eCombinedImageSampler;
+        w1[0].setImageInfo(tex1_full);
 
-        w1[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         w1[1].dstSet = bloom_ds_tex1_to_tex0[i];
         w1[1].dstBinding = 1;
-        w1[1].descriptorCount = 1;
-        w1[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        w1[1].pImageInfo = &tex0_mip_infos[i];
+        w1[1].descriptorType = vk::DescriptorType::eStorageImage;
+        w1[1].setImageInfo(tex0_mip_infos[i]);
     }
 
-    vkUpdateDescriptorSets(dev, static_cast<std::uint32_t>(writes.size() * 2), &writes[0][0], 0, nullptr);
+    std::array<vk::WriteDescriptorSet, total_sets * 2> flat_writes;
+    for (std::uint32_t i = 0; i < total_sets; ++i) {
+        flat_writes[i * 2 + 0] = writes[i][0];
+        flat_writes[i * 2 + 1] = writes[i][1];
+    }
+    dev.updateDescriptorSets(flat_writes, { });
 }
 
 void gearoenix::vulkan::camera::Camera::destroy_bloom_descriptors()
 {
-    if (nullptr != bloom_descriptor_pool) {
-        const auto dev = device::Logical::get().get_vulkan_data();
-        vkDestroyDescriptorPool(dev, bloom_descriptor_pool, nullptr);
-        bloom_descriptor_pool = nullptr;
+    if (*bloom_descriptor_pool) {
+        bloom_descriptor_pool = vk::raii::DescriptorPool { nullptr };
         bloom_ds_tex0_to_tex1 = { };
         bloom_ds_tex1_to_tex0 = { };
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const VkCommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const vk::CommandBuffer cmd) const
 {
-    if (!target.is_default() || nullptr == bloom_descriptor_pool) {
+    if (!target.is_default() || !*bloom_descriptor_pool) {
         return;
     }
 
@@ -420,17 +400,17 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(c
     auto* const tex0_img = tex0->get_view()->get_image().get();
     auto* const tex1_img = tex1->get_view()->get_image().get();
 
-    tex0_img->transit(cmd, image::TransitionRequest::shader_read(VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT));
+    tex0_img->transit(cmd, image::TransitionRequest::shader_read(vk::PipelineStageFlagBits2::eComputeShader));
     {
         image::TransitionRequest req;
-        req.layout = VK_IMAGE_LAYOUT_GENERAL;
-        req.access = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
-        req.stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        req.layout = vk::ImageLayout::eGeneral;
+        req.access = vk::AccessFlagBits2::eShaderStorageWrite;
+        req.stage = vk::PipelineStageFlagBits2::eComputeShader;
         tex1_img->transit(cmd, req.with_mips(0, 1));
     }
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline()->get_vulkan_data());
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_ctaa_pipeline_layout(), 0, 1, &bloom_ds_tex0_to_tex1[0], 0, nullptr);
+    cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_ctaa_pipeline()->get_vulkan_data());
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_ctaa_pipeline_layout(), 0, bloom_ds_tex0_to_tex1[0], { });
 
     ColourCorrectionPushConstants pc { };
     switch (colour_tuning.get_index()) {
@@ -451,11 +431,11 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(c
         break;
     }
 
-    vkCmdPushConstants(cmd, mgr.get_ctaa_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(pc), &pc);
+    cmd.pushConstants(mgr.get_ctaa_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
 
     const auto w = tex1_img->get_image_width();
     const auto h = tex1_img->get_image_height();
-    vkCmdDispatch(cmd, (w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
+    cmd.dispatch((w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
 }
 
 void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_number, const render::record::Camera& rc)
@@ -468,7 +448,7 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
     cameras_joint_model_indices.clear();
 
     {
-        auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
+        const auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
         shader_data_index = sd.get_index();
         auto& [vp, position_far] = *sd.get_ptr();
         position_far = { math::Vec3<float>(rc.transform->get_local_position()), far };
@@ -490,28 +470,22 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
     }
 }
 
-void gearoenix::vulkan::camera::Camera::record_viewport(const render::record::Camera& cmr, const VkCommandBuffer cmd)
+void gearoenix::vulkan::camera::Camera::record_viewport(const render::record::Camera& cmr, const vk::CommandBuffer cmd)
 {
-    const VkViewport viewport {
-        .x = cmr.viewport_clip.x,
-        .y = cmr.viewport_clip.y,
-        .width = cmr.viewport_clip.z,
-        .height = cmr.viewport_clip.w,
-        .minDepth = 0.0f,
-        .maxDepth = 1.0f,
+    const vk::Viewport viewport {
+        cmr.viewport_clip.x,
+        cmr.viewport_clip.y,
+        cmr.viewport_clip.z,
+        cmr.viewport_clip.w,
+        0.0f,
+        1.0f,
     };
-    vkCmdSetViewport(cmd, 0, 1, &viewport);
+    cmd.setViewport(0, viewport);
 
-    const VkRect2D scissor {
-        .offset = {
-            .x = static_cast<std::int32_t>(cmr.viewport_clip.x),
-            .y = static_cast<std::int32_t>(cmr.viewport_clip.y),
-        },
-        .extent = {
-            .width = static_cast<std::uint32_t>(cmr.viewport_clip.z),
-            .height = static_cast<std::uint32_t>(cmr.viewport_clip.w),
-        },
+    const vk::Rect2D scissor {
+        { static_cast<std::int32_t>(cmr.viewport_clip.x), static_cast<std::int32_t>(cmr.viewport_clip.y) },
+        { static_cast<std::uint32_t>(cmr.viewport_clip.z), static_cast<std::uint32_t>(cmr.viewport_clip.w) },
     };
-    vkCmdSetScissor(cmd, 0, 1, &scissor);
+    cmd.setScissor(0, scissor);
 }
 #endif

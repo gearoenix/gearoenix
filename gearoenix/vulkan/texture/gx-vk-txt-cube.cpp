@@ -14,8 +14,8 @@
 gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& in_name)
     : render::texture::TextureCube(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), 1u, convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 6u, convert_image_format(info.get_format()),
-          VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
-          VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT | (render::texture::format_is_depth(info.get_format()) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))))
+          vk::ImageCreateFlagBits::eCubeCompatible,
+          vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eStorage | (render::texture::format_is_depth(info.get_format()) ? vk::ImageUsageFlagBits::eDepthStencilAttachment : vk::ImageUsageFlagBits::eColorAttachment))))
     , view_index(descriptor::Bindless::get().allocate_cube_image(view->get_vulkan_data()))
     , mips([this] {
         std::array<std::vector<std::shared_ptr<image::View>>, 6> result;
@@ -43,7 +43,7 @@ void gearoenix::vulkan::texture::TextureCube::write(const std::shared_ptr<platfo
     write_gpu_texture_data(*view->get_image(), info, static_cast<std::uint32_t>(get_mipmaps_count()), 6, s, e);
 }
 
-void gearoenix::vulkan::texture::TextureCube::generate_mipmap(const VkCommandBuffer cmd)
+void gearoenix::vulkan::texture::TextureCube::generate_mipmap(const vk::CommandBuffer cmd)
 {
     view->get_image()->generate_mipmaps(cmd);
 }

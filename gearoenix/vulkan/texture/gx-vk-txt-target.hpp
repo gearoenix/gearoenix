@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 #include "../gx-vk-loader.hpp"
 #include "../image/gx-vk-img-image.hpp"
@@ -22,10 +21,10 @@ struct TextureCube;
 struct Target final : render::texture::Target {
     struct RenderingScope final {
     private:
-        const VkCommandBuffer command_buffer;
+        const vk::CommandBuffer command_buffer;
 
     public:
-        explicit RenderingScope(VkCommandBuffer cb);
+        explicit RenderingScope(vk::CommandBuffer cb);
         RenderingScope(RenderingScope&&) = delete;
         RenderingScope(const RenderingScope&) = delete;
         ~RenderingScope();
@@ -40,19 +39,22 @@ struct Target final : render::texture::Target {
         image::TransitionRequest transition_request;
     };
 
-    GX_GET_CREF_PRV(std::vector<GapiAttachment>, gapi_attachments);
-    std::vector<VkRenderingAttachmentInfo> color_attachments;
-    std::optional<VkRenderingAttachmentInfo> depth_attachment;
-    VkRenderingInfo rendering_info { };
+private:
+    std::vector<GapiAttachment> gapi_attachments;
+    std::vector<vk::RenderingAttachmentInfo> color_attachments;
+    std::optional<vk::RenderingAttachmentInfo> depth_attachment;
+    vk::RenderingInfo rendering_info { };
 
     Target(std::string&&, std::vector<render::texture::Attachment>&& attachments);
 
 public:
+    [[nodiscard]] const std::vector<GapiAttachment>& get_gapi_attachments() const { return gapi_attachments; }
+
     static void construct(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& end_callback);
     ~Target() override;
-    [[nodiscard]] RenderingScope create_rendering_scope(VkCommandBuffer cb, VkAttachmentLoadOp load_colours = VK_ATTACHMENT_LOAD_OP_CLEAR, VkAttachmentLoadOp load_depth = VK_ATTACHMENT_LOAD_OP_CLEAR);
+    [[nodiscard]] RenderingScope create_rendering_scope(vk::CommandBuffer cb, vk::AttachmentLoadOp load_colours = vk::AttachmentLoadOp::eClear, vk::AttachmentLoadOp load_depth = vk::AttachmentLoadOp::eClear);
     void update_rendering_info();
-    [[nodiscard]] VkFormat get_colour_format() const;
+    [[nodiscard]] vk::Format get_colour_format() const;
 };
 }
 

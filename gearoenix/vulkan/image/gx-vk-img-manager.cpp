@@ -1,13 +1,11 @@
 #include "gx-vk-img-manager.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
-#include "../gx-vk-check.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-img-image.hpp"
@@ -41,18 +39,15 @@ void gearoenix::vulkan::image::Manager::upload(std::shared_ptr<Image>&& img, std
         auto mip_height = img->get_image_height();
         auto mip_depth = img->get_image_depth();
         for (const auto& mip_buff : array_buffs) {
-            VkBufferImageCopy region;
-            GX_SET_ZERO(region);
+            vk::BufferImageCopy region;
             region.bufferOffset = mip_buff->get_offset();
-            region.bufferRowLength = 0;
-            region.bufferImageHeight = 0;
             region.imageSubresource.aspectMask = aspect_flags;
             region.imageSubresource.mipLevel = mip_index;
             region.imageSubresource.baseArrayLayer = array_index;
             region.imageSubresource.layerCount = 1;
-            region.imageOffset = { 0, 0, 0 };
-            region.imageExtent = { mip_width, mip_height, mip_depth };
-            vkCmdCopyBufferToImage(vk_cmd, mip_buff->get_vulkan_data(), img->get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+            region.imageOffset = vk::Offset3D { 0, 0, 0 };
+            region.imageExtent = vk::Extent3D { mip_width, mip_height, mip_depth };
+            vk_cmd.copyBufferToImage(mip_buff->get_vulkan_data(), img->get_vulkan_data(), vk::ImageLayout::eTransferDstOptimal, region);
 
             ++mip_index;
             mip_width = std::max(1u, mip_width >> 1);

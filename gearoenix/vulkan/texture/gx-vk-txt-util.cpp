@@ -1,7 +1,6 @@
 #include "gx-vk-txt-util.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/job/gx-cr-job-manager.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
@@ -11,61 +10,62 @@
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../image/gx-vk-img-image.hpp"
+#include "../memory/gx-vk-mem-memory.hpp"
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 
-VkImageType gearoenix::vulkan::texture::convert_image_type(const render::texture::Type type)
+vk::ImageType gearoenix::vulkan::texture::convert_image_type(const render::texture::Type type)
 {
     switch (type) {
     case render::texture::Type::Texture2D:
-        return VK_IMAGE_TYPE_2D;
+        return vk::ImageType::e2D;
     case render::texture::Type::Texture3D:
-        return VK_IMAGE_TYPE_3D;
+        return vk::ImageType::e3D;
     case render::texture::Type::TextureCube:
-        return VK_IMAGE_TYPE_2D;
+        return vk::ImageType::e2D;
     default:
         GX_UNEXPECTED;
     }
 }
 
-VkFormat gearoenix::vulkan::texture::convert_image_format(const render::texture::TextureFormat format)
+vk::Format gearoenix::vulkan::texture::convert_image_format(const render::texture::TextureFormat format)
 {
     switch (format) {
     case render::texture::TextureFormat::RgbaUint8:
-        return VK_FORMAT_R8G8B8A8_UNORM;
+        return vk::Format::eR8G8B8A8Unorm;
     case render::texture::TextureFormat::RgbaFloat32:
-        return VK_FORMAT_R32G32B32A32_SFLOAT;
+        return vk::Format::eR32G32B32A32Sfloat;
     case render::texture::TextureFormat::RgbFloat32:
-        return VK_FORMAT_R32G32B32_SFLOAT;
+        return vk::Format::eR32G32B32Sfloat;
     case render::texture::TextureFormat::RgFloat32:
-        return VK_FORMAT_R32G32_SFLOAT;
+        return vk::Format::eR32G32Sfloat;
     case render::texture::TextureFormat::Float32:
-        return VK_FORMAT_R32_SFLOAT;
+        return vk::Format::eR32Sfloat;
     case render::texture::TextureFormat::RgbaFloat16:
-        return VK_FORMAT_R16G16B16A16_SFLOAT;
+        return vk::Format::eR16G16B16A16Sfloat;
     case render::texture::TextureFormat::RgbFloat16:
-        return VK_FORMAT_R16G16B16_SFLOAT;
+        return vk::Format::eR16G16B16Sfloat;
     case render::texture::TextureFormat::RgFloat16:
-        return VK_FORMAT_R16G16_SFLOAT;
+        return vk::Format::eR16G16Sfloat;
     case render::texture::TextureFormat::Float16:
-        return VK_FORMAT_R16_SFLOAT;
+        return vk::Format::eR16Sfloat;
     case render::texture::TextureFormat::D32:
-        return VK_FORMAT_D32_SFLOAT;
+        return vk::Format::eD32Sfloat;
     case render::texture::TextureFormat::D24:
-        return VK_FORMAT_X8_D24_UNORM_PACK32;
+        return vk::Format::eX8D24UnormPack32;
     case render::texture::TextureFormat::D16:
-        return VK_FORMAT_D16_UNORM;
+        return vk::Format::eD16Unorm;
     default:
         GX_UNEXPECTED;
     }
 }
 
-bool gearoenix::vulkan::texture::has_depth(const VkFormat format)
+bool gearoenix::vulkan::texture::has_depth(const vk::Format format)
 {
     switch (format) {
-    case VK_FORMAT_D32_SFLOAT:
-    case VK_FORMAT_X8_D24_UNORM_PACK32:
-    case VK_FORMAT_D16_UNORM:
+    case vk::Format::eD32Sfloat:
+    case vk::Format::eX8D24UnormPack32:
+    case vk::Format::eD16Unorm:
         return true;
     default:
         return false;
@@ -109,16 +109,15 @@ void gearoenix::vulkan::texture::write_gpu_texture_data(
         auto level_height = height;
         for (std::uint32_t mip = 0; mip < mips_count; ++mip) {
             const auto buffer_index = layer * mips_count + mip;
-            VkBufferImageCopy region;
-            GX_SET_ZERO(region);
+            vk::BufferImageCopy region;
             region.bufferOffset = staging_buffers[buffer_index]->get_offset();
             region.imageSubresource.aspectMask = aspect_flags;
             region.imageSubresource.mipLevel = mip;
             region.imageSubresource.baseArrayLayer = layer;
             region.imageSubresource.layerCount = 1;
-            region.imageExtent = { level_width, level_height, 1 };
+            region.imageExtent = vk::Extent3D { level_width, level_height, 1 };
 
-            vkCmdCopyImageToBuffer(vk_cmd, img.get_vulkan_data(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, staging_buffers[buffer_index]->get_vulkan_data(), 1, &region);
+            vk_cmd.copyImageToBuffer(img.get_vulkan_data(), vk::ImageLayout::eTransferSrcOptimal, staging_buffers[buffer_index]->get_vulkan_data(), region);
 
             level_width = std::max(1u, level_width >> 1);
             level_height = std::max(1u, level_height >> 1);

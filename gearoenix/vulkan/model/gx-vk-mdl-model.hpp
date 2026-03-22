@@ -33,16 +33,21 @@ struct Model final : render::model::Model {
     constexpr static std::array all_parent_object_type_indices { render::model::Model::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::model::Model::object_type_index };
 
-    GX_GET_CREF_PRV(gapi_meshes_set_t, gapi_meshes);
-    GX_GET_VAL_PRV(std::uint64_t, last_update_frame, static_cast<std::uint64_t>(-1));
-    GX_GET_VAL_PRV(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
+private:
+    gapi_meshes_set_t gapi_meshes;
+    std::uint64_t last_update_frame = static_cast<std::uint64_t>(-1);
+    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
 
     Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
 
 public:
+    [[nodiscard]] const gapi_meshes_set_t& get_gapi_meshes() const { return gapi_meshes; }
+    [[nodiscard]] std::uint64_t get_last_update_frame() const { return last_update_frame; }
+    [[nodiscard]] std::uint32_t get_shader_data_index() const { return shader_data_index; }
+
     ~Model() override;
-    void render_shadow(const render::record::CameraModel& camera_model, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
-    void render_forward(const render::record::CameraModel& camera_model, const pipeline::FormatPipelines& fp, VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline);
+    void render_shadow(const render::record::CameraModel& camera_model, vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline);
+    void render_forward(const render::record::CameraModel& camera_model, const pipeline::FormatPipelines& fp, vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline);
     void after_record(std::uint64_t frame_number, const render::record::CameraModel& rec_cam_mdl);
 };
 }

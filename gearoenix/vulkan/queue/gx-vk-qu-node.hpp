@@ -1,7 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 #include "gx-vk-qu-node-label.hpp"
 
@@ -28,16 +27,26 @@ struct Node final {
     using per_frame_semaphores_t = std::vector<std::shared_ptr<sync::Semaphore>>;
     using output_map_t = boost::container::flat_map<NodeLabel, per_frame_semaphores_t>;
 
-    GX_GET_CREF_PRV(NodeLabel, node_label);
-    GX_GET_VAL_PRV(VkPipelineStageFlags, stage, VK_PIPELINE_STAGE_NONE_KHR);
-    GX_GET_CREF_PRV(std::vector<std::shared_ptr<command::Buffer>>, frame_commands);
-    GX_GET_VAL_PRV(int, traversal_level, -1);
-    GX_GETSET_VAL_PRV(bool, traversed, false);
-    GX_GET_REF_PRV(boost::container::flat_set<NodeLabel>, providers);
-    GX_GET_REF_PRV(output_map_t, consumers);
+private:
+    NodeLabel node_label;
+    vk::PipelineStageFlags stage = { };
+    std::vector<std::shared_ptr<command::Buffer>> frame_commands;
+    int traversal_level = -1;
+    bool traversed = false;
+    boost::container::flat_set<NodeLabel> providers;
+    output_map_t consumers;
 
 public:
-    Node(NodeLabel node_label, VkPipelineStageFlags stage);
+    [[nodiscard]] NodeLabel get_node_label() const { return node_label; }
+    [[nodiscard]] vk::PipelineStageFlags get_stage() const { return stage; }
+    [[nodiscard]] const std::vector<std::shared_ptr<command::Buffer>>& get_frame_commands() const { return frame_commands; }
+    [[nodiscard]] int get_traversal_level() const { return traversal_level; }
+    [[nodiscard]] bool get_traversed() const { return traversed; }
+    void set_traversed(const bool v) { traversed = v; }
+    [[nodiscard]] boost::container::flat_set<NodeLabel>& get_providers() { return providers; }
+    [[nodiscard]] output_map_t& get_consumers() { return consumers; }
+
+    Node(NodeLabel node_label, vk::PipelineStageFlags stage);
     ~Node();
     Node(Node&&) noexcept;
     Node(const Node&);

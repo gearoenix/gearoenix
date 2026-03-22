@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-singleton.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::command {
@@ -18,10 +17,13 @@ namespace gearoenix::vulkan::queue {
 /// We only have one queue because some devices only have support for one queue.
 /// Even those devices, which support several queues, don't have a good parallelism.
 struct Queue final : core::Singleton<Queue> {
-    GX_GET_CVAL_PRV(VkQueue, vulkan_data);
+private:
+    vk::Queue vulkan_data;
     std::mutex submission_lock;
 
 public:
+    [[nodiscard]] vk::Queue get_vulkan_data() const { return vulkan_data; }
+
     Queue(Queue&&) = delete;
     Queue(const Queue&) = delete;
     Queue& operator=(Queue&&) = delete;
@@ -30,9 +32,9 @@ public:
     Queue();
     ~Queue() override;
     void submit(const command::Buffer&, const sync::Fence& fence);
-    void submit(std::uint64_t wait_semaphores_count, const VkSemaphore* wait_semaphores, const VkPipelineStageFlags* wait_stages, std::uint64_t commands_count, const VkCommandBuffer* commands, std::uint64_t signal_semaphores_count,
-        const VkSemaphore* signal_semaphores, VkFence fence = nullptr);
-    [[nodiscard]] VkResult present(const VkPresentInfoKHR& info);
+    void submit(vk::ArrayProxy<const vk::Semaphore> wait_semaphores, vk::ArrayProxy<const vk::PipelineStageFlags> wait_stages, vk::ArrayProxy<const vk::CommandBuffer> commands,
+        vk::ArrayProxy<const vk::Semaphore> signal_semaphores, vk::Fence fence = nullptr);
+    void present(const vk::PresentInfoKHR& info);
 };
 }
 #endif

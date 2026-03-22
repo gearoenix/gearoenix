@@ -5,10 +5,11 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../sync/gx-vk-sync-semaphore.hpp"
 
-gearoenix::vulkan::queue::Node::Node(const NodeLabel node_label, const VkPipelineStageFlags stage)
+#include <ranges>
+
+gearoenix::vulkan::queue::Node::Node(const NodeLabel node_label, const vk::PipelineStageFlags stage)
     : node_label(node_label)
     , stage(stage)
-    , frame_commands()
 {
 }
 
@@ -26,8 +27,8 @@ void gearoenix::vulkan::queue::Node::clear_traversing_level(boost::container::fl
 {
     traversal_level = -1;
     traversed = false;
-    for (auto& consumer : consumers) {
-        auto node_search = nodes.find(consumer.first);
+    for (auto& key : consumers | std::views::keys) {
+        auto node_search = nodes.find(key);
         GX_ASSERT(nodes.end() != node_search);
         node_search->second.clear_traversing_level(nodes);
     }
@@ -38,11 +39,10 @@ int gearoenix::vulkan::queue::Node::update_traversing_level(const int tl, boost:
     int max_tl = tl;
     if (tl > traversal_level) {
         traversal_level = tl;
-        for (auto& consumer : consumers) {
-            auto node_search = nodes.find(consumer.first);
+        for (auto& key : consumers | std::views::keys) {
+            auto node_search = nodes.find(key);
             GX_ASSERT(nodes.end() != node_search);
-            const auto child_max_tl = node_search->second.update_traversing_level(tl + 1, nodes);
-            if (child_max_tl > max_tl) {
+            if (const auto child_max_tl = node_search->second.update_traversing_level(tl + 1, nodes); child_max_tl > max_tl) {
                 max_tl = child_max_tl;
             }
         }

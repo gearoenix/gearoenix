@@ -11,7 +11,6 @@
 #include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
-#include "../gx-vk-check.hpp"
 #include "../gx-vk-imgui-manager.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
@@ -183,8 +182,8 @@ void gearoenix::vulkan::engine::Engine::submit()
     const auto vk_cmd = cmd.get_vulkan_data();
     cmd.begin();
 
-    vkCmdSetFrontFace(cmd.get_vulkan_data(), VK_FRONT_FACE_COUNTER_CLOCKWISE);
-    vkCmdSetCullMode(cmd.get_vulkan_data(), VK_CULL_MODE_BACK_BIT);
+    vk_cmd.setFrontFace(vk::FrontFace::eCounterClockwise);
+    vk_cmd.setCullMode(vk::CullModeFlagBits::eBack);
 
     upload_uniforms();
     buffer_manager->upload_dynamics(vk_cmd);
@@ -193,13 +192,10 @@ void gearoenix::vulkan::engine::Engine::submit()
     imgui_manager->update();
     cmd.end();
 
-    constexpr VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    render_queue->submit(
-        1, frame.present_semaphore->get_vulkan_data_ptr(),
-        &wait_stage,
-        1, cmd.get_vulkan_data_ptr(),
-        1, swapchain->get_present_semaphore().get_vulkan_data_ptr(),
-        frame.render_fence->get_vulkan_data());
+    const vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    const auto wait_semaphore = frame.present_semaphore->get_vulkan_data();
+    const auto signal_semaphore = swapchain->get_present_semaphore().get_vulkan_data();
+    render_queue->submit(wait_semaphore, wait_stage, vk_cmd, signal_semaphore, frame.render_fence->get_vulkan_data());
 }
 
 gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() { return *frames[frame_number]; }
@@ -218,7 +214,7 @@ bool gearoenix::vulkan::engine::Engine::is_supported()
     }
 
     const auto& instance = *instance_result;
-    const auto gpus = device::Physical::get_available_devices(instance.get_vulkan_data());
+    const auto gpus = instance.get_vulkan_data().enumeratePhysicalDevices();
     return !gpus.empty();
 }
 

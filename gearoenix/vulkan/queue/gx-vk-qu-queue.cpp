@@ -1,25 +1,15 @@
 #include "gx-vk-qu-queue.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-assert.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
-#include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 
-#include <boost/container/flat_map.hpp>
 #include <mutex>
-#include <thread>
 
 gearoenix::vulkan::queue::Queue::Queue()
     : Singleton(this)
-    , vulkan_data([&] {
-        VkQueue q = nullptr;
-        vkGetDeviceQueue(device::Logical::get().get_vulkan_data(), device::Physical::get().get_graphics_queue_node_index(), 0, &q);
-        return q;
-    }())
+    , vulkan_data(device::Logical::get().get_vulkan_data().getQueue(device::Physical::get().get_graphics_queue_node_index(), 0))
 {
 }
 
@@ -27,36 +17,29 @@ gearoenix::vulkan::queue::Queue::~Queue() = default;
 
 void gearoenix::vulkan::queue::Queue::submit(const command::Buffer& cmd, const sync::Fence& fence)
 {
-    VkSubmitInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    info.commandBufferCount = 1;
-    info.pCommandBuffers = cmd.get_vulkan_data_ptr();
+    const auto vk_cmd = cmd.get_vulkan_data();
+    vk::SubmitInfo info;
+    info.setCommandBuffers(vk_cmd);
     const std::lock_guard _(submission_lock);
-    GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence.get_vulkan_data()));
+    vulkan_data.submit(info, fence.get_vulkan_data());
 }
 
-void gearoenix::vulkan::queue::Queue::submit(const std::uint64_t wait_semaphores_count, const VkSemaphore* const wait_semaphores, const VkPipelineStageFlags* const wait_stages, const std::uint64_t commands_count,
-    const VkCommandBuffer* const commands, const std::uint64_t signal_semaphores_count, const VkSemaphore* const signal_semaphores, const VkFence fence)
+void gearoenix::vulkan::queue::Queue::submit(const vk::ArrayProxy<const vk::Semaphore> wait_semaphores, const vk::ArrayProxy<const vk::PipelineStageFlags> wait_stages,
+    const vk::ArrayProxy<const vk::CommandBuffer> commands, const vk::ArrayProxy<const vk::Semaphore> signal_semaphores, const vk::Fence fence)
 {
-    VkSubmitInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    info.waitSemaphoreCount = static_cast<std::uint32_t>(wait_semaphores_count);
-    info.pWaitSemaphores = wait_semaphores;
-    info.pWaitDstStageMask = wait_stages;
-    info.commandBufferCount = static_cast<std::uint32_t>(commands_count);
-    info.pCommandBuffers = commands;
-    info.signalSemaphoreCount = static_cast<std::uint32_t>(signal_semaphores_count);
-    info.pSignalSemaphores = signal_semaphores;
+    vk::SubmitInfo info;
+    info.setWaitSemaphores(wait_semaphores);
+    info.setWaitDstStageMask(wait_stages);
+    info.setCommandBuffers(commands);
+    info.setSignalSemaphores(signal_semaphores);
     const std::lock_guard _(submission_lock);
-    GX_VK_CHK(vkQueueSubmit(vulkan_data, 1, &info, fence));
+    vulkan_data.submit(info, fence);
 }
 
-VkResult gearoenix::vulkan::queue::Queue::present(const VkPresentInfoKHR& info)
+void gearoenix::vulkan::queue::Queue::present(const vk::PresentInfoKHR& info)
 {
     const std::lock_guard _(submission_lock);
-    return vkQueuePresentKHR(vulkan_data, &info);
+    vulkan_data.presentKHR(info);
 }
 
 #endif

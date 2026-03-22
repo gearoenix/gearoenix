@@ -1,36 +1,27 @@
 #include "gx-vk-sync-fence.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
-#include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 
 gearoenix::vulkan::sync::Fence::Fence(const bool signaled)
+    : vulkan_data(
+          device::Logical::get().get_device(),
+          vk::FenceCreateInfo(signaled ? vk::FenceCreateFlagBits::eSignaled : vk::FenceCreateFlags { }))
 {
-    VkFenceCreateInfo fence_create_info;
-    GX_SET_ZERO(fence_create_info);
-    fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    if (signaled) {
-        fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    }
-    GX_VK_CHK(vkCreateFence(device::Logical::get().get_vulkan_data(), &fence_create_info, nullptr, &vulkan_data));
 }
 
-gearoenix::vulkan::sync::Fence::~Fence()
-{
-    vkDestroyFence(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
-    vulkan_data = nullptr;
-}
+gearoenix::vulkan::sync::Fence::~Fence() = default;
 
 void gearoenix::vulkan::sync::Fence::wait()
 {
-    GX_VK_CHK(vkWaitForFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data, VK_TRUE, UINT64_MAX));
+    if (const auto result = device::Logical::get().get_device().waitForFences(*vulkan_data, vk::True, UINT64_MAX); result != vk::Result::eSuccess) {
+        GX_LOG_F("Failed to wait for fence: " << vk::to_string(result));
+    }
 }
 
 void gearoenix::vulkan::sync::Fence::reset()
 {
-    GX_VK_CHK(vkResetFences(device::Logical::get().get_vulkan_data(), 1, &vulkan_data));
+    device::Logical::get().get_device().resetFences(*vulkan_data);
 }
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> gearoenix::vulkan::sync::Fence::create_frame_based(const bool signaled)

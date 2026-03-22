@@ -2,7 +2,6 @@
 #include "../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-singleton.hpp"
-#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-build-configuration.hpp"
 #include "gx-vk-loader.hpp"
 
@@ -27,13 +26,20 @@ struct Swapchain final : core::Singleton<Swapchain> {
 
     using frames_t = std::array<Frame, frames_in_flight>;
 
-    GX_GET_CREF_PRV(VkSurfaceFormatKHR, format);
-    GX_GET_VAL_PRV(VkSwapchainKHR, vulkan_data, nullptr);
-    GX_GET_CREF_PRV(frames_t, frames);
-    GX_GET_VAL_PRV(bool, is_valid, true);
-    GX_GET_VAL_PRV(std::uint32_t, image_index, 0);
+private:
+    vk::SurfaceFormatKHR format { };
+    vk::raii::SwapchainKHR vulkan_data { nullptr };
+    frames_t frames { };
+    bool is_valid = true;
+    std::uint32_t image_index = 0;
 
 public:
+    [[nodiscard]] const vk::SurfaceFormatKHR& get_format() const { return format; }
+    [[nodiscard]] vk::SwapchainKHR get_vulkan_data() const { return *vulkan_data; }
+    [[nodiscard]] const frames_t& get_frames() const { return frames; }
+    [[nodiscard]] bool get_is_valid() const { return is_valid; }
+    [[nodiscard]] std::uint32_t get_image_index() const { return image_index; }
+
     Swapchain();
     Swapchain(Swapchain&&) = delete;
     Swapchain(const Swapchain&) = delete;
@@ -45,7 +51,6 @@ public:
     void acquire_next_image(const sync::Semaphore& semaphore);
     void initialize();
     [[nodiscard]] const Frame& get_frame() const { return frames[image_index]; }
-    [[nodiscard]] const VkSwapchainKHR* get_vulkan_data_ptr() const;
     void present();
     [[nodiscard]] const sync::Semaphore& get_present_semaphore() const;
 };

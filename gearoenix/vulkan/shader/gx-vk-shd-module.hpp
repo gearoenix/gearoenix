@@ -1,7 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 #include <cstdint>
@@ -9,9 +8,11 @@
 
 namespace gearoenix::vulkan::shader {
 struct Module final {
-    GX_GET_VAL_PRV(VkShaderModule, vulkan_data, nullptr);
+private:
+    vk::raii::ShaderModule vulkan_data;
 
 public:
+    [[nodiscard]] vk::ShaderModule get_vulkan_data() const { return *vulkan_data; }
     Module(Module&&) = delete;
     Module(const Module&) = delete;
     Module& operator=(Module&&) = delete;

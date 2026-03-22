@@ -20,7 +20,7 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array all_parent_object_type_indices { render::scene::Scene::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
-    GX_GET_VAL_PRV(std::uint32_t, shader_data_index, static_cast<std::uint32_t>(-1));
+    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
     std::shared_ptr<texture::Texture2D> brdflut;
 
     Scene(core::ecs::Entity* e, std::string&& name, double layer);
@@ -29,11 +29,13 @@ struct Scene final : render::scene::Scene {
     void initialise_brdflut();
 
 public:
+    [[nodiscard]] std::uint32_t get_shader_data_index() const { return shader_data_index; }
+
     ~Scene() override;
     void update() override;
-    void render_shadows(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
-    void render_reflection_probes(VkCommandBuffer vk_cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const;
-    void render_forward(VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline);
+    void render_shadows(vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline);
+    void render_reflection_probes(vk::CommandBuffer vk_cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const;
+    void render_forward(vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline);
     void after_record(std::uint64_t frame_number);
 };
 }

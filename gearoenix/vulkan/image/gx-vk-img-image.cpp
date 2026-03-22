@@ -1,15 +1,14 @@
 #include "gx-vk-img-image.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
-#include "../../core/macro/gx-cr-mcr-flagger.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-manager.hpp"
+#include "../memory/gx-vk-mem-memory.hpp"
 
 bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
 {
@@ -55,11 +54,11 @@ bool gearoenix::vulkan::image::Image::State::has_uniform_layout() const
     return true;
 }
 
-gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::shader_read(const VkPipelineStageFlags2 stage)
+gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::shader_read(const vk::PipelineStageFlags2 stage)
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        .access = VK_ACCESS_2_SHADER_READ_BIT,
+        .layout = vk::ImageLayout::eShaderReadOnlyOptimal,
+        .access = vk::AccessFlagBits2::eShaderRead,
         .stage = stage,
     };
 }
@@ -67,45 +66,45 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
 gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_dst()
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        .access = VK_ACCESS_2_TRANSFER_WRITE_BIT,
-        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+        .layout = vk::ImageLayout::eTransferDstOptimal,
+        .access = vk::AccessFlagBits2::eTransferWrite,
+        .stage = vk::PipelineStageFlagBits2::eTransfer,
     };
 }
 
 gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::transfer_src()
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-        .access = VK_ACCESS_2_TRANSFER_READ_BIT,
-        .stage = VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+        .layout = vk::ImageLayout::eTransferSrcOptimal,
+        .access = vk::AccessFlagBits2::eTransferRead,
+        .stage = vk::PipelineStageFlagBits2::eTransfer,
     };
 }
 
 gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::color_attachment()
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-        .access = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
-        .stage = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .layout = vk::ImageLayout::eColorAttachmentOptimal,
+        .access = vk::AccessFlagBits2::eColorAttachmentWrite,
+        .stage = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
     };
 }
 
 gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::depth_attachment()
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-        .access = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-        .stage = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+        .layout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
+        .access = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+        .stage = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
     };
 }
 
 gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::TransitionRequest::present()
 {
     return {
-        .layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-        .access = VK_ACCESS_2_NONE,
-        .stage = VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT,
+        .layout = vk::ImageLayout::ePresentSrcKHR,
+        .access = vk::AccessFlagBits2::eNone,
+        .stage = vk::PipelineStageFlagBits2::eBottomOfPipe,
     };
 }
 
@@ -132,8 +131,8 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
     return result;
 }
 
-gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage, const VkImage vulkan_data)
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const vk::ImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const vk::Format format, const vk::ImageCreateFlags flags, const vk::ImageUsageFlags usage, const vk::Image vulkan_data)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -149,8 +148,8 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     GX_VK_MARK(name, vulkan_data);
 }
 
-gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const VkImageType image_type, const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers, const VkFormat format, const VkImageCreateFlags flags, const VkImageUsageFlags usage)
+gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const vk::ImageType image_type, const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers, const vk::Format format, const vk::ImageCreateFlags flags, const vk::ImageUsageFlags usage)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -162,34 +161,22 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     , usage(usage)
     , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
-    auto& logical_device = device::Logical::get();
+    auto dev = device::Logical::get().get_vulkan_data();
 
-    VkImageCreateInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    info.imageType = image_type;
-    info.format = format;
-    info.extent.width = image_width;
-    info.extent.height = image_height;
-    info.extent.depth = image_depth;
-    info.mipLevels = mipmap_levels;
-    info.arrayLayers = array_layers;
-    info.samples = VK_SAMPLE_COUNT_1_BIT;
-    info.tiling = VK_IMAGE_TILING_OPTIMAL;
-    info.usage = usage;
-    info.flags = flags;
-    info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    GX_VK_CHK(vkCreateImage(logical_device.get_vulkan_data(), &info, nullptr, &vulkan_data));
+    const vk::ImageCreateInfo info {
+        flags, image_type, format,
+        { image_width, image_height, image_depth },
+        mipmap_levels, array_layers,
+        vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, usage
+    };
+    vulkan_data = dev.createImage(info);
 
-    VkMemoryRequirements mem_req;
-    GX_SET_ZERO(mem_req);
-    vkGetImageMemoryRequirements(logical_device.get_vulkan_data(), vulkan_data, &mem_req);
+    auto mem_req = dev.getImageMemoryRequirements(vulkan_data);
 
     allocated_memory = memory::Manager::get().allocate(
         static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, memory::Place::Gpu);
     GX_ASSERT_D(allocated_memory != nullptr);
-    GX_VK_CHK(vkBindImageMemory(
-        logical_device.get_vulkan_data(), vulkan_data, allocated_memory->get_vulkan_data(), static_cast<VkDeviceSize>(allocated_memory->get_allocator()->get_offset())));
+    dev.bindImageMemory(vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset());
 
     GX_VK_MARK(name, vulkan_data);
 }
@@ -197,11 +184,11 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
 gearoenix::vulkan::image::Image::~Image()
 {
     if (owned) {
-        vkDestroyImage(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr);
+        device::Logical::get().get_vulkan_data().destroyImage(vulkan_data);
     }
 }
 
-VkImageLayout gearoenix::vulkan::image::Image::get_layout() const
+vk::ImageLayout gearoenix::vulkan::image::Image::get_layout() const
 {
     GX_ASSERT_D(!state.per_array_states.empty());
     GX_ASSERT_D(!state.per_array_states[0].per_mip_states.empty());
@@ -209,28 +196,28 @@ VkImageLayout gearoenix::vulkan::image::Image::get_layout() const
     return state.per_array_states[0].per_mip_states[0].layout;
 }
 
-VkImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
+vk::ImageAspectFlags gearoenix::vulkan::image::Image::get_aspect_flags() const
 {
-    if (!GX_FLAG_CHECK(usage, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)) {
-        return VK_IMAGE_ASPECT_COLOR_BIT;
+    if (!(usage & vk::ImageUsageFlagBits::eDepthStencilAttachment)) {
+        return vk::ImageAspectFlagBits::eColor;
     }
     switch (format) {
-    case VK_FORMAT_D16_UNORM:
-    case VK_FORMAT_D32_SFLOAT:
-    case VK_FORMAT_X8_D24_UNORM_PACK32:
-        return VK_IMAGE_ASPECT_DEPTH_BIT;
-    case VK_FORMAT_S8_UINT:
-        return VK_IMAGE_ASPECT_STENCIL_BIT;
-    case VK_FORMAT_D16_UNORM_S8_UINT:
-    case VK_FORMAT_D24_UNORM_S8_UINT:
-    case VK_FORMAT_D32_SFLOAT_S8_UINT:
-        return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    case vk::Format::eD16Unorm:
+    case vk::Format::eD32Sfloat:
+    case vk::Format::eX8D24UnormPack32:
+        return vk::ImageAspectFlagBits::eDepth;
+    case vk::Format::eS8Uint:
+        return vk::ImageAspectFlagBits::eStencil;
+    case vk::Format::eD16UnormS8Uint:
+    case vk::Format::eD24UnormS8Uint:
+    case vk::Format::eD32SfloatS8Uint:
+        return vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
     default:
         GX_UNEXPECTED;
     }
 }
 
-void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd)
+void gearoenix::vulkan::image::Image::generate_mipmaps(const vk::CommandBuffer cmd)
 {
     const auto aspect_flags = get_aspect_flags();
 
@@ -244,10 +231,9 @@ void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd
         // Transition destination mip level to TRANSFER_DST
         transit(cmd, TransitionRequest::transfer_dst().with_mips(mip, 1));
 
-        VkImageBlit blit;
-        GX_SET_ZERO(blit);
-        blit.srcOffsets[0] = { 0, 0, 0 };
-        blit.srcOffsets[1] = { mip_width, mip_height, mip_depth };
+        vk::ImageBlit blit;
+        blit.srcOffsets[0] = vk::Offset3D { 0, 0, 0 };
+        blit.srcOffsets[1] = vk::Offset3D { mip_width, mip_height, mip_depth };
         blit.srcSubresource.aspectMask = aspect_flags;
         blit.srcSubresource.mipLevel = mip - 1;
         blit.srcSubresource.baseArrayLayer = 0;
@@ -257,14 +243,14 @@ void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd
         const auto next_height = std::max(1, mip_height >> 1);
         const auto next_depth = std::max(1, mip_depth >> 1);
 
-        blit.dstOffsets[0] = { 0, 0, 0 };
-        blit.dstOffsets[1] = { next_width, next_height, next_depth };
+        blit.dstOffsets[0] = vk::Offset3D { 0, 0, 0 };
+        blit.dstOffsets[1] = vk::Offset3D { next_width, next_height, next_depth };
         blit.dstSubresource.aspectMask = aspect_flags;
         blit.dstSubresource.mipLevel = mip;
         blit.dstSubresource.baseArrayLayer = 0;
         blit.dstSubresource.layerCount = array_layers;
 
-        vkCmdBlitImage(cmd, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vulkan_data, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+        cmd.blitImage(vulkan_data, vk::ImageLayout::eTransferSrcOptimal, vulkan_data, vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eLinear);
 
         // Transition the source mip to SHADER_READ_ONLY
         transit(cmd, TransitionRequest::shader_read().with_mips(mip - 1, 1));
@@ -278,12 +264,12 @@ void gearoenix::vulkan::image::Image::generate_mipmaps(const VkCommandBuffer cmd
     transit(cmd, TransitionRequest::shader_read().with_mips(mipmap_levels - 1, 1));
 }
 
-void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const TransitionRequest& request)
+void gearoenix::vulkan::image::Image::transit(const vk::CommandBuffer cmd, const TransitionRequest& request)
 {
-    const auto actual_mip_count = request.mip_count == VK_REMAINING_MIP_LEVELS ? mipmap_levels - request.base_mip : request.mip_count;
-    const auto actual_layer_count = request.layer_count == VK_REMAINING_ARRAY_LAYERS ? array_layers - request.base_layer : request.layer_count;
+    const auto actual_mip_count = request.mip_count == vk::RemainingMipLevels ? mipmap_levels - request.base_mip : request.mip_count;
+    const auto actual_layer_count = request.layer_count == vk::RemainingArrayLayers ? array_layers - request.base_layer : request.layer_count;
 
-    thread_local std::vector<VkImageMemoryBarrier2> barriers;
+    thread_local std::vector<vk::ImageMemoryBarrier2> barriers;
     barriers.clear();
     barriers.reserve(actual_mip_count * actual_layer_count);
 
@@ -295,9 +281,7 @@ void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const T
                 continue;
             }
 
-            VkImageMemoryBarrier2 barrier;
-            GX_SET_ZERO(barrier);
-            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+            vk::ImageMemoryBarrier2 barrier;
             barrier.srcStageMask = stage;
             barrier.srcAccessMask = access;
             barrier.dstStageMask = request.stage;
@@ -326,13 +310,9 @@ void gearoenix::vulkan::image::Image::transit(const VkCommandBuffer cmd, const T
         return;
     }
 
-    VkDependencyInfo dependency_info;
-    GX_SET_ZERO(dependency_info);
-    dependency_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
-    dependency_info.imageMemoryBarrierCount = static_cast<std::uint32_t>(barriers.size());
-    dependency_info.pImageMemoryBarriers = barriers.data();
-
-    vkCmdPipelineBarrier2(cmd, &dependency_info);
+    vk::DependencyInfo dependency_info;
+    dependency_info.setImageMemoryBarriers(barriers);
+    cmd.pipelineBarrier2(dependency_info);
 }
 
 #endif

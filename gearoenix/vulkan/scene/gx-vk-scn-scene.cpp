@@ -49,7 +49,7 @@ void gearoenix::vulkan::scene::Scene::update()
     render::scene::Scene::update();
 }
 
-void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::scene::Scene::render_shadows(const vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline)
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
 
@@ -62,7 +62,7 @@ void gearoenix::vulkan::scene::Scene::render_shadows(const VkCommandBuffer vk_cm
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBuffer vk_cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::scene::Scene::render_reflection_probes(const vk::CommandBuffer vk_cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
 {
     GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
 
@@ -72,7 +72,7 @@ void gearoenix::vulkan::scene::Scene::render_reflection_probes(const VkCommandBu
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_forward(const VkCommandBuffer vk_cmd, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::scene::Scene::render_forward(const vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline)
 {
     pipeline::PushConstants pc;
     pc.scene_index = shader_data_index;

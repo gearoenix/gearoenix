@@ -1,26 +1,24 @@
 #include "gx-vk-img-view.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-flagger.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
+#include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 
 namespace {
-[[nodiscard]] VkImageAspectFlags get_depth_stencil_aspect(const VkFormat format)
+[[nodiscard]] vk::ImageAspectFlags get_depth_stencil_aspect(const vk::Format format)
 {
     switch (format) {
-    case VK_FORMAT_D16_UNORM:
-    case VK_FORMAT_D32_SFLOAT:
-    case VK_FORMAT_X8_D24_UNORM_PACK32:
-        return VK_IMAGE_ASPECT_DEPTH_BIT;
-    case VK_FORMAT_S8_UINT:
-        return VK_IMAGE_ASPECT_STENCIL_BIT;
-    case VK_FORMAT_D16_UNORM_S8_UINT:
-    case VK_FORMAT_D24_UNORM_S8_UINT:
-    case VK_FORMAT_D32_SFLOAT_S8_UINT:
-        return VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    case vk::Format::eD16Unorm:
+    case vk::Format::eD32Sfloat:
+    case vk::Format::eX8D24UnormPack32:
+        return vk::ImageAspectFlagBits::eDepth;
+    case vk::Format::eS8Uint:
+        return vk::ImageAspectFlagBits::eStencil;
+    case vk::Format::eD16UnormS8Uint:
+    case vk::Format::eD24UnormS8Uint:
+    case vk::Format::eD32SfloatS8Uint:
+        return vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
     default:
         GX_UNEXPECTED;
     }
@@ -33,13 +31,12 @@ gearoenix::vulkan::image::View::View(
     std::optional<std::uint32_t> level_count,
     std::uint32_t base_layer,
     std::optional<std::uint32_t> layer_count,
-    std::optional<VkFormat> format_override)
+    std::optional<vk::Format> format_override)
     : image(std::move(img))
-    , extent {
-        .width = std::max(image->get_image_width() >> base_level, 1u),
-        .height = std::max(image->get_image_height() >> base_level, 1u),
-        .depth = std::max(image->get_image_depth() >> base_level, 1u),
-    }
+    , extent(
+          std::max(image->get_image_width() >> base_level, 1u),
+          std::max(image->get_image_height() >> base_level, 1u),
+          std::max(image->get_image_depth() >> base_level, 1u))
     , base_level(base_level)
     , level_count(level_count.value_or(image->get_mipmap_levels() - base_level))
     , base_layer(base_layer)
@@ -51,58 +48,56 @@ gearoenix::vulkan::image::View::View(
     GX_ASSERT_D(base_layer < image->get_array_layers());
     GX_ASSERT_D(base_layer + this->layer_count <= image->get_array_layers());
 
-    VkImageViewCreateInfo info;
-    GX_SET_ZERO(info);
-    info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    vk::ImageViewCreateInfo info;
     info.image = image->get_vulkan_data();
 
-    const bool is_cube = GX_FLAG_CHECK(image->get_flags(), VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) && this->layer_count >= 6 && this->layer_count % 6 == 0;
+    const bool is_cube = (image->get_flags() & vk::ImageCreateFlagBits::eCubeCompatible) && this->layer_count >= 6 && this->layer_count % 6 == 0;
 
     switch (image->get_image_type()) {
-    case VK_IMAGE_TYPE_1D:
-        info.viewType = this->layer_count > 1 ? VK_IMAGE_VIEW_TYPE_1D_ARRAY : VK_IMAGE_VIEW_TYPE_1D;
+    case vk::ImageType::e1D:
+        info.viewType = this->layer_count > 1 ? vk::ImageViewType::e1DArray : vk::ImageViewType::e1D;
         break;
-    case VK_IMAGE_TYPE_2D:
+    case vk::ImageType::e2D:
         if (is_cube) {
-            info.viewType = this->layer_count > 6 ? VK_IMAGE_VIEW_TYPE_CUBE_ARRAY : VK_IMAGE_VIEW_TYPE_CUBE;
+            info.viewType = this->layer_count > 6 ? vk::ImageViewType::eCubeArray : vk::ImageViewType::eCube;
         } else {
-            info.viewType = this->layer_count > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
+            info.viewType = this->layer_count > 1 ? vk::ImageViewType::e2DArray : vk::ImageViewType::e2D;
         }
         break;
-    case VK_IMAGE_TYPE_3D:
-        info.viewType = VK_IMAGE_VIEW_TYPE_3D;
+    case vk::ImageType::e3D:
+        info.viewType = vk::ImageViewType::e3D;
         break;
     default:
         GX_UNEXPECTED;
     }
 
     info.format = format_override.value_or(image->get_format());
-    info.components.r = VK_COMPONENT_SWIZZLE_R;
-    info.components.g = VK_COMPONENT_SWIZZLE_G;
-    info.components.b = VK_COMPONENT_SWIZZLE_B;
-    info.components.a = VK_COMPONENT_SWIZZLE_A;
     info.subresourceRange.baseMipLevel = this->base_level;
     info.subresourceRange.levelCount = this->level_count;
     info.subresourceRange.baseArrayLayer = this->base_layer;
     info.subresourceRange.layerCount = this->layer_count;
 
-    if GX_FLAG_CHECK (image->get_usage(), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+    if (image->get_usage() & vk::ImageUsageFlagBits::eDepthStencilAttachment) {
         info.subresourceRange.aspectMask = get_depth_stencil_aspect(image->get_format());
     } else {
-        info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        info.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
     }
 
-    GX_VK_CHK(vkCreateImageView(device::Logical::get().get_vulkan_data(), &info, nullptr, &vulkan_data));
+    vulkan_data = vk::raii::ImageView(device::Logical::get().get_device(), info);
 }
 
-gearoenix::vulkan::image::View::~View() { vkDestroyImageView(device::Logical::get().get_vulkan_data(), vulkan_data, nullptr); }
+gearoenix::vulkan::image::View::~View() = default;
 
 std::shared_ptr<gearoenix::vulkan::image::View> gearoenix::vulkan::image::View::create_depth_stencil(const std::string& name)
 {
     const auto& physical_device = device::Physical::get();
     const auto depth_format = physical_device.get_supported_depth_format();
     const auto surf_cap = physical_device.get_surface_capabilities();
-    return std::make_shared<View>(std::make_shared<Image>(name, surf_cap.currentExtent.width, surf_cap.currentExtent.height, 1, VK_IMAGE_TYPE_2D, 1, 1, depth_format, 0, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
+    return std::make_shared<View>(std::make_shared<Image>(
+        name,
+        surf_cap.currentExtent.width, surf_cap.currentExtent.height, 1,
+        vk::ImageType::e2D, 1, 1, depth_format, vk::ImageCreateFlags { },
+        vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransferSrc));
 }
 
 #endif

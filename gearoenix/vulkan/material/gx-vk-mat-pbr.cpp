@@ -86,12 +86,12 @@ void gearoenix::vulkan::material::Pbr::set_occlusion(std::shared_ptr<render::tex
     render::material::Pbr::set_occlusion(std::move(txt));
 }
 
-void gearoenix::vulkan::material::Pbr::bind_forward(const VkCommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Pbr::bind_forward(const vk::CommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
 {
     bind_graphics((skinned ? fp.pbr_skinned_forward.get() : fp.pbr_forward.get())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
 }
 
-void gearoenix::vulkan::material::Pbr::bind_shadow(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Pbr::bind_shadow(const vk::CommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
 {
     const auto& mgr = pipeline::Manager::get();
     bind_graphics((skinned ? mgr.get_skinned_shadow() : mgr.get_shadow())->get_vulkan_data(), cmd, pc, current_bound_pipeline);

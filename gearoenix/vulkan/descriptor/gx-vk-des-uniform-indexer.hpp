@@ -3,7 +3,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-singleton.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-uniform.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
@@ -31,10 +30,14 @@ struct UniformIndexer : core::Singleton<UniformIndexer<GlslStruct, Policy>> {
     using policy_holder_t = std::conditional_t<IsAllocator, allocator_t, counter_t>;
 
     struct DataAccess final {
-        GX_GET_PTR_PRV(GlslStruct, ptr);
-        GX_GET_VAL_PRV(std::uint32_t, index, static_cast<std::uint32_t>(-1));
+    private:
+        GlslStruct* ptr;
+        std::uint32_t index = static_cast<std::uint32_t>(-1);
 
     public:
+        [[nodiscard]] GlslStruct* get_ptr() const { return ptr; }
+        [[nodiscard]] std::uint32_t get_index() const { return index; }
+
         explicit DataAccess(GlslStruct* const ptr, const std::uint32_t index)
             : ptr(ptr)
             , index(index)

@@ -3,7 +3,6 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
@@ -58,7 +57,7 @@ void gearoenix::vulkan::scene::Manager::update()
     });
 }
 
-void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer cmd)
+void gearoenix::vulkan::scene::Manager::submit(const vk::CommandBuffer cmd)
 {
     render_shadows(cmd);
     Singleton<reflection::Manager>::get().submit(cmd);
@@ -71,11 +70,11 @@ void gearoenix::vulkan::scene::Manager::submit(const VkCommandBuffer cmd)
     // }
 }
 
-void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd)
+void gearoenix::vulkan::scene::Manager::render_forward(const vk::CommandBuffer cmd)
 {
     {
         GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
-        VkPipeline current_bound_pipeline = nullptr;
+        vk::Pipeline current_bound_pipeline;
         for (const auto& scene : scenes | std::views::values) {
             scene->render_forward(cmd, current_bound_pipeline);
         }
@@ -89,7 +88,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
         auto& swapchain_image = *swapchain_view.get_image();
 
         // Check if the swapchain supports being a blit destination
-        if ((swapchain_image.get_usage() & VK_IMAGE_USAGE_TRANSFER_DST_BIT) == 0) {
+        if (!(swapchain_image.get_usage() & vk::ImageUsageFlagBits::eTransferDst)) {
             // TODO: Fall back to shader-based rendering to swapchain
             GX_LOG_D("Swapchain does not support blit destination, skipping camera composition.");
             return;
@@ -99,7 +98,7 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
         const auto swapchain_width = swapchain_view.get_extent().width;
         const auto swapchain_height = swapchain_view.get_extent().height;
 
-        bool first_camera = swapchain_image.get_layout() == VK_IMAGE_LAYOUT_UNDEFINED;
+        bool first_camera = swapchain_image.get_layout() == vk::ImageLayout::eUndefined;
 
         for (auto* const scene : scenes | std::views::values) {
             for (const auto& record_cameras = scene->get_record().cameras; const auto camera_index : record_cameras.mains | std::views::values) {
@@ -162,34 +161,21 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
 
                 // Clear swapchain on first camera blit (to get black bars)
                 if (first_camera) {
-                    VkClearColorValue clear_color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
-                    VkImageSubresourceRange clear_range;
-                    GX_SET_ZERO(clear_range);
-                    clear_range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                    clear_range.baseMipLevel = 0;
-                    clear_range.levelCount = 1;
-                    clear_range.baseArrayLayer = 0;
-                    clear_range.layerCount = 1;
-                    vkCmdClearColorImage(cmd, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clear_color, 1, &clear_range);
+                    constexpr vk::ClearColorValue clear_color { std::array { 0.0f, 0.0f, 0.0f, 1.0f } };
+                    constexpr vk::ImageSubresourceRange clear_range { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
+                    cmd.clearColorImage(vk_swapchain_image, vk::ImageLayout::eTransferDstOptimal, clear_color, clear_range);
                 }
 
                 // Perform blit
-                VkImageBlit blit;
-                GX_SET_ZERO(blit);
-                blit.srcOffsets[0] = { 0, 0, 0 };
-                blit.srcOffsets[1] = { src_width, src_height, 1 };
-                blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                blit.srcSubresource.mipLevel = 0;
-                blit.srcSubresource.baseArrayLayer = 0;
-                blit.srcSubresource.layerCount = 1;
-                blit.dstOffsets[0] = { dst_x, dst_y, 0 };
-                blit.dstOffsets[1] = { dst_x + dst_width, dst_y + dst_height, 1 };
-                blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                blit.dstSubresource.mipLevel = 0;
-                blit.dstSubresource.baseArrayLayer = 0;
-                blit.dstSubresource.layerCount = 1;
+                vk::ImageBlit blit;
+                blit.srcOffsets[0] = vk::Offset3D { 0, 0, 0 };
+                blit.srcOffsets[1] = vk::Offset3D { src_width, src_height, 1 };
+                blit.srcSubresource = vk::ImageSubresourceLayers { vk::ImageAspectFlagBits::eColor, 0, 0, 1 };
+                blit.dstOffsets[0] = vk::Offset3D { dst_x, dst_y, 0 };
+                blit.dstOffsets[1] = vk::Offset3D { dst_x + dst_width, dst_y + dst_height, 1 };
+                blit.dstSubresource = vk::ImageSubresourceLayers { vk::ImageAspectFlagBits::eColor, 0, 0, 1 };
 
-                vkCmdBlitImage(cmd, vk_src_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vk_swapchain_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+                cmd.blitImage(vk_src_image, vk::ImageLayout::eTransferSrcOptimal, vk_swapchain_image, vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eLinear);
 
                 // Transition the source image back to COLOR_ATTACHMENT_OPTIMAL for the next frame's rendering.
                 src_image.transit(cmd, image::TransitionRequest::color_attachment());
@@ -199,16 +185,16 @@ void gearoenix::vulkan::scene::Manager::render_forward(const VkCommandBuffer cmd
         }
 
         // If we blitted, transition swapchain to COLOR_ATTACHMENT_OPTIMAL for ImGui
-        if (swapchain_image.get_layout() == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        if (swapchain_image.get_layout() == vk::ImageLayout::eTransferDstOptimal) {
             swapchain_image.transit(cmd, image::TransitionRequest::color_attachment());
         }
     }
 }
 
-void gearoenix::vulkan::scene::Manager::render_shadows(const VkCommandBuffer cmd)
+void gearoenix::vulkan::scene::Manager::render_shadows(const vk::CommandBuffer cmd)
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
-    VkPipeline current_bound_pipeline = nullptr;
+    vk::Pipeline current_bound_pipeline;
     for (const auto& scene : scenes | std::views::values) {
         scene->render_shadows(cmd, current_bound_pipeline);
     }

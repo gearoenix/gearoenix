@@ -3,13 +3,11 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
 #include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../gx-vk-check.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -23,114 +21,58 @@
 
 void gearoenix::vulkan::reflection::Manager::initialise_convolution_compute()
 {
-    const auto dev = device::Logical::get().get_vulkan_data();
-
     constexpr std::array bindings {
-        VkDescriptorSetLayoutBinding {
-            .binding = 0,
-            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount = 1,
-            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-            .pImmutableSamplers = nullptr },
-        VkDescriptorSetLayoutBinding {
-            .binding = 1,
-            .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .descriptorCount = 1,
-            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-            .pImmutableSamplers = nullptr },
+        vk::DescriptorSetLayoutBinding { 0, vk::DescriptorType::eCombinedImageSampler, 1, vk::ShaderStageFlagBits::eCompute },
+        vk::DescriptorSetLayoutBinding { 1, vk::DescriptorType::eStorageImage, 1, vk::ShaderStageFlagBits::eCompute },
     };
 
-    VkDescriptorSetLayoutCreateInfo dsl_info;
-    GX_SET_ZERO(dsl_info);
-    dsl_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    dsl_info.bindingCount = static_cast<std::uint32_t>(bindings.size());
-    dsl_info.pBindings = bindings.data();
-    GX_VK_CHK(vkCreateDescriptorSetLayout(dev, &dsl_info, nullptr, &convolution_descriptor_set_layout));
+    vk::DescriptorSetLayoutCreateInfo dsl_info { { }, bindings };
+    convolution_descriptor_set_layout = vk::raii::DescriptorSetLayout(device::Logical::get().get_device(), dsl_info);
 
-    VkSamplerCreateInfo sampler_info;
-    GX_SET_ZERO(sampler_info);
-    sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    sampler_info.magFilter = VK_FILTER_LINEAR;
-    sampler_info.minFilter = VK_FILTER_LINEAR;
-    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    sampler_info.maxLod = VK_LOD_CLAMP_NONE;
-    GX_VK_CHK(vkCreateSampler(dev, &sampler_info, nullptr, &convolution_sampler));
+    vk::SamplerCreateInfo sampler_info { };
+    sampler_info.magFilter = vk::Filter::eLinear;
+    sampler_info.minFilter = vk::Filter::eLinear;
+    sampler_info.mipmapMode = vk::SamplerMipmapMode::eLinear;
+    sampler_info.addressModeU = vk::SamplerAddressMode::eClampToEdge;
+    sampler_info.addressModeV = vk::SamplerAddressMode::eClampToEdge;
+    sampler_info.addressModeW = vk::SamplerAddressMode::eClampToEdge;
+    sampler_info.maxLod = vk::LodClampNone;
+    convolution_sampler = vk::raii::Sampler(device::Logical::get().get_device(), sampler_info);
 
     convolution_pipeline_cache = std::make_shared<pipeline::Cache>();
 
     {
-        VkPushConstantRange push_range;
-        GX_SET_ZERO(push_range);
-        push_range.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-        push_range.offset = 0;
-        push_range.size = sizeof(Runtime::IrradiancePushConstants);
+        vk::PushConstantRange push_range { vk::ShaderStageFlagBits::eCompute, 0, sizeof(Runtime::IrradiancePushConstants) };
 
-        VkPipelineLayoutCreateInfo pl_info;
-        GX_SET_ZERO(pl_info);
-        pl_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pl_info.setLayoutCount = 1;
-        pl_info.pSetLayouts = &convolution_descriptor_set_layout;
-        pl_info.pushConstantRangeCount = 1;
-        pl_info.pPushConstantRanges = &push_range;
-        GX_VK_CHK(vkCreatePipelineLayout(dev, &pl_info, nullptr, &irradiance_pipeline_layout));
+        vk::PipelineLayoutCreateInfo pl_info { { }, *convolution_descriptor_set_layout, push_range };
+        irradiance_pipeline_layout = vk::raii::PipelineLayout(device::Logical::get().get_device(), pl_info);
 
         const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct("vulkan/shader/irradiance.comp.spv"));
         GX_ASSERT_D(stream);
         const auto file_content = stream->get_file_content();
         irradiance_shader_module = std::make_shared<shader::Module>(std::span { file_content.data(), file_content.size() });
 
-        VkPipelineShaderStageCreateInfo stage_info;
-        GX_SET_ZERO(stage_info);
-        stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        stage_info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-        stage_info.module = irradiance_shader_module->get_vulkan_data();
-        stage_info.pName = "main";
+        vk::PipelineShaderStageCreateInfo stage_info { { }, vk::ShaderStageFlagBits::eCompute, irradiance_shader_module->get_vulkan_data(), "main" };
 
-        VkComputePipelineCreateInfo compute_info;
-        GX_SET_ZERO(compute_info);
-        compute_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-        compute_info.stage = stage_info;
-        compute_info.layout = irradiance_pipeline_layout;
+        vk::ComputePipelineCreateInfo compute_info { { }, stage_info, *irradiance_pipeline_layout };
         irradiance_pipeline = pipeline::Pipeline::construct_compute(std::shared_ptr(convolution_pipeline_cache), compute_info);
     }
 
     // Radiance pipeline (different push constant size from irradiance)
     {
-        VkPushConstantRange push_range;
-        GX_SET_ZERO(push_range);
-        push_range.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
-        push_range.offset = 0;
-        push_range.size = sizeof(Runtime::RadiancePushConstants);
+        vk::PushConstantRange push_range { vk::ShaderStageFlagBits::eCompute, 0, sizeof(Runtime::RadiancePushConstants) };
 
-        VkPipelineLayoutCreateInfo pl_info;
-        GX_SET_ZERO(pl_info);
-        pl_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pl_info.setLayoutCount = 1;
-        pl_info.pSetLayouts = &convolution_descriptor_set_layout;
-        pl_info.pushConstantRangeCount = 1;
-        pl_info.pPushConstantRanges = &push_range;
-        GX_VK_CHK(vkCreatePipelineLayout(dev, &pl_info, nullptr, &radiance_pipeline_layout));
+        vk::PipelineLayoutCreateInfo pl_info { { }, *convolution_descriptor_set_layout, push_range };
+        radiance_pipeline_layout = vk::raii::PipelineLayout(device::Logical::get().get_device(), pl_info);
 
         const std::unique_ptr<platform::stream::Stream> stream(platform::stream::Asset::construct("vulkan/shader/radiance.comp.spv"));
         GX_ASSERT_D(stream);
         const auto file_content = stream->get_file_content();
         radiance_shader_module = std::make_shared<shader::Module>(std::span { file_content.data(), file_content.size() });
 
-        VkPipelineShaderStageCreateInfo stage_info;
-        GX_SET_ZERO(stage_info);
-        stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        stage_info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-        stage_info.module = radiance_shader_module->get_vulkan_data();
-        stage_info.pName = "main";
+        vk::PipelineShaderStageCreateInfo stage_info { { }, vk::ShaderStageFlagBits::eCompute, radiance_shader_module->get_vulkan_data(), "main" };
 
-        VkComputePipelineCreateInfo compute_info;
-        GX_SET_ZERO(compute_info);
-        compute_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-        compute_info.stage = stage_info;
-        compute_info.layout = radiance_pipeline_layout;
+        vk::ComputePipelineCreateInfo compute_info { { }, stage_info, *radiance_pipeline_layout };
         radiance_pipeline = pipeline::Pipeline::construct_compute(std::shared_ptr(convolution_pipeline_cache), compute_info);
     }
 }
@@ -180,24 +122,6 @@ gearoenix::vulkan::reflection::Manager::~Manager()
     irradiance_pipeline = nullptr;
     irradiance_shader_module = nullptr;
     convolution_pipeline_cache = nullptr;
-
-    const auto dev = device::Logical::get().get_vulkan_data();
-    if (nullptr != radiance_pipeline_layout) {
-        vkDestroyPipelineLayout(dev, radiance_pipeline_layout, nullptr);
-        radiance_pipeline_layout = nullptr;
-    }
-    if (nullptr != irradiance_pipeline_layout) {
-        vkDestroyPipelineLayout(dev, irradiance_pipeline_layout, nullptr);
-        irradiance_pipeline_layout = nullptr;
-    }
-    if (nullptr != convolution_sampler) {
-        vkDestroySampler(dev, convolution_sampler, nullptr);
-        convolution_sampler = nullptr;
-    }
-    if (nullptr != convolution_descriptor_set_layout) {
-        vkDestroyDescriptorSetLayout(dev, convolution_descriptor_set_layout, nullptr);
-        convolution_descriptor_set_layout = nullptr;
-    }
 }
 
 gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_baked(
@@ -240,7 +164,7 @@ void gearoenix::vulkan::reflection::Manager::upload_uniforms()
     uniform_indexer.update();
 }
 
-void gearoenix::vulkan::reflection::Manager::submit(const VkCommandBuffer cmd) const
+void gearoenix::vulkan::reflection::Manager::submit(const vk::CommandBuffer cmd) const
 {
     GX_VK_PUSH_DEBUG_GROUP(cmd, 0.5f, 1.0f, 0.5f, "render-reflection-probes");
 

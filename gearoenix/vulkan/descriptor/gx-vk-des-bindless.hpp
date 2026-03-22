@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-singleton.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-build-configuration.hpp"
 #include "../gx-vk-loader.hpp"
 
@@ -23,11 +22,12 @@ struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_samplers = 32;
     static constexpr std::uint32_t max_shadow_samplers = 1;
 
-    GX_GET_VAL_PRV(VkDescriptorSetLayout, descriptor_set_layout, VK_NULL_HANDLE);
-    GX_GET_VAL_PRV(VkDescriptorPool, descriptor_pool, VK_NULL_HANDLE);
-    GX_GET_VAL_PRV(VkDescriptorSet, descriptor_set, VK_NULL_HANDLE);
-    GX_GET_VAL_PRV(VkPipelineLayout, pipeline_layout, VK_NULL_HANDLE);
-    GX_GET_VAL_PRV(VkSampler, shadow_sampler, VK_NULL_HANDLE);
+private:
+    vk::raii::DescriptorSetLayout descriptor_set_layout { nullptr };
+    vk::raii::DescriptorPool descriptor_pool { nullptr };
+    vk::DescriptorSet descriptor_set;
+    vk::raii::PipelineLayout pipeline_layout { nullptr };
+    vk::raii::Sampler shadow_sampler { nullptr };
 
     std::vector<std::uint32_t> free_1d_image_indices = { };
     std::vector<std::uint32_t> free_2d_image_indices = { };
@@ -37,25 +37,31 @@ struct Bindless final : core::Singleton<Bindless> {
 
     std::mutex allocation_lock;
 
-    void write_image_descriptor(std::uint32_t binding, std::uint32_t index, VkImageView view, VkImageLayout layout) const;
-    void write_sampler_descriptor(std::uint32_t index, VkSampler sampler) const;
+    void write_image_descriptor(std::uint32_t binding, std::uint32_t index, vk::ImageView view, vk::ImageLayout layout) const;
+    void write_sampler_descriptor(std::uint32_t index, vk::Sampler sampler) const;
 
 public:
     Bindless(const buffer::Buffer& scenes_buffer, const buffer::Buffer& cameras_buffer, const buffer::Buffer& models_buffer, const buffer::Buffer& materials_buffer, const buffer::Buffer& point_lights_buffer,
         const buffer::Buffer& directional_lights_buffer, const buffer::Buffer& shadow_caster_directional_lights_buffer, const buffer::Buffer& bones_buffer, const buffer::Buffer& reflection_probes_buffer,
         const buffer::Buffer& cameras_joint_models_buffer);
-    ~Bindless() override;
+    ~Bindless() override = default;
 
     Bindless(Bindless&&) = delete;
     Bindless(const Bindless&) = delete;
     Bindless& operator=(Bindless&&) = delete;
     Bindless& operator=(const Bindless&) = delete;
 
-    [[nodiscard]] std::uint32_t allocate_1d_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    [[nodiscard]] std::uint32_t allocate_2d_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    [[nodiscard]] std::uint32_t allocate_3d_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    [[nodiscard]] std::uint32_t allocate_cube_image(VkImageView view, VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    [[nodiscard]] std::uint32_t allocate_sampler(VkSampler sampler);
+    [[nodiscard]] vk::DescriptorSetLayout get_descriptor_set_layout() const { return *descriptor_set_layout; }
+    [[nodiscard]] vk::DescriptorPool get_descriptor_pool() const { return *descriptor_pool; }
+    [[nodiscard]] vk::DescriptorSet get_descriptor_set() const { return descriptor_set; }
+    [[nodiscard]] vk::PipelineLayout get_pipeline_layout() const { return *pipeline_layout; }
+    [[nodiscard]] vk::Sampler get_shadow_sampler() const { return *shadow_sampler; }
+
+    [[nodiscard]] std::uint32_t allocate_1d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+    [[nodiscard]] std::uint32_t allocate_2d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+    [[nodiscard]] std::uint32_t allocate_3d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+    [[nodiscard]] std::uint32_t allocate_cube_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+    [[nodiscard]] std::uint32_t allocate_sampler(vk::Sampler sampler);
 
     void free_1d_image(std::uint32_t index);
     void free_2d_image(std::uint32_t index);
@@ -63,7 +69,7 @@ public:
     void free_cube_image(std::uint32_t index);
     void free_sampler(std::uint32_t index);
 
-    void bind(VkCommandBuffer) const;
+    void bind(vk::CommandBuffer cmd) const;
 };
 }
 #endif

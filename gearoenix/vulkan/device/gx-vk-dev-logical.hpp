@@ -3,7 +3,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-build-configuration.hpp"
 #include "../../core/gx-cr-singleton.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 #if GX_DEBUG_MODE
@@ -12,8 +11,9 @@
 
 namespace gearoenix::vulkan::device {
 struct Logical final : core::Singleton<Logical> {
-    GX_GET_VAL_PRV(VkDevice, vulkan_data, nullptr);
-    GX_GET_VAL_PRV(bool, debug_marker_is_available, false);
+private:
+    vk::raii::Device vulkan_device;
+    bool debug_marker_is_available = false;
 
 public:
     Logical();
@@ -22,6 +22,10 @@ public:
     Logical& operator=(Logical&&) = delete;
     Logical& operator=(const Logical&) = delete;
     ~Logical() override;
+
+    [[nodiscard]] const vk::raii::Device& get_device() const { return vulkan_device; }
+    [[nodiscard]] vk::Device get_vulkan_data() const { return *vulkan_device; }
+    [[nodiscard]] bool get_debug_marker_is_available() const { return debug_marker_is_available; }
 
     void wait_to_finish();
 };

@@ -1,20 +1,17 @@
 #include "gx-vk-loader.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../platform/gx-plt-log.hpp"
-#include "device/gx-vk-dev-logical.hpp"
-#include "gx-vk-instance.hpp"
 
 #include <SDL3/SDL_vulkan.h>
 #include <cstdlib>
 #include <string>
 
-#define GX_VULKAN_LOADER_DECL_FUNCTIONS(GX_VULKAN_LOADER_FUNCTION) PFN_##GX_VULKAN_LOADER_FUNCTION GX_VULKAN_LOADER_FUNCTION = nullptr
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
-GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_DECL_FUNCTIONS)
-
-#undef GX_VULKAN_LOADER_DECL_FUNCTIONS
-
-bool gearoenix::vulkan::Loader::is_loaded() { return vkCreateInstance != nullptr; }
+bool gearoenix::vulkan::Loader::is_loaded()
+{
+    return VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateInstance != nullptr;
+}
 
 bool gearoenix::vulkan::Loader::load()
 {
@@ -40,63 +37,28 @@ bool gearoenix::vulkan::Loader::load()
         return false;
     }
 
-    vkGetInstanceProcAddr = reinterpret_cast<decltype(vkGetInstanceProcAddr)>(SDL_Vulkan_GetVkGetInstanceProcAddr());
-    if (nullptr == vkGetInstanceProcAddr) {
+    const auto vkGetInstanceProcAddr_fn = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
+        SDL_Vulkan_GetVkGetInstanceProcAddr());
+    if (nullptr == vkGetInstanceProcAddr_fn) {
         GX_LOG_D("Failed to get vkGetInstanceProcAddr: " << SDL_GetError());
         SDL_Vulkan_UnloadLibrary();
         return false;
     }
 
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                                         \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                           \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetInstanceProcAddr(VK_NULL_HANDLE, #GX_VULKAN_LOADER_FUNCTION)); \
-    }
-
-    GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
-
-#undef GX_VULKAN_LOADER_LOAD_FUNCTION
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr_fn);
     return is_loaded();
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkInstance instance)
+void gearoenix::vulkan::Loader::load(const vk::Instance& instance)
 {
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                                   \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                     \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetInstanceProcAddr(instance, #GX_VULKAN_LOADER_FUNCTION)); \
-    }
-
-    GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
-
-#undef GX_VULKAN_LOADER_LOAD_FUNCTION
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(instance);
 }
 
-void gearoenix::vulkan::Loader::load([[maybe_unused]] const VkDevice device)
+void gearoenix::vulkan::Loader::load(const vk::Device& device)
 {
-#define GX_VULKAN_LOADER_LOAD_FUNCTION(GX_VULKAN_LOADER_FUNCTION)                                                                               \
-    if (nullptr == GX_VULKAN_LOADER_FUNCTION) {                                                                                                 \
-        GX_VULKAN_LOADER_FUNCTION = reinterpret_cast<PFN_##GX_VULKAN_LOADER_FUNCTION>(vkGetDeviceProcAddr(device, #GX_VULKAN_LOADER_FUNCTION)); \
-    }
-
-    GX_VULKAN_FUNCTIONS_MAP(GX_VULKAN_LOADER_LOAD_FUNCTION)
-
-#undef GX_VULKAN_LOADER_LOAD_FUNCTION
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(device);
 }
 
 void gearoenix::vulkan::Loader::unload() { SDL_Vulkan_UnloadLibrary(); }
-
-PFN_vkVoidFunction gearoenix::vulkan::Loader::get(const char* const name)
-{
-    auto result = vkGetInstanceProcAddr(VK_NULL_HANDLE, name);
-    if (result) {
-        return result;
-    }
-
-    result = vkGetInstanceProcAddr(Instance::get().get_vulkan_data(), name);
-    if (result) {
-        return result;
-    }
-
-    return vkGetDeviceProcAddr(device::Logical::get().get_vulkan_data(), name);
-}
 
 #endif

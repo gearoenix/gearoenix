@@ -1,7 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
@@ -16,16 +15,16 @@ namespace gearoenix::vulkan::image {
 /// Describes the desired state for an image transition.
 /// Users only specify what they NEED - the image tracks the current state internally.
 struct TransitionRequest final {
-    VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
-    VkAccessFlags2 access = 0;
-    VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
-    std::uint32_t queue_family = VK_QUEUE_FAMILY_IGNORED;
+    vk::ImageLayout layout = vk::ImageLayout::eUndefined;
+    vk::AccessFlags2 access = { };
+    vk::PipelineStageFlags2 stage = vk::PipelineStageFlagBits2::eTopOfPipe;
+    std::uint32_t queue_family = vk::QueueFamilyIgnored;
     std::uint32_t base_mip = 0;
-    std::uint32_t mip_count = VK_REMAINING_MIP_LEVELS;
+    std::uint32_t mip_count = vk::RemainingMipLevels;
     std::uint32_t base_layer = 0;
-    std::uint32_t layer_count = VK_REMAINING_ARRAY_LAYERS;
+    std::uint32_t layer_count = vk::RemainingArrayLayers;
 
-    [[nodiscard]] static TransitionRequest shader_read(VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT);
+    [[nodiscard]] static TransitionRequest shader_read(vk::PipelineStageFlags2 stage = vk::PipelineStageFlagBits2::eFragmentShader);
     [[nodiscard]] static TransitionRequest transfer_dst();
     [[nodiscard]] static TransitionRequest transfer_src();
     [[nodiscard]] static TransitionRequest color_attachment();
@@ -39,10 +38,10 @@ struct TransitionRequest final {
 
 struct Image final {
     struct PerMipState final {
-        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
-        std::uint32_t queue_family_index = VK_QUEUE_FAMILY_IGNORED;
-        VkAccessFlags2 access = 0;
-        VkPipelineStageFlags2 stage = VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+        vk::ImageLayout layout = vk::ImageLayout::eUndefined;
+        std::uint32_t queue_family_index = vk::QueueFamilyIgnored;
+        vk::AccessFlags2 access = { };
+        vk::PipelineStageFlags2 stage = vk::PipelineStageFlagBits2::eTopOfPipe;
 
         [[nodiscard]] bool operator==(const PerMipState& other) const;
     };
@@ -60,43 +59,59 @@ struct Image final {
         [[nodiscard]] bool has_uniform_layout() const;
     };
 
-    GX_GET_CREF_PRV(std::shared_ptr<memory::Memory>, allocated_memory);
-    GX_GET_VAL_PRV(std::uint32_t, image_width, 0);
-    GX_GET_VAL_PRV(std::uint32_t, image_height, 0);
-    GX_GET_VAL_PRV(std::uint32_t, image_depth, 0);
-    GX_GET_VAL_PRV(VkImageType, image_type, VK_IMAGE_TYPE_MAX_ENUM);
-    GX_GET_VAL_PRV(std::uint32_t, mipmap_levels, 0);
-    GX_GET_VAL_PRV(std::uint32_t, array_layers, 0);
-    GX_GET_VAL_PRV(VkFormat, format, VK_FORMAT_UNDEFINED);
-    GX_GET_VAL_PRV(VkImageCreateFlags, flags, 0);
-    GX_GET_VAL_PRV(VkImageUsageFlags, usage, 0);
-    GX_GET_VAL_PRV(VkImage, vulkan_data, nullptr);
-    GX_GETSET_VAL_PRV(bool, owned, true);
-    GX_GET_CREF_PRV(State, state);
+private:
+    std::shared_ptr<memory::Memory> allocated_memory;
+    std::uint32_t image_width = 0;
+    std::uint32_t image_height = 0;
+    std::uint32_t image_depth = 0;
+    vk::ImageType image_type = { };
+    std::uint32_t mipmap_levels = 0;
+    std::uint32_t array_layers = 0;
+    vk::Format format = vk::Format::eUndefined;
+    vk::ImageCreateFlags flags = { };
+    vk::ImageUsageFlags usage = { };
+    vk::Image vulkan_data;
+    bool owned = true;
+    State state;
 
 public:
-    [[nodiscard]] VkImageAspectFlags get_aspect_flags() const;
+    [[nodiscard]] const std::shared_ptr<memory::Memory>& get_allocated_memory() const { return allocated_memory; }
+    [[nodiscard]] std::uint32_t get_image_width() const { return image_width; }
+    [[nodiscard]] std::uint32_t get_image_height() const { return image_height; }
+    [[nodiscard]] std::uint32_t get_image_depth() const { return image_depth; }
+    [[nodiscard]] vk::ImageType get_image_type() const { return image_type; }
+    [[nodiscard]] std::uint32_t get_mipmap_levels() const { return mipmap_levels; }
+    [[nodiscard]] std::uint32_t get_array_layers() const { return array_layers; }
+    [[nodiscard]] vk::Format get_format() const { return format; }
+    [[nodiscard]] vk::ImageCreateFlags get_flags() const { return flags; }
+    [[nodiscard]] vk::ImageUsageFlags get_usage() const { return usage; }
+    [[nodiscard]] vk::Image get_vulkan_data() const { return vulkan_data; }
+    [[nodiscard]] bool get_owned() const { return owned; }
+    void set_owned(const bool v) { owned = v; }
+    [[nodiscard]] const State& get_state() const { return state; }
+    [[nodiscard]] vk::ImageAspectFlags get_aspect_flags() const;
+
     Image(Image&&) = delete;
     Image(const Image&) = delete;
     Image& operator=(Image&&) = delete;
     Image& operator=(const Image&) = delete;
-    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, VkImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, VkFormat format, VkImageCreateFlags flags,
-        VkImageUsageFlags usage, VkImage vulkan_data);
-    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, VkImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, VkFormat format, VkImageCreateFlags flags,
-        VkImageUsageFlags usage);
+    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, vk::ImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, vk::Format format, vk::ImageCreateFlags flags,
+        vk::ImageUsageFlags usage, vk::Image vulkan_data);
+    Image(const std::string& name, std::uint32_t image_width, std::uint32_t image_height, std::uint32_t image_depth, vk::ImageType image_type, std::uint32_t mipmap_levels, std::uint32_t array_layers, vk::Format format, vk::ImageCreateFlags flags,
+        vk::ImageUsageFlags usage);
     ~Image();
-    [[nodiscard]] VkImageLayout get_layout() const;
+    [[nodiscard]] vk::ImageLayout get_layout() const;
 
     /// Unified transition API - transitions to the requested state.
     /// Automatically determines source state from internal tracking.
     /// Updates internal state after transition.
     /// Skips transition if already in the requested state.
-    void transit(VkCommandBuffer cmd, const TransitionRequest& request);
+    void transit(vk::CommandBuffer cmd, const TransitionRequest& request);
 
     /// Generates mipmaps by blitting from each mip level to the next.
     /// Expects the image to be in TRANSFER_DST layout before calling.
-    /// Leaves the entire image in SHADER_READ_ONLY layout when done.
-    void generate_mipmaps(VkCommandBuffer cmd);
+    /// Leaves the entire image in the SHADER_READ_ONLY layout when done.
+    void generate_mipmaps(vk::CommandBuffer cmd);
 };
 }
 #endif

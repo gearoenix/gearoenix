@@ -94,35 +94,61 @@ struct Frame;
 struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     using frames_t = std::array<std::unique_ptr<Frame>, frames_in_flight>;
 
-    GX_GET_UPTR_PRV(Instance, instance);
-    GX_GET_UPTR_PRV(Surface, surface);
-    GX_GET_UPTR_PRV(device::Physical, physical_device);
-    GX_GET_UPTR_PRV(device::Logical, logical_device);
-    GX_GET_UPTR_PRV(Swapchain, swapchain);
-    GX_GET_UPTR_PRV(memory::Manager, memory_manager);
-    GX_GET_UPTR_PRV(command::Manager, command_manager);
-    GX_GET_UPTR_PRV(descriptor::Bindless, bindless_descriptor_manager);
-    GX_GET_UPTR_PRV(pipeline::Manager, pipeline_manager);
-    GX_GET_UPTR_PRV(buffer::Manager, buffer_manager);
-    GX_GET_UPTR_PRV(ImGuiManager, imgui_manager);
-    GX_GET_UPTR_PRV(image::Manager, image_manager);
-    GX_GET_UPTR_PRV(sampler::Manager, sampler_manager);
-    GX_GET_PTRC_PRV(texture::Manager, vk_texture_manager);
-    GX_GET_PTRC_PRV(mesh::Manager, vk_mesh_manager);
-    GX_GET_PTRC_PRV(material::Manager, vk_material_manager);
-    GX_GET_PTRC_PRV(model::Manager, vk_model_manager);
-    GX_GET_PTRC_PRV(light::Manager, vk_light_manager);
-    GX_GET_PTRC_PRV(camera::Manager, vk_camera_manager);
-    GX_GET_PTRC_PRV(scene::Manager, vk_scene_manager);
-    GX_GET_PTRC_PRV(skybox::Manager, vk_skybox_manager);
-    GX_GET_PTRC_PRV(reflection::Manager, vk_reflection_manager);
-    GX_GET_CREF_PRV(frames_t, frames);
-    GX_GET_UPTR_PRV(queue::Queue, render_queue);
+private:
+    std::unique_ptr<Instance> instance;
+    std::unique_ptr<Surface> surface;
+    std::unique_ptr<device::Physical> physical_device;
+    std::unique_ptr<device::Logical> logical_device;
+    std::unique_ptr<Swapchain> swapchain;
+    std::unique_ptr<memory::Manager> memory_manager;
+    std::unique_ptr<command::Manager> command_manager;
+    std::unique_ptr<descriptor::Bindless> bindless_descriptor_manager;
+    std::unique_ptr<pipeline::Manager> pipeline_manager;
+    std::unique_ptr<buffer::Manager> buffer_manager;
+    std::unique_ptr<ImGuiManager> imgui_manager;
+    std::unique_ptr<image::Manager> image_manager;
+    std::unique_ptr<sampler::Manager> sampler_manager;
+    texture::Manager* vk_texture_manager = nullptr;
+    mesh::Manager* vk_mesh_manager = nullptr;
+    material::Manager* vk_material_manager = nullptr;
+    model::Manager* vk_model_manager = nullptr;
+    light::Manager* vk_light_manager = nullptr;
+    camera::Manager* vk_camera_manager = nullptr;
+    scene::Manager* vk_scene_manager = nullptr;
+    skybox::Manager* vk_skybox_manager = nullptr;
+    reflection::Manager* vk_reflection_manager = nullptr;
+    frames_t frames;
+    std::unique_ptr<queue::Queue> render_queue;
 
     void initialize_frame();
     void window_resized() override;
 
 public:
+    [[nodiscard]] const std::unique_ptr<Instance>& get_instance() const { return instance; }
+    [[nodiscard]] const std::unique_ptr<Surface>& get_surface() const { return surface; }
+    [[nodiscard]] const std::unique_ptr<device::Physical>& get_physical_device() const { return physical_device; }
+    [[nodiscard]] const std::unique_ptr<device::Logical>& get_logical_device() const { return logical_device; }
+    [[nodiscard]] const std::unique_ptr<Swapchain>& get_swapchain() const { return swapchain; }
+    [[nodiscard]] const std::unique_ptr<memory::Manager>& get_memory_manager() const { return memory_manager; }
+    [[nodiscard]] const std::unique_ptr<command::Manager>& get_command_manager() const { return command_manager; }
+    [[nodiscard]] const std::unique_ptr<descriptor::Bindless>& get_bindless_descriptor_manager() const { return bindless_descriptor_manager; }
+    [[nodiscard]] const std::unique_ptr<pipeline::Manager>& get_pipeline_manager() const { return pipeline_manager; }
+    [[nodiscard]] const std::unique_ptr<buffer::Manager>& get_buffer_manager() const { return buffer_manager; }
+    [[nodiscard]] const std::unique_ptr<ImGuiManager>& get_imgui_manager() const { return imgui_manager; }
+    [[nodiscard]] const std::unique_ptr<image::Manager>& get_image_manager() const { return image_manager; }
+    [[nodiscard]] const std::unique_ptr<sampler::Manager>& get_sampler_manager() const { return sampler_manager; }
+    [[nodiscard]] const texture::Manager* get_vk_texture_manager() const { return vk_texture_manager; }
+    [[nodiscard]] const mesh::Manager* get_vk_mesh_manager() const { return vk_mesh_manager; }
+    [[nodiscard]] const material::Manager* get_vk_material_manager() const { return vk_material_manager; }
+    [[nodiscard]] const model::Manager* get_vk_model_manager() const { return vk_model_manager; }
+    [[nodiscard]] const light::Manager* get_vk_light_manager() const { return vk_light_manager; }
+    [[nodiscard]] const camera::Manager* get_vk_camera_manager() const { return vk_camera_manager; }
+    [[nodiscard]] const scene::Manager* get_vk_scene_manager() const { return vk_scene_manager; }
+    [[nodiscard]] const skybox::Manager* get_vk_skybox_manager() const { return vk_skybox_manager; }
+    [[nodiscard]] const reflection::Manager* get_vk_reflection_manager() const { return vk_reflection_manager; }
+    [[nodiscard]] const frames_t& get_frames() const { return frames; }
+    [[nodiscard]] const std::unique_ptr<queue::Queue>& get_render_queue() const { return render_queue; }
+
     Engine();
     Engine(Engine&&) = delete;
     Engine(const Engine&) = delete;

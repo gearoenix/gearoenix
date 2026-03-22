@@ -14,11 +14,16 @@ using points_uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataPointLig
 using directional_shadow_casters_uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight>;
 
 struct Manager final : render::light::Manager, core::Singleton<Manager> {
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataDirectionalLight>, directionals_uniform_indexer);
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataPointLight>, points_uniform_indexer);
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight>, directional_shadow_casters_uniform_indexer);
+private:
+    descriptor::UniformIndexer<GxShaderDataDirectionalLight> directionals_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataPointLight> points_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight> directional_shadow_casters_uniform_indexer;
 
 public:
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataDirectionalLight>& get_directionals_uniform_indexer() const { return directionals_uniform_indexer; }
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataPointLight>& get_points_uniform_indexer() const { return points_uniform_indexer; }
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataShadowCasterDirectionalLight>& get_directional_shadow_casters_uniform_indexer() const { return directional_shadow_casters_uniform_indexer; }
+
     Manager();
     ~Manager() override;
     void update() override;

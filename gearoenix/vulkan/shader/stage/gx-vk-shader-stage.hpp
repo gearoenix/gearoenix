@@ -1,7 +1,6 @@
 #pragma once
 #include "../../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../gx-vk-loader.hpp"
 
 #include <cstdint>
@@ -9,9 +8,12 @@
 
 namespace gearoenix::vulkan::shader::stage {
 struct Stage {
-    GX_GET_CVAL_PRT(VkShaderModule, vulkan_data);
+protected:
+    vk::raii::ShaderModule vulkan_data;
 
 public:
+    [[nodiscard]] vk::ShaderModule get_vulkan_data() const { return *vulkan_data; }
+
     explicit Stage(std::span<std::uint8_t> data);
     virtual ~Stage();
 };

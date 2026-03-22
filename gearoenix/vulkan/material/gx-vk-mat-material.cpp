@@ -12,22 +12,22 @@ gearoenix::vulkan::material::Material::Material()
 
 gearoenix::vulkan::material::Material::~Material() = default;
 
-void gearoenix::vulkan::material::Material::bind_forward(const VkCommandBuffer, const bool, const pipeline::FormatPipelines&, pipeline::PushConstants&, VkPipeline&)
+void gearoenix::vulkan::material::Material::bind_forward(const vk::CommandBuffer, const bool, const pipeline::FormatPipelines&, pipeline::PushConstants&, vk::Pipeline&)
 {
     GX_UNIMPLEMENTED; // needs to be implemented by the child type
 }
 
-void gearoenix::vulkan::material::Material::bind_shadow(const VkCommandBuffer, const bool, pipeline::PushConstants&, VkPipeline&)
+void gearoenix::vulkan::material::Material::bind_shadow(const vk::CommandBuffer, const bool, pipeline::PushConstants&, vk::Pipeline&)
 {
     GX_UNIMPLEMENTED; // needs to be implemented by the child type
 }
 
-void gearoenix::vulkan::material::Material::bind_graphics(const VkPipeline pipeline, const VkCommandBuffer cmd, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Material::bind_graphics(const vk::Pipeline pipeline, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
 {
     pc.material_index = shader_data.get_index();
     if (current_bound_pipeline != pipeline) {
         current_bound_pipeline = pipeline;
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+        cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
     }
 }
 

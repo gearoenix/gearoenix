@@ -34,12 +34,12 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
 
 gearoenix::vulkan::skybox::Skybox::~Skybox() = default;
 
-void gearoenix::vulkan::skybox::Skybox::render_forward(const VkCommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline) const
+void gearoenix::vulkan::skybox::Skybox::render_forward(const vk::CommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
 {
     const auto vk_pipeline = (is_equirectangular ? fp.skybox_equirectangular : fp.skybox_cube)->get_vulkan_data();
     if (vk_pipeline != current_bound_pipeline) {
         current_bound_pipeline = vk_pipeline;
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_pipeline);
+        cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, vk_pipeline);
     }
     pc.material_index = material_shader_data.get_index();
     vk_mesh->draw(cmd, pc);

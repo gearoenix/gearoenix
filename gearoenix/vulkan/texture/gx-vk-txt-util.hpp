@@ -21,9 +21,9 @@ struct TextureInfo;
 }
 
 namespace gearoenix::vulkan::texture {
-[[nodiscard]] VkImageType convert_image_type(render::texture::Type type);
-[[nodiscard]] VkFormat convert_image_format(render::texture::TextureFormat format);
-[[nodiscard]] bool has_depth(VkFormat format);
+[[nodiscard]] vk::ImageType convert_image_type(render::texture::Type type);
+[[nodiscard]] vk::Format convert_image_format(render::texture::TextureFormat format);
+[[nodiscard]] bool has_depth(vk::Format format);
 
 void write_gpu_texture_data(
     image::Image& img,

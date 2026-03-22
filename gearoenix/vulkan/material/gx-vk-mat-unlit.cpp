@@ -57,12 +57,12 @@ void gearoenix::vulkan::material::Unlit::set_alpha_cutoff(const float v)
     sd.alpha_cutoff_occlusion_strength_reserved.x = v;
 }
 
-void gearoenix::vulkan::material::Unlit::bind_forward(const VkCommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Unlit::bind_forward(const vk::CommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
 {
     bind_graphics((skinned ? fp.unlit_skinned_forward.get() : fp.unlit_forward.get())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
 }
 
-void gearoenix::vulkan::material::Unlit::bind_shadow(const VkCommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, VkPipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Unlit::bind_shadow(const vk::CommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
 {
     const auto& mgr = pipeline::Manager::get();
     bind_graphics((skinned ? mgr.get_skinned_shadow() : mgr.get_shadow())->get_vulkan_data(), cmd, pc, current_bound_pipeline);

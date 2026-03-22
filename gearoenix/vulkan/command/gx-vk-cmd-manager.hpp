@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/gx-cr-singleton.hpp"
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-cmd-buffer.hpp"
 #include "gx-vk-cmd-pool.hpp"
 #include "gx-vk-cmd-type.hpp"

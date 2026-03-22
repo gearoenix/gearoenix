@@ -14,44 +14,24 @@ struct Logical;
 
 namespace gearoenix::vulkan {
 
-struct PushDebugGroup final {
-    const VkCommandBuffer cmd;
+void mark_impl(const std::string& name, std::uint64_t handle, vk::ObjectType type);
 
-    PushDebugGroup(VkCommandBuffer cmd, float red, float green, float blue, const char* name);
+template <typename T>
+void mark(const std::string& name, T handle)
+{
+    mark_impl(name, reinterpret_cast<std::uint64_t>(static_cast<typename T::NativeType>(handle)), T::objectType);
+}
+
+struct PushDebugGroup final {
+    const vk::CommandBuffer cmd;
+
+    PushDebugGroup(vk::CommandBuffer cmd, float red, float green, float blue, const char* name);
     ~PushDebugGroup();
 };
 
-void mark(const std::string& name, VkAccelerationStructureKHR o);
-void mark(const std::string& name, VkBuffer o);
-void mark(const std::string& name, VkBufferView o);
-void mark(const std::string& name, VkCommandBuffer o);
-void mark(const std::string& name, VkCommandPool o);
-void mark(const std::string& name, VkDescriptorPool o);
-void mark(const std::string& name, VkDescriptorSet o);
-void mark(const std::string& name, VkDescriptorSetLayout o);
-void mark(const std::string& name, VkDevice o);
-void mark(const std::string& name, VkDeviceMemory o);
-void mark(const std::string& name, VkEvent o);
-void mark(const std::string& name, VkFence o);
-void mark(const std::string& name, VkFramebuffer o);
-void mark(const std::string& name, VkImage o);
-void mark(const std::string& name, VkImageView o);
-void mark(const std::string& name, VkInstance o);
-void mark(const std::string& name, VkPhysicalDevice o);
-void mark(const std::string& name, VkPipeline o);
-void mark(const std::string& name, VkPipelineCache o);
-void mark(const std::string& name, VkPipelineLayout o);
-void mark(const std::string& name, VkQueryPool o);
-void mark(const std::string& name, VkQueue o);
-void mark(const std::string& name, VkRenderPass o);
-void mark(const std::string& name, VkSampler o);
-void mark(const std::string& name, VkSemaphore o);
-void mark(const std::string& name, VkShaderModule o);
-void mark(const std::string& name, VkSurfaceKHR o);
-void mark(const std::string& name, VkSwapchainKHR o);
 }
 
-#define GX_VK_MARK(name, obj) mark(name, obj)
+#define GX_VK_MARK(name, obj) gearoenix::vulkan::mark(name, obj)
 
 #define GX_VK_PUSH_DEBUG_GROUP_STR_VAR GX_CONCAT(_gearoenix_vulkan_push_debug_str_, __LINE__)
 #define GX_VK_PUSH_DEBUG_GROUP_OBJ_VAR GX_CONCAT(_gearoenix_vulkan_push_debug_obj_, __LINE__)

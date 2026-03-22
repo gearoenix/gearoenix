@@ -3,7 +3,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../core/gx-cr-build-configuration.hpp"
 #include "../core/gx-cr-singleton.hpp"
-#include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-vk-loader.hpp"
 
 #include <memory>
@@ -14,11 +13,12 @@
 
 namespace gearoenix::vulkan {
 struct Instance final : core::Singleton<Instance> {
-    GX_GET_CVAL_PRV(std::uint32_t, api_version);
-    GX_GET_VAL_PRV(VkInstance, vulkan_data, nullptr);
-
+private:
+    vk::raii::Context context;
+    vk::raii::Instance vulkan_instance;
+    std::uint32_t api_version = 0;
 #if GX_VULKAN_INSTANCE_DEBUG
-    GX_GET_VAL_PRV(VkDebugUtilsMessengerEXT, debug_messenger, nullptr);
+    vk::raii::DebugUtilsMessengerEXT debug_messenger;
 #endif
 
     Instance();
@@ -31,6 +31,9 @@ public:
     ~Instance() override;
 
     [[nodiscard]] static std::unique_ptr<Instance> construct();
+    [[nodiscard]] std::uint32_t get_api_version() const { return api_version; }
+    [[nodiscard]] const vk::raii::Instance& get_instance() const { return vulkan_instance; }
+    [[nodiscard]] vk::Instance get_vulkan_data() const { return *vulkan_instance; }
 };
 }
 #endif

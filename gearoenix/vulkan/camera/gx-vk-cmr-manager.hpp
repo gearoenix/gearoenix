@@ -36,20 +36,35 @@ struct ColourCorrectionPushConstants final {
 static_assert(sizeof(ColourCorrectionPushConstants) == 16);
 
 struct Manager final : render::camera::Manager, core::Singleton<Manager> {
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCamera>, camera_uniform_indexer);
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataCameraJointModel>, cameras_joint_models_uniform_indexer);
+public:
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataCamera>& get_camera_uniform_indexer() const { return camera_uniform_indexer; }
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataCameraJointModel>& get_cameras_joint_models_uniform_indexer() const { return cameras_joint_models_uniform_indexer; }
+    [[nodiscard]] vk::DescriptorSetLayout get_bloom_descriptor_set_layout() const { return *bloom_descriptor_set_layout; }
+    [[nodiscard]] vk::Sampler get_bloom_sampler() const { return *bloom_sampler; }
+    [[nodiscard]] vk::PipelineLayout get_bloom_pipeline_layout() const { return *bloom_pipeline_layout; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_bloom_multiply_pipeline() const { return bloom_multiply_pipeline; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_bloom_prefilter_pipeline() const { return bloom_prefilter_pipeline; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_bloom_horizontal_pipeline() const { return bloom_horizontal_pipeline; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_bloom_vertical_pipeline() const { return bloom_vertical_pipeline; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_bloom_upsampler_pipeline() const { return bloom_upsampler_pipeline; }
+    [[nodiscard]] vk::PipelineLayout get_ctaa_pipeline_layout() const { return *ctaa_pipeline_layout; }
+    [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_ctaa_pipeline() const { return ctaa_pipeline; }
 
-    GX_GET_VAL_PRV(VkDescriptorSetLayout, bloom_descriptor_set_layout, nullptr);
-    GX_GET_VAL_PRV(VkSampler, bloom_sampler, nullptr);
-    GX_GET_VAL_PRV(VkPipelineLayout, bloom_pipeline_layout, nullptr);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_multiply_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_prefilter_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_horizontal_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_vertical_pipeline);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, bloom_upsampler_pipeline);
+private:
+    descriptor::UniformIndexer<GxShaderDataCamera> camera_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataCameraJointModel> cameras_joint_models_uniform_indexer;
 
-    GX_GET_VAL_PRV(VkPipelineLayout, ctaa_pipeline_layout, nullptr);
-    GX_GET_CREF_PRV(std::shared_ptr<pipeline::Pipeline>, ctaa_pipeline);
+    vk::raii::DescriptorSetLayout bloom_descriptor_set_layout { nullptr };
+    vk::raii::Sampler bloom_sampler { nullptr };
+    vk::raii::PipelineLayout bloom_pipeline_layout { nullptr };
+    std::shared_ptr<pipeline::Pipeline> bloom_multiply_pipeline;
+    std::shared_ptr<pipeline::Pipeline> bloom_prefilter_pipeline;
+    std::shared_ptr<pipeline::Pipeline> bloom_horizontal_pipeline;
+    std::shared_ptr<pipeline::Pipeline> bloom_vertical_pipeline;
+    std::shared_ptr<pipeline::Pipeline> bloom_upsampler_pipeline;
+
+    vk::raii::PipelineLayout ctaa_pipeline_layout { nullptr };
+    std::shared_ptr<pipeline::Pipeline> ctaa_pipeline;
 
     std::shared_ptr<pipeline::Cache> bloom_pipeline_cache;
     std::shared_ptr<shader::Module> bloom_multiply_shader_module;

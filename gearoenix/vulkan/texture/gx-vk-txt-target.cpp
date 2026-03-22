@@ -1,6 +1,5 @@
 #include "gx-vk-txt-target.hpp"
 #ifdef GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -8,12 +7,12 @@
 #include "gx-vk-txt-3d.hpp"
 #include "gx-vk-txt-cube.hpp"
 
-gearoenix::vulkan::texture::Target::RenderingScope::RenderingScope(const VkCommandBuffer cb)
+gearoenix::vulkan::texture::Target::RenderingScope::RenderingScope(const vk::CommandBuffer cb)
     : command_buffer(cb)
 {
 }
 
-gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope() { vkCmdEndRendering(command_buffer); }
+gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope() { command_buffer.endRendering(); }
 
 gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
     : render::texture::Target(std::move(in_name), std::move(attachments))
@@ -29,7 +28,7 @@ void gearoenix::vulkan::texture::Target::construct(std::string&& name, std::vect
 
 gearoenix::vulkan::texture::Target::~Target() = default;
 
-gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const VkCommandBuffer cb, const VkAttachmentLoadOp load_colours, const VkAttachmentLoadOp load_depth)
+gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::Target::create_rendering_scope(const vk::CommandBuffer cb, const vk::AttachmentLoadOp load_colours, const vk::AttachmentLoadOp load_depth)
 {
     for (auto& ca : color_attachments) {
         ca.loadOp = load_colours;
@@ -42,7 +41,7 @@ gearoenix::vulkan::texture::Target::RenderingScope gearoenix::vulkan::texture::T
         view->get_image()->transit(cb, transition_request);
     }
 
-    vkCmdBeginRendering(cb, &rendering_info);
+    cb.beginRendering(rendering_info);
     return RenderingScope(cb);
 }
 
@@ -50,8 +49,7 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
 {
     GX_ASSERT_D(!attachments.empty());
 
-    GX_SET_ZERO(rendering_info);
-    rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+    rendering_info = vk::RenderingInfo { };
 
     color_attachments.clear();
     color_attachments.reserve(attachments.size());
@@ -93,19 +91,17 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
             transition_request = is_depth ? image::TransitionRequest::depth_attachment() : image::TransitionRequest::color_attachment();
             transition_request = transition_request.with_mips(mip_index, 1).with_layers(array_index, 1);
 
-            VkRenderingAttachmentInfo attachment_info;
-            GX_SET_ZERO(attachment_info);
-            attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+            vk::RenderingAttachmentInfo attachment_info;
             attachment_info.imageView = view->get_vulkan_data();
-            attachment_info.imageLayout = is_depth ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-            attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            attachment_info.imageLayout = is_depth ? vk::ImageLayout::eDepthStencilAttachmentOptimal : vk::ImageLayout::eColorAttachmentOptimal;
+            attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+            attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
 
             if (is_depth) {
-                attachment_info.clearValue.depthStencil = VkClearDepthStencilValue { 1.0f, 0 };
+                attachment_info.clearValue.setDepthStencil({ 1.0f, 0 });
                 depth_attachment = attachment_info;
             } else {
-                attachment_info.clearValue.color = VkClearColorValue { 0.0f, 0.0f, 0.0f, 0.0f };
+                attachment_info.clearValue.setColor(vk::ClearColorValue { std::array { 0.0f, 0.0f, 0.0f, 0.0f } });
                 color_attachments.emplace_back(attachment_info);
             }
 
@@ -129,19 +125,18 @@ void gearoenix::vulkan::texture::Target::update_rendering_info()
     }
 
     rendering_info.layerCount = 1;
-    rendering_info.colorAttachmentCount = static_cast<uint32_t>(color_attachments.size());
-    rendering_info.pColorAttachments = color_attachments.data();
+    rendering_info.setColorAttachments(color_attachments);
     rendering_info.pDepthAttachment = depth_attachment.has_value() ? &*depth_attachment : nullptr;
 }
 
-VkFormat gearoenix::vulkan::texture::Target::get_colour_format() const
+vk::Format gearoenix::vulkan::texture::Target::get_colour_format() const
 {
     for (const auto& a : gapi_attachments) {
-        if (a.transition_request.layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+        if (a.transition_request.layout == vk::ImageLayout::eColorAttachmentOptimal) {
             return a.view->get_image()->get_format();
         }
     }
-    return VK_FORMAT_UNDEFINED;
+    return vk::Format::eUndefined;
 }
 
 #endif

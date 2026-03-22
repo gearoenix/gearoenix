@@ -1,7 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
@@ -9,7 +8,8 @@
 
 namespace gearoenix::vulkan::sync {
 struct Fence {
-    GX_GET_VAL_PRV(VkFence, vulkan_data, nullptr);
+private:
+    vk::raii::Fence vulkan_data;
 
 public:
     Fence(Fence&&) = delete;
@@ -21,6 +21,10 @@ public:
     ~Fence();
     void wait();
     void reset();
+
+    [[nodiscard]] const vk::raii::Fence& get_fence() const { return vulkan_data; }
+    [[nodiscard]] vk::Fence get_vulkan_data() const { return *vulkan_data; }
+
     [[nodiscard]] static std::vector<std::shared_ptr<Fence>> create_frame_based(bool signaled = false);
 };
 }

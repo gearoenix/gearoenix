@@ -6,10 +6,14 @@
 
 namespace gearoenix::vulkan::model {
 struct Manager final : render::model::Manager, core::Singleton<Manager> {
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataModel>, model_uniform_indexer);
-    GX_GET_CREF_PRV(descriptor::UniformIndexer<GxShaderDataBone>, bone_uniform_indexer);
+private:
+    descriptor::UniformIndexer<GxShaderDataModel> model_uniform_indexer;
+    descriptor::UniformIndexer<GxShaderDataBone> bone_uniform_indexer;
 
 public:
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataModel>& get_model_uniform_indexer() const { return model_uniform_indexer; }
+    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataBone>& get_bone_uniform_indexer() const { return bone_uniform_indexer; }
+
     Manager();
     ~Manager() override;
 

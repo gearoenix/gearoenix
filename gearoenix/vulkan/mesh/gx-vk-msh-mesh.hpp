@@ -27,16 +27,20 @@ struct Mesh final : render::mesh::Mesh {
     constexpr static std::array all_parent_object_type_indices { render::mesh::Mesh::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { render::mesh::Mesh::object_type_index };
 
-    GX_GET_CREF_PRV(std::shared_ptr<Buffer>, gapi_buffer);
-    GX_GET_CREF_PRV(std::shared_ptr<material::Material>, gapi_material);
+private:
+    std::shared_ptr<Buffer> gapi_buffer;
+    std::shared_ptr<material::Material> gapi_material;
 
 public:
+    [[nodiscard]] const std::shared_ptr<Buffer>& get_gapi_buffer() const { return gapi_buffer; }
+    [[nodiscard]] const std::shared_ptr<material::Material>& get_gapi_material() const { return gapi_material; }
+
     Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material);
     static void construct(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material, const core::job::EndCallerShared<render::mesh::Mesh>& end_callback);
     ~Mesh() override;
     Mesh(const Mesh&) = delete;
 
-    void draw(VkCommandBuffer cmd, pipeline::PushConstants& pc) const;
+    void draw(vk::CommandBuffer cmd, pipeline::PushConstants& pc) const;
     void set_material(std::shared_ptr<render::material::Material>&& material) override;
 };
 }

@@ -1,9 +1,7 @@
 #include "gx-vk-rfl-runtime.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
-#include "../../core/macro/gx-cr-mcr-zeroer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
-#include "../gx-vk-check.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-cube.hpp"
@@ -44,19 +42,15 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
 
     const auto& mgr = core::Singleton<Manager>::get();
     const auto dev = device::Logical::get().get_vulkan_data();
+    const auto& dev_raii = device::Logical::get().get_device();
 
     {
         constexpr std::array pool_sizes {
-            VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 6 },
-            VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 6 },
+            vk::DescriptorPoolSize { vk::DescriptorType::eCombinedImageSampler, 6 },
+            vk::DescriptorPoolSize { vk::DescriptorType::eStorageImage, 6 },
         };
-        VkDescriptorPoolCreateInfo dp_info;
-        GX_SET_ZERO(dp_info);
-        dp_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        dp_info.maxSets = static_cast<std::uint32_t>(irradiance_descriptor_sets.size());
-        dp_info.poolSizeCount = static_cast<std::uint32_t>(pool_sizes.size());
-        dp_info.pPoolSizes = pool_sizes.data();
-        GX_VK_CHK(vkCreateDescriptorPool(dev, &dp_info, nullptr, &irradiance_descriptor_pool));
+        vk::DescriptorPoolCreateInfo dp_info { { }, static_cast<std::uint32_t>(irradiance_descriptor_sets.size()), pool_sizes };
+        irradiance_descriptor_pool = vk::raii::DescriptorPool(dev_raii, dp_info);
 
         const std::array layouts {
             mgr.get_convolution_descriptor_set_layout(),
@@ -68,47 +62,39 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
         };
         GX_ASSERT_D(layouts.size() == irradiance_descriptor_sets.size());
 
-        VkDescriptorSetAllocateInfo ds_info;
-        GX_SET_ZERO(ds_info);
-        ds_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        ds_info.descriptorPool = irradiance_descriptor_pool;
-        ds_info.descriptorSetCount = static_cast<std::uint32_t>(layouts.size());
-        ds_info.pSetLayouts = layouts.data();
-        GX_VK_CHK(vkAllocateDescriptorSets(dev, &ds_info, irradiance_descriptor_sets.data()));
+        vk::DescriptorSetAllocateInfo ds_info { *irradiance_descriptor_pool, layouts };
+        auto allocated = dev.allocateDescriptorSets(ds_info);
+        for (std::size_t i = 0; i < irradiance_descriptor_sets.size(); ++i) {
+            irradiance_descriptor_sets[i] = allocated[i];
+        }
 
-        const VkDescriptorImageInfo env_info {
+        const vk::DescriptorImageInfo env_info {
             mgr.get_convolution_sampler(),
             gapi_environment->get_view()->get_vulkan_data(),
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            vk::ImageLayout::eShaderReadOnlyOptimal,
         };
 
-        std::array<VkDescriptorImageInfo, 6> irr_infos { };
-        std::array<std::array<VkWriteDescriptorSet, 2>, 6> writes { };
+        std::array<vk::DescriptorImageInfo, 6> irr_infos { };
+        std::array<vk::WriteDescriptorSet, 12> flat_writes { };
 
         for (std::uint32_t fi = 0; fi < irr_infos.size(); ++fi) {
             auto& irr_info = irr_infos[fi];
-            irr_info.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+            irr_info.imageLayout = vk::ImageLayout::eGeneral;
             irr_info.imageView = gapi_irradiance->get_mips()[fi][0]->get_vulkan_data();
 
-            auto& face_writes = writes[fi];
-
-            auto& write0 = face_writes[0];
-            write0.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            auto& write0 = flat_writes[fi * 2];
             write0.dstSet = irradiance_descriptor_sets[fi];
             write0.dstBinding = 0;
-            write0.descriptorCount = 1;
-            write0.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            write0.pImageInfo = &env_info;
+            write0.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+            write0.setImageInfo(env_info);
 
-            auto& write1 = face_writes[1];
-            write1.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            auto& write1 = flat_writes[fi * 2 + 1];
             write1.dstSet = irradiance_descriptor_sets[fi];
             write1.dstBinding = 1;
-            write1.descriptorCount = 1;
-            write1.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-            write1.pImageInfo = &irr_info;
+            write1.descriptorType = vk::DescriptorType::eStorageImage;
+            write1.setImageInfo(irr_info);
         }
-        vkUpdateDescriptorSets(dev, static_cast<std::uint32_t>(writes.size() * writes[0].size()), &writes[0][0], 0, nullptr);
+        dev.updateDescriptorSets(flat_writes, { });
     }
 
     {
@@ -116,27 +102,16 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
         const auto total_sets = 6u * mip_count;
 
         const std::array pool_sizes {
-            VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = total_sets },
-            VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = total_sets },
+            vk::DescriptorPoolSize { vk::DescriptorType::eCombinedImageSampler, total_sets },
+            vk::DescriptorPoolSize { vk::DescriptorType::eStorageImage, total_sets },
         };
-        VkDescriptorPoolCreateInfo dp_info;
-        GX_SET_ZERO(dp_info);
-        dp_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        dp_info.maxSets = total_sets;
-        dp_info.poolSizeCount = static_cast<std::uint32_t>(pool_sizes.size());
-        dp_info.pPoolSizes = pool_sizes.data();
-        GX_VK_CHK(vkCreateDescriptorPool(dev, &dp_info, nullptr, &radiance_descriptor_pool));
+        vk::DescriptorPoolCreateInfo dp_info { { }, total_sets, pool_sizes };
+        radiance_descriptor_pool = vk::raii::DescriptorPool(dev_raii, dp_info);
 
         std::vector layouts(total_sets, mgr.get_convolution_descriptor_set_layout());
 
-        std::vector<VkDescriptorSet> flat_sets(total_sets);
-        VkDescriptorSetAllocateInfo ds_info;
-        GX_SET_ZERO(ds_info);
-        ds_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        ds_info.descriptorPool = radiance_descriptor_pool;
-        ds_info.descriptorSetCount = total_sets;
-        ds_info.pSetLayouts = layouts.data();
-        GX_VK_CHK(vkAllocateDescriptorSets(dev, &ds_info, flat_sets.data()));
+        vk::DescriptorSetAllocateInfo ds_info { *radiance_descriptor_pool, layouts };
+        auto flat_sets = dev.allocateDescriptorSets(ds_info);
 
         for (std::uint32_t fi = 0; fi < 6; ++fi) {
             radiance_descriptor_sets[fi].resize(mip_count);
@@ -145,14 +120,14 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
             }
         }
 
-        const VkDescriptorImageInfo env_info {
-            .sampler = mgr.get_convolution_sampler(),
-            .imageView = gapi_environment->get_view()->get_vulkan_data(),
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        const vk::DescriptorImageInfo env_info {
+            mgr.get_convolution_sampler(),
+            gapi_environment->get_view()->get_vulkan_data(),
+            vk::ImageLayout::eShaderReadOnlyOptimal,
         };
 
-        std::vector<VkWriteDescriptorSet> all_writes;
-        std::vector<VkDescriptorImageInfo> rad_infos(total_sets);
+        std::vector<vk::WriteDescriptorSet> all_writes;
+        std::vector<vk::DescriptorImageInfo> rad_infos(total_sets);
         all_writes.reserve(total_sets * 2);
 
         for (std::uint32_t fi = 0; fi < 6; ++fi) {
@@ -161,31 +136,25 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
                 const auto ds = radiance_descriptor_sets[fi][li];
 
                 auto& rad_info = rad_infos[idx];
-                rad_info.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+                rad_info.imageLayout = vk::ImageLayout::eGeneral;
                 rad_info.imageView = gapi_radiance->get_mips()[fi][li]->get_vulkan_data();
 
-                VkWriteDescriptorSet write0;
-                GX_SET_ZERO(write0);
-                write0.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                vk::WriteDescriptorSet write0;
                 write0.dstSet = ds;
                 write0.dstBinding = 0;
-                write0.descriptorCount = 1;
-                write0.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                write0.pImageInfo = &env_info;
+                write0.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+                write0.setImageInfo(env_info);
                 all_writes.push_back(write0);
 
-                VkWriteDescriptorSet write1;
-                GX_SET_ZERO(write1);
-                write1.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                vk::WriteDescriptorSet write1;
                 write1.dstSet = ds;
                 write1.dstBinding = 1;
-                write1.descriptorCount = 1;
-                write1.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-                write1.pImageInfo = &rad_infos[idx];
+                write1.descriptorType = vk::DescriptorType::eStorageImage;
+                write1.setImageInfo(rad_infos[idx]);
                 all_writes.push_back(write1);
             }
         }
-        vkUpdateDescriptorSets(dev, static_cast<std::uint32_t>(all_writes.size()), all_writes.data(), 0, nullptr);
+        dev.updateDescriptorSets(all_writes, { });
     }
 
     for (std::uint32_t face_index = 0; face_index < 6; ++face_index) {
@@ -232,20 +201,9 @@ void gearoenix::vulkan::reflection::Runtime::construct(
     }));
 }
 
-gearoenix::vulkan::reflection::Runtime::~Runtime()
-{
-    const auto dev = device::Logical::get().get_vulkan_data();
-    if (nullptr != radiance_descriptor_pool) {
-        vkDestroyDescriptorPool(dev, radiance_descriptor_pool, nullptr);
-        radiance_descriptor_pool = nullptr;
-    }
-    if (nullptr != irradiance_descriptor_pool) {
-        vkDestroyDescriptorPool(dev, irradiance_descriptor_pool, nullptr);
-        irradiance_descriptor_pool = nullptr;
-    }
-}
+gearoenix::vulkan::reflection::Runtime::~Runtime() = default;
 
-void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkCommandBuffer cmd) const
+void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const vk::CommandBuffer cmd) const
 {
     const auto& mgr = core::Singleton<Manager>::get();
     const auto fi = state_irradiance_face;
@@ -253,13 +211,13 @@ void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkComman
     const auto& irr_cube = *gapi_irradiance;
     const auto irr_width = irr_cube.get_view()->get_image()->get_image_width();
 
-    env_cube.get_view()->get_image()->transit(cmd, image::TransitionRequest::shader_read(VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT));
+    env_cube.get_view()->get_image()->transit(cmd, image::TransitionRequest::shader_read(vk::PipelineStageFlagBits2::eComputeShader));
 
     {
         image::TransitionRequest req;
-        req.layout = VK_IMAGE_LAYOUT_GENERAL;
-        req.access = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
-        req.stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        req.layout = vk::ImageLayout::eGeneral;
+        req.access = vk::AccessFlagBits2::eShaderStorageWrite;
+        req.stage = vk::PipelineStageFlagBits2::eComputeShader;
         req.base_layer = fi;
         req.layer_count = 1;
         req.base_mip = 0;
@@ -267,9 +225,9 @@ void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkComman
         irr_cube.get_view()->get_image()->transit(cmd, req);
     }
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_irradiance_pipeline()->get_vulkan_data());
+    cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_irradiance_pipeline()->get_vulkan_data());
     const auto ds = irradiance_descriptor_sets[fi];
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_irradiance_pipeline_layout(), 0, 1, &ds, 0, nullptr);
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_irradiance_pipeline_layout(), 0, ds, { });
 
     IrradiancePushConstants pc { };
     const auto& axes = face_uv_axis[fi];
@@ -285,17 +243,17 @@ void gearoenix::vulkan::reflection::Runtime::convolute_irradiance(const VkComman
     pc.face_axis[1] = axes[2].y;
     pc.face_axis[2] = axes[2].z;
     pc.image_size = irr_width;
-    vkCmdPushConstants(cmd, mgr.get_irradiance_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(IrradiancePushConstants), &pc);
+    cmd.pushConstants(mgr.get_irradiance_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(IrradiancePushConstants), &pc);
 
     const auto group_count_x = (irr_width + 15u) >> 4u;
     const auto group_count_y = (irr_width + 15u) >> 4u;
-    vkCmdDispatch(cmd, group_count_x, group_count_y, 1u);
+    cmd.dispatch(group_count_x, group_count_y, 1u);
 
     irr_cube.get_view()->get_image()->transit(cmd,
         image::TransitionRequest::shader_read().with_layers(fi, 1).with_mips(0, 1));
 }
 
-void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandBuffer cmd) const
+void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const vk::CommandBuffer cmd) const
 {
     const auto& mgr = core::Singleton<Manager>::get();
     const auto fi = state_radiance_face;
@@ -304,13 +262,13 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandB
     const auto& rad_cube = *gapi_radiance;
     const auto rad_width = static_cast<std::uint32_t>(rad_cube.get_view()->get_image()->get_image_width() >> li);
 
-    env_cube.get_view()->get_image()->transit(cmd, image::TransitionRequest::shader_read(VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT));
+    env_cube.get_view()->get_image()->transit(cmd, image::TransitionRequest::shader_read(vk::PipelineStageFlagBits2::eComputeShader));
 
     {
         image::TransitionRequest req;
-        req.layout = VK_IMAGE_LAYOUT_GENERAL;
-        req.access = VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
-        req.stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        req.layout = vk::ImageLayout::eGeneral;
+        req.access = vk::AccessFlagBits2::eShaderStorageWrite;
+        req.stage = vk::PipelineStageFlagBits2::eComputeShader;
         req.base_layer = fi;
         req.layer_count = 1;
         req.base_mip = li;
@@ -318,9 +276,9 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandB
         rad_cube.get_view()->get_image()->transit(cmd, req);
     }
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_radiance_pipeline()->get_vulkan_data());
+    cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_radiance_pipeline()->get_vulkan_data());
     const auto ds = radiance_descriptor_sets[fi][li];
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mgr.get_radiance_pipeline_layout(), 0, 1, &ds, 0, nullptr);
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_radiance_pipeline_layout(), 0, ds, { });
 
     const auto roughness = roughnesses[li];
     const auto roughness_p_2 = roughness * roughness;
@@ -345,17 +303,17 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const VkCommandB
     pc.roughness = static_cast<float>(roughness);
     pc.roughness_p_4 = static_cast<float>(roughness_p_4);
     pc.sa_texel = static_cast<float>(sa_texel);
-    vkCmdPushConstants(cmd, mgr.get_radiance_pipeline_layout(), VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(RadiancePushConstants), &pc);
+    cmd.pushConstants(mgr.get_radiance_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(RadiancePushConstants), &pc);
 
     const auto group_count_x = (rad_width + 15u) >> 4u;
     const auto group_count_y = (rad_width + 15u) >> 4u;
-    vkCmdDispatch(cmd, group_count_x, group_count_y, 1u);
+    cmd.dispatch(group_count_x, group_count_y, 1u);
 
     rad_cube.get_view()->get_image()->transit(cmd,
         image::TransitionRequest::shader_read().with_layers(fi, 1).with_mips(li, 1));
 }
 
-void gearoenix::vulkan::reflection::Runtime::vk_update(const VkCommandBuffer cmd) const
+void gearoenix::vulkan::reflection::Runtime::vk_update(const vk::CommandBuffer cmd) const
 {
     switch (state) {
     case State::EnvironmentCubeMipMap:
