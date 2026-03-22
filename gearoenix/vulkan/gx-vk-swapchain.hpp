@@ -29,7 +29,7 @@ struct Swapchain final : core::Singleton<Swapchain> {
 private:
     vk::SurfaceFormatKHR format { };
     vk::raii::SwapchainKHR vulkan_data { nullptr };
-    frames_t frames { };
+    frames_t frames;
     bool is_valid = true;
     std::uint32_t image_index = 0;
 

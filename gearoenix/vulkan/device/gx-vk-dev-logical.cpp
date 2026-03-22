@@ -2,7 +2,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../platform/gx-plt-log.hpp"
-#include "../gx-vk-instance.hpp"
 #include "gx-vk-dev-physical.hpp"
 
 #include <array>
@@ -93,11 +92,9 @@ gearoenix::vulkan::device::Logical::Logical()
     GX_ASSERT_D(physical.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME));
     device_extensions.push_back(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
 
-#ifdef VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME
     if (physical.get_supported_extensions().contains(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
         device_extensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
     }
-#endif
 
     if (physical.get_rtx_supported()) {
         device_extensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);

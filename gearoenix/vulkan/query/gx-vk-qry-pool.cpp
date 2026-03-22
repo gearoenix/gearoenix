@@ -2,6 +2,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../gx-vk-check.hpp"
 
 std::uint32_t gearoenix::vulkan::query::Pool::register_request(const vk::QueryType qt, const std::uint64_t ii)
 {
@@ -39,7 +40,8 @@ vk::DeviceSize gearoenix::vulkan::query::Pool::get_acceleration_structure_compac
 {
     vk::DeviceSize result = 0;
     const auto qi = indices[vk::QueryType::eAccelerationStructureCompactedSizeKHR][id];
-    device::Logical::get().get_vulkan_data().getQueryPoolResults(vulkan_data, qi, 1, sizeof(vk::DeviceSize), &result, sizeof(vk::DeviceSize), vk::QueryResultFlagBits::eWait);
+    GX_VK_CHK_L(device::Logical::get().get_vulkan_data().getQueryPoolResults(
+        vulkan_data, qi, 1, sizeof(vk::DeviceSize), &result, sizeof(vk::DeviceSize), vk::QueryResultFlagBits::eWait));
     return result;
 }
 

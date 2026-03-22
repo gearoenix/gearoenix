@@ -15,6 +15,7 @@
 #define GX_USE_DEBUG_EXTENSIONS true
 #endif
 
+#define VK_ENABLE_BETA_EXTENSIONS 1
 #define VK_NO_PROTOTYPES 1
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>

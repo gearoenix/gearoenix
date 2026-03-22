@@ -39,7 +39,8 @@ void gearoenix::vulkan::queue::Queue::submit(const vk::ArrayProxy<const vk::Sema
 void gearoenix::vulkan::queue::Queue::present(const vk::PresentInfoKHR& info)
 {
     const std::lock_guard _(submission_lock);
-    vulkan_data.presentKHR(info);
+    const auto result = vulkan_data.presentKHR(info);
+    GX_ASSERT_D(vk::Result::eSuccess == result || vk::Result::eSuboptimalKHR == result);
 }
 
 #endif
