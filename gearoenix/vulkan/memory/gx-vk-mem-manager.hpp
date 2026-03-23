@@ -13,7 +13,7 @@ struct Memory;
 struct Manager final : core::Singleton<Manager> {
 private:
     std::mutex memories_lock;
-    std::map<std::pair<std::uint32_t, Place>, std::weak_ptr<Memory>> memories;
+    std::map<std::uint32_t /* memory type index */, std::weak_ptr<Memory>> memories;
 
 public:
     Manager();

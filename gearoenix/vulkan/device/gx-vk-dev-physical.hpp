@@ -6,6 +6,7 @@
 
 #include <array>
 #include <limits>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -86,7 +87,7 @@ public:
     [[nodiscard]] std::uint32_t get_present_queue_node_index() const { return present_queue_node_index; }
     [[nodiscard]] bool get_rtx_supported() const { return rtx_supported; }
 
-    [[nodiscard]] std::uint32_t get_memory_type_index(std::uint32_t type_bits, vk::MemoryPropertyFlags mem_properties) const;
+    [[nodiscard]] std::optional<std::uint32_t> get_memory_type_index(std::uint32_t type_bits, vk::MemoryPropertyFlags mem_properties) const;
     [[nodiscard]] vk::SurfaceCapabilitiesKHR get_surface_capabilities() const;
 };
 }

@@ -15,15 +15,33 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
     const std::int64_t size, const std::int64_t alignment, const std::uint32_t type_bits, const Place place)
 {
     const auto& physical_device = device::Physical::get();
-    const auto memory_properties = place == Place::Gpu
-        ? vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal)
-        : vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
-    const auto index = std::make_pair(physical_device.get_memory_type_index(type_bits, memory_properties), place);
+    const auto index = [&] {
+        if (const auto idx = physical_device.get_memory_type_index(
+            type_bits,
+            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal |
+                vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent)); idx.has_value()) {
+            return *idx;
+        }
+        if (place == Place::Gpu) {
+            if (const auto idx = physical_device.get_memory_type_index(
+                type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal)); idx.has_value()) {
+                return *idx;
+            }
+        }
+        if (const auto idx = physical_device.get_memory_type_index(
+            type_bits,
+            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent)); idx.has_value()) {
+            return *idx;
+        }
+        GX_UNEXPECTED;
+    }();
     const std::lock_guard _lg(memories_lock);
     auto& root_weak = memories[index];
     auto root = root_weak.lock();
     if (nullptr == root) {
-        root = Memory::construct(place, index.first);
+        root = Memory::construct(place, index);
         root_weak = root;
     }
     return root->allocate(size, alignment);

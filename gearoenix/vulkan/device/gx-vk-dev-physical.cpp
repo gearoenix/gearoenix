@@ -258,17 +258,17 @@ gearoenix::vulkan::device::Physical::Physical()
 
 gearoenix::vulkan::device::Physical::~Physical() = default;
 
-std::uint32_t gearoenix::vulkan::device::Physical::get_memory_type_index(std::uint32_t type_bits, const vk::MemoryPropertyFlags mem_properties) const
+std::optional<std::uint32_t> gearoenix::vulkan::device::Physical::get_memory_type_index(std::uint32_t type_bits, const vk::MemoryPropertyFlags mem_properties) const
 {
     for (uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
-        if ((type_bits & 1u) == 1u) {
+        if (type_bits & 1u) {
             if ((memory_properties.memoryTypes[i].propertyFlags & mem_properties) == mem_properties) {
                 return i;
             }
         }
         type_bits >>= 1u;
     }
-    GX_LOG_F("Could not find the requested memory type.");
+    return std::nullopt;
 }
 
 vk::SurfaceCapabilitiesKHR gearoenix::vulkan::device::Physical::get_surface_capabilities() const
