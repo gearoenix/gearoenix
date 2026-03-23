@@ -12,10 +12,6 @@
 
 #include <utility>
 
-#if GX_DEBUG_MODE
-#define GX_DEBUG_SWAPCHAIN true
-#endif
-
 namespace {
 [[nodiscard]] std::optional<vk::Format> srgb_to_unorm(const vk::Format format)
 {
@@ -65,7 +61,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     const auto& surface = Surface::get();
     const auto caps = physical_device.get_surface_capabilities();
     const auto& formats = physical_device.get_surface_formats();
-    auto old_swapchain = std::move(vulkan_data);
+    vulkan_data = vk::raii::SwapchainKHR { nullptr };
 
     auto chosen_format_index = [&] {
         constexpr std::array acceptable_formats {
@@ -108,11 +104,10 @@ void gearoenix::vulkan::Swapchain::initialize()
     const auto mutable_format_supported = unorm_format.has_value() && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
 
     // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
-    std::array<vk::Format, 2> format_list_entries { };
     vk::ImageFormatListCreateInfo format_list_info;
 
     if (mutable_format_supported) {
-        format_list_entries = { format.format, *unorm_format };
+        std::array format_list_entries = { format.format, *unorm_format };
         format_list_info.setViewFormats(format_list_entries);
     }
 
@@ -125,8 +120,8 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 && caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max()
-        && caps.currentExtent.height != 0) {
+    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 &&
+        caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
         info.imageExtent = caps.currentExtent;
     } else {
         const auto window_size = platform::BaseApplication::get().get_window_size();
@@ -138,7 +133,6 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.imageArrayLayers = 1;
     info.imageSharingMode = vk::SharingMode::eExclusive;
     info.presentMode = vk::PresentModeKHR::eFifo;
-    info.oldSwapchain = *old_swapchain;
     info.clipped = true;
     if (caps.supportedCompositeAlpha & vk::CompositeAlphaFlagBitsKHR::eOpaque) {
         info.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
@@ -155,10 +149,21 @@ void gearoenix::vulkan::Swapchain::initialize()
     const auto dev = logical_device.get_vulkan_data();
     vulkan_data = vk::raii::SwapchainKHR(logical_device.get_device(), info);
     auto images = dev.getSwapchainImagesKHR(*vulkan_data);
+    GX_ASSERT_D(images.size() == frames_in_flight);
 
     for (std::uint32_t i = 0; i < images.size(); ++i) {
-        auto img = std::make_shared<image::Image>("swapchain-img-" + std::to_string(i), static_cast<std::uint32_t>(info.imageExtent.width), static_cast<std::uint32_t>(info.imageExtent.height), static_cast<std::uint32_t>(1), vk::ImageType::e2D,
-            static_cast<std::uint32_t>(1), static_cast<std::uint32_t>(1), info.imageFormat, mutable_format_supported ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags { }, info.imageUsage, images[i]);
+        auto img = std::make_shared<image::Image>(
+            "swapchain-img-" + std::to_string(i),
+            static_cast<std::uint32_t>(info.imageExtent.width),
+            static_cast<std::uint32_t>(info.imageExtent.height),
+            static_cast<std::uint32_t>(1),
+            vk::ImageType::e2D,
+            static_cast<std::uint32_t>(1),
+            static_cast<std::uint32_t>(1),
+            info.imageFormat,
+            mutable_format_supported ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags { },
+            info.imageUsage,
+            images[i]);
         img->set_owned(false);
         frames[i].view = std::make_shared<image::View>(std::shared_ptr(img));
         if (mutable_format_supported) {
@@ -166,7 +171,6 @@ void gearoenix::vulkan::Swapchain::initialize()
         }
         frames[i].present = std::make_unique<sync::Semaphore>("present-" + std::to_string(i));
     }
-    old_swapchain = vk::raii::SwapchainKHR { nullptr }; // destroy old swapchain now that new one is created
     is_valid = true;
     image_index = 0;
 }
@@ -189,6 +193,9 @@ void gearoenix::vulkan::Swapchain::present()
     }
 }
 
-const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::Swapchain::get_present_semaphore() const { return *frames[image_index].present; }
+const gearoenix::vulkan::sync::Semaphore& gearoenix::vulkan::Swapchain::get_present_semaphore() const
+{
+    return *frames[image_index].present;
+}
 
 #endif
