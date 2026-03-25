@@ -64,18 +64,24 @@ gearoenix::vulkan::buffer::Buffer::~Buffer()
     }
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size, const std::int64_t alignment)
 {
-    auto alc_mem = allocated_memory->allocate(size, 1);
+    auto alc_mem = allocated_memory->allocate(size, alignment);
     if (nullptr == alc_mem) {
         return nullptr;
     }
 
     const auto mem_off = alc_mem->get_allocator()->get_offset() - allocated_memory->get_allocator()->get_offset();
+    GX_ASSERT_D(mem_off % alignment == 0); // the final memory must be aligned, if it wasn't, maybe you need to choose a better offsetting for your root buffer
 
     std::shared_ptr<Buffer> result(new Buffer(offset + static_cast<std::uint32_t>(mem_off), self.lock(), std::move(alc_mem), vulkan_data));
     result->self = result;
     return result;
+}
+
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::allocate(const std::int64_t size)
+{
+    return allocate(size, static_cast<std::int64_t>(device::Physical::get().get_properties().limits.optimalBufferCopyOffsetAlignment));
 }
 
 void gearoenix::vulkan::buffer::Buffer::write(const void* const data, const std::int64_t size)

@@ -4,6 +4,7 @@
 #ifdef GX_RENDER_VULKAN_ENABLED
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -15,7 +16,8 @@ namespace {
 [[nodiscard]] std::shared_ptr<gearoenix::vulkan::buffer::Buffer> create_staging_buffer(const std::vector<std::uint8_t>& pixels)
 {
     GX_ASSERT_D(!pixels.empty());
-    auto buff = gearoenix::vulkan::buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixels.size()));
+    const auto alignment = static_cast<std::int64_t>(gearoenix::vulkan::device::Physical::get().get_properties().limits.optimalBufferCopyRowPitchAlignment);
+    auto buff = gearoenix::vulkan::buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixels.size()), alignment);
     buff->write(pixels.data(), static_cast<std::int64_t>(pixels.size()));
     return buff;
 }

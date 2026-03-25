@@ -95,10 +95,10 @@ void main() {
     ao = mix(1.0, ao, material.alpha_cutoff_occlusion_strength_reserved.y);
 
     // Normal mapping
-    vec3 normal_sample = texture(sampler2D(textures_2d[nonuniformEXT(material.normal_texture_index)], samplers[nonuniformEXT(material.normal_sampler_index)]), in_uv).xyz;
-    vec3 normal_tangent = (normal_sample * 2.0 - 1.0) * material.normal_metallic_factor.xyz;
-    mat3 tbn = mat3(in_tng, in_btg, in_nrm);
-    vec3 nrm = normalize(tbn * normal_tangent);
+    const vec3 normal_sample = texture(sampler2D(textures_2d[nonuniformEXT(material.normal_texture_index)], samplers[nonuniformEXT(material.normal_sampler_index)]), in_uv).xyz;
+    const vec3 normal_tangent = (normal_sample * 2.0 - 1.0) * material.normal_metallic_factor.xyz;
+    const mat3 tbn = mat3(in_tng, in_btg, in_nrm);
+    const vec3 nrm = normalize(tbn * normal_tangent);
 
     // Emission
     vec3 ems = texture(sampler2D(textures_2d[nonuniformEXT(material.emission_texture_index)], samplers[nonuniformEXT(material.emission_sampler_index)]), in_uv).rgb;

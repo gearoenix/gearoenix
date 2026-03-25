@@ -35,6 +35,7 @@ public:
     [[nodiscard]] vk::Buffer get_vulkan_data() const { return vulkan_data; }
 
     [[nodiscard]] static std::shared_ptr<Buffer> construct(const std::string&, std::int64_t size, memory::Place place);
+    [[nodiscard]] std::shared_ptr<Buffer> allocate(std::int64_t size, std::int64_t alignment);
     [[nodiscard]] std::shared_ptr<Buffer> allocate(std::int64_t size);
     void write(const void* data, std::int64_t size);
     [[nodiscard]] vk::DeviceAddress get_device_address() const;

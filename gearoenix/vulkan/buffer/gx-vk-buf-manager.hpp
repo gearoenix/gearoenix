@@ -52,6 +52,7 @@ public:
     [[nodiscard]] const std::shared_ptr<Buffer>& get_gpu_root_buffer() const { return gpu_root_buffer; }
 
     [[nodiscard]] std::shared_ptr<Buffer> create_static(std::int64_t size);
+    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size, std::int64_t alignment);
     [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, core::job::EndCaller<>&& end);

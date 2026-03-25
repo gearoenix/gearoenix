@@ -65,6 +65,11 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return gpu_root_buffer->allocate(size);
 }
 
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::int64_t size, const std::int64_t alignment)
+{
+    return upload_root_buffer->allocate(size, alignment);
+}
+
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_staging(const std::int64_t size)
 {
     return upload_root_buffer->allocate(size);
@@ -72,11 +77,12 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
 
 std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::int64_t size)
 {
+    const auto alignment = static_cast<std::int64_t>(device::Physical::get().get_properties().limits.minUniformBufferOffsetAlignment);
     std::vector<std::shared_ptr<Buffer>> cpus(each_frame_upload_source.size());
     for (std::uint64_t fi = 0; fi < each_frame_upload_source.size(); ++fi) {
-        cpus[fi] = each_frame_upload_source[fi]->allocate(size);
+        cpus[fi] = each_frame_upload_source[fi]->allocate(size, alignment);
     }
-    auto gpu = each_frame_upload_destination->allocate(size);
+    auto gpu = each_frame_upload_destination->allocate(size, alignment);
     return std::make_shared<Uniform>(std::move(cpus), std::move(gpu));
 }
 
