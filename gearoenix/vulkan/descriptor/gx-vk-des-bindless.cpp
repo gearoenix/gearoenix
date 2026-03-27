@@ -36,9 +36,9 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         vk::DescriptorSetLayoutBinding { 1, vk::DescriptorType::eSampledImage, max_2d_images, all },
         vk::DescriptorSetLayoutBinding { 2, vk::DescriptorType::eSampledImage, max_3d_images, all },
         vk::DescriptorSetLayoutBinding { 3, vk::DescriptorType::eSampledImage, max_cube_images, all },
-        vk::DescriptorSetLayoutBinding { 4, vk::DescriptorType::eSampler, max_samplers, all },
-        vk::DescriptorSetLayoutBinding { 5, vk::DescriptorType::eSampler, max_shadow_samplers, all },
-        vk::DescriptorSetLayoutBinding { 6, vk::DescriptorType::eStorageBuffer, 1, all },
+        vk::DescriptorSetLayoutBinding { 4, vk::DescriptorType::eSampledImage, max_shadow_2d_images, all },
+        vk::DescriptorSetLayoutBinding { 5, vk::DescriptorType::eSampler, max_samplers, all },
+        vk::DescriptorSetLayoutBinding { 6, vk::DescriptorType::eSampler, max_shadow_samplers, all },
         vk::DescriptorSetLayoutBinding { 7, vk::DescriptorType::eStorageBuffer, 1, all },
         vk::DescriptorSetLayoutBinding { 8, vk::DescriptorType::eStorageBuffer, 1, all },
         vk::DescriptorSetLayoutBinding { 9, vk::DescriptorType::eStorageBuffer, 1, all },
@@ -48,6 +48,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         vk::DescriptorSetLayoutBinding { 13, vk::DescriptorType::eStorageBuffer, 1, all },
         vk::DescriptorSetLayoutBinding { 14, vk::DescriptorType::eStorageBuffer, 1, all },
         vk::DescriptorSetLayoutBinding { 15, vk::DescriptorType::eStorageBuffer, 1, all },
+        vk::DescriptorSetLayoutBinding { 16, vk::DescriptorType::eStorageBuffer, 1, all },
     };
 
     constexpr std::array binding_flags {
@@ -55,6 +56,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         gx_binding_flags, // 2D images
         gx_binding_flags, // 3D images
         gx_binding_flags, // Cube images
+        gx_binding_flags, // shadow/depth 2D images
         gx_binding_flags, // Samplers
         vk::DescriptorBindingFlags { }, // shadow comparison sampler
         vk::DescriptorBindingFlags { }, // scenes buffer
@@ -66,7 +68,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         vk::DescriptorBindingFlags { }, // shadow caster directional lights buffer
         vk::DescriptorBindingFlags { }, // bones buffer
         vk::DescriptorBindingFlags { }, // reflection probes buffer
-        vk::DescriptorBindingFlags { } // cameras joint models buffer
+        vk::DescriptorBindingFlags { }, // cameras joint models buffer
     };
 
     vk::DescriptorSetLayoutBindingFlagsCreateInfo binding_flags_info;
@@ -132,6 +134,12 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         free_cube_image_indices.push_back(i);
     }
 
+    free_shadow_2d_image_indices.reserve(max_shadow_2d_images);
+    for (std::uint32_t i = max_shadow_2d_images; i > 0;) {
+        --i;
+        free_shadow_2d_image_indices.push_back(i);
+    }
+
     free_sampler_indices.reserve(max_samplers);
     for (std::uint32_t i = max_samplers; i > 0;) {
         --i;
@@ -163,7 +171,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
         buffer_infos[i].range = static_cast<vk::DeviceSize>(allocator.get_size());
 
         writes[i].dstSet = descriptor_set;
-        writes[i].dstBinding = 6 + i; // Buffers start at binding 6
+        writes[i].dstBinding = 7 + i; // Buffers start at binding 7
         writes[i].descriptorType = vk::DescriptorType::eStorageBuffer;
         writes[i].setBufferInfo(buffer_infos[i]);
     }
@@ -189,7 +197,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
 
     vk::WriteDescriptorSet shadow_sampler_write;
     shadow_sampler_write.dstSet = descriptor_set;
-    shadow_sampler_write.dstBinding = 5;
+    shadow_sampler_write.dstBinding = 6;
     shadow_sampler_write.descriptorType = vk::DescriptorType::eSampler;
     shadow_sampler_write.setImageInfo(shadow_sampler_descriptor_info);
 
@@ -221,7 +229,7 @@ void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std
 
     vk::WriteDescriptorSet write;
     write.dstSet = descriptor_set;
-    write.dstBinding = 4; // Sampler binding
+    write.dstBinding = 5; // Sampler binding
     write.dstArrayElement = index;
     write.descriptorType = vk::DescriptorType::eSampler;
 
@@ -279,6 +287,18 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const
     return index;
 }
 
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_shadow_2d_image(const vk::ImageView view, const vk::ImageLayout layout)
+{
+    GX_ASSERT_D(view);
+    const std::lock_guard _lg(allocation_lock);
+    GX_ASSERT_D(!free_shadow_2d_image_indices.empty());
+    const auto index = free_shadow_2d_image_indices.back();
+    free_shadow_2d_image_indices.pop_back();
+
+    write_image_descriptor(4, index, view, layout);
+    return index;
+}
+
 std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_sampler(const vk::Sampler sampler)
 {
     GX_ASSERT_D(sampler);
@@ -321,6 +341,14 @@ void gearoenix::vulkan::descriptor::Bindless::free_cube_image(const std::uint32_
     GX_ASSERT_D(index < max_cube_images);
     // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
     free_cube_image_indices.push_back(index);
+}
+
+void gearoenix::vulkan::descriptor::Bindless::free_shadow_2d_image(const std::uint32_t index)
+{
+    const std::lock_guard _lg(allocation_lock);
+    GX_ASSERT_D(index < max_shadow_2d_images);
+    // No need to write null descriptor - PARTIALLY_BOUND_BIT allows unaccessed descriptors to be invalid
+    free_shadow_2d_image_indices.push_back(index);
 }
 
 void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t index)

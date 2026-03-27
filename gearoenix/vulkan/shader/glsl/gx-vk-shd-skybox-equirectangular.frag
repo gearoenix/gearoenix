@@ -11,13 +11,11 @@ layout(location = 0) out vec4 frag_out;
 const vec2 inv_atan = vec2(0.1591, 0.3183);
 
 void main() {
-    GxShaderDataMaterial material = materials[pc.material_index];
+    const GxShaderDataMaterial material = materials[pc.material_index];
 
-    vec3 v = normalize(in_pos);
+    const vec3 v = normalize(in_pos);
     vec2 uv = vec2(atan(v.y, v.x), asin(v.z)) * inv_atan + 0.5;
     uv.y = 1.0 - uv.y;
 
-    frag_out = texture(sampler2D(
-        textures_2d[nonuniformEXT(material.albedo_texture_index)],
-        samplers[nonuniformEXT(material.albedo_sampler_index)]), uv) * material.albedo_factor;
+    frag_out = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), uv) * material.albedo_factor;
 }

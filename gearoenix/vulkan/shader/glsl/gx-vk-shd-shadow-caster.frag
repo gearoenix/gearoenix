@@ -7,13 +7,11 @@
 layout(location = 0) in vec2 in_uv;
 
 void main() {
-    GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[pc.material_index];
+    const GxShaderDataModel model = models[pc.model_index];
+    const GxShaderDataMaterial material = materials[pc.material_index];
 
     // Sample albedo for alpha testing
-    float alpha = texture(
-        sampler2D(textures_2d[nonuniformEXT(material.albedo_texture_index)], samplers[nonuniformEXT(material.albedo_sampler_index)]),
-        in_uv).a * material.albedo_factor.a;
+    const float alpha = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), in_uv).a * material.albedo_factor.a;
 
     // Alpha test - discard fragments below cutoff
     if (alpha <= material.alpha_cutoff_occlusion_strength_reserved.x) {

@@ -18,7 +18,8 @@ struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_2d_images = 8192;
     static constexpr std::uint32_t max_3d_images = 8;
     static constexpr std::uint32_t max_cube_images = 32;
-    static constexpr std::uint32_t max_images = max_1d_images + max_2d_images + max_3d_images + max_cube_images;
+    static constexpr std::uint32_t max_shadow_2d_images = 256;
+    static constexpr std::uint32_t max_images = max_1d_images + max_2d_images + max_3d_images + max_cube_images + max_shadow_2d_images;
     static constexpr std::uint32_t max_samplers = 32;
     static constexpr std::uint32_t max_shadow_samplers = 1;
 
@@ -33,6 +34,7 @@ private:
     std::vector<std::uint32_t> free_2d_image_indices = { };
     std::vector<std::uint32_t> free_3d_image_indices = { };
     std::vector<std::uint32_t> free_cube_image_indices = { };
+    std::vector<std::uint32_t> free_shadow_2d_image_indices = { };
     std::vector<std::uint32_t> free_sampler_indices = { };
 
     std::mutex allocation_lock;
@@ -61,12 +63,14 @@ public:
     [[nodiscard]] std::uint32_t allocate_2d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
     [[nodiscard]] std::uint32_t allocate_3d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
     [[nodiscard]] std::uint32_t allocate_cube_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+    [[nodiscard]] std::uint32_t allocate_shadow_2d_image(vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
     [[nodiscard]] std::uint32_t allocate_sampler(vk::Sampler sampler);
 
     void free_1d_image(std::uint32_t index);
     void free_2d_image(std::uint32_t index);
     void free_3d_image(std::uint32_t index);
     void free_cube_image(std::uint32_t index);
+    void free_shadow_2d_image(std::uint32_t index);
     void free_sampler(std::uint32_t index);
 
     void bind(vk::CommandBuffer cmd) const;

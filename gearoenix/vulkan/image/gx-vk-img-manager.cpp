@@ -70,11 +70,12 @@ void gearoenix::vulkan::image::Manager::upload(std::shared_ptr<Image>&& img, std
 
     queue::Queue::get().submit(*cmd, *fence);
 
-    core::job::send_job_to_pool([cmd = std::move(cmd), fence = std::move(fence), buffs = std::move(buffs), end = std::move(end)] {
+    core::job::send_job_to_pool([cmd = std::move(cmd), fence = std::move(fence), buffs = std::move(buffs), end = std::move(end), img = std::move(img)] {
         fence->wait();
         (void)cmd;
         (void)buffs;
         (void)end;
+        (void)img;
     });
 }
 #endif

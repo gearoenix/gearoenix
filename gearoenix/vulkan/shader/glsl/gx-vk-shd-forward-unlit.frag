@@ -9,13 +9,11 @@ layout(location = 0) in vec2 in_uv;
 layout(location = 0) out vec4 frag_out;
 
 void main() {
-    GxShaderDataModel model = models[pc.model_index];
-    GxShaderDataMaterial material = materials[pc.material_index];
+    const GxShaderDataModel model = models[pc.model_index];
+    const GxShaderDataMaterial material = materials[pc.material_index];
 
     // Sample albedo texture and multiply by factor
-    vec4 colour = texture(
-        sampler2D(textures_2d[nonuniformEXT(material.albedo_texture_index)], samplers[nonuniformEXT(material.albedo_sampler_index)]),
-        in_uv) * material.albedo_factor;
+    const vec4 colour = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), in_uv) * material.albedo_factor;
 
     // Alpha test
     if (colour.a <= material.alpha_cutoff_occlusion_strength_reserved.x) {

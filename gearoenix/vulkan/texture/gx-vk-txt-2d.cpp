@@ -23,7 +23,9 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureI
     , view(new image::View(std::make_shared<image::Image>(name, info.get_width(), info.get_height(), info.get_depth(), convert_image_type(info.get_type()), static_cast<std::uint32_t>(compute_mipmaps_count(info)), 1u,
           convert_image_format(info.get_format()), vk::ImageCreateFlags { },
           vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eSampled | (render::texture::format_is_depth(info.get_format()) ? vk::ImageUsageFlagBits::eDepthStencilAttachment : (vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eStorage)))))
-    , view_index(descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
+    , view_index(render::texture::format_is_depth(info.get_format())
+          ? descriptor::Bindless::get().allocate_shadow_2d_image(view->get_vulkan_data())
+          : descriptor::Bindless::get().allocate_2d_image(view->get_vulkan_data()))
     , mips([this] {
         std::vector<std::shared_ptr<image::View>> result;
         const auto mip_count = view->get_image()->get_mipmap_levels();
