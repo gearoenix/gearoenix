@@ -28,8 +28,9 @@ static bool is_loaded = false;
 
 bool gearoenix::gl::load_library()
 {
-    if (is_loaded)
+    if (is_loaded) {
         return true;
+    }
 
 #ifdef GX_PLATFORM_INTERFACE_SDL
     if (!SDL_GL_LoadLibrary(nullptr)) {

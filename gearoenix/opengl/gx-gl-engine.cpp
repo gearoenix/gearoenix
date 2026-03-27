@@ -131,7 +131,10 @@ void gearoenix::gl::Engine::window_resized()
 
 void gearoenix::gl::Engine::upload_imgui_fonts() { }
 
-bool gearoenix::gl::Engine::is_supported() { return load_library(); }
+bool gearoenix::gl::Engine::is_supported()
+{
+    return load_library();
+}
 
 std::unique_ptr<gearoenix::gl::Engine> gearoenix::gl::Engine::construct()
 {

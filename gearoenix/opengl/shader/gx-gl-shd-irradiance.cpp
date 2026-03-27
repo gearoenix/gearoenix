@@ -23,13 +23,14 @@ in vec3 out_pos;
 
 out vec4 frag_out;
 
+const float sample_delta = 0.02;
+
 void main() {
     vec3 nrm = normalize(out_pos);
     vec3 irradiance = vec3(0.0);
     vec3 up = vec3(0.0, 1.0, 0.0);
     vec3 right = normalize(cross(up, nrm));
     up = normalize(cross(nrm, right));
-    float sample_delta = 0.005;
     float phi_samples_count = 0.001f;
     for(float phi = 0.0; phi < 2.0 * gx_pi; phi += sample_delta, ++phi_samples_count) {
         float theta_samples_count = 0.001f;

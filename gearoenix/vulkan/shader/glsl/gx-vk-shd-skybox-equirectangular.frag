@@ -14,8 +14,7 @@ void main() {
     const GxShaderDataMaterial material = materials[pc.material_index];
 
     const vec3 v = normalize(in_pos);
-    vec2 uv = vec2(atan(v.y, v.x), asin(v.z)) * inv_atan + 0.5;
-    uv.y = 1.0 - uv.y;
+    const vec2 uv = 0.5 - vec2(atan(v.y, v.x), asin(v.z)) * inv_atan;
 
     frag_out = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), uv) * material.albedo_factor;
 }
