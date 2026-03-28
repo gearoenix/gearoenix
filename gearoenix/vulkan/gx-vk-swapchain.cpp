@@ -120,8 +120,7 @@ void gearoenix::vulkan::Swapchain::initialize()
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
     info.imageColorSpace = format.colorSpace;
-    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 &&
-        caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
+    if (caps.currentExtent.width != std::numeric_limits<decltype(caps.currentExtent.width)>::max() && caps.currentExtent.width != 0 && caps.currentExtent.height != std::numeric_limits<decltype(caps.currentExtent.height)>::max() && caps.currentExtent.height != 0) {
         info.imageExtent = caps.currentExtent;
     } else {
         const auto window_size = platform::BaseApplication::get().get_window_size();

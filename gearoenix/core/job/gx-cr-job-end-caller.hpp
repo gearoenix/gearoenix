@@ -2,9 +2,12 @@
 #include "../gx-cr-build-configuration.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 #include "gx-cr-job-manager.hpp"
+
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <thread>
 #include <type_traits>
 
 #if GX_DEBUG_MODE
@@ -12,7 +15,7 @@
 #endif
 
 #if GX_END_CALLER_CATCH_CALLER_LOCATION
-#include <boost/stacktrace.hpp>
+#include <stacktrace>
 
 #define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(a) a
 #define GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(a1, a2) a1, a2
@@ -26,6 +29,8 @@
 
 namespace gearoenix::core::job {
 
+constexpr auto GX_END_CALLER_CATCH_DANGLING = false;
+
 template <typename T = void>
 struct EndCaller final {
 private:
@@ -38,11 +43,11 @@ private:
         const std::thread::id context_thread;
         std::optional<Type> value = std::nullopt;
         bool ignore_empty_value = false;
-        GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const boost::stacktrace::stacktrace stack_trace;)
+        GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const std::stacktrace stack_trace;)
 
         explicit Caller(Function&& f)
             : function(std::move(f))
-            , context_thread(std::this_thread::get_id()) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+            , context_thread(std::this_thread::get_id()) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(std::stacktrace::current()))
         {
         }
 
@@ -63,22 +68,31 @@ private:
     };
 
     std::shared_ptr<Caller> caller;
-    GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const boost::stacktrace::stacktrace stack_trace;)
+    GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const std::stacktrace stack_trace;)
 
 public:
     explicit EndCaller(Function&& f)
-        : caller(new Caller(std::move(f))) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(new Caller(std::move(f))) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(std::stacktrace::current()))
     {
+        if constexpr (GX_END_CALLER_CATCH_DANGLING) {
+            std::jthread([wc = std::weak_ptr(caller)] {
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(10s);
+                if (const auto c = wc.lock(); c) {
+                    GX_LOG_F("Caller is not destroyed.");
+                }
+            }).detach();
+        }
     }
 
     EndCaller(const EndCaller& o)
-        : caller(o.caller) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(o.caller) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(std::stacktrace::current()))
     {
         GX_ASSERT_D(nullptr != caller);
     }
 
     EndCaller(EndCaller&& o) noexcept
-        : caller(std::move(o.caller)) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(boost::stacktrace::stacktrace()))
+        : caller(std::move(o.caller)) GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD2(, stack_trace(std::stacktrace::current()))
     {
         GX_ASSERT_D(nullptr != caller);
     }

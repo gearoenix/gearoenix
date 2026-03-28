@@ -25,11 +25,6 @@ gearoenix::vulkan::memory::Memory::Memory(
 {
 }
 
-std::int64_t gearoenix::vulkan::memory::Memory::align(const std::int64_t sz)
-{
-    return math::Numeric::align(sz, static_cast<std::int64_t>(device::Physical::get().get_max_memory_alignment()));
-}
-
 gearoenix::vulkan::memory::Memory::~Memory()
 {
     if (!parent) {
@@ -55,15 +50,17 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
 {
     const auto is_gpu = place == Place::Gpu;
     const auto& cfg = render::RuntimeConfiguration::get();
-    const auto aligned_size = align(is_gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
-    auto dev = device::Logical::get().get_vulkan_data();
+    const auto configured_size = static_cast<std::int64_t>(is_gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
+    const auto& mem_props = device::Physical::get().get_memory_properties();
+    const auto heap_index = mem_props.memoryTypes[type_index].heapIndex;
+    const auto heap_size = static_cast<std::int64_t>(mem_props.memoryHeaps[heap_index].size);
+    const auto aligned_size = std::min(configured_size, (heap_size - 256u) & ~255u);
+    const auto dev = device::Logical::get().get_vulkan_data();
     const auto rtx_enabled = device::Physical::get().get_rtx_supported();
 
-    vk::MemoryAllocateFlagsInfo flags_info(vk::MemoryAllocateFlagBits::eDeviceAddress);
+    constexpr vk::MemoryAllocateFlagsInfo flags_info(vk::MemoryAllocateFlagBits::eDeviceAddress);
 
-    vk::MemoryAllocateInfo info(
-        static_cast<vk::DeviceSize>(aligned_size),
-        type_index);
+    vk::MemoryAllocateInfo info(static_cast<vk::DeviceSize>(aligned_size), type_index);
     if (is_gpu && rtx_enabled) {
         info.pNext = &flags_info;
     }

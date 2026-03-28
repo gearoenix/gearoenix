@@ -35,8 +35,8 @@ private:
     const std::array<std::shared_ptr<Buffer>, frames_in_flight> each_frame_upload_source;
     const std::shared_ptr<Buffer> each_frame_upload_destination;
 
-    [[nodiscard]] std::shared_ptr<Buffer> create_upload_root_buffer() const;
-    [[nodiscard]] std::shared_ptr<Buffer> create_gpu_root_buffer() const;
+    [[nodiscard]] static std::shared_ptr<Buffer> create_upload_root_buffer();
+    [[nodiscard]] static std::shared_ptr<Buffer> create_gpu_root_buffer();
     [[nodiscard]] std::array<std::shared_ptr<Buffer>, frames_in_flight> create_each_frame_upload_source() const;
     [[nodiscard]] std::shared_ptr<Buffer> create_each_frame_upload_destination() const;
 

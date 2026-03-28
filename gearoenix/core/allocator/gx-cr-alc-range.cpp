@@ -12,7 +12,7 @@ gearoenix::core::allocator::Range::Range(const std::int64_t size, const std::int
 
 void gearoenix::core::allocator::Range::deallocate(const Range* const child)
 {
-    std::lock_guard _lg(this_lock);
+    const std::lock_guard _lg(this_lock);
     auto* const child_previous = child->previous;
     auto* const child_next = child->next;
     const auto new_range = std::make_pair(child_previous, child_next);
@@ -37,6 +37,7 @@ void gearoenix::core::allocator::Range::deallocate(const Range* const child)
         child_next->previous_key = new_key;
     }
     ranges[new_key] = new_range;
+    allocated_size -= child->size;
 }
 
 std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::construct(const std::int64_t size)
@@ -57,7 +58,7 @@ gearoenix::core::allocator::Range::~Range()
 std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::Range::allocate(const std::int64_t sz, const std::int64_t alignment)
 {
     GX_ASSERT_D(sz > 0);
-    std::lock_guard _lg(this_lock);
+    const std::lock_guard _lg(this_lock);
     auto search = std::upper_bound(ranges.begin(), ranges.end(), sz, [](const std::int64_t a, const decltype(ranges)::value_type& b) {
         return a <= b.first.first;
     });
@@ -82,6 +83,7 @@ std::shared_ptr<gearoenix::core::allocator::Range> gearoenix::core::allocator::R
     GX_ASSERT_D(!self.expired());
     std::shared_ptr<Range> result(new Range(sz, aligned_offset, self.lock()));
     result->self = result;
+    allocated_size += sz;
     const auto del_range = search->second;
     ranges.erase(search);
     auto* const result_previous = del_range.first;

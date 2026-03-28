@@ -18,6 +18,7 @@ namespace {
     GX_ASSERT_D(!pixels.empty());
     const auto alignment = static_cast<std::int64_t>(gearoenix::vulkan::device::Physical::get().get_properties().limits.optimalBufferCopyRowPitchAlignment);
     auto buff = gearoenix::vulkan::buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixels.size()), alignment);
+    GX_ASSERT_D(buff);
     buff->write(pixels.data(), static_cast<std::int64_t>(pixels.size()));
     return buff;
 }

@@ -14,22 +14,20 @@
 #include "gx-vk-buf-buffer.hpp"
 #include "gx-vk-buf-uniform.hpp"
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer() const
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_upload_root_buffer()
 {
-    const auto& cfg = render::RuntimeConfiguration::get();
-    const auto& phs_dev = device::Physical::get();
-    const auto up_asz = cfg.get_maximum_cpu_render_memory_size();
-    const auto up_sz = (up_asz == cfg.get_maximum_cpu_render_memory_size()) ? cfg.get_maximum_cpu_render_memory_size() : (up_asz - phs_dev.get_max_memory_alignment());
-    return Buffer::construct("upload-buffer", up_sz, memory::Place::Cpu);
+    const auto sz = render::RuntimeConfiguration::get().get_maximum_cpu_render_memory_size();
+    auto result = Buffer::construct("upload-buffer", sz, memory::Place::Cpu);
+    GX_ASSERT_D(result);
+    return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_gpu_root_buffer() const
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_gpu_root_buffer()
 {
-    const auto& cfg = render::RuntimeConfiguration::get();
-    const auto& phs_dev = device::Physical::get();
-    const auto gpu_asz = cfg.get_maximum_gpu_buffer_size();
-    const auto gpu_sz = (gpu_asz == cfg.get_maximum_gpu_buffer_size()) ? cfg.get_maximum_gpu_buffer_size() : (gpu_asz - phs_dev.get_max_memory_alignment());
-    return Buffer::construct("gpu-buffer", gpu_sz, memory::Place::Gpu);
+    const auto sz = render::RuntimeConfiguration::get().get_maximum_gpu_buffer_size();
+    auto result = Buffer::construct("gpu-buffer", sz, memory::Place::Gpu);
+    GX_ASSERT_D(result);
+    return result;
 }
 
 std::array<std::shared_ptr<gearoenix::vulkan::buffer::Buffer>, gearoenix::vulkan::frames_in_flight> gearoenix::vulkan::buffer::Manager::create_each_frame_upload_source() const

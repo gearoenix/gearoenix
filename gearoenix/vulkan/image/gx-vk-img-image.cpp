@@ -10,6 +10,12 @@
 #include "../memory/gx-vk-mem-manager.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 
+namespace {
+#if GX_DEBUG_MODE
+std::atomic<std::uint64_t> total_allocated_image_sz = 0;
+#endif
+}
+
 bool gearoenix::vulkan::image::Image::PerMipState::operator==(const PerMipState& other) const
 {
     return layout == other.layout && queue_family_index == other.queue_family_index && access == other.access && stage == other.stage;
@@ -172,6 +178,10 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     vulkan_data = dev.createImage(info);
 
     auto mem_req = dev.getImageMemoryRequirements(vulkan_data);
+
+#if GX_DEBUG_MODE
+    [[maybe_unused]] const auto total_allocated_image_sz_before = total_allocated_image_sz.fetch_add(mem_req.size, std::memory_order_relaxed);
+#endif
 
     allocated_memory = memory::Manager::get().allocate(
         static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, memory::Place::Gpu);
