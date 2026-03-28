@@ -208,10 +208,10 @@ gearoenix::vulkan::device::Physical::Physical()
     for (std::uint32_t i = 0; i < gpus.size(); ++i) {
         const auto props = gpus[i].getProperties();
         GX_LOG_D("GPU device " << i << ": " << props.deviceName.data());
-        if (vk::PhysicalDeviceType::eDiscreteGpu != props.deviceType)
+        if (vk::PhysicalDeviceType::eDiscreteGpu != props.deviceType) {
             continue;
-        const auto device_point = is_good(gpus[i]);
-        if (device_point > best_device_point) {
+        }
+        if (const auto device_point = is_good(gpus[i]); device_point > best_device_point) {
             best_device_index = static_cast<int>(i);
             best_device_point = device_point;
         }
@@ -219,8 +219,7 @@ gearoenix::vulkan::device::Physical::Physical()
 
     if (-1 == best_device_index) {
         for (std::uint32_t i = 0; i < gpus.size(); ++i) {
-            const auto device_point = is_good(gpus[i]);
-            if (device_point > best_device_point) {
+            if (const auto device_point = is_good(gpus[i]); device_point > best_device_point) {
                 best_device_index = static_cast<int>(i);
                 best_device_point = device_point;
             }

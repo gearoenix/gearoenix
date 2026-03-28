@@ -43,7 +43,6 @@ private:
     vk::PhysicalDeviceRayTracingPipelinePropertiesKHR ray_tracing_pipeline_properties = { };
     std::vector<vk::SurfaceFormatKHR> surface_formats;
     vk::Format supported_depth_format = vk::Format::eUndefined;
-    std::uint32_t max_memory_alignment = std::numeric_limits<std::uint32_t>::max();
     std::uint32_t graphics_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     std::uint32_t transfer_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     std::uint32_t compute_queue_node_index = std::numeric_limits<std::uint32_t>::max();
@@ -80,7 +79,6 @@ public:
     [[nodiscard]] const vk::PhysicalDeviceRayTracingPipelinePropertiesKHR& get_ray_tracing_pipeline_properties() const { return ray_tracing_pipeline_properties; }
     [[nodiscard]] const std::vector<vk::SurfaceFormatKHR>& get_surface_formats() const { return surface_formats; }
     [[nodiscard]] vk::Format get_supported_depth_format() const { return supported_depth_format; }
-    [[nodiscard]] std::uint32_t get_max_memory_alignment() const { return max_memory_alignment; }
     [[nodiscard]] std::uint32_t get_graphics_queue_node_index() const { return graphics_queue_node_index; }
     [[nodiscard]] std::uint32_t get_transfer_queue_node_index() const { return transfer_queue_node_index; }
     [[nodiscard]] std::uint32_t get_compute_queue_node_index() const { return compute_queue_node_index; }

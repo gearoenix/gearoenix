@@ -40,8 +40,8 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     }
 
     const vk::BufferCreateInfo info({ }, static_cast<vk::DeviceSize>(aligned_size), usage);
-    auto dev = logical_device.get_vulkan_data();
-    auto vulkan_data = dev.createBuffer(info);
+    const auto dev = logical_device.get_vulkan_data();
+    const auto vulkan_data = dev.createBuffer(info);
 
     const auto mem_req = dev.getBufferMemoryRequirements(vulkan_data);
     auto allocated_memory = memory::Manager::get().allocate(

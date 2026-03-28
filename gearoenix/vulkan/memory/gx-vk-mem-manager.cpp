@@ -16,23 +16,25 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
 {
     const auto& physical_device = device::Physical::get();
     const auto index = [&] {
-        if (const auto idx = physical_device.get_memory_type_index(
-            type_bits,
-            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal |
-                vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent)); idx.has_value()) {
-            return *idx;
-        }
+        // if (vk::PhysicalDeviceType::eDiscreteGpu != physical_device.get_properties().deviceType) {
+        //     if (const auto idx = physical_device.get_memory_type_index(
+        //             type_bits,
+        //             vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal | vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent));
+        //         idx.has_value()) {
+        //         return *idx;
+        //     }
+        // }
         if (place == Place::Gpu) {
             if (const auto idx = physical_device.get_memory_type_index(
-                type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal)); idx.has_value()) {
+                    type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal));
+                idx.has_value()) {
                 return *idx;
             }
         }
         if (const auto idx = physical_device.get_memory_type_index(
-            type_bits,
-            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent)); idx.has_value()) {
+                type_bits,
+                vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent));
+            idx.has_value()) {
             return *idx;
         }
         GX_UNEXPECTED;
@@ -44,7 +46,8 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Ma
         root = Memory::construct(place, index);
         root_weak = root;
     }
-    return root->allocate(size, alignment);
+    auto result = root->allocate(size, alignment);
+    return result;
 }
 
 #endif

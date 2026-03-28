@@ -79,7 +79,6 @@ void gearoenix::render::gltf::Textures::load(const int index, core::job::EndCall
         .set_sampler_info(sampler)
         .set_width(img.width)
         .set_height(img.height)
-        .set_depth(0)
         .set_type(texture::Type::Texture2D)
         .set_has_mipmap(needs_mipmap);
 

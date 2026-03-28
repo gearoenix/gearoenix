@@ -30,6 +30,7 @@ gearoenix::render::texture::Manager::~Manager() = default;
 void gearoenix::render::texture::Manager::read_gx3d(const platform::stream::Path& path, core::job::EndCallerShared<Texture>&& c, const bool use_cache)
 {
     const auto stream = platform::stream::Stream::open(path);
+    GX_ASSERT_D(stream);
     read_gx3d(*stream, std::move(c), use_cache);
 }
 

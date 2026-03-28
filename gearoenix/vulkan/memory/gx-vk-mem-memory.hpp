@@ -37,7 +37,6 @@ public:
     [[nodiscard]] std::uint32_t get_type_index() const { return type_index; }
     [[nodiscard]] vk::DeviceMemory get_vulkan_data() const { return vulkan_data; }
 
-    [[nodiscard]] static std::int64_t align(std::int64_t);
     [[nodiscard]] static std::shared_ptr<Memory> construct(Place, std::uint32_t type_index);
     [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::int64_t alignment);
 };

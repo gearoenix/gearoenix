@@ -3,6 +3,7 @@
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-build-configuration.hpp"
 #include "gx-rnd-resolution.hpp"
+
 #include <cstdint>
 
 namespace gearoenix::render::engine {

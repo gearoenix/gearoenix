@@ -11,6 +11,8 @@ struct Range final {
     GX_GET_CVAL_PRV(std::int64_t, size);
     /// It is the offset from the origin parent
     GX_GET_VAL_PRV(std::int64_t, offset, 0);
+    /// Total size currently allocated by sub-ranges
+    GX_GET_VAL_PRV(std::int64_t, allocated_size, 0);
     /// size, offset (within itself)
     typedef std::pair<std::int64_t, std::int64_t> SizeOffset;
     /// allocator that is before free space, allocator that is after space
