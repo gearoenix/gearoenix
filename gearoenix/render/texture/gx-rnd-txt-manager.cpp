@@ -112,9 +112,7 @@ void gearoenix::render::texture::Manager::read_gx3d(platform::stream::Stream& st
             fill_mips(face_pixels);
         }
         core::job::EndCallerShared<TextureCube> end([c = std::move(c)](std::shared_ptr<TextureCube>&& t) {
-            if (!c.has_return()) {
-                c.set_return(std::move(t));
-            }
+            c.set_return_if_empty(std::move(t));
         });
         create_cube_from_pixels(std::move(name), std::move(pixels), txt_info, std::move(end), false);
         return;
@@ -126,9 +124,7 @@ void gearoenix::render::texture::Manager::read_gx3d(platform::stream::Stream& st
             fill_mips(pixels);
         }
         core::job::EndCallerShared<Texture2D> end([c = std::move(c)](std::shared_ptr<Texture2D>&& t) {
-            if (!c.has_return()) {
-                c.set_return(std::move(t));
-            }
+            c.set_return_if_empty(std::move(t));
         });
         create_2d_from_pixels(std::move(name), std::move(pixels), txt_info, std::move(end), false);
         return;
@@ -196,10 +192,7 @@ void gearoenix::render::texture::Manager::get_brdflut(core::job::EndCallerShared
                 core::job::EndCallerShared<Texture>([this, c = std::move(c)](std::shared_ptr<Texture>&& t) {
                     brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
                     textures_2d.set(file_name, brdflut);
-                    // c is needed because it is possible that the texture name is difference when it got loaded by GX3D.
-                    if (!c.has_return()) {
-                        c.set_return(std::shared_ptr(brdflut));
-                    }
+                    c.set_return_if_empty(std::shared_ptr(brdflut));
                 }),
                 false);
             return;
@@ -309,9 +302,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     return textures_2d.get(name, core::job::EndCallerShared<Texture2D>([c GX_DEBUG_TXT_INFO](std::shared_ptr<Texture2D>&& t) {
         GX_ASSERT_D(!info.has_value() || info->get_type() == Type::Unknown || *info == t->get_info());
         GX_ASSERT_D(Type::Texture2D == t->get_info().get_type());
-        if (!c.has_return()) {
-            c.set_return(std::move(t));
-        }
+        c.set_return_if_empty(std::move(t));
     }));
 }
 
@@ -320,9 +311,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     return textures_cube.get(name, core::job::EndCallerShared<TextureCube>([c GX_DEBUG_TXT_INFO](std::shared_ptr<TextureCube>&& t) {
         GX_ASSERT_D(!info.has_value() || *info == t->get_info());
         GX_ASSERT_D(Type::TextureCube == t->get_info().get_type());
-        if (!c.has_return()) {
-            c.set_return(std::move(t));
-        }
+        c.set_return_if_empty(std::move(t));
     }));
 }
 
@@ -333,9 +322,7 @@ void gearoenix::render::texture::Manager::create_2d_from_pixels(std::string&& na
     }
     core::job::EndCallerShared<Texture2D> end([this, c = std::move(c), name](std::shared_ptr<Texture2D>&& t) {
         textures_2d.set(name, t);
-        if (!c.has_return()) {
-            c.set_return(std::move(t));
-        }
+        c.set_return_if_empty(std::move(t));
     });
     create_2d_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
 }
@@ -375,8 +362,8 @@ void gearoenix::render::texture::Manager::create_2df_from_formatted(std::string&
     }
     GX_ASSERT_D(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented soon.
     GX_ASSERT_D(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
-    GX_ASSERT_D(0 == info.get_width()); // dimension changing does not have a high priority
-    GX_ASSERT_D(0 == info.get_height()); // dimension changing does not have a high priority
+    GX_ASSERT_D(1 >= info.get_width()); // dimension changing does not have a high priority
+    GX_ASSERT_D(1 >= info.get_height()); // dimension changing does not have a high priority
     std::uint32_t img_width = 0;
     std::uint32_t img_height = 0;
     std::uint32_t img_channels = 0;
@@ -473,9 +460,7 @@ void gearoenix::render::texture::Manager::create_cube_from_pixels(
 
     core::job::EndCallerShared<TextureCube> end([this, n = name, c = std::move(c)](std::shared_ptr<TextureCube>&& t) mutable {
         textures_cube.set(n, t);
-        if (!c.has_return()) {
-            c.set_return(std::move(t));
-        }
+        c.set_return_if_empty(std::move(t));
     });
     create_cube_from_pixels_v(std::move(name), std::move(pixels), info, std::move(end));
 }
@@ -500,9 +485,7 @@ void gearoenix::render::texture::Manager::create_target(std::string&& name, std:
 
     core::job::EndCallerShared<Target> end_caller([this, n = name, c = std::move(c)](std::shared_ptr<Target>&& t) {
         targets.set(n, t);
-        if (!c.has_return()) {
-            c.set_return(std::move(t));
-        }
+        c.set_return_if_empty(std::move(t));
     });
     create_target_v(std::move(name), std::move(attachments), std::move(end_caller));
 }

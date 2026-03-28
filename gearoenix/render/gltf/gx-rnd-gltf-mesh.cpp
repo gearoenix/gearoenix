@@ -160,7 +160,6 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
         const auto bi_inc = tx0_a->ByteStride(*tx0_bv);
         for (auto& vertex : vertices) {
             vertex.uv = *reinterpret_cast<const math::Vec2<float>*>(&buff.data[bi]);
-            vertex.uv.y = 1.0f - vertex.uv.y;
             bi += bi_inc;
         }
         GX_ASSERT_D(buff.data.size() >= bi);

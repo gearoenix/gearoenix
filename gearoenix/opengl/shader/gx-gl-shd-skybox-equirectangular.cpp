@@ -23,7 +23,7 @@ in vec3 out_uv;
 
 out vec4 frag_colour;
 
-const vec2 inv_atan = vec2(-0.1591, 0.3183);
+const vec2 inv_atan = vec2(-0.1591, -0.3183);
 
 void main() {
     vec3 v = normalize(out_uv);

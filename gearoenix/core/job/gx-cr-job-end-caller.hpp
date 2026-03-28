@@ -41,6 +41,7 @@ private:
     struct Caller final {
         Function function;
         const std::thread::id context_thread;
+        std::mutex value_lock;
         std::optional<Type> value = std::nullopt;
         bool ignore_empty_value = false;
         GX_END_CALLER_CATCH_CALLER_LOCATION_GUARD(const std::stacktrace stack_trace;)
@@ -54,11 +55,15 @@ private:
         ~Caller()
         {
             if constexpr (std::is_same_v<void, T>) {
-                send_job(context_thread, [f = std::move(function)]() mutable { f(); });
+                send_job(context_thread, [f = std::move(function)]() mutable {
+                    f();
+                });
             } else {
                 GX_ASSERT_D(ignore_empty_value || value.has_value());
                 if (value.has_value()) {
-                    send_job(context_thread, [v = std::move(*value), f = std::move(function)]() mutable { f(std::move(v)); });
+                    send_job(context_thread, [v = std::move(*value), f = std::move(function)]() mutable {
+                        f(std::move(v));
+                    });
                 }
             }
         }
@@ -116,7 +121,18 @@ public:
     template <typename TT = T>
     std::enable_if_t<!std::is_same_v<void, TT>, void> set_return(Type&& v) const
     {
+        const std::lock_guard _lg(caller->value_lock);
         GX_ASSERT_D(!caller->value.has_value());
+        caller->value = std::move(v);
+    }
+
+    template <typename TT = T>
+    std::enable_if_t<!std::is_same_v<void, TT>, void> set_return_if_empty(Type&& v) const
+    {
+        const std::lock_guard _lg(caller->value_lock);
+        if (caller->value.has_value()) {
+            return;
+        }
         caller->value = std::move(v);
     }
 
@@ -125,12 +141,6 @@ public:
     {
         GX_ASSERT_D(caller->value.has_value());
         return *caller->value;
-    }
-
-    template <typename TT = T>
-    std::enable_if_t<!std::is_same_v<void, TT>, bool> has_return() const
-    {
-        return caller->value.has_value();
     }
 
     void set_ignore_empty_value(const bool ignore_empty_value) const

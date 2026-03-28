@@ -54,7 +54,9 @@ public:
     GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void { material_is_ready(std::move(m)); }));
+        GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void {
+            material_is_ready(std::move(m));
+        }));
     }
 
     void material_is_ready(GxPbrPtr&& material)
@@ -75,7 +77,7 @@ public:
         if constexpr (use_texture_file) {
             // Or you can load an image before that make sure you have the image in the assets' folder.
             GxTexManager::get().create_2d_from_file(
-                use_abs_path ? GxPath::create_absolute("../../../../assets/gearoenix-logo.png") : GxPath::create_asset("logo.png"),
+                use_abs_path ? GxPath::create_absolute("../../../../assets/gearoenix-logo.png") : GxPath::create_asset("sky.hdr"),
                 GxTextureInfo(),
                 GxTexture2DEndCaller([this, m = std::move(material)](GxTexture2DPtr&& t) mutable {
                     texture_is_ready(std::move(m), std::move(t));
@@ -99,14 +101,18 @@ public:
     {
         material->set_albedo(std::move(texture));
 
-        GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this](GxMeshPtr&& mesh) -> void { mesh_is_ready(std::move(mesh)); }));
+        GxMeshManager::get().build_plate(std::move(material), GxMeshEndCaller([this](GxMeshPtr&& mesh) -> void {
+            mesh_is_ready(std::move(mesh));
+        }));
     }
 
     void mesh_is_ready(GxMeshPtr&& mesh)
     {
         auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false);
 
-        GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void { camera_is_ready(std::move(e)); }));
+        GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
+            camera_is_ready(std::move(e));
+        }));
     }
 
     void camera_is_ready(GxEntityPtr&& camera_entity)
@@ -118,7 +124,9 @@ public:
 
         GxLightManager::get().build_shadow_caster_directional(
             "directional-light", scene_entity.get(), 1024, 10.0f, 1.0f, 10.0f,
-            GxEntityEndCaller([this](GxEntityPtr&& e) -> void { light_is_ready(std::move(e)); }));
+            GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
+                light_is_ready(std::move(e));
+            }));
     }
 
     void light_is_ready(GxEntityPtr&& light_entity)

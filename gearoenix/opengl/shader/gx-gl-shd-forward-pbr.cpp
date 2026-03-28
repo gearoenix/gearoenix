@@ -270,9 +270,15 @@ void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_norm
     glUniformMatrix4fv(shadow_caster_directional_light_normalised_vp, static_cast<sizei>(shadow_caster_directional_light_shadow_map_indices.size()), GL_FALSE, reinterpret_cast<const float*>(data));
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data) { glUniform3fv(directional_light_direction, directional_lights_count, reinterpret_cast<const float*>(data)); }
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_direction_data(const void* const data)
+{
+    glUniform3fv(directional_light_direction, directional_lights_count, reinterpret_cast<const float*>(data));
+}
 
-void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data) { glUniform3fv(directional_light_colour, directional_lights_count, reinterpret_cast<const float*>(data)); }
+void gearoenix::gl::shader::ForwardPbr::set_directional_light_colour_data(const void* const data)
+{
+    glUniform3fv(directional_light_colour, directional_lights_count, reinterpret_cast<const float*>(data));
+}
 
 void gearoenix::gl::shader::ForwardPbr::set_shadow_caster_directional_light_direction_data(const void* const data)
 {
@@ -291,6 +297,9 @@ const gearoenix::gl::sint* gearoenix::gl::shader::ForwardPbr::get_shadow_caster_
     return shadow_caster_directional_light_shadow_map_indices.data();
 }
 
-void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data) { glUniformMatrix4fv(bones_m_inv_m, bones_matrices_count, GL_FALSE, reinterpret_cast<const float*>(data)); }
+void gearoenix::gl::shader::ForwardPbr::set_bones_m_inv_m_data(const void* const data)
+{
+    glUniformMatrix4fv(bones_m_inv_m, bones_matrices_count, GL_FALSE, reinterpret_cast<const float*>(data));
+}
 
 #endif

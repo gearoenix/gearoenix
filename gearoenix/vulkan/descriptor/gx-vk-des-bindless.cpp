@@ -6,6 +6,7 @@
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 
@@ -80,6 +81,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     layout_info.pNext = &binding_flags_info;
 
     descriptor_set_layout = vk::raii::DescriptorSetLayout(dev_raii, layout_info);
+    GX_VK_MARK("gx-vk-main-descriptor-set-layout", *descriptor_set_layout);
 
     // ========== Pipeline Layout ==========
     constexpr vk::PushConstantRange push_constant_range { vk::ShaderStageFlagBits::eAll, 0, sizeof(pipeline::PushConstants) };
@@ -87,6 +89,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     const vk::PipelineLayoutCreateInfo pipeline_layout_info { { }, descriptor_set_layout_raw, push_constant_range };
 
     pipeline_layout = vk::raii::PipelineLayout(dev_raii, pipeline_layout_info);
+    GX_VK_MARK("gx-vk-main-pipeline-layout", *pipeline_layout);
 
     // ========== Descriptor Pool ==========
     constexpr std::array pool_sizes {
@@ -100,6 +103,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     };
 
     descriptor_pool = vk::raii::DescriptorPool(dev_raii, pool_info);
+    GX_VK_MARK("gx-vk-main-descriptor-pool", *descriptor_pool);
 
     // ========== Allocate Descriptor Set ==========
     vk::DescriptorSetAllocateInfo allocate_info;
@@ -108,6 +112,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
 
     auto sets = dev.allocateDescriptorSets(allocate_info);
     descriptor_set = sets[0];
+    GX_VK_MARK("gx-vk-main-descriptor-set", descriptor_set);
 
     // ========== Initialize Free Index Lists ==========
     free_1d_image_indices.reserve(max_1d_images);

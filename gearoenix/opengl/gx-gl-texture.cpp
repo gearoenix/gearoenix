@@ -326,7 +326,6 @@ gearoenix::gl::TextureManager::~TextureManager() = default;
 void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
-    flip_texture(pixels, info.get_height());
     std::shared_ptr<Texture2D> result(new Texture2D(info, std::move(name)));
     const bool needs_mipmap_generation = info.get_has_mipmap() && pixels.size() < 2;
     const auto internal_format = convert_internal_format(info.get_format());
