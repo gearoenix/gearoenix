@@ -179,7 +179,7 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
 
     try {
         instance->vulkan_instance = instance->context.createInstance(create_info);
-    } catch (const vk::SystemError& e) {
+    } catch ([[maybe_unused]] const vk::SystemError& e) {
         GX_LOG_D("Failed to create Vulkan instance: " << e.what());
         return nullptr;
     }

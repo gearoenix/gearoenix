@@ -9,6 +9,7 @@
 #include "../gx-vk-marker.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../image/gx-vk-img-view.hpp"
 
 namespace {
 constexpr vk::DescriptorBindingFlags gx_binding_flags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eUpdateUnusedWhilePending;
@@ -209,10 +210,11 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     dev.updateDescriptorSets(shadow_sampler_write, { });
 }
 
-void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::uint32_t binding, const std::uint32_t index, const vk::ImageView view, const vk::ImageLayout layout) const
+void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(
+    const std::uint32_t binding, const std::uint32_t index, const std::shared_ptr<image::View>& view, const vk::ImageLayout layout) const
 {
     vk::DescriptorImageInfo info;
-    info.imageView = view;
+    info.imageView = view->get_vulkan_data();
     info.imageLayout = layout;
 
     vk::WriteDescriptorSet write;
@@ -221,9 +223,10 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(const std::
     write.dstArrayElement = index;
     write.descriptorType = vk::DescriptorType::eSampledImage;
 
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info]() mutable {
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info, view]() mutable {
         write.setImageInfo(info);
         device::Logical::get().get_vulkan_data().updateDescriptorSets(write, { });
+        (void)view;
     });
 }
 
@@ -244,7 +247,7 @@ void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std
     });
 }
 
-std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const vk::ImageView view, const vk::ImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const std::shared_ptr<image::View>& view, const vk::ImageLayout layout)
 {
     GX_ASSERT_D(view);
     const std::lock_guard _lg(allocation_lock);
@@ -256,7 +259,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_1d_image(const v
     return index;
 }
 
-std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const vk::ImageView view, const vk::ImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const std::shared_ptr<image::View>& view, const vk::ImageLayout layout)
 {
     GX_ASSERT_D(view);
     const std::lock_guard _lg(allocation_lock);
@@ -268,7 +271,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_2d_image(const v
     return index;
 }
 
-std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const vk::ImageView view, const vk::ImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const std::shared_ptr<image::View>& view, const vk::ImageLayout layout)
 {
     GX_ASSERT_D(view);
     const std::lock_guard _lg(allocation_lock);
@@ -280,7 +283,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_3d_image(const v
     return index;
 }
 
-std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const vk::ImageView view, const vk::ImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const std::shared_ptr<image::View>& view, const vk::ImageLayout layout)
 {
     GX_ASSERT_D(view);
     const std::lock_guard _lg(allocation_lock);
@@ -292,7 +295,7 @@ std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_cube_image(const
     return index;
 }
 
-std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_shadow_2d_image(const vk::ImageView view, const vk::ImageLayout layout)
+std::uint32_t gearoenix::vulkan::descriptor::Bindless::allocate_shadow_2d_image(const std::shared_ptr<image::View>& view, const vk::ImageLayout layout)
 {
     GX_ASSERT_D(view);
     const std::lock_guard _lg(allocation_lock);

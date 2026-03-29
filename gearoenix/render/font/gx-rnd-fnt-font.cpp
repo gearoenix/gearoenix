@@ -6,6 +6,7 @@
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
+
 #include <cmath>
 #include <string>
 
@@ -33,7 +34,7 @@ static int file_index = 0;
 
 void gearoenix::render::font::Font::init()
 {
-    const auto init_result = stbtt_InitFont(stb_font.get(), ttf_data.data(), 0);
+    [[maybe_unused]] const auto init_result = stbtt_InitFont(stb_font.get(), ttf_data.data(), 0);
     GX_ASSERT_D(0 != init_result);
     stbtt_GetFontVMetrics(stb_font.get(), &ascent, &descent, &line_gap);
     fnt_height = ascent - descent;

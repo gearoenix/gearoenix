@@ -6,7 +6,7 @@ endif()
 
 include(${BASE_TOOLCHAIN})
 
-set(EMSCRIPTEN_PTHREADS_FLAGS " -pthread -O3 -ffast-math -flto=full")
+set(EMSCRIPTEN_PTHREADS_FLAGS " -pthread -O3 -ffast-math -flto=full -msimd128")
 
 string(APPEND CMAKE_C_FLAGS_INIT   "${EMSCRIPTEN_PTHREADS_FLAGS}")
 string(APPEND CMAKE_CXX_FLAGS_INIT "${EMSCRIPTEN_PTHREADS_FLAGS}")

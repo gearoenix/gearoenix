@@ -57,12 +57,12 @@ bool gearoenix::gl::load_library()
     GX_GL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD)
     GX_GL_OPTIONAL_FUNCTION_MAP(GX_GL_FUNCTION_LOAD_UNCHECKED);
 
-    if constexpr (GX_DEBUG_MODE) {
-        if (nullptr != glDebugMessageCallback) {
-            glEnable(GL_DEBUG_OUTPUT);
-            glDebugMessageCallback(debug_callback, nullptr);
-        }
+#if GX_DEBUG_MODE
+    if (nullptr != glDebugMessageCallback) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(debug_callback, nullptr);
     }
+#endif
 
     sint num_ext = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &num_ext);

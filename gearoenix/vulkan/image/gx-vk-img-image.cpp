@@ -137,8 +137,18 @@ gearoenix::vulkan::image::TransitionRequest gearoenix::vulkan::image::Transition
     return result;
 }
 
-gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const vk::ImageType image_type, const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers, const vk::Format format, const vk::ImageCreateFlags flags, const vk::ImageUsageFlags usage, const vk::Image vulkan_data)
+gearoenix::vulkan::image::Image::Image(
+    [[maybe_unused]] const std::string& name,
+    const std::uint32_t image_width,
+    const std::uint32_t image_height,
+    const std::uint32_t image_depth,
+    const vk::ImageType image_type,
+    const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers,
+    const vk::Format format,
+    const vk::ImageCreateFlags flags,
+    const vk::ImageUsageFlags usage,
+    const vk::Image vulkan_data)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -154,8 +164,17 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     GX_VK_MARK(name, vulkan_data);
 }
 
-gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint32_t image_width, const std::uint32_t image_height, const std::uint32_t image_depth, const vk::ImageType image_type, const std::uint32_t mipmap_levels,
-    const std::uint32_t array_layers, const vk::Format format, const vk::ImageCreateFlags flags, const vk::ImageUsageFlags usage)
+gearoenix::vulkan::image::Image::Image(
+    [[maybe_unused]] const std::string& name,
+    const std::uint32_t image_width,
+    const std::uint32_t image_height,
+    const std::uint32_t image_depth,
+    const vk::ImageType image_type,
+    const std::uint32_t mipmap_levels,
+    const std::uint32_t array_layers,
+    const vk::Format format,
+    const vk::ImageCreateFlags flags,
+    const vk::ImageUsageFlags usage)
     : image_width(image_width)
     , image_height(image_height)
     , image_depth(image_depth)
@@ -167,7 +186,7 @@ gearoenix::vulkan::image::Image::Image(const std::string& name, const std::uint3
     , usage(usage)
     , state { .per_array_states = std::vector(array_layers, PerArrayState { .per_mip_states = std::vector<PerMipState>(mipmap_levels) }) }
 {
-    auto dev = device::Logical::get().get_vulkan_data();
+    const auto dev = device::Logical::get().get_vulkan_data();
 
     const vk::ImageCreateInfo info {
         flags, image_type, format,

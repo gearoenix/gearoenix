@@ -22,11 +22,21 @@ namespace {
 }
 
 template <template <typename> typename Value>
-void read_output(boost::container::flat_map<double, gearoenix::physics::animation::Keyframe<Value<double>>>& keyframes, const tinygltf::Accessor& input, const tinygltf::Accessor& output, const tinygltf::BufferView& output_bv,
-    const gearoenix::physics::animation::Interpolation interpolation, const std::uint64_t output_b_ptr, const std::vector<float>& times)
+void read_output(
+    boost::container::flat_map<double, gearoenix::physics::animation::Keyframe<Value<double>>>& keyframes,
+    const tinygltf::Accessor& input,
+    [[maybe_unused]] const tinygltf::Accessor& output,
+    [[maybe_unused]] const tinygltf::BufferView& output_bv,
+    const gearoenix::physics::animation::Interpolation interpolation,
+    const std::uint64_t output_b_ptr,
+    const std::vector<float>& times)
 {
     keyframes.reserve(input.count);
+
+#if GX_DEBUG_MODE
     const auto output_bytes_count = output.count * sizeof(Value<float>);
+#endif
+
     GX_COMPLAIN_D(output_bytes_count == output_bv.byteLength, "Inefficient gltf exporter for keyframes.");
     GX_ASSERT_D(output_bytes_count <= output_bv.byteLength);
     switch (interpolation) {

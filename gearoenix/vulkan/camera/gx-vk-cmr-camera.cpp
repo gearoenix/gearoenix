@@ -146,7 +146,7 @@ void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_bloom(const scene::Scene& scene, const vk::CommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_bloom([[maybe_unused]] const scene::Scene& scene, const vk::CommandBuffer cmd) const
 {
     if (!bloom_data.has_value() || !target.is_default() || !*bloom_descriptor_pool) {
         return;
@@ -385,7 +385,7 @@ void gearoenix::vulkan::camera::Camera::destroy_bloom_descriptors()
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing(const scene::Scene& scene, const vk::CommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing([[maybe_unused]] const scene::Scene& scene, const vk::CommandBuffer cmd) const
 {
     if (!target.is_default() || !*bloom_descriptor_pool) {
         return;

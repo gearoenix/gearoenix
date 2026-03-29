@@ -17,7 +17,7 @@ gearoenix::vulkan::buffer::Buffer::Buffer(const std::uint32_t offset, std::share
 {
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(const std::string& name, const std::int64_t size, const memory::Place place)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct([[maybe_unused]] const std::string& name, const std::int64_t size, const memory::Place place)
 {
     const auto& logical_device = device::Logical::get();
     const auto& physical_device = device::Physical::get();

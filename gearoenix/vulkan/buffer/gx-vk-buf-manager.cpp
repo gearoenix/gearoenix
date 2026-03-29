@@ -84,7 +84,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::M
     return std::make_shared<Uniform>(std::move(cpus), std::move(gpu));
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create(const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create([[maybe_unused]] const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
 {
     auto cpu = upload_root_buffer->allocate(size);
     if (nullptr == cpu) {

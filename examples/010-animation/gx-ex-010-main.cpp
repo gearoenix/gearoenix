@@ -4,6 +4,7 @@
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/animation/gx-phs-anm-animation.hpp>
 #include <gearoenix/physics/animation/gx-phs-anm-armature.hpp>
+#include <gearoenix/physics/constraint/gx-phs-cns-jet-controller.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
@@ -23,6 +24,7 @@ using GxEntity = gearoenix::core::ecs::Entity;
 using GxEntityPtr = gearoenix::core::ecs::EntityPtr;
 using GxEntityEndCaller = gearoenix::core::job::EndCaller<GxEntityPtr>;
 using GxConstraintManager = gearoenix::physics::constraint::Manager;
+using GxJetCtrl = gearoenix::physics::constraint::JetController;
 using GxTransform = gearoenix::physics::Transformation;
 using GxAnimPlayer = gearoenix::physics::animation::AnimationPlayer;
 using GxArm = gearoenix::physics::animation::Armature;
@@ -41,8 +43,11 @@ public:
     GameApp()
     {
         gearoenix::render::gltf::load(
-            GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/FlightHelmet/glTF/FlightHelmet.gltf"),
-            // GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
+            // GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf"),
+            // GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/ABeautifulGame/glTF/ABeautifulGame.gltf"),
+            // GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/DamagedHelmet/glTF/DamagedHelmet.gltf"),
+            // GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/FlightHelmet/glTF/FlightHelmet.gltf"),
+            GxPath::create_absolute("../../../../../submodules/glTF-Sample-Assets/Models/RiggedSimple/glTF/RiggedSimple.gltf"),
             GxEndCaller<std::vector<GxEntityPtr>>([this](auto&& entities) {
                 scene_entity = std::move(entities[0]);
                 gltf_is_ready();
@@ -82,9 +87,11 @@ public:
 
     void camera_is_ready(const GxEntity* const entity, const GxEndCaller<void>&)
     {
+        entity->get_component<GxCamera>()->set_near(0.01);
         auto trn = entity->get_component_shared_ptr<GxTransform>();
-        trn->local_look_at({ 19.0, 19.0, 5.0 }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
-        (void)GxConstraintManager::get().create_jet_controller(entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+        trn->local_look_at({ 0.0, 0.0, 3.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 1.0, 0.0 });
+        const auto e = GxConstraintManager::get().create_jet_controller(entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+        e->get_component<GxJetCtrl>()->set_movement_speed(1.0);
     }
 };
 

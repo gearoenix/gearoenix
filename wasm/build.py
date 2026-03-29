@@ -61,6 +61,11 @@ def main():
         eprint(f"error: emsdk_env.sh not found at: {emsdk_script}")
         sys.exit(1)
 
+    # Remove host compiler env vars so that emsdk_env.sh and vcpkg's autotools
+    # builds (e.g. libsodium) use the Emscripten toolchain, not the host one.
+    for var in ("CC", "CXX", "AR", "LD", "NM", "RANLIB", "STRIP", "OBJDUMP"):
+        os.environ.pop(var, None)
+
     # Source emsdk_env.sh (capture exported env)
     # We run a shell that sources the script and then prints env as null-separated pairs.
     try:
@@ -85,6 +90,7 @@ def main():
     if shutil.which("emcmake", path=new_env.get("PATH", "")) is None:
         eprint("error: emcmake not found after sourcing emsdk_env.sh")
         sys.exit(1)
+
 
     # Configure
     try:

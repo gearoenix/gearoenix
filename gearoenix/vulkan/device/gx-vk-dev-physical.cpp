@@ -138,10 +138,12 @@ void gearoenix::vulkan::device::Physical::initialize_extensions()
     rtx_supported = rtx_supported && supported_extensions.contains(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
     rtx_supported = rtx_supported && supported_extensions.contains(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 
+#if GX_DEBUG_MODE
     GX_LOG_D("Supported extensions are:");
     for (auto& s : supported_extensions) {
         GX_LOG_D("    " << s);
     }
+#endif
 }
 
 void gearoenix::vulkan::device::Physical::initialize_features()

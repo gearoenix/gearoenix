@@ -20,6 +20,7 @@
         "rhs": "Windows"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-x64-windows",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
@@ -33,6 +34,7 @@
         "rhs": "Windows"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-x64-windows",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
@@ -46,6 +48,7 @@
         "rhs": "Linux"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-x64-linux",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
@@ -59,6 +62,7 @@
         "rhs": "Linux"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-x64-linux",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
@@ -72,6 +76,7 @@
         "rhs": "Darwin"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-osx",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
@@ -85,6 +90,63 @@
         "rhs": "Darwin"
       },
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-osx",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "ios-debug",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/ios/debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-arm64-ios",
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "ios-release",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/ios/release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-arm64-ios",
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "android-debug",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/android/debug",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-arm64-android",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake",
+        "ANDROID_ABI": "arm64-v8a",
+        "ANDROID_PLATFORM": "android-24",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "android-release",
+      "inherits": "vcpkg",
+      "binaryDir": "${sourceDir}/build/android/release",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "gearoenix-arm64-android",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake",
+        "ANDROID_ABI": "arm64-v8a",
+        "ANDROID_PLATFORM": "android-24",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
@@ -163,6 +225,32 @@
         "rhs": "Darwin"
       },
       "configurePreset": "macos-release"
+    },
+    {
+      "name": "ios-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "configurePreset": "ios-debug"
+    },
+    {
+      "name": "ios-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "configurePreset": "ios-release"
+    },
+    {
+      "name": "android-debug",
+      "configurePreset": "android-debug"
+    },
+    {
+      "name": "android-release",
+      "configurePreset": "android-release"
     },
     {
       "name": "wasm-debug",

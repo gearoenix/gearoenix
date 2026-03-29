@@ -105,9 +105,9 @@ void gearoenix::vulkan::Swapchain::initialize()
 
     // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
     vk::ImageFormatListCreateInfo format_list_info;
+    std::array format_list_entries = { format.format, unorm_format.value_or(format.format) };
 
     if (mutable_format_supported) {
-        std::array format_list_entries = { format.format, *unorm_format };
         format_list_info.setViewFormats(format_list_entries);
     }
 

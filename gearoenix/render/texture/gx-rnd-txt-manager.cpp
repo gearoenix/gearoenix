@@ -52,7 +52,7 @@ void gearoenix::render::texture::Manager::read_gx3d(platform::stream::Stream& st
     const auto is_float = format_has_float_component(txt_info.get_format());
     const auto comps_count = format_components_count(txt_info.get_format());
     const auto mips_count = Texture::compute_mipmaps_count(txt_info);
-    const auto comp_bits = format_component_bits_count(txt_info.get_format());
+    [[maybe_unused]] const auto comp_bits = format_component_bits_count(txt_info.get_format());
     if (is_float) {
         GX_ASSERT_D(32 == comp_bits);
         if (!engine::Engine::get().get_specification().is_float_texture_supported) {
@@ -293,10 +293,12 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     }
 }
 
-bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<Texture2D>& c, const TextureInfo* const info)
+bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<Texture2D>& c, [[maybe_unused]] const TextureInfo* const info)
 {
 #if GX_DEBUG_MODE
 #define GX_DEBUG_TXT_INFO , info = info ? std::make_optional(*info) : std::nullopt
+#else
+#define GX_DEBUG_TXT_INFO
 #endif
 
     return textures_2d.get(name, core::job::EndCallerShared<Texture2D>([c GX_DEBUG_TXT_INFO](std::shared_ptr<Texture2D>&& t) {
@@ -306,7 +308,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
     }));
 }
 
-bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<TextureCube>& c, const TextureInfo* const info)
+bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<TextureCube>& c, [[maybe_unused]] const TextureInfo* const info)
 {
     return textures_cube.get(name, core::job::EndCallerShared<TextureCube>([c GX_DEBUG_TXT_INFO](std::shared_ptr<TextureCube>&& t) {
         GX_ASSERT_D(!info.has_value() || *info == t->get_info());
@@ -469,15 +471,17 @@ void gearoenix::render::texture::Manager::create_target(std::string&& name, std:
 {
 #if GX_DEBUG_MODE
 #define GX_DEBUG_TARGET_ATT , attachments
+#else
+#define GX_DEBUG_TARGET_ATT
 #endif
 
     if (use_cache && targets.get(name, core::job::EndCallerShared<Target>([c GX_DEBUG_TARGET_ATT](std::shared_ptr<Target>&& t) {
-            if constexpr (GX_DEBUG_MODE) {
-                GX_ASSERT_D(attachments.size() == t->get_attachments().size());
-                for (std::size_t i = 0; i < attachments.size(); ++i) {
-                    GX_ASSERT_D(attachments[i].shallow_equal(t->get_attachments()[i]));
-                }
+#if GX_DEBUG_MODE
+            GX_ASSERT_D(attachments.size() == t->get_attachments().size());
+            for (std::size_t i = 0; i < attachments.size(); ++i) {
+                GX_ASSERT_D(attachments[i].shallow_equal(t->get_attachments()[i]));
             }
+#endif
             c.set_return(std::move(t));
         }))) {
         return;
