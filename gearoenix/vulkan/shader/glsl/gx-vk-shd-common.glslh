@@ -110,17 +110,11 @@ struct GxShaderDataMaterial {
     uint normal_texture_index;
     uint normal_sampler_index;
 
-    uint metallic_roughness_texture_index;
-    uint metallic_roughness_sampler_index;
+    uint orm_texture_index;
+    uint orm_sampler_index;
 
     uint emission_texture_index;
     uint emission_sampler_index;
-
-    uint occlusion_texture_index;
-    uint occlusion_sampler_index;
-
-    uint _padding0;
-    uint _padding1;
 };
 
 struct GxShaderDataPointLight {

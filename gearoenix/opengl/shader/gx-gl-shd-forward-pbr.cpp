@@ -81,8 +81,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_li
     fs << "uniform sampler2D albedo;\n";
     fs << "uniform sampler2D normal;\n";
     fs << "uniform sampler2D emission;\n";
-    fs << "uniform sampler2D metallic_roughness;\n";
-    fs << "uniform sampler2D occlusion;\n";
+    fs << "uniform sampler2D orm;\n";
     fs << "uniform sampler2D brdflut;\n";
     fs << "\n";
     fs << "uniform samplerCube irradiance;\n";
@@ -144,10 +143,11 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_li
     fs << "\n";
     fs << "    vec4 alb = texture(albedo, out_uv) * albedo_factor;\n";
     fs << "    if(alb.w <= alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.x) discard;\n";
-    fs << "    vec2 mtr = texture(metallic_roughness, out_uv).xy * vec2(normal_metallic_factor.w, emission_roughness_factor.w);\n";
-    fs << "    float metallic = clamp(mtr.x, 0.0001, 0.9999);\n";
-    fs << "    float roughness = clamp(mtr.y * mtr.y, 0.0001, 0.9999);\n";
-    fs << "    float ao = mix(1.0, texture(occlusion, out_uv).x, alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y);\n";
+    fs << "    vec3 orm_sample = texture(orm, out_uv).xyz;\n";
+    fs << "    float metallic = clamp(orm_sample.z * normal_metallic_factor.w, 0.0001, 0.9999);\n";
+    fs << "    float sq_roughness = orm_sample.y * emission_roughness_factor.w;\n";
+    fs << "    float roughness = clamp(sq_roughness * sq_roughness, 0.0001, 0.9999);\n";
+    fs << "    float ao = mix(1.0, orm_sample.x, alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y);\n";
     fs << "    vec3 nrm = normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz));\n";
     fs << "    vec3 ems = texture(emission, out_uv).xyz * emission_roughness_factor.xyz;\n";
     fs << "    vec3 f0 = mix(vec3(0.04), alb.xyz, metallic);\n";
@@ -196,7 +196,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_li
     }
     fs << "\n";
     fs << "    vec3 irr = texture(irradiance, nrm).xyz;\n";
-    fs << "    vec3 rad = textureLod(radiance, reflection, mtr.y * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
+    fs << "    vec3 rad = textureLod(radiance, reflection, sq_roughness * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.z).xyz;\n";
     fs << "    vec3 ambient = irr * alb.xyz * (vec3(1.0) - fresnel) * (1.0 - metallic);\n";
     fs << "    vec2 brdf = texture(brdflut, vec2(normal_dot_view, roughness)).rg;\n";
     fs << "    ambient += rad * ((f0 * brdf.x) + brdf.y);\n";
@@ -218,8 +218,7 @@ gearoenix::gl::shader::ForwardPbr::ForwardPbr(const std::uint32_t directional_li
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(normal);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(emission);
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness);
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(orm);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(brdflut);
@@ -257,8 +256,7 @@ void gearoenix::gl::shader::ForwardPbr::bind(uint& current_shader) const
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness);
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(orm);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(brdflut);

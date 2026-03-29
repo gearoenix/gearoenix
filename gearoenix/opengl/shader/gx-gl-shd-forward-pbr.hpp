@@ -23,8 +23,7 @@ struct ForwardPbr final : Shader {
     GX_GL_UNIFORM_TEXTURE(albedo);
     GX_GL_UNIFORM_TEXTURE(normal);
     GX_GL_UNIFORM_TEXTURE(emission);
-    GX_GL_UNIFORM_TEXTURE(metallic_roughness);
-    GX_GL_UNIFORM_TEXTURE(occlusion);
+    GX_GL_UNIFORM_TEXTURE(orm);
     GX_GL_UNIFORM_TEXTURE(irradiance);
     GX_GL_UNIFORM_TEXTURE(radiance);
     GX_GL_UNIFORM_TEXTURE(brdflut);

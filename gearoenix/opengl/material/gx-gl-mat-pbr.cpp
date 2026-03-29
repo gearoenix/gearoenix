@@ -42,15 +42,6 @@ void gearoenix::gl::material::Pbr::shadow(const Mesh& mesh, const render::record
     auto& shadow_caster_shader = shadow_caster_combination->get(recorded_cam_model.model->bones_count);
     shadow_caster_shader.bind(current_shader);
 
-    // std::vector<math::Mat4x4<float>> bones_ms;
-    // if (recorded_cam_model.model->bones_count > 0) {
-    //     for (const auto* const b : recorded_cam_model.model->armature->get_all_bones()) {
-    //         bones_ms.push_back(camera.camera->get_view_projection() * math::Mat4x4<float>(b->get_global_matrix()));
-    //     }
-    // } else {
-    //     bones_ms.push_back(camera.camera->get_view_projection() * math::Mat4x4<float>(recorded_cam_model.model->transform->get_global_matrix()));
-    // }
-    // shadow_caster_shader.set_mvp_data(bones_ms.data()->data());
     shadow_caster_shader.set_mvp_data(camera.mvps[recorded_cam_model.first_mvp_index].data());
 
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff_occlusion_strength_reserved_reserved.x);
@@ -81,16 +72,10 @@ void gearoenix::gl::material::Pbr::set_emission(std::shared_ptr<render::texture:
     render::material::Pbr::set_emission(std::move(o));
 }
 
-void gearoenix::gl::material::Pbr::set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&& o)
+void gearoenix::gl::material::Pbr::set_orm(std::shared_ptr<render::texture::Texture2D>&& o)
 {
-    gl_metallic_roughness = std::dynamic_pointer_cast<Texture2D>(o);
-    render::material::Pbr::set_metallic_roughness(std::move(o));
-}
-
-void gearoenix::gl::material::Pbr::set_occlusion(std::shared_ptr<render::texture::Texture2D>&& o)
-{
-    gl_occlusion = std::dynamic_pointer_cast<Texture2D>(o);
-    render::material::Pbr::set_occlusion(std::move(o));
+    gl_orm = std::dynamic_pointer_cast<Texture2D>(o);
+    render::material::Pbr::set_orm(std::move(o));
 }
 
 void gearoenix::gl::material::Pbr::set_brdflut(std::shared_ptr<render::texture::Texture2D>&& o)
@@ -135,10 +120,8 @@ void gearoenix::gl::material::Pbr::render_forward(const Scene&, const render::re
     glBindTexture(GL_TEXTURE_2D, gl_normal->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_emission_index()));
     glBindTexture(GL_TEXTURE_2D, gl_emission->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_metallic_roughness_index()));
-    glBindTexture(GL_TEXTURE_2D, gl_metallic_roughness->get_object());
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_occlusion_index()));
-    glBindTexture(GL_TEXTURE_2D, gl_occlusion->get_object());
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_orm_index()));
+    glBindTexture(GL_TEXTURE_2D, gl_orm->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_irradiance_index()));
     glBindTexture(GL_TEXTURE_CUBE_MAP, core::cast_ptr<const TextureCube>(rm.probe->get_irradiance().get())->get_object());
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_radiance_index()));
@@ -212,10 +195,8 @@ void gearoenix::gl::material::Pbr::render_forward(const Scene&, const render::re
 //     glBindTexture(GL_TEXTURE_2D, gl_normal->get_object());
 //     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_emission_index()));
 //     glBindTexture(GL_TEXTURE_2D, gl_emission->get_object());
-//     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_metallic_roughness_index()));
-//     glBindTexture(GL_TEXTURE_2D, gl_metallic_roughness->get_object());
-//     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_occlusion_index()));
-//     glBindTexture(GL_TEXTURE_2D, gl_occlusion->get_object());
+//     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_orm_index()));
+//     glBindTexture(GL_TEXTURE_2D, gl_orm->get_object());
 //     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_irradiance_index()));
 //     glBindTexture(GL_TEXTURE_CUBE_MAP, model.irradiance);
 //     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_radiance_index()));

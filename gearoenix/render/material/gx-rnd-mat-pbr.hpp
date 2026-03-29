@@ -17,8 +17,7 @@ struct Pbr : Material {
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, albedo);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, normal);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, emission);
-    GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, metallic_roughness);
-    GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, occlusion);
+    GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, orm);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, brdflut);
 
     Pbr(core::object_type_index_t final_type_index, std::string&& name);
@@ -30,8 +29,7 @@ public:
     void show_debug_gui() override;
     virtual void set_normal(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_emission(std::shared_ptr<texture::Texture2D>&&);
-    virtual void set_metallic_roughness(std::shared_ptr<texture::Texture2D>&&);
-    virtual void set_occlusion(std::shared_ptr<texture::Texture2D>&&);
+    virtual void set_orm(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_brdflut(std::shared_ptr<texture::Texture2D>&&);
     virtual void set_albedo_factor(const math::Vec4<float>&);
     virtual void set_emission_roughness_factor(const math::Vec4<float>&);

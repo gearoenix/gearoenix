@@ -7,7 +7,6 @@ enum struct BindingPoint : std::uint8_t {
     Albedo = 1,
     Normal = 2,
     Emission = 3,
-    MetallicRoughness = 4,
-    Occlusion = 5,
+    Orm = 4,
 };
 }

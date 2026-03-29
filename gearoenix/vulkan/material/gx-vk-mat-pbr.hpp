@@ -27,8 +27,7 @@ public:
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_occlusion(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_orm(std::shared_ptr<render::texture::Texture2D>&&) override;
     void bind_forward(vk::CommandBuffer cmd, bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) override;
     void bind_shadow(vk::CommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) override;
     void set_albedo_factor(const math::Vec4<float>&) override;

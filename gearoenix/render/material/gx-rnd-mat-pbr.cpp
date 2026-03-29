@@ -21,20 +21,16 @@ void gearoenix::render::material::Pbr::initialise(core::job::EndCallerShared<Pbr
         set_albedo(std::move(t));
         (void)c; // prevent this from deletion
     }));
-    tm.create_2d_from_colour(math::Vec4(0.5f, 0.5f, 1.0f, 0.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
+    tm.create_2d_from_colour(math::Vec4(0.5f, 0.5f, 1.0f, 1.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
         set_normal(std::move(t));
         (void)c; // prevent this from deletion
     }));
-    tm.create_2d_from_colour(math::Vec4(0.0f, 0.0f, 0.0f, 0.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
+    tm.create_2d_from_colour(math::Vec4(0.0f, 0.0f, 0.0f, 1.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
         set_emission(std::move(t));
         (void)c; // prevent this from deletion
     }));
-    tm.create_2d_from_colour(math::Vec4(1.0f, 1.0f, 0.0f, 0.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
-        set_metallic_roughness(std::move(t));
-        (void)c; // prevent this from deletion
-    }));
-    tm.create_2d_from_colour(math::Vec4(1.0f, 1.0f, 1.0f, 1.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
-        set_occlusion(std::move(t));
+    tm.create_2d_from_colour(math::Vec4(1.0f, 0.5f, 0.5f, 1.0f), core::job::EndCallerShared<texture::Texture2D>([this, c](std::shared_ptr<texture::Texture2D>&& t) {
+        set_orm(std::move(t));
         (void)c; // prevent this from deletion
     }));
     tm.get_brdflut(core::job::EndCallerShared<texture::Texture2D>([this, c = std::move(c)](std::shared_ptr<texture::Texture2D>&& t) {
@@ -66,9 +62,8 @@ void gearoenix::render::material::Pbr::show_debug_gui()
 
             GX_MAT_HELPER("Albedo", albedo);
             GX_MAT_HELPER("Normal", normal);
-            GX_MAT_HELPER("Metallic Roughness", metallic_roughness);
+            GX_MAT_HELPER("ORM", orm);
             GX_MAT_HELPER("Emission", emission);
-            GX_MAT_HELPER("Occlusion", occlusion);
             GX_MAT_HELPER("BRDF LUT", brdflut);
         });
     });
@@ -84,14 +79,9 @@ void gearoenix::render::material::Pbr::set_emission(std::shared_ptr<texture::Tex
     emission = std::move(o);
 }
 
-void gearoenix::render::material::Pbr::set_metallic_roughness(std::shared_ptr<texture::Texture2D>&& o)
+void gearoenix::render::material::Pbr::set_orm(std::shared_ptr<texture::Texture2D>&& o)
 {
-    metallic_roughness = std::move(o);
-}
-
-void gearoenix::render::material::Pbr::set_occlusion(std::shared_ptr<texture::Texture2D>&& o)
-{
-    occlusion = std::move(o);
+    orm = std::move(o);
 }
 
 void gearoenix::render::material::Pbr::set_brdflut(std::shared_ptr<texture::Texture2D>&& o)

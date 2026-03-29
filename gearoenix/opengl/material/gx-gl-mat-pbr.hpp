@@ -22,8 +22,7 @@ struct Pbr final : render::material::Pbr, Material {
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_albedo);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_normal);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_emission);
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_metallic_roughness);
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_occlusion);
+    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_orm);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_brdflut);
     GX_GET_REFC_PRV(std::shared_ptr<shader::ShadowCasterCombination>, shadow_caster_combination);
     GX_GET_REFC_PRV(std::shared_ptr<shader::ForwardPbrCombination>, forward_pbr_combination);
@@ -40,8 +39,7 @@ public:
     void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_occlusion(std::shared_ptr<render::texture::Texture2D>&&) override;
+    void set_orm(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_brdflut(std::shared_ptr<render::texture::Texture2D>&&) override;
 };
 }

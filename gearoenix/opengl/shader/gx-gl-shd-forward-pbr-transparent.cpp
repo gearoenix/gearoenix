@@ -41,8 +41,7 @@ uniform vec4 alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved;
 uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D emission;
-uniform sampler2D metallic_roughness;
-uniform sampler2D occlusion;
+uniform sampler2D orm;
 
 uniform samplerCube irradiance;
 uniform samplerCube radiance;
@@ -59,12 +58,14 @@ layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_IND
 layout(location = " GX_STRINGIFY(GEAROENIX_GL_GBUFFER_FRAMEBUFFER_ATTACHMENT_INDEX_EMISSION_ROUGHNESS) ") out vec4 frag_out_emission_roughness;
 
 void main() {
-    vec2 mtr = texture(metallic_roughness, out_uv).xy * vec2(normal_metallic_factor.w, emission_roughness_factor.w);
-    float ao = texture(occlusion, out_uv).x * alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y;
-    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, mtr.x) * 0.0001 + texture(irradiance, out_pos);
+    vec3 orm_sample = texture(orm, out_uv).xyz;
+    float metallic = clamp(orm_sample.z * normal_metallic_factor.w, 0.0001, 0.9999);
+    float roughness = orm_sample.y * emission_roughness_factor.w;
+    float ao = mix(1.0, orm_sample.x, alpha_cutoff_occlusion_strength_radiance_lod_coefficient_reserved.y);
+    frag_out_albedo_metallic = vec4(texture(albedo, out_uv).xyz * albedo_factor.xyz, metallic) * 0.0001 + texture(irradiance, out_pos);
     frag_out_position_depth = vec4(out_pos, gl_FragCoord.z);
     frag_out_normal_ao = vec4(normalize(mat3(out_tng, out_btg, out_nrm) * ((texture(normal, out_uv).xyz * 2.0 - 1.0) * normal_metallic_factor.xyz)), ao);
-    frag_out_emission_roughness = vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, mtr.y);
+    frag_out_emission_roughness = vec4(texture(emission, out_uv).xyz * emission_roughness_factor.xyz, roughness);
 }
 )SHADER";
 }
@@ -86,8 +87,7 @@ gearoenix::gl::shader::ForwardPbrTransparent::ForwardPbrTransparent()
     GX_GL_THIS_GET_UNIFORM_TEXTURE(albedo);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(normal);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(emission);
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(metallic_roughness);
-    GX_GL_THIS_GET_UNIFORM_TEXTURE(occlusion);
+    GX_GL_THIS_GET_UNIFORM_TEXTURE(orm);
     GX_GL_THIS_GET_UNIFORM_TEXTURE(irradiance);
     // GX_GL_THIS_GET_UNIFORM_TEXTURE(radiance);
 }
@@ -103,8 +103,7 @@ void gearoenix::gl::shader::ForwardPbrTransparent::bind(uint& current_shader) co
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(albedo);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(normal);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(emission);
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(metallic_roughness);
-    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(occlusion);
+    GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(orm);
     GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(irradiance);
     // GX_GL_SHADER_SET_TEXTURE_INDEX_UNIFORM(radiance);
 }

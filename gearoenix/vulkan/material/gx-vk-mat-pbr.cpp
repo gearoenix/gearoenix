@@ -64,26 +64,15 @@ void gearoenix::vulkan::material::Pbr::set_emission(std::shared_ptr<render::text
     render::material::Pbr::set_emission(std::move(txt));
 }
 
-void gearoenix::vulkan::material::Pbr::set_metallic_roughness(std::shared_ptr<render::texture::Texture2D>&& txt)
+void gearoenix::vulkan::material::Pbr::set_orm(std::shared_ptr<render::texture::Texture2D>&& txt)
 {
     const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
 
     auto& sd = *shader_data.get_ptr();
-    sd.metallic_roughness_texture_index = t.get_view_index();
-    sd.metallic_roughness_sampler_index = t.get_sampler_index();
+    sd.orm_texture_index = t.get_view_index();
+    sd.orm_sampler_index = t.get_sampler_index();
 
-    render::material::Pbr::set_metallic_roughness(std::move(txt));
-}
-
-void gearoenix::vulkan::material::Pbr::set_occlusion(std::shared_ptr<render::texture::Texture2D>&& txt)
-{
-    const auto& t = *core::cast_ptr<texture::Texture2D>(txt.get());
-
-    auto& sd = *shader_data.get_ptr();
-    sd.occlusion_texture_index = t.get_view_index();
-    sd.occlusion_sampler_index = t.get_sampler_index();
-
-    render::material::Pbr::set_occlusion(std::move(txt));
+    render::material::Pbr::set_orm(std::move(txt));
 }
 
 void gearoenix::vulkan::material::Pbr::bind_forward(const vk::CommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)

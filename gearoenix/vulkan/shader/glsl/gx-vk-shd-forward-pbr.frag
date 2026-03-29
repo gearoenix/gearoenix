@@ -85,13 +85,13 @@ void main() {
         discard;
     }
 
-    const vec2 mtr = texture(sampler2D(textures_2d[material.metallic_roughness_texture_index], samplers[material.metallic_roughness_sampler_index]), in_uv).xy *
-        vec2(material.normal_metallic_factor.w, material.emission_roughness_factor.w);
-    const float metallic = clamp(mtr.x, 0.0001, 0.9999);
-    const float roughness = clamp(mtr.y * mtr.y, 0.0001, 0.9999); // Perceptual roughness squared
+    const vec3 orm_sample = texture(sampler2D(textures_2d[material.orm_texture_index], samplers[material.orm_sampler_index]), in_uv).xyz;
+    const float metallic = clamp(orm_sample.z * material.normal_metallic_factor.w, 0.0001, 0.9999);
+    const float sqrt_roughness = orm_sample.y * material.emission_roughness_factor.w;
+    const float roughness = clamp(sqrt_roughness * sqrt_roughness, 0.0001, 0.9999); // Perceptual roughness squared
 
     // Ambient occlusion
-    const float ao = mix(1.0, texture(sampler2D(textures_2d[material.occlusion_texture_index], samplers[material.occlusion_sampler_index]), in_uv).r, material.alpha_cutoff_occlusion_strength_reserved.y);
+    const float ao = mix(1.0, orm_sample.x, material.alpha_cutoff_occlusion_strength_reserved.y);
 
     // Normal mapping
     const vec3 normal_sample = texture(sampler2D(textures_2d[material.normal_texture_index], samplers[material.normal_sampler_index]), in_uv).xyz;
@@ -187,8 +187,8 @@ void main() {
     const vec3 irr = texture(samplerCube(textures_cube[probe.irradiance_texture_index], samplers[probe.irradiance_sampler_index]), nrm).rgb;
 
     // Specular IBL - radiance (pre-filtered environment) map with LOD based on roughness
-    const float lod = mtr.y * probe.radiance_lod_coefficient;
-    const vec3 rad = textureLod(samplerCube(textures_cube[probe.radiance_texture_index], samplers[probe.radiance_sampler_index]), reflection, lod).rgb;
+    const float rad_lod = sqrt_roughness * probe.radiance_lod_coefficient;
+    const vec3 rad = textureLod(samplerCube(textures_cube[probe.radiance_texture_index], samplers[probe.radiance_sampler_index]), reflection, rad_lod).rgb;
 
     // BRDF integration LUT
     const vec2 brdf = texture(sampler2D(textures_2d[scene.brdflut_texture_index], samplers[scene.brdflut_sampler_index]), vec2(normal_dot_view, roughness)).rg;
