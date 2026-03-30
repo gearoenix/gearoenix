@@ -1,0 +1,39 @@
+name: 'Android           '
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Debug and Release
+    runs-on: ubuntu-latest
+    container:
+      image: noroozpour/gearoenix:linux-0.1
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Echos
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
+          echo "GRADLE_HOME=$GRADLE_HOME"
+          echo "VCPKG_ROOT=$VCPKG_ROOT"
+          echo "PATH=$PATH"
+      - name: Generate Gradle wrapper
+        working-directory: android
+        run: gradle wrapper
+      - name: Build Debug
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build Release
+        working-directory: android
+        run: ./gradlew assembleRelease

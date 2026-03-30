@@ -38,4 +38,33 @@ RUN git clone https://github.com/microsoft/vcpkg.git /root/vcpkg && \
     ./bootstrap-vcpkg.sh
 ENV VCPKG_ROOT="/root/vcpkg"
 
+RUN apt-get update && \
+    apt-get install -y openjdk-21-jdk-headless wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+ENV JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
+
+RUN mkdir -p /root/android-sdk/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip && \
+    unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools && \
+    mv /tmp/cmdline-tools/cmdline-tools /root/android-sdk/cmdline-tools/latest && \
+    rm /tmp/cmdline-tools.zip
+ENV ANDROID_HOME="/root/android-sdk"
+ENV PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+RUN yes | sdkmanager --licenses && \
+    sdkmanager \
+    "platforms;android-36" \
+    "platform-tools" \
+    "build-tools;36.0.0" \
+    "ndk;30.0.14904198" \
+    "cmake;4.1.2"
+ENV ANDROID_NDK_HOME="$ANDROID_HOME/ndk/30.0.14904198"
+
+RUN wget -q https://services.gradle.org/distributions/gradle-9.4.1-bin.zip -O /tmp/gradle.zip && \
+    unzip -q /tmp/gradle.zip -d /opt && \
+    rm /tmp/gradle.zip
+ENV GRADLE_HOME="/opt/gradle-9.4.1"
+ENV PATH="$GRADLE_HOME/bin:$PATH"
+
 ENTRYPOINT ["tail", "-f", "/dev/null"]
