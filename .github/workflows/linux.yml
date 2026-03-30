@@ -1,4 +1,4 @@
-name: 'Ubuntu-26.04       '
+name: 'Ubuntu-26.04 |'
 on:
   push:
     branches: [ main ]

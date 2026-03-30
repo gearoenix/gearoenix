@@ -62,7 +62,6 @@ captures
 .cxx
 .cxx/
 .project
-proguard-rules.pro
 
 games/
 android/app/release/

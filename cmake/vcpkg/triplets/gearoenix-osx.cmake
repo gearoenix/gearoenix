@@ -1,16 +1,26 @@
+set(VCPKG_ENV_PASSTHROUGH "VCPKG_ROOT")
+
+if(NOT DEFINED ENV{VCPKG_ROOT})
+    message(FATAL_ERROR "VCPKG_ROOT is not defined")
+endif()
+
+set(GX_TRIPLET_ARCH "arm64")
+
 execute_process(COMMAND uname -m OUTPUT_VARIABLE GX_HOST_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 if(GX_HOST_ARCH STREQUAL "arm64" OR GX_HOST_ARCH STREQUAL "aarch64")
-    set(VCPKG_TARGET_ARCHITECTURE arm64)
-    set(VCPKG_OSX_ARCHITECTURES arm64)
+    set(GX_TRIPLET_ARCH "arm64")
 else()
-    set(VCPKG_TARGET_ARCHITECTURE x64)
-    set(VCPKG_OSX_ARCHITECTURES x86_64)
+    set(GX_TRIPLET_ARCH "x64")
 endif()
-set(VCPKG_CRT_LINKAGE dynamic)
-set(VCPKG_LIBRARY_LINKAGE static)
-set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
-set(VCPKG_C_FLAGS "-ftree-vectorize -march=native") # because of SDL3 fast-math removed
-set(VCPKG_CXX_FLAGS "-ftree-vectorize -march=native") # because of SDL3 fast-math removed
-set(VCPKG_C_FLAGS_RELEASE "-O3 -flto")
-set(VCPKG_CXX_FLAGS_RELEASE "-O3 -flto")
-set(VCPKG_LINKER_FLAGS_RELEASE "-ffast-math -ftree-vectorize -march=native -O3 -flto")
+
+set(GX_BASE_TRIPLET "$ENV{VCPKG_ROOT}/triplets/${GX_TRIPLET_ARCH}-osx.cmake")
+if(NOT EXISTS "${GX_BASE_TRIPLET}")
+    message(FATAL_ERROR "Base triplet file not found: ${GX_BASE_TRIPLET}.")
+endif()
+
+include(${GX_BASE_TRIPLET})
+
+set(VCPKG_BUILD_TYPE release)
+set(VCPKG_C_FLAGS "-ftree-vectorize -march=native -O3 -flto") # because of SDL3 fast-math removed
+set(VCPKG_CXX_FLAGS "-ftree-vectorize -march=native -O3 -flto") # because of SDL3 fast-math removed
+set(VCPKG_LINKER_FLAGS "-ffast-math -ftree-vectorize -march=native -O3 -flto")

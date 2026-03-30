@@ -311,7 +311,7 @@ bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name
 bool gearoenix::render::texture::Manager::get_from_cache(const std::string& name, core::job::EndCallerShared<TextureCube>& c, [[maybe_unused]] const TextureInfo* const info)
 {
     return textures_cube.get(name, core::job::EndCallerShared<TextureCube>([c GX_DEBUG_TXT_INFO](std::shared_ptr<TextureCube>&& t) {
-        GX_ASSERT_D(!info.has_value() || *info == t->get_info());
+        GX_ASSERT_D(!info.has_value() || *info == t->get_info() || info->get_format() == TextureFormat::RgbaFloat32);
         GX_ASSERT_D(Type::TextureCube == t->get_info().get_type());
         c.set_return_if_empty(std::move(t));
     }));

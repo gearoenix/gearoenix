@@ -1,4 +1,4 @@
-name: 'Visual Studio 2026       '
+name: 'Visual Studio 2026 |'
 on:
   push:
     branches: [ main ]

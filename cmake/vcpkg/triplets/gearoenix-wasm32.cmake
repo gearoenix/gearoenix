@@ -22,10 +22,7 @@ set(VCPKG_LIBRARY_LINKAGE static)
 set(VCPKG_CMAKE_SYSTEM_NAME Emscripten)
 set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${GEAROENIX_EMSCRIPTEN_TOOLCHAIN}")
 set(VCPKG_BUILD_TYPE release)
-set(VCPKG_C_FLAGS "-pthread -msimd128") # because of SDL3 fast-math removed
-set(VCPKG_CXX_FLAGS "-pthread -msimd128") # because of SDL3 fast-math removed
-set(VCPKG_C_FLAGS_RELEASE "-O3 -flto=full") # because of SDL3 fast-math removed
-set(VCPKG_CXX_FLAGS_RELEASE "-O3 -flto=full") # because of SDL3 fast-math removed
-set(VCPKG_LINKER_FLAGS "-pthread -sPROXY_TO_PTHREAD=1 -fwasm-exceptions -sPROXY_TO_PTHREAD=1 -sOFFSCREENCANVAS_SUPPORT=1 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1 -sPTHREAD_POOL_SIZE='navigator.hardwareConcurrency' -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sALLOW_TABLE_GROWTH=1")
-set(VCPKG_LINKER_FLAGS_RELEASE "-ffast-math -msimd128 -O3 -flto=full")
+set(VCPKG_C_FLAGS "-pthread -msimd128 -O3 -flto=full") # because of SDL3 fast-math removed
+set(VCPKG_CXX_FLAGS "-pthread -msimd128 -O3 -flto=full") # because of SDL3 fast-math removed
+set(VCPKG_LINKER_FLAGS "-pthread -sPROXY_TO_PTHREAD=1 -fwasm-exceptions -sOFFSCREENCANVAS_SUPPORT=1 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1 -sPTHREAD_POOL_SIZE='navigator.hardwareConcurrency' -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sALLOW_TABLE_GROWTH=1 -ffast-math -msimd128 -O3 -flto=full")
 set(VCPKG_TARGET_TRIPLET "gearoenix-wasm32")

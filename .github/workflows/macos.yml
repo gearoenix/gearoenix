@@ -1,4 +1,4 @@
-name: 'macOS-26  '
+name: 'macOS-26 |'
 on:
   push:
     branches: [ main ]
