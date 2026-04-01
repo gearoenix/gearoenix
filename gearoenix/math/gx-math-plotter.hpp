@@ -27,7 +27,7 @@ private:
 
 public:
     Plotter(std::uint32_t* pixels, int img_width, int img_height);
-    void draw_point(const Vec2<double>& pos, const Brush& b = Brush());
-    void draw_line(const Vec2<double>& start, const Vec2<double>& end, const Brush& b = Brush());
+    void draw_point(const Vec2<core::fp_t>& pos, const Brush& b = Brush());
+    void draw_line(const Vec2<core::fp_t>& start, const Vec2<core::fp_t>& end, const Brush& b = Brush());
 };
 }

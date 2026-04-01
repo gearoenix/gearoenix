@@ -13,7 +13,7 @@ struct Collider : core::ecs::Component, render::gizmo::Drawer {
     constexpr static auto object_type_index = gearoenix_physics_collider_type_index;
 
     GX_GET_CREF_PRT(std::shared_ptr<Transformation>, transform);
-    GX_GET_CREF_PRT(math::Aabb3<double>, surrounding_box);
+    GX_GET_CREF_PRT(math::Aabb3<core::fp_t>, surrounding_box);
     GX_GET_VAL_PRT(bool, surrounding_box_changed, false);
 
     Collider(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, core::object_type_index_t final_type_index, std::string&& name);
@@ -22,8 +22,8 @@ struct Collider : core::ecs::Component, render::gizmo::Drawer {
 public:
     ~Collider() override;
     virtual void update_surrounding_box() = 0;
-    [[nodiscard]] virtual bool check_intersection(const math::Aabb3<double>& box) const;
-    [[nodiscard]] virtual math::IntersectionStatus check_intersection_status(const math::Aabb3<double>& box) const;
+    [[nodiscard]] virtual bool check_intersection(const math::Aabb3<core::fp_t>& box) const;
+    [[nodiscard]] virtual math::IntersectionStatus check_intersection_status(const math::Aabb3<core::fp_t>& box) const;
     static void update_all_after_transform_update();
     void draw_gizmo() override;
 };

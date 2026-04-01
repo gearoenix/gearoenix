@@ -8,7 +8,7 @@
 
 #include <ranges>
 
-gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const double layer)
+gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const core::fp_t layer)
     : render::scene::Scene(entity, core::ecs::ComponentType::create_index(this), layer, std::move(name))
 {
 }
@@ -63,7 +63,7 @@ gearoenix::gl::SceneManager::SceneManager() { core::ecs::ComponentType::add<Scen
 
 gearoenix::gl::SceneManager::~SceneManager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::gl::SceneManager::build(std::string&& name, double layer) const
+gearoenix::core::ecs::EntityPtr gearoenix::gl::SceneManager::build(std::string&& name, core::fp_t layer) const
 {
     auto entity = Manager::build(std::move(name), layer);
     entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));

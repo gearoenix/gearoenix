@@ -25,7 +25,7 @@ struct Baked final : Probe, render::reflection::Baked {
         std::string&& name,
         std::shared_ptr<render::texture::TextureCube>&& irr,
         std::shared_ptr<render::texture::TextureCube>&& rad,
-        const math::Aabb3<double>& include_box);
+        const math::Aabb3<core::fp_t>& include_box);
     ~Baked() override;
 };
 }

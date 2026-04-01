@@ -58,7 +58,7 @@ struct Camera : core::ecs::Component {
     GX_GET_VAL_PRT(float, near, 1.0f);
     GX_GET_REF_PRT(ColourTuning, colour_tuning);
     GX_GET_CREF_PRT(ProjectionData, projection_data);
-    GX_GETSET_VAL_PRT(double, layer, 0.0);
+    GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
     GX_GETSET_VAL_PRT(Usage, usage, Usage::Main);
     GX_GET_REFC_PRT(math::Vec4<float>, debug_colour);
     GX_GET_CREF_PRT(std::optional<BloomData>, bloom_data);
@@ -78,7 +78,7 @@ struct Camera : core::ecs::Component {
 
 public:
     ~Camera() override;
-    void generate_frustum_points(const math::Vec3<double>& location, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, std::array<math::Vec3<double>, 8>& points) const;
+    void generate_frustum_points(const math::Vec3<core::fp_t>& location, const math::Vec3<core::fp_t>& x, const math::Vec3<core::fp_t>& y, const math::Vec3<core::fp_t>& z, std::array<math::Vec3<core::fp_t>, 8>& points) const;
     void set_view(const math::Mat4x4<float>& view);
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
     void disable_customised_target_aspect_ratio();
@@ -90,7 +90,7 @@ public:
     void update_projection();
     void set_near(float);
     void set_far(float);
-    [[nodiscard]] math::Ray3<double> generate_ray(const math::Vec2<double>& normalised_point) const;
+    [[nodiscard]] math::Ray3<core::fp_t> generate_ray(const math::Vec2<core::fp_t>& normalised_point) const;
     virtual void set_customised_target(std::shared_ptr<texture::Target>&&);
     virtual void disable_bloom();
     virtual void enable_bloom();

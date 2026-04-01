@@ -21,8 +21,8 @@ public:
     [[nodiscard]] const std::shared_ptr<buffer::Buffer>& get_index() const { return index; }
     [[nodiscard]] std::uint32_t get_indices_count() const { return indices_count; }
 
-    explicit Buffer(const math::Aabb3<double>& box);
-    static void construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<double>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback);
+    explicit Buffer(const math::Aabb3<core::fp_t>& box);
+    static void construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<core::fp_t>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback);
     ~Buffer() override;
 };
 }

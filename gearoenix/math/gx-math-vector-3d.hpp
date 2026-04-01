@@ -279,7 +279,7 @@ struct Vec3 final {
             z = upper;
     }
 
-    [[nodiscard]] constexpr Vec3 atan() const { return Vec3(static_cast<Element>(std::atan(static_cast<double>(x))), static_cast<Element>(std::atan(static_cast<double>(y))), static_cast<Element>(std::atan(static_cast<double>(z)))); }
+    [[nodiscard]] constexpr Vec3 atan() const { return Vec3(static_cast<Element>(std::atan(static_cast<core::fp_t>(x))), static_cast<Element>(std::atan(static_cast<core::fp_t>(y))), static_cast<Element>(std::atan(static_cast<core::fp_t>(z)))); }
 
     [[nodiscard]] constexpr Vec3 sign() const
     {

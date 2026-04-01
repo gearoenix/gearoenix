@@ -29,27 +29,27 @@
 //
 // struct EditTheme {
 //     Alignment h_align = Alignment::Center;
-//     math::Vec4<double> text_color = math::Vec4(0.8, 0.8, 0.8, 1.0);
-//     double text_size = 0.9;
-//     math::Vec4<double> hint_text_color = math::Vec4(0.7);
-//     double hint_text_size = 0.9;
-//     math::Vec4<double> background_color = math::Vec4(0.4, 0.4, 0.4, 1.0);
-//     math::Vec4<double> cursor_color = math::Vec4(0.0, 0.0, 0.0, 1.0);
+//     math::Vec4<core::fp_t> text_color = math::Vec4(0.8, 0.8, 0.8, 1.0);
+//     core::fp_t text_size = 0.9;
+//     math::Vec4<core::fp_t> hint_text_color = math::Vec4(0.7);
+//     core::fp_t hint_text_size = 0.9;
+//     math::Vec4<core::fp_t> background_color = math::Vec4(0.4, 0.4, 0.4, 1.0);
+//     math::Vec4<core::fp_t> cursor_color = math::Vec4(0.0, 0.0, 0.0, 1.0);
 //     std::uint8_t cursor_width = 4;
 //     /// Size compare to the height of Edit
-//     double cursor_size = 0.9;
-//     double cursor_state_time = 0.125;
-//     double cursor_blink_time = 0.125;
+//     core::fp_t cursor_size = 0.9;
+//     core::fp_t cursor_state_time = 0.125;
+//     core::fp_t cursor_blink_time = 0.125;
 // };
 // struct Edit final : Widget, core::event::Listener {
 //     GX_GET_CPTR_PRV(core::event::Engine, event_engine);
 //     GX_GET_CREF_PRV(std::shared_ptr<font::Font2D>, text_font);
 //     GX_GET_CREF_PRV(std::wstring, text);
-//     GX_GET_CREF_PRV(std::vector<double>, text_widths);
+//     GX_GET_CREF_PRV(std::vector<core::fp_t>, text_widths);
 //     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, text_model);
 //     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, text_material);
 //     GX_GET_CREF_PRV(std::wstring, hint_text);
-//     GX_GET_CREF_PRV(std::vector<double>, hint_text_widths);
+//     GX_GET_CREF_PRV(std::vector<core::fp_t>, hint_text_widths);
 //     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, hint_text_model);
 //     GX_GET_CREF_PRV(std::shared_ptr<material::Unlit>, hint_text_material);
 //     GX_GET_CREF_PRV(std::shared_ptr<model::Dynamic>, background_model);
@@ -62,10 +62,10 @@
 //     GX_GET_VAL_PRV(bool, left_to_right, true);
 //     GX_GET_CREF_PRV(std::vector<wchar_t>, left_text);
 //     GX_GET_CREF_PRV(std::vector<wchar_t>, right_text);
-//     GX_GET_CREF_PRV(math::Vec2<double>, aspects);
-//     GX_GET_VAL_PRV(double, cursor_pos_in_text, 0.0f);
-//     GX_GET_VAL_PRV(double, starting_text_cut, 0.0f);
-//     GX_GET_VAL_PRV(double, ending_text_cut, 0.0f);
+//     GX_GET_CREF_PRV(math::Vec2<core::fp_t>, aspects);
+//     GX_GET_VAL_PRV(core::fp_t, cursor_pos_in_text, 0.0f);
+//     GX_GET_VAL_PRV(core::fp_t, starting_text_cut, 0.0f);
+//     GX_GET_VAL_PRV(core::fp_t, ending_text_cut, 0.0f);
 //     GX_GET_VAL_PRV(std::uint64_t, temporary_left, 0);
 //     GX_GET_VAL_PRV(std::uint64_t, temporary_right, 0);
 //     GX_GET_CREF_PRV(std::weak_ptr<Edit>, edit_self);
@@ -131,7 +131,7 @@
 //     void insert(wchar_t character, const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
 //     void backspace(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
 //     void del(const core::job::EndCaller<core::job::EndCallerIgnore>& c = GX_DEFAULT_IGNORED_END_CALLER);
-//     void selected(const math::Vec3<double>& point) override;
+//     void selected(const math::Vec3<core::fp_t>& point) override;
 //     void clear();
 // };
 // }

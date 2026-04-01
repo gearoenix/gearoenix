@@ -11,7 +11,7 @@ gearoenix::render::scene::Manager::Manager()
 
 gearoenix::render::scene::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::string&& name, const double) const
+gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::string&& name, const core::fp_t) const
 {
     return core::ecs::Entity::construct(std::move(name), nullptr);
 }

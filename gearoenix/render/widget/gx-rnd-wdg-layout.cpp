@@ -8,20 +8,20 @@ void gearoenix::render::widget::LayoutWindowBasedPlacer::set_location(physics::T
 {
     const auto wds = distance.to_world();
     const auto& wsz = platform::Application::get().get_base().get_window_size();
-    const auto war = static_cast<double>(wsz.x) / static_cast<double>(wsz.y);
+    const auto war = static_cast<core::fp_t>(wsz.x) / static_cast<core::fp_t>(wsz.y);
     auto l = trn.get_local_position();
     switch (side) {
     case Side::Top:
-        l.y = std::max(1.0 / war, 1.0) * 0.5 - wds;
+        l.y = std::max(static_cast<core::fp_t>(1.0) / war, static_cast<core::fp_t>(1.0)) * static_cast<core::fp_t>(0.5) - wds;
         break;
     case Side::Bottom:
-        l.y = wds - std::max(1.0 / war, 1.0) * 0.5;
+        l.y = wds - std::max(static_cast<core::fp_t>(1.0) / war, static_cast<core::fp_t>(1.0)) * static_cast<core::fp_t>(0.5);
         break;
     case Side::Right:
-        l.x = std::max(war, 1.0) * 0.5 - wds;
+        l.x = std::max(war, static_cast<core::fp_t>(1.0)) * static_cast<core::fp_t>(0.5) - wds;
         break;
     case Side::Left:
-        l.x = wds - std::max(war, 1.0) * 0.5;
+        l.x = wds - std::max(war, static_cast<core::fp_t>(1.0)) * static_cast<core::fp_t>(0.5);
         break;
     }
     trn.set_local_position(l);

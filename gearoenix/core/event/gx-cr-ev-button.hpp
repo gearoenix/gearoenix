@@ -18,11 +18,11 @@ public:
 struct Mouse final {
     GX_GET_CVAL_PRV(platform::key::Action, action);
     GX_GET_CVAL_PRV(platform::key::Id, key);
-    GX_GET_CREF_PRV(math::Vec2<double>, position_normalised);
-    GX_GET_CREF_PRV(math::Vec2<double>, position);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, position_normalised);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, position);
 
 public:
-    Mouse(const platform::key::Action action, const platform::key::Id key, const math::Vec2<double>& position_normalised, const math::Vec2<double>& position)
+    Mouse(const platform::key::Action action, const platform::key::Id key, const math::Vec2<core::fp_t>& position_normalised, const math::Vec2<core::fp_t>& position)
         : action(action)
         , key(key)
         , position_normalised(position_normalised)
@@ -32,10 +32,10 @@ public:
 };
 
 struct MouseScroll final {
-    GX_GET_REFC_PRV(math::Vec2<double>, direction);
+    GX_GET_REFC_PRV(math::Vec2<core::fp_t>, direction);
 
 public:
-    explicit MouseScroll(const math::Vec2<double>& direction)
+    explicit MouseScroll(const math::Vec2<core::fp_t>& direction)
         : direction(direction)
     {
     }

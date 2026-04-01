@@ -20,7 +20,7 @@
 #include <ranges>
 
 namespace {
-boost::container::flat_set<std::pair<double, gearoenix::vulkan::scene::Scene*>> scenes;
+boost::container::flat_set<std::pair<gearoenix::core::fp_t, gearoenix::vulkan::scene::Scene*>> scenes;
 }
 
 gearoenix::vulkan::scene::Manager::Manager()
@@ -32,7 +32,7 @@ gearoenix::vulkan::scene::Manager::Manager()
 
 gearoenix::vulkan::scene::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::string&& name, double layer) const
+gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::string&& name, core::fp_t layer) const
 {
     auto entity = render::scene::Manager::build(std::move(name), layer);
     entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));

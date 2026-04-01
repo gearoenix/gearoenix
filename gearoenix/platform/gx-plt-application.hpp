@@ -49,12 +49,12 @@ struct BaseApplication final : core::Singleton<BaseApplication> {
     GX_GET_CREF_PRV(math::Vec2<int>, window_position);
     GX_GET_VAL_PRV(bool, window_is_up, false);
     GX_GETSET_VAL_PRV(bool, window_is_going_to_be_closed, false);
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_position);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, mouse_position);
     /// Its value is in the range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_normalised_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_position);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, mouse_normalised_position);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, mouse_previous_position);
     /// Its value is in the range of ({-window_aspect, -1.0}, {+window_aspect, +1.0})
-    GX_GET_CREF_PRV(math::Vec2<double>, mouse_previous_normalised_position);
+    GX_GET_CREF_PRV(math::Vec2<core::fp_t>, mouse_previous_normalised_position);
     GX_GET_UPTR_PRV(render::engine::Engine, render_engine);
     GX_GET_UPTR_PRV(audio::Engine, audio_engine);
     GX_GET_UPTR_PRV(core::event::Engine, event_engine);
@@ -74,14 +74,14 @@ public:
     void initialize_window_size(int w, int h);
     void update_window_size(int w, int h);
     void update_window();
-    void initialize_mouse_position(double x, double y);
-    void update_mouse_position(double x, double y);
+    void initialize_mouse_position(core::fp_t x, core::fp_t y);
+    void update_mouse_position(core::fp_t x, core::fp_t y);
     void mouse_key(key::Id, key::Action);
-    void mouse_wheel(double v);
+    void mouse_wheel(core::fp_t v);
     void keyboard_key(key::Id, key::Action);
     void character_input(char16_t ch);
-    void touch_down(FingerId finger_id, double x, double y);
-    void touch_move(FingerId finger_id, double x, double y);
+    void touch_down(FingerId finger_id, core::fp_t x, core::fp_t y);
+    void touch_move(FingerId finger_id, core::fp_t x, core::fp_t y);
     void touch_up(FingerId finger_id);
     void touch_cancel(FingerId finger_id);
     void initialize_engine();
@@ -100,9 +100,9 @@ public:
     [[nodiscard]] static std::pair<void*, int> get_default_font_data();
 
 private:
-    [[nodiscard]] double normalise_x(double x) const;
-    [[nodiscard]] double normalise_y(double y) const;
-    [[nodiscard]] math::Vec2<double> normalise_position(double x, double y) const;
+    [[nodiscard]] core::fp_t normalise_x(core::fp_t x) const;
+    [[nodiscard]] core::fp_t normalise_y(core::fp_t y) const;
+    [[nodiscard]] math::Vec2<core::fp_t> normalise_position(core::fp_t x, core::fp_t y) const;
 };
 }
 

@@ -54,8 +54,8 @@ struct Camera final {
     camera::Camera* camera = nullptr;
     physics::Transformation* transform = nullptr;
     physics::collider::Collider* collider = nullptr;
-    std::vector<std::pair<double, CameraModel>> translucent_models;
-    std::vector<std::pair<double, CameraModel>> opaque_models;
+    std::vector<std::pair<core::fp_t, CameraModel>> translucent_models;
+    std::vector<std::pair<core::fp_t, CameraModel>> opaque_models;
     std::vector<math::Mat4x4<float>> mvps;
     std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
 

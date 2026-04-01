@@ -14,7 +14,7 @@
 // public:
 //     explicit UpdateManager(sync::KernelWorkers* workers);
 //     ~UpdateManager();
-//     [[nodiscard]] Id add(std::vector<Id> influenced_ids, double priority, std::function<void()> fun);
+//     [[nodiscard]] Id add(std::vector<Id> influenced_ids, core::fp_t priority, std::function<void()> fun);
 //     void remove(Id id);
 // };
 // }

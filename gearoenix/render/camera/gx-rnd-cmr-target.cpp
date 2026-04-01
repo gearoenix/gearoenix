@@ -56,7 +56,7 @@ void gearoenix::render::camera::Target::set_customised(std::shared_ptr<texture::
     target = Customised { .target = std::move(customised_target) };
 }
 
-double gearoenix::render::camera::Target::get_aspect_ratio() const
+gearoenix::core::fp_t gearoenix::render::camera::Target::get_aspect_ratio() const
 {
     switch (target.index()) {
     case customised_var_index: {

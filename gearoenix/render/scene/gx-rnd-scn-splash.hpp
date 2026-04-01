@@ -21,17 +21,15 @@ private:
     physics::Transformation* right_wing_tran = nullptr;
     physics::Transformation* gearoenix_text_tran = nullptr;
     material::Unlit* gearoenix_text_mat = nullptr;
-    double wings_current_angle = 0.0f;
-    double current_scale = 0.0f;
-    double scale_animation_time_current = 0.0;
+    core::fp_t wings_current_angle = static_cast<core::fp_t>(0);
+    core::fp_t current_scale = static_cast<core::fp_t>(0);
+    core::fp_t scale_animation_time_current = static_cast<core::fp_t>(0);
     bool is_animating_scale = true;
-    double text_animation_time_current = 0.0;
+    core::fp_t text_animation_time_current = static_cast<core::fp_t>(0);
     bool is_animating_text = false;
-    double after_animation = 0.0;
+    core::fp_t after_animation = static_cast<core::fp_t>(0);
     std::weak_ptr<Splash> weak_self;
     std::optional<core::job::EndCaller<>> end_callback;
-
-    [[nodiscard]] double calculate_scale() const;
 
     explicit Splash(core::job::EndCaller<>&& end_callback);
     void initialise(core::job::EndCaller<>&& start_callback);

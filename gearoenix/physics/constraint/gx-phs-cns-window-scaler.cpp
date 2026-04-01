@@ -54,25 +54,25 @@
 //     registered = true;
 // }
 //
-// void gearoenix::physics::constraint::WindowScaler::set_size_percentage(const double v)
+// void gearoenix::physics::constraint::WindowScaler::set_size_percentage(const core::fp_t v)
 // {
 //     size_percentage = v;
 //     WindowScaler::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowScaler::set_max_size_scale(std::optional<double> v)
+// void gearoenix::physics::constraint::WindowScaler::set_max_size_scale(std::optional<core::fp_t> v)
 // {
 //     max_size_scale = v;
 //     WindowScaler::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowScaler::set_min_size_scale(std::optional<double> v)
+// void gearoenix::physics::constraint::WindowScaler::set_min_size_scale(std::optional<core::fp_t> v)
 // {
 //     min_size_scale = v;
 //     WindowScaler::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowScaler::set_current_size(const double v)
+// void gearoenix::physics::constraint::WindowScaler::set_current_size(const core::fp_t v)
 // {
 //     current_size = v;
 //     WindowScaler::update();

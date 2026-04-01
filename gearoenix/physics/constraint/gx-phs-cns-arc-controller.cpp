@@ -92,43 +92,43 @@
 //     event_engine->remove_listener(core::event::Id::ButtonKeyboard, 0.0f, this);
 // }
 //
-// void gearoenix::render::camera::ArcController::set_vertical_angle(const double a)
+// void gearoenix::render::camera::ArcController::set_vertical_angle(const core::fp_t a)
 //{
 //     vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_min_vertical_angle(const double a)
+// void gearoenix::render::camera::ArcController::set_min_vertical_angle(const core::fp_t a)
 //{
 //     min_vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_max_vertical_angle(const double a)
+// void gearoenix::render::camera::ArcController::set_max_vertical_angle(const core::fp_t a)
 //{
 //     max_vertical_angle = a;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_distance(const double d)
+// void gearoenix::render::camera::ArcController::set_distance(const core::fp_t d)
 //{
 //     distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_min_distance(const double d)
+// void gearoenix::render::camera::ArcController::set_min_distance(const core::fp_t d)
 //{
 //     min_distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_max_distance(const double d)
+// void gearoenix::render::camera::ArcController::set_max_distance(const core::fp_t d)
 //{
 //     max_distance = d;
 //     values_updated();
 // }
 //
-// void gearoenix::render::camera::ArcController::set_target(const math::Vec3<double>& t)
+// void gearoenix::render::camera::ArcController::set_target(const math::Vec3<core::fp_t>& t)
 //{
 //     target = t;
 //     values_updated();

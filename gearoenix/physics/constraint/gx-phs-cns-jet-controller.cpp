@@ -149,7 +149,7 @@ void gearoenix::physics::constraint::JetController::update()
         transformation->local_inner_x_rotate(rotate_x);
     }
     if (0.0 != rotate_z) {
-        transformation->local_inner_rotate(rotate_z, math::Z3D<double>);
+        transformation->local_inner_rotate(rotate_z, math::Z3D<core::fp_t>);
     }
     if (0.0 != move_forward_accumulated) {
         transformation->local_z_translate(move_forward_accumulated);
@@ -169,10 +169,10 @@ void gearoenix::physics::constraint::JetController::update()
         transformation->local_x_translate(-delta_movement);
     }
     if (rotate_right) {
-        transformation->local_inner_rotate(-delta_rotation, math::Z3D<double>);
+        transformation->local_inner_rotate(-delta_rotation, math::Z3D<core::fp_t>);
     }
     if (rotate_left) {
-        transformation->local_inner_rotate(delta_rotation, math::Z3D<double>);
+        transformation->local_inner_rotate(delta_rotation, math::Z3D<core::fp_t>);
     }
     clear_transforms();
 }

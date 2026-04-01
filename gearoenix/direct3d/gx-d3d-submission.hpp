@@ -37,8 +37,8 @@ struct SubmissionManager final {
             Frame(Device&);
         };
         D3D12_GPU_VIRTUAL_ADDRESS current_frame_uniform_address;
-        std::vector<std::pair<double, ModelBvhData>> opaque_models_data;
-        std::vector<std::pair<double, ModelBvhData>> tranclucent_models_data;
+        std::vector<std::pair<core::fp_t, ModelBvhData>> opaque_models_data;
+        std::vector<std::pair<core::fp_t, ModelBvhData>> tranclucent_models_data;
         std::array<Frame, GX_D3D_FRAMES_BACKBUFFER_NUMBER> frames;
 
         CameraData(Device&);
@@ -46,7 +46,7 @@ struct SubmissionManager final {
 
     struct SceneData final {
         std::uint32_t bvh_pool_index = 0;
-        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::uint32_t /*camera-pool-index*/> cameras;
+        boost::container::flat_map<std::pair<core::fp_t /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::uint32_t /*camera-pool-index*/> cameras;
     };
 
     GX_GET_RRF_PRV(Engine, e)
@@ -61,7 +61,7 @@ private:
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<core::fp_t /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
 
     [[nodiscard]] bool fill_g_buffer(const std::uint32_t camera_pool_index);
 

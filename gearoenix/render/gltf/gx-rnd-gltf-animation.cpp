@@ -23,7 +23,7 @@ namespace {
 
 template <template <typename> typename Value>
 void read_output(
-    boost::container::flat_map<double, gearoenix::physics::animation::Keyframe<Value<double>>>& keyframes,
+    boost::container::flat_map<gearoenix::core::fp_t, gearoenix::physics::animation::Keyframe<Value<gearoenix::core::fp_t>>>& keyframes,
     const tinygltf::Accessor& input,
     [[maybe_unused]] const tinygltf::Accessor& output,
     [[maybe_unused]] const tinygltf::BufferView& output_bv,
@@ -44,28 +44,28 @@ void read_output(
         GX_ASSERT_D(input.count * sizeof(Value<float>) * 3 == output_bytes_count);
         for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr; data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
             const std::uint64_t in_ptr = curr_output_ptr;
-            const auto in = Value<double>(*reinterpret_cast<const Value<float>*>(in_ptr));
+            const auto in = Value<gearoenix::core::fp_t>(*reinterpret_cast<const Value<float>*>(in_ptr));
             curr_output_ptr += sizeof(Value<float>);
             const std::uint64_t key_ptr = curr_output_ptr;
-            const auto key = Value<double>(*reinterpret_cast<const Value<float>*>(key_ptr));
+            const auto key = Value<gearoenix::core::fp_t>(*reinterpret_cast<const Value<float>*>(key_ptr));
             curr_output_ptr += sizeof(Value<float>);
             const std::uint64_t out_ptr = curr_output_ptr;
-            const auto out = Value<double>(*reinterpret_cast<const Value<float>*>(out_ptr));
-            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<double>>::construct_gltf2_bezier(in, key, out));
+            const auto out = Value<gearoenix::core::fp_t>(*reinterpret_cast<const Value<float>*>(out_ptr));
+            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<gearoenix::core::fp_t>>::construct_gltf2_bezier(in, key, out));
         }
         break;
     }
     case gearoenix::physics::animation::Interpolation::Linear: {
         GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
         for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr; data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
-            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<double>>::construct_linear(Value<double>(*reinterpret_cast<const Value<float>*>(curr_output_ptr))));
+            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<gearoenix::core::fp_t>>::construct_linear(Value<gearoenix::core::fp_t>(*reinterpret_cast<const Value<float>*>(curr_output_ptr))));
         }
         break;
     }
     case gearoenix::physics::animation::Interpolation::Step: {
         GX_ASSERT_D(input.count * sizeof(Value<float>) == output_bytes_count);
         for (std::uint64_t data_i = 0, curr_output_ptr = output_b_ptr; data_i < input.count; ++data_i, curr_output_ptr += sizeof(Value<float>)) {
-            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<double>>::construct_step(Value<double>(*reinterpret_cast<const Value<float>*>(curr_output_ptr))));
+            keyframes.emplace(times[data_i], gearoenix::physics::animation::Keyframe<Value<gearoenix::core::fp_t>>::construct_step(Value<gearoenix::core::fp_t>(*reinterpret_cast<const Value<float>*>(curr_output_ptr))));
         }
         break;
     }

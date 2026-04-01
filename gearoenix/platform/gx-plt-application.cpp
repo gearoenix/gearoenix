@@ -16,8 +16,8 @@
 #include <ImGui/imgui.h>
 
 namespace {
-constexpr double click_time_threshold = 0.3;
-constexpr double click_distance_threshold = 0.1;
+constexpr auto click_time_threshold = static_cast<gearoenix::core::fp_t>(0.3);
+constexpr auto click_distance_threshold = static_cast<gearoenix::core::fp_t>(0.1);
 
 void initialise_default_font()
 {
@@ -45,9 +45,15 @@ void platform_set_ime_data(ImGuiContext*, ImGuiViewport*, ImGuiPlatformImeData* 
     }
 }
 
-const char* get_clipboard_text(ImGuiContext*) { return gearoenix::platform::Application::get().get_clipboard(); }
+const char* get_clipboard_text(ImGuiContext*const)
+{
+    return gearoenix::platform::Application::get().get_clipboard();
+}
 
-void set_clipboard_text(ImGuiContext* const, const char* text) { gearoenix::platform::Application::get().set_clipboard(text); }
+void set_clipboard_text(ImGuiContext* const, const char* text)
+{
+    gearoenix::platform::Application::get().set_clipboard(text);
+}
 }
 
 void gearoenix::platform::BaseApplication::initialise_imgui()
@@ -145,14 +151,14 @@ void gearoenix::platform::BaseApplication::update_window()
     }
 }
 
-void gearoenix::platform::BaseApplication::initialize_mouse_position(const double x, const double y)
+void gearoenix::platform::BaseApplication::initialize_mouse_position(const core::fp_t x, const core::fp_t y)
 {
     mouse_previous_position = mouse_position = { x, y };
     mouse_previous_normalised_position = mouse_normalised_position = normalise_position(x, y);
     ImGui::GetIO().MousePos = { static_cast<float>(x), static_cast<float>(y) };
 }
 
-void gearoenix::platform::BaseApplication::update_mouse_position(const double x, const double y)
+void gearoenix::platform::BaseApplication::update_mouse_position(const core::fp_t x, const core::fp_t y)
 {
     mouse_previous_position = mouse_position;
     mouse_previous_normalised_position = mouse_normalised_position;
@@ -177,7 +183,10 @@ void gearoenix::platform::BaseApplication::mouse_key(const key::Id k, const key:
     event_engine->broadcast(core::event::Data(core::event::Id::ButtonMouse, core::event::button::Mouse(a, k, mouse_normalised_position, mouse_position)));
 }
 
-void gearoenix::platform::BaseApplication::mouse_wheel(const double v) { ImGui::GetIO().MouseWheel += static_cast<float>(v); }
+void gearoenix::platform::BaseApplication::mouse_wheel(const core::fp_t v)
+{
+    ImGui::GetIO().MouseWheel += static_cast<float>(v);
+}
 
 void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const key::Action a)
 {
@@ -207,20 +216,24 @@ void gearoenix::platform::BaseApplication::keyboard_key(const key::Id k, const k
     event_engine->broadcast(core::event::Data(core::event::Id::ButtonKeyboard, core::event::button::Keyboard(a, k)));
 }
 
-void gearoenix::platform::BaseApplication::character_input(const char16_t ch) { ImGui::GetIO().AddInputCharacterUTF16(ch); }
+void gearoenix::platform::BaseApplication::character_input(const char16_t ch)
+{
+    ImGui::GetIO().AddInputCharacterUTF16(ch);
+}
 
-void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const double x, const double y)
+void gearoenix::platform::BaseApplication::touch_down(const FingerId finger_id, const core::fp_t x, const core::fp_t y)
 {
     const core::event::Point2D p({ x, y }, normalise_position(x, y));
     touch_states[finger_id] = p;
     event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(p, finger_id, core::event::touch::Action::Down)));
 }
 
-void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, const double x, const double y)
+void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, const core::fp_t x, const core::fp_t y)
 {
     const auto search = touch_states.find(finger_id);
-    if (touch_states.end() == search)
+    if (touch_states.end() == search) {
         return;
+    }
     auto& p = search->second;
     p.update({ x, y }, normalise_position(x, y));
     if (touch_states.size() == 1 && p.get_delta_start_time() > click_time_threshold) {
@@ -240,8 +253,9 @@ void gearoenix::platform::BaseApplication::touch_move(const FingerId finger_id, 
 void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id)
 {
     const auto search = touch_states.find(finger_id);
-    if (touch_states.end() == search)
+    if (touch_states.end() == search) {
         return;
+    }
     const auto& p = search->second;
     if (touch_states.size() == 1 && search->second.get_delta_start_position().length() < click_distance_threshold && p.get_delta_start_time() < click_time_threshold) {
         core::event::gesture::Click click(p);
@@ -255,8 +269,9 @@ void gearoenix::platform::BaseApplication::touch_up(const FingerId finger_id)
 void gearoenix::platform::BaseApplication::touch_cancel(const FingerId finger_id)
 {
     const auto search = touch_states.find(finger_id);
-    if (touch_states.end() == search)
+    if (touch_states.end() == search) {
         return;
+    }
     event_engine->broadcast(core::event::Data(core::event::Id::Touch, core::event::touch::Data(search->second, finger_id, core::event::touch::Action::Cancel)));
     touch_states.erase(finger_id);
 }
@@ -318,8 +333,17 @@ std::pair<void*, int> gearoenix::platform::BaseApplication::get_default_font_dat
     return { content, static_cast<int>(read_bytes) };
 }
 
-double gearoenix::platform::BaseApplication::normalise_x(const double x) const { return (x - static_cast<double>(window_size.x) * 0.5) / static_cast<double>(window_size.y); }
+gearoenix::core::fp_t gearoenix::platform::BaseApplication::normalise_x(const core::fp_t x) const
+{
+    return (x - static_cast<core::fp_t>(window_size.x) * 0.5) / static_cast<core::fp_t>(window_size.y);
+}
 
-double gearoenix::platform::BaseApplication::normalise_y(const double y) const { return 0.5 - (y / static_cast<double>(window_size.y)); }
+gearoenix::core::fp_t gearoenix::platform::BaseApplication::normalise_y(const core::fp_t y) const
+{
+    return 0.5 - (y / static_cast<core::fp_t>(window_size.y));
+}
 
-gearoenix::math::Vec2<double> gearoenix::platform::BaseApplication::normalise_position(const double x, const double y) const { return { normalise_x(x), normalise_y(y) }; }
+gearoenix::math::Vec2<gearoenix::core::fp_t> gearoenix::platform::BaseApplication::normalise_position(const core::fp_t x, const core::fp_t y) const
+{
+    return { normalise_x(x), normalise_y(y) };
+}

@@ -12,25 +12,27 @@
 
 BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
 {
-    gearoenix::core::ecs::World world;
-    {
-        gearoenix::core::Object::register_type<gearoenix::physics::Transformation>();
+    using namespace gearoenix;
 
-        const auto gizo_manager = std::make_unique<gearoenix::render::gizmo::Manager>();
+    core::ecs::World world;
+    {
+        core::Object::register_type<physics::Transformation>();
+
+        const auto gizo_manager = std::make_unique<render::gizmo::Manager>();
         (void)gizo_manager; // We need this to be available.
 
-        gearoenix::core::ecs::ComponentType::add<gearoenix::physics::Transformation>();
+        core::ecs::ComponentType::add<physics::Transformation>();
 
-        auto entity = gearoenix::core::ecs::Entity::construct("entity", nullptr);
+        auto entity = core::ecs::Entity::construct("entity", nullptr);
 
-        auto transform = gearoenix::core::Object::construct<gearoenix::physics::Transformation>(entity.get(), "transform");
-        constexpr auto gx_epsilon = gearoenix::math::Numeric::epsilon<double>;
+        auto transform = core::Object::construct<physics::Transformation>(entity.get(), "transform");
+        constexpr auto gx_epsilon = math::Numeric::epsilon<core::fp_t>;
 
         auto glmm = glm::identity<glm::dmat4>();
 
         std::random_device rd;
         std::default_random_engine re(rd());
-        std::uniform_real_distribution dis(-100.0, 100.0);
+        std::uniform_real_distribution dis(static_cast<core::fp_t>(-100), static_cast<core::fp_t>(100));
 
         world.update();
 
@@ -42,14 +44,14 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
                 const auto z = dis(re);
                 const auto d = dis(re);
 
-                transform->local_inner_rotate(d, gearoenix::math::Vec3(x, y, z).normalised());
-                glmm = glm::rotate(glm::identity<glm::dmat4>(), d, glm::normalize(glm::dvec3(x, y, z))) * glmm;
+                transform->local_inner_rotate(d, math::Vec3(x, y, z).normalised());
+                glmm = glm::rotate(glm::identity<glm::dmat4>(), static_cast<double>(d), glm::normalize(glm::dvec3(x, y, z))) * glmm;
             }
 
             auto gxq = transform->get_rotation().get_quat();
             auto glmq = glm::quat_cast(glmm);
 
-            if (!gxq.safe_equal(gearoenix::math::Quat(glmq.x, glmq.y, glmq.z, glmq.w))) {
+            if (!gxq.safe_equal(math::Quat<core::fp_t>(glmq.x, glmq.y, glmq.z, glmq.w))) {
                 GX_TEST_FLOAT_NEAR(gxq.w, glmq.w);
                 GX_TEST_FLOAT_NEAR(gxq.x, glmq.x);
                 GX_TEST_FLOAT_NEAR(gxq.y, glmq.y);
@@ -61,11 +63,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
         for (int tests_count = 0; tests_count < 100; ++tests_count) {
             const auto tran = glm::dvec3(dis(re), dis(re), dis(re));
             const auto rot = glm::normalize(glm::dquat(dis(re), dis(re), dis(re), dis(re)));
-            const auto scale = glm::abs(glm::dvec3(dis(re), dis(re), dis(re))) + gx_epsilon;
+            const auto scale = glm::abs(glm::dvec3(dis(re), dis(re), dis(re))) + static_cast<double>(gx_epsilon);
 
             glmm = glm::translate(glm::dmat4(1.0), tran) * glm::mat4_cast(rot) * glm::scale(glm::dmat4(1.0), scale);
 
-            gearoenix::math::Mat4x4<double> local;
+            math::Mat4x4<core::fp_t> local;
             for (int i = 0; i < 4; ++i) {
                 for (int j = 0; j < 4; ++j) {
                     local[i][j] = glmm[i][j];
@@ -78,9 +80,9 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             const auto gxs = transform->get_scale();
             const auto gxq = transform->get_rotation().get_quat();
 
-            BOOST_TEST_CHECK(gxt.equal({ tran.x, tran.y, tran.z }));
-            BOOST_TEST_CHECK(gxs.equal({ scale.x, scale.y, scale.z }));
-            BOOST_TEST_CHECK(gxq.safe_equal({ rot.x, rot.y, rot.z, rot.w }));
+            BOOST_TEST_CHECK(gxt.equal(math::Vec3<core::fp_t>(tran.x, tran.y, tran.z)));
+            BOOST_TEST_CHECK(gxs.equal(math::Vec3<core::fp_t>(scale.x, scale.y, scale.z)));
+            BOOST_TEST_CHECK(gxq.safe_equal(math::Quat<core::fp_t>(rot.x, rot.y, rot.z, rot.w)));
         }
         world.update();
     }

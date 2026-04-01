@@ -11,7 +11,7 @@ gearoenix::vulkan::mesh::Manager::Manager()
 
 gearoenix::vulkan::mesh::Manager::~Manager() = default;
 
-void gearoenix::vulkan::mesh::Manager::build(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<double>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
+void gearoenix::vulkan::mesh::Manager::build(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<core::fp_t>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
     Buffer::construct(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(end_callback));
 }

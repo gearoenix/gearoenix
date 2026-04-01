@@ -97,7 +97,7 @@ void load_mesh(const Context& context, const int mesh_index, const int primitive
     GX_ASSERT_D(pos_max.size() == 3);
     GX_ASSERT_D(pos_min.size() == 3);
 
-    const math::Aabb3 box(math::Vec3(pos_max[0], pos_max[1], pos_max[2]), math::Vec3(pos_min[0], pos_min[1], pos_min[2]));
+    const math::Aabb3 box(math::Vec3<core::fp_t>(pos_max[0], pos_max[1], pos_max[2]), math::Vec3<core::fp_t>(pos_min[0], pos_min[1], pos_min[2]));
 
     std::vector<PbrVertex> vertices(pos_a.count);
     std::vector<PbrVertexAnimated> animated_vertices(is_animated ? pos_a.count : 0);

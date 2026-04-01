@@ -15,14 +15,14 @@ struct JetController final : core::event::Listener, Constraint {
     constexpr static std::array all_parent_object_type_indices { Constraint::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Constraint::object_type_index };
 
-    GX_GETSET_VAL_PRV(double, movement_speed, 10.0);
-    GX_GETSET_VAL_PRV(double, rotation_speed, 0.5);
+    GX_GETSET_VAL_PRV(core::fp_t, movement_speed, 10.0);
+    GX_GETSET_VAL_PRV(core::fp_t, rotation_speed, 0.5);
 
     GX_GETSET_CREF_PRV(std::shared_ptr<Transformation>, transformation);
 
-    double rotate_x = 0.0;
-    double rotate_z = 0.0;
-    double move_forward_accumulated = 0.0;
+    core::fp_t rotate_x = 0.0;
+    core::fp_t rotate_z = 0.0;
+    core::fp_t move_forward_accumulated = 0.0;
     bool move_forward = false;
     bool move_rightward = false;
     bool move_leftward = false;

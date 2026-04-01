@@ -61,13 +61,13 @@ public:
         core::ecs::Entity* parent,
         std::shared_ptr<render::texture::TextureCube>&& irradiance,
         std::shared_ptr<render::texture::TextureCube>&& radiance,
-        const math::Aabb3<double>& include_box) override;
+        const math::Aabb3<core::fp_t>& include_box) override;
     void build_runtime(
         std::string&& name,
         core::ecs::Entity* parent,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
+        const math::Aabb3<core::fp_t>& receive_box,
+        const math::Aabb3<core::fp_t>& exclude_box,
+        const math::Aabb3<core::fp_t>& include_box,
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,

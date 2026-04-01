@@ -4,8 +4,8 @@
 namespace gearoenix::physics::body {
 struct Static : public Body {
 private:
-    double friction;
-    double bounciness;
+    core::fp_t friction;
+    core::fp_t bounciness;
 
 public:
     Static();

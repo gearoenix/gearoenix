@@ -14,7 +14,7 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
 private:
-    Scene(core::ecs::Entity* entity, std::string&& name, double layer);
+    Scene(core::ecs::Entity* entity, std::string&& name, core::fp_t layer);
     Scene(core::object_id_t id, std::string&& name);
     static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
 
@@ -29,7 +29,7 @@ public:
 struct SceneManager final : render::scene::Manager {
     SceneManager();
     ~SceneManager() override;
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::fp_t layer) const override;
 };
 }
 

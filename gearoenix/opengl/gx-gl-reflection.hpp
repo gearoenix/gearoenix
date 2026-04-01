@@ -37,7 +37,7 @@ struct BakedReflection final : render::reflection::Baked, ReflectionProbe {
     constexpr static std::array all_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index, Probe::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Baked::object_type_index, ReflectionProbe::object_type_index };
 
-    BakedReflection(core::ecs::Entity* entity, std::string&& name, std::shared_ptr<TextureCube>&& irr, std::shared_ptr<TextureCube>&& rad, const math::Aabb3<double>& include_box);
+    BakedReflection(core::ecs::Entity* entity, std::string&& name, std::shared_ptr<TextureCube>&& irr, std::shared_ptr<TextureCube>&& rad, const math::Aabb3<core::fp_t>& include_box);
     ~BakedReflection() override;
 };
 
@@ -66,11 +66,11 @@ struct RuntimeReflection final : render::reflection::Runtime, ReflectionProbe {
 
     void initialise_gl();
 
-    RuntimeReflection(core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name);
+    RuntimeReflection(core::ecs::Entity* entity, const math::Aabb3<core::fp_t>& receive_box, const math::Aabb3<core::fp_t>& exclude_box, const math::Aabb3<core::fp_t>& include_box, std::string&& name);
 
 public:
     static void construct(
-        core::ecs::Entity* entity, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        core::ecs::Entity* entity, const math::Aabb3<core::fp_t>& receive_box, const math::Aabb3<core::fp_t>& exclude_box, const math::Aabb3<core::fp_t>& include_box,
         std::string&& name, std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCallerShared<RuntimeReflection>&& end_callback);
     ~RuntimeReflection() override;
@@ -80,10 +80,10 @@ struct ReflectionManager final : render::reflection::Manager, core::Singleton<Re
 private:
     [[nodiscard]] core::ecs::EntityPtr build_baked(
         std::string&& name, core::ecs::Entity* parent, std::shared_ptr<render::texture::TextureCube>&& irradiance, std::shared_ptr<render::texture::TextureCube>&& radiance,
-        const math::Aabb3<double>& include_box) override;
+        const math::Aabb3<core::fp_t>& include_box) override;
 
     void build_runtime(std::string&& name, core::ecs::Entity* parent,
-        const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box,
+        const math::Aabb3<core::fp_t>& receive_box, const math::Aabb3<core::fp_t>& exclude_box, const math::Aabb3<core::fp_t>& include_box,
         std::uint32_t environment_resolution, std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
 

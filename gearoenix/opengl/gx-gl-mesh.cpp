@@ -14,7 +14,7 @@ const auto buffer_allocator = gearoenix::core::allocator::SharedArray<gearoenix:
 const auto mesh_allocator = gearoenix::core::allocator::SharedArray<gearoenix::gl::Mesh, gearoenix::render::mesh::Mesh::max_count>::construct();
 }
 
-gearoenix::gl::Buffer::Buffer(const math::Aabb3<double>& box)
+gearoenix::gl::Buffer::Buffer(const math::Aabb3<core::fp_t>& box)
     : render::mesh::Buffer(box)
 {
 }
@@ -39,7 +39,7 @@ void gearoenix::gl::Buffer::construct(
     std::string&& name,
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const math::Aabb3<double>& occlusion_box,
+    const math::Aabb3<core::fp_t>& occlusion_box,
     core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
     auto buffer = buffer_allocator->make_shared(occlusion_box);
@@ -125,7 +125,7 @@ void gearoenix::gl::MeshManager::build(
     std::string&& name,
     render::Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const math::Aabb3<double>& occlusion_box,
+    const math::Aabb3<core::fp_t>& occlusion_box,
     core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
     Buffer::construct(std::move(name), std::move(vertices), std::move(indices), occlusion_box, std::move(end_callback));

@@ -104,7 +104,6 @@ target_link_libraries(GearoenixGameEngine PUBLIC unofficial::sqlite3::sqlite3)
 
 if(GX_PROFILING_ENABLED)
     target_link_libraries(GearoenixGameEngine PUBLIC TracyClient)
-    target_compile_definitions(GearoenixGameEngine PUBLIC TRACY_ENABLE=true)
     target_compile_definitions(GearoenixGameEngine PUBLIC GX_PROFILING_ENABLED=true)
 endif()
 

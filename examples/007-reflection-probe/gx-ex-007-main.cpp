@@ -27,11 +27,12 @@ template <typename T>
 using GxEndCallerShared = gearoenix::core::job::EndCallerShared<T>;
 
 using GxCoreApp = gearoenix::core::Application;
+using GxFP = gearoenix::core::fp_t;
 using GxEntityPtr = gearoenix::core::ecs::EntityPtr;
 using GxEndCaller = gearoenix::core::job::EndCaller<>;
 using GxEntityEndCaller = gearoenix::core::job::EndCaller<GxEntityPtr>;
-using GxAabb3 = gearoenix::math::Aabb3<double>;
-using GxVec3 = gearoenix::math::Vec3<double>;
+using GxAabb3 = gearoenix::math::Aabb3<GxFP>;
+using GxVec3 = gearoenix::math::Vec3<GxFP>;
 using GxConstraintManager = gearoenix::physics::constraint::Manager;
 using GxTransform = gearoenix::physics::Transformation;
 using GxPath = gearoenix::platform::stream::Path;
@@ -123,7 +124,8 @@ public:
     void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&&)
     {
         auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, true);
-        entity->get_component<GxTransform>()->local_translate({ static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0 });
+        entity->get_component<GxTransform>()->local_translate(
+            GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
     }
 };
 }

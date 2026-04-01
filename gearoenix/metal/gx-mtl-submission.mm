@@ -150,7 +150,7 @@ void gearoenix::metal::SubmissionManager::update()
                 [encoder setDepthStencilState:e.get_pipeline_manager()->get_depth_state()];
             }
 
-            core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<double, ModelData>& distance_model_data, const unsigned int thread_index) {
+            core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<core::fp_t, ModelData>& distance_model_data, const unsigned int thread_index) {
                 auto& model_data = distance_model_data.second;
                 const auto& enc = encoders[thread_index];
                 [enc setVertexBuffer:model_data.vertex offset:0 atIndex:GEAROENIX_METAL_GBUFFERS_FILLER_VERTEX_BUFFER_BIND_INDEX];

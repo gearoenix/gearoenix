@@ -32,7 +32,7 @@ void gearoenix::render::camera::Manager::update()
 {
     core::ecs::World::get().parallel_system<core::ecs::All<Camera, physics::Transformation, physics::collider::Frustum>>([](const auto /*entity-id*/, auto* const cam, const auto* const transform, auto* const collider, const auto /*kernel_index*/) {
         cam->set_view(math::Mat4x4<float>(transform->get_transposed_inverted_global_matrix().transposed()));
-        std::array<math::Vec3<double>, 8> points;
+        std::array<math::Vec3<core::fp_t>, 8> points;
         cam->generate_frustum_points(transform->get_global_position(), transform->get_x_axis(), transform->get_y_axis(), transform->get_z_axis(), points);
         collider->update(points);
     });

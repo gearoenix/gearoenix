@@ -23,7 +23,7 @@ struct Model;
 struct Models;
 
 struct ShadowCasterDirectionalLightData final {
-    math::Frustum<double> frustum;
+    math::Frustum<core::fp_t> frustum;
     math::Mat4x4<float> normalised_vp;
     math::Vec3<float> direction;
     math::Vec3<float> colour;

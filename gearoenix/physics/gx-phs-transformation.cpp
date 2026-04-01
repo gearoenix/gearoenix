@@ -31,11 +31,11 @@
 //     std::shared_ptr<platform::stream::Stream>&& s,
 //     core::job::EndCaller<>&& e)
 // {
-//     math::Vec3<double> pos;
+//     math::Vec3<core::fp_t> pos;
 //     pos.read(*s);
-//     math::Quat<double> rot;
+//     math::Quat<core::fp_t> rot;
 //     rot.read(*s);
-//     math::Vec3<double> scl;
+//     math::Vec3<core::fp_t> scl;
 //     scl.read(*s);
 //
 //     core::job::EndCaller end([this, s = component_self.lock(), e = std::move(e), pos, rot, scl] {
@@ -80,7 +80,7 @@ gearoenix::physics::Transformation::Transformation(core::ecs::Entity* const enti
 
 gearoenix::physics::Transformation::~Transformation() = default;
 
-void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<double>& lm)
+void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<core::fp_t>& lm)
 {
     changed = true;
     local_matrix = lm;
@@ -89,57 +89,93 @@ void gearoenix::physics::Transformation::set_local_matrix(const math::Mat4x4<dou
     rotation = decltype(rotation.quat)::from(rotation_matrix);
 }
 
-gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_global_position() const { return global_matrix.get_position(); }
+gearoenix::math::Vec3<gearoenix::core::fp_t> gearoenix::physics::Transformation::get_global_position() const
+{
+    return global_matrix.get_position();
+}
 
-void gearoenix::physics::Transformation::get_global_position(math::Vec3<double>& l) const { global_matrix.get_position(l); }
+void gearoenix::physics::Transformation::get_global_position(math::Vec3<core::fp_t>& l) const
+{
+    global_matrix.get_position(l);
+}
 
-void gearoenix::physics::Transformation::set_local_position(const math::Vec3<double>& p)
+void gearoenix::physics::Transformation::set_local_position(const math::Vec3<core::fp_t>& p)
 {
     changed = true;
     local_matrix.set_position(p);
 }
 
-gearoenix::math::Vec3<double> gearoenix::physics::Transformation::get_local_position() const { return local_matrix.get_position(); }
+gearoenix::math::Vec3<gearoenix::core::fp_t> gearoenix::physics::Transformation::get_local_position() const
+{
+    return local_matrix.get_position();
+}
 
-void gearoenix::physics::Transformation::get_local_position(math::Vec3<double>& p) const { local_matrix.get_position(p); }
+void gearoenix::physics::Transformation::get_local_position(math::Vec3<core::fp_t>& p) const
+{
+    local_matrix.get_position(p);
+}
 
-void gearoenix::physics::Transformation::local_translate(const math::Vec3<double>& t)
+void gearoenix::physics::Transformation::local_translate(const math::Vec3<core::fp_t>& t)
 {
     changed = true;
     local_matrix.translate(t);
 }
 
-void gearoenix::physics::Transformation::local_x_translate(const double v) { local_translate(rotation_matrix.columns[0] * v); }
+void gearoenix::physics::Transformation::local_x_translate(const core::fp_t v)
+{
+    local_translate(rotation_matrix.columns[0] * v);
+}
 
-void gearoenix::physics::Transformation::local_y_translate(const double v) { local_translate(rotation_matrix.columns[1] * v); }
+void gearoenix::physics::Transformation::local_y_translate(const core::fp_t v)
+{
+    local_translate(rotation_matrix.columns[1] * v);
+}
 
-void gearoenix::physics::Transformation::local_z_translate(const double v) { local_translate(rotation_matrix.columns[2] * v); }
+void gearoenix::physics::Transformation::local_z_translate(const core::fp_t v)
+{
+    local_translate(rotation_matrix.columns[2] * v);
+}
 
-void gearoenix::physics::Transformation::local_outer_rotate(const double rad, const math::Vec3<double>& axis, const math::Vec3<double>& l)
+void gearoenix::physics::Transformation::local_outer_rotate(const core::fp_t rad, const math::Vec3<core::fp_t>& axis, const math::Vec3<core::fp_t>& l)
 {
     const auto r = decltype(rotation.quat)::angle_axis(rad, axis);
     const auto position = r.rotate(get_local_position() - l) + l;
     reset(scale, r * rotation.get_quat(), position);
 }
 
-void gearoenix::physics::Transformation::local_outer_rotate(const double rad, const math::Vec3<double>& axis)
+void gearoenix::physics::Transformation::local_outer_rotate(const core::fp_t rad, const math::Vec3<core::fp_t>& axis)
 {
     const auto r = decltype(rotation.quat)::angle_axis(rad, axis);
     const auto position = r.rotate(get_local_position());
     reset(scale, r * rotation.get_quat(), position);
 }
 
-void gearoenix::physics::Transformation::local_inner_rotate(const double rad, const math::Vec3<double>& axis) { local_inner_rotate(decltype(rotation.quat)::angle_axis(rad, axis)); }
+void gearoenix::physics::Transformation::local_inner_rotate(const core::fp_t rad, const math::Vec3<core::fp_t>& axis)
+{
+    local_inner_rotate(decltype(rotation.quat)::angle_axis(rad, axis));
+}
 
-void gearoenix::physics::Transformation::local_inner_rotate(const math::Quat<double>& q) { reset(scale, q * rotation.get_quat(), get_local_position()); }
+void gearoenix::physics::Transformation::local_inner_rotate(const math::Quat<core::fp_t>& q)
+{
+    reset(scale, q * rotation.get_quat(), get_local_position());
+}
 
-void gearoenix::physics::Transformation::local_inner_x_rotate(const double rad) { local_inner_rotate(rad, get_x_axis()); }
+void gearoenix::physics::Transformation::local_inner_x_rotate(const core::fp_t rad)
+{
+    local_inner_rotate(rad, get_x_axis());
+}
 
-void gearoenix::physics::Transformation::local_inner_y_rotate(const double rad) { local_inner_rotate(rad, get_y_axis()); }
+void gearoenix::physics::Transformation::local_inner_y_rotate(const core::fp_t rad)
+{
+    local_inner_rotate(rad, get_y_axis());
+}
 
-void gearoenix::physics::Transformation::local_inner_z_rotate(const double rad) { local_inner_rotate(rad, get_z_axis()); }
+void gearoenix::physics::Transformation::local_inner_z_rotate(const core::fp_t rad)
+{
+    local_inner_rotate(rad, get_z_axis());
+}
 
-void gearoenix::physics::Transformation::set_local_inner_scale(const math::Vec3<double>& s)
+void gearoenix::physics::Transformation::set_local_inner_scale(const math::Vec3<core::fp_t>& s)
 {
     changed = true;
     scale = s;
@@ -147,52 +183,67 @@ void gearoenix::physics::Transformation::set_local_inner_scale(const math::Vec3<
     local_matrix.local_scale(s);
 }
 
-void gearoenix::physics::Transformation::local_inner_scale(const double s)
+void gearoenix::physics::Transformation::local_inner_scale(const core::fp_t s)
 {
     changed = true;
     scale = math::Vec3(s);
     local_matrix.local_scale(s);
 }
 
-void gearoenix::physics::Transformation::local_inner_scale(const math::Vec3<double>& s)
+void gearoenix::physics::Transformation::local_inner_scale(const math::Vec3<core::fp_t>& s)
 {
     changed = true;
     scale *= s;
     local_matrix.local_scale(s);
 }
 
-void gearoenix::physics::Transformation::local_inner_x_scale(const double s)
+void gearoenix::physics::Transformation::local_inner_x_scale(const core::fp_t s)
 {
     changed = true;
     scale.x *= s;
     local_matrix.local_x_scale(s);
 }
 
-void gearoenix::physics::Transformation::local_inner_y_scale(const double s)
+void gearoenix::physics::Transformation::local_inner_y_scale(const core::fp_t s)
 {
     changed = true;
     scale.y *= s;
     local_matrix.local_y_scale(s);
 }
 
-void gearoenix::physics::Transformation::local_inner_z_scale(const double s)
+void gearoenix::physics::Transformation::local_inner_z_scale(const core::fp_t s)
 {
     changed = true;
     scale.z *= s;
     local_matrix.local_z_scale(s);
 }
 
-void gearoenix::physics::Transformation::set_rotation(const math::Quat<double>& r) { reset(scale, r, get_local_position()); }
+void gearoenix::physics::Transformation::set_rotation(const math::Quat<core::fp_t>& r)
+{
+    reset(scale, r, get_local_position());
+}
 
-void gearoenix::physics::Transformation::set_rotation(const Rotation& r) { reset(scale, r, get_local_position()); }
+void gearoenix::physics::Transformation::set_rotation(const Rotation& r)
+{
+    reset(scale, r, get_local_position());
+}
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::Transformation::get_x_axis() const { return rotation_matrix[0]; }
+const gearoenix::math::Vec3<gearoenix::core::fp_t>& gearoenix::physics::Transformation::get_x_axis() const
+{
+    return rotation_matrix[0];
+}
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::Transformation::get_y_axis() const { return rotation_matrix[1]; }
+const gearoenix::math::Vec3<gearoenix::core::fp_t>& gearoenix::physics::Transformation::get_y_axis() const
+{
+    return rotation_matrix[1];
+}
 
-const gearoenix::math::Vec3<double>& gearoenix::physics::Transformation::get_z_axis() const { return rotation_matrix[2]; }
+const gearoenix::math::Vec3<gearoenix::core::fp_t>& gearoenix::physics::Transformation::get_z_axis() const
+{
+    return rotation_matrix[2];
+}
 
-void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& pos, const math::Vec3<double>& target, const math::Vec3<double>& up)
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<core::fp_t>& pos, const math::Vec3<core::fp_t>& target, const math::Vec3<core::fp_t>& up)
 {
     changed = true;
     local_matrix = decltype(local_matrix)::look_at_inverted(pos, target, up);
@@ -201,7 +252,10 @@ void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>&
     scale = decltype(scale)(1.0);
 }
 
-void gearoenix::physics::Transformation::local_look_at(const math::Vec3<double>& target, const math::Vec3<double>& up) { local_look_at(get_local_position(), target, up); }
+void gearoenix::physics::Transformation::local_look_at(const math::Vec3<core::fp_t>& target, const math::Vec3<core::fp_t>& up)
+{
+    local_look_at(get_local_position(), target, up);
+}
 
 void gearoenix::physics::Transformation::update_without_inverse_root()
 {
@@ -241,7 +295,10 @@ void gearoenix::physics::Transformation::update_without_inverse_child()
     }
 }
 
-void gearoenix::physics::Transformation::clear_change() { changed = false; }
+void gearoenix::physics::Transformation::clear_change()
+{
+    changed = false;
+}
 
 void gearoenix::physics::Transformation::reset()
 {
@@ -252,7 +309,7 @@ void gearoenix::physics::Transformation::reset()
     changed = false;
 }
 
-void gearoenix::physics::Transformation::reset(const math::Vec3<double>& s, const Rotation& r, const math::Vec3<double>& p)
+void gearoenix::physics::Transformation::reset(const math::Vec3<core::fp_t>& s, const Rotation& r, const math::Vec3<core::fp_t>& p)
 {
     changed = true;
     local_matrix = r.get_quat().to_m4x4();
@@ -263,7 +320,7 @@ void gearoenix::physics::Transformation::reset(const math::Vec3<double>& s, cons
     local_matrix.set_position(p);
 }
 
-void gearoenix::physics::Transformation::reset(const math::Vec3<double>& s, const math::Quat<double>& r, const math::Vec3<double>& p)
+void gearoenix::physics::Transformation::reset(const math::Vec3<core::fp_t>& s, const math::Quat<core::fp_t>& r, const math::Vec3<core::fp_t>& p)
 {
     changed = true;
     rotation = r;
@@ -274,7 +331,7 @@ void gearoenix::physics::Transformation::reset(const math::Vec3<double>& s, cons
     local_matrix.set_position(p);
 }
 
-void gearoenix::physics::Transformation::reset(const math::Vec3<double>& s, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, const math::Vec3<double>& p)
+void gearoenix::physics::Transformation::reset(const math::Vec3<core::fp_t>& s, const math::Vec3<core::fp_t>& x, const math::Vec3<core::fp_t>& y, const math::Vec3<core::fp_t>& z, const math::Vec3<core::fp_t>& p)
 {
     changed = true;
     rotation_matrix = { x, y, z };
@@ -334,6 +391,11 @@ void gearoenix::physics::Transformation::draw_gizmo()
 
 void gearoenix::physics::Transformation::update()
 {
-    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) { transform->update_without_inverse_root(); });
-    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) { transform->update_inverse(); });
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+        transform->update_without_inverse_root();
+    });
+
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+        transform->update_inverse();
+    });
 }

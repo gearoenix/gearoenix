@@ -17,7 +17,7 @@ struct Baked : Probe {
     constexpr static std::array immediate_parent_object_type_indices { Probe::object_type_index };
 
 protected:
-    Baked(core::ecs::Entity* entity, core::object_type_index_t final_component_type_index, std::shared_ptr<texture::TextureCube>&& irradiance, std::shared_ptr<texture::TextureCube>&& radiance, const math::Aabb3<double>& include_box,
+    Baked(core::ecs::Entity* entity, core::object_type_index_t final_component_type_index, std::shared_ptr<texture::TextureCube>&& irradiance, std::shared_ptr<texture::TextureCube>&& radiance, const math::Aabb3<core::fp_t>& include_box,
         std::string&& name);
 
 public:
