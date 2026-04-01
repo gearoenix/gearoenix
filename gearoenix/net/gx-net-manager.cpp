@@ -8,7 +8,8 @@
 gearoenix::net::Manager::Manager()
     : Singleton(this)
 {
-    GX_ASSERT_D(enet_initialize() == 0);
+    [[maybe_unused]] const auto result = enet_initialize();
+    GX_ASSERT_D(0 == result);
 }
 
 gearoenix::net::Manager::~Manager() { enet_deinitialize(); }

@@ -137,9 +137,8 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     }
 
     if (swapchain->get_is_valid()) {
-        GX_PROFILE_BEGIN(vulkan - start - frame - fence - wait);
+        GX_PROFILE_SCOPE(vulkan_start_frame_fence_wait);
         frames[frame_number]->start();
-        GX_PROFILE_END(vulkan - start - frame - fence - wait);
     }
 
     core::job::execute_current_thread_jobs();
@@ -148,24 +147,29 @@ void gearoenix::vulkan::engine::Engine::start_frame()
 
     core::job::execute_current_thread_jobs();
 
-    GX_PROFILE_BEGIN(vulkan - start - frame - swapchain - wait);
-    if (swapchain->get_is_valid()) {
-        swapchain->acquire_next_image(*frames[frame_number]->present_semaphore);
+    {
+        GX_PROFILE_SCOPE(vulkan_start_frame_swapchain_wait);
+        if (swapchain->get_is_valid()) {
+            swapchain->acquire_next_image(*frames[frame_number]->present_semaphore);
+        }
     }
-    GX_PROFILE_END(vulkan - start - frame - swapchain - wait);
 }
 
 void gearoenix::vulkan::engine::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
 
-    GX_PROFILE_BEGIN(vulkan - end - frame);
     imgui_manager->end_frame();
     if (swapchain->get_is_valid()) {
-        submit();
-        swapchain->present();
+        {
+            GX_PROFILE_SCOPE(vulkan_end_frame_submission);
+            submit();
+        }
+        {
+            GX_PROFILE_SCOPE(vulkan_end_frame_present);
+            swapchain->present();
+        }
     }
-    GX_PROFILE_END(vulkan - end - frame);
 
     core::job::execute_current_thread_jobs();
 }

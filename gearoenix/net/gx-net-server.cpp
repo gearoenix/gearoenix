@@ -173,13 +173,15 @@ void gearoenix::net::Server::terminate()
 {
     running = false;
     core::job::send_job_to_pool([t = thread, h = host] {
-        t->join();
+        if(t) {
+            t->join();
+        }
         if (h) {
             enet_host_destroy(h);
         }
         GX_LOG_D("ENet server stopped");
     });
-    thread.reset();
+    thread = nullptr;
 }
 
 gearoenix::net::Server::~Server() { terminate(); }

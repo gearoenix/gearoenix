@@ -11,7 +11,9 @@ endif()
 
 include(${GX_BASE_TRIPLET})
 
-set(VCPKG_BUILD_TYPE release)
-set(VCPKG_C_FLAGS "-fuse-ld=lld -O3 -flto -ftree-vectorize -march=native -Wno-error=incompatible-pointer-types-discards-qualifiers -Wno-error=initializer-overrides") # because of SDL3 fast-math removed, Wno-error flags for libsystemd+clang-22+glibc compat
-set(VCPKG_CXX_FLAGS "-fuse-ld=lld -O3 -flto -ftree-vectorize -march=native -Wno-error=incompatible-pointer-types-discards-qualifiers -Wno-error=initializer-overrides") # because of SDL3 fast-math removed
-set(VCPKG_LINKER_FLAGS "-fuse-ld=lld -ffast-math -ftree-vectorize -march=native -O3 -flto")
+set(VCPKG_C_FLAGS "-O3 -ftree-vectorize -march=native -Wno-error=incompatible-pointer-types-discards-qualifiers -Wno-error=initializer-overrides") # because of SDL3 fast-math removed
+set(VCPKG_CXX_FLAGS "-O3 -ftree-vectorize -march=native -Wno-error=incompatible-pointer-types-discards-qualifiers -Wno-error=initializer-overrides") # because of SDL3 fast-math removed
+set(VCPKG_C_FLAGS_RELEASE "-flto")
+set(VCPKG_CXX_FLAGS_RELEASE "-flto")
+set(VCPKG_LINKER_FLAGS "-ffast-math -ftree-vectorize -march=native -O3")
+set(VCPKG_LINKER_FLAGS_RELEASE "-flto")

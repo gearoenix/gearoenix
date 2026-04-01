@@ -288,7 +288,6 @@ void gearoenix::platform::BaseApplication::terminate()
     render_engine = nullptr;
     ImGui::DestroyContext();
     core::job::terminate();
-    GX_PROFILE_REPORT;
 }
 
 void gearoenix::platform::BaseApplication::update()

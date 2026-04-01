@@ -26,6 +26,8 @@ option(GX_TEST_ENABLED "Enables test units" ON)
 
 option(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
+option(GX_PROFILING_ENABLED "Enables Tracy profiler" OFF)
+
 message(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
 set(GX_MAIN_ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
@@ -56,10 +58,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-ffast-math -msimd128 -O3 -flto ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(GX_IN_LINUX TRUE)
-    set(CMAKE_CXX_FLAGS "-fuse-ld=lld -ffast-math -ftree-vectorize -march=native ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-ffast-math -ftree-vectorize -march=native ${CMAKE_CXX_FLAGS}")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
-    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld ${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=lld ${CMAKE_SHARED_LINKER_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-ffast-math -ftree-vectorize -march=native -O3 -flto ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-ffast-math -ftree-vectorize -march=native -O3 -flto ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -118,6 +118,8 @@ set(GX_RELEASE_LIBS ${GX_RELEASE_LIBS} ${GX_COMMON_LIBS})
 
 set(GX_SUBMODULES_DIR ${CMAKE_SOURCE_DIR}/submodules)
 
+include(FetchContent)
+
 find_package(Boost CONFIG REQUIRED COMPONENTS lockfree mp11 included_unit_test_framework headers core container container_hash)
 
 find_package(SDL3 CONFIG REQUIRED)
@@ -130,9 +132,21 @@ find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 find_path(SQLITE_MODERN_CPP_INCLUDE_DIRS "sqlite_modern_cpp.h")
 
-if(NOT GX_IN_WASM)
+if (GX_PROFILING_ENABLED)
+    option(TRACY_ENABLE    "" ON)
+    option(TRACY_ON_DEMAND "" ON)
+    FetchContent_Declare(
+            tracy
+            GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+            GIT_TAG v0.13.1
+            GIT_SHALLOW TRUE
+            GIT_PROGRESS TRUE)
+    FetchContent_MakeAvailable(tracy)
+endif ()
+
+if (NOT GX_IN_WASM)
     find_package(Vulkan REQUIRED)
-endif()
+endif ()
 
 add_subdirectory(gearoenix)
 add_subdirectory(editor)

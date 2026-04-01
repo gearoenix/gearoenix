@@ -24,29 +24,28 @@ gearoenix::physics::Engine::~Engine() = default;
 
 void gearoenix::physics::Engine::start_frame()
 {
-    GX_PROFILE_BEGIN(physics - start - frame);
+    GX_PROFILE_SCOPE(physics_start_frame);
 
-    GX_PROFILE_BEGIN(physics - start - animation_manager->update);
-    animation_manager->update();
-    GX_PROFILE_END(physics - start - animation_manager->update);
-
-    GX_PROFILE_BEGIN(physics - start - constraint_manager->update);
-    constraint_manager->update();
-    GX_PROFILE_END(physics - start - constraint_manager->update);
-
-    GX_PROFILE_BEGIN(physics - start - transformations->update);
-    Transformation::update();
-    GX_PROFILE_END(physics - start - transformations->update);
-
-    GX_PROFILE_BEGIN(physics - start - bones->update);
-    animation::Bone::update_all_bones_after_transform_updates();
-    GX_PROFILE_END(physics - start - bones->update);
-
-    GX_PROFILE_BEGIN(physics - start - colliders->update);
-    collider::Collider::update_all_after_transform_update();
-    GX_PROFILE_END(physics - start - colliders->update);
-
-    GX_PROFILE_END(physics - start - frame);
+    {
+        GX_PROFILE_SCOPE(physics - start - animation_manager->update);
+        animation_manager->update();
+    }
+    {
+        GX_PROFILE_SCOPE(physics - start - constraint_manager->update);
+        constraint_manager->update();
+    }
+    {
+        GX_PROFILE_SCOPE(physics - start - transformations->update);
+        Transformation::update();
+    }
+    {
+        GX_PROFILE_SCOPE(physics - start - bones->update);
+        animation::Bone::update_all_bones_after_transform_updates();
+    }
+    {
+        GX_PROFILE_SCOPE(physics - start - colliders->update);
+        collider::Collider::update_all_after_transform_update();
+    }
 }
 
 void gearoenix::physics::Engine::end_frame()

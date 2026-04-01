@@ -102,6 +102,12 @@ target_link_libraries(GearoenixGameEngine PUBLIC unofficial-sodium::sodium)
 target_include_directories(GearoenixGameEngine SYSTEM PUBLIC ${SQLITE_MODERN_CPP_INCLUDE_DIRS})
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial::sqlite3::sqlite3)
 
+if(GX_PROFILING_ENABLED)
+    target_link_libraries(GearoenixGameEngine PUBLIC TracyClient)
+    target_compile_definitions(GearoenixGameEngine PUBLIC TRACY_ENABLE=true)
+    target_compile_definitions(GearoenixGameEngine PUBLIC GX_PROFILING_ENABLED=true)
+endif()
+
 foreach (GX_LIB ${GX_DEBUG_LIBS})
     target_link_libraries(GearoenixGameEngine PUBLIC debug ${GX_LIB})
 endforeach ()

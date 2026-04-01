@@ -10,6 +10,8 @@
 #include "../reflection/gx-rnd-rfl-baked.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "../reflection/gx-rnd-rfl-probe.hpp"
+#include "../../core/gx-cr-profiler.hpp"
+
 #include <boost/functional/hash.hpp>
 
 void gearoenix::render::record::ModelThreadData::clear()
@@ -95,9 +97,12 @@ void gearoenix::render::record::Models::update(core::ecs::Entity* const scene_en
         static_models_bvh.create_nodes();
     }
 
-    dynamic_models_bvh.reset();
-    for (const auto& m : dynamic_models) {
-        dynamic_models_bvh.add({ m.collider->get_surrounding_box(), m });
+    {
+        GX_PROFILE_SCOPE(render_record_models_dynamic_models_bvh_recreation);
+        dynamic_models_bvh.reset();
+        for (const auto& m : dynamic_models) {
+            dynamic_models_bvh.add({ m.collider->get_surrounding_box(), m });
+        }
+        dynamic_models_bvh.create_nodes();
     }
-    dynamic_models_bvh.create_nodes();
 }

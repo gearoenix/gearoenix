@@ -24,11 +24,14 @@ void gearoenix::core::FunctionLoader::unload()
             const std::lock_guard _lg(load_functions_lock);
             std::swap(load_functions, unload_functions);
         }
-        for (const auto& f : unload_functions) {
+        for (auto& f : unload_functions) {
             f();
         }
         unload_functions.clear();
     }
 }
 
-bool gearoenix::core::FunctionLoader::empty() const { return load_functions.empty(); }
+bool gearoenix::core::FunctionLoader::empty() const
+{
+    return load_functions.empty();
+}
