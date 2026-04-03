@@ -1,5 +1,7 @@
 #include "gx-rnd-scn-scene.hpp"
 
+#include "../../core/gx-cr-profiler.hpp"
+
 namespace {
 constexpr std::uint32_t io_unique_marker = 0x6056f3a0;
 }
@@ -42,7 +44,17 @@ void gearoenix::render::scene::Scene::write(std::shared_ptr<platform::stream::St
 
 gearoenix::render::scene::Scene::~Scene() = default;
 
-void gearoenix::render::scene::Scene::update()
+void gearoenix::render::scene::Scene::update_per_frame()
 {
-    record.update(entity);
+    if (changed) {
+        GX_PROFILE_EXP(record.update_after_change(entity));
+    }
+    GX_PROFILE_EXP(record.update_per_frame(entity));
+
+    changed = false;
+}
+
+void gearoenix::render::scene::Scene::update_after_change()
+{
+    changed = true;
 }

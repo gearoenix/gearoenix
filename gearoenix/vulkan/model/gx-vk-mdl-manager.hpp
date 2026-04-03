@@ -17,7 +17,7 @@ public:
     Manager();
     ~Manager() override;
 
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable) override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable, bool is_skinned) override;
     void update() override;
     void upload_uniforms();
 };

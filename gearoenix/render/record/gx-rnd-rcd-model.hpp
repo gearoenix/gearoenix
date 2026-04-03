@@ -1,9 +1,18 @@
 #pragma once
+#include "../../core/gx-cr-build-configuration.hpp"
 #include "../../core/gx-cr-growing-array.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../gx-rnd-build-configuration.hpp"
+
 #include <boost/container/static_vector.hpp>
+
 #include <vector>
+
+#define GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS true
+
+#if GX_DEBUG_MODE
+#define GEAROENIX_RENDER_RECORD_MODEL_DEBUG true
+#endif
 
 namespace gearoenix::core::ecs {
 struct Entity;
@@ -63,23 +72,22 @@ struct Model final {
     ~Model() = default;
 };
 
-struct ModelThreadData final {
-    std::vector<Model> static_models;
-    std::vector<Model> dynamic_models;
-    std::size_t static_models_hash = 0;
-
-    void clear();
-};
-
 struct Models final {
-    std::vector<ModelThreadData> threads;
-    std::vector<Model> static_models;
-    std::vector<Model> dynamic_models;
-    physics::accelerator::Bvh<Model> static_models_bvh;
-    physics::accelerator::Bvh<Model> dynamic_models_bvh;
-    std::uintptr_t previous_frame_static_models_hash = 0;
+    std::vector<Model> models;
+    std::size_t dynamic_models_starting_index = 0;
+    physics::accelerator::Bvh static_models_bvh;
+
+#if GEAROENIX_RENDER_RECORD_MODEL_DEBUG
+    std::uint64_t last_frame_update = 0;
+    std::size_t previous_models_hash = 0;
+#endif
+
+#if GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
+    physics::accelerator::Bvh dynamic_models_bvh;
+#endif
 
     Models();
-    void update(core::ecs::Entity* scene_entity);
+    void update_after_change(core::ecs::Entity* scene_entity);
+    void update_per_frame(core::ecs::Entity* scene_entity);
 };
 }

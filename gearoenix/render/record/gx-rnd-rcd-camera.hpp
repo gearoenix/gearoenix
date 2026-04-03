@@ -12,7 +12,6 @@ struct Transformation;
 }
 
 namespace gearoenix::physics::accelerator {
-template <typename T>
 struct Bvh;
 }
 
@@ -54,14 +53,15 @@ struct Camera final {
     camera::Camera* camera = nullptr;
     physics::Transformation* transform = nullptr;
     physics::collider::Collider* collider = nullptr;
-    std::vector<std::pair<core::fp_t, CameraModel>> translucent_models;
-    std::vector<std::pair<core::fp_t, CameraModel>> opaque_models;
+    std::vector<std::pair<core::fp_t, CameraModel>> temp_models;
+    std::vector<std::pair<core::fp_t, CameraModel>> all_models;
+    std::size_t translucent_models_starting_index = 0;
     std::vector<math::Mat4x4<float>> mvps;
     std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
 
     Camera();
     void clear();
-    void update_models(physics::accelerator::Bvh<Model>& bvh);
+    void update_models(physics::accelerator::Bvh& bvh, std::vector<Model>& models);
     void update_models(Models& models);
 };
 

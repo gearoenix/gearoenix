@@ -137,20 +137,18 @@ void gearoenix::vulkan::engine::Engine::start_frame()
     }
 
     if (swapchain->get_is_valid()) {
-        GX_PROFILE_SCOPE(vulkan_start_frame_fence_wait);
-        frames[frame_number]->start();
+        GX_PROFILE_EXP(frames[frame_number]->start());
     }
 
     core::job::execute_current_thread_jobs();
 
-    imgui_manager->start_frame();
+    GX_PROFILE_EXP(imgui_manager->start_frame());
 
     core::job::execute_current_thread_jobs();
 
     {
-        GX_PROFILE_SCOPE(vulkan_start_frame_swapchain_wait);
         if (swapchain->get_is_valid()) {
-            swapchain->acquire_next_image(*frames[frame_number]->present_semaphore);
+            GX_PROFILE_EXP(swapchain->acquire_next_image(*frames[frame_number]->present_semaphore));
         }
     }
 }
@@ -159,16 +157,10 @@ void gearoenix::vulkan::engine::Engine::end_frame()
 {
     render::engine::Engine::end_frame();
 
-    imgui_manager->end_frame();
+    GX_PROFILE_EXP(imgui_manager->end_frame());
     if (swapchain->get_is_valid()) {
-        {
-            GX_PROFILE_SCOPE(vulkan_end_frame_submission);
-            submit();
-        }
-        {
-            GX_PROFILE_SCOPE(vulkan_end_frame_present);
-            swapchain->present();
-        }
+        GX_PROFILE_EXP(submit());
+        GX_PROFILE_EXP(swapchain->present());
     }
 
     core::job::execute_current_thread_jobs();
@@ -189,22 +181,28 @@ void gearoenix::vulkan::engine::Engine::submit()
     vk_cmd.setFrontFace(vk::FrontFace::eCounterClockwise);
     vk_cmd.setCullMode(vk::CullModeFlagBits::eBack);
 
-    upload_uniforms();
-    buffer_manager->upload_dynamics(vk_cmd);
-    bindless_descriptor_manager->bind(vk_cmd);
-    vk_scene_manager->submit(vk_cmd);
-    imgui_manager->update();
-    cmd.end();
+    GX_PROFILE_EXP(upload_uniforms());
+    GX_PROFILE_EXP(buffer_manager->upload_dynamics(vk_cmd));
+    GX_PROFILE_EXP(bindless_descriptor_manager->bind(vk_cmd));
+    GX_PROFILE_EXP(vk_scene_manager->submit(vk_cmd));
+    GX_PROFILE_EXP(imgui_manager->update());
+    GX_PROFILE_EXP(cmd.end());
 
     const vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     const auto wait_semaphore = frame.present_semaphore->get_vulkan_data();
     const auto signal_semaphore = swapchain->get_present_semaphore().get_vulkan_data();
-    render_queue->submit(wait_semaphore, wait_stage, vk_cmd, signal_semaphore, frame.render_fence->get_vulkan_data());
+    GX_PROFILE_EXP(render_queue->submit(wait_semaphore, wait_stage, vk_cmd, signal_semaphore, frame.render_fence->get_vulkan_data()));
 }
 
-gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() { return *frames[frame_number]; }
+gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame()
+{
+    return *frames[frame_number];
+}
 
-const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const { return *frames[frame_number]; }
+const gearoenix::vulkan::engine::Frame& gearoenix::vulkan::engine::Engine::get_current_frame() const
+{
+    return *frames[frame_number];
+}
 
 bool gearoenix::vulkan::engine::Engine::is_supported()
 {

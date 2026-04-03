@@ -4,10 +4,17 @@
 #include "../material/gx-rnd-mat-material.hpp"
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 
-gearoenix::render::model::Model::Model(core::ecs::Entity* const entity, const core::object_type_index_t final_component_type, const bool is_transformable, meshes_set_t&& meshes, std::string&& name)
+gearoenix::render::model::Model::Model(
+    core::ecs::Entity* const entity,
+    const core::object_type_index_t final_component_type,
+    const bool is_transformable,
+    meshes_set_t&& meshes,
+    std::string&& name,
+    const bool is_skinned)
     : Component(entity, final_component_type, std::move(name))
     , is_transformable(is_transformable)
     , meshes(std::move(meshes))
+    , is_skinned(is_skinned)
 {
 }
 

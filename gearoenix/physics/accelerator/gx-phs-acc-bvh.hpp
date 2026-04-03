@@ -3,29 +3,26 @@
 #include "../../math/gx-math-aabb.hpp"
 #include "../../math/gx-math-ray.hpp"
 
-#include <boost/container/static_vector.hpp>
-
 #include <array>
-#include <functional>
 #include <optional>
-#include <string>
 #include <utility>
 #include <vector>
 
 namespace gearoenix::physics::accelerator {
-template <typename UserData>
 struct Bvh final {
-    constexpr static std::uint32_t local_data_size = 5;
-    constexpr static std::uint32_t bins_count = 32;
-    constexpr static std::uint32_t walls_count = bins_count - 1;
-    constexpr static std::uint32_t leaf_flag = 0x80000000u;
+    using index_t = std::uint32_t;
 
-    static_assert(bins_count > 4 && bins_count % 2 == 0, "Bins count is unexpected.");
-    static_assert(std::is_trivially_destructible_v<UserData>, "Only trivially destructible data is accepted.");
+    constexpr static index_t local_data_size = 5u;
+    constexpr static index_t bins_count = 32u;
+    constexpr static index_t walls_count = bins_count - 1u;
+    constexpr static index_t leaf_flag = 0x80000000u;
+
+
+    static_assert(bins_count > 4u && bins_count % 2u == 0u, "Bins count is unexpected.");
 
     struct Data final {
         math::Aabb3<core::fp_t> box;
-        UserData user_data;
+        index_t index;
     };
 
 private:
@@ -34,15 +31,15 @@ private:
     struct Node final {
         math::Vec3<float> upper;
         math::Vec3<float> lower;
-        std::uint32_t left;
-        std::uint32_t right;
+        index_t left;
+        index_t right;
     };
 
     static_assert(sizeof(Node) == 32, "Node must be exactly 32 bytes.");
 
     struct Bin final {
         math::Aabb3<core::fp_t> volume;
-        std::uint32_t count = 0;
+        index_t count = 0;
     };
 
     std::vector<std::uint8_t> nodes;
@@ -51,35 +48,35 @@ private:
     std::array<Bin, bins_count> bins;
     std::vector<Data> data;
 
-    [[nodiscard]] Node& node_at(const std::uint32_t ptr) { return *reinterpret_cast<Node*>(&nodes[ptr]); }
-    [[nodiscard]] const Node& node_at(const std::uint32_t ptr) const { return *reinterpret_cast<const Node*>(&nodes[ptr]); }
-    [[nodiscard]] Data& data_at(const std::uint32_t ptr) { return *reinterpret_cast<Data*>(&nodes[ptr]); }
-    [[nodiscard]] const Data& data_at(const std::uint32_t ptr) const { return *reinterpret_cast<const Data*>(&nodes[ptr]); }
+    [[nodiscard]] Node& node_at(const index_t ptr) { return *reinterpret_cast<Node*>(&nodes[ptr]); }
+    [[nodiscard]] const Node& node_at(const index_t ptr) const { return *reinterpret_cast<const Node*>(&nodes[ptr]); }
+    [[nodiscard]] Data& data_at(const index_t ptr) { return *reinterpret_cast<Data*>(&nodes[ptr]); }
+    [[nodiscard]] const Data& data_at(const index_t ptr) const { return *reinterpret_cast<const Data*>(&nodes[ptr]); }
 
     [[nodiscard]] static bool is_leaf(const Node& n) { return (n.left & leaf_flag) != 0; }
-    [[nodiscard]] static std::uint32_t leaf_count(const Node& n) { return n.left & ~leaf_flag; }
+    [[nodiscard]] static index_t leaf_count(const Node& n) { return n.left & ~leaf_flag; }
 
-    std::uint32_t allocate_bytes(const std::uint32_t sz)
+    index_t allocate_bytes(const index_t sz)
     {
-        const auto off = static_cast<std::uint32_t>(nodes.size());
+        const auto off = static_cast<index_t>(nodes.size());
         nodes.resize(off + sz);
         return off;
     }
 
     template <typename T>
-    std::pair<std::uint32_t, T&> allocate()
+    std::pair<index_t, T&> allocate()
     {
-        const auto off = allocate_bytes(static_cast<std::uint32_t>(sizeof(T)));
+        const auto off = allocate_bytes(static_cast<index_t>(sizeof(T)));
         auto* p = new (&nodes[off]) T();
         return { off, *p };
     }
 
-    void make_leaf(const math::Aabb3<core::fp_t>& volume, const std::uint32_t data_starting_index, const std::uint32_t data_ending_index)
+    void make_leaf(const math::Aabb3<core::fp_t>& volume, const index_t data_starting_index, const index_t data_ending_index)
     {
         const auto count = data_ending_index - data_starting_index;
         auto [_, node] = allocate<Node>();
-        node.upper = math::Vec3<float>(volume.get_upper());
-        node.lower = math::Vec3<float>(volume.get_lower());
+        node.upper = volume.get_upper().to<float>();
+        node.lower = volume.get_lower().to<float>();
         node.left = leaf_flag | count;
         node.right = 0;
         for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index) {
@@ -88,8 +85,8 @@ private:
     }
 
     void create_node(
-        const std::uint32_t data_starting_index,
-        const std::uint32_t data_ending_index,
+        const index_t data_starting_index,
+        const index_t data_ending_index,
         const math::Aabb3<core::fp_t>& center_volume,
         const math::Aabb3<core::fp_t>& volume)
     {
@@ -101,8 +98,8 @@ private:
         }
 
         const auto& dimensions = center_volume.get_diameter();
-        std::array<std::pair<std::uint32_t, core::fp_t>, 3> dimensions_indices;
-        for (std::uint32_t dimension_index = 0; dimension_index < 3; ++dimension_index) {
+        std::array<std::pair<index_t, core::fp_t>, 3> dimensions_indices;
+        for (index_t dimension_index = 0; dimension_index < 3; ++dimension_index) {
             dimensions_indices[dimension_index] = { dimension_index, dimensions[dimension_index] };
         }
         if (dimensions_indices[0].second < dimensions_indices[1].second) {
@@ -131,7 +128,7 @@ private:
 
             for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index) {
                 const auto& d = data[data_index];
-                auto bin_idx = static_cast<std::uint32_t>((d.box.get_center()[dimension_index.first] - lower_val) * inv_split);
+                auto bin_idx = static_cast<index_t>((d.box.get_center()[dimension_index.first] - lower_val) * inv_split);
                 if (bin_idx >= bins_count) {
                     bin_idx = bins_count - 1;
                 }
@@ -159,10 +156,10 @@ private:
 
             /// Prefix-scan SAH: O(bins) reverse prefix for right boxes
             std::array<math::Aabb3<core::fp_t>, walls_count> right_boxes;
-            std::array<std::uint32_t, walls_count> right_counts;
+            std::array<index_t, walls_count> right_counts;
             right_boxes[walls_count - 1] = bins[bins_count - 1].volume;
             right_counts[walls_count - 1] = bins[bins_count - 1].count;
-            for (std::uint32_t ri = walls_count - 1; ri > 0;) {
+            for (index_t ri = walls_count - 1; ri > 0;) {
                 const auto ri_prev = ri - 1;
                 right_boxes[ri_prev] = right_boxes[ri];
                 right_boxes[ri_prev].put(bins[ri].volume);
@@ -172,13 +169,13 @@ private:
 
             /// Single left-to-right sweep for SAH evaluation
             auto best_wall_cost = std::numeric_limits<core::fp_t>::max();
-            auto best_wall_index = static_cast<std::uint32_t>(-1);
+            auto best_wall_index = static_cast<index_t>(-1);
             math::Aabb3<core::fp_t> best_wall_left_box;
             math::Aabb3<core::fp_t> best_wall_right_box;
             math::Aabb3<core::fp_t> left_box;
-            std::uint32_t left_count = 0;
+            index_t left_count = 0;
 
-            for (std::uint32_t wall_index = 0; wall_index < walls_count; ++wall_index) {
+            for (index_t wall_index = 0; wall_index < walls_count; ++wall_index) {
                 left_count += bins[wall_index].count;
                 if (left_count == 0) {
                     continue;
@@ -197,7 +194,7 @@ private:
                 }
             }
 
-            if (best_wall_index == static_cast<std::uint32_t>(-1)) {
+            if (best_wall_index == static_cast<index_t>(-1)) {
                 continue;
             }
 
@@ -207,7 +204,7 @@ private:
             /// items in bins [0..best_wall_index) come first, no extra copies.
             auto mid = data_starting_index;
             for (auto data_index = data_starting_index; data_index < data_ending_index; ++data_index) {
-                auto bin_idx = static_cast<std::uint32_t>((data[data_index].box.get_center()[dimension_index.first] - lower_val) * inv_split);
+                auto bin_idx = static_cast<index_t>((data[data_index].box.get_center()[dimension_index.first] - lower_val) * inv_split);
                 if (bin_idx >= bins_count) {
                     bin_idx = bins_count - 1;
                 }
@@ -237,10 +234,10 @@ private:
             current_node.upper = math::Vec3<float>(volume.get_upper());
             current_node.lower = math::Vec3<float>(volume.get_lower());
 
-            current_node.left = static_cast<std::uint32_t>(nodes.size());
+            current_node.left = static_cast<index_t>(nodes.size());
             create_node(data_starting_index, mid, left_center_volume, best_wall_left_box);
 
-            node_at(current_node_index).right = static_cast<std::uint32_t>(nodes.size());
+            node_at(current_node_index).right = static_cast<index_t>(nodes.size());
             create_node(mid, data_ending_index, right_center_volume, best_wall_right_box);
 
             return;
@@ -265,7 +262,7 @@ private:
 
     /// Ray hit traversal — caller has already tested this node's box
     [[nodiscard]] std::optional<std::pair<core::fp_t, const Data*>> hit(
-        const std::uint32_t ptr,
+        const index_t ptr,
         const math::Ray3<core::fp_t>& ray,
         const math::Vec3<float>& ro,
         const math::Vec3<float>& rrd,
@@ -277,8 +274,8 @@ private:
             const auto data_size = leaf_count(node);
             auto min_dis = minimum_distance;
             const Data* min_data = nullptr;
-            auto data_ptr = ptr + static_cast<std::uint32_t>(sizeof(Node));
-            for (std::uint32_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<std::uint32_t>(sizeof(Data))) {
+            auto data_ptr = ptr + static_cast<index_t>(sizeof(Node));
+            for (index_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<index_t>(sizeof(Data))) {
                 const auto& d = data_at(data_ptr);
                 if (const auto h = d.box.hit(ray, min_dis); h.has_value()) {
                     min_dis = *h;
@@ -320,13 +317,13 @@ private:
     }
 
     template <typename Function>
-    void call_on_all(const std::uint32_t ptr, Function&& function)
+    void call_on_all(const index_t ptr, Function&& function)
     {
         const auto& node = node_at(ptr);
         if (is_leaf(node)) {
             const auto data_size = leaf_count(node);
-            auto data_ptr = ptr + static_cast<std::uint32_t>(sizeof(Node));
-            for (std::uint32_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<std::uint32_t>(sizeof(Data))) {
+            auto data_ptr = ptr + static_cast<index_t>(sizeof(Node));
+            for (index_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<index_t>(sizeof(Data))) {
                 function(data_at(data_ptr));
             }
         } else {
@@ -336,7 +333,7 @@ private:
     }
 
     template <typename Collider, typename Function>
-    void call_on_intersecting(const std::uint32_t ptr, const Collider& cld, Function&& on_intersection)
+    void call_on_intersecting(const index_t ptr, const Collider& cld, Function&& on_intersection)
     {
         const auto& node = node_at(ptr);
         const math::Aabb3 node_box(math::Vec3<core::fp_t>(node.upper), math::Vec3<core::fp_t>(node.lower));
@@ -350,8 +347,8 @@ private:
         }
         if (is_leaf(node)) {
             const auto data_size = leaf_count(node);
-            auto data_ptr = ptr + static_cast<std::uint32_t>(sizeof(Node));
-            for (std::uint32_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<std::uint32_t>(sizeof(Data))) {
+            auto data_ptr = ptr + static_cast<index_t>(sizeof(Node));
+            for (index_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<index_t>(sizeof(Data))) {
                 auto& d = data_at(data_ptr);
                 if (math::IntersectionStatus::Out != cld.check_intersection_status(d.box)) {
                     on_intersection(d);
@@ -364,7 +361,7 @@ private:
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
-    void call_on_intersecting(const std::uint32_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
+    void call_on_intersecting(const index_t ptr, const Collider& cld, Function&& on_intersection, ElseFunction&& not_intersection)
     {
         const auto& node = node_at(ptr);
         const math::Aabb3<core::fp_t> node_box(math::Vec3<core::fp_t>(node.upper), math::Vec3<core::fp_t>(node.lower));
@@ -379,8 +376,8 @@ private:
         }
         if (is_leaf(node)) {
             const auto data_size = leaf_count(node);
-            auto data_ptr = ptr + static_cast<std::uint32_t>(sizeof(Node));
-            for (std::uint32_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<std::uint32_t>(sizeof(Data))) {
+            auto data_ptr = ptr + static_cast<index_t>(sizeof(Node));
+            for (index_t data_index = 0; data_index < data_size; ++data_index, data_ptr += static_cast<index_t>(sizeof(Data))) {
                 auto& d = data_at(data_ptr);
                 if (math::IntersectionStatus::Out == cld.check_intersection_status(d.box)) {
                     not_intersection(d);
@@ -418,7 +415,7 @@ public:
         nodes.reserve(data.size() * (sizeof(Node) + sizeof(Data)) * 2);
         accu_volume.update();
         accu_center_volume.update();
-        create_node(0, static_cast<std::uint32_t>(data.size()), accu_center_volume, accu_volume);
+        create_node(0, static_cast<index_t>(data.size()), accu_center_volume, accu_volume);
     }
 
     [[nodiscard]] std::optional<std::pair<core::fp_t, const Data*>> hit(const math::Ray3<core::fp_t>& ray, const core::fp_t minimum_distance) const
@@ -426,8 +423,8 @@ public:
         if (nodes.empty()) {
             return std::nullopt;
         }
-        const math::Vec3<float> ro(ray.get_origin());
-        const math::Vec3<float> rrd(ray.get_reversed_normalized_direction());
+        const auto ro = ray.get_origin().to<float>();
+        const auto rrd = ray.get_reversed_normalized_direction().to<float>();
         if (!node_hit(node_at(0), ro, rrd, static_cast<float>(minimum_distance))) {
             return std::nullopt;
         }
@@ -440,7 +437,7 @@ public:
         if (nodes.empty()) {
             return;
         }
-        call_on_intersecting(static_cast<std::uint32_t>(0), cld, std::forward<Function>(on_intersection));
+        call_on_intersecting(static_cast<index_t>(0), cld, std::forward<Function>(on_intersection));
     }
 
     template <typename Collider, typename Function, typename ElseFunction>
@@ -449,7 +446,7 @@ public:
         if (nodes.empty()) {
             return;
         }
-        call_on_intersecting(static_cast<std::uint32_t>(0), cld, std::forward<Function>(on_intersection), std::forward<ElseFunction>(not_intersection));
+        call_on_intersecting(static_cast<index_t>(0), cld, std::forward<Function>(on_intersection), std::forward<ElseFunction>(not_intersection));
     }
 
     template <typename Function>
@@ -458,7 +455,7 @@ public:
         if (nodes.empty()) {
             return;
         }
-        call_on_all(static_cast<std::uint32_t>(0), std::forward<Function>(function));
+        call_on_all(static_cast<index_t>(0), std::forward<Function>(function));
     }
 };
 }

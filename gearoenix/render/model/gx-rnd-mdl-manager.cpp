@@ -15,7 +15,8 @@ gearoenix::render::model::Manager::Manager()
 
 gearoenix::render::model::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(std::string&& name, core::ecs::Entity* const parent, meshes_set_t&& meshes, const bool)
+gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(
+    std::string&& name, core::ecs::Entity* const parent, meshes_set_t&& meshes, const bool, const bool)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
     math::Aabb3<core::fp_t> box;

@@ -94,7 +94,7 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
     const auto mat_bi_inc = inv_mat_acc.ByteStride(inv_mat_bv);
     auto mat_bi = decltype(mat_bi_inc) { 0 };
     for (auto& mat : inverse_bind_matrices) {
-        mat = math::Mat4x4<core::fp_t>(*reinterpret_cast<const math::Mat4x4<float>*>(&mat_b[mat_bi]));
+        mat = reinterpret_cast<const math::Mat4x4<float>*>(&mat_b[mat_bi])->to<core::fp_t>();
         mat_bi += mat_bi_inc;
     }
     for (int i = 0; i < inv_mat_acc.count; ++i) {

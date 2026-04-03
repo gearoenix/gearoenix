@@ -9,6 +9,7 @@
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-draw-state.hpp"
 #include "../light/gx-vk-lt-shadow-caster-directional.hpp"
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
@@ -16,35 +17,34 @@
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../reflection/gx-vk-rfl-baked.hpp"
 
-gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable)
-    : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name))
+gearoenix::vulkan::model::Model::Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable, const bool is_skinned)
+    : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name), is_skinned)
 {
     for (const auto& mesh : meshes) {
-        auto m = core::cast_shared<mesh::Mesh>(std::shared_ptr(mesh));
+        const auto* const m = core::cast_ptr<mesh::Mesh>(mesh.get());
         GX_ASSERT_D(m);
-        gapi_meshes.insert(std::move(m));
+        auto& dc = draw_caches.emplace_back();
+        m->set(is_skinned, dc);
     }
 }
 
 gearoenix::vulkan::model::Model::~Model() = default;
 
-void gearoenix::vulkan::model::Model::render_shadow(const render::record::CameraModel& camera_model, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
+void gearoenix::vulkan::model::Model::render_shadow(DrawState& draw_state)
 {
-    pc.model_index = shader_data_index;
-    const auto skinned = camera_model.model->bones_count > 0;
-    for (const auto& msh : gapi_meshes) {
-        msh->get_gapi_material()->bind_shadow(cmd, skinned, pc, current_bound_pipeline);
-        msh->draw(cmd, pc);
+    draw_state.push_constants.model_index = shader_data_index;
+    GX_ASSERT_D(is_skinned == draw_state.camera_model->model->bones_count > 0);
+    for (const auto& dc : draw_caches) {
+        draw_mesh(draw_state, dc, dc.material_draw_cache.shadow_pipeline_index);
     }
 }
 
-void gearoenix::vulkan::model::Model::render_forward(const render::record::CameraModel& camera_model, const pipeline::FormatPipelines& fp, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
+void gearoenix::vulkan::model::Model::render_forward(DrawState& draw_state)
 {
-    pc.model_index = shader_data_index;
-    const auto skinned = camera_model.model->bones_count > 0;
-    for (const auto& msh : gapi_meshes) {
-        msh->get_gapi_material()->bind_forward(cmd, skinned, fp, pc, current_bound_pipeline);
-        msh->draw(cmd, pc);
+    draw_state.push_constants.model_index = shader_data_index;
+    GX_ASSERT_D(is_skinned == draw_state.camera_model->model->bones_count > 0);
+    for (const auto& dc : draw_caches) {
+        draw_mesh(draw_state, dc, dc.material_draw_cache.forward_pipeline_index);
     }
 }
 
@@ -62,8 +62,8 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
     shader_data_index = shader_data.get_index();
     auto& sd = *shader_data.get_ptr();
 
-    sd.m = math::Mat4x4<float>(trn.get_global_matrix());
-    sd.inv_transpose_m = math::Mat4x4<float>(trn.get_transposed_inverted_global_matrix());
+    sd.m = trn.get_global_matrix().to<float>();
+    sd.inv_transpose_m = trn.get_transposed_inverted_global_matrix().to<float>();
 
     if (rec_mdl.armature) {
         auto& bone_indexer = descriptor::UniformIndexer<GxShaderDataBone>::get();
@@ -71,8 +71,8 @@ void gearoenix::vulkan::model::Model::after_record(const std::uint64_t frame_num
         for (const auto& all_bones = rec_mdl.armature->get_all_bones(); const auto* const b : all_bones) {
             auto bone_sd = bone_indexer.get_next();
             auto& [m, inv_transpose_m] = *bone_sd.get_ptr();
-            m = math::Mat4x4<float>(b->get_global_matrix());
-            inv_transpose_m = math::Mat4x4<float>(b->get_transposed_inverted_global_matrix());
+            m = b->get_global_matrix().to<float>();
+            inv_transpose_m = b->get_transposed_inverted_global_matrix().to<float>();
         }
         sd.bones_end_index = bone_indexer.get_current_index();
     } else {

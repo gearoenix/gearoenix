@@ -371,7 +371,7 @@ void gearoenix::gl::submission::Manager::render_with_forward()
 {
     push_debug_group("render-forward");
     for (const auto& scene : scenes | std::views::values) {
-        scene->render_forward(current_shader);
+        GX_PROFILE_EXP(scene->render_forward(current_shader));
     }
     pop_debug_group();
 
@@ -468,20 +468,20 @@ void gearoenix::gl::submission::Manager::update()
         scenes.emplace(scene->get_layer(), scene);
     });
 
-    render_shadows();
-    render_reflection_probes();
+    GX_PROFILE_EXP(render_shadows());
+    GX_PROFILE_EXP(render_reflection_probes());
 
     if (render::engine::Engine::get().get_specification().is_deferred_supported) {
         render_with_deferred();
     } else {
-        render_with_forward();
+        GX_PROFILE_EXP(render_with_forward());
     }
     GX_GL_CHECK_D;
 
     render_imgui();
 
 #ifdef GX_PLATFORM_INTERFACE_SDL
-    SDL_GL_SwapWindow(platform::Application::get().get_window());
+    GX_PROFILE_EXP(SDL_GL_SwapWindow(platform::Application::get().get_window()));
 #elif defined(GX_PLATFORM_INTERFACE_ANDROID)
     (void)e.get_platform_application().get_gl_context()->swap(); // TODO handle the other states
 #endif

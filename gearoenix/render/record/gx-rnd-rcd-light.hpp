@@ -10,7 +10,6 @@ struct Transformation;
 }
 
 namespace gearoenix::physics::accelerator {
-template <typename T>
 struct Bvh;
 }
 
@@ -23,30 +22,21 @@ struct Model;
 struct Models;
 
 struct ShadowCasterDirectionalLightData final {
-    math::Frustum<core::fp_t> frustum;
-    math::Mat4x4<float> normalised_vp;
-    math::Vec3<float> direction;
-    math::Vec3<float> colour;
-    core::ecs::Entity* entity = nullptr;
-    light::ShadowCasterDirectional* shadow_caster_directional = nullptr;
-    physics::Transformation* transform = nullptr;
-
-    ~ShadowCasterDirectionalLightData() = default;
-};
-
-struct LightThreadData final {
-    std::vector<ShadowCasterDirectionalLightData> shadow_caster_directionals;
-
-    void clear();
+    const math::Frustum<core::fp_t>* const frustum;
+    const math::Mat4x4<float>* const normalised_vp;
+    const math::Vec3<core::fp_t>* const direction;
+    const math::Vec3<float>* const colour;
+    const core::ecs::Entity* const entity;
+    light::ShadowCasterDirectional* const shadow_caster_directional;
+    const physics::Transformation* const transform;
 };
 
 struct Lights final {
-    std::vector<LightThreadData> threads;
     std::vector<ShadowCasterDirectionalLightData> shadow_caster_directionals;
 
-    Lights();
-    void update(core::ecs::Entity* scene_entity);
-    void update_models(physics::accelerator::Bvh<Model>& bvh);
+    void update_per_frame(core::ecs::Entity* scene_entity);
+    void update_after_change(core::ecs::Entity* scene_entity);
+    void update_models(physics::accelerator::Bvh& bvh, std::vector<Model>& models);
     void update_dynamic_models(Models& models);
     void update_static_models(Models& models);
 };

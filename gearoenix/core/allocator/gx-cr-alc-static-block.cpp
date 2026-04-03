@@ -1,1 +1,0 @@
-#include "gx-cr-alc-static-block.hpp"

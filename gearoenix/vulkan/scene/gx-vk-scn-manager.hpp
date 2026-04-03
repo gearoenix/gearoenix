@@ -9,6 +9,10 @@
 
 struct GxShaderDataScene;
 
+namespace gearoenix::vulkan {
+struct DrawState;
+}
+
 namespace gearoenix::vulkan::buffer {
 struct Uniform;
 }
@@ -28,9 +32,9 @@ public:
     ~Manager() override;
     [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::fp_t layer) const override;
     void update() override;
-    void submit(vk::CommandBuffer cmd);
-    void render_forward(vk::CommandBuffer cmd);
-    void render_shadows(vk::CommandBuffer cmd);
+    static void submit(vk::CommandBuffer cmd);
+    static void render_forward(DrawState& draw_state);
+    static void render_shadows(DrawState& draw_state);
     void upload_uniforms();
 };
 }

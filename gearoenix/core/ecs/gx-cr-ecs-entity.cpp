@@ -167,10 +167,10 @@ void gearoenix::core::ecs::Entity::add_child(EntityPtr&& child)
 
 void gearoenix::core::ecs::Entity::add_to_world()
 {
-    World::get().delayed_add_entity(get_ptr());
     for (auto& c : children) {
         c.second->add_to_world();
     }
+    World::get().delayed_add_entity(get_ptr());
 }
 
 const std::shared_ptr<gearoenix::core::ecs::Component>& gearoenix::core::ecs::Entity::get_component(const object_type_index_t component_type) const

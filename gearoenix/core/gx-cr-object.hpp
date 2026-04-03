@@ -33,7 +33,7 @@ concept ObjectTypeHasRead = requires(std::shared_ptr<T>&& self, std::shared_ptr<
 
 #define GEAROENIX_OBJECT_STRUCT_DEF        \
     friend struct gearoenix::core::Object; \
-    template <typename T, std::int64_t S>  \
+    template <typename T, std::size_t S>  \
     friend struct gearoenix::core::allocator::SharedArray
 
 struct Object {

@@ -4,12 +4,16 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-draw-state.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../gx-vk-swapchain.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
+#include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
@@ -59,30 +63,35 @@ void gearoenix::vulkan::scene::Manager::update()
 
 void gearoenix::vulkan::scene::Manager::submit(const vk::CommandBuffer cmd)
 {
-    render_shadows(cmd);
-    Singleton<reflection::Manager>::get().submit(cmd);
+    DrawState draw_state;
+    draw_state.command_buffer = cmd;
+    pipeline::Manager::get().set(draw_state.pipelines);
+    draw_state.gpu_buffer = buffer::Manager::get().get_gpu_root_buffer()->get_vulkan_data();
+    draw_state.bindless_pipeline_layout = descriptor::Bindless::get().get_pipeline_layout();
+
+    GX_PROFILE_EXP(render_shadows(draw_state));
+    GX_PROFILE_EXP(Singleton<reflection::Manager>::get().submit(cmd));
 
     // if (render::engine::Engine::get().get_specification().is_deferred_supported) {
     // render_with_deferred();
     // GX_UNIMPLEMENTED;
     // } else {
-    render_forward(cmd);
+    GX_PROFILE_EXP(render_forward(draw_state));
     // }
 }
 
-void gearoenix::vulkan::scene::Manager::render_forward(const vk::CommandBuffer cmd)
+void gearoenix::vulkan::scene::Manager::render_forward(DrawState& draw_state)
 {
     {
-        GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
-        vk::Pipeline current_bound_pipeline;
+        GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 1.0f, 0.0f, 0.0f, "render-forward-all-scenes");
         for (const auto& scene : scenes | std::views::values) {
-            scene->render_forward(cmd, current_bound_pipeline);
+            scene->render_forward(draw_state);
         }
     }
 
     // Combine all cameras to swapchain
     {
-        GX_VK_PUSH_DEBUG_GROUP(cmd, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
+        GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.0f, 1.0f, 0.0f, "combine-all-cameras");
 
         const auto& swapchain_view = *Singleton<Swapchain>::get().get_frame().view;
         auto& swapchain_image = *swapchain_view.get_image();
@@ -154,16 +163,16 @@ void gearoenix::vulkan::scene::Manager::render_forward(const vk::CommandBuffer c
 
                 // Transition source image from COLOR_ATTACHMENT_OPTIMAL (after rendering) to TRANSFER_SRC_OPTIMAL
                 // Note: After rendering completes, the image is in COLOR_ATTACHMENT_OPTIMAL layout.
-                src_image.transit(cmd, image::TransitionRequest::transfer_src());
+                src_image.transit(draw_state.command_buffer, image::TransitionRequest::transfer_src());
 
                 // Transition swapchain image to TRANSFER_DST_OPTIMAL (with clear on first camera)
-                swapchain_image.transit(cmd, image::TransitionRequest::transfer_dst());
+                swapchain_image.transit(draw_state.command_buffer, image::TransitionRequest::transfer_dst());
 
                 // Clear swapchain on first camera blit (to get black bars)
                 if (first_camera) {
                     constexpr vk::ClearColorValue clear_color { std::array { 0.0f, 0.0f, 0.0f, 1.0f } };
                     constexpr vk::ImageSubresourceRange clear_range { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 };
-                    cmd.clearColorImage(vk_swapchain_image, vk::ImageLayout::eTransferDstOptimal, clear_color, clear_range);
+                    draw_state.command_buffer.clearColorImage(vk_swapchain_image, vk::ImageLayout::eTransferDstOptimal, clear_color, clear_range);
                 }
 
                 // Perform blit
@@ -175,10 +184,12 @@ void gearoenix::vulkan::scene::Manager::render_forward(const vk::CommandBuffer c
                 blit.dstOffsets[1] = vk::Offset3D { dst_x + dst_width, dst_y + dst_height, 1 };
                 blit.dstSubresource = vk::ImageSubresourceLayers { vk::ImageAspectFlagBits::eColor, 0, 0, 1 };
 
-                cmd.blitImage(vk_src_image, vk::ImageLayout::eTransferSrcOptimal, vk_swapchain_image, vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eLinear);
+                draw_state.command_buffer.blitImage(
+                    vk_src_image, vk::ImageLayout::eTransferSrcOptimal, vk_swapchain_image,
+                    vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eLinear);
 
                 // Transition the source image back to COLOR_ATTACHMENT_OPTIMAL for the next frame's rendering.
-                src_image.transit(cmd, image::TransitionRequest::color_attachment());
+                src_image.transit(draw_state.command_buffer, image::TransitionRequest::color_attachment());
 
                 first_camera = false;
             }
@@ -186,19 +197,21 @@ void gearoenix::vulkan::scene::Manager::render_forward(const vk::CommandBuffer c
 
         // If we blitted, transition swapchain to COLOR_ATTACHMENT_OPTIMAL for ImGui
         if (swapchain_image.get_layout() == vk::ImageLayout::eTransferDstOptimal) {
-            swapchain_image.transit(cmd, image::TransitionRequest::color_attachment());
+            swapchain_image.transit(draw_state.command_buffer, image::TransitionRequest::color_attachment());
         }
     }
 }
 
-void gearoenix::vulkan::scene::Manager::render_shadows(const vk::CommandBuffer cmd)
+void gearoenix::vulkan::scene::Manager::render_shadows(DrawState& draw_state)
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
-    vk::Pipeline current_bound_pipeline;
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 1.0f, 0.0f, 1.0f, "render-shadow-all-scenes");
     for (const auto& scene : scenes | std::views::values) {
-        scene->render_shadows(cmd, current_bound_pipeline);
+        scene->render_shadows(draw_state);
     }
 }
 
-void gearoenix::vulkan::scene::Manager::upload_uniforms() { uniform_indexer.update(); }
+void gearoenix::vulkan::scene::Manager::upload_uniforms()
+{
+    uniform_indexer.update();
+}
 #endif

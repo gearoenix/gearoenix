@@ -10,6 +10,7 @@
 #include "../material/gx-vk-mat-material.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "gx-vk-msh-buffer.hpp"
+#include "gx-vk-msh-draw-cache.hpp"
 
 gearoenix::vulkan::mesh::Mesh::Mesh(std::string&& name, std::shared_ptr<render::mesh::Buffer>&& buffer, std::shared_ptr<render::material::Material>&& material)
     : render::mesh::Mesh(std::move(name), std::move(buffer), std::move(material))
@@ -46,6 +47,15 @@ void gearoenix::vulkan::mesh::Mesh::set_material(std::shared_ptr<render::materia
 {
     render::mesh::Mesh::set_material(std::move(material));
     gapi_material = std::dynamic_pointer_cast<material::Material>(this->bound_material);
+    GX_UNIMPLEMENTED; // we need to find a way to update the draw cache when material changes.
+}
+
+void gearoenix::vulkan::mesh::Mesh::set(const bool skinned, DrawCache& cache) const
+{
+    cache.vertex_offset = static_cast<vk::DeviceSize>(gapi_buffer->get_vertex()->get_offset());
+    cache.index_offset = static_cast<vk::DeviceSize>(gapi_buffer->get_index()->get_offset());
+    cache.indices_count = gapi_buffer->get_indices_count();
+    gapi_material->set(skinned, cache.material_draw_cache);
 }
 
 #endif

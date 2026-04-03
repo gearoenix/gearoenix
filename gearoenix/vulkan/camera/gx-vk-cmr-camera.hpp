@@ -11,6 +11,10 @@ struct Model;
 struct Skyboxes;
 }
 
+namespace gearoenix::vulkan {
+struct DrawState;
+}
+
 namespace gearoenix::vulkan::pipeline {
 struct FormatPipelines;
 struct Pipeline;
@@ -61,9 +65,9 @@ private:
 public:
     static void construct(core::ecs::Entity* entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform);
     ~Camera() override;
-    void render_shadow(const render::record::Camera&, vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const;
-    void render_forward(const render::record::Camera&, const render::record::Skyboxes&, vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const;
-    void render_forward_skyboxes(const render::record::Skyboxes&, const pipeline::FormatPipelines& fp, vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const;
+    void render_shadow(const render::record::Camera&, DrawState& draw_state) const;
+    void render_forward(const render::record::Camera&, const render::record::Skyboxes&, DrawState& draw_state) const;
+    void render_forward_skyboxes(const render::record::Skyboxes&, DrawState& draw_state) const;
     void render_bloom(const scene::Scene& scene, vk::CommandBuffer cmd) const;
     void render_colour_correction_anti_aliasing(const scene::Scene& scene, vk::CommandBuffer cmd) const;
     void after_record(std::uint64_t frame_number, const render::record::Camera& rc);

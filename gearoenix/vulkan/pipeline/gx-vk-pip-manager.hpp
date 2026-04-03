@@ -49,7 +49,7 @@ private:
     std::shared_ptr<Pipeline> shadow;
     std::shared_ptr<Pipeline> skinned_shadow;
 
-    core::static_flat_map<vk::Format, FormatPipelines, 4> formats_pipelines;
+    core::static_flat_map<vk::Format, FormatPipelinesDataHolder, 4> formats_pipelines;
 
     void initialise_ray_tracing();
     void load_shaders();
@@ -63,7 +63,7 @@ private:
     [[nodiscard]] std::shared_ptr<Pipeline> create_skybox_cube_pipeline(vk::Format colour_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_shadow_pipeline(vk::Format depth_format);
     [[nodiscard]] std::shared_ptr<Pipeline> create_skinned_shadow_pipeline(vk::Format depth_format);
-    [[nodiscard]] FormatPipelines create_format_pipelines(vk::Format colour_format);
+    [[nodiscard]] FormatPipelinesDataHolder create_format_pipelines(vk::Format colour_format);
 
 public:
     [[nodiscard]] const std::shared_ptr<Cache>& get_cache() const { return cache; }
@@ -78,7 +78,8 @@ public:
     Manager();
     ~Manager() override;
 
-    [[nodiscard]] const FormatPipelines& get_pipelines(vk::Format colour_format);
+    void set(AllPipelines& pipelines, vk::Format colour_format);
+    void set(AllPipelines& pipelines) const;
 
     [[nodiscard]] std::shared_ptr<Pipeline> create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>& des_set_layout);
 };

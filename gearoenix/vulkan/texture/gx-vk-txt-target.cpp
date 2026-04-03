@@ -12,7 +12,10 @@ gearoenix::vulkan::texture::Target::RenderingScope::RenderingScope(const vk::Com
 {
 }
 
-gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope() { command_buffer.endRendering(); }
+gearoenix::vulkan::texture::Target::RenderingScope::~RenderingScope()
+{
+    command_buffer.endRendering();
+}
 
 gearoenix::vulkan::texture::Target::Target(std::string&& in_name, std::vector<render::texture::Attachment>&& attachments)
     : render::texture::Target(std::move(in_name), std::move(attachments))

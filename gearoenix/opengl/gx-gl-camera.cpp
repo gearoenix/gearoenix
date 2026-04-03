@@ -107,7 +107,12 @@ void gearoenix::gl::Camera::render_shadow(const render::record::Camera& cmr, uin
     ctx::set_framebuffer(gl_target.get_customised().target->get_framebuffer());
     ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    for (const auto& camera_model : cmr.opaque_models | std::views::values) {
+    std::size_t model_index = 0;
+    for (const auto& camera_model : cmr.all_models | std::views::values) {
+        if (model_index >= cmr.translucent_models_starting_index) {
+            break;
+        }
+        ++model_index;
         auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_shadow(cmr, camera_model, current_shader);
     }
@@ -134,18 +139,20 @@ void gearoenix::gl::Camera::render_forward(const Scene& scene, const render::rec
     }
     ctx::set_viewport_scissor_clip(math::Vec4<sizei>(cmr.viewport_clip));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    for (const auto& camera_model : cmr.opaque_models | std::views::values) {
+    std::size_t model_index = 0;
+    for (const auto& camera_model : cmr.all_models | std::views::values) {
+        if (model_index == cmr.translucent_models_starting_index) {
+            render_forward_skyboxes(scene, cmr, current_shader);
+            GX_GL_CHECK_D;
+            glEnable(GL_BLEND);
+        }
+        ++model_index;
         auto& model = *core::cast_ptr<Model>(camera_model.model->model);
         model.render_forward(scene, cmr, camera_model, current_shader);
         GX_GL_CHECK_D;
     }
-    render_forward_skyboxes(scene, cmr, current_shader);
-    GX_GL_CHECK_D;
-    glEnable(GL_BLEND);
-    // Rendering forward pbr
-    for (const auto& camera_model : cmr.translucent_models | std::views::values) {
-        auto& model = *core::cast_ptr<Model>(camera_model.model->model);
-        model.render_forward(scene, cmr, camera_model, current_shader);
+    if (cmr.all_models.empty() || cmr.all_models.size() == cmr.translucent_models_starting_index) {
+        render_forward_skyboxes(scene, cmr, current_shader);
         GX_GL_CHECK_D;
     }
     glDisable(GL_BLEND);
@@ -154,17 +161,19 @@ void gearoenix::gl::Camera::render_forward(const Scene& scene, const render::rec
 
 void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const render::record::Camera& cmr, uint& current_shader) const
 {
+#if GX_GL_LABELING_ENABLED
     static std::string debug_group;
     debug_group.clear();
     debug_group += "render-skyboxes for scene: ";
     debug_group += scene.get_object_name();
     debug_group += ", and for camera: ";
     debug_group += object_name;
+#endif
 
     push_debug_group(debug_group);
     glDepthMask(GL_FALSE);
     // Rendering skyboxes
-    const math::Vec4 camera_pos_scale = { math::Vec3<float>(cmr.transform->get_global_position()), cmr.skybox_scale };
+    const math::Vec4 camera_pos_scale = { cmr.transform->get_global_position().to<float>(), cmr.skybox_scale };
     bool is_equirectangular_current = true;
     skybox_equirectangular_shader->bind(current_shader);
     skybox_equirectangular_shader->set_vp_data(cmr.camera->get_view_projection().data());

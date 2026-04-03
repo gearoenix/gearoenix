@@ -1,5 +1,6 @@
 #include "gx-rnd-scn-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-scn-scene.hpp"
 
@@ -19,6 +20,6 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::st
 void gearoenix::render::scene::Manager::update()
 {
     core::ecs::World::get().parallel_system<Scene>([](auto* const, Scene* const s, const auto /*kernel_index*/) {
-        s->update();
+        GX_PROFILE_EXP(s->update_per_frame());
     });
 }

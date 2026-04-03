@@ -1,6 +1,7 @@
 #include "gx-vk-sky-skybox.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
+#include "../gx-vk-draw-state.hpp"
 #include "../material/gx-vk-mat-manager.hpp"
 #include "../pipeline/gx-vk-pip-format-pipelines.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
@@ -17,6 +18,11 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
     , material_shader_data(material::uniform_indexer_t::get().get_next())
     , vk_mesh(core::cast_shared<mesh::Mesh>(std::shared_ptr(bound_mesh)))
 {
+    vk_mesh->set(false, draw_cache);
+    draw_cache.material_draw_cache.material_index = material_shader_data.get_index();
+    draw_cache.material_draw_cache.forward_pipeline_index =
+        static_cast<std::uint8_t>(is_equirectangular ? pipeline::FormatPipelinesIndices::skybox_equirectangular_index : pipeline::FormatPipelinesIndices::skybox_cube_index);
+
     auto& r = *material_shader_data.get_ptr();
 
     r.albedo_factor = math::Vec4(1.0f);
@@ -34,14 +40,8 @@ gearoenix::vulkan::skybox::Skybox::Skybox(
 
 gearoenix::vulkan::skybox::Skybox::~Skybox() = default;
 
-void gearoenix::vulkan::skybox::Skybox::render_forward(const vk::CommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
+void gearoenix::vulkan::skybox::Skybox::render_forward(DrawState& draw_state) const
 {
-    const auto vk_pipeline = (is_equirectangular ? fp.skybox_equirectangular : fp.skybox_cube)->get_vulkan_data();
-    if (vk_pipeline != current_bound_pipeline) {
-        current_bound_pipeline = vk_pipeline;
-        cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, vk_pipeline);
-    }
-    pc.material_index = material_shader_data.get_index();
-    vk_mesh->draw(cmd, pc);
+    draw_mesh(draw_state, draw_cache, draw_cache.material_draw_cache.forward_pipeline_index);
 }
 #endif

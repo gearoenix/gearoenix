@@ -5,6 +5,7 @@
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "gx-vk-mat-manager.hpp"
+#include "gx-vk-mat-draw-cache.hpp"
 
 gearoenix::vulkan::material::Unlit::Unlit(std::string&& name)
     : render::material::Unlit(object_type_index, std::move(name))
@@ -57,15 +58,16 @@ void gearoenix::vulkan::material::Unlit::set_alpha_cutoff(const float v)
     sd.alpha_cutoff_occlusion_strength_reserved.x = v;
 }
 
-void gearoenix::vulkan::material::Unlit::bind_forward(const vk::CommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
+void gearoenix::vulkan::material::Unlit::set(const bool skinned, DrawCache& dc)
 {
-    bind_graphics((skinned ? fp.unlit_skinned_forward.get() : fp.unlit_forward.get())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
-}
-
-void gearoenix::vulkan::material::Unlit::bind_shadow(const vk::CommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
-{
-    const auto& mgr = pipeline::Manager::get();
-    bind_graphics((skinned ? mgr.get_skinned_shadow() : mgr.get_shadow())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
+    if (skinned) {
+        dc.forward_pipeline_index = static_cast<decltype(dc.forward_pipeline_index)>(pipeline::FormatPipelinesIndices::unlit_skinned_forward_index);
+        dc.shadow_pipeline_index = static_cast<decltype(dc.shadow_pipeline_index)>(pipeline::ShadowPipelinesIndices::skinned_index);
+    } else {
+        dc.forward_pipeline_index = static_cast<decltype(dc.forward_pipeline_index)>(pipeline::FormatPipelinesIndices::unlit_forward_index);
+        dc.shadow_pipeline_index = static_cast<decltype(dc.shadow_pipeline_index)>(pipeline::ShadowPipelinesIndices::no_skin_index);
+    }
+    dc.material_index = shader_data.get_index();
 }
 
 #endif
