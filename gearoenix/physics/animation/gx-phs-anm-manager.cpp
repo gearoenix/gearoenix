@@ -34,7 +34,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_a
     entity->add_component(std::move(armature));
     entity->add_component(std::move(transform));
 
-    entity->add_component(core::Object::construct<AnimationPlayer>(entity.get(), std::shared_ptr(anim), entity->get_object_name() + "-animation-player", 0.0));
+    entity->add_component(core::Object::construct<AnimationPlayer>(entity.get(), std::shared_ptr(anim), entity->get_object_name() + "-animation-player", static_cast<core::fp_t>(0)));
     auto anim_name = anim->get_object_name();
     const std::lock_guard _lg(this_lock);
     animations.emplace(std::move(anim_name), std::move(anim));
@@ -45,8 +45,8 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Manager::create_a
 void gearoenix::physics::animation::Manager::create_sprite(core::ecs::EntityPtr& entity, std::shared_ptr<render::material::Sprite>&& sprite, const std::uint32_t width, const std::uint32_t height)
 {
     auto anim = core::Object::construct<SpriteAnimation>(entity->get_object_name() + "-sprite-animation", std::move(sprite), width, height);
-    auto player = core::Object::construct<AnimationPlayer>(entity.get(), std::shared_ptr(anim), entity->get_object_name() + "-animation-player", 0.0);
-    player->set_loop_range_time(0.0, 0.999);
+    auto player = core::Object::construct<AnimationPlayer>(entity.get(), std::shared_ptr(anim), entity->get_object_name() + "-animation-player", static_cast<core::fp_t>(0));
+    player->set_loop_range_time(static_cast<core::fp_t>(0), static_cast<core::fp_t>(0.999));
     entity->add_component(std::move(player));
     auto anim_name = anim->get_object_name();
     const std::lock_guard _lg(this_lock);

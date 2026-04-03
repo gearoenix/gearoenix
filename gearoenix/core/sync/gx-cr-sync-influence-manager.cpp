@@ -2,7 +2,7 @@
 //
 // gearoenix::core::Id gearoenix::core::sync::InfluenceManager::add(
 //     std::vector<Id> influenced_ids,
-//     const double priority,
+//     const core::fp_t priority,
 //     std::function<void()> function)
 // {
 //     std::lock_guard<std::mutex> _lg(actions_lock)
@@ -28,7 +28,7 @@
 //             if (const auto id = std::get_if<Id>(&a)) {
 //                 added_functions.erase(*id);
 //             } else {
-//                 auto& t = std::get<std::tuple<Id, std::vector<Id>, double, std::function<void()>>>(a);
+//                 auto& t = std::get<std::tuple<Id, std::vector<Id>, core::fp_t, std::function<void()>>>(a);
 //                 added_functions.emplace(
 //                     std::get<0>(t),
 //                     std::make_tuple(std::move(std::get<1>(t)), std::get<2>(t), std::move(std::get<3>(t))));
@@ -37,7 +37,7 @@
 //     }
 //     Id influencer = 1;
 //     std::map<Id, Id> influenced_to_influencer;
-//     std::map<Id, std::pair<std::set<Id>, std::multimap<double, std::function<void()>>>> influencer_to_influenceds;
+//     std::map<Id, std::pair<std::set<Id>, std::multimap<core::fp_t, std::function<void()>>>> influencer_to_influenceds;
 //     for (auto& id_fun_info : added_functions) {
 //         const auto& fun_info = id_fun_info.second;
 //         const auto& inf = std::get<0>(fun_info);

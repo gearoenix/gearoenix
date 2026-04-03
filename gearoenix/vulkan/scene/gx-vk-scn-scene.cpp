@@ -12,7 +12,7 @@
 
 #include <ranges>
 
-gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const double layer)
+gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const core::fp_t layer)
     : render::scene::Scene(e, core::ecs::ComponentType::create_index(this), layer, std::move(name))
 {
     initialise_brdflut();

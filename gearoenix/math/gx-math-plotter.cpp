@@ -34,14 +34,14 @@ gearoenix::math::Plotter::Plotter(std::uint32_t* const pixels, const int img_wid
 {
 }
 
-void gearoenix::math::Plotter::draw_point(const Vec2<double>& pos, const Brush& b)
+void gearoenix::math::Plotter::draw_point(const Vec2<core::fp_t>& pos, const Brush& b)
 {
     const int x = static_cast<int>(std::round(pos.x));
     const int y = static_cast<int>(std::round(pos.y));
     plot(x, y, b);
 }
 
-void gearoenix::math::Plotter::draw_line(const Vec2<double>& start, const Vec2<double>& end, const Brush& b)
+void gearoenix::math::Plotter::draw_line(const Vec2<core::fp_t>& start, const Vec2<core::fp_t>& end, const Brush& b)
 {
     //    Vec2 d = end - start;
     int x0 = (int)std::round(start.x);

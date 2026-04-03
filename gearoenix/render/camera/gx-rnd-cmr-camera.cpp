@@ -103,27 +103,27 @@ void gearoenix::render::camera::Camera::read(std::shared_ptr<platform::stream::S
     }));
 }
 
-void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3<double>& location, const math::Vec3<double>& x, const math::Vec3<double>& y, const math::Vec3<double>& z, std::array<math::Vec3<double>, 8>& points) const
+void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3<core::fp_t>& location, const math::Vec3<core::fp_t>& x, const math::Vec3<core::fp_t>& y, const math::Vec3<core::fp_t>& z, std::array<math::Vec3<core::fp_t>, 8>& points) const
 {
     const auto [scale, fpn] = [&] {
         if (projection_data.is_perspective()) {
             const auto [field_of_view_y] = projection_data.get_perspective();
-            const auto s = static_cast<double>(near * tanf(field_of_view_y * 0.5f));
-            return std::make_pair(s, (static_cast<double>(far) + static_cast<double>(near)) * s / static_cast<double>(near));
+            const auto s = static_cast<core::fp_t>(near * tanf(field_of_view_y * 0.5f));
+            return std::make_pair(s, (static_cast<core::fp_t>(far) + static_cast<core::fp_t>(near)) * s / static_cast<core::fp_t>(near));
         }
         if (projection_data.is_orthographic()) {
-            const auto [scale] = projection_data.get_orthographic();
-            const auto s = static_cast<double>(scale * 0.5f);
+            const auto [proj_scale] = projection_data.get_orthographic();
+            const auto s = static_cast<core::fp_t>(proj_scale * 0.5f);
             return std::make_pair(s, s);
         }
         GX_UNEXPECTED;
     }();
     const auto target_aspect_ratio = get_target_aspect_ratio();
-    const auto far_x = static_cast<double>(target_aspect_ratio) * fpn;
+    const auto far_x = static_cast<core::fp_t>(target_aspect_ratio) * fpn;
     const auto far_y = fpn;
-    const auto nz = z * -static_cast<double>(near);
-    const auto fz = z * -static_cast<double>(far);
-    const auto nx = x * (static_cast<double>(target_aspect_ratio) * scale);
+    const auto nz = z * -static_cast<core::fp_t>(near);
+    const auto fz = z * -static_cast<core::fp_t>(far);
+    const auto nx = x * (static_cast<core::fp_t>(target_aspect_ratio) * scale);
     const auto fx = x * far_x;
     const auto ny = y * scale;
     const auto fy = y * far_y;
@@ -247,20 +247,20 @@ void gearoenix::render::camera::Camera::show_debug_gui()
     });
 }
 
-gearoenix::math::Ray3<double> gearoenix::render::camera::Camera::generate_ray(const math::Vec2<double>& normalised_point) const
+gearoenix::math::Ray3<gearoenix::core::fp_t> gearoenix::render::camera::Camera::generate_ray(const math::Vec2<core::fp_t>& normalised_point) const
 {
     const auto [scale, is_perspective] = [&] {
         if (projection_data.is_perspective()) {
             const auto [field_of_view_y] = projection_data.get_perspective();
-            return std::make_pair(static_cast<double>(2.0f * near * tanf(field_of_view_y * 0.5f)), true);
+            return std::make_pair(static_cast<core::fp_t>(2.0f * near * tanf(field_of_view_y * 0.5f)), true);
         }
         if (projection_data.is_orthographic()) {
-            const auto [scale] = projection_data.get_orthographic();
-            return std::make_pair(static_cast<double>(scale), false);
+            const auto [proj_scale] = projection_data.get_orthographic();
+            return std::make_pair(static_cast<core::fp_t>(proj_scale), false);
         }
         GX_UNEXPECTED;
     }();
-    const auto near_plane_point = math::Vec3(normalised_point * scale, static_cast<double>(-near));
+    const auto near_plane_point = math::Vec3(normalised_point * scale, static_cast<core::fp_t>(-near));
     const auto direction = transform->get_rotation_matrix() * near_plane_point;
     const auto origin = transform->get_local_position() + direction;
     return { origin, is_perspective ? direction.normalised() : -transform->get_z_axis() };
@@ -273,7 +273,10 @@ void gearoenix::render::camera::Camera::set_customised_target(std::shared_ptr<te
     update_projection();
 }
 
-void gearoenix::render::camera::Camera::disable_bloom() { bloom_data = std::nullopt; }
+void gearoenix::render::camera::Camera::disable_bloom()
+{
+    bloom_data = std::nullopt;
+}
 
 void gearoenix::render::camera::Camera::enable_bloom()
 {

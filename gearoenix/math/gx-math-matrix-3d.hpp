@@ -213,8 +213,8 @@ struct Mat3x3 final {
 
     [[nodiscard]] constexpr static Mat3x3 rotation(const Vec3<Element>& w, const Element degree)
     {
-        const auto sinus = static_cast<Element>(sin(static_cast<double>(degree)));
-        const auto cosine = static_cast<Element>(cos(static_cast<double>(degree)));
+        const auto sinus = static_cast<Element>(sin(degree));
+        const auto cosine = static_cast<Element>(cos(degree));
         const auto one_minus_cos = static_cast<Element>(1) - cosine;
         const auto wx2 = w.x * w.x;
         const auto wxy = w.x * w.y;

@@ -46,7 +46,7 @@ struct Runtime : Probe {
     typedef std::array<CameraData, 6> CubeCamera;
     typedef std::array<std::shared_ptr<texture::Target>, 6> CubeTarget;
     typedef std::array<boost::container::static_vector<std::shared_ptr<texture::Target>, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT>, 6> MippedCubeTarget;
-    typedef boost::container::static_vector<double, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MippedRoughness;
+    typedef boost::container::static_vector<core::fp_t, GX_RENDER_MAX_RUNTIME_REFLECTION_MIPMAPS_COUNT> MippedRoughness;
 
     constexpr static auto max_count = 8;
     constexpr static auto object_type_index = gearoenix_render_reflection_runtime_type_index;
@@ -68,16 +68,16 @@ struct Runtime : Probe {
     GX_GETSET_VAL_PRT(std::uint64_t, resting_frames_count, std::numeric_limits<std::uint64_t>::max());
     GX_GET_CREF_PRT(std::function<void()>, on_rendered);
     GX_GETSET_VAL_PRT(bool, pending_to_start, false);
-    GX_GET_CREF_PRT(math::Aabb3<double>, receive_box);
-    GX_GET_CREF_PRT(math::Aabb3<double>, exclude_box);
+    GX_GET_CREF_PRT(math::Aabb3<core::fp_t>, receive_box);
+    GX_GET_CREF_PRT(math::Aabb3<core::fp_t>, exclude_box);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, environment_depth);
 
-    Runtime(core::ecs::Entity* entity, core::object_type_index_t final_component_type_index, const math::Aabb3<double>& receive_box, const math::Aabb3<double>& exclude_box, const math::Aabb3<double>& include_box, std::string&& name);
+    Runtime(core::ecs::Entity* entity, core::object_type_index_t final_component_type_index, const math::Aabb3<core::fp_t>& receive_box, const math::Aabb3<core::fp_t>& exclude_box, const math::Aabb3<core::fp_t>& include_box, std::string&& name);
     void set_runtime_reflection_self(std::uint32_t environment_resolution, std::uint32_t irradiance_resolution, std::uint32_t radiance_resolution, core::job::EndCaller<>&& end_callback);
 
 public:
     ~Runtime() override;
-    void set_location(const math::Vec3<double>& p);
+    void set_location(const math::Vec3<core::fp_t>& p);
     void update_state();
     void set_on_rendered(std::function<void()>&&);
     void export_baked(const std::shared_ptr<platform::stream::Stream>& s, core::job::EndCaller<>&& end_callback) const;

@@ -8,10 +8,10 @@
 //
 // namespace gearoenix::physics::constraint {
 // struct WindowScaler final : public Constraint, public core::event::Listener {
-//     GX_GET_VAL_PRV(double, size_percentage, 1.0)
-//     GX_GET_VAL_PRV(std::optional<double>, max_size_scale, std::nullopt)
-//     GX_GET_VAL_PRV(std::optional<double>, min_size_scale, std::nullopt)
-//     GX_GET_VAL_PRV(double, current_size, 1.0)
+//     GX_GET_VAL_PRV(core::fp_t, size_percentage, 1.0)
+//     GX_GET_VAL_PRV(std::optional<core::fp_t>, max_size_scale, std::nullopt)
+//     GX_GET_VAL_PRV(std::optional<core::fp_t>, min_size_scale, std::nullopt)
+//     GX_GET_VAL_PRV(core::fp_t, current_size, 1.0)
 //     GX_GET_VAL_PRV(bool, registered, false)
 //     GX_GET_CPTR_PRV(core::event::Engine, event_engine)
 //
@@ -22,15 +22,15 @@
 //     WindowScaler(core::Id id, std::string name, render::engine::Engine* e);
 //     ~WindowScaler() override;
 //
-//     void apply(double, double) final { }
+//     void apply(core::fp_t, core::fp_t) final { }
 //
 //     [[nodiscard]] bool on_event(const core::event::Data& e) override;
 //
 //     void register_listener();
 //
-//     void set_size_percentage(double v);
-//     void set_max_size_scale(std::optional<double> v);
-//     void set_min_size_scale(std::optional<double> v);
-//     void set_current_size(double s);
+//     void set_size_percentage(core::fp_t v);
+//     void set_max_size_scale(std::optional<core::fp_t> v);
+//     void set_min_size_scale(std::optional<core::fp_t> v);
+//     void set_current_size(core::fp_t s);
 // };
 // }

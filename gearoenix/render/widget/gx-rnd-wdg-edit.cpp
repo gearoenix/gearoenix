@@ -90,7 +90,7 @@
 //     cursor_animation = std::make_shared<physics::animation::Animation>(
 //         "gx-edit-" + name + "-crs-anm",
 //         [cursor_material { cursor_material }, t1, t2, t3, t4, t5](
-//             const double from_start, const double) {
+//             const core::fp_t from_start, const core::fp_t) {
 //             const auto s = from_start - std::floor(from_start / t5) * t5;
 //             if (t1 > s) {
 //                 cursor_material->set_alpha(1.0f);
@@ -102,7 +102,7 @@
 //                 cursor_material->set_alpha(static_cast<float>((s - t4) / t2));
 //             }
 //         },
-//         std::numeric_limits<double>::max());
+//         std::numeric_limits<core::fp_t>::max());
 //     e->get_physics_engine()->get_animation_manager()->add(get_root()->get_id(), cursor_animation);
 //
 //     collider->set_on_scale([this] { on_scale(); });
@@ -121,8 +121,8 @@
 //     } else {
 //         set_text(text);
 //     }
-//     auto cursor_scale = static_cast<double>(theme.cursor_width) * 0.5f;
-//     cursor_scale /= static_cast<double>(e->get_platform_application()->get_event_engine()->get_window_width());
+//     auto cursor_scale = static_cast<core::fp_t>(theme.cursor_width) * 0.5f;
+//     cursor_scale /= static_cast<core::fp_t>(e->get_platform_application()->get_event_engine()->get_window_width());
 //     cursor_scale /= cursor_model->get_collider()->get_current_local_scale()[0];
 //     cursor_model->get_transformation()->local_x_scale(cursor_scale);
 // }
@@ -487,12 +487,12 @@
 //     } else {
 //         return;
 //     }
-//     const double cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
-//     const double before = text_widths.empty() ? 0.0f : text_widths[text.size()];
+//     const core::fp_t cursor_before = increase_to_right ? cursor_pos_in_text - starting_text_cut : ending_text_cut - cursor_pos_in_text;
+//     const core::fp_t before = text_widths.empty() ? 0.0f : text_widths[text.size()];
 //     refill_text();
 //     text_font->compute_text_widths(text, aspects[1], text_widths);
 //     cursor_pos_in_text = text_widths[left_text.size()];
-//     const double increase = text_widths[text.size()] - before;
+//     const core::fp_t increase = text_widths[text.size()] - before;
 //     if (increase_to_right) {
 //         if (cursor_before + increase > aspects[0]) {
 //             ending_text_cut = cursor_pos_in_text;
@@ -514,7 +514,7 @@
 //     place_cursor();
 // }
 //
-// void gearoenix::render::widget::Edit::selected(const math::Vec3<double>& point)
+// void gearoenix::render::widget::Edit::selected(const math::Vec3<core::fp_t>& point)
 // {
 //     e->get_platform_application()->set_soft_keyboard_visibility(true);
 //     if (text.empty())

@@ -2,7 +2,6 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
 #include "../font/gx-rnd-fnt-font.hpp"
 #include "../material/gx-rnd-mat-manager.hpp"
 #include "../material/gx-rnd-mat-unlit.hpp"
@@ -10,8 +9,8 @@
 #include "../mesh/gx-rnd-msh-mesh.hpp"
 #include "../model/gx-rnd-mdl-manager.hpp"
 
-gearoenix::render::widget::Text::Text(std::string&& n)
-    : Widget(std::move(n), Type::Text)
+gearoenix::render::widget::Text::Text(std::string&& name)
+    : Widget(std::move(name), Type::Text)
 {
 }
 
@@ -47,9 +46,9 @@ void gearoenix::render::widget::Text::construct(std::string&& name, core::ecs::E
 
 gearoenix::render::widget::Text::~Text() { }
 
-gearoenix::math::Vec2<double> gearoenix::render::widget::Text::get_text_size() const
+gearoenix::math::Vec2<gearoenix::core::fp_t> gearoenix::render::widget::Text::get_text_size() const
 {
-    auto* const trn = model_entity->get_component<physics::Transformation>();
+    const auto* const trn = model_entity->get_component<physics::Transformation>();
     GX_ASSERT_D(nullptr != trn);
     return trn->get_scale().xy() * 2.0; // TODO not sure about 2 multiplication
 }
@@ -57,7 +56,7 @@ gearoenix::math::Vec2<double> gearoenix::render::widget::Text::get_text_size() c
 void gearoenix::render::widget::Text::update_text(const core::job::EndCaller<>& c) const
 {
     const auto img_dim = get_text_size();
-    double width = 0.0;
+    core::fp_t width = 0.0;
     text_font->bake(text, text_colour, img_dim.y, width, core::job::EndCallerShared<texture::Texture2D>([c, self = text_self.lock()](std::shared_ptr<texture::Texture2D>&& t) {
         self->text_material->set_albedo(std::move(t));
         (void)c;

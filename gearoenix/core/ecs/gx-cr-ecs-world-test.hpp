@@ -1,19 +1,23 @@
 #pragma once
+#include "../gx-cr-build-configuration.hpp"
 #include "gx-cr-ecs-entity.hpp"
 #include "gx-cr-ecs-world.hpp"
+
 #include <chrono>
 #include <cmath>
 #include <thread>
 
 namespace gearoenix_core_ecs_world_test {
-struct Position final : gearoenix::core::ecs::Component {
+using namespace gearoenix::core;
+
+struct Position final : ecs::Component {
     constexpr static auto max_count = 100;
     constexpr static auto object_type_index = 100;
-    double x;
-    double y;
+    fp_t x;
+    fp_t y;
 
-    Position(gearoenix::core::ecs::Entity* const e, const double x, const double y)
-        : Component(e, gearoenix::core::ecs::ComponentType::create_index(this), "position")
+    Position(ecs::Entity* const e, const fp_t x, const fp_t y)
+        : Component(e, ecs::ComponentType::create_index(this), "position")
         , x(x)
         , y(y)
     {
@@ -22,15 +26,15 @@ struct Position final : gearoenix::core::ecs::Component {
     ~Position() override = default;
 };
 
-struct Speed final : gearoenix::core::ecs::Component {
+struct Speed final : ecs::Component {
     constexpr static auto max_count = 100;
     constexpr static auto object_type_index = 101;
 
-    double x;
-    double y;
+    fp_t x;
+    fp_t y;
 
-    Speed(gearoenix::core::ecs::Entity* const e, const double x, const double y)
-        : Component(e, gearoenix::core::ecs::ComponentType::create_index(this), "speed")
+    Speed(ecs::Entity* const e, const fp_t x, const fp_t y)
+        : Component(e, ecs::ComponentType::create_index(this), "speed")
         , x(x)
         , y(y)
     {

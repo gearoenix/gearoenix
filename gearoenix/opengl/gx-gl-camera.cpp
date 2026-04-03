@@ -197,7 +197,7 @@ void gearoenix::gl::Camera::render_forward_skyboxes(const Scene& scene, const re
     pop_debug_group();
 }
 
-void gearoenix::gl::Camera::render_bloom(const Scene& scene, const render::record::Camera& record_cam, uint& current_shader) const
+void gearoenix::gl::Camera::render_bloom([[maybe_unused]] const Scene& scene, const render::record::Camera& record_cam, uint& current_shader) const
 {
     if (!bloom_data.has_value()) {
         return;
@@ -344,7 +344,7 @@ void gearoenix::gl::Camera::render_bloom(const Scene& scene, const render::recor
     pop_debug_group();
 }
 
-void gearoenix::gl::Camera::render_colour_correction_anti_aliasing(const Scene& scene, const render::record::Camera& rc, uint& current_shader) const
+void gearoenix::gl::Camera::render_colour_correction_anti_aliasing([[maybe_unused]] const Scene& scene, const render::record::Camera& rc, uint& current_shader) const
 {
     GX_GL_CHECK_D;
 
@@ -386,12 +386,20 @@ void gearoenix::gl::CameraManager::build(std::string&& name, core::ecs::Entity* 
     build_impl(std::move(name), parent, entity_callback);
     auto* const entity = entity_callback.get_return().get();
     auto transform = entity->get_component_shared_ptr<physics::Transformation>();
-    Camera::construct(entity, entity->get_object_name() + "-gl-camera", core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) { end.get_return()->add_component(std::move(c)); }), std::move(transform));
+    Camera::construct(entity, entity->get_object_name() + "-gl-camera", core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) {
+        end.get_return()->add_component(std::move(c));
+    }), std::move(transform));
 }
 
-gearoenix::gl::CameraManager::CameraManager() { core::ecs::ComponentType::add<Camera>(); }
+gearoenix::gl::CameraManager::CameraManager()
+{
+    core::ecs::ComponentType::add<Camera>();
+}
 
-void gearoenix::gl::CameraManager::window_resized() { Manager::window_resized(); }
+void gearoenix::gl::CameraManager::window_resized()
+{
+    Manager::window_resized();
+}
 
 gearoenix::gl::CameraManager::~CameraManager() = default;
 

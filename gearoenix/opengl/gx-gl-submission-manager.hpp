@@ -69,7 +69,7 @@ private:
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
     std::uint32_t resolution_cfg_listener_id = static_cast<std::uint32_t>(-1);
-    boost::container::flat_set<std::pair<double /*layer*/, Scene*>> scenes;
+    boost::container::flat_set<std::pair<core::fp_t /*layer*/, Scene*>> scenes;
 
     void initialise_back_buffer_sizes();
     void back_buffer_size_changed();

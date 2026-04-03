@@ -1,4 +1,5 @@
 #pragma once
+#include "../../core/gx-cr-build-configuration.hpp"
 #include "../../core/gx-cr-static-flat-map.hpp"
 
 namespace gearoenix::core::ecs {
@@ -17,7 +18,7 @@ struct Skyboxes final {
         bool equirectangular = false;
     };
 
-    core::static_flat_map<double, Data, 8> skyboxes;
+    core::static_flat_map<core::fp_t, Data, 8> skyboxes;
 
     void update(core::ecs::Entity* scene_entity);
 };

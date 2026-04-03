@@ -10,18 +10,18 @@
 //
 // gearoenix::physics::body::Rigid::~Rigid() = default;
 //
-// void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<double>& f)
+// void gearoenix::physics::body::Rigid::apply_force_on_origin(const math::Vec3<core::fp_t>& f)
 // {
 //     force += f;
 // }
 //
-// void gearoenix::physics::body::Rigid::apply_time(const double delta_time)
+// void gearoenix::physics::body::Rigid::apply_time(const core::fp_t delta_time)
 // {
 //     const auto hdt = delta_time * 0.5;
 //     const auto acc = (force + (speed * air_friction)) * inverted_mass;
 //     const auto cur_speed = acc * delta_time;
 //     const auto translation = (cur_speed * hdt) + (speed * delta_time);
-//     force = math::Vec3<double>();
+//     force = math::Vec3<core::fp_t>();
 //     speed += cur_speed;
 //     (void)translation;
 //     GX_UNIMPLEMENTED

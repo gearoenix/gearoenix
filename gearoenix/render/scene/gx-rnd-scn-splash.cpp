@@ -18,29 +18,31 @@
 #include "gx-rnd-scn-manager.hpp"
 #include "gx-rnd-scn-scene.hpp"
 
-constexpr double gear_base_scale = 0.125;
-constexpr double glare_base_scale = 0.15;
-constexpr double wings_base_scale = 0.15;
-constexpr double gearoenix_text_base_scale = 0.0375;
-constexpr double animation_speed = 1.2;
+namespace {
+constexpr auto gear_base_scale = static_cast<gearoenix::core::fp_t>(0.125);
+constexpr auto glare_base_scale = static_cast<gearoenix::core::fp_t>(0.15);
+constexpr auto wings_base_scale = static_cast<gearoenix::core::fp_t>(0.15);
+constexpr auto gearoenix_text_base_scale = static_cast<gearoenix::core::fp_t>(0.0375);
+constexpr auto animation_speed = static_cast<gearoenix::core::fp_t>(1.2);
 
-constexpr double whole_scale_animation = 0.5;
-constexpr double whole_scale_start = 1.0 - whole_scale_animation;
+constexpr auto whole_scale_animation = static_cast<gearoenix::core::fp_t>(0.5);
+constexpr auto whole_scale_start = static_cast<gearoenix::core::fp_t>(1.0) - whole_scale_animation;
 
-constexpr double wing_angle_start = -0.4;
-constexpr double wing_angle_end = 0.2;
-constexpr double wing_rotate_dis = wing_angle_end - wing_angle_start;
+constexpr auto wing_angle_start = static_cast<gearoenix::core::fp_t>(-0.4);
+constexpr auto wing_angle_end = static_cast<gearoenix::core::fp_t>(0.2);
+constexpr auto wing_rotate_dis = wing_angle_end - wing_angle_start;
 
-double gearoenix::render::scene::Splash::calculate_scale() const
+gearoenix::core::fp_t calculate_scale()
 {
-    auto& win_sz = platform::Application::get().get_base().get_window_size();
-    const auto win_ar = static_cast<double>(win_sz.x) / static_cast<double>(win_sz.y);
-    constexpr auto threshold = 1.5;
-    constexpr auto out = 1.3;
+    auto& win_sz = gearoenix::platform::Application::get().get_base().get_window_size();
+    const auto win_ar = static_cast<gearoenix::core::fp_t>(win_sz.x) / static_cast<gearoenix::core::fp_t>(win_sz.y);
+    constexpr auto threshold = static_cast<gearoenix::core::fp_t>(1.5);
+    constexpr auto out = static_cast<gearoenix::core::fp_t>(1.3);
     if (win_ar > threshold) {
         return out;
     }
     return win_ar * (out / threshold);
+}
 }
 
 gearoenix::render::scene::Splash::Splash(core::job::EndCaller<>&& end_callback)
@@ -103,7 +105,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
         std::shared_ptr<mesh::Mesh> left_wing_mesh;
         std::shared_ptr<mesh::Mesh> right_wing_mesh;
 
-        double text_width = 0.0, text_height = 0.0;
+        core::fp_t text_width = 0.0, text_height = 0.0;
 
         Values(std::shared_ptr<Splash>&& splash, core::job::EndCaller<>&& entity_callback)
             : entity_callback(std::move(entity_callback))
@@ -203,12 +205,12 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
                 }));
         }));
 
-    values->text_height = platform::Application::get().get_base().get_screen_size().y * math::Numeric::epsilon<double>;
+    values->text_height = platform::Application::get().get_base().get_screen_size().y * math::Numeric::epsilon<core::fp_t>;
 
     material::Manager::get().get_unlit("gearoenix-splash-text", core::job::EndCallerShared<material::Unlit>([values, font = std::move(font)](std::shared_ptr<material::Unlit>&& m) mutable {
         m->set_transparency(material::Transparency::Transparent);
         m->get_albedo_factor() = { 0.4f, 0.0f, 0.0f, 0.0f };
-        font->bake(L"Gearoenix", math::Vec4(1.0), values->text_height, values->text_width, core::job::EndCallerShared<texture::Texture2D>([values, m = std::move(m)](std::shared_ptr<texture::Texture2D>&& t) mutable {
+        font->bake(L"Gearoenix", math::Vec4<core::fp_t>(1.0), values->text_height, values->text_width, core::job::EndCallerShared<texture::Texture2D>([values, m = std::move(m)](std::shared_ptr<texture::Texture2D>&& t) mutable {
             m->set_albedo(std::move(t));
             mesh::Manager::get().build_plate(std::move(m), core::job::EndCallerShared<mesh::Mesh>([values](std::shared_ptr<mesh::Mesh>&& m) { values->text_mesh = std::move(m); }));
         }));
@@ -229,24 +231,24 @@ void gearoenix::render::scene::Splash::update()
         return;
     }
 
-    const auto delta_time = math::Numeric::safe_minimum(engine::Engine::get().get_delta_time(), 0.05);
+    const auto delta_time = math::Numeric::safe_minimum(engine::Engine::get().get_delta_time(), static_cast<core::fp_t>(0.05));
     if (is_animating_scale) {
         scale_animation_time_current += delta_time * animation_speed;
-        if (scale_animation_time_current > 1.0) {
-            scale_animation_time_current = 1.0;
+        if (scale_animation_time_current > static_cast<core::fp_t>(1)) {
+            scale_animation_time_current = static_cast<core::fp_t>(1);
             is_animating_scale = false;
             is_animating_text = true;
         }
     } else if (is_animating_text) {
         text_animation_time_current += delta_time * animation_speed;
-        if (text_animation_time_current > 1.0) {
-            text_animation_time_current = 1.0;
+        if (text_animation_time_current > static_cast<core::fp_t>(1)) {
+            text_animation_time_current = static_cast<core::fp_t>(1);
             is_animating_text = false;
         }
         gearoenix_text_mat->get_albedo_factor().w = static_cast<float>(text_animation_time_current);
     } else {
         after_animation += delta_time;
-        if (after_animation > 1.0) {
+        if (after_animation > static_cast<core::fp_t>(1)) {
             end_callback = std::nullopt;
             (void)end_callback;
         }

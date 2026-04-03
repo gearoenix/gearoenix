@@ -114,11 +114,11 @@ gearoenix::render::engine::Engine::~Engine() = default;
 void gearoenix::render::engine::Engine::start_frame()
 {
     GX_PROFILE_NEW_FRAME;
-    if (const auto diff = minimum_frame_time - std::chrono::duration<double>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
-        std::this_thread::sleep_for(std::chrono::duration<double>(diff));
+    if (const auto diff = minimum_frame_time - std::chrono::duration<core::fp_t>(clock_t::now() - last_frame_time).count(); diff > 0.0) {
+        std::this_thread::sleep_for(std::chrono::duration<core::fp_t>(diff));
     }
     const auto now = clock_t::now();
-    delta_time = std::chrono::duration<double>(now - last_frame_time).count();
+    delta_time = std::chrono::duration<core::fp_t>(now - last_frame_time).count();
     GX_ASSERT_D(delta_time > 0.0);
     ImGui::GetIO().DeltaTime = static_cast<float>(delta_time);
     last_frame_time = now;
@@ -129,8 +129,8 @@ void gearoenix::render::engine::Engine::start_frame()
     core::ecs::World::get().update();
 
     if constexpr (GX_DEBUG_MODE) {
-        static double time_lapsed = 0.0;
-        static double counter = 0.0;
+        static core::fp_t time_lapsed = 0.0;
+        static core::fp_t counter = 0.0;
         ++counter;
         time_lapsed += delta_time;
         if (time_lapsed >= 5.0) {

@@ -17,12 +17,12 @@ struct Buffer final : render::mesh::Buffer {
     GX_GET_VAL_PRV(sizei, indices_count, 0);
 
 public:
-    explicit Buffer(const math::Aabb3<double>& box);
+    explicit Buffer(const math::Aabb3<core::fp_t>& box);
     static void construct(
         std::string&& name,
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const math::Aabb3<double>& occlusion_box,
+        const math::Aabb3<core::fp_t>& occlusion_box,
         core::job::EndCallerShared<render::mesh::Buffer>&& end_callback);
     ~Buffer() override;
 };
@@ -53,7 +53,7 @@ struct MeshManager final : render::mesh::Manager {
         std::string&& name,
         render::Vertices&& vertices,
         std::vector<std::uint32_t>&& indices,
-        const math::Aabb3<double>& occlusion_box,
+        const math::Aabb3<core::fp_t>& occlusion_box,
         core::job::EndCallerShared<render::mesh::Buffer>&& end_callback) override;
     void build(
         std::string&& name,

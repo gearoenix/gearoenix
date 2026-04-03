@@ -99,12 +99,12 @@ int32_t gearoenix::platform::Application::handle(android_app* const, AInputEvent
         switch (flags) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN:
-            base.touch_down(static_cast<FingerId>(pointer_id), static_cast<double>(AMotionEvent_getRawX(e, pointer_index)), static_cast<double>(AMotionEvent_getRawY(e, pointer_index)));
+            base.touch_down(static_cast<FingerId>(pointer_id), static_cast<core::fp_t>(AMotionEvent_getRawX(e, pointer_index)), static_cast<core::fp_t>(AMotionEvent_getRawY(e, pointer_index)));
             break;
         case AMOTION_EVENT_ACTION_MOVE: {
             const auto pointer_counts = AMotionEvent_getPointerCount(e);
             for (auto pi = decltype(pointer_counts) { 0 }; pi < pointer_counts; ++pi) {
-                base.touch_move(static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)), static_cast<double>(AMotionEvent_getRawX(e, pi)), static_cast<double>(AMotionEvent_getRawY(e, pi)));
+                base.touch_move(static_cast<FingerId>(AMotionEvent_getPointerId(e, pi)), static_cast<core::fp_t>(AMotionEvent_getRawX(e, pi)), static_cast<core::fp_t>(AMotionEvent_getRawY(e, pi)));
             }
             break;
         }

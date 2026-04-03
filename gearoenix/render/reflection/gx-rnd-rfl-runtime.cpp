@@ -13,9 +13,9 @@
 gearoenix::render::reflection::Runtime::Runtime(
     core::ecs::Entity* const entity,
     const core::object_type_index_t final_component_type_index,
-    const math::Aabb3<double>& receive_box,
-    const math::Aabb3<double>& exclude_box,
-    const math::Aabb3<double>& include_box,
+    const math::Aabb3<core::fp_t>& receive_box,
+    const math::Aabb3<core::fp_t>& exclude_box,
+    const math::Aabb3<core::fp_t>& include_box,
     std::string&& name)
     : Probe(entity, final_component_type_index, include_box, std::move(name))
     , on_rendered([] { })
@@ -33,13 +33,13 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
     core::job::EndCaller<>&& end_callback)
 {
     const auto radiance_mipmap_levels = static_cast<std::uint32_t>(RuntimeConfiguration::compute_radiance_mipmaps_count(static_cast<std::uint16_t>(radiance_resolution)));
-    const auto nears = math::Vec3<float>(exclude_box.get_diameter() * 0.5);
-    const auto fars = math::Vec3<float>(receive_box.get_diameter() * 0.5);
+    const auto nears = math::Vec3<float>(exclude_box.get_diameter()) * 0.5f;
+    const auto fars = math::Vec3<float>(receive_box.get_diameter()) * 0.5f;
     struct FaceInfo {
         texture::Face face;
-        double x_rotate;
-        double y_rotate;
-        double z_rotate;
+        core::fp_t x_rotate;
+        core::fp_t y_rotate;
+        core::fp_t z_rotate;
         float near;
         float far;
     };
@@ -51,8 +51,8 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
         { texture::FACES[4], std::numbers::pi * 1.0, std::numbers::pi * 0.0, std::numbers::pi * 0.0, nears.z, fars.z },
         { texture::FACES[5], std::numbers::pi * 0.0, std::numbers::pi * 0.0, std::numbers::pi * 1.0, nears.z, fars.z },
     } };
-    const auto roughness_move = 1.0 / static_cast<double>(radiance_mipmap_levels - 1);
-    double current_roughness = 0.0;
+    const auto roughness_move = static_cast<core::fp_t>(1) / static_cast<core::fp_t>(radiance_mipmap_levels - 1);
+    auto current_roughness = static_cast<core::fp_t>(0);
     for (auto i = decltype(radiance_mipmap_levels) { 0 }; i < radiance_mipmap_levels; ++i) {
         roughnesses.push_back(current_roughness);
         current_roughness += roughness_move;
@@ -186,7 +186,7 @@ void gearoenix::render::reflection::Runtime::set_runtime_reflection_self(
 
 gearoenix::render::reflection::Runtime::~Runtime() = default;
 
-void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<double>& p)
+void gearoenix::render::reflection::Runtime::set_location(const math::Vec3<core::fp_t>& p)
 {
     receive_box.set_center(p);
     exclude_box.set_center(p);

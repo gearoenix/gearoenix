@@ -98,7 +98,7 @@ void gearoenix::vulkan::reflection::Manager::initialise_black()
         auto rad = irr;
         black = core::Object::construct<Baked>(
             nullptr, "reflection-default-black", std::move(irr), std::move(rad),
-            math::Aabb3(math::Vec3(std::numeric_limits<double>::max()), -math::Vec3(std::numeric_limits<double>::max())));
+            math::Aabb3(math::Vec3(std::numeric_limits<core::fp_t>::max()), -math::Vec3(std::numeric_limits<core::fp_t>::max())));
     }));
 }
 
@@ -129,7 +129,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_ba
     core::ecs::Entity* const parent,
     std::shared_ptr<render::texture::TextureCube>&& irradiance,
     std::shared_ptr<render::texture::TextureCube>&& radiance,
-    const math::Aabb3<double>& include_box)
+    const math::Aabb3<core::fp_t>& include_box)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
     entity->add_component(core::Object::construct<Baked>(entity.get(), entity->get_object_name() + "-gapi-reflection", std::move(irradiance), std::move(radiance), include_box));
@@ -139,9 +139,9 @@ gearoenix::core::ecs::EntityPtr gearoenix::vulkan::reflection::Manager::build_ba
 void gearoenix::vulkan::reflection::Manager::build_runtime(
     std::string&& name,
     core::ecs::Entity* const parent,
-    const math::Aabb3<double>& receive_box,
-    const math::Aabb3<double>& exclude_box,
-    const math::Aabb3<double>& include_box,
+    const math::Aabb3<core::fp_t>& receive_box,
+    const math::Aabb3<core::fp_t>& exclude_box,
+    const math::Aabb3<core::fp_t>& include_box,
     const std::uint32_t environment_resolution,
     const std::uint32_t irradiance_resolution,
     const std::uint32_t radiance_resolution,

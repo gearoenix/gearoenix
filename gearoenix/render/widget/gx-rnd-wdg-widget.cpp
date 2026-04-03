@@ -5,9 +5,9 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 #include "gx-rnd-wdg-layout.hpp"
+
 #include <array>
 
 constexpr std::array default_event_ids {
@@ -19,7 +19,7 @@ constexpr std::array default_event_ids {
     gearoenix::core::event::Id::Touch,
 };
 
-std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<double>& normalised_point) const
+std::optional<gearoenix::math::Vec3<gearoenix::core::fp_t>> gearoenix::render::widget::Widget::get_hit_point(const math::Vec2<core::fp_t>& normalised_point) const
 {
     if (nullptr == model_entity) {
         return std::nullopt;
@@ -37,7 +37,7 @@ std::optional<gearoenix::math::Vec3<double>> gearoenix::render::widget::Widget::
         return std::nullopt;
     }
     const auto ray = camera->generate_ray(normalised_point);
-    if (const auto dis = collider->get_surrounding_box().hit(ray, std::numeric_limits<double>::max()); dis.has_value()) {
+    if (const auto dis = collider->get_surrounding_box().hit(ray, std::numeric_limits<core::fp_t>::max()); dis.has_value()) {
         return ray.get_point(dis.value());
     }
     return std::nullopt;
@@ -107,13 +107,13 @@ void gearoenix::render::widget::Widget::handle_cancel()
     }
 }
 
-void gearoenix::render::widget::Widget::handle_press(const math::Vec3<double>& hit_point)
+void gearoenix::render::widget::Widget::handle_press(const math::Vec3<core::fp_t>& hit_point)
 {
     is_pressed = true;
     on_press(hit_point);
 }
 
-void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>& hit_point)
+void gearoenix::render::widget::Widget::handle_release(const math::Vec3<core::fp_t>& hit_point)
 {
     if (is_pressed) {
         is_pressed = false;
@@ -124,9 +124,9 @@ void gearoenix::render::widget::Widget::handle_release(const math::Vec3<double>&
 gearoenix::render::widget::Widget::Widget(std::string&& n, const Type widget_type)
     : name(std::move(n))
     , widget_type(widget_type)
-    , on_press([](const math::Vec3<double>&) -> void { })
-    , on_release([](const math::Vec3<double>&) -> void { })
-    , on_click([](const math::Vec3<double>&) -> void { })
+    , on_press([](const math::Vec3<core::fp_t>&) -> void { })
+    , on_release([](const math::Vec3<core::fp_t>&) -> void { })
+    , on_click([](const math::Vec3<core::fp_t>&) -> void { })
     , on_cancel([]() -> void { })
 {
 }
@@ -139,13 +139,13 @@ gearoenix::render::widget::Widget::~Widget()
     }
 }
 
-void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) { on_press = fun; }
+void gearoenix::render::widget::Widget::set_on_press(const std::function<void(const math::Vec3<core::fp_t>&)>& fun) { on_press = fun; }
 
-void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) { on_release = fun; }
+void gearoenix::render::widget::Widget::set_on_release(const std::function<void(const math::Vec3<core::fp_t>&)>& fun) { on_release = fun; }
 
 void gearoenix::render::widget::Widget::set_on_cancel(const std::function<void()>& fun) { on_cancel = fun; }
 
-void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<double>&)>& fun) { on_click = fun; }
+void gearoenix::render::widget::Widget::set_on_click(const std::function<void(const math::Vec3<core::fp_t>&)>& fun) { on_click = fun; }
 
 void gearoenix::render::widget::Widget::set_sensitivity(const bool b)
 {
@@ -191,7 +191,7 @@ void gearoenix::render::widget::Widget::hide()
     set_sensitivity(false);
 }
 
-void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const double priority) { children[std::make_pair(priority, child->name)] = std::move(child); }
+void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child, const core::fp_t priority) { children[std::make_pair(priority, child->name)] = std::move(child); }
 
 void gearoenix::render::widget::Widget::add_child(std::shared_ptr<Widget>&& child) { add_child(std::move(child), 0.0); }
 

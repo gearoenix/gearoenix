@@ -1,11 +1,9 @@
 #include <gearoenix/core/ecs/gx-cr-ecs-world.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
-#include <gearoenix/physics/gx-phs-engine.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-local.hpp>
-#include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
 #include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
@@ -19,16 +17,13 @@
 #include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
 
 using GxCoreApp = gearoenix::core::Application;
+using GxFP = gearoenix::core::fp_t;
 using GxEntityPtr = gearoenix::core::ecs::EntityPtr;
 using GxEndCaller = gearoenix::core::job::EndCaller<>;
 using GxEntityEndCaller = gearoenix::core::job::EndCaller<GxEntityPtr>;
-using GxAabb3 = gearoenix::math::Aabb3<double>;
-using GxVec3 = gearoenix::math::Vec3<double>;
+using GxVec3 = gearoenix::math::Vec3<GxFP>;
 using GxConstraintManager = gearoenix::physics::constraint::Manager;
 using GxTransform = gearoenix::physics::Transformation;
-using GxPath = gearoenix::platform::stream::Path;
-using GxStream = gearoenix::platform::stream::Stream;
-using GxLocal = gearoenix::platform::stream::Local;
 using GxCameraManager = gearoenix::render::camera::Manager;
 using GxLightManager = gearoenix::render::light::Manager;
 using GxShadowCaster = gearoenix::render::light::ShadowCasterDirectional;
@@ -37,11 +32,7 @@ using GxPbr = gearoenix::render::material::Pbr;
 using GxMeshManager = gearoenix::render::mesh::Manager;
 using GxMesh = gearoenix::render::mesh::Mesh;
 using GxModelManager = gearoenix::render::model::Manager;
-using GxReflectionManager = gearoenix::render::reflection::Manager;
-using GxReflectionRuntime = gearoenix::render::reflection::Runtime;
 using GxSceneManager = gearoenix::render::scene::Manager;
-using GxSkyboxManager = gearoenix::render::skybox::Manager;
-
 using GxMeshEndCaller = gearoenix::core::job::EndCallerShared<GxMesh>;
 using GxPbrEndCaller = gearoenix::core::job::EndCallerShared<GxPbr>;
 using GxMeshPtr = std::shared_ptr<GxMesh>;
@@ -85,7 +76,7 @@ public:
                 GxEntityEndCaller([e = end, light_index](GxEntityPtr&& light_entity) {
                     auto* const light = light_entity->get_component<GxShadowCaster>();
                     light->get_shadow_transform()->local_look_at(
-                        { static_cast<double>(((light_index & 1) << 1) - 1) * 11.0, static_cast<double>(((light_index >> 1) << 1) - 1) * 11.0, 11.0 },
+                        GxVec3(static_cast<double>(((light_index & 1) << 1) - 1) * 11.0, static_cast<double>(((light_index >> 1) << 1) - 1) * 11.0, 11.0),
                         { 0.0, 0.0, 0.0 },
                         { 0.0, 1.0, 0.0 });
                     light->colour = { 2.0f, 2.0f, 2.0f };
@@ -99,7 +90,7 @@ public:
     void icosphere_mesh_is_ready(GxMeshPtr&& mesh, const std::string& postfix, const GxEndCaller&, const float metallic, const float roughness)
     {
         auto model_entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, true);
-        model_entity->get_component<GxTransform>()->local_translate({ static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0 });
+        model_entity->get_component<GxTransform>()->local_translate(GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
     }
 
     void icosphere_material_is_ready(GxPbrPtr&& material, std::string&& postfix, const float metallic, const float roughness, const GxEndCaller& end)

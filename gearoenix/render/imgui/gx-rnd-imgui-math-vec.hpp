@@ -1,8 +1,7 @@
 #pragma once
 #include "../../math/gx-math-vector-3d.hpp"
 #include "gx-rnd-imgui-id.hpp"
-
-#include <ImGui/imgui.h>
+#include "gx-rnd-imgui-input-fp.hpp"
 
 namespace gearoenix::render::imgui {
 template <typename T>
@@ -21,10 +20,10 @@ template <typename T>
     bool result = false;
 
     const auto fun = [&](T& e) constexpr {
-        if constexpr (std::is_same_v<double, T>) {
-            result |= ImGui::InputDouble(eid.data(), &e, 0.01, 1.0, item_format);
+        if constexpr (std::is_same_v<core::fp_t, T>) {
+            result |= input(eid.data(), e, static_cast<core::fp_t>(0.01), static_cast<core::fp_t>(1.0), item_format);
         } else if constexpr (std::is_same_v<float, T>) {
-            result |= ImGui::InputFloat(eid.data(), &e, 0.01, 1.0, item_format);
+            result |= input(eid.data(), e, static_cast<core::fp_t>(0.01), static_cast<core::fp_t>(1.0), item_format);
         } else {
             static_assert(false, "Unimplemented type.");
         }

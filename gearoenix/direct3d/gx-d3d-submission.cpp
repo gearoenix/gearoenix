@@ -69,7 +69,7 @@ bool gearoenix::d3d::SubmissionManager::fill_g_buffer(const std::uint32_t camera
         first_command = false;
     }
 
-    core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<double, ModelBvhData>& distance_model_data, const unsigned int thread_index) {
+    core::sync::ParallelFor::seq_ranges_exec(camera.opaque_models_data.begin(), camera.opaque_models_data.end(), [&](std::pair<core::fp_t, ModelBvhData>& distance_model_data, const unsigned int thread_index) {
         auto& model_data = distance_model_data.second;
         auto* const cmd = frame.threads_g_buffer_filler_commands[thread_index].get_list();
         cmd->SetGraphicsRootConstantBufferView(0, model_data.current_frame_uniform_address);

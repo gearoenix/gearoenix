@@ -79,7 +79,7 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
         bone_indices.push_back(static_cast<int>(std::distance(arm_bones.begin(), std::ranges::find(arm_bones, ptr))));
     }
     arm->sort_all_bones(bone_indices);
-    std::vector<math::Mat4x4<double>> inverse_bind_matrices;
+    std::vector<math::Mat4x4<core::fp_t>> inverse_bind_matrices;
     const auto inv_mat_index = skin.inverseBindMatrices;
     GX_ASSERT_D(inv_mat_index != -1);
     const auto& inv_mat_acc = context.data.accessors[inv_mat_index];
@@ -94,7 +94,7 @@ bool gearoenix::render::gltf::Armatures::process(const int node_index, core::ecs
     const auto mat_bi_inc = inv_mat_acc.ByteStride(inv_mat_bv);
     auto mat_bi = decltype(mat_bi_inc) { 0 };
     for (auto& mat : inverse_bind_matrices) {
-        mat = math::Mat4x4<double>(*reinterpret_cast<const math::Mat4x4<float>*>(&mat_b[mat_bi]));
+        mat = math::Mat4x4<core::fp_t>(*reinterpret_cast<const math::Mat4x4<float>*>(&mat_b[mat_bi]));
         mat_bi += mat_bi_inc;
     }
     for (int i = 0; i < inv_mat_acc.count; ++i) {

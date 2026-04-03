@@ -4,7 +4,7 @@
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 
-gearoenix::vulkan::sync::Semaphore::Semaphore(const std::string& name)
+gearoenix::vulkan::sync::Semaphore::Semaphore([[maybe_unused]] const std::string& name)
     : vulkan_data(
           device::Logical::get().get_device(),
           vk::SemaphoreCreateInfo())

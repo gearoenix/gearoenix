@@ -20,7 +20,7 @@ namespace gearoenix::render::widget {
 struct Text final : Widget {
     GX_GETSET_CREF_PRT(std::wstring, text);
     GX_GETSET_CREF_PRT(std::shared_ptr<font::Font>, text_font);
-    GX_GETSET_CREF_PRT(math::Vec4<double>, text_colour);
+    GX_GETSET_CREF_PRT(math::Vec4<core::fp_t>, text_colour);
     GX_GETSET_VAL_PRT(Alignment, vertical_align, Alignment::Center);
     GX_GETSET_VAL_PRT(Alignment, horizontal_align, Alignment::Center);
     GX_GET_CREF_PRT(std::shared_ptr<material::Unlit>, text_material);
@@ -34,7 +34,7 @@ public:
     static void construct(std::string&& name, core::ecs::Entity* camera_entity, std::shared_ptr<material::Unlit>&& mat, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Text>&& end_callback);
     static void construct(std::string&& name, core::ecs::Entity* camera_entity, std::shared_ptr<mesh::Mesh>&& msh, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Text>&& end_callback);
     ~Text() override;
-    [[nodiscard]] math::Vec2<double> get_text_size() const;
+    [[nodiscard]] math::Vec2<core::fp_t> get_text_size() const;
     void update_text(const core::job::EndCaller<>& c) const;
 };
 }

@@ -271,7 +271,7 @@ void gearoenix::render::mesh::Manager::build(
     std::string&& name,
     Vertices&& vertices,
     std::vector<std::uint32_t>&& indices,
-    const math::Aabb3<double>& occlusion_box,
+    const math::Aabb3<core::fp_t>& occlusion_box,
     std::shared_ptr<material::Material>&& material,
     core::job::EndCallerShared<Mesh>&& end_callback,
     const bool use_cache)
@@ -299,9 +299,9 @@ void gearoenix::render::mesh::Manager::build(
         GEAROENIX_RENDER_MESH_MANAGER_CACHE;
     }
 
-    math::Aabb3<double> occlusion_box;
+    math::Aabb3<core::fp_t> occlusion_box;
     for (const PbrVertex& vertex : vertices) {
-        occlusion_box.put_without_update(math::Vec3<double>(vertex.position));
+        occlusion_box.put_without_update(math::Vec3<core::fp_t>(vertex.position));
     }
     occlusion_box.update();
 
@@ -320,9 +320,9 @@ void gearoenix::render::mesh::Manager::build(
         GEAROENIX_RENDER_MESH_MANAGER_CACHE;
     }
 
-    math::Aabb3<double> occlusion_box;
+    math::Aabb3<core::fp_t> occlusion_box;
     for (const auto& vertex : vertices) {
-        occlusion_box.put_without_update(math::Vec3<double>(vertex.base.position));
+        occlusion_box.put_without_update(math::Vec3<core::fp_t>(vertex.base.position));
     }
     occlusion_box.update();
 

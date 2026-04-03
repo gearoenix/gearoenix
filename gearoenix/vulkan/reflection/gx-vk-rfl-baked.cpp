@@ -8,7 +8,7 @@ gearoenix::vulkan::reflection::Baked::Baked(
     std::string&& name,
     std::shared_ptr<render::texture::TextureCube>&& irr,
     std::shared_ptr<render::texture::TextureCube>&& rad,
-    const math::Aabb3<double>& include_box)
+    const math::Aabb3<core::fp_t>& include_box)
     : render::reflection::Baked(entity, core::ecs::ComponentType::create_index(this), std::move(irr), std::move(rad), include_box, std::move(name))
 {
     set_textures(

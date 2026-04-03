@@ -174,9 +174,9 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
 
 gearoenix::vulkan::reflection::Runtime::Runtime(
     core::ecs::Entity* const entity,
-    const math::Aabb3<double>& receive_box,
-    const math::Aabb3<double>& exclude_box,
-    const math::Aabb3<double>& include_box,
+    const math::Aabb3<core::fp_t>& receive_box,
+    const math::Aabb3<core::fp_t>& exclude_box,
+    const math::Aabb3<core::fp_t>& include_box,
     std::string&& name)
     : render::reflection::Runtime(entity, core::ecs::ComponentType::create_index(this), receive_box, exclude_box, include_box, std::move(name))
 {
@@ -184,9 +184,9 @@ gearoenix::vulkan::reflection::Runtime::Runtime(
 
 void gearoenix::vulkan::reflection::Runtime::construct(
     core::ecs::Entity* const entity,
-    const math::Aabb3<double>& receive_box,
-    const math::Aabb3<double>& exclude_box,
-    const math::Aabb3<double>& include_box,
+    const math::Aabb3<core::fp_t>& receive_box,
+    const math::Aabb3<core::fp_t>& exclude_box,
+    const math::Aabb3<core::fp_t>& include_box,
     std::string&& name,
     const std::uint32_t environment_resolution,
     const std::uint32_t irradiance_resolution,
@@ -283,7 +283,7 @@ void gearoenix::vulkan::reflection::Runtime::convolute_radiance(const vk::Comman
     const auto roughness = roughnesses[li];
     const auto roughness_p_2 = roughness * roughness;
     const auto roughness_p_4 = roughness_p_2 * roughness_p_2;
-    const auto env_resolution = static_cast<double>(env_cube.get_view()->get_image()->get_image_width());
+    const auto env_resolution = static_cast<core::fp_t>(env_cube.get_view()->get_image()->get_image_width());
     const auto sa_texel = std::numbers::pi / (1.5 * env_resolution * env_resolution);
 
     RadiancePushConstants pc { };

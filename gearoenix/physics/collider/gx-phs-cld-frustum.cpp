@@ -20,7 +20,7 @@ void gearoenix::physics::collider::Frustum::update_surrounding_box()
     // the actual update happens in the `update` function.
 }
 
-gearoenix::physics::collider::Frustum::Frustum(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<double>, 8>& points)
+gearoenix::physics::collider::Frustum::Frustum(core::ecs::Entity* const entity, std::shared_ptr<Transformation>&& transform, std::string&& name, const std::array<math::Vec3<core::fp_t>, 8>& points)
     : Collider(entity, std::move(transform), core::ecs::ComponentType::create_index(this), std::move(name))
     , frustum(points)
 {
@@ -30,7 +30,7 @@ gearoenix::physics::collider::Frustum::Frustum(core::ecs::Entity* const entity, 
     surrounding_box.update();
 }
 
-void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<double>, 8>& points)
+void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<core::fp_t>, 8>& points)
 {
     frustum = math::Frustum(points);
     surrounding_box.reset(points[0]);
@@ -40,12 +40,12 @@ void gearoenix::physics::collider::Frustum::update(const std::array<math::Vec3<d
     surrounding_box.update();
 }
 
-bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3<double>& b) const
+bool gearoenix::physics::collider::Frustum::check_intersection(const math::Aabb3<core::fp_t>& b) const
 {
     return Collider::check_intersection(b) && frustum.check_intersection_status(b) != math::IntersectionStatus::Out;
 }
 
-gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(const math::Aabb3<double>& b) const
+gearoenix::math::IntersectionStatus gearoenix::physics::collider::Frustum::check_intersection_status(const math::Aabb3<core::fp_t>& b) const
 {
     if (surrounding_box.check_intersection(b)) {
         return frustum.check_intersection_status(b);

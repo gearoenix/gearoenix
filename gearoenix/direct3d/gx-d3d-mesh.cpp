@@ -10,7 +10,7 @@
 #include "gx-d3d-uploader.hpp"
 #include "shaders/gx-d3d-shd-common.hpp"
 
-gearoenix::d3d::Mesh::Mesh(std::shared_ptr<GpuBuffer>&& in_vb, std::shared_ptr<GpuBuffer>&& in_ib, math::Aabb3<double>&& box, const UINT vertex_size, const UINT vertices_size, const UINT indices_count)
+gearoenix::d3d::Mesh::Mesh(std::shared_ptr<GpuBuffer>&& in_vb, std::shared_ptr<GpuBuffer>&& in_ib, math::Aabb3<core::fp_t>&& box, const UINT vertex_size, const UINT vertices_size, const UINT indices_count)
     : render::mesh::Mesh(std::move(box))
     , vb(std::move(in_vb))
     , ib(std::move(in_ib))
@@ -35,7 +35,7 @@ gearoenix::d3d::MeshManager::MeshManager(Engine& e)
 
 gearoenix::d3d::MeshManager::~MeshManager() = default;
 
-std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::d3d::MeshManager::build(std::string&& name, std::vector<render::PbrVertex>&& vertices, std::vector<std::uint32_t>&& indices, math::Aabb3<double>&& occlusion_box, core::job::EndCaller&& c)
+std::shared_ptr<gearoenix::render::mesh::Mesh> gearoenix::d3d::MeshManager::build(std::string&& name, std::vector<render::PbrVertex>&& vertices, std::vector<std::uint32_t>&& indices, math::Aabb3<core::fp_t>&& occlusion_box, core::job::EndCaller&& c)
 {
     auto& eng = dynamic_cast<Engine&>(e);
     auto* const d = eng.get_device()->get_device().Get();

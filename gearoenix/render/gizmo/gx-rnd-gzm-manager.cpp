@@ -120,19 +120,19 @@ void gearoenix::render::gizmo::Manager::set_viewport_camera(camera::Camera* cons
     }
 }
 
-bool gearoenix::render::gizmo::Manager::show_transform(math::Mat4x4<double>& inout) const
+bool gearoenix::render::gizmo::Manager::show_transform(math::Mat4x4<core::fp_t>& inout) const
 {
     math::Mat4x4<float> m(inout);
     if (!Manipulate(current_view_matrix.data(), current_projection_matrix.data(), static_cast<ImGuizmo::OPERATION>(operation_handles), static_cast<ImGuizmo::MODE>(transform_mode), m.data())) {
         return false;
     }
-    inout = math::Mat4x4<double>(m);
+    inout = math::Mat4x4<core::fp_t>(m);
     return true;
 }
 
-bool gearoenix::render::gizmo::Manager::show(math::Aabb3<double>& box)
+bool gearoenix::render::gizmo::Manager::show(math::Aabb3<core::fp_t>& box)
 {
-    std::array<math::Vec3<double>, 8> points;
+    std::array<math::Vec3<core::fp_t>, 8> points;
     box.get_all_corners(points);
     bool result = false;
     std::array<math::Vec2<float>, points.size()> display_points;
@@ -173,7 +173,7 @@ bool gearoenix::render::gizmo::Manager::show(math::Aabb3<double>& box)
         if (draw_translate_handle(points[i], p, point_hash)) {
             result = true;
             box.reset(points[i]);
-            box.put(points[math::Aabb3<double>::counter_corners_indices[i]]);
+            box.put(points[math::Aabb3<core::fp_t>::counter_corners_indices[i]]);
         }
     }
     return result;
@@ -201,7 +201,7 @@ void gearoenix::render::gizmo::Manager::enable_local_transform_mode() { transfor
 
 void gearoenix::render::gizmo::Manager::disable_local_transform_mode() { transform_mode = ImGuizmo::MODE::WORLD; }
 
-bool gearoenix::render::gizmo::Manager::draw_translate_handle(math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id)
+bool gearoenix::render::gizmo::Manager::draw_translate_handle(math::Vec3<core::fp_t>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id)
 {
     constexpr auto radius = 5.0f;
     constexpr auto colour = IM_COL32(250, 140, 140, 128);
@@ -220,7 +220,7 @@ bool gearoenix::render::gizmo::Manager::draw_translate_handle(math::Vec3<double>
         math::Mat4x4<float> m;
         m.set_position(math::Vec3<float>(point));
         if (Manipulate(current_view_matrix.data(), current_projection_matrix.data(), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, m.data())) {
-            point = math::Vec3<double>(m.get_position());
+            point = math::Vec3<core::fp_t>(m.get_position());
             return true;
         }
     }

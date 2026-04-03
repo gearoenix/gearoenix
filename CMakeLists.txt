@@ -26,7 +26,7 @@ option(GX_TEST_ENABLED "Enables test units" ON)
 
 option(GX_COVERAGE_ENABLED "Enables the measurement of test coverages" OFF)
 
-option(GX_PROFILING_ENABLED "Enables Tracy profiler" OFF)
+option(GX_PROFILING_ENABLED "Enables Tracy profiler" ON)
 
 message(STATUS "Gearoenix is going to be compiled for ${CMAKE_SYSTEM_NAME}")
 
@@ -83,16 +83,12 @@ elseif (APPLE)
         set(GX_IN_IOS TRUE)
     else ()
         set(GX_IN_MACOS TRUE)
-        set(CMAKE_CXX_FLAGS "-march=native ${CMAKE_CXX_FLAGS}")
-        set(CMAKE_OBJCXX_FLAGS "-march=native ${CMAKE_OBJCXX_FLAGS}")
     endif ()
     set(GX_COMMON_LIBS ${GX_COMMON_LIBS} iconv)
-    set(CMAKE_CXX_FLAGS "-ffast-math -ftree-vectorize ${CMAKE_CXX_FLAGS}")
-    set(CMAKE_OBJCXX_FLAGS "-ffast-math -ftree-vectorize ${CMAKE_OBJCXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
-    set(CMAKE_OBJCXX_FLAGS_RELEASE "-O3 -flto ${CMAKE_OBJCXX_FLAGS_RELEASE}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-ffast-math -ftree-vectorize -O3 -flto ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-ffast-math -ftree-vectorize -O3 -flto ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -flto=thin ${CMAKE_CXX_FLAGS_RELEASE}")
+    set(CMAKE_OBJCXX_FLAGS_RELEASE "-Ofast -flto=thin ${CMAKE_OBJCXX_FLAGS_RELEASE}")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Ofast -flto=thin ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Ofast -flto=thin ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 endif ()
 
 if (GX_COVERAGE_ENABLED AND GX_TEST_ENABLED)
@@ -138,9 +134,9 @@ if (GX_PROFILING_ENABLED)
     FetchContent_Declare(
             tracy
             GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-            GIT_TAG v0.13.1
-            GIT_SHALLOW TRUE
-            GIT_PROGRESS TRUE)
+            GIT_TAG        v0.13.1
+            GIT_SHALLOW    TRUE
+            GIT_PROGRESS   TRUE)
     FetchContent_MakeAvailable(tracy)
 endif ()
 

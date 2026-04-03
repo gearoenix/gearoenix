@@ -63,7 +63,7 @@ LRESULT gearoenix::platform::Application::handler(HWND hwnd, const UINT message,
         base.mouse_key(key::Id::Middle, key::Action::Release);
         break;
     case WM_MOUSEWHEEL:
-        base.mouse_wheel(static_cast<double>(GET_WHEEL_DELTA_WPARAM(w_param)) / static_cast<double>(WHEEL_DELTA));
+        base.mouse_wheel(static_cast<core::fp_t>(GET_WHEEL_DELTA_WPARAM(w_param)) / static_cast<core::fp_t>(WHEEL_DELTA));
         break;
     case WM_MOUSEMOVE:
         update_mouse_position();

@@ -23,17 +23,6 @@
 #include <random>
 
 namespace {
-constexpr double position_limit = 2.0;
-constexpr double cube_size = 0.05;
-constexpr double max_speed = cube_size * 2.5;
-constexpr std::uint32_t objects_count = 8000;
-
-std::random_device random_device { };
-std::default_random_engine random_engine { random_device() };
-std::uniform_real_distribution space_distribution(-position_limit, position_limit);
-std::uniform_real_distribution speed_distribution(-max_speed, max_speed);
-std::uniform_real_distribution colour_distribution(0.5f, 1.0f);
-
 template <typename... Ts>
 using GxAll = gearoenix::core::ecs::All<Ts...>;
 template <typename T>
@@ -42,6 +31,7 @@ template <typename T>
 using GxEndCaller = gearoenix::core::job::EndCaller<T>;
 
 typedef gearoenix::core::Application GxCoreApp;
+typedef gearoenix::core::fp_t GxFP;
 typedef gearoenix::core::ecs::Entity GxEntity;
 typedef gearoenix::core::ecs::EntityPtr GxEntityPtr;
 typedef gearoenix::core::ecs::Component GxComp;
@@ -64,13 +54,24 @@ typedef GxEndCallerShared<GxPbr> GxPbrEndCaller;
 typedef std::shared_ptr<GxMesh> GxMeshPtr;
 typedef std::shared_ptr<GxPbr> GxPbrPtr;
 
+constexpr auto position_limit = static_cast<GxFP>(2);
+constexpr auto cube_size = static_cast<GxFP>(0.05);
+constexpr auto max_speed = cube_size * static_cast<GxFP>(2.5);
+constexpr std::uint32_t objects_count = 8000;
+
+std::random_device random_device { };
+std::default_random_engine random_engine { random_device() };
+std::uniform_real_distribution space_distribution(-position_limit, position_limit);
+std::uniform_real_distribution speed_distribution(-max_speed, max_speed);
+std::uniform_real_distribution colour_distribution(static_cast<GxFP>(0.5), static_cast<GxFP>(1));
+
 struct Position;
 
 struct Speed final : GxComp {
     constexpr static auto max_count = objects_count;
     constexpr static auto object_type_index = gearoenix_last_component_type_index + 1;
 
-    gearoenix::math::Vec3<double> value;
+    gearoenix::math::Vec3<GxFP> value;
 
     explicit Speed(GxEntity* e);
     void update(const Position& p);
@@ -80,10 +81,10 @@ struct Position final : GxComp {
     constexpr static auto max_count = objects_count;
     constexpr static auto object_type_index = gearoenix_last_component_type_index + 2;
 
-    gearoenix::math::Vec3<double> value;
+    gearoenix::math::Vec3<GxFP> value;
 
     explicit Position(GxEntity* e);
-    void update(double delta_time, const Speed& speed);
+    void update(GxFP delta_time, const Speed& speed);
 };
 
 Speed::Speed(GxEntity* const e)
@@ -99,28 +100,28 @@ void Speed::update(const Position& p)
 {
     const auto pos = p.value.abs() + 0.1f;
     if (pos.greater(position_limit).or_elements()) {
-        gearoenix::math::Vec3<double> n;
+        gearoenix::math::Vec3<GxFP> n;
         if (pos.x > position_limit) {
             if (p.value.x < 0.0) {
-                n = gearoenix::math::Vec3(1.0, 0.0, 0.0);
+                n = gearoenix::math::Vec3<GxFP>(1.0, 0.0, 0.0);
             } else {
-                n = gearoenix::math::Vec3(-1.0, 0.0, 0.0);
+                n = gearoenix::math::Vec3<GxFP>(-1.0, 0.0, 0.0);
             }
             value = n.reflect(value);
         }
         if (pos.y > position_limit) {
             if (p.value.y < 0.0) {
-                n = gearoenix::math::Vec3(0.0, 1.0, 0.0);
+                n = gearoenix::math::Vec3<GxFP>(0.0, 1.0, 0.0);
             } else {
-                n = gearoenix::math::Vec3(0.0, -1.0, 0.0);
+                n = gearoenix::math::Vec3<GxFP>(0.0, -1.0, 0.0);
             }
             value = n.reflect(value);
         }
         if (pos.z > position_limit) {
             if (p.value.z < 0.0) {
-                n = gearoenix::math::Vec3(0.0, 0.0, 1.0);
+                n = gearoenix::math::Vec3<GxFP>(0.0, 0.0, 1.0);
             } else {
-                n = gearoenix::math::Vec3(0.0, 0.0, -1.0);
+                n = gearoenix::math::Vec3<GxFP>(0.0, 0.0, -1.0);
             }
             value = n.reflect(value);
         }
@@ -133,7 +134,7 @@ Position::Position(GxEntity* const e)
 {
 }
 
-void Position::update(const double delta_time, const Speed& speed)
+void Position::update(const GxFP delta_time, const Speed& speed)
 {
     value += speed.value * delta_time;
     value.clamp(-position_limit, position_limit);

@@ -10,19 +10,19 @@ gearoenix::core::event::Engine::~Engine()
         GX_UNEXPECTED;
 }
 
-void gearoenix::core::event::Engine::add_listener(const Id event_id, Listener* const listener, const double priority)
+void gearoenix::core::event::Engine::add_listener(const Id event_id, Listener* const listener, const core::fp_t priority)
 {
     events_id_priority_listeners.emplace(event_id, priority, listener);
 }
 
-void gearoenix::core::event::Engine::remove_listener(const Id event_id, const double priority, Listener* const listener)
+void gearoenix::core::event::Engine::remove_listener(const Id event_id, const core::fp_t priority, Listener* const listener)
 {
     events_id_priority_listeners.erase(std::make_tuple(event_id, priority, listener));
 }
 
 void gearoenix::core::event::Engine::remove_listener(const Id event_id, Listener* const listener)
 {
-    auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_id, -std::numeric_limits<double>::max(), listener));
+    auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_id, -std::numeric_limits<core::fp_t>::max(), listener));
     while (events_id_priority_listeners.end() != search && std::get<0>(*search) == event_id) {
         if (std::get<2>(*search) == listener) {
             search = events_id_priority_listeners.erase(search);
@@ -47,7 +47,7 @@ void gearoenix::core::event::Engine::remove_listener(Listener* const listener)
 void gearoenix::core::event::Engine::broadcast(const Data& event_data)
 {
     bool keep_continuing = true;
-    for (auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<double>::max(), nullptr));
+    for (auto search = events_id_priority_listeners.lower_bound(std::make_tuple(event_data.get_source(), -std::numeric_limits<core::fp_t>::max(), nullptr));
         keep_continuing && search != events_id_priority_listeners.end() && std::get<0>(*search) == event_data.get_source();) {
         switch (std::get<2>(*search)->on_event(event_data)) {
         case Listener::Response::Erase:

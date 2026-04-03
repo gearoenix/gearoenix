@@ -39,19 +39,19 @@
 //     return false;
 // }
 //
-// void gearoenix::physics::constraint::WindowPlacer::set_width_percentage(const double v)
+// void gearoenix::physics::constraint::WindowPlacer::set_width_percentage(const core::fp_t v)
 // {
 //     width_percentage = v;
 //     WindowPlacer::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowPlacer::set_height_percentage(const double v)
+// void gearoenix::physics::constraint::WindowPlacer::set_height_percentage(const core::fp_t v)
 // {
 //     height_percentage = v;
 //     WindowPlacer::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowPlacer::set_z(const double v)
+// void gearoenix::physics::constraint::WindowPlacer::set_z(const core::fp_t v)
 // {
 //     z = v;
 //     WindowPlacer::update();
@@ -63,7 +63,7 @@
 //     WindowPlacer::update();
 // }
 //
-// void gearoenix::physics::constraint::WindowPlacer::set_distance(const gearoenix::math::Vec2<double>& v)
+// void gearoenix::physics::constraint::WindowPlacer::set_distance(const gearoenix::math::Vec2<core::fp_t>& v)
 // {
 //     set_distance([v] { return v; });
 // }

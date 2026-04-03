@@ -30,13 +30,13 @@ struct SubmissionManager final {
     struct CameraData final {
         std::uint8_t* uniform_ptr = nullptr;
         NSUInteger uniform_gpu_offset = 0;
-        std::vector<std::pair<double, ModelData>> opaque_models_data;
-        std::vector<std::pair<double, ModelData>> tranclucent_models_data;
+        std::vector<std::pair<core::fp_t, ModelData>> opaque_models_data;
+        std::vector<std::pair<core::fp_t, ModelData>> tranclucent_models_data;
     };
 
     struct SceneData final {
         std::uint32_t bvh_pool_index = 0;
-        boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::uint32_t /*camera-pool-index*/> cameras;
+        boost::container::flat_map<std::pair<core::fp_t /*layer*/, core::ecs::entity_id_t /*camera-entity-id*/>, std::uint32_t /*camera-pool-index*/> cameras;
     };
 
 private:
@@ -44,7 +44,7 @@ private:
     core::Pool<CameraData> camera_pool;
     core::Pool<SceneData> scene_pool;
 
-    boost::container::flat_map<std::pair<double /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
+    boost::container::flat_map<std::pair<core::fp_t /*layer*/, core::ecs::entity_id_t /*scene-entity-id*/>, std::uint32_t /*scene-pool-index*/> scenes;
 
     dispatch_semaphore_t present_semaphore;
 

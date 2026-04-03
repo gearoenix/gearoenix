@@ -8,14 +8,14 @@ namespace {
 const auto buffer_allocator = gearoenix::core::allocator::SharedArray<gearoenix::vulkan::mesh::Buffer, gearoenix::render::mesh::Buffer::max_count>::construct();
 }
 
-gearoenix::vulkan::mesh::Buffer::Buffer(const math::Aabb3<double>& box)
+gearoenix::vulkan::mesh::Buffer::Buffer(const math::Aabb3<core::fp_t>& box)
     : render::mesh::Buffer(box)
 {
 }
 
 gearoenix::vulkan::mesh::Buffer::~Buffer() = default;
 
-void gearoenix::vulkan::mesh::Buffer::construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<double>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
+void gearoenix::vulkan::mesh::Buffer::construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<core::fp_t>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
     auto result = buffer_allocator->make_shared(occlusion_box);
     result->indices_count = static_cast<std::uint32_t>(indices.size());

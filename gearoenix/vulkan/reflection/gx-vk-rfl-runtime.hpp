@@ -91,17 +91,17 @@ private:
 
     Runtime(
         core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
+        const math::Aabb3<core::fp_t>& receive_box,
+        const math::Aabb3<core::fp_t>& exclude_box,
+        const math::Aabb3<core::fp_t>& include_box,
         std::string&& name);
 
 public:
     static void construct(
         core::ecs::Entity* entity,
-        const math::Aabb3<double>& receive_box,
-        const math::Aabb3<double>& exclude_box,
-        const math::Aabb3<double>& include_box,
+        const math::Aabb3<core::fp_t>& receive_box,
+        const math::Aabb3<core::fp_t>& exclude_box,
+        const math::Aabb3<core::fp_t>& include_box,
         std::string&& name,
         std::uint32_t environment_resolution,
         std::uint32_t irradiance_resolution,

@@ -169,28 +169,50 @@ struct Mat4x4 final {
     }
 
     template <typename T>
-    constexpr const Vec4<Element>& operator[](const T i) const { return columns[i]; }
+    constexpr const Vec4<Element>& operator[](const T i) const {
+        return columns[i];
+    }
 
     template <typename T>
-    constexpr Vec4<Element>& operator[](const T i) { return columns[i]; }
+    constexpr Vec4<Element>& operator[](const T i) {
+        return columns[i];
+    }
 
     /// It does not change position
-    [[nodiscard]] constexpr Vec3<Element> get_diameter() const { return { columns[0].x, columns[1].y, columns[2].z }; }
+    [[nodiscard]] constexpr Vec3<Element> get_diameter() const
+    {
+        return { columns[0].x, columns[1].y, columns[2].z };
+    }
 
     /// It does not change position
-    constexpr void local_scale(const Element s) { local_scale(s, s, s); }
+    constexpr void local_scale(const Element s)
+    {
+        local_scale(s, s, s);
+    }
 
     /// It does not change position
-    constexpr void local_x_scale(const Element s) { columns[0] *= s; }
+    constexpr void local_x_scale(const Element s)
+    {
+        columns[0] *= s;
+    }
 
     /// It does not change position
-    constexpr void local_y_scale(const Element s) { columns[1] *= s; }
+    constexpr void local_y_scale(const Element s)
+    {
+        columns[1] *= s;
+    }
 
     /// It does not change position
-    constexpr void local_z_scale(const Element s) { columns[2] *= s; }
+    constexpr void local_z_scale(const Element s)
+    {
+        columns[2] *= s;
+    }
 
     /// It does not change position
-    constexpr void local_w_scale(const Element s) { columns[3] *= s; }
+    constexpr void local_w_scale(const Element s)
+    {
+        columns[3] *= s;
+    }
 
     /// It does not change position
     constexpr void local_scale(const Element a, const Element b, const Element c)
@@ -208,13 +230,22 @@ struct Mat4x4 final {
     }
 
     /// It does not change position
-    constexpr void local_scale(const Vec3<Element>& s) { local_scale(s.x, s.y, s.z); }
+    constexpr void local_scale(const Vec3<Element>& s)
+    {
+        local_scale(s.x, s.y, s.z);
+    }
 
     /// It changes position
-    constexpr void local_scale(const Vec4<Element>& s) { local_scale(s.x, s.y, s.z, s.w); }
+    constexpr void local_scale(const Vec4<Element>& s)
+    {
+        local_scale(s.x, s.y, s.z, s.w);
+    }
 
     /// It changes position
-    constexpr void global_scale(const Element s) { global_scale(s, s, s); }
+    constexpr void global_scale(const Element s)
+    {
+        global_scale(s, s, s);
+    }
 
     /// It changes position
     constexpr void global_scale(const Element a, const Element b, const Element c)
@@ -420,8 +451,8 @@ struct Mat4x4 final {
 
     [[nodiscard]] constexpr static Mat4x4 rotation(const Vec3<Element>& w, const Element degree)
     {
-        const auto sinus = static_cast<Element>(sin(static_cast<double>(degree)));
-        const auto cosine = static_cast<Element>(cos(static_cast<double>(degree)));
+        const auto sinus = static_cast<Element>(sin(degree));
+        const auto cosine = static_cast<Element>(cos(degree));
         const Element one_minus_cos = 1.0f - cosine;
         const Element wx2 = w[0] * w[0];
         const Element wxy = w[0] * w[1];
@@ -521,8 +552,14 @@ struct Mat4x4 final {
         return r;
     }
 
-    [[nodiscard]] constexpr const Element* data() const { return reinterpret_cast<const Element*>(this); }
+    [[nodiscard]] constexpr const Element* data() const
+    {
+        return reinterpret_cast<const Element*>(this);
+    }
 
-    [[nodiscard]] constexpr Element* data() { return reinterpret_cast<Element*>(this); }
+    [[nodiscard]] constexpr Element* data()
+    {
+        return reinterpret_cast<Element*>(this);
+    }
 };
 }

@@ -15,18 +15,31 @@ void gearoenix::render::gltf::apply_transform(const int node_index, const Contex
     const auto& translation = node.translation;
     GX_ASSERT_D(translation.empty() || translation.size() == 3);
     if (scale.size() == 3) {
-        transform.local_inner_scale({ scale[0], scale[1], scale[2] });
+        transform.local_inner_scale(math::Vec3(
+            static_cast<core::fp_t>(scale[0]),
+            static_cast<core::fp_t>(scale[1]),
+            static_cast<core::fp_t>(scale[2])));
     }
     if (rotation.size() == 4) {
-        transform.local_inner_rotate(math::Quat(rotation[0], rotation[1], rotation[2], rotation[3]));
+        transform.local_inner_rotate(math::Quat(
+            static_cast<core::fp_t>(rotation[0]),
+            static_cast<core::fp_t>(rotation[1]),
+            static_cast<core::fp_t>(rotation[2]),
+            static_cast<core::fp_t>(rotation[3])));
     }
     if (translation.size() == 3) {
-        transform.set_local_position(math::Vec3(translation[0], translation[1], translation[2]));
+        transform.set_local_position(math::Vec3(
+            static_cast<core::fp_t>(translation[0]),
+            static_cast<core::fp_t>(translation[1]),
+            static_cast<core::fp_t>(translation[2])));
     }
 
     if (!node.matrix.empty()) {
-        const auto local_matrix = math::Mat4x4(node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3], node.matrix[4], node.matrix[5], node.matrix[6], node.matrix[7], node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
-            node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]);
+        const auto local_matrix = math::Mat4x4(
+            static_cast<core::fp_t>(node.matrix[0]), static_cast<core::fp_t>(node.matrix[1]), static_cast<core::fp_t>(node.matrix[2]), static_cast<core::fp_t>(node.matrix[3]),
+            static_cast<core::fp_t>(node.matrix[4]), static_cast<core::fp_t>(node.matrix[5]), static_cast<core::fp_t>(node.matrix[6]), static_cast<core::fp_t>(node.matrix[7]),
+            static_cast<core::fp_t>(node.matrix[8]), static_cast<core::fp_t>(node.matrix[9]), static_cast<core::fp_t>(node.matrix[10]), static_cast<core::fp_t>(node.matrix[11]),
+            static_cast<core::fp_t>(node.matrix[12]), static_cast<core::fp_t>(node.matrix[13]), static_cast<core::fp_t>(node.matrix[14]), static_cast<core::fp_t>(node.matrix[15]));
 
         if (!transform.get_local_matrix().equal(local_matrix)) {
             GX_ASSERT_D(transform.get_local_matrix().equal({ })); // The glTF implementation is sending unexpected transform data

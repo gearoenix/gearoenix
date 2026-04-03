@@ -10,12 +10,12 @@ struct Aabb3 final : Collider {
     constexpr static std::array all_parent_object_type_indices { Collider::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Collider::object_type_index };
 
-    GX_GET_CREF_PRV(math::Aabb3<double>, original_box);
+    GX_GET_CREF_PRV(math::Aabb3<core::fp_t>, original_box);
 
     void update_surrounding_box() override;
 
-    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Vec3<double>& upper, const math::Vec3<double>& lower, std::string&& name);
-    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Aabb3<double>& original_box, std::string&& name);
+    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Vec3<core::fp_t>& upper, const math::Vec3<core::fp_t>& lower, std::string&& name);
+    Aabb3(core::ecs::Entity* entity, std::shared_ptr<Transformation>&& transform, const math::Aabb3<core::fp_t>& original_box, std::string&& name);
 
 public:
     ~Aabb3() override;

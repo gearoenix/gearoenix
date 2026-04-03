@@ -21,6 +21,6 @@ endif()
 include(${GX_BASE_TRIPLET})
 
 set(VCPKG_BUILD_TYPE release)
-set(VCPKG_C_FLAGS "-ftree-vectorize -march=native -O3 -flto") # because of SDL3 fast-math removed
-set(VCPKG_CXX_FLAGS "-ftree-vectorize -march=native -O3 -flto") # because of SDL3 fast-math removed
-set(VCPKG_LINKER_FLAGS "-ffast-math -ftree-vectorize -march=native -O3 -flto")
+set(VCPKG_C_FLAGS "-Ofast -flto=thin")
+set(VCPKG_CXX_FLAGS "-Ofast -flto=thin")
+set(VCPKG_LINKER_FLAGS "-Ofast -flto=thin")

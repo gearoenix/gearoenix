@@ -29,8 +29,8 @@ void gearoenix::physics::animation::Bone::read(platform::stream::Stream& s, core
     scale_samples.clear();
     scale_samples.reserve(scale_samples_count);
     for (auto i = decltype(scale_samples_count) { 0 }; i < scale_samples_count; ++i) {
-        const auto t = s.read<double>();
-        Keyframe<math::Vec3<double>> key;
+        const auto t = s.read<core::fp_t>();
+        Keyframe<math::Vec3<core::fp_t>> key;
         key.read(s);
         scale_samples.emplace(t, key);
     }
@@ -39,8 +39,8 @@ void gearoenix::physics::animation::Bone::read(platform::stream::Stream& s, core
     rotation_samples.clear();
     rotation_samples.reserve(rotation_samples_count);
     for (auto i = decltype(rotation_samples_count) { 0 }; i < rotation_samples_count; ++i) {
-        const auto t = s.read<double>();
-        Keyframe<math::Quat<double>> key;
+        const auto t = s.read<core::fp_t>();
+        Keyframe<math::Quat<core::fp_t>> key;
         key.read(s);
         rotation_samples.emplace(t, key);
     }
@@ -49,8 +49,8 @@ void gearoenix::physics::animation::Bone::read(platform::stream::Stream& s, core
     translation_samples.clear();
     translation_samples.reserve(translation_samples_count);
     for (auto i = decltype(translation_samples_count) { 0 }; i < translation_samples_count; ++i) {
-        const auto t = s.read<double>();
-        Keyframe<math::Vec3<double>> key;
+        const auto t = s.read<core::fp_t>();
+        Keyframe<math::Vec3<core::fp_t>> key;
         key.read(s);
         translation_samples.emplace(t, key);
     }
@@ -87,7 +87,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::animation::Bone::build(std::
     return entity;
 }
 
-void gearoenix::physics::animation::Bone::set_inverse_bind_matrix(const math::Mat4x4<double>& m)
+void gearoenix::physics::animation::Bone::set_inverse_bind_matrix(const math::Mat4x4<core::fp_t>& m)
 {
     inverse_bind_matrix = m;
     bind_matrix = m.inverted().transposed();

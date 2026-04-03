@@ -40,7 +40,7 @@ public:
     [[nodiscard]] bool is_default() const;
     [[nodiscard]] bool has_cube() const;
     void set_customised(std::shared_ptr<texture::Target>&& customised_target);
-    [[nodiscard]] double get_aspect_ratio() const;
+    [[nodiscard]] core::fp_t get_aspect_ratio() const;
     [[nodiscard]] math::Vec2<std::uint32_t> get_dimension() const;
     [[nodiscard]] const texture::DefaultCameraTargets& get_default() const;
     [[nodiscard]] const Customised& get_customised() const;

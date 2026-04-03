@@ -8,21 +8,21 @@ struct Point2D final {
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, start_time);
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, previous_time);
     GX_GET_CREF_PRV(std::chrono::high_resolution_clock::time_point, current_time);
-    GX_GET_CREF_PRV(math::Vec2<double>, start_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, previous_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, current_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_start_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_previous_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_start_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_previous_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, raw_current_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_start_position);
-    GX_GET_CREF_PRV(math::Vec2<double>, delta_raw_previous_position);
-    GX_GET_VAL_PRV(double, delta_start_time, 0.0);
-    GX_GET_VAL_PRV(double, delta_previous_time, 0.0);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, start_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, previous_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, current_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, delta_start_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, delta_previous_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, raw_start_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, raw_previous_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, raw_current_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, delta_raw_start_position);
+    GX_GET_CREF_PRV(math::Vec2<fp_t>, delta_raw_previous_position);
+    GX_GET_VAL_PRV(fp_t, delta_start_time, 0.0);
+    GX_GET_VAL_PRV(core::fp_t, delta_previous_time, 0.0);
 
 public:
-    explicit Point2D(const math::Vec2<double>& raw = { }, const math::Vec2<double>& p = { })
+    explicit Point2D(const math::Vec2<fp_t>& raw = { }, const math::Vec2<fp_t>& p = { })
         : start_time(std::chrono::high_resolution_clock::now())
         , previous_time(start_time)
         , current_time(start_time)
@@ -38,7 +38,7 @@ public:
     Point2D(const Point2D& o) = default;
     Point2D& operator=(const Point2D& o) = default;
 
-    void update(const math::Vec2<double>& raw, const math::Vec2<double>& p)
+    void update(const math::Vec2<fp_t>& raw, const math::Vec2<fp_t>& p)
     {
         previous_position = current_position;
         raw_previous_position = raw_current_position;
@@ -55,7 +55,7 @@ public:
         previous_time = current_time;
         current_time = std::chrono::high_resolution_clock::now();
 
-        std::chrono::duration<double> dur = current_time - previous_time;
+        std::chrono::duration<fp_t> dur = current_time - previous_time;
         delta_previous_time = dur.count();
         dur = current_time - start_time;
         delta_start_time = dur.count();
@@ -66,8 +66,8 @@ public:
         start_time = previous_time = current_time = std::chrono::high_resolution_clock::now();
         start_position = previous_position = current_position;
         raw_start_position = raw_previous_position = raw_current_position;
-        delta_start_position = delta_previous_position = math::Vec2(0.0);
-        delta_raw_start_position = delta_raw_previous_position = math::Vec2(0.0);
+        delta_start_position = delta_previous_position = math::Vec2(static_cast<fp_t>(0));
+        delta_raw_start_position = delta_raw_previous_position = math::Vec2(static_cast<fp_t>(0));
         delta_start_time = delta_previous_time = 0.0;
     }
 };

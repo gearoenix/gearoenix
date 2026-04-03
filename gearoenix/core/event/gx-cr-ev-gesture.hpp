@@ -28,11 +28,11 @@ public:
 
 struct Scale {
     GX_GET_CARR_PRV(Point2D, points, 2);
-    GX_GET_CVAL_PRV(double, start_scale);
-    GX_GET_CVAL_PRV(double, previous_scale);
-    GX_GET_CVAL_PRV(double, current_scale);
-    GX_GET_CVAL_PRV(double, delta_previous_scale);
-    GX_GET_CVAL_PRV(double, delta_start_scale);
+    GX_GET_CVAL_PRV(core::fp_t, start_scale);
+    GX_GET_CVAL_PRV(core::fp_t, previous_scale);
+    GX_GET_CVAL_PRV(core::fp_t, current_scale);
+    GX_GET_CVAL_PRV(core::fp_t, delta_previous_scale);
+    GX_GET_CVAL_PRV(core::fp_t, delta_start_scale);
 
 public:
     Scale(const Point2D& p1, const Point2D& p2)

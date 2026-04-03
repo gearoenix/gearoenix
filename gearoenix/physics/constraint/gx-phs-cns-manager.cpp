@@ -21,5 +21,7 @@ gearoenix::core::ecs::EntityPtr gearoenix::physics::constraint::Manager::create_
 
 void gearoenix::physics::constraint::Manager::update()
 {
-    core::ecs::World::get().parallel_system<Constraint>([&](const auto, auto* const cns, const auto) { cns->update(); });
+    core::ecs::World::get().parallel_system<Constraint>([&](const auto, auto* const cns, const auto) {
+        cns->update();
+    });
 }

@@ -26,7 +26,7 @@ public:
 
     Manager();
     ~Manager() override;
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, double layer) const override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::fp_t layer) const override;
     void update() override;
     void submit(vk::CommandBuffer cmd);
     void render_forward(vk::CommandBuffer cmd);

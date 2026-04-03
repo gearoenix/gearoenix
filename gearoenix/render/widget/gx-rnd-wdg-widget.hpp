@@ -16,7 +16,7 @@ struct Transformation;
 namespace gearoenix::render::widget {
 struct Layout;
 struct Widget : core::event::Listener {
-    typedef std::map<std::pair<double /*event-priority*/, std::string>, std::shared_ptr<Widget>> ChildrenMap;
+    typedef std::map<std::pair<core::fp_t /*event-priority*/, std::string>, std::shared_ptr<Widget>> ChildrenMap;
 
     const std::string name;
     const Type widget_type;
@@ -26,30 +26,30 @@ struct Widget : core::event::Listener {
     GX_GET_CREF_PRT(std::shared_ptr<physics::Transformation>, transform);
     GX_GET_CREF_PRT(ChildrenMap, children);
     GX_GET_CREF_PRT(std::shared_ptr<Layout>, layout);
-    GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_press);
-    GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_release);
-    GX_GET_CREF_PRT(std::function<void(const math::Vec3<double>&)>, on_click);
+    GX_GET_CREF_PRT(std::function<void(const math::Vec3<core::fp_t>&)>, on_press);
+    GX_GET_CREF_PRT(std::function<void(const math::Vec3<core::fp_t>&)>, on_release);
+    GX_GET_CREF_PRT(std::function<void(const math::Vec3<core::fp_t>&)>, on_click);
     GX_GET_CREF_PRT(std::function<void()>, on_cancel);
     GX_GET_REF_PRT(core::ecs::EntityPtr, model_entity);
     GX_GET_PTR_PRT(core::ecs::Entity, camera_entity);
     GX_GET_VAL_PRT(bool, is_pressed, false); // For later, it can be better to include more states in here.
 
-    [[nodiscard]] std::optional<math::Vec3<double>> get_hit_point(const math::Vec2<double>& normalised_point) const;
+    [[nodiscard]] std::optional<math::Vec3<core::fp_t>> get_hit_point(const math::Vec2<core::fp_t>& normalised_point) const;
     void handle_click_gesture(const core::event::Data& event_data);
     void handle_button_mouse(const core::event::Data& event_data);
     void handle_movement_mouse(const core::event::Data& event_data);
     void handle_touch(const core::event::Data& event_data);
     void handle_cancel();
-    void handle_press(const math::Vec3<double>& hit_point);
-    void handle_release(const math::Vec3<double>& hit_point);
+    void handle_press(const math::Vec3<core::fp_t>& hit_point);
+    void handle_release(const math::Vec3<core::fp_t>& hit_point);
 
 public:
     Widget(std::string&& name, Type t);
     ~Widget() override;
-    virtual void set_on_press(const std::function<void(const math::Vec3<double>&)>& fun);
-    virtual void set_on_release(const std::function<void(const math::Vec3<double>&)>& fun);
+    virtual void set_on_press(const std::function<void(const math::Vec3<core::fp_t>&)>& fun);
+    virtual void set_on_release(const std::function<void(const math::Vec3<core::fp_t>&)>& fun);
     virtual void set_on_cancel(const std::function<void()>& fun);
-    virtual void set_on_click(const std::function<void(const math::Vec3<double>&)>& fun);
+    virtual void set_on_click(const std::function<void(const math::Vec3<core::fp_t>&)>& fun);
     virtual void set_sensitivity(bool);
     virtual void set_model_entity(core::ecs::EntityPtr&& e);
     virtual void set_camera_entity(core::ecs::Entity* e);
@@ -57,7 +57,7 @@ public:
     virtual void set_layout(std::shared_ptr<Layout> layout);
     virtual void show();
     virtual void hide();
-    virtual void add_child(std::shared_ptr<Widget>&& child, double priority);
+    virtual void add_child(std::shared_ptr<Widget>&& child, core::fp_t priority);
     void add_child(std::shared_ptr<Widget>&& child);
     Response on_event(const core::event::Data& event_data) override;
 };

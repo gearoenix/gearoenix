@@ -30,8 +30,8 @@ public:
     ~Manager() override;
     void show_view();
     void set_viewport_camera(camera::Camera*);
-    [[nodiscard]] bool show_transform(math::Mat4x4<double>&) const;
-    [[nodiscard]] bool show(math::Aabb3<double>&);
+    [[nodiscard]] bool show_transform(math::Mat4x4<core::fp_t>&) const;
+    [[nodiscard]] bool show(math::Aabb3<core::fp_t>&);
     [[nodiscard]] bool is_processing_inputs() const;
     void register_drawer(Drawer*);
     void remove_drawer(Drawer*);
@@ -43,6 +43,6 @@ public:
     void disable_scale_handle();
     void enable_local_transform_mode();
     void disable_local_transform_mode();
-    [[nodiscard]] bool draw_translate_handle(math::Vec3<double>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id);
+    [[nodiscard]] bool draw_translate_handle(math::Vec3<core::fp_t>& point, const math::Vec2<float>& projected_point, std::uintptr_t pointer_id);
 };
 }

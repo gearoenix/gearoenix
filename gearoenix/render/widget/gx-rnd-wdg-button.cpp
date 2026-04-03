@@ -11,9 +11,9 @@
 #include "../texture/gx-rnd-txt-manager.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
 
-void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<double>&)>& fun)
+void gearoenix::render::widget::Button::set_on_press_impl(const std::function<void(const math::Vec3<core::fp_t>&)>& fun)
 {
-    on_press = [this, fun = fun](const math::Vec3<double>& p) -> void {
+    on_press = [this, fun = fun](const math::Vec3<core::fp_t>& p) -> void {
         if (const auto* const mdl = model_entity->get_component<model::Model>(); nullptr != mdl) {
             mdl->get_meshes().begin()->get()->get_bound_material()->set_albedo(std::shared_ptr(pressed_texture));
         }
@@ -21,9 +21,9 @@ void gearoenix::render::widget::Button::set_on_press_impl(const std::function<vo
     };
 }
 
-void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<double>&)>& fun)
+void gearoenix::render::widget::Button::set_on_release_impl(const std::function<void(const math::Vec3<core::fp_t>&)>& fun)
 {
-    on_release = [this, fun = fun](const math::Vec3<double>& p) -> void {
+    on_release = [this, fun = fun](const math::Vec3<core::fp_t>& p) -> void {
         if (const auto* const mdl = model_entity->get_component<model::Model>(); nullptr != mdl) {
             mdl->get_meshes().begin()->get()->get_bound_material()->set_albedo(std::shared_ptr(rest_texture));
         }
@@ -102,9 +102,9 @@ void gearoenix::render::widget::Button::construct(std::string&& name, std::share
     end_callback.set_return(std::move(but));
 }
 
-void gearoenix::render::widget::Button::set_on_press(const std::function<void(const math::Vec3<double>&)>& fun) { set_on_press_impl(fun); }
+void gearoenix::render::widget::Button::set_on_press(const std::function<void(const math::Vec3<core::fp_t>&)>& fun) { set_on_press_impl(fun); }
 
-void gearoenix::render::widget::Button::set_on_release(const std::function<void(const math::Vec3<double>&)>& fun) { set_on_release_impl(fun); }
+void gearoenix::render::widget::Button::set_on_release(const std::function<void(const math::Vec3<core::fp_t>&)>& fun) { set_on_release_impl(fun); }
 
 void gearoenix::render::widget::Button::set_on_cancel(const std::function<void()>& fun) { set_on_cancel_impl(fun); }
 

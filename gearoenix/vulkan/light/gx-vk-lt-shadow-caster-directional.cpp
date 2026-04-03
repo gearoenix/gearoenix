@@ -41,8 +41,8 @@ void gearoenix::vulkan::light::ShadowCasterDirectional::after_record(const std::
 
     auto sd = directional_shadow_casters_uniform_indexer_t::get().get_next();
 
-    auto& [direction_bit_shadow_map_texture_index, colour, normalised_vp] = *sd.get_ptr();
-    colour = math::Vec4(rec.colour, 0.0f);
+    auto& [direction_bit_shadow_map_texture_index, sd_colour, normalised_vp] = *sd.get_ptr();
+    sd_colour = math::Vec4(rec.colour, 0.0f);
     direction_bit_shadow_map_texture_index = math::Vec4(rec.direction, *reinterpret_cast<const float*>(&shadow_map_shader_index));
     normalised_vp = rec.normalised_vp;
 

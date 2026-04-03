@@ -34,7 +34,7 @@
 //
 // gearoenix::core::Id gearoenix::core::sync::UpdateManager::add(
 //     std::vector<Id> influenced_ids,
-//     const double priority,
+//     const core::fp_t priority,
 //     std::function<void()> fun)
 // {
 //     return influence_manager.add(std::move(influenced_ids), priority, std::move(fun));
