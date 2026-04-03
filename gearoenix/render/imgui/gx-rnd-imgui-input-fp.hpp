@@ -7,7 +7,7 @@
 
 namespace gearoenix::render::imgui {
 template <typename T>
-[[nodiscard]] bool input(const char * const id, T& v, const T step = static_cast<T>(0), const T step_fast = static_cast<T>(0), const char* const format = "%.6f")
+[[nodiscard]] bool input(const char* const id, T& v, const T step = static_cast<T>(0), const T step_fast = static_cast<T>(0), const char* const format = "%.6f")
 {
     static_assert(std::is_same_v<T, double> || std::is_same_v<T, float>);
 

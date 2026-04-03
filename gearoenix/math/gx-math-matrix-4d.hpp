@@ -66,6 +66,7 @@ struct Mat4x4 final {
               { static_cast<Element>(m[3][0]), static_cast<Element>(m[3][1]), static_cast<Element>(m[3][2]), static_cast<Element>(m[3][3]) },
           } }
     {
+        static_assert(!std::is_same_v<std::remove_cvref_t<Element>, std::remove_cvref_t<T>>, "Only different type can be used by this constructor.");
     }
 
     [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const
@@ -169,12 +170,14 @@ struct Mat4x4 final {
     }
 
     template <typename T>
-    constexpr const Vec4<Element>& operator[](const T i) const {
+    constexpr const Vec4<Element>& operator[](const T i) const
+    {
         return columns[i];
     }
 
     template <typename T>
-    constexpr Vec4<Element>& operator[](const T i) {
+    constexpr Vec4<Element>& operator[](const T i)
+    {
         return columns[i];
     }
 

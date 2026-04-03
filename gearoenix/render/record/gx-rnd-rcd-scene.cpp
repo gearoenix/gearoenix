@@ -1,6 +1,6 @@
 #include "gx-rnd-rcd-scene.hpp"
-#include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 #include "../../core/gx-cr-profiler.hpp"
+#include "../../core/sync/gx-cr-sync-parallel-for.hpp"
 
 void gearoenix::render::record::Scene::update(core::ecs::Entity* const scene_entity)
 {

@@ -2,9 +2,9 @@
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/gx-cr-string.hpp"
+#include "../../render/imgui/gx-rnd-imgui-input-fp.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-table.hpp"
 #include "../../render/imgui/gx-rnd-imgui-type-tree.hpp"
-#include "../../render/imgui/gx-rnd-imgui-input-fp.hpp"
 #include "../../render/material/gx-rnd-mat-sprite.hpp"
 #include "../gx-phs-transformation.hpp"
 #include "gx-phs-anm-bone.hpp"
@@ -150,7 +150,7 @@ void gearoenix::physics::animation::SpriteAnimation::animate(const core::fp_t ti
     GX_ASSERT_D(time <= static_cast<core::fp_t>(1));
     const auto pos = static_cast<std::uint32_t>(count * time);
     const math::Vec2 v(static_cast<core::fp_t>(pos % aspect.x), static_cast<core::fp_t>(pos / aspect.y));
-    sprite->set_uv_transform(math::Vec4<float>(uv_scale, uv_scale * v));
+    sprite->set_uv_transform(math::Vec4(uv_scale.to<float>(), (uv_scale * v).to<float>()));
 }
 
 void gearoenix::physics::animation::SpriteAnimation::show_debug_gui()

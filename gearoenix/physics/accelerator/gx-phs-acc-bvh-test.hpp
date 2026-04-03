@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_call_on_all)
 
     physics::accelerator::Bvh<Data> bvh;
     constexpr int n = 100;
-    std::array<bool, n> visited = {};
+    std::array<bool, n> visited = { };
 
     for (int i = 0; i < n; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
@@ -212,8 +212,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_intersecting_with_miss)
     /// Frustum that covers only x in [-2, 12], should hit boxes 0, 1, 2 and miss 3-9
     const Frustum frustum(std::array<V3, 8> {
         V3(-2.0, 2.0, -2.0), V3(12.0, 2.0, -2.0), V3(-2.0, -2.0, -2.0), V3(12.0, -2.0, -2.0),
-        V3(-2.0, 2.0, 2.0), V3(12.0, 2.0, 2.0), V3(-2.0, -2.0, 2.0), V3(12.0, -2.0, 2.0)
-    });
+        V3(-2.0, 2.0, 2.0), V3(12.0, 2.0, 2.0), V3(-2.0, -2.0, 2.0), V3(12.0, -2.0, 2.0) });
 
     int hit_count = 0;
     int miss_count = 0;

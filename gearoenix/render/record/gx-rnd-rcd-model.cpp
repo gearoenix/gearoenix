@@ -1,5 +1,6 @@
 #include "gx-rnd-rcd-model.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
@@ -10,7 +11,6 @@
 #include "../reflection/gx-rnd-rfl-baked.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "../reflection/gx-rnd-rfl-probe.hpp"
-#include "../../core/gx-cr-profiler.hpp"
 
 #include <boost/functional/hash.hpp>
 

@@ -4,6 +4,11 @@
 namespace gearoenix::math {
 template <typename Element>
 struct Vec3 final {
+    template <typename T>
+    constexpr static bool is_deep_same_v = std::is_same_v<std::remove_cvref_t<Element>, std::remove_cvref_t<T>>;
+
+    static_assert(std::is_same_v<std::remove_cvref_t<Element>, Element>);
+
     Element x, y, z;
 
     constexpr Vec3()
@@ -42,12 +47,30 @@ struct Vec3 final {
         , y(static_cast<Element>(o.y))
         , z(static_cast<Element>(o.z))
     {
-        static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
+        static_assert(!is_deep_same_v<T>, "Only different type can be used by this constructor.");
     }
 
-    constexpr Vec3 operator-() const { return Vec3(-x, -y, -z); }
+    template <typename T>
+    constexpr std::enable_if_t<is_deep_same_v<T>, const Vec3&> to() const
+    {
+        return *this;
+    }
 
-    constexpr Vec3 operator+(const Vec3& o) const { return Vec3(x + o.x, y + o.y, z + o.z); }
+    template <typename T>
+    constexpr std::enable_if_t<!is_deep_same_v<T>, Vec3<T>> to() const
+    {
+        return Vec3<T>(*this);
+    }
+
+    constexpr Vec3 operator-() const
+    {
+        return Vec3(-x, -y, -z);
+    }
+
+    constexpr Vec3 operator+(const Vec3& o) const
+    {
+        return Vec3(x + o.x, y + o.y, z + o.z);
+    }
 
     constexpr Vec3 operator-(const Vec3& o) const
     {
@@ -55,11 +78,20 @@ struct Vec3 final {
         return Vec3(x - o.x, y - o.y, z - o.z);
     }
 
-    constexpr Vec3 operator*(const Vec3& o) const { return Vec3(x * o.x, y * o.y, z * o.z); }
+    constexpr Vec3 operator*(const Vec3& o) const
+    {
+        return Vec3(x * o.x, y * o.y, z * o.z);
+    }
 
-    constexpr Vec3 operator/(const Vec3& o) const { return Vec3(x / o.x, y / o.y, z / o.z); }
+    constexpr Vec3 operator/(const Vec3& o) const
+    {
+        return Vec3(x / o.x, y / o.y, z / o.z);
+    }
 
-    constexpr Vec3 operator+(const Element o) const { return Vec3(x + o, y + o, z + o); }
+    constexpr Vec3 operator+(const Element o) const
+    {
+        return Vec3(x + o, y + o, z + o);
+    }
 
     constexpr Vec3 operator-(const Element o) const
     {
@@ -67,7 +99,10 @@ struct Vec3 final {
         return Vec3(x - o, y - o, z - o);
     }
 
-    constexpr Vec3 operator*(const Element o) const { return Vec3(x * o, y * o, z * o); }
+    constexpr Vec3 operator*(const Element o) const
+    {
+        return Vec3(x * o, y * o, z * o);
+    }
 
     constexpr Vec3 operator/(const Element o) const
     {
@@ -144,9 +179,15 @@ struct Vec3 final {
         }
     }
 
-    [[nodiscard]] constexpr Vec3 mix(const Vec3& o, const Element t) const { return (*this * (static_cast<Element>(1) - t)) + (o * t); }
+    [[nodiscard]] constexpr Vec3 mix(const Vec3& o, const Element t) const
+    {
+        return (*this * (static_cast<Element>(1) - t)) + (o * t);
+    }
 
-    [[nodiscard]] constexpr Vec3 linear_mix(const Vec3& o, const Element t) const { return mix(o, t); }
+    [[nodiscard]] constexpr Vec3 linear_mix(const Vec3& o, const Element t) const
+    {
+        return mix(o, t);
+    }
 
     template <typename T>
     [[nodiscard]] constexpr Element operator[](const T i) const
@@ -162,35 +203,80 @@ struct Vec3 final {
         return reinterpret_cast<Element*>(this)[i];
     }
 
-    [[nodiscard]] constexpr bool operator<(const Vec3& o) const { return z < o.z || (z == o.z && (y < o.y || (y == o.y && z < o.z))); }
+    [[nodiscard]] constexpr bool operator<(const Vec3& o) const
+    {
+        return z < o.z || (z == o.z && (y < o.y || (y == o.y && z < o.z)));
+    }
 
-    [[nodiscard]] constexpr bool operator<=(const Vec3& o) const { return z < o.z || (z == o.z && (y < o.y || (y == o.y && z <= o.z))); }
+    [[nodiscard]] constexpr bool operator<=(const Vec3& o) const
+    {
+        return z < o.z || (z == o.z && (y < o.y || (y == o.y && z <= o.z)));
+    }
 
-    [[nodiscard]] constexpr bool operator==(const Vec3& o) const { return z == o.z && y == o.y && z == o.z; }
+    [[nodiscard]] constexpr bool operator==(const Vec3& o) const
+    {
+        return z == o.z && y == o.y && z == o.z;
+    }
 
-    [[nodiscard]] constexpr bool operator>(const Vec3& o) const { return z > o.z || (z == o.z && (y > o.y || (y == o.y && z > o.z))); }
+    [[nodiscard]] constexpr bool operator>(const Vec3& o) const
+    {
+        return z > o.z || (z == o.z && (y > o.y || (y == o.y && z > o.z)));
+    }
 
-    [[nodiscard]] constexpr bool operator>=(const Vec3& o) const { return z > o.z || (z == o.z && (y > o.y || (y == o.y && z >= o.z))); }
+    [[nodiscard]] constexpr bool operator>=(const Vec3& o) const
+    {
+        return z > o.z || (z == o.z && (y > o.y || (y == o.y && z >= o.z)));
+    }
 
-    [[nodiscard]] constexpr Vec2<Element> xy() const { return Vec2<Element>(x, y); }
+    [[nodiscard]] constexpr Vec2<Element> xy() const
+    {
+        return Vec2<Element>(x, y);
+    }
 
-    [[nodiscard]] constexpr const Element* data() const { return &x; }
+    [[nodiscard]] constexpr const Element* data() const
+    {
+        return &x;
+    }
 
-    [[nodiscard]] constexpr Element* data() { return reinterpret_cast<Element*>(this); }
+    [[nodiscard]] constexpr Element* data()
+    {
+        return reinterpret_cast<Element*>(this);
+    }
 
-    [[nodiscard]] constexpr Element dot(const Vec3& o) const { return x * o.x + y * o.y + z * o.z; }
+    [[nodiscard]] constexpr Element dot(const Vec3& o) const
+    {
+        return x * o.x + y * o.y + z * o.z;
+    }
 
-    [[nodiscard]] constexpr Element square_length() const { return dot(*this); }
+    [[nodiscard]] constexpr Element square_length() const
+    {
+        return dot(*this);
+    }
 
-    [[nodiscard]] constexpr Element length() const { return static_cast<Element>(std::sqrt(square_length())); }
+    [[nodiscard]] constexpr Element length() const
+    {
+        return static_cast<Element>(std::sqrt(square_length()));
+    }
 
-    [[nodiscard]] constexpr Element abs_length() const { return std::abs(x) + std::abs(y) + std::abs(z); }
+    [[nodiscard]] constexpr Element abs_length() const
+    {
+        return std::abs(x) + std::abs(y) + std::abs(z);
+    }
 
-    [[nodiscard]] constexpr Element square_distance(const Vec3& o) const { return (*this - o).square_length(); }
+    [[nodiscard]] constexpr Element square_distance(const Vec3& o) const
+    {
+        return (*this - o).square_length();
+    }
 
-    [[nodiscard]] constexpr Element distance(const Vec3& o) const { return (*this - o).length(); }
+    [[nodiscard]] constexpr Element distance(const Vec3& o) const
+    {
+        return (*this - o).length();
+    }
 
-    [[nodiscard]] constexpr Element abs_distance(const Vec3& o) const { return (*this - o).abs_length(); }
+    [[nodiscard]] constexpr Element abs_distance(const Vec3& o) const
+    {
+        return (*this - o).abs_length();
+    }
 
     /// \note Only on unit(normalised) vectors will give expected result.
     [[nodiscard]] constexpr Vec3 normalized_perpendicular() const
@@ -216,11 +302,20 @@ struct Vec3 final {
     }
 
     /// \note Only on (this) unit(normalised) vectors will give expected result.
-    [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const { return o - (*this * dot(o)); }
+    [[nodiscard]] constexpr Vec3 normalized_perpendicular(const Vec3& o) const
+    {
+        return o - (*this * dot(o));
+    }
 
-    [[nodiscard]] constexpr Vec3 abs() const { return Vec3(std::abs(x), std::abs(y), std::abs(z)); }
+    [[nodiscard]] constexpr Vec3 abs() const
+    {
+        return Vec3(std::abs(x), std::abs(y), std::abs(z));
+    }
 
-    [[nodiscard]] constexpr Vec3 cross(const Vec3& o) const { return Vec3(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x); }
+    [[nodiscard]] constexpr Vec3 cross(const Vec3& o) const
+    {
+        return Vec3(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x);
+    }
 
     [[nodiscard]] constexpr bool equal(const Vec3& o, const Element tolerance = Numeric::epsilon<Element>) const
     {
@@ -235,15 +330,30 @@ struct Vec3 final {
         return b.x && b.y && b.z;
     }
 
-    [[nodiscard]] constexpr Vec3 safe_minimum(const Vec3& o) const { return Vec3(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y), Numeric::safe_minimum(z, o.z)); }
+    [[nodiscard]] constexpr Vec3 safe_minimum(const Vec3& o) const
+    {
+        return Vec3(Numeric::safe_minimum(x, o.x), Numeric::safe_minimum(y, o.y), Numeric::safe_minimum(z, o.z));
+    }
 
-    [[nodiscard]] constexpr Vec3 minimum(const Vec3& o) const { return Vec3(x < o.x ? x : o.x, y < o.y ? y : o.y, z < o.z ? z : o.z); }
+    [[nodiscard]] constexpr Vec3 minimum(const Vec3& o) const
+    {
+        return Vec3(x < o.x ? x : o.x, y < o.y ? y : o.y, z < o.z ? z : o.z);
+    }
 
-    [[nodiscard]] constexpr Vec3 safe_maximum(const Vec3& o) const { return Vec3(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y), Numeric::safe_maximum(z, o.z)); }
+    [[nodiscard]] constexpr Vec3 safe_maximum(const Vec3& o) const
+    {
+        return Vec3(Numeric::safe_maximum(x, o.x), Numeric::safe_maximum(y, o.y), Numeric::safe_maximum(z, o.z));
+    }
 
-    [[nodiscard]] constexpr Vec3 maximum(const Vec3& o) const { return Vec3(x > o.x ? x : o.x, y > o.y ? y : o.y, z > o.z ? z : o.z); }
+    [[nodiscard]] constexpr Vec3 maximum(const Vec3& o) const
+    {
+        return Vec3(x > o.x ? x : o.x, y > o.y ? y : o.y, z > o.z ? z : o.z);
+    }
 
-    [[nodiscard]] constexpr Element safe_minimum() const { return Numeric::safe_minimum(Numeric::safe_minimum(x, y), z); }
+    [[nodiscard]] constexpr Element safe_minimum() const
+    {
+        return Numeric::safe_minimum(Numeric::safe_minimum(x, y), z);
+    }
 
     [[nodiscard]] constexpr Element minimum() const
     {
@@ -259,27 +369,39 @@ struct Vec3 final {
         return m > z ? m : z;
     }
 
-    [[nodiscard]] constexpr Vec3 normalised() const { return *this / length(); }
+    [[nodiscard]] constexpr Vec3 normalised() const
+    {
+        return *this / length();
+    }
 
-    constexpr void normalise() { *this /= length(); }
+    constexpr void normalise()
+    {
+        *this /= length();
+    }
 
     constexpr void clamp(const Element lower, const Element upper)
     {
-        if (x < lower)
+        if (x < lower) {
             x = lower;
-        else if (x > upper)
+        } else if (x > upper) {
             x = upper;
-        if (y < lower)
+        }
+        if (y < lower) {
             y = lower;
-        else if (y > upper)
+        } else if (y > upper) {
             y = upper;
-        if (z < lower)
+        }
+        if (z < lower) {
             z = lower;
-        else if (z > upper)
+        } else if (z > upper) {
             z = upper;
+        }
     }
 
-    [[nodiscard]] constexpr Vec3 atan() const { return Vec3(static_cast<Element>(std::atan(static_cast<core::fp_t>(x))), static_cast<Element>(std::atan(static_cast<core::fp_t>(y))), static_cast<Element>(std::atan(static_cast<core::fp_t>(z)))); }
+    [[nodiscard]] constexpr Vec3 atan() const
+    {
+        return Vec3(static_cast<Element>(std::atan(static_cast<core::fp_t>(x))), static_cast<Element>(std::atan(static_cast<core::fp_t>(y))), static_cast<Element>(std::atan(static_cast<core::fp_t>(z))));
+    }
 
     [[nodiscard]] constexpr Vec3 sign() const
     {
@@ -287,19 +409,40 @@ struct Vec3 final {
     }
 
     /// the called vector must be normalised
-    [[nodiscard]] constexpr Vec3 reflect(const Vec3& o) const { return o + (*this * (dot(o) * static_cast<Element>(-2))); }
+    [[nodiscard]] constexpr Vec3 reflect(const Vec3& o) const
+    {
+        return o + (*this * (dot(o) * static_cast<Element>(-2)));
+    }
 
-    [[nodiscard]] constexpr Vec3<bool> less(const Element v) const { return Vec3<bool>(x < v, y < v, z < v); }
+    [[nodiscard]] constexpr Vec3<bool> less(const Element v) const
+    {
+        return Vec3<bool>(x < v, y < v, z < v);
+    }
 
-    [[nodiscard]] constexpr Vec3<bool> less(const Vec3& o) const { return Vec3<bool>(x < o.x, y < o.y, z < o.z); }
+    [[nodiscard]] constexpr Vec3<bool> less(const Vec3& o) const
+    {
+        return Vec3<bool>(x < o.x, y < o.y, z < o.z);
+    }
 
-    [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const { return Vec3<bool>(x > v, y > v, z > v); }
+    [[nodiscard]] constexpr Vec3<bool> greater(const Element v) const
+    {
+        return Vec3<bool>(x > v, y > v, z > v);
+    }
 
-    [[nodiscard]] constexpr Vec3<bool> greater(const Vec3& o) const { return Vec3<bool>(x > o.x, y > o.y, z > o.z); }
+    [[nodiscard]] constexpr Vec3<bool> greater(const Vec3& o) const
+    {
+        return Vec3<bool>(x > o.x, y > o.y, z > o.z);
+    }
 
-    [[nodiscard]] constexpr bool and_elements() const { return x && y && z; }
+    [[nodiscard]] constexpr bool and_elements() const
+    {
+        return x && y && z;
+    }
 
-    [[nodiscard]] constexpr bool or_elements() const { return x || y || z; }
+    [[nodiscard]] constexpr bool or_elements() const
+    {
+        return x || y || z;
+    }
 
     [[nodiscard]] constexpr static Vec3 importance_sample_ggx(const Vec2<Element>& xi, const Vec3& n, const Element roughness, const Element tolerance = Numeric::epsilon<Element>)
     {

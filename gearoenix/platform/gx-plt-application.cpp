@@ -45,7 +45,7 @@ void platform_set_ime_data(ImGuiContext*, ImGuiViewport*, ImGuiPlatformImeData* 
     }
 }
 
-const char* get_clipboard_text(ImGuiContext*const)
+const char* get_clipboard_text(ImGuiContext* const)
 {
     return gearoenix::platform::Application::get().get_clipboard();
 }

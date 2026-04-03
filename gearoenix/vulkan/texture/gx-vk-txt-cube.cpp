@@ -14,14 +14,10 @@
 gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& in_name)
     : render::texture::TextureCube(std::move(in_name), info)
     , view(new image::View(std::make_shared<image::Image>(
-        name, info.get_width(), info.get_height(), 1u, convert_image_type(info.get_type()),
-        static_cast<std::uint32_t>(compute_mipmaps_count(info)), 6u, convert_image_format(info.get_format()),
+          name, info.get_width(), info.get_height(), 1u, convert_image_type(info.get_type()),
+          static_cast<std::uint32_t>(compute_mipmaps_count(info)), 6u, convert_image_format(info.get_format()),
           vk::ImageCreateFlagBits::eCubeCompatible,
-          vk::ImageUsageFlagBits::eTransferDst |
-          vk::ImageUsageFlagBits::eTransferSrc |
-          vk::ImageUsageFlagBits::eSampled |
-          vk::ImageUsageFlagBits::eStorage |
-          (render::texture::format_is_depth(info.get_format()) ? vk::ImageUsageFlagBits::eDepthStencilAttachment : vk::ImageUsageFlagBits::eColorAttachment))))
+          vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eStorage | (render::texture::format_is_depth(info.get_format()) ? vk::ImageUsageFlagBits::eDepthStencilAttachment : vk::ImageUsageFlagBits::eColorAttachment))))
     , view_index(descriptor::Bindless::get().allocate_cube_image(view))
     , mips([this] {
         std::array<std::vector<std::shared_ptr<image::View>>, 6> result;

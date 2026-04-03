@@ -63,7 +63,7 @@ std::random_device random_device { };
 std::default_random_engine random_engine { random_device() };
 std::uniform_real_distribution space_distribution(-position_limit, position_limit);
 std::uniform_real_distribution speed_distribution(-max_speed, max_speed);
-std::uniform_real_distribution colour_distribution(static_cast<GxFP>(0.5), static_cast<GxFP>(1));
+std::uniform_real_distribution colour_distribution(0.5f, 1.0f);
 
 struct Position;
 
@@ -154,7 +154,9 @@ public:
 
         const auto materials = std::make_shared<std::array<GxPbrPtr, objects_count>>();
 
-        const GxEndCaller<void> end([this, materials] { materials_ready(*materials); });
+        const GxEndCaller<void> end([this, materials] {
+            materials_ready(*materials);
+        });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
             GxMatManager::get().get_pbr("material-" + std::to_string(model_index), GxPbrEndCaller([model_index, materials, end](GxPbrPtr&& m) {
@@ -169,7 +171,9 @@ public:
     {
         const auto meshes = std::make_shared<std::array<GxMeshPtr, objects_count>>();
 
-        const GxEndCaller<void> end([this, meshes] { meshes_ready(*meshes); });
+        const GxEndCaller<void> end([this, meshes] {
+            meshes_ready(*meshes);
+        });
 
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
             GxMeshManager::get().build_cube(std::move(materials[model_index]), GxMeshEndCaller([meshes, end, model_index](GxMeshPtr&& mesh) {
@@ -192,7 +196,9 @@ public:
             entity->add_component(std::move(position));
         }
 
-        const GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
+        const GxEndCaller<void> end([this] {
+            scene_entity->add_to_world();
+        });
 
         GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](GxEntityPtr&& entity) -> void {
             auto trn = entity->get_component_shared_ptr<GxTransform>();

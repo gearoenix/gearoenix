@@ -22,9 +22,7 @@ template <typename Value, typename T>
         const auto tp2 = t * t;
         const auto tp3 = tp2 * t;
         const auto tp2mp3 = tp2 * static_cast<core::fp_t>(3);
-        return s_key * (tp3 * static_cast<core::fp_t>(2) - tp2mp3 + static_cast<core::fp_t>(1)) +
-            s_out * (td * (tp3 - tp2 * static_cast<core::fp_t>(2) + t)) +
-                e_key * (static_cast<core::fp_t>(-2) * tp3 + tp2mp3) + e_in * (td * (tp3 - tp2));
+        return s_key * (tp3 * static_cast<core::fp_t>(2) - tp2mp3 + static_cast<core::fp_t>(1)) + s_out * (td * (tp3 - tp2 * static_cast<core::fp_t>(2) + t)) + e_key * (static_cast<core::fp_t>(-2) * tp3 + tp2mp3) + e_in * (td * (tp3 - tp2));
     }
     if (start_keyframe.second.is_step() || end_keyframe.second.is_step()) {
         if (t > static_cast<core::fp_t>(0.5)) {

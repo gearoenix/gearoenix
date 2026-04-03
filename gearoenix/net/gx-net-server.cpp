@@ -173,7 +173,7 @@ void gearoenix::net::Server::terminate()
 {
     running = false;
     core::job::send_job_to_pool([t = thread, h = host] {
-        if(t) {
+        if (t) {
             t->join();
         }
         if (h) {

@@ -388,7 +388,8 @@ void gearoenix::gl::CameraManager::build(std::string&& name, core::ecs::Entity* 
     auto transform = entity->get_component_shared_ptr<physics::Transformation>();
     Camera::construct(entity, entity->get_object_name() + "-gl-camera", core::job::EndCallerShared<Camera>([end = std::move(entity_callback)](std::shared_ptr<Camera>&& c) {
         end.get_return()->add_component(std::move(c));
-    }), std::move(transform));
+    }),
+        std::move(transform));
 }
 
 gearoenix::gl::CameraManager::CameraManager()

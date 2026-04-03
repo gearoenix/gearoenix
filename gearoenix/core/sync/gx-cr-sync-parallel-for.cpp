@@ -1,27 +1,27 @@
 #include "gx-cr-sync-parallel-for.hpp"
-#include "gx-cr-sync-thread.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
+#include "gx-cr-sync-thread.hpp"
 
 #include <atomic>
 #include <new>
+#include <optional>
 #include <thread>
 #include <vector>
-#include <optional>
 
 namespace {
 struct ParallelContext final {
+    alignas(std::hardware_destructive_interference_size) std::atomic<unsigned int> generation;
+    alignas(std::hardware_destructive_interference_size) std::atomic<unsigned int> done_count = 0;
+
     const unsigned int count;
     std::atomic<unsigned int> terminated_count = 0;
     gearoenix::core::sync::parallel_for_t task = nullptr;
     const void* context = nullptr;
     std::vector<std::thread> workers;
 
-    alignas(std::hardware_destructive_interference_size) std::atomic<unsigned int> generation;
-    alignas(std::hardware_destructive_interference_size) std::atomic<unsigned int> done_count = 0;
-
     ParallelContext()
-        : count(gearoenix::core::sync::threads_count())
-        , generation(count)
+        : generation(gearoenix::core::sync::threads_count())
+        , count(gearoenix::core::sync::threads_count())
     {
         workers.reserve(count);
         for (std::uint32_t i = 0; i < count; ++i) {
@@ -84,8 +84,8 @@ struct ParallelContext final {
         done_count.store(0, std::memory_order_relaxed);
         generation.store(0, std::memory_order_release);
         generation.notify_all();
-        for (auto i = done_count.load(std::memory_order_acquire); i < count; i = done_count.load(std::memory_order_acquire))  {
-           done_count.wait(i, std::memory_order_acquire);
+        for (auto i = done_count.load(std::memory_order_acquire); i < count; i = done_count.load(std::memory_order_acquire)) {
+            done_count.wait(i, std::memory_order_acquire);
         }
     }
 };

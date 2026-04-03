@@ -7,9 +7,9 @@
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
+#include "../image/gx-vk-img-view.hpp"
 #include "../memory/gx-vk-mem-memory.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
-#include "../image/gx-vk-img-view.hpp"
 
 namespace {
 constexpr vk::DescriptorBindingFlags gx_binding_flags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eUpdateUnusedWhilePending;

@@ -4,6 +4,11 @@
 namespace gearoenix::math {
 template <typename Element>
 struct Vec4 final {
+    template <typename T>
+    constexpr static bool is_deep_same_v = std::is_same_v<std::remove_cvref_t<Element>, std::remove_cvref_t<T>>;
+
+    static_assert(std::is_same_v<std::remove_cvref_t<Element>, Element>);
+
     Element x, y, z, w;
 
     constexpr Vec4(const Element x, const Element y, const Element z, const Element w)
@@ -63,16 +68,27 @@ struct Vec4 final {
         , z(static_cast<Element>(o.z))
         , w(static_cast<Element>(o.w))
     {
-        static_assert(!std::is_same_v<Element, T>, "Only different type can be used by this constructor.");
+        static_assert(!is_deep_same_v<T>, "Only different type can be used by this constructor.");
+    }
+
+    constexpr Vec4(const Vec2<Element>& v1, const Vec2<Element>& v2)
+        : x(v1.x)
+        , y(v1.y)
+        , z(v2.x)
+        , w(v2.y)
+    {
     }
 
     template <typename T>
-    constexpr Vec4(const Vec2<T>& v1, const Vec2<T>& v2)
-        : x(static_cast<Element>(v1.x))
-        , y(static_cast<Element>(v1.y))
-        , z(static_cast<Element>(v2.x))
-        , w(static_cast<Element>(v2.y))
+    constexpr std::enable_if_t<is_deep_same_v<T>, const Vec4&> to() const
     {
+        return *this;
+    }
+
+    template <typename T>
+    constexpr std::enable_if_t<!is_deep_same_v<T>, Vec4<T>> to() const
+    {
+        return Vec4<T>(*this);
     }
 
     [[nodiscard]] constexpr Vec2<Element> xy() const

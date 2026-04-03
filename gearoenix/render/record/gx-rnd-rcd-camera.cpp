@@ -61,7 +61,7 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     clear();
 
     const auto target_dimension = camera->get_target().get_dimension();
-    viewport_clip = camera->get_starting_clip_ending_clip() * math::Vec4<float>(target_dimension, target_dimension);
+    viewport_clip = camera->get_starting_clip_ending_clip() * math::Vec4(target_dimension.to<float>(), target_dimension.to<float>());
     skybox_scale = camera->get_far() * (1.0f / 1.7320508075688772935274463415059f);
 
     parent_entity = entity->get_parent();
@@ -70,8 +70,12 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     update_models(models.static_models_bvh);
     update_models(models.dynamic_models_bvh);
 
-    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first < lhs.first; });
-    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(), [](const auto& rhs, const auto& lhs) { return rhs.first > lhs.first; });
+    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(), [](const auto& rhs, const auto& lhs) {
+        return rhs.first < lhs.first;
+    });
+    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(), [](const auto& rhs, const auto& lhs) {
+        return rhs.first > lhs.first;
+    });
 
     mvps.clear();
     auto gather_mvps = [&](auto& trn_opq_models) {
