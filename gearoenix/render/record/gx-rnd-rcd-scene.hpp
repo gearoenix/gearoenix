@@ -5,6 +5,8 @@
 #include "gx-rnd-rcd-reflection.hpp"
 #include "gx-rnd-rcd-skybox.hpp"
 
+#include <functional>
+
 namespace gearoenix::render::record {
 struct Scene final {
     Cameras cameras;
@@ -13,6 +15,12 @@ struct Scene final {
     Reflections reflections;
     Skyboxes skyboxes;
 
-    void update(core::ecs::Entity* scene_entity);
+    std::array<std::function<void(core::ecs::Entity* scene_entity)>, 5> parallel_functions_1;
+
+    Scene();
+    ~Scene();
+
+    void update_per_frame(core::ecs::Entity* scene_entity);
+    void update_after_change(core::ecs::Entity* scene_entity);
 };
 }

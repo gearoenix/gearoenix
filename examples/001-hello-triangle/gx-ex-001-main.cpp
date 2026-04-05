@@ -80,7 +80,7 @@ public:
 
     void set_mesh(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxModelManager::get().build("triangle-model", scene_entity.get(), { std::move(mesh) }, true);
+        auto model_builder = GxModelManager::get().build("triangle-model", scene_entity.get(), { std::move(mesh) }, false, false);
 
         GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& c) { set_camera(std::move(c)); }));
     }

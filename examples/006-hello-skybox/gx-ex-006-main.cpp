@@ -30,9 +30,13 @@ public:
     GameApp()
         : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        GxEndCaller<void> end([this] { scene_entity->add_to_world(); });
+        GxEndCaller<void> end([this] {
+            scene_entity->add_to_world();
+        });
 
-        GxSkyboxManager::get().build("skybox", scene_entity.get(), GxPath::create_asset("sky.hdr"), GxEntityEndCaller([end](auto&&) { (void)end; }));
+        GxSkyboxManager::get().build("skybox", scene_entity.get(), GxPath::create_asset("sky.hdr"), GxEntityEndCaller([end](auto&&) {
+            (void)end;
+        }));
 
         GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) {
             auto trn = entity->template get_component_shared_ptr<GxTransform>();

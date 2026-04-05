@@ -36,7 +36,7 @@ struct ParallelContext final {
         auto index = count;
         while (true) {
             generation.wait(index, std::memory_order_acquire);
-            index = generation.load(std::memory_order_acquire);
+            index = generation.load(std::memory_order_relaxed);
             if (index >= count) {
                 continue;
             }
@@ -84,7 +84,7 @@ struct ParallelContext final {
         done_count.store(0, std::memory_order_relaxed);
         generation.store(0, std::memory_order_release);
         generation.notify_all();
-        for (auto i = done_count.load(std::memory_order_acquire); i < count; i = done_count.load(std::memory_order_acquire)) {
+        for (auto i = done_count.load(std::memory_order_relaxed); i < count; i = done_count.load(std::memory_order_relaxed)) {
             done_count.wait(i, std::memory_order_acquire);
         }
     }

@@ -6,6 +6,11 @@ namespace gearoenix::math {
 /// It is a column major matrix
 template <typename Element>
 struct Mat4x4 final {
+    template <typename T>
+    constexpr static bool is_deep_same_v = std::is_same_v<std::remove_cvref_t<Element>, std::remove_cvref_t<T>>;
+
+    static_assert(std::is_same_v<std::remove_cvref_t<Element>, Element>);
+
     std::array<Vec4<Element>, 4> columns;
 
     constexpr Mat4x4()
@@ -67,6 +72,16 @@ struct Mat4x4 final {
           } }
     {
         static_assert(!std::is_same_v<std::remove_cvref_t<Element>, std::remove_cvref_t<T>>, "Only different type can be used by this constructor.");
+    }
+
+    template <typename T>
+    constexpr std::conditional_t<is_deep_same_v<T>, const Mat4x4&, Mat4x4<T>> to() const
+    {
+        if constexpr (is_deep_same_v<T>) {
+            return *this;
+        } else {
+            return Mat4x4<T>(*this);
+        }
     }
 
     [[nodiscard]] constexpr Vec4<Element> operator*(const Vec4<Element>& v) const

@@ -47,7 +47,7 @@ void gearoenix::render::widget::Label::construct(std::string&& name, std::shared
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::move(background_texture));
-    auto model_entity = model::Manager::get().build(name + "-model", parent->get_model_entity().get(), { std::move(msh) }, true);
+    auto model_entity = model::Manager::get().build(name + "-model", parent->get_model_entity().get(), { std::move(msh) }, true, false);
     auto result = std::make_shared<Label>(std::move(name));
     result->transform = model_entity->get_component_shared_ptr<physics::Transformation>();
     result->set_model_entity(std::move(model_entity));

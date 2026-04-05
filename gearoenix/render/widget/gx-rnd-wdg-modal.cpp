@@ -42,7 +42,7 @@ void gearoenix::render::widget::Modal::construct(std::string&& name, std::string
     auto values_ready = core::job::EndCaller([values, parent = std::move(parent), camera_entity]() mutable {
         values->mat->set_transparency(material::Transparency::Transparent);
         values->mat->set_albedo(std::move(values->background_texture));
-        values->return_value.background_model_builder = model::Manager::get().build(values->return_value.modal->name + "-background-model", parent ? parent->get_model_entity().get() : nullptr, { values->msh }, true);
+        values->return_value.background_model_builder = model::Manager::get().build(values->return_value.modal->name + "-background-model", parent ? parent->get_model_entity().get() : nullptr, { values->msh }, true, false);
         values->return_value.modal->transform = values->return_value.background_model_builder->get_component_shared_ptr<physics::Transformation>();
         values->return_value.modal->set_model_entity(core::ecs::EntityPtr(values->return_value.background_model_builder));
         values->return_value.modal->set_camera_entity(camera_entity);

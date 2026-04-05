@@ -743,26 +743,41 @@ void gearoenix::vulkan::pipeline::Manager::initialise_shadow_pipelines()
     skinned_shadow = create_skinned_shadow_pipeline(fixed_depth_format);
 }
 
-gearoenix::vulkan::pipeline::FormatPipelines gearoenix::vulkan::pipeline::Manager::create_format_pipelines(const vk::Format colour_format)
+gearoenix::vulkan::pipeline::FormatPipelinesDataHolder gearoenix::vulkan::pipeline::Manager::create_format_pipelines(const vk::Format colour_format)
 {
     GX_ASSERT_D(colour_format != vk::Format::eUndefined);
-    FormatPipelines fp;
-    fp.pbr_forward = create_pbr_forward_pipeline(colour_format);
-    fp.pbr_skinned_forward = create_pbr_skinned_forward_pipeline(colour_format);
-    fp.unlit_forward = create_unlit_forward_pipeline(colour_format);
-    fp.unlit_skinned_forward = create_unlit_skinned_forward_pipeline(colour_format);
+
+    FormatPipelinesDataHolder fp;
+
+    fp.pbr_forward            = create_pbr_forward_pipeline(colour_format);
+    fp.pbr_skinned_forward    = create_pbr_skinned_forward_pipeline(colour_format);
+    fp.unlit_forward          = create_unlit_forward_pipeline(colour_format);
+    fp.unlit_skinned_forward  = create_unlit_skinned_forward_pipeline(colour_format);
     fp.skybox_equirectangular = create_skybox_equirectangular_pipeline(colour_format);
-    fp.skybox_cube = create_skybox_cube_pipeline(colour_format);
+    fp.skybox_cube            = create_skybox_cube_pipeline(colour_format);
+
     return fp;
 }
 
-const gearoenix::vulkan::pipeline::FormatPipelines& gearoenix::vulkan::pipeline::Manager::get_pipelines(const vk::Format colour_format)
+void gearoenix::vulkan::pipeline::Manager::set(AllPipelines& pipelines, const vk::Format colour_format)
 {
     auto& fp = formats_pipelines[colour_format];
     if (nullptr == fp.pbr_forward) {
         fp = create_format_pipelines(colour_format);
     }
-    return fp;
+
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_forward_index)]            = fp.pbr_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_skinned_forward_index)]    = fp.pbr_skinned_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_forward_index)]          = fp.unlit_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_skinned_forward_index)]  = fp.unlit_skinned_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::skybox_equirectangular_index)] = fp.skybox_equirectangular->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::skybox_cube_index)]            = fp.skybox_cube->get_vulkan_data();
+}
+
+void gearoenix::vulkan::pipeline::Manager::set(AllPipelines& pipelines) const
+{
+    pipelines[static_cast<std::size_t>(ShadowPipelinesIndices::no_skin_index)] = shadow->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(ShadowPipelinesIndices::skinned_index)] = skinned_shadow->get_vulkan_data();
 }
 
 std::shared_ptr<gearoenix::vulkan::pipeline::Pipeline> gearoenix::vulkan::pipeline::Manager::create_ray_tracing_pbr(const std::shared_ptr<descriptor::SetLayout>&)

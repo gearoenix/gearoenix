@@ -108,7 +108,7 @@ public:
 
     void mesh_is_ready(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false);
+        auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false, false);
 
         GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
             camera_is_ready(std::move(e));

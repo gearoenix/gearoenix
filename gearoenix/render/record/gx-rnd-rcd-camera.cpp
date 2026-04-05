@@ -1,6 +1,7 @@
 #include "gx-rnd-rcd-camera.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/sync/gx-cr-sync-thread.hpp"
+#include "../../core/gx-cr-profiler.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
@@ -20,39 +21,54 @@
 #define GX_PARALLEL_POLICY std::execution::par_unseq,
 #endif
 
+namespace {
+void on_intersection(auto& m, auto& self, const auto& camera_location, const auto& m_box, auto* const black_probe, auto& temp_models, auto& all_models)
+{
+    if ((m.model->cameras_flags & self.camera->get_flag()) == 0) {
+        return;
+    }
+    const auto dir = camera_location - m_box.get_center();
+    const auto dis = dir.square_length();
+    if (self.parent_reflection_probe == m.probe) {
+        m.probe = black_probe;
+    }
+    if (m.model->has_transparent_material()) {
+        temp_models.emplace_back(dis, &m);
+    } else {
+        all_models.emplace_back(dis, &m);
+    }
+}
+}
+
 gearoenix::render::record::Camera::Camera()
     : threads_mvps(core::sync::threads_count())
+#if !GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
+    , threads_temp_models(core::sync::threads_count())
+    , threads_all_models(core::sync::threads_count())
+#endif
 {
 }
 
 void gearoenix::render::record::Camera::clear()
 {
-    translucent_models.clear();
-    opaque_models.clear();
+    temp_models.clear();
+    all_models.clear();
+    mvps.clear();
+
+#if !GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
+    for (auto& t : threads_temp_models) { t.clear(); }
+    for (auto& t : threads_all_models) { t.clear(); }
+#endif
 }
 
-void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh<Model>& bvh)
+void gearoenix::render::record::Camera::update_models(physics::accelerator::Bvh& bvh, std::vector<Model>& models)
 {
-    using node_t = std::remove_cvref_t<decltype(bvh)>::Data;
-
     const auto camera_location = transform->get_global_position();
     auto* const black_probe = reflection::Manager::get().get_black().get();
 
-    bvh.call_on_intersecting(*collider, [&, this](node_t& node) -> void {
-        if ((node.user_data.model->cameras_flags & camera->get_flag()) == 0) {
-            return;
-        }
-        const auto dir = camera_location - node.box.get_center();
-        const auto dis = dir.square_length();
-        auto& m = node.user_data;
-        if (parent_reflection_probe == m.probe) {
-            m.probe = black_probe;
-        }
-        if (m.model->has_transparent_material()) {
-            translucent_models.emplace_back(dis, &m);
-        } else {
-            opaque_models.emplace_back(dis, &m);
-        }
+    bvh.call_on_intersecting(*collider, [&](auto& node) -> void {
+        auto& m = models[node.index];
+        on_intersection(m, *this, camera_location, node.box, black_probe, temp_models, all_models);
     });
 }
 
@@ -67,17 +83,41 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     parent_entity = entity->get_parent();
     parent_reflection_probe = parent_entity ? parent_entity->get_component<reflection::Probe>() : nullptr;
 
-    update_models(models.static_models_bvh);
-    update_models(models.dynamic_models_bvh);
+    GX_PROFILE_EXP(update_models(models.static_models_bvh, models.models));
 
-    std::sort(GX_PARALLEL_POLICY opaque_models.begin(), opaque_models.end(), [](const auto& rhs, const auto& lhs) {
+#if GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
+    GX_PROFILE_EXP(update_models(models.dynamic_models_bvh, models.models));
+#else
+    if (models.dynamic_models_starting_index < models.models.size()) {
+        const auto camera_location = transform->get_global_position();
+        auto* const black_probe = reflection::Manager::get().get_black().get();
+        const auto models_begin = models.models.begin() + static_cast<decltype(models.models)::difference_type>(models.dynamic_models_starting_index);
+        core::sync::parallel_for(models_begin, models.models.end(), [&](auto& model, const auto ki) {
+            const auto& m_box = model.collider->get_surrounding_box();
+            if (!collider->check_intersection(m_box)) {
+                return;
+            }
+            on_intersection(model, *this, camera_location, m_box, black_probe, threads_temp_models[ki], threads_all_models[ki]);
+        });
+
+        for (auto& t : threads_temp_models) {
+            temp_models.insert(temp_models.end(), t.begin(), t.end());
+        }
+        for (auto& t : threads_all_models) {
+            all_models.insert(all_models.end(), t.begin(), t.end());
+        }
+    }
+#endif
+
+    std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(), [](const auto& rhs, const auto& lhs) {
         return rhs.first < lhs.first;
     });
-    std::sort(GX_PARALLEL_POLICY translucent_models.begin(), translucent_models.end(), [](const auto& rhs, const auto& lhs) {
+    std::sort(GX_PARALLEL_POLICY temp_models.begin(), temp_models.end(), [](const auto& rhs, const auto& lhs) {
         return rhs.first > lhs.first;
     });
+    translucent_models_starting_index = all_models.size();
+    all_models.insert(all_models.end(), temp_models.begin(), temp_models.end());
 
-    mvps.clear();
     auto gather_mvps = [&](auto& trn_opq_models) {
         for (auto& t : threads_mvps) {
             t.clear();
@@ -111,10 +151,7 @@ void gearoenix::render::record::Camera::update_models(Models& models)
         }
     };
 
-    mvps.clear();
-
-    gather_mvps(opaque_models);
-    gather_mvps(translucent_models);
+    GX_PROFILE_EXP(gather_mvps(all_models));
 }
 
 void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_entity)
@@ -167,6 +204,8 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
 void gearoenix::render::record::Cameras::update_models(Models& models)
 {
     if (last_camera_index > 0) {
-        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) { c.update_models(models); });
+        core::sync::parallel_for(cameras.begin(), cameras.begin() + last_camera_index, [&](auto& c, const auto) {
+            c.update_models(models);
+        });
     }
 }

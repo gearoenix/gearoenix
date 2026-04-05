@@ -2,6 +2,7 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
+#include "../gx-vk-draw-state.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 #include "../shader/glsl/gx-vk-shd-common.glslh"
@@ -30,7 +31,11 @@ void gearoenix::vulkan::scene::Scene::read(
     std::shared_ptr<core::ObjectStreamer>&& object_streamer,
     core::job::EndCaller<>&& end)
 {
-    render::scene::Scene::read(std::shared_ptr<render::scene::Scene>(std::move(self)), std::move(stream), std::move(object_streamer), std::move(end));
+    render::scene::Scene::read(
+        std::shared_ptr<render::scene::Scene>(std::move(self)),
+        std::move(stream),
+        std::move(object_streamer),
+        std::move(end));
 }
 
 void gearoenix::vulkan::scene::Scene::initialise_brdflut()
@@ -44,49 +49,47 @@ void gearoenix::vulkan::scene::Scene::initialise_brdflut()
 
 gearoenix::vulkan::scene::Scene::~Scene() = default;
 
-void gearoenix::vulkan::scene::Scene::update()
+void gearoenix::vulkan::scene::Scene::update_per_frame()
 {
-    render::scene::Scene::update();
+    render::scene::Scene::update_per_frame();
 }
 
-void gearoenix::vulkan::scene::Scene::render_shadows(const vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline)
+void gearoenix::vulkan::scene::Scene::render_shadows(DrawState& draw_state)
 {
-    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
 
-    pipeline::PushConstants pc;
-    pc.scene_index = shader_data_index;
+    draw_state.push_constants.scene_index = shader_data_index;
 
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
         auto& cmr_rcd = record.cameras.cameras[index];
-        core::cast_ptr<camera::Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, vk_cmd, pc, current_bound_pipeline);
+        core::cast_ptr<camera::Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, draw_state);
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_reflection_probes(const vk::CommandBuffer vk_cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
+void gearoenix::vulkan::scene::Scene::render_reflection_probes(DrawState& draw_state) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
 
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
-        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(camera, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
+        core::cast_ptr<camera::Camera>(camera.camera)->render_forward(camera, record.skyboxes, draw_state);
     }
 }
 
-void gearoenix::vulkan::scene::Scene::render_forward(const vk::CommandBuffer vk_cmd, vk::Pipeline& current_bound_pipeline)
+void gearoenix::vulkan::scene::Scene::render_forward(DrawState& draw_state)
 {
-    pipeline::PushConstants pc;
-    pc.scene_index = shader_data_index;
+    draw_state.push_constants.scene_index = shader_data_index;
 
-    render_reflection_probes(vk_cmd, pc, current_bound_pipeline);
+    render_reflection_probes(draw_state);
 
-    GX_VK_PUSH_DEBUG_GROUP(vk_cmd, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
 
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& rc = record.cameras.cameras[camera_index];
         auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
-        cam.render_forward(rc, record.skyboxes, vk_cmd, pc, current_bound_pipeline);
-        cam.render_bloom(*this, vk_cmd);
-        cam.render_colour_correction_anti_aliasing(*this, vk_cmd);
+        cam.render_forward(rc, record.skyboxes, draw_state);
+        cam.render_bloom(*this, draw_state.command_buffer);
+        cam.render_colour_correction_anti_aliasing(*this, draw_state.command_buffer);
     }
 }
 

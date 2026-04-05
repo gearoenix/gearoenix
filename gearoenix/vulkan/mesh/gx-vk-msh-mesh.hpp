@@ -20,6 +20,7 @@ struct PushConstants;
 
 namespace gearoenix::vulkan::mesh {
 struct Buffer;
+struct DrawCache;
 struct Mesh final : render::mesh::Mesh {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
@@ -42,6 +43,7 @@ public:
 
     void draw(vk::CommandBuffer cmd, pipeline::PushConstants& pc) const;
     void set_material(std::shared_ptr<render::material::Material>&& material) override;
+    void set(bool skinned, DrawCache& cache) const;
 };
 }
 

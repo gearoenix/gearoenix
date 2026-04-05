@@ -3,6 +3,8 @@
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-entity-ptr.hpp"
+#include "../gx-cr-profiler.hpp"
+
 #include <map>
 #include <memory>
 #include <variant>
@@ -93,7 +95,7 @@ public:
             if (!archetype_ref.satisfy<Condition>()) {
                 continue;
             }
-            archetype_ref.parallel_system_conditioned<Condition>(fun);
+            GX_PROFILE_EXP(archetype_ref.parallel_system_conditioned<Condition>(fun));
         }
     }
 
@@ -106,7 +108,7 @@ public:
             if (!archetype.second->satisfy<Condition>()) {
                 continue;
             }
-            archetype.second->synchronised_system_conditioned<Condition>(fun);
+            GX_PROFILE_EXP(archetype.second->synchronised_system_conditioned<Condition>(fun));
         }
     }
 

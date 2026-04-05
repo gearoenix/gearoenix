@@ -54,10 +54,10 @@ public:
     {
         const GxEndCaller end([this] { scene_entity->add_to_world(); });
 
-        for (int metallic_i = 0; metallic_i < 10; ++metallic_i) {
-            for (int roughness_i = 0; roughness_i < 10; ++roughness_i) {
-                const auto metallic = 0.05f + static_cast<float>(metallic_i) * 0.1f;
-                const auto roughness = 0.05f + static_cast<float>(roughness_i) * 0.1f;
+        for (int metallic_i = 0; metallic_i < 11; ++metallic_i) {
+            for (int roughness_i = 0; roughness_i < 11; ++roughness_i) {
+                const auto metallic = static_cast<float>(metallic_i) * 0.1f;
+                const auto roughness = static_cast<float>(roughness_i) * 0.1f;
                 const auto postfix = "-metallic:" + std::to_string(metallic) + "-roughness:" + std::to_string(roughness);
                 GxMaterialManager::get().get_pbr(
                     "material-" + postfix, GxPbrEndCaller([this, metallic, roughness, p = postfix, e = end](GxPbrPtr&& material) mutable {
@@ -95,7 +95,10 @@ public:
 
     void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&&)
     {
-        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, true);
+        // The reason for `is_transformable` is to show to have mixed static and dynamic models in a scene.
+        const auto is_transformable = roughness > 0.5f;
+
+        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, is_transformable, false);
         entity->get_component<GxTransform>()->local_translate(GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
     }
 };

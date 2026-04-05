@@ -26,7 +26,7 @@ struct Model final : render::model::Model {
 
     GX_GET_CREF_PRV(gl_meshes_set_t, gl_meshes);
 
-    Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable);
+    Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable, bool is_skinned);
 
 public:
     ~Model() override;
@@ -36,7 +36,7 @@ public:
 
 struct ModelManager final : render::model::Manager {
 private:
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable) override;
+    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable, bool is_skinned) override;
 
 public:
     ModelManager();

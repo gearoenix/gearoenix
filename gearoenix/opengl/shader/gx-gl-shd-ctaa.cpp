@@ -90,6 +90,7 @@ gearoenix::gl::shader::ColourTuningAntiAliasing::ColourTuningAntiAliasing(const 
     } else if (is_colour_scale_index) {
         fs << "    frag_colour.xyz *= colour_scale;\n";
     }
+    fs << "    frag_colour.w = 1.0;\n";
     fs << "}\n";
     set_fragment_shader(fs.str());
     link();

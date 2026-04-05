@@ -1,12 +1,10 @@
 #include "gx-gl-skybox.hpp"
 #ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "gx-gl-texture.hpp"
-#include <boost/mp11/algorithm.hpp>
 
 // void gearoenix::gl::Skybox::write_in_io_context(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const
 // {
@@ -33,9 +31,15 @@ gearoenix::gl::uint gearoenix::gl::Skybox::get_vertex_object() const
     return gl_mesh->get_cached_vertex_object(); // todo these can be cached for improving
 }
 
-gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const { return gl_mesh->get_cached_index_buffer(); }
+gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const
+{
+    return gl_mesh->get_cached_index_buffer();
+}
 
-gearoenix::gl::SkyboxManager::SkyboxManager() { core::ecs::ComponentType::add<Skybox>(); }
+gearoenix::gl::SkyboxManager::SkyboxManager()
+{
+    core::ecs::ComponentType::add<Skybox>();
+}
 
 gearoenix::gl::SkyboxManager::~SkyboxManager() = default;
 

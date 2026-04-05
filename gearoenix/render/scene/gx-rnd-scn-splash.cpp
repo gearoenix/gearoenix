@@ -116,12 +116,12 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
         ~Values()
         {
             {
-                auto entity = model::Manager::get().build("gearoenix-splash-bg", splash->scene_entity.get(), { std::move(bg_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-bg", splash->scene_entity.get(), { std::move(bg_mesh) }, true, false);
                 entity->get_component<physics::Transformation>()->local_inner_scale(100.0);
             }
 
             {
-                auto entity = model::Manager::get().build("gearoenix-splash-gear", splash->scene_entity.get(), { std::shared_ptr(gear_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-gear", splash->scene_entity.get(), { std::shared_ptr(gear_mesh) }, true, false);
                 auto* const trn = entity->get_component<physics::Transformation>();
                 trn->local_inner_scale(splash->current_scale * gear_base_scale);
                 trn->local_translate({ 0.0f, 0.0f, 0.3f });
@@ -129,7 +129,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
             }
 
             {
-                auto entity = model::Manager::get().build("gearoenix-splash-glare", splash->scene_entity.get(), { std::move(glare_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-glare", splash->scene_entity.get(), { std::move(glare_mesh) }, true, false);
                 auto* const trn = entity->get_component<physics::Transformation>();
                 trn->local_inner_scale(splash->current_scale * glare_base_scale);
                 trn->local_translate({ 0.0f, 0.0f, 0.2f });
@@ -137,7 +137,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
             }
 
             {
-                auto entity = model::Manager::get().build("gearoenix-splash-left-wing", splash->scene_entity.get(), { std::move(left_wing_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-left-wing", splash->scene_entity.get(), { std::move(left_wing_mesh) }, true, false);
                 auto* const trn = entity->get_component<physics::Transformation>();
                 trn->local_inner_scale(splash->current_scale * wings_base_scale);
                 trn->local_translate({ 0.0, 0.0, 0.1 });
@@ -146,7 +146,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
             }
 
             {
-                auto entity = model::Manager::get().build("gearoenix-splash-right-wing", splash->scene_entity.get(), { std::move(right_wing_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-right-wing", splash->scene_entity.get(), { std::move(right_wing_mesh) }, true, false);
                 auto* const trn = entity->get_component<physics::Transformation>();
                 trn->local_inner_scale(splash->current_scale * wings_base_scale);
                 trn->local_translate({ 0.0f, 0.0f, 0.1f });
@@ -157,7 +157,7 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
             {
                 math::Vec3 scale(splash->current_scale * gearoenix_text_base_scale);
                 scale.x *= text_width / text_height;
-                auto entity = model::Manager::get().build("gearoenix-splash-text", splash->scene_entity.get(), { std::move(text_mesh) }, true);
+                auto entity = model::Manager::get().build("gearoenix-splash-text", splash->scene_entity.get(), { std::move(text_mesh) }, true, false);
                 auto* const trn = entity->get_component<physics::Transformation>();
                 trn->local_inner_scale(scale);
                 trn->local_translate({ 0.0f, -0.25f, 0.5f });

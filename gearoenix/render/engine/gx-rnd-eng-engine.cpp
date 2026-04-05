@@ -146,34 +146,13 @@ void gearoenix::render::engine::Engine::end_frame()
     // Don't mistake the following with the actual start of a frame.
     // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
 
-    {
-        GX_PROFILE_SCOPE(render_engine_physics_engine_start_frame);
-        physics_engine->start_frame();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_model_manager_update);
-        model_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_camera_manager_update);
-        camera_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_light_manager_update);
-        light_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_reflection_manager_update);
-        reflection_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_scene_manager_update);
-        scene_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(render_engine_physics_engine_end_frame);
-        physics_engine->end_frame();
-    }
+    GX_PROFILE_EXP(physics_engine->start_frame());
+    GX_PROFILE_EXP(model_manager->update());
+    GX_PROFILE_EXP(camera_manager->update());
+    GX_PROFILE_EXP(light_manager->update());
+    GX_PROFILE_EXP(reflection_manager->update());
+    GX_PROFILE_EXP(scene_manager->update());
+    GX_PROFILE_EXP(physics_engine->end_frame());
 }
 
 void gearoenix::render::engine::Engine::window_resized()

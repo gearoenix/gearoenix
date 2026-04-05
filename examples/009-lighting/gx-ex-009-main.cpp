@@ -89,7 +89,7 @@ public:
 
     void icosphere_mesh_is_ready(GxMeshPtr&& mesh, const std::string& postfix, const GxEndCaller&, const float metallic, const float roughness)
     {
-        auto model_entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, true);
+        auto model_entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, true, false);
         model_entity->get_component<GxTransform>()->local_translate(GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
     }
 
@@ -106,7 +106,7 @@ public:
 
     void plate_mesh_is_ready(GxMeshPtr&& mesh, const GxEndCaller&)
     {
-        auto model_entity = GxModelManager::get().build("ground", scene_entity.get(), { std::move(mesh) }, true);
+        auto model_entity = GxModelManager::get().build("ground", scene_entity.get(), { std::move(mesh) }, true, false);
         auto& trn = *model_entity->get_component<GxTransform>();
         trn.local_inner_scale(30.0);
         trn.local_translate({ 0.0, 0.0, -5.0 });

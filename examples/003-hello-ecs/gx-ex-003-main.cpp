@@ -186,7 +186,7 @@ public:
     void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
     {
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            auto entity = GxModelManager::get().build("triangle" + std::to_string(model_index), scene_entity.get(), { std::move(meshes[model_index]) }, true);
+            auto entity = GxModelManager::get().build("triangle" + std::to_string(model_index), scene_entity.get(), { std::move(meshes[model_index]) }, true, false);
             auto speed = Speed::construct<Speed>(entity.get());
             auto position = Position::construct<Position>(entity.get());
             auto* const trn = entity->get_component<GxTransform>();

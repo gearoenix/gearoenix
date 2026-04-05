@@ -24,9 +24,16 @@ struct Model : core::ecs::Component {
 
     GX_GET_VAL_PRT(bool, is_transformable, false);
     GX_GET_CREF_PRT(meshes_set_t, meshes);
+    const bool is_skinned;
 
     /// \note A model can be static while it has a transform component.
-    Model(core::ecs::Entity* entity, core::object_type_index_t final_component_type, bool is_transformable, meshes_set_t&& meshes, std::string&& name);
+    Model(
+        core::ecs::Entity* entity,
+        core::object_type_index_t final_component_type,
+        bool is_transformable,
+        meshes_set_t&& meshes,
+        std::string&& name,
+        bool is_skinned);
 
 public:
     /// By having a value (even an empty one) we show that we want to have camera filtering enabled.

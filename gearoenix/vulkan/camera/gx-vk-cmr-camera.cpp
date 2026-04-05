@@ -5,6 +5,7 @@
 #include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../gx-vk-draw-state.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -39,7 +40,6 @@ constexpr auto mip_aspect(const std::uint32_t base, const std::uint32_t mip_inde
 }
 }
 
-struct GxShaderDataCameraJointModel;
 void gearoenix::vulkan::camera::Camera::set_customised_target(std::shared_ptr<render::texture::Target>&& t)
 {
     auto vk_t = std::dynamic_pointer_cast<texture::Target>(t);
@@ -62,13 +62,15 @@ void gearoenix::vulkan::camera::Camera::update_target(core::job::EndCaller<>&& e
     }));
 }
 
-gearoenix::vulkan::camera::Camera::Camera(core::ecs::Entity* const entity, const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+gearoenix::vulkan::camera::Camera::Camera(
+    core::ecs::Entity* const entity, const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform)
     : render::camera::Camera(entity, core::ecs::ComponentType::create_index(this), name, std::move(target), std::move(transform))
     , gapi_target(this->target)
 {
 }
 
-void gearoenix::vulkan::camera::Camera::construct(core::ecs::Entity* const entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
+void gearoenix::vulkan::camera::Camera::construct(
+    core::ecs::Entity* const entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
     c.set_return(Object::construct<Camera>(entity, name, render::camera::Target(), std::move(transform)));
     c.get_return()->initialise();
@@ -80,69 +82,71 @@ gearoenix::vulkan::camera::Camera::~Camera()
     destroy_bloom_descriptors();
 }
 
-void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Camera& cmr, DrawState& draw_state) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.3f, 0.5f, 0.9f, "render-shadow-camera for camera: {}", object_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.3f, 0.5f, 0.9f, "render-shadow-camera for camera: {}", object_name);
 
-    pc.camera_index = shader_data_index;
+    draw_state.push_constants.camera_index = shader_data_index;
 
-    cmd.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
+    draw_state.command_buffer.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
     // Shadow's camera must always have a customised target.
     GX_ASSERT_D(target.is_customised());
-    const auto render_scope = gapi_target.get_customised().target->create_rendering_scope(cmd);
+    const auto render_scope = gapi_target.get_customised().target->create_rendering_scope(draw_state.command_buffer);
 
-    record_viewport(cmr, cmd);
+    record_viewport(cmr, draw_state.command_buffer);
 
-    const auto render_models = [&](const auto& models) {
-        for (const auto& camera_model : models | std::views::values) {
-            GX_ASSERT_D(camera_model.first_mvp_index != static_cast<std::uint32_t>(-1));
-            pc.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
-            core::cast_ptr<model::Model>(camera_model.model->model)->render_shadow(camera_model, cmd, pc, current_bound_pipeline);
-        }
-    };
-
-    render_models(cmr.opaque_models);
-    render_models(cmr.translucent_models);
+    for (const auto& camera_model : cmr.all_models | std::views::values) {
+        GX_ASSERT_D(camera_model.first_mvp_index != static_cast<std::uint32_t>(-1));
+        draw_state.push_constants.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
+        draw_state.camera_model = &camera_model;
+        core::cast_ptr<model::Model>(camera_model.model->model)->render_shadow(draw_state);
+    }
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const render::record::Skyboxes& skyboxes, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Camera& cmr, const render::record::Skyboxes& skyboxes, DrawState& draw_state) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 
-    pc.camera_index = shader_data_index;
+    draw_state.push_constants.camera_index = shader_data_index;
 
-    cmd.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
+    draw_state.command_buffer.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
     const auto render_scope = [&] {
         if (target.is_customised()) {
-            return gapi_target.get_customised().target->create_rendering_scope(cmd);
+            return gapi_target.get_customised().target->create_rendering_scope(draw_state.command_buffer);
         }
-        return gapi_target.get_default().main->create_rendering_scope(cmd);
+        return gapi_target.get_default().main->create_rendering_scope(draw_state.command_buffer);
     }();
 
-    record_viewport(cmr, cmd);
+    record_viewport(cmr, draw_state.command_buffer);
 
-    const auto& fp = pipeline::Manager::get().get_pipelines(rendering_colour_format);
+    if (draw_state.pipeline_target_format != rendering_colour_format) {
+        pipeline::Manager::get().set(draw_state.pipelines, rendering_colour_format);
+        draw_state.pipeline_target_format = rendering_colour_format;
+        draw_state.current_pipeline_index = DrawState::INVALID_PIPELINE_INDEX;
+    }
 
-    const auto render_models = [&](const auto& models) {
-        for (const auto& camera_model : models | std::views::values) {
-            pc.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
-            core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(camera_model, fp, cmd, pc, current_bound_pipeline);
-        }
-    };
-
-    render_models(cmr.opaque_models);
-    render_forward_skyboxes(skyboxes, fp, cmd, pc, current_bound_pipeline);
-    render_models(cmr.translucent_models);
+    for (std::size_t camera_model_i = 0; camera_model_i < cmr.translucent_models_starting_index; ++camera_model_i) {
+        const auto& camera_model = cmr.all_models[camera_model_i].second;
+        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
+        draw_state.camera_model = &camera_model;
+        core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(draw_state);
+    }
+    render_forward_skyboxes(skyboxes, draw_state);
+    for (std::size_t camera_model_i = cmr.translucent_models_starting_index; camera_model_i < cmr.all_models.size(); ++camera_model_i) {
+        const auto& camera_model = cmr.all_models[camera_model_i].second;
+        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
+        draw_state.camera_model = &camera_model;
+        core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(draw_state);
+    }
 }
 
-void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(
-    const render::record::Skyboxes& skyboxes, const pipeline::FormatPipelines& fp, const vk::CommandBuffer cmd, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const
+void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const render::record::Skyboxes& skyboxes, DrawState& draw_state) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
     for (const auto& skybox_data : skyboxes.skyboxes | std::views::values) {
-        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(cmd, fp, pc, current_bound_pipeline);
+        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(draw_state);
     }
 }
 
@@ -451,7 +455,7 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
         const auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
         shader_data_index = sd.get_index();
         auto& [vp, position_far] = *sd.get_ptr();
-        position_far = { math::Vec3<float>(rc.transform->get_local_position()), far };
+        position_far = { rc.transform->get_local_position().to<float>(), far };
         vp = view_projection;
     }
 
@@ -461,11 +465,7 @@ void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_n
         cameras_joint_model_indices.push_back(sd.get_index());
     }
 
-    for (const auto& camera_model : rc.opaque_models | std::views::values) {
-        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(frame_number, camera_model);
-    }
-
-    for (const auto& camera_model : rc.translucent_models | std::views::values) {
+    for (const auto& camera_model : rc.all_models | std::views::values) {
         core::cast_ptr<model::Model>(camera_model.model->model)->after_record(frame_number, camera_model);
     }
 }

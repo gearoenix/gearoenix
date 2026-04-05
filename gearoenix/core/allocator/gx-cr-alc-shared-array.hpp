@@ -1,37 +1,49 @@
 #pragma once
+#include "../gx-cr-build-configuration.hpp"
 #include "../../math/gx-math-numeric.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
+
 #include <array>
-#include <boost/container/static_vector.hpp>
 #include <cstring>
 #include <memory>
 #include <mutex>
 
+#include <boost/container/static_vector.hpp>
+
 namespace gearoenix::core::allocator {
-template <typename T, std::int64_t S>
+template <typename T, std::size_t S>
 struct SharedArray final {
 private:
-    constexpr static std::int64_t gx_core_shared_array_align_size = 256;
-    constexpr static std::int64_t gx_core_shared_array_element_size = math::Numeric::align<std::int64_t>(sizeof(T), gx_core_shared_array_align_size);
-    constexpr static std::int64_t gx_core_shared_array_size = gx_core_shared_array_element_size * S;
+    constexpr static std::size_t element_size = math::Numeric::align<std::size_t>(sizeof(T), alignof(T));
 
-    std::mutex gx_core_shared_array_lock;
-    std::array<std::uint8_t, gx_core_shared_array_size> gx_core_shared_array_objects;
-    boost::container::static_vector<T*, S> gx_core_shared_array_free_pointers;
+    alignas(alignof(T)) std::array<std::uint8_t, element_size * S> heap;
+    boost::container::static_vector<T*, S> free_pointers;
     std::weak_ptr<SharedArray> weak_self;
+    std::mutex lock;
 
     SharedArray()
     {
         if constexpr (GX_DEBUG_MODE) {
-            std::memset(gx_core_shared_array_objects.data(), 0, gx_core_shared_array_objects.size());
+            std::memset(heap.data(), 0, heap.size());
         }
-        for (std::int64_t i = S * gx_core_shared_array_element_size; i > 0;) {
-            i -= gx_core_shared_array_element_size;
-            gx_core_shared_array_free_pointers.push_back(reinterpret_cast<T*>(&gx_core_shared_array_objects[i]));
+        for (std::size_t i = S * element_size; i > 0;) {
+            i -= element_size;
+            free_pointers.push_back(reinterpret_cast<T*>(&heap[i]));
         }
     }
 
 public:
+    ~SharedArray()
+    {
+        GX_ASSERT_D(free_pointers.size() == S);
+        GX_ASSERT_D(weak_self.expired());
+        if constexpr (GX_DEBUG_MODE) {
+            for (const auto b : heap) {
+                GX_ASSERT(0 == b);
+            }
+        }
+    }
+
     struct StdDeleter final {
         const std::shared_ptr<SharedArray> allocator;
 
@@ -44,10 +56,10 @@ public:
         {
             o->~T();
             if constexpr (GX_DEBUG_MODE) {
-                std::memset(reinterpret_cast<std::uint8_t*>(o), 0, gx_core_shared_array_element_size);
+                std::memset(reinterpret_cast<std::uint8_t*>(o), 0, element_size);
             }
-            const std::lock_guard<std::mutex> _lg(allocator->gx_core_shared_array_lock);
-            allocator->gx_core_shared_array_free_pointers.push_back(o);
+            const std::lock_guard<std::mutex> _lg(allocator->lock);
+            allocator->free_pointers.push_back(o);
         }
     };
 
@@ -62,22 +74,32 @@ public:
     [[nodiscard]] std::shared_ptr<T> make_shared(Args&&... args)
     {
         auto* const ptr = [this] {
-            const std::lock_guard _lg(gx_core_shared_array_lock);
+            const std::lock_guard _lg(lock);
 
-            if (gx_core_shared_array_free_pointers.empty()) {
+            if (free_pointers.empty()) {
                 GX_LOG_F("Allocation failed, out of memory for type: " << typeid(T).name());
             }
-            auto* const result = gx_core_shared_array_free_pointers.back();
-            gx_core_shared_array_free_pointers.pop_back();
+            auto* const result = free_pointers.back();
+            free_pointers.pop_back();
             return result;
         }();
         if constexpr (GX_DEBUG_MODE) {
             const auto* const bs = reinterpret_cast<std::uint8_t*>(ptr);
-            for (std::int64_t i = 0; i < gx_core_shared_array_element_size; ++i) {
+            for (std::size_t i = 0; i < element_size; ++i) {
                 GX_ASSERT(bs[i] == 0);
             }
         }
-        return std::shared_ptr<T>(new (ptr) T(std::forward<Args>(args)...), StdDeleter(weak_self.lock()));
+        try {
+            new (ptr) T(std::forward<Args>(args)...);
+        } catch (...) {
+            if constexpr (GX_DEBUG_MODE) {
+                std::memset(reinterpret_cast<std::uint8_t*>(ptr), 0, element_size);
+            }
+            const std::lock_guard _lg(lock);
+            free_pointers.push_back(ptr);
+            throw;
+        }
+        return std::shared_ptr<T>(ptr, StdDeleter(weak_self.lock()));
     }
 };
 }

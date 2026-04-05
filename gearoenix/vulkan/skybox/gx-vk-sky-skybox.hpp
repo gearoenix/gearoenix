@@ -4,6 +4,11 @@
 #include "../../render/skybox/gx-rnd-sky-skybox.hpp"
 #include "../material/gx-vk-mat-material.hpp"
 #include "../mesh/gx-vk-msh-mesh.hpp"
+#include "../mesh/gx-vk-msh-draw-cache.hpp"
+
+namespace gearoenix::vulkan {
+struct DrawState;
+}
 
 namespace gearoenix::vulkan::skybox {
 struct Skybox final : render::skybox::Skybox {
@@ -16,6 +21,7 @@ struct Skybox final : render::skybox::Skybox {
 private:
     material::uniform_indexer_t::DataAccess material_shader_data;
     std::shared_ptr<mesh::Mesh> vk_mesh;
+    mesh::DrawCache draw_cache;
 
     Skybox(
         core::ecs::Entity* entity,
@@ -28,7 +34,7 @@ public:
     [[nodiscard]] const std::shared_ptr<mesh::Mesh>& get_vk_mesh() const { return vk_mesh; }
 
     ~Skybox() override;
-    void render_forward(vk::CommandBuffer cmd, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) const;
+    void render_forward(DrawState& draw_state) const;
 };
 }
 #endif

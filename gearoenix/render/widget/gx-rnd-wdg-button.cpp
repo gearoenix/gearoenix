@@ -90,7 +90,7 @@ void gearoenix::render::widget::Button::construct(std::string&& name, std::share
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::shared_ptr(rest_texture));
-    auto model_entity = model::Manager::get().build(name + "-model", parent ? parent->get_model_entity().get() : nullptr, { std::move(button_mesh) }, true);
+    auto model_entity = model::Manager::get().build(name + "-model", parent ? parent->get_model_entity().get() : nullptr, { std::move(button_mesh) }, true, false);
     auto but = std::make_shared<Button>(std::move(name));
     but->transform = model_entity->get_component_shared_ptr<physics::Transformation>();
     but->set_rest_texture(std::move(rest_texture));

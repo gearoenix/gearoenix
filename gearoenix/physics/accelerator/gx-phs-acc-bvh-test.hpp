@@ -7,26 +7,24 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_frustum)
 {
     using namespace gearoenix;
 
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V2 = math::Vec2<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Frustum = math::Frustum<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
+    physics::accelerator::Bvh bvh;
+    using index_t = decltype(bvh)::index_t;
 
-    bvh.add({ Box(V3(1.0), V3(-1.0)), Data { 0 } });
+    bvh.add({ Box(V3(1.0), V3(-1.0)), 0 });
 
     bvh.create_nodes();
 
     bvh.reset();
 
-    for (int i = 0; i < 11; ++i) {
-        for (int j = 0; j < 11; ++j) {
+    for (index_t i = 0; i < 11; ++i) {
+        for (index_t j = 0; j < 11; ++j) {
             const V3 p(V2(static_cast<core::fp_t>(i), static_cast<core::fp_t>(j)) * 3.0 - 15.0, 0.0);
-            bvh.add({ Box(p + 1.0, p - 1.0), Data { (i << 8) | j } });
+            bvh.add({ Box(p + 1.0, p - 1.0), (i << 8) | j });
         }
     }
 
@@ -54,8 +52,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_frustum)
     count = 0;
     bvh.call_on_intersecting(frustum, [&](auto& d) {
         ++count;
-        const int i = d.user_data.id & 255;
-        const int j = (d.user_data.id >> 8) & 255;
+        const int i = d.index & 255;
+        const int j = (d.index >> 8) & 255;
         const bool b = i > 1 && i < 9 && j > 1 && j < 9;
         BOOST_TEST(b);
     });
@@ -66,19 +64,17 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_hit)
 {
     using namespace gearoenix;
 
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
 
     /// Place 5 boxes along the +Z axis at z = 2, 4, 6, 8, 10
-    for (int i = 0; i < 5; ++i) {
+    for (index_t i = 0; i < 5; ++i) {
         const core::fp_t z = 2.0 + 2.0 * static_cast<core::fp_t>(i);
-        bvh.add({ Box(V3(1.0, 1.0, z + 0.5), V3(-1.0, -1.0, z - 0.5)), Data { i } });
+        bvh.add({ Box(V3(1.0, 1.0, z + 0.5), V3(-1.0, -1.0, z - 0.5)), i });
     }
     bvh.create_nodes();
 
@@ -87,7 +83,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_hit)
         const Ray ray(V3(0.0), V3(0.0, 0.0, 1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
-        BOOST_TEST(result->second->user_data.id == 0);
+        BOOST_TEST(result->second->index == 0);
         BOOST_TEST(result->first >= 1.4);
         BOOST_TEST(result->first <= 1.6);
     }
@@ -97,7 +93,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_hit)
         const Ray ray(V3(0.0, 0.0, 100.0), V3(0.0, 0.0, -1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
-        BOOST_TEST(result->second->user_data.id == 4);
+        BOOST_TEST(result->second->index == 4);
     }
 
     /// Ray along +X at y=0, z=0 misses all boxes (boxes are at z >= 1.5)
@@ -118,7 +114,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_hit)
 
     /// Empty BVH hit returns nullopt
     {
-        physics::accelerator::Bvh<Data> empty_bvh;
+        physics::accelerator::Bvh empty_bvh;
         const Ray ray(V3(0.0), V3(0.0, 0.0, 1.0));
         BOOST_TEST(!empty_bvh.hit(ray, 1000.0).has_value());
     }
@@ -128,23 +124,20 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_nearest)
 {
     using namespace gearoenix;
 
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
     /// Place two overlapping boxes at different depths — verify we always get the nearest
-    physics::accelerator::Bvh<Data> bvh;
-    bvh.add({ Box(V3(1.0, 1.0, 3.0), V3(-1.0, -1.0, 2.0)), Data { 10 } });
-    bvh.add({ Box(V3(1.0, 1.0, 6.0), V3(-1.0, -1.0, 5.0)), Data { 20 } });
+    physics::accelerator::Bvh bvh;
+    bvh.add({ Box(V3(1.0, 1.0, 3.0), V3(-1.0, -1.0, 2.0)), 10 });
+    bvh.add({ Box(V3(1.0, 1.0, 6.0), V3(-1.0, -1.0, 5.0)), 20 });
     bvh.create_nodes();
 
     const Ray ray(V3(0.0), V3(0.0, 0.0, 1.0));
     const auto result = bvh.hit(ray, 1000.0);
     BOOST_TEST(result.has_value());
-    BOOST_TEST(result->second->user_data.id == 10);
+    BOOST_TEST(result->second->index == 10);
     BOOST_TEST(result->first >= 1.9);
     BOOST_TEST(result->first <= 2.1);
 
@@ -152,39 +145,38 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_nearest)
     const Ray reverse_ray(V3(0.0, 0.0, 100.0), V3(0.0, 0.0, -1.0));
     const auto reverse_result = bvh.hit(reverse_ray, 1000.0);
     BOOST_TEST(reverse_result.has_value());
-    BOOST_TEST(reverse_result->second->user_data.id == 20);
+    BOOST_TEST(reverse_result->second->index == 20);
 }
 
 BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_call_on_all)
 {
     using namespace gearoenix;
 
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
-    constexpr int n = 100;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
+
+    constexpr index_t n = 100;
     std::array<bool, n> visited = { };
 
-    for (int i = 0; i < n; ++i) {
+    for (index_t i = 0; i < n; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), Data { i } });
+        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
     }
     bvh.create_nodes();
 
-    int count = 0;
+    index_t count = 0;
     bvh.call_on_all([&](const auto& d) {
-        BOOST_TEST(d.user_data.id >= 0);
-        BOOST_TEST(d.user_data.id < n);
-        visited[d.user_data.id] = true;
+        BOOST_TEST(d.index >= 0);
+        BOOST_TEST(d.index < n);
+        visited[d.index] = true;
         ++count;
     });
 
     BOOST_TEST(count == n);
-    for (int i = 0; i < n; ++i) {
+    for (index_t i = 0; i < n; ++i) {
         BOOST_TEST(visited[i]);
     }
 }
@@ -193,19 +185,17 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_intersecting_with_miss)
 {
     using namespace gearoenix;
 
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Frustum = math::Frustum<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
 
     /// Create a 1D row of boxes along X: 10 boxes, spaced at x = 0, 5, 10, ..., 45
-    for (int i = 0; i < 10; ++i) {
+    for (index_t i = 0; i < 10; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), Data { i } });
+        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
     }
     bvh.create_nodes();
 
@@ -220,11 +210,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_intersecting_with_miss)
         frustum,
         [&](auto& d) {
             ++hit_count;
-            BOOST_TEST(d.user_data.id <= 2);
+            BOOST_TEST(d.index <= 2);
         },
         [&](auto& d) {
             ++miss_count;
-            BOOST_TEST(d.user_data.id >= 3);
+            BOOST_TEST(d.index >= 3);
         });
 
     BOOST_TEST(hit_count == 3);
@@ -237,42 +227,41 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_quality)
 
     /// Validate that SAH produces a reasonable tree by checking that ray queries
     /// against a grid return correct results regardless of insertion order.
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
     /// Build a 10x10 grid of boxes on the XY plane
-    physics::accelerator::Bvh<Data> bvh;
-    constexpr int grid = 10;
-    for (int i = 0; i < grid; ++i) {
-        for (int j = 0; j < grid; ++j) {
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
+
+    constexpr index_t grid = 10;
+    for (index_t i = 0; i < grid; ++i) {
+        for (index_t j = 0; j < grid; ++j) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
             const core::fp_t y = static_cast<core::fp_t>(j) * 3.0;
-            bvh.add({ Box(V3(x + 0.5, y + 0.5, 0.5), V3(x - 0.5, y - 0.5, -0.5)), Data { i * grid + j } });
+            bvh.add({ Box(V3(x + 0.5, y + 0.5, 0.5), V3(x - 0.5, y - 0.5, -0.5)), i * grid + j });
         }
     }
     bvh.create_nodes();
 
     /// Cast a ray down onto each grid cell and verify it hits the correct box
-    for (int i = 0; i < grid; ++i) {
-        for (int j = 0; j < grid; ++j) {
+    for (index_t i = 0; i < grid; ++i) {
+        for (index_t j = 0; j < grid; ++j) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
             const core::fp_t y = static_cast<core::fp_t>(j) * 3.0;
             const Ray ray(V3(x, y, 100.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
             if (result.has_value()) {
-                BOOST_TEST(result->second->user_data.id == i * grid + j);
+                BOOST_TEST(result->second->index == i * grid + j);
             }
         }
     }
 
     /// Cast rays that miss between grid cells
-    for (int i = 0; i < grid - 1; ++i) {
-        for (int j = 0; j < grid - 1; ++j) {
+    for (index_t i = 0; i < grid - 1; ++i) {
+        for (index_t j = 0; j < grid - 1; ++j) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 3.0 + 1.5;
             const core::fp_t y = static_cast<core::fp_t>(j) * 3.0 + 1.5;
             const Ray ray(V3(x, y, 100.0), V3(0.0, 0.0, -1.0));
@@ -289,44 +278,42 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_depth_layers)
     /// Build boxes at different Z depths with X/Y overlap to verify SAH splits
     /// correctly along the axis with the most spread, and that ray queries
     /// still find the nearest hit through multiple BVH levels.
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
 
     /// 4 layers of 4 boxes each, all overlapping in XY but at different Z
-    for (int layer = 0; layer < 4; ++layer) {
-        for (int i = 0; i < 4; ++i) {
+    for (index_t layer = 0; layer < 4; ++layer) {
+        for (index_t i = 0; i < 4; ++i) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
             const core::fp_t z = static_cast<core::fp_t>(layer) * 5.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, z + 1.0), V3(x - 1.0, -1.0, z - 1.0)), Data { layer * 4 + i } });
+            bvh.add({ Box(V3(x + 1.0, 1.0, z + 1.0), V3(x - 1.0, -1.0, z - 1.0)), layer * 4 + i });
         }
     }
     bvh.create_nodes();
 
     /// Ray going along +Z from below should hit layer 0 first
-    for (int i = 0; i < 4; ++i) {
+    for (index_t i = 0; i < 4; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
         const Ray ray(V3(x, 0.0, -100.0), V3(0.0, 0.0, 1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
         if (result.has_value()) {
-            BOOST_TEST(result->second->user_data.id == i);
+            BOOST_TEST(result->second->index == i);
         }
     }
 
     /// Ray going along -Z from above should hit layer 3 first
-    for (int i = 0; i < 4; ++i) {
+    for (index_t i = 0; i < 4; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
         const Ray ray(V3(x, 0.0, 100.0), V3(0.0, 0.0, -1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
         if (result.has_value()) {
-            BOOST_TEST(result->second->user_data.id == 3 * 4 + i);
+            BOOST_TEST(result->second->index == 3 * 4 + i);
         }
     }
 }
@@ -336,15 +323,14 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_single_element)
     using namespace gearoenix;
 
     /// Edge case: BVH with exactly 1 element
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
-    bvh.add({ Box(V3(1.0), V3(-1.0)), Data { 42 } });
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
+
+    bvh.add({ Box(V3(1.0), V3(-1.0)),  42 });
     bvh.create_nodes();
 
     /// Ray that hits the single box
@@ -353,7 +339,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_single_element)
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
         if (result.has_value()) {
-            BOOST_TEST(result->second->user_data.id == 42);
+            BOOST_TEST(result->second->index == 42);
         }
     }
 
@@ -364,7 +350,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_single_element)
         BOOST_TEST(!result.has_value());
     }
 
-    int count = 0;
+    index_t count = 0;
     bvh.call_on_all([&](const auto&) { ++count; });
     BOOST_TEST(count == 1);
 }
@@ -375,53 +361,54 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_leaf_boundary)
 
     /// Test with exactly local_data_size elements (should create a single leaf)
     /// and local_data_size + 1 (should force a split)
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
     /// Exactly local_data_size = 5 items → single leaf node
     {
-        physics::accelerator::Bvh<Data> bvh;
-        for (int i = 0; i < 5; ++i) {
+        physics::accelerator::Bvh bvh;
+        using index_t = physics::accelerator::Bvh::index_t;
+
+        for (index_t i = 0; i < 5; ++i) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), Data { i } });
+            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
         }
         bvh.create_nodes();
 
-        for (int i = 0; i < 5; ++i) {
+        for (index_t i = 0; i < 5; ++i) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
             const Ray ray(V3(x, 0.0, 10.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
             if (result.has_value()) {
-                BOOST_TEST(result->second->user_data.id == i);
+                BOOST_TEST(result->second->index == i);
             }
         }
     }
 
     /// local_data_size + 1 = 6 items → must split
     {
-        physics::accelerator::Bvh<Data> bvh;
-        for (int i = 0; i < 6; ++i) {
+        physics::accelerator::Bvh bvh;
+        using index_t = physics::accelerator::Bvh::index_t;
+
+        for (index_t i = 0; i < 6; ++i) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), Data { i } });
+            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
         }
         bvh.create_nodes();
 
-        for (int i = 0; i < 6; ++i) {
+        for (index_t i = 0; i < 6; ++i) {
             const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
             const Ray ray(V3(x, 0.0, 10.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
             if (result.has_value()) {
-                BOOST_TEST(result->second->user_data.id == i);
+                BOOST_TEST(result->second->index == i);
             }
         }
 
-        int count = 0;
+        index_t count = 0;
         bvh.call_on_all([&](const auto&) { ++count; });
         BOOST_TEST(count == 6);
     }
@@ -433,17 +420,17 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_coincident_centers)
 
     /// All boxes have the same center — SAH cannot split by center spread,
     /// so the BVH should fall back to creating a leaf.
-    struct Data final {
-        int id = 0;
-    };
+    ///
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
-    for (int i = 0; i < 20; ++i) {
+    physics::accelerator::Bvh bvh;
+        using index_t = physics::accelerator::Bvh::index_t;
+
+    for (index_t i = 0; i < 20; ++i) {
         const core::fp_t half = 1.0 + static_cast<core::fp_t>(i) * 0.1;
-        bvh.add({ Box(V3(half), V3(-half)), Data { i } });
+        bvh.add({ Box(V3(half), V3(-half)),  i });
     }
     bvh.create_nodes();
 
@@ -455,7 +442,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_coincident_centers)
     }
 
     /// All items should be visitable
-    int count = 0;
+    index_t count = 0;
     bvh.call_on_all([&](const auto&) { ++count; });
     BOOST_TEST(count == 20);
 }
@@ -465,26 +452,25 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_diagonal_ray)
     using namespace gearoenix;
 
     /// Test diagonal rays hitting a 3D grid to exercise multi-axis SAH splits
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
-    int id = 0;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
+
+    index_t id = 0;
     constexpr int grid = 5;
     constexpr core::fp_t spacing = 4.0;
 
-    for (int x = 0; x < grid; ++x) {
-        for (int y = 0; y < grid; ++y) {
-            for (int z = 0; z < grid; ++z) {
+    for (index_t x = 0; x < grid; ++x) {
+        for (index_t y = 0; y < grid; ++y) {
+            for (index_t z = 0; z < grid; ++z) {
                 const V3 center(
                     static_cast<core::fp_t>(x) * spacing,
                     static_cast<core::fp_t>(y) * spacing,
                     static_cast<core::fp_t>(z) * spacing);
-                bvh.add({ Box(center + 0.5, center - 0.5), Data { id++ } });
+                bvh.add({ Box(center + 0.5, center - 0.5),  id++ });
             }
         }
     }
@@ -493,11 +479,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_diagonal_ray)
     BOOST_TEST(id == grid * grid * grid);
 
     /// Diagonal ray from corner towards the center of the grid
-    const V3 grid_center(
+    constexpr V3 grid_center(
         static_cast<core::fp_t>(grid - 1) * spacing * 0.5,
         static_cast<core::fp_t>(grid - 1) * spacing * 0.5,
         static_cast<core::fp_t>(grid - 1) * spacing * 0.5);
-    const V3 origin = grid_center - V3(100.0);
+    constexpr V3 origin = grid_center - V3(100.0);
     const V3 direction = (grid_center - origin).normalised();
     const Ray ray(origin, direction);
 
@@ -517,7 +503,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_diagonal_ray)
     }
 
     /// Verify total count
-    int count = 0;
+    index_t count = 0;
     bvh.call_on_all([&](const auto&) { ++count; });
     BOOST_TEST(count == grid * grid * grid);
 }
@@ -527,19 +513,17 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_reset_and_rebuild)
     using namespace gearoenix;
 
     /// Verify reset + rebuild works correctly
-    struct Data final {
-        int id = 0;
-    };
     using Box = math::Aabb3<core::fp_t>;
     using V3 = math::Vec3<core::fp_t>;
     using Ray = math::Ray3<core::fp_t>;
 
-    physics::accelerator::Bvh<Data> bvh;
+    physics::accelerator::Bvh bvh;
+    using index_t = physics::accelerator::Bvh::index_t;
 
     /// First build: 3 boxes along X
-    for (int i = 0; i < 3; ++i) {
+    for (index_t i = 0; i < 3; ++i) {
         const core::fp_t x = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), Data { i } });
+        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
     }
     bvh.create_nodes();
 
@@ -547,15 +531,15 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_reset_and_rebuild)
         const Ray ray(V3(0.0, 0.0, 10.0), V3(0.0, 0.0, -1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
-        BOOST_TEST(result->second->user_data.id == 0);
+        BOOST_TEST(result->second->index == 0);
     }
 
     /// Reset and rebuild with different data
     bvh.reset();
 
-    for (int i = 0; i < 3; ++i) {
+    for (index_t i = 0; i < 3; ++i) {
         const core::fp_t y = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(1.0, y + 1.0, 1.0), V3(-1.0, y - 1.0, -1.0)), Data { 100 + i } });
+        bvh.add({ Box(V3(1.0, y + 1.0, 1.0), V3(-1.0, y - 1.0, -1.0)),  100 + i });
     }
     bvh.create_nodes();
 
@@ -563,7 +547,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_reset_and_rebuild)
         const Ray ray(V3(0.0, 0.0, 10.0), V3(0.0, 0.0, -1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
-        BOOST_TEST(result->second->user_data.id == 100);
+        BOOST_TEST(result->second->index == 100);
     }
 
     /// Old data should not be accessible

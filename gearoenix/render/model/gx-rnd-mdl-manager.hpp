@@ -12,7 +12,7 @@ protected:
 public:
     ~Manager() override;
 
-    [[nodiscard]] virtual core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, meshes_set_t&& meshes, bool is_transformable);
+    [[nodiscard]] virtual core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, meshes_set_t&& meshes, bool is_transformable, bool is_skinned);
     virtual void update();
 };
 }

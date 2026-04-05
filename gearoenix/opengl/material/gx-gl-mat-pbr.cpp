@@ -92,19 +92,19 @@ void gearoenix::gl::material::Pbr::render_forward(const Scene&, const render::re
     shader.bind(current_shader);
     shader.set_vp_data(camera.camera->get_view_projection().data());
 
-    const math::Vec4 camera_position = { math::Vec3<float>(camera.transform->get_global_position()), 1.0f };
+    const math::Vec4 camera_position = { camera.transform->get_global_position().to<float>(), 1.0f };
     shader.set_camera_position_reserved_data(camera_position.data());
 
     if (rm.bones_count > 0) {
         static std::vector<std::array<math::Mat4x4<float>, 2>> bones_data;
         bones_data.clear();
         for (const auto* const b : rm.armature->get_all_bones()) {
-            bones_data.push_back({ math::Mat4x4<float>(b->get_global_matrix()), math::Mat4x4<float>(b->get_transposed_inverted_global_matrix()) });
+            bones_data.push_back({ b->get_global_matrix().to<float>(), b->get_transposed_inverted_global_matrix().to<float>() });
         }
         shader.set_bones_m_inv_m_data(bones_data.data()->data());
     } else {
-        const auto m = math::Mat4x4<float>(rm.transform->get_global_matrix());
-        const auto inv_m = math::Mat4x4<float>(rm.transform->get_transposed_inverted_global_matrix());
+        const auto m = rm.transform->get_global_matrix().to<float>();
+        const auto inv_m = rm.transform->get_transposed_inverted_global_matrix().to<float>();
         shader.set_m_data(m.data());
         shader.set_inv_m_data(inv_m.data());
     }
@@ -152,9 +152,9 @@ void gearoenix::gl::material::Pbr::render_forward(const Scene&, const render::re
             if (!l) {
                 break;
             }
-            lights_colour.emplace_back(l->colour);
-            lights_direction.emplace_back(l->direction);
-            lights_vp.emplace_back(l->normalised_vp);
+            lights_colour.emplace_back(l->colour->to<float>());
+            lights_direction.emplace_back(l->direction->to<float>());
+            lights_vp.emplace_back(l->normalised_vp->to<float>());
         }
 
         shader.set_shadow_caster_directional_light_normalised_vp_data(lights_vp.data()->data());

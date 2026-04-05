@@ -5,6 +5,7 @@
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
 #include "gx-vk-mat-manager.hpp"
+#include "gx-vk-mat-draw-cache.hpp"
 
 gearoenix::vulkan::material::Pbr::Pbr(std::string&& name)
     : render::material::Pbr(object_type_index, std::move(name))
@@ -75,17 +76,6 @@ void gearoenix::vulkan::material::Pbr::set_orm(std::shared_ptr<render::texture::
     render::material::Pbr::set_orm(std::move(txt));
 }
 
-void gearoenix::vulkan::material::Pbr::bind_forward(const vk::CommandBuffer cmd, const bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
-{
-    bind_graphics((skinned ? fp.pbr_skinned_forward.get() : fp.pbr_forward.get())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
-}
-
-void gearoenix::vulkan::material::Pbr::bind_shadow(const vk::CommandBuffer cmd, const bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline)
-{
-    const auto& mgr = pipeline::Manager::get();
-    bind_graphics((skinned ? mgr.get_skinned_shadow() : mgr.get_shadow())->get_vulkan_data(), cmd, pc, current_bound_pipeline);
-}
-
 void gearoenix::vulkan::material::Pbr::set_albedo_factor(const math::Vec4<float>& v)
 {
     render::material::Pbr::set_albedo_factor(v);
@@ -112,6 +102,18 @@ void gearoenix::vulkan::material::Pbr::set_alpha_cutoff_occlusion_strength_reser
     render::material::Pbr::set_alpha_cutoff_occlusion_strength_reserved_reserved(v);
     auto& sd = *shader_data.get_ptr();
     sd.alpha_cutoff_occlusion_strength_reserved = v;
+}
+
+void gearoenix::vulkan::material::Pbr::set(const bool skinned, DrawCache& dc)
+{
+    if (skinned) {
+        dc.forward_pipeline_index = static_cast<decltype(dc.forward_pipeline_index)>(pipeline::FormatPipelinesIndices::pbr_skinned_forward_index);
+        dc.shadow_pipeline_index = static_cast<decltype(dc.shadow_pipeline_index)>(pipeline::ShadowPipelinesIndices::skinned_index);
+    } else {
+        dc.forward_pipeline_index = static_cast<decltype(dc.forward_pipeline_index)>(pipeline::FormatPipelinesIndices::pbr_forward_index);
+        dc.shadow_pipeline_index = static_cast<decltype(dc.shadow_pipeline_index)>(pipeline::ShadowPipelinesIndices::no_skin_index);
+    }
+    dc.material_index = shader_data.get_index();
 }
 
 #endif

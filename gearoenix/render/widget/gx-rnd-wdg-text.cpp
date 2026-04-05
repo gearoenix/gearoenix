@@ -34,7 +34,7 @@ void gearoenix::render::widget::Text::construct(std::string&& name, core::ecs::E
     r->text_material = std::dynamic_pointer_cast<material::Unlit>(msh->get_bound_material());
     r->text_material->set_transparency(material::Transparency::Transparent);
     r->text_self = r;
-    auto model_entity = model::Manager::get().build(r->name + "-model-text", parent ? parent->get_model_entity().get() : nullptr, { std::move(msh) }, true);
+    auto model_entity = model::Manager::get().build(r->name + "-model-text", parent ? parent->get_model_entity().get() : nullptr, { std::move(msh) }, true, false);
     r->set_model_entity(std::move(model_entity));
     r->set_camera_entity(camera_entity);
     if (parent != nullptr) {

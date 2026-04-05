@@ -14,8 +14,15 @@ struct Pbr final : render::material::Pbr, Material {
 
     constexpr static auto max_count = render::material::Pbr::max_count;
     constexpr static auto object_type_index = gearoenix_gapi_material_pbr_type_index;
-    constexpr static std::array all_parent_object_type_indices { render::material::Material::object_type_index, render::material::Pbr::object_type_index, material::Material::object_type_index };
-    constexpr static std::array immediate_parent_object_type_indices { render::material::Pbr::object_type_index, material::Material::object_type_index };
+    constexpr static std::array all_parent_object_type_indices {
+        render::material::Material::object_type_index,
+        render::material::Pbr::object_type_index,
+        material::Material::object_type_index
+    };
+    constexpr static std::array immediate_parent_object_type_indices {
+        render::material::Pbr::object_type_index,
+        material::Material::object_type_index
+    };
 
 private:
     explicit Pbr(std::string&& name);
@@ -28,12 +35,11 @@ public:
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_orm(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void bind_forward(vk::CommandBuffer cmd, bool skinned, const pipeline::FormatPipelines& fp, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) override;
-    void bind_shadow(vk::CommandBuffer cmd, bool skinned, pipeline::PushConstants& pc, vk::Pipeline& current_bound_pipeline) override;
     void set_albedo_factor(const math::Vec4<float>&) override;
     void set_emission_roughness_factor(const math::Vec4<float>&) override;
     void set_normal_metallic_factor(const math::Vec4<float>&) override;
     void set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>&) override;
+    void set(bool skinned, DrawCache& dc) override;
 };
 }
 #endif

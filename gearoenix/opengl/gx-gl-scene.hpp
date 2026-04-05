@@ -20,7 +20,7 @@ private:
 
 public:
     ~Scene() override;
-    void update() override;
+    void update_per_frame() override;
     void render_shadows(uint& current_shader);
     void render_reflection_probes(uint& current_shader) const;
     void render_forward(uint& current_shader);

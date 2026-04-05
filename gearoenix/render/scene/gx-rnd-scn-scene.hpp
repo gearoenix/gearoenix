@@ -12,11 +12,12 @@ struct Scene : core::ecs::Component {
 
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRT(math::Vec4<float>, ssao_settings);
-    GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
     GX_GET_REF_PRT(record::Scene, record);
     GX_GET_REFC_PRT(std::string, forward_render_pass_name);
     GX_GET_REFC_PRT(std::string, shadow_render_pass_name);
     GX_GET_REFC_PRT(std::string, shadow_reflection_probe_render_pass_name);
+    GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
+    GX_GETSET_VAL_PRT(bool, changed, true);
 
     Scene(core::ecs::Entity* entity, core::object_type_index_t final_type_index, core::fp_t layer, std::string&& name);
     Scene(core::object_type_index_t final_type_index, core::object_id_t id, std::string&& name);
@@ -26,6 +27,17 @@ struct Scene : core::ecs::Component {
 
 public:
     ~Scene() override;
-    virtual void update();
+    virtual void update_per_frame();
+
+    /// Update the whole scene after major changes
+    ///
+    /// This function updates the internal structure of the scene after any major change in the scene.
+    /// After these changes you need to call this function:
+    ///   * - Any child-entity addition to or deletion from a scene.
+    ///   * - Any transformation in static entities (not the dynamic entities).
+    ///   * - Any update in enable/disable of any child-entity.
+    ///   * - Look into the implementation for further info and update this list.
+    /// @note This is an expensive operation, try to avoid calling it too often and try to batch your changes.
+    virtual void update_after_change();
 };
 }

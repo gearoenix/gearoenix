@@ -1,5 +1,6 @@
 #include "gx-vk-qu-queue.hpp"
 #if GX_RENDER_VULKAN_ENABLED
+#include "../../core/gx-cr-profiler.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
@@ -33,7 +34,7 @@ void gearoenix::vulkan::queue::Queue::submit(const vk::ArrayProxy<const vk::Sema
     info.setCommandBuffers(commands);
     info.setSignalSemaphores(signal_semaphores);
     const std::lock_guard _(submission_lock);
-    vulkan_data.submit(info, fence);
+    GX_PROFILE_EXP(vulkan_data.submit(info, fence));
 }
 
 void gearoenix::vulkan::queue::Queue::present(const vk::PresentInfoKHR& info)
