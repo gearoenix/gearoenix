@@ -10,6 +10,7 @@
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
+struct Uniform;
 }
 
 namespace gearoenix::vulkan::image {
@@ -26,11 +27,13 @@ struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_images = max_1d_images + max_2d_images + max_3d_images + max_cube_images + max_shadow_2d_images;
     static constexpr std::uint32_t max_samplers = 32;
     static constexpr std::uint32_t max_shadow_samplers = 1;
+    static constexpr std::uint32_t buffer_bindings_count = 10;
 
 private:
+    const std::uint32_t descriptor_set_count;
     vk::raii::DescriptorSetLayout descriptor_set_layout { nullptr };
     vk::raii::DescriptorPool descriptor_pool { nullptr };
-    vk::DescriptorSet descriptor_set;
+    std::vector<vk::DescriptorSet> descriptor_sets;
     vk::raii::PipelineLayout pipeline_layout { nullptr };
     vk::raii::Sampler shadow_sampler { nullptr };
 
@@ -48,16 +51,16 @@ private:
 
 public:
     Bindless(
-        const buffer::Buffer& scenes_buffer,
-        const buffer::Buffer& cameras_buffer,
-        const buffer::Buffer& models_buffer,
-        const buffer::Buffer& materials_buffer,
-        const buffer::Buffer& point_lights_buffer,
-        const buffer::Buffer& directional_lights_buffer,
-        const buffer::Buffer& shadow_caster_directional_lights_buffer,
-        const buffer::Buffer& bones_buffer,
-        const buffer::Buffer& reflection_probes_buffer,
-        const buffer::Buffer& cameras_joint_models_buffer);
+        const buffer::Uniform& scenes_uniform,
+        const buffer::Uniform& cameras_uniform,
+        const buffer::Uniform& models_uniform,
+        const buffer::Uniform& materials_uniform,
+        const buffer::Uniform& point_lights_uniform,
+        const buffer::Uniform& directional_lights_uniform,
+        const buffer::Uniform& shadow_caster_directional_lights_uniform,
+        const buffer::Uniform& bones_uniform,
+        const buffer::Uniform& reflection_probes_uniform,
+        const buffer::Uniform& cameras_joint_models_uniform);
     ~Bindless() override = default;
 
     Bindless(Bindless&&) = delete;
@@ -66,8 +69,6 @@ public:
     Bindless& operator=(const Bindless&) = delete;
 
     [[nodiscard]] vk::DescriptorSetLayout get_descriptor_set_layout() const { return *descriptor_set_layout; }
-    [[nodiscard]] vk::DescriptorPool get_descriptor_pool() const { return *descriptor_pool; }
-    [[nodiscard]] vk::DescriptorSet get_descriptor_set() const { return descriptor_set; }
     [[nodiscard]] vk::PipelineLayout get_pipeline_layout() const { return *pipeline_layout; }
     [[nodiscard]] vk::Sampler get_shadow_sampler() const { return *shadow_sampler; }
 

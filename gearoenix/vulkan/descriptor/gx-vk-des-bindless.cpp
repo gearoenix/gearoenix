@@ -4,7 +4,9 @@
 #include "../../core/job/gx-cr-job-manager.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
+#include "../buffer/gx-vk-buf-uniform.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
+#include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -16,17 +18,18 @@ constexpr vk::DescriptorBindingFlags gx_binding_flags = vk::DescriptorBindingFla
 }
 
 gearoenix::vulkan::descriptor::Bindless::Bindless(
-    const buffer::Buffer& scenes_buffer,
-    const buffer::Buffer& cameras_buffer,
-    const buffer::Buffer& models_buffer,
-    const buffer::Buffer& materials_buffer,
-    const buffer::Buffer& point_lights_buffer,
-    const buffer::Buffer& directional_lights_buffer,
-    const buffer::Buffer& shadow_caster_directional_lights_buffer,
-    const buffer::Buffer& bones_buffer,
-    const buffer::Buffer& reflection_probes_buffer,
-    const buffer::Buffer& cameras_joint_models_buffer)
+    const buffer::Uniform& scenes_uniform,
+    const buffer::Uniform& cameras_uniform,
+    const buffer::Uniform& models_uniform,
+    const buffer::Uniform& materials_uniform,
+    const buffer::Uniform& point_lights_uniform,
+    const buffer::Uniform& directional_lights_uniform,
+    const buffer::Uniform& shadow_caster_directional_lights_uniform,
+    const buffer::Uniform& bones_uniform,
+    const buffer::Uniform& reflection_probes_uniform,
+    const buffer::Uniform& cameras_joint_models_uniform)
     : Singleton(this)
+    , descriptor_set_count(device::Physical::get().get_unified_memory() ? frames_in_flight : 1)
 {
     const auto& dev_raii = device::Logical::get().get_device();
     const auto dev = device::Logical::get().get_vulkan_data();
@@ -93,27 +96,29 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     GX_VK_MARK("gx-vk-main-pipeline-layout", *pipeline_layout);
 
     // ========== Descriptor Pool ==========
-    constexpr std::array pool_sizes {
-        vk::DescriptorPoolSize { vk::DescriptorType::eSampledImage, max_images },
-        vk::DescriptorPoolSize { vk::DescriptorType::eSampler, max_samplers + max_shadow_samplers },
-        vk::DescriptorPoolSize { vk::DescriptorType::eStorageBuffer, 10 },
+    const std::array pool_sizes {
+        vk::DescriptorPoolSize { vk::DescriptorType::eSampledImage, max_images * descriptor_set_count },
+        vk::DescriptorPoolSize { vk::DescriptorType::eSampler, (max_samplers + max_shadow_samplers) * descriptor_set_count },
+        vk::DescriptorPoolSize { vk::DescriptorType::eStorageBuffer, buffer_bindings_count * descriptor_set_count },
     };
     const vk::DescriptorPoolCreateInfo pool_info {
         vk::DescriptorPoolCreateFlagBits::eUpdateAfterBind | vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-        1, pool_sizes
+        descriptor_set_count, pool_sizes
     };
 
     descriptor_pool = vk::raii::DescriptorPool(dev_raii, pool_info);
     GX_VK_MARK("gx-vk-main-descriptor-pool", *descriptor_pool);
 
-    // ========== Allocate Descriptor Set ==========
+    // ========== Allocate Descriptor Sets ==========
+    const std::vector layouts(descriptor_set_count, descriptor_set_layout_raw);
     vk::DescriptorSetAllocateInfo allocate_info;
     allocate_info.descriptorPool = *descriptor_pool;
-    allocate_info.setSetLayouts(descriptor_set_layout_raw);
+    allocate_info.setSetLayouts(layouts);
 
-    auto sets = dev.allocateDescriptorSets(allocate_info);
-    descriptor_set = sets[0];
-    GX_VK_MARK("gx-vk-main-descriptor-set", descriptor_set);
+    descriptor_sets = dev.allocateDescriptorSets(allocate_info);
+    for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+        GX_VK_MARK("gx-vk-main-descriptor-set-" + std::to_string(s), descriptor_sets[s]);
+    }
 
     // ========== Initialize Free Index Lists ==========
     free_1d_image_indices.reserve(max_1d_images);
@@ -153,36 +158,42 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     }
 
     // ========== Initialize Buffer Descriptors ==========
-    const std::array buffers {
-        &scenes_buffer,
-        &cameras_buffer,
-        &models_buffer,
-        &materials_buffer,
-        &point_lights_buffer,
-        &directional_lights_buffer,
-        &shadow_caster_directional_lights_buffer,
-        &bones_buffer,
-        &reflection_probes_buffer,
-        &cameras_joint_models_buffer
+    const std::array uniforms {
+        &scenes_uniform,
+        &cameras_uniform,
+        &models_uniform,
+        &materials_uniform,
+        &point_lights_uniform,
+        &directional_lights_uniform,
+        &shadow_caster_directional_lights_uniform,
+        &bones_uniform,
+        &reflection_probes_uniform,
+        &cameras_joint_models_uniform
     };
 
-    std::array<vk::DescriptorBufferInfo, 10> buffer_infos { };
-    std::array<vk::WriteDescriptorSet, 10> writes { };
+    const auto is_unified = device::Physical::get().get_unified_memory();
 
-    for (std::uint32_t i = 0; i < buffers.size(); ++i) {
-        const auto& buff = *buffers[i];
-        const auto& allocator = *buff.get_allocated_memory()->get_allocator();
-        buffer_infos[i].buffer = buff.get_vulkan_data();
-        buffer_infos[i].offset = static_cast<vk::DeviceSize>(buff.get_offset());
-        buffer_infos[i].range = static_cast<vk::DeviceSize>(allocator.get_size());
+    for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+        std::array<vk::DescriptorBufferInfo, buffer_bindings_count> buffer_infos { };
+        std::array<vk::WriteDescriptorSet, buffer_bindings_count> writes { };
 
-        writes[i].dstSet = descriptor_set;
-        writes[i].dstBinding = 7 + i; // Buffers start at binding 7
-        writes[i].descriptorType = vk::DescriptorType::eStorageBuffer;
-        writes[i].setBufferInfo(buffer_infos[i]);
+        for (std::uint32_t i = 0; i < buffer_bindings_count; ++i) {
+            const auto& buff = is_unified
+                ? uniforms[i]->get_cpu_buffer(s)
+                : *uniforms[i]->get_gpu();
+            const auto& allocator = *buff.get_allocated_memory()->get_allocator();
+            buffer_infos[i].buffer = buff.get_vulkan_data();
+            buffer_infos[i].offset = static_cast<vk::DeviceSize>(buff.get_offset());
+            buffer_infos[i].range = static_cast<vk::DeviceSize>(allocator.get_size());
+
+            writes[i].dstSet = descriptor_sets[s];
+            writes[i].dstBinding = 7 + i; // Buffers start at binding 7
+            writes[i].descriptorType = vk::DescriptorType::eStorageBuffer;
+            writes[i].setBufferInfo(buffer_infos[i]);
+        }
+
+        dev.updateDescriptorSets(writes, { });
     }
-
-    dev.updateDescriptorSets(writes, { });
 
     // ========== Create Shadow Comparison Sampler ==========
     vk::SamplerCreateInfo shadow_sampler_info;
@@ -199,51 +210,55 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
 
     shadow_sampler = vk::raii::Sampler(dev_raii, shadow_sampler_info);
 
-    const vk::DescriptorImageInfo shadow_sampler_descriptor_info { *shadow_sampler };
+    // Write shadow sampler to all descriptor sets
+    for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+        const vk::DescriptorImageInfo shadow_sampler_descriptor_info { *shadow_sampler };
 
-    vk::WriteDescriptorSet shadow_sampler_write;
-    shadow_sampler_write.dstSet = descriptor_set;
-    shadow_sampler_write.dstBinding = 6;
-    shadow_sampler_write.descriptorType = vk::DescriptorType::eSampler;
-    shadow_sampler_write.setImageInfo(shadow_sampler_descriptor_info);
+        vk::WriteDescriptorSet shadow_sampler_write;
+        shadow_sampler_write.dstSet = descriptor_sets[s];
+        shadow_sampler_write.dstBinding = 6;
+        shadow_sampler_write.descriptorType = vk::DescriptorType::eSampler;
+        shadow_sampler_write.setImageInfo(shadow_sampler_descriptor_info);
 
-    dev.updateDescriptorSets(shadow_sampler_write, { });
+        dev.updateDescriptorSets(shadow_sampler_write, { });
+    }
 }
 
 void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(
     const std::uint32_t binding, const std::uint32_t index, const std::shared_ptr<image::View>& view, const vk::ImageLayout layout) const
 {
-    vk::DescriptorImageInfo info;
-    info.imageView = view->get_vulkan_data();
-    info.imageLayout = layout;
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, binding, index, layout, view]() {
+        vk::DescriptorImageInfo info;
+        info.imageView = view->get_vulkan_data();
+        info.imageLayout = layout;
 
-    vk::WriteDescriptorSet write;
-    write.dstSet = descriptor_set;
-    write.dstBinding = binding;
-    write.dstArrayElement = index;
-    write.descriptorType = vk::DescriptorType::eSampledImage;
-
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info, view]() mutable {
-        write.setImageInfo(info);
-        device::Logical::get().get_vulkan_data().updateDescriptorSets(write, { });
-        (void)view;
+        for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+            vk::WriteDescriptorSet write;
+            write.dstSet = descriptor_sets[s];
+            write.dstBinding = binding;
+            write.dstArrayElement = index;
+            write.descriptorType = vk::DescriptorType::eSampledImage;
+            write.setImageInfo(info);
+            device::Logical::get().get_vulkan_data().updateDescriptorSets(write, { });
+        }
     });
 }
 
 void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const vk::Sampler sampler) const
 {
-    vk::DescriptorImageInfo info;
-    info.sampler = sampler;
+    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, index, sampler]() {
+        vk::DescriptorImageInfo info;
+        info.sampler = sampler;
 
-    vk::WriteDescriptorSet write;
-    write.dstSet = descriptor_set;
-    write.dstBinding = 5; // Sampler binding
-    write.dstArrayElement = index;
-    write.descriptorType = vk::DescriptorType::eSampler;
-
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [write, info]() mutable {
-        write.setImageInfo(info);
-        device::Logical::get().get_vulkan_data().updateDescriptorSets(write, { });
+        for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+            vk::WriteDescriptorSet write;
+            write.dstSet = descriptor_sets[s];
+            write.dstBinding = 5;
+            write.dstArrayElement = index;
+            write.descriptorType = vk::DescriptorType::eSampler;
+            write.setImageInfo(info);
+            device::Logical::get().get_vulkan_data().updateDescriptorSets(write, { });
+        }
     });
 }
 
@@ -369,7 +384,9 @@ void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t i
 
 void gearoenix::vulkan::descriptor::Bindless::bind(const vk::CommandBuffer cmd) const
 {
-    cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pipeline_layout, 0, descriptor_set, { });
+    const auto frame_number = Singleton<engine::Engine>::get().get_frame_number();
+    const auto set_index = frame_number % descriptor_set_count;
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pipeline_layout, 0, descriptor_sets[set_index], { });
 }
 
 #endif

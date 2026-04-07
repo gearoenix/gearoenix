@@ -13,10 +13,11 @@ gearoenix::vulkan::buffer::Uniform::Uniform(std::vector<std::shared_ptr<Buffer>>
 
 gearoenix::vulkan::buffer::Uniform::~Uniform() = default;
 
-void gearoenix::vulkan::buffer::Uniform::update(const void* const src)
+void gearoenix::vulkan::buffer::Uniform::update(const void* const src, const std::int64_t size)
 {
     auto& b = *cpu[core::Singleton<engine::Engine>::get().get_frame_number()];
-    b.write(src, b.get_allocated_memory()->get_allocator()->get_size());
+    GX_ASSERT_D(size <= b.get_allocated_memory()->get_allocator()->get_size());
+    b.write(src, size);
 }
 
 #endif

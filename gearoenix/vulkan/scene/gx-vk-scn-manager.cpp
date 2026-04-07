@@ -66,7 +66,7 @@ void gearoenix::vulkan::scene::Manager::submit(const vk::CommandBuffer cmd)
     DrawState draw_state;
     draw_state.command_buffer = cmd;
     pipeline::Manager::get().set(draw_state.pipelines);
-    draw_state.gpu_buffer = buffer::Manager::get().get_gpu_root_buffer()->get_vulkan_data();
+    draw_state.gpu_buffer = buffer::Manager::get().get_device_root()->get_vulkan_data();
     draw_state.bindless_pipeline_layout = descriptor::Bindless::get().get_pipeline_layout();
 
     GX_PROFILE_EXP(render_shadows(draw_state));

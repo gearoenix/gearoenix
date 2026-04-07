@@ -2,12 +2,12 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
-#include "../../math/gx-math-numeric.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 
 gearoenix::vulkan::memory::Memory::Memory(
     std::shared_ptr<Memory> parent,
@@ -46,32 +46,59 @@ std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Me
     return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place place, const std::uint32_t type_index)
+std::int64_t gearoenix::vulkan::memory::Memory::get_max_gpu_needed_size(const bool is_unified_memory)
 {
-    const auto is_gpu = place == Place::Gpu;
     const auto& cfg = render::RuntimeConfiguration::get();
-    const auto configured_size = static_cast<std::int64_t>(is_gpu ? cfg.get_maximum_gpu_render_memory_size() : cfg.get_maximum_cpu_render_memory_size());
+    const auto buffer_req = buffer::Buffer::get_max_gpu_needed_size(is_unified_memory);
+    return cfg.get_maximum_allowed_textures_memory_size() + buffer_req;
+}
+
+std::int64_t gearoenix::vulkan::memory::Memory::get_max_gpu_needed_size()
+{
+    return get_max_gpu_needed_size(device::Physical::get().get_unified_memory());
+}
+
+std::int64_t gearoenix::vulkan::memory::Memory::get_max_cpu_needed_size()
+{
+    GX_ASSERT_D(!device::Physical::get().get_unified_memory());
+    return buffer::Buffer::get_max_cpu_needed_size();
+}
+
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place in_place, const std::uint32_t type_index)
+{
+    const auto place = device::Physical::get().get_unified_memory()? Place::Gpu: in_place;
+    const auto size = static_cast<vk::DeviceSize>(place == Place::Gpu ? get_max_gpu_needed_size() : get_max_cpu_needed_size());
+    return construct(place, type_index, size);
+}
+
+std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place in_place, const std::uint32_t type_index, const vk::DeviceSize size)
+{
+    const auto place = device::Physical::get().get_unified_memory()? Place::Gpu: in_place;
+    const auto is_gpu = place == Place::Gpu;
+
     const auto& mem_props = device::Physical::get().get_memory_properties();
-    const auto heap_index = mem_props.memoryTypes[type_index].heapIndex;
-    const auto heap_size = static_cast<std::int64_t>(mem_props.memoryHeaps[heap_index].size);
-    const auto aligned_size = std::min(configured_size, (heap_size - 256u) & ~255u);
+    GX_ASSERT_D(size <= mem_props.memoryHeaps[mem_props.memoryTypes[type_index].heapIndex].size);
+
     const auto dev = device::Logical::get().get_vulkan_data();
     const auto rtx_enabled = device::Physical::get().get_rtx_supported();
 
     constexpr vk::MemoryAllocateFlagsInfo flags_info(vk::MemoryAllocateFlagBits::eDeviceAddress);
 
-    vk::MemoryAllocateInfo info(static_cast<vk::DeviceSize>(aligned_size), type_index);
+    vk::MemoryAllocateInfo info(size, type_index);
     if (is_gpu && rtx_enabled) {
         info.pNext = &flags_info;
     }
 
     const vk::DeviceMemory vulkan_data = dev.allocateMemory(info);
     void* data = nullptr;
-    if (Place::Cpu == place) {
-        data = dev.mapMemory(vulkan_data, 0, static_cast<vk::DeviceSize>(aligned_size), { });
+    // Map memory whenever it is host-visible, not just for CPU-placed allocations.
+    // On unified-memory GPUs, GPU allocations are also host-visible and can be mapped
+    // for direct CPU access, eliminating the need for staging buffers.
+    if (mem_props.memoryTypes[type_index].propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible) {
+        data = dev.mapMemory(vulkan_data, 0, size, { });
         GX_ASSERT_D(nullptr != data);
     }
-    std::shared_ptr<Memory> result(new Memory(nullptr, core::allocator::Range::construct(aligned_size), data, place, type_index, vulkan_data));
+    std::shared_ptr<Memory> result(new Memory(nullptr, core::allocator::Range::construct(static_cast<std::int64_t>(size)), data, place, type_index, vulkan_data));
     result->self = result;
     return result;
 }

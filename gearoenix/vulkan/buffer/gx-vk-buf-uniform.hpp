@@ -12,12 +12,12 @@ private:
     std::shared_ptr<Buffer> gpu;
 
 public:
-    [[nodiscard]] const std::vector<std::shared_ptr<Buffer>>& get_cpu() const { return cpu; }
     [[nodiscard]] const std::shared_ptr<Buffer>& get_gpu() const { return gpu; }
+    [[nodiscard]] Buffer& get_cpu_buffer(const std::uint32_t frame) const { return *cpu[frame]; }
 
     Uniform(std::vector<std::shared_ptr<Buffer>>&& cpu, std::shared_ptr<Buffer>&& gpu);
     ~Uniform();
-    void update(const void*);
+    void update(const void*, std::int64_t size);
 };
 }
 #endif

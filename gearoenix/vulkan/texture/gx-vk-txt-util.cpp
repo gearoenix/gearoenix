@@ -86,7 +86,6 @@ void gearoenix::vulkan::texture::write_gpu_texture_data(
     const auto aspect_flags = img.get_aspect_flags();
     const auto width = info.get_width();
     const auto height = info.get_height();
-    const auto alignment = static_cast<std::int64_t>(device::Physical::get().get_properties().limits.optimalBufferCopyRowPitchAlignment);
 
     std::vector<std::shared_ptr<buffer::Buffer>> staging_buffers;
     staging_buffers.reserve(layer_count * mips_count);
@@ -95,7 +94,7 @@ void gearoenix::vulkan::texture::write_gpu_texture_data(
         auto level_height = height;
         for (std::uint32_t mip = 0; mip < mips_count; ++mip) {
             staging_buffers.push_back(buffer::Manager::get().create_staging(
-                static_cast<std::int64_t>(pixel_size) * static_cast<std::int64_t>(level_width) * static_cast<std::int64_t>(level_height), alignment));
+                static_cast<std::int64_t>(pixel_size) * static_cast<std::int64_t>(level_width) * static_cast<std::int64_t>(level_height)));
             level_width = std::max(1u, level_width >> 1);
             level_height = std::max(1u, level_height >> 1);
         }

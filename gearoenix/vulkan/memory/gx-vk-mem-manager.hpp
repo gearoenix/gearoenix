@@ -24,6 +24,8 @@ public:
     ~Manager() override;
 
     [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::int64_t alignment, std::uint32_t type_bits, Place place);
+    [[nodiscard]] static std::shared_ptr<Memory> allocate_dedicated(std::int64_t size, std::uint32_t type_bits, Place place);
+    [[nodiscard]] static std::uint32_t get_memory_type_index(std::uint32_t type_bits, Place place);
 };
 }
 #endif

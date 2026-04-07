@@ -48,6 +48,7 @@ private:
     std::uint32_t compute_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     std::uint32_t present_queue_node_index = std::numeric_limits<std::uint32_t>::max();
     bool rtx_supported = false;
+    bool unified_memory = false;
 
     [[nodiscard]] int is_good(const vk::raii::PhysicalDevice& gpu);
     void initialize_extensions();
@@ -84,6 +85,7 @@ public:
     [[nodiscard]] std::uint32_t get_compute_queue_node_index() const { return compute_queue_node_index; }
     [[nodiscard]] std::uint32_t get_present_queue_node_index() const { return present_queue_node_index; }
     [[nodiscard]] bool get_rtx_supported() const { return rtx_supported; }
+    [[nodiscard]] bool get_unified_memory() const { return unified_memory; }
 
     [[nodiscard]] std::optional<std::uint32_t> get_memory_type_index(std::uint32_t type_bits, vk::MemoryPropertyFlags mem_properties) const;
     [[nodiscard]] vk::SurfaceCapabilitiesKHR get_surface_capabilities() const;

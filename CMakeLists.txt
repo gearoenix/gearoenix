@@ -138,6 +138,11 @@ if (GX_PROFILING_ENABLED)
             GIT_SHALLOW    TRUE
             GIT_PROGRESS   TRUE)
     FetchContent_MakeAvailable(tracy)
+    if (TARGET TracyClient)
+        target_compile_options(TracyClient PRIVATE -w)
+        get_target_property(tracy_include_dirs TracyClient INTERFACE_INCLUDE_DIRECTORIES)
+        set_target_properties(TracyClient PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${tracy_include_dirs}")
+    endif ()
 endif ()
 
 if (NOT GX_IN_WASM)

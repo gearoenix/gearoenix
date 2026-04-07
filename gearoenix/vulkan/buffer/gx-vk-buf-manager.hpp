@@ -9,36 +9,21 @@
 #include <array>
 #include <memory>
 
-namespace gearoenix::core::sync {
-struct WorkWaiter;
-}
-
-namespace gearoenix::vulkan::command {
-struct Buffer;
-}
-
-namespace gearoenix::vulkan::image {
-struct Image;
-}
-
-namespace gearoenix::vulkan::queue {
-struct Queue;
-}
-
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
 struct Uniform;
 struct Manager final : core::Singleton<Manager> {
 private:
-    const std::shared_ptr<Buffer> upload_root_buffer;
-    const std::shared_ptr<Buffer> gpu_root_buffer;
-    const std::array<std::shared_ptr<Buffer>, frames_in_flight> each_frame_upload_source;
-    const std::shared_ptr<Buffer> each_frame_upload_destination;
+    const bool is_unified_memory;
+    const std::shared_ptr<Buffer> device_root;
+    const std::shared_ptr<Buffer> host_root;
+    const std::array<std::shared_ptr<Buffer>, frames_in_flight> each_frame;
+    const std::shared_ptr<Buffer> each_frame_destination;
 
-    [[nodiscard]] static std::shared_ptr<Buffer> create_upload_root_buffer();
-    [[nodiscard]] static std::shared_ptr<Buffer> create_gpu_root_buffer();
-    [[nodiscard]] std::array<std::shared_ptr<Buffer>, frames_in_flight> create_each_frame_upload_source() const;
-    [[nodiscard]] std::shared_ptr<Buffer> create_each_frame_upload_destination() const;
+    [[nodiscard]] std::shared_ptr<Buffer> create_host_root() const;
+    [[nodiscard]] std::shared_ptr<Buffer> create_device_root() const;
+    [[nodiscard]] std::array<std::shared_ptr<Buffer>, frames_in_flight> create_each_frame() const;
+    [[nodiscard]] std::shared_ptr<Buffer> create_each_frame_destination() const;
 
 public:
     Manager();
@@ -48,11 +33,9 @@ public:
     Manager& operator=(const Manager&) = delete;
     ~Manager() override;
 
-    [[nodiscard]] const std::shared_ptr<Buffer>& get_upload_root_buffer() const { return upload_root_buffer; }
-    [[nodiscard]] const std::shared_ptr<Buffer>& get_gpu_root_buffer() const { return gpu_root_buffer; }
+    [[nodiscard]] const std::shared_ptr<Buffer>& get_device_root() const { return device_root; }
 
     [[nodiscard]] std::shared_ptr<Buffer> create_static(std::int64_t size);
-    [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size, std::int64_t alignment);
     [[nodiscard]] std::shared_ptr<Buffer> create_staging(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Uniform> create_uniform(std::int64_t size);
     [[nodiscard]] std::shared_ptr<Buffer> create(const std::string& name, const void* data, std::int64_t size, core::job::EndCaller<>&& end);

@@ -38,7 +38,11 @@ public:
     [[nodiscard]] vk::DeviceMemory get_vulkan_data() const { return vulkan_data; }
 
     [[nodiscard]] static std::shared_ptr<Memory> construct(Place, std::uint32_t type_index);
+    [[nodiscard]] static std::shared_ptr<Memory> construct(Place, std::uint32_t type_index, vk::DeviceSize size);
     [[nodiscard]] std::shared_ptr<Memory> allocate(std::int64_t size, std::int64_t alignment);
+    [[nodiscard]] static std::int64_t get_max_gpu_needed_size(bool is_unified_memory);
+    [[nodiscard]] static std::int64_t get_max_gpu_needed_size();
+    [[nodiscard]] static std::int64_t get_max_cpu_needed_size();
 };
 }
 #endif

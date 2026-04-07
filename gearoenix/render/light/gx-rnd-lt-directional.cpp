@@ -39,6 +39,7 @@ void gearoenix::render::light::ShadowCasterDirectional::initialise(const std::ui
 
                 shadow_camera = shadow_camera_entity->get_component_shared_ptr<camera::Camera>();
                 shadow_camera->set_usage(camera::Camera::Usage::Shadow);
+                shadow_camera->set_enabled(false); // Disabled until customised target is ready
 
                 initialise_camera(camera_far, camera_near, camera_aspect);
                 set_shadow_map(resolution, std::move(e));
@@ -76,7 +77,9 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(const std
             .set_height(resolution)
             .set_type(texture::Type::Texture2D)
             .set_has_mipmap(false),
-        core::job::EndCallerShared<texture::Texture2D>([e = end_callback, self = std::move(self)](std::shared_ptr<texture::Texture2D>&& t) mutable { self->set_shadow_map(std::move(t), std::move(e)); }));
+        core::job::EndCallerShared<texture::Texture2D>([e = end_callback, self = std::move(self)](std::shared_ptr<texture::Texture2D>&& t) mutable {
+            self->set_shadow_map(std::move(t), std::move(e));
+        }));
 }
 
 void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(std::shared_ptr<texture::Texture2D>&& sm, core::job::EndCaller<>&& end_callback)
@@ -94,4 +97,5 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map_target(st
 {
     shadow_map_target = std::move(t);
     shadow_camera->set_customised_target(std::shared_ptr(shadow_map_target));
+    shadow_camera->set_enabled(true); // Target is ready, camera can now participate in rendering
 }

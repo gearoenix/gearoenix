@@ -6,7 +6,10 @@
 #include "imgui/gx-rnd-imgui-type-table.hpp"
 #include "imgui/gx-rnd-imgui-type-tree.hpp"
 
-gearoenix::render::RuntimeConfiguration::RuntimeConfiguration() { set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution); }
+gearoenix::render::RuntimeConfiguration::RuntimeConfiguration()
+{
+    set_runtime_reflection_radiance_resolution(runtime_reflection_radiance_resolution);
+}
 
 gearoenix::render::RuntimeConfiguration::~RuntimeConfiguration() = default;
 
@@ -21,10 +24,9 @@ void gearoenix::render::RuntimeConfiguration::write(platform::stream::Stream& s)
     s.write_fail_debug(shadow_cascades_count);
     s.write_fail_debug(runtime_reflection_environment_resolution);
     s.write_fail_debug(runtime_reflection_irradiance_resolution);
-    s.write_fail_debug(maximum_cpu_render_memory_size);
-    s.write_fail_debug(maximum_gpu_render_memory_size);
-    s.write_fail_debug(maximum_gpu_buffer_size);
-    s.write_fail_debug(maximum_dynamic_buffer_size);
+    s.write_fail_debug(maximum_allowed_textures_memory_size);
+    s.write_fail_debug(maximum_allowed_meshs_memory_size);
+    s.write_fail_debug(maximum_allowed_dynamic_buffer_size);
     s.write_fail_debug(brdflut_resolution);
     s.write_fail_debug(runtime_reflection_radiance_resolution);
     s.write_fail_debug(runtime_reflection_radiance_levels);
@@ -36,10 +38,9 @@ void gearoenix::render::RuntimeConfiguration::read(platform::stream::Stream& s)
     s.read(shadow_cascades_count);
     s.read(runtime_reflection_environment_resolution);
     s.read(runtime_reflection_irradiance_resolution);
-    s.read(maximum_cpu_render_memory_size);
-    s.read(maximum_gpu_render_memory_size);
-    s.read(maximum_gpu_buffer_size);
-    s.read(maximum_dynamic_buffer_size);
+    s.read(maximum_allowed_textures_memory_size);
+    s.read(maximum_allowed_meshs_memory_size);
+    s.read(maximum_allowed_dynamic_buffer_size);
     s.read(brdflut_resolution);
     s.read(runtime_reflection_radiance_resolution);
     s.read(runtime_reflection_radiance_levels);
@@ -83,24 +84,19 @@ void gearoenix::render::RuntimeConfiguration::show_debug_gui()
             GX_IMGUI_VAR_INPUT_UINT(runtime_reflection_irradiance_resolution);
             ImGui::TableNextColumn();
 
-            ImGui::Text("Maximum CPU Render Memory Size: ");
+            ImGui::Text("Maximum Allowed Texture Memory Size: ");
             ImGui::TableNextColumn();
-            GX_IMGUI_VAR_INPUT_UINT(maximum_cpu_render_memory_size);
-            ImGui::TableNextColumn();
-
-            ImGui::Text("Maximum GPU Render Memory Size: ");
-            ImGui::TableNextColumn();
-            GX_IMGUI_VAR_INPUT_UINT(maximum_gpu_render_memory_size);
+            GX_IMGUI_VAR_INPUT_UINT(maximum_allowed_textures_memory_size);
             ImGui::TableNextColumn();
 
-            ImGui::Text("Maximum GPU Buffer Size: ");
+            ImGui::Text("Maximum Allowed Mesh Memory Size: ");
             ImGui::TableNextColumn();
-            GX_IMGUI_VAR_INPUT_UINT(maximum_gpu_buffer_size);
+            GX_IMGUI_VAR_INPUT_UINT(maximum_allowed_meshs_memory_size);
             ImGui::TableNextColumn();
 
-            ImGui::Text("Maximum Dynamic Buffer Size: ");
+            ImGui::Text("Maximum Allowed Dynamic Buffer Size: ");
             ImGui::TableNextColumn();
-            GX_IMGUI_VAR_INPUT_UINT(maximum_dynamic_buffer_size);
+            GX_IMGUI_VAR_INPUT_UINT(maximum_allowed_dynamic_buffer_size);
             ImGui::TableNextColumn();
 
             ImGui::Text("Brdflut Resolution: ");

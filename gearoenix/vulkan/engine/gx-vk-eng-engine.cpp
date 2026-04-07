@@ -85,16 +85,16 @@ gearoenix::vulkan::engine::Engine::Engine()
     skybox_manager = std::unique_ptr<skybox::Manager>(vk_skybox_manager);
 
     bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
-        vk_scene_manager->get_uniform_indexer().get_gpu_buffer(),
-        vk_camera_manager->get_camera_uniform_indexer().get_gpu_buffer(),
-        vk_model_manager->get_model_uniform_indexer().get_gpu_buffer(),
-        vk_material_manager->get_uniform_indexer().get_gpu_buffer(),
-        vk_light_manager->get_points_uniform_indexer().get_gpu_buffer(),
-        vk_light_manager->get_directionals_uniform_indexer().get_gpu_buffer(),
-        vk_light_manager->get_directional_shadow_casters_uniform_indexer().get_gpu_buffer(),
-        vk_model_manager->get_bone_uniform_indexer().get_gpu_buffer(),
-        vk_reflection_manager->get_uniform_indexer().get_gpu_buffer(),
-        vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_gpu_buffer());
+        vk_scene_manager->get_uniform_indexer().get_uniform_buffer(),
+        vk_camera_manager->get_camera_uniform_indexer().get_uniform_buffer(),
+        vk_model_manager->get_model_uniform_indexer().get_uniform_buffer(),
+        vk_material_manager->get_uniform_indexer().get_uniform_buffer(),
+        vk_light_manager->get_points_uniform_indexer().get_uniform_buffer(),
+        vk_light_manager->get_directionals_uniform_indexer().get_uniform_buffer(),
+        vk_light_manager->get_directional_shadow_casters_uniform_indexer().get_uniform_buffer(),
+        vk_model_manager->get_bone_uniform_indexer().get_uniform_buffer(),
+        vk_reflection_manager->get_uniform_indexer().get_uniform_buffer(),
+        vk_camera_manager->get_cameras_joint_models_uniform_indexer().get_uniform_buffer());
     pipeline_manager = std::make_unique<pipeline::Manager>();
     imgui_manager = std::make_unique<ImGuiManager>();
     initialize_frame();

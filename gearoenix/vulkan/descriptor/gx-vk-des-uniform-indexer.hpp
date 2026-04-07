@@ -63,6 +63,7 @@ struct UniformIndexer : core::Singleton<UniformIndexer<GlslStruct, Policy>> {
     };
 
 private:
+    const std::uint32_t bytes_count;
     std::vector<GlslStruct> shader_datas;
     const std::shared_ptr<buffer::Uniform> uniform_buffer;
     policy_holder_t policy_holder;
@@ -70,6 +71,7 @@ private:
 public:
     explicit UniformIndexer(const std::uint32_t count)
         : core::Singleton<UniformIndexer>(this)
+        , bytes_count(count * sizeof(GlslStruct))
         , shader_datas(count)
         , uniform_buffer(buffer::Manager::get().create_uniform(count * sizeof(GlslStruct)))
     {
@@ -129,7 +131,7 @@ public:
 
     void update()
     {
-        uniform_buffer->update(shader_datas.data());
+        uniform_buffer->update(shader_datas.data(), bytes_count);
     }
 
     [[nodiscard]] std::uint32_t get_current_index() const
@@ -141,11 +143,12 @@ public:
             return policy_holder;
         }
         static_assert(IsAtomic || IsDefault);
+        return ~static_cast<std::uint32_t>(0);
     }
 
-    [[nodiscard]] buffer::Buffer& get_gpu_buffer() const
+    [[nodiscard]] const buffer::Uniform& get_uniform_buffer() const
     {
-        return *uniform_buffer->get_gpu();
+        return *uniform_buffer;
     }
 };
 }

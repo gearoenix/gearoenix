@@ -17,14 +17,31 @@ gearoenix::vulkan::buffer::Buffer::Buffer(const std::uint32_t offset, std::share
 {
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct([[maybe_unused]] const std::string& name, const std::int64_t size, const memory::Place place)
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Buffer::construct(
+    [[maybe_unused]] const std::string& name, const std::int64_t size, const memory::Place place, const bool has_dedicated_memory)
 {
+    GX_ASSERT_D(!has_dedicated_memory || place == memory::Place::Cpu);
+
     const auto& logical_device = device::Logical::get();
     const auto& physical_device = device::Physical::get();
     const auto aligned_size = size;
 
     vk::BufferUsageFlags usage;
-    if (memory::Place::Cpu == place) {
+    if (physical_device.get_unified_memory()) {
+        // On unified-memory GPUs, all buffers get the full set of usage flags
+        // since CPU and GPU share the same physical memory.
+        usage = vk::BufferUsageFlagBits::eVertexBuffer
+            | vk::BufferUsageFlagBits::eIndexBuffer
+            | vk::BufferUsageFlagBits::eUniformBuffer
+            | vk::BufferUsageFlagBits::eTransferSrc
+            | vk::BufferUsageFlagBits::eTransferDst
+            | vk::BufferUsageFlagBits::eStorageBuffer;
+        if (physical_device.get_rtx_supported()) {
+            usage |= vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR
+                | vk::BufferUsageFlagBits::eAccelerationStructureStorageKHR
+                | vk::BufferUsageFlagBits::eShaderDeviceAddress;
+        }
+    } else if (memory::Place::Cpu == place) {
         usage = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst;
     } else {
         usage = vk::BufferUsageFlagBits::eVertexBuffer
@@ -44,12 +61,19 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Bu
     const auto vulkan_data = dev.createBuffer(info);
 
     const auto mem_req = dev.getBufferMemoryRequirements(vulkan_data);
-    auto allocated_memory = memory::Manager::get().allocate(
-        static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, place);
+
+    std::shared_ptr<memory::Memory> allocated_memory;
+    if (has_dedicated_memory) {
+        allocated_memory = memory::Manager::allocate_dedicated(static_cast<std::int64_t>(mem_req.size), mem_req.memoryTypeBits, place);
+    } else {
+        allocated_memory = memory::Manager::get().allocate(static_cast<std::int64_t>(mem_req.size), static_cast<std::int64_t>(mem_req.alignment), mem_req.memoryTypeBits, place);
+    }
+
     if (nullptr == allocated_memory) {
         dev.destroyBuffer(vulkan_data);
         return nullptr;
     }
+
     dev.bindBufferMemory(vulkan_data, allocated_memory->get_vulkan_data(), allocated_memory->get_allocator()->get_offset());
     GX_VK_MARK(name, vulkan_data);
     std::shared_ptr<Buffer> result(new Buffer(0, nullptr, std::move(allocated_memory), vulkan_data));
@@ -94,6 +118,28 @@ vk::DeviceAddress gearoenix::vulkan::buffer::Buffer::get_device_address() const
 {
     const vk::BufferDeviceAddressInfo addr_info { vulkan_data };
     return device::Logical::get().get_device().getBufferAddress(addr_info) + static_cast<vk::DeviceAddress>(offset);
+}
+
+std::int64_t gearoenix::vulkan::buffer::Buffer::get_max_gpu_needed_size()
+{
+    return get_max_gpu_needed_size(device::Physical::get().get_unified_memory());
+}
+
+std::int64_t gearoenix::vulkan::buffer::Buffer::get_max_gpu_needed_size(const bool is_unified_memory)
+{
+    const auto& cfg = render::RuntimeConfiguration::get();
+    if (is_unified_memory) {
+        return cfg.get_maximum_allowed_dynamic_buffer_size() * frames_in_flight + cfg.get_maximum_allowed_meshs_memory_size();
+    }
+    return cfg.get_maximum_allowed_dynamic_buffer_size() + cfg.get_maximum_allowed_meshs_memory_size();
+}
+
+std::int64_t gearoenix::vulkan::buffer::Buffer::get_max_cpu_needed_size()
+{
+    // When device is unified we shouldn't query this.
+    GX_ASSERT_D(!device::Physical::get().get_unified_memory());
+    const auto& cfg = render::RuntimeConfiguration::get();
+    return cfg.get_maximum_allowed_dynamic_buffer_size() * frames_in_flight;
 }
 
 #endif

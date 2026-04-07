@@ -4,6 +4,7 @@
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-vk-instance.hpp"
 #include "../gx-vk-surface.hpp"
+#include "../memory/gx-vk-mem-memory.hpp"
 
 #include <algorithm>
 
@@ -189,6 +190,23 @@ void gearoenix::vulkan::device::Physical::initialize_properties()
 
     queue_family_properties = vulkan_data.getQueueFamilyProperties();
     GX_CHECK_NOT_EQUAL_D(static_cast<std::size_t>(0), queue_family_properties.size());
+
+    unified_memory = false;
+    const auto req_size_for_unified_mem = memory::Memory::get_max_gpu_needed_size(true);
+    for (std::uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i) {
+        const auto& mem_type = memory_properties.memoryTypes[i];
+        const auto& heap = memory_properties.memoryHeaps[mem_type.heapIndex];
+        const auto flags = mem_type.propertyFlags;
+        const auto& heap_size = heap.size;
+        if ((flags & vk::MemoryPropertyFlagBits::eDeviceLocal)
+            && (flags & vk::MemoryPropertyFlagBits::eHostVisible)
+            && (flags & vk::MemoryPropertyFlagBits::eHostCoherent)
+            && req_size_for_unified_mem < heap_size) {
+            unified_memory = true;
+            break;
+        }
+    }
+    GX_LOG_D("Unified memory: " << (unified_memory ? "supported" : "not supported"));
 
     auto chain = vulkan_data.getProperties2<
         vk::PhysicalDeviceProperties2,
