@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/gx-cr-singleton.hpp"
 #include "../math/gx-math-vector-4d.hpp"
 #include "gx-gl-types.hpp"

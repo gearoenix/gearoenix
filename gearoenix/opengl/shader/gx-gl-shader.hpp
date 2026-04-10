@@ -1,6 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../../platform/gx-plt-log.hpp"
 #include "../gx-gl-constants.hpp"

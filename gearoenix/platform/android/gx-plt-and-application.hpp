@@ -21,7 +21,7 @@ struct Application {
     GX_GET_VAL_PRV(bool, focused, false);
     GX_GET_VAL_PRV(bool, surface_ready, false);
     GX_GET_UPTR_PRV(GooglePlayBilling, google_play_billing);
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
     GX_GET_UPTR_PRV(GlContext, gl_context);
 #endif
 

@@ -1,5 +1,5 @@
 #include "gx-gl-texture.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../platform/stream/gx-plt-stm-local.hpp"
 #include "../platform/stream/gx-plt-stm-memory.hpp"
 #include "gx-gl-check.hpp"

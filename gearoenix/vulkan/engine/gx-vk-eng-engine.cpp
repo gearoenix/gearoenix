@@ -58,7 +58,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     , swapchain(new Swapchain())
     , memory_manager(new memory::Manager())
     , command_manager(new command::Manager())
-    , buffer_manager(new buffer::Manager())
+    , vk_buffer_manager(new buffer::Manager())
     , render_queue(new queue::Queue())
     , image_manager(new image::Manager())
     , sampler_manager(new sampler::Manager())
@@ -83,6 +83,7 @@ gearoenix::vulkan::engine::Engine::Engine()
     scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
     reflection_manager = std::unique_ptr<reflection::Manager>(vk_reflection_manager);
     skybox_manager = std::unique_ptr<skybox::Manager>(vk_skybox_manager);
+    buffer_manager = std::unique_ptr<buffer::Manager>(vk_buffer_manager);
 
     bindless_descriptor_manager = std::make_unique<descriptor::Bindless>(
         vk_scene_manager->get_uniform_indexer().get_uniform_buffer(),
@@ -182,7 +183,7 @@ void gearoenix::vulkan::engine::Engine::submit()
     vk_cmd.setCullMode(vk::CullModeFlagBits::eBack);
 
     GX_PROFILE_EXP(upload_uniforms());
-    GX_PROFILE_EXP(buffer_manager->upload_dynamics(vk_cmd));
+    GX_PROFILE_EXP(vk_buffer_manager->upload_dynamics(vk_cmd));
     GX_PROFILE_EXP(bindless_descriptor_manager->bind(vk_cmd));
     GX_PROFILE_EXP(vk_scene_manager->submit(vk_cmd));
     GX_PROFILE_EXP(imgui_manager->update());

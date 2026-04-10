@@ -22,6 +22,10 @@ namespace gearoenix::platform {
 struct Application;
 }
 
+namespace gearoenix::render::buffer {
+struct Manager;
+}
+
 namespace gearoenix::render::camera {
 struct Manager;
 }
@@ -70,40 +74,52 @@ namespace gearoenix::render::engine {
 struct Engine : core::Singleton<Engine> {
     using clock_t = std::chrono::steady_clock;
 
-    GX_GET_CREF_PRT(std::unique_ptr<core::ecs::World>, world);
-    GX_GET_CVAL_PRT(std::thread::id, jobs_thread_id);
-    GX_GET_CVAL_PRT(Type, engine_type);
-    GX_GET_UPTR_PRT(physics::Engine, physics_engine);
     GX_GET_CREF_PRT(Specification, specification);
-    GX_GET_VAL_PRT(std::uint64_t, frames_count, 2);
-    GX_GET_VAL_PRT(std::uint64_t, frame_number, 0);
-    GX_GET_VAL_PRT(std::uint64_t, next_frame_number, 1);
-    GX_GET_VAL_PRT(std::uint64_t, previous_frame_number, 1);
-    GX_GET_VAL_PRT(std::uint64_t, frame_number_from_start, static_cast<decltype(frame_number)>(-1));
-    GX_GETSET_VAL_PRT(core::fp_t, minimum_frame_time, 1.0 / 121.0); // Limit FPS
-    GX_GET_VAL_PRT(core::fp_t, delta_time, 0.0f);
-    GX_GET_UPTR_PRT(scene::Manager, scene_manager);
-    GX_GET_UPTR_PRT(mesh::Manager, mesh_manager);
-    GX_GET_UPTR_PRT(model::Manager, model_manager);
-    GX_GET_UPTR_PRT(material::Manager, material_manager);
-    GX_GET_UPTR_PRT(camera::Manager, camera_manager);
-    GX_GET_UPTR_PRT(texture::Manager, texture_manager);
-    GX_GET_UPTR_PRT(skybox::Manager, skybox_manager);
-    GX_GET_UPTR_PRT(reflection::Manager, reflection_manager);
-    GX_GET_UPTR_PRT(font::Manager, font_manager);
-    GX_GET_UPTR_PRT(light::Manager, light_manager);
-    GX_GET_UPTR_PRT(gizmo::Manager, gizmo_manager);
-    GX_GET_CREF_PRT(std::chrono::time_point<clock_t>, last_frame_time);
-    GX_GET_VAL_PRT(bool, half_depth_clip, false);
 
-    explicit Engine(Type engine_type);
+    static Type engine_type;
+    static std::thread::id jobs_thread_id;
+    static std::uint64_t frames_count; // = 2
+    static std::uint64_t frame_number; // = 0
+    static std::uint64_t next_frame_number; // = 1
+    static std::uint64_t previous_frame_number; // = 1
+    static std::uint64_t frame_number_from_start; // = static_cast<decltype(frame_number)>(-1)
+    static core::fp_t minimum_frame_time; // = 1.0 / 121.0, limits the FPS
+    static core::fp_t delta_time; // = 0.0f
+    static std::chrono::time_point<clock_t> last_frame_time;
+    static bool half_depth_clip; // = false
+
+    std::unique_ptr<core::ecs::World> world;
+    std::unique_ptr<physics::Engine> physics_engine;
+    std::unique_ptr<scene::Manager> scene_manager;
+    std::unique_ptr<mesh::Manager> mesh_manager;
+    std::unique_ptr<model::Manager> model_manager;
+    std::unique_ptr<material::Manager> material_manager;
+    std::unique_ptr<camera::Manager> camera_manager;
+    std::unique_ptr<texture::Manager> texture_manager;
+    std::unique_ptr<skybox::Manager> skybox_manager;
+    std::unique_ptr<reflection::Manager> reflection_manager;
+    std::unique_ptr<font::Manager> font_manager;
+    std::unique_ptr<light::Manager> light_manager;
+    std::unique_ptr<gizmo::Manager> gizmo_manager;
+    std::unique_ptr<buffer::Manager> buffer_manager;
+
+    explicit Engine(Type in_engine_type);
 
 public:
-    Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
+    Engine(const Engine&) = delete;
+    ~Engine() override;
+
     [[nodiscard]] static const boost::container::flat_set<Type>& get_available_engines();
     [[nodiscard]] static std::unique_ptr<Engine> construct();
-    ~Engine() override;
+    [[nodiscard]] static Type get_engine_type() { return engine_type; }
+    [[nodiscard]] static std::thread::id get_jobs_thread_id() { return jobs_thread_id; }
+    [[nodiscard]] static std::uint64_t get_frames_count() { return frames_count; }
+    [[nodiscard]] static std::uint64_t get_frame_number() { return frame_number; }
+    [[nodiscard]] static std::uint64_t get_frame_number_from_start() { return frame_number_from_start; }
+    [[nodiscard]] static core::fp_t get_delta_time() { return delta_time; }
+    [[nodiscard]] static bool get_half_depth_clip() { return half_depth_clip; }
+
     virtual void start_frame();
     virtual void end_frame();
     virtual void window_resized();

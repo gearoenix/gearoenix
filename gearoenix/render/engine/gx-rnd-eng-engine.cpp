@@ -5,6 +5,7 @@
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-runtime-configuration.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
 #include "../gizmo/gx-rnd-gzm-manager.hpp"
@@ -37,16 +38,16 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
-gearoenix::render::engine::Engine::Engine(const Type engine_type)
+gearoenix::render::engine::Engine::Engine(const Type in_engine_type)
     : Singleton(this)
     , world(new core::ecs::World())
-    , jobs_thread_id(std::this_thread::get_id())
-    , engine_type(engine_type)
     , physics_engine(new physics::Engine())
     , font_manager(new font::Manager())
     , gizmo_manager(new gizmo::Manager())
-    , last_frame_time(clock_t::now())
 {
+    jobs_thread_id = std::this_thread::get_id();
+    engine_type = in_engine_type;
+    last_frame_time = clock_t::now();
     core::job::register_current_thread();
 }
 

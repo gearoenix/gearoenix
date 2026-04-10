@@ -104,7 +104,7 @@ private:
     std::unique_ptr<command::Manager> command_manager;
     std::unique_ptr<descriptor::Bindless> bindless_descriptor_manager;
     std::unique_ptr<pipeline::Manager> pipeline_manager;
-    std::unique_ptr<buffer::Manager> buffer_manager;
+    buffer::Manager* vk_buffer_manager = nullptr;
     std::unique_ptr<ImGuiManager> imgui_manager;
     std::unique_ptr<image::Manager> image_manager;
     std::unique_ptr<sampler::Manager> sampler_manager;
@@ -121,49 +121,20 @@ private:
     std::unique_ptr<queue::Queue> render_queue;
 
     void initialize_frame();
-    void window_resized() override;
+    void upload_uniforms();
+    void submit();
 
 public:
-    [[nodiscard]] const std::unique_ptr<Instance>& get_instance() const { return instance; }
-    [[nodiscard]] const std::unique_ptr<Surface>& get_surface() const { return surface; }
-    [[nodiscard]] const std::unique_ptr<device::Physical>& get_physical_device() const { return physical_device; }
-    [[nodiscard]] const std::unique_ptr<device::Logical>& get_logical_device() const { return logical_device; }
-    [[nodiscard]] const std::unique_ptr<Swapchain>& get_swapchain() const { return swapchain; }
-    [[nodiscard]] const std::unique_ptr<memory::Manager>& get_memory_manager() const { return memory_manager; }
-    [[nodiscard]] const std::unique_ptr<command::Manager>& get_command_manager() const { return command_manager; }
-    [[nodiscard]] const std::unique_ptr<descriptor::Bindless>& get_bindless_descriptor_manager() const { return bindless_descriptor_manager; }
-    [[nodiscard]] const std::unique_ptr<pipeline::Manager>& get_pipeline_manager() const { return pipeline_manager; }
-    [[nodiscard]] const std::unique_ptr<buffer::Manager>& get_buffer_manager() const { return buffer_manager; }
-    [[nodiscard]] const std::unique_ptr<ImGuiManager>& get_imgui_manager() const { return imgui_manager; }
-    [[nodiscard]] const std::unique_ptr<image::Manager>& get_image_manager() const { return image_manager; }
-    [[nodiscard]] const std::unique_ptr<sampler::Manager>& get_sampler_manager() const { return sampler_manager; }
-    [[nodiscard]] const texture::Manager* get_vk_texture_manager() const { return vk_texture_manager; }
-    [[nodiscard]] const mesh::Manager* get_vk_mesh_manager() const { return vk_mesh_manager; }
-    [[nodiscard]] const material::Manager* get_vk_material_manager() const { return vk_material_manager; }
-    [[nodiscard]] const model::Manager* get_vk_model_manager() const { return vk_model_manager; }
-    [[nodiscard]] const light::Manager* get_vk_light_manager() const { return vk_light_manager; }
-    [[nodiscard]] const camera::Manager* get_vk_camera_manager() const { return vk_camera_manager; }
-    [[nodiscard]] const scene::Manager* get_vk_scene_manager() const { return vk_scene_manager; }
-    [[nodiscard]] const skybox::Manager* get_vk_skybox_manager() const { return vk_skybox_manager; }
-    [[nodiscard]] const reflection::Manager* get_vk_reflection_manager() const { return vk_reflection_manager; }
-    [[nodiscard]] const frames_t& get_frames() const { return frames; }
-    [[nodiscard]] const std::unique_ptr<queue::Queue>& get_render_queue() const { return render_queue; }
-
     Engine();
-    Engine(Engine&&) = delete;
-    Engine(const Engine&) = delete;
-    Engine& operator=(Engine&&) = delete;
-    Engine& operator=(const Engine&) = delete;
     ~Engine() override;
     void start_frame() override;
     void end_frame() override;
     void upload_imgui_fonts() override;
-    void submit();
     [[nodiscard]] Frame& get_current_frame();
     [[nodiscard]] const Frame& get_current_frame() const;
     [[nodiscard]] static bool is_supported();
     void flush() override;
-    void upload_uniforms();
+    void window_resized() override;
 };
 }
 #endif

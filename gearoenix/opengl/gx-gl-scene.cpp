@@ -1,5 +1,5 @@
 #include "gx-gl-scene.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/gx-cr-profiler.hpp"
 #include "../render/camera/gx-rnd-cmr-camera.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/mesh/gx-rnd-msh-buffer.hpp"
 #include "../render/mesh/gx-rnd-msh-manager.hpp"
 #include "../render/mesh/gx-rnd-msh-mesh.hpp"

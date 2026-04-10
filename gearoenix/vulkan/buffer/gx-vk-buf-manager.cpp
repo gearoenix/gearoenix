@@ -57,7 +57,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
 }
 
 gearoenix::vulkan::buffer::Manager::Manager()
-    : Singleton(this)
+    : Singleton<Manager>(this)
     , is_unified_memory(device::Physical::get().get_unified_memory())
     , device_root(create_device_root())
     , host_root(create_host_root())
@@ -82,15 +82,20 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::int64_t size)
+std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform_vk(const std::int64_t size)
 {
     const auto alignment = static_cast<std::int64_t>(device::Physical::get().get_properties().limits.minUniformBufferOffsetAlignment);
     std::vector<std::shared_ptr<Buffer>> cpus(each_frame.size());
     for (std::uint64_t fi = 0; fi < each_frame.size(); ++fi) {
         cpus[fi] = each_frame[fi]->allocate(size, alignment);
     }
-    auto gpu = is_unified_memory? nullptr: each_frame_destination->allocate(size, alignment);
-    return std::make_shared<Uniform>(std::move(cpus), std::move(gpu));
+    auto gpu = is_unified_memory ? nullptr : each_frame_destination->allocate(size, alignment);
+    return std::make_shared<Uniform>(static_cast<std::size_t>(size), std::move(cpus), std::move(gpu));
+}
+
+std::shared_ptr<gearoenix::render::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::size_t size)
+{
+    return create_uniform_vk(static_cast<std::int64_t>(size));
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create([[maybe_unused]] const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)

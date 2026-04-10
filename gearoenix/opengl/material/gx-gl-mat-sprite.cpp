@@ -1,5 +1,5 @@
 #include "gx-gl-mat-sprite.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../gx-gl-engine.hpp"

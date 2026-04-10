@@ -1,5 +1,5 @@
 #include "gx-gl-camera.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-transformation.hpp"
 #include "../render/record/gx-rnd-rcd-camera.hpp"

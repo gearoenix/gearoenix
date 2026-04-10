@@ -73,7 +73,7 @@ public:
         : core::Singleton<UniformIndexer>(this)
         , bytes_count(count * sizeof(GlslStruct))
         , shader_datas(count)
-        , uniform_buffer(buffer::Manager::get().create_uniform(count * sizeof(GlslStruct)))
+        , uniform_buffer(buffer::Manager::get().create_uniform_vk(count * sizeof(GlslStruct)))
     {
         if constexpr (IsAtomic) {
             policy_holder.store(0, std::memory_order_relaxed);

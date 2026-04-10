@@ -1,5 +1,5 @@
 #include "gx-gl-shd-gbuffers-filler.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/macro/gx-cr-mcr-stringifier.hpp"
 #include "../gx-gl-constants.hpp"
 #include "../gx-gl-engine.hpp"
