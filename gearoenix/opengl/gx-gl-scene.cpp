@@ -1,21 +1,17 @@
 #include "gx-gl-scene.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/gx-cr-profiler.hpp"
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-context.hpp"
 #include "gx-gl-label.hpp"
+#include "gx-gl-texture.hpp"
 
 #include <ranges>
 
-gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const core::fp_t layer)
-    : render::scene::Scene(entity, core::ecs::ComponentType::create_index(this), layer, std::move(name))
-{
-}
-
-gearoenix::gl::Scene::Scene(const core::object_id_t id, std::string&& name)
-    : render::scene::Scene(core::ecs::ComponentType::create_index(this), id, std::move(name))
+gearoenix::gl::Scene::Scene(core::ecs::Entity* const entity, std::string&& name, const core::fp_t layer, std::shared_ptr<render::texture::Texture2D>&& brdflut)
+    : render::scene::Scene(entity, core::ecs::ComponentType::create_index(this), layer, std::move(name), std::move(brdflut))
 {
 }
 
@@ -26,29 +22,22 @@ void gearoenix::gl::Scene::read(std::shared_ptr<Scene>&& self, std::shared_ptr<p
 
 gearoenix::gl::Scene::~Scene() = default;
 
-void gearoenix::gl::Scene::update_per_frame()
-{
-    render::scene::Scene::update_per_frame();
-}
-
 void gearoenix::gl::Scene::render_shadows(uint& current_shader)
 {
-    push_debug_group(shadow_render_pass_name);
+    GX_GL_PUSH_DEBUG_GROUP("Shadow pass of Scene {}", object_name);
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
         auto& cmr_rcd = record.cameras.cameras[index];
         GX_PROFILE_EXP(core::cast_ptr<Camera>(cmr_rcd.camera)->render_shadow(cmr_rcd, current_shader));
     }
-    pop_debug_group();
 }
 
 void gearoenix::gl::Scene::render_reflection_probes(uint& current_shader) const
 {
-    push_debug_group(shadow_reflection_probe_render_pass_name);
+    GX_GL_PUSH_DEBUG_GROUP("Reflection probe pass of Scene: {}", object_name);
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
         GX_PROFILE_EXP(core::cast_ptr<Camera>(camera.camera)->render_forward(*this, camera, current_shader));
     }
-    pop_debug_group();
 }
 
 void gearoenix::gl::Scene::render_forward(uint& current_shader)
@@ -70,11 +59,14 @@ gearoenix::gl::SceneManager::SceneManager()
 
 gearoenix::gl::SceneManager::~SceneManager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::gl::SceneManager::build(std::string&& name, core::fp_t layer) const
+void gearoenix::gl::SceneManager::build(std::string&& name, const core::fp_t layer, core::job::EndCaller<core::ecs::EntityPtr>&& end) const
 {
-    auto entity = Manager::build(std::move(name), layer);
-    entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));
-    return entity;
+    auto entity = core::ecs::Entity::construct(std::move(name), nullptr);
+    end.set_return(std::move(entity));
+    Singleton<TextureManager>::get().get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([end = std::move(end), layer](std::shared_ptr<render::texture::Texture2D>&& t) {
+        auto* const e = end.get_return().get();
+        e->add_component(core::Object::construct<Scene>(e, e->get_object_name() + "-scene", layer, std::move(t)));
+    }));
 }
 
 #endif

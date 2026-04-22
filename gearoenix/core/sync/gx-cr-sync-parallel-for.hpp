@@ -3,9 +3,9 @@
 #include <iterator>
 
 namespace gearoenix::core::sync {
-typedef void (*parallel_for_t)(unsigned int /*kernel_index*/, unsigned int /*kernels_count*/, const void*);
+typedef void (*parallel_for_t)(unsigned int /*kernel_index*/, unsigned int /*kernels_count*/, void* const /*user-data*/);
 
-void parallel(parallel_for_t fun, const void* fun_data);
+void parallel(parallel_for_t fun, void* fun_data);
 
 template <typename Iter>
 [[nodiscard]] bool advance(Iter& curr_iter, const Iter& iter_end, const auto n)
@@ -31,14 +31,14 @@ template <typename Iter>
 template <typename Iter, typename Fun>
 void parallel_for(const Iter& iter_first, const Iter& iter_end, const Fun& fun)
 {
-    const struct Context {
+    struct Context {
         const Iter& iter_first;
         const Iter& iter_end;
         const Fun& fun;
     } ctx { iter_first, iter_end, fun };
 
     if constexpr (std::random_access_iterator<Iter>) {
-        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, const void* const context) -> void {
+        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, void* const context) -> void {
             const auto& [begin_iter, end_iter, f] = *static_cast<const Context*>(context);
             const auto total = static_cast<unsigned int>(end_iter - begin_iter);
             const auto chunk = total / kernels_count;
@@ -74,14 +74,14 @@ void parallel_for(Container& container, const Fun& fun)
 template <typename Iter, typename Fun>
 void parallel_for_i(const Iter& iter_first, const Iter& iter_end, const Fun& fun)
 {
-    const struct Context {
+    struct Context {
         const Iter& iter_first;
         const Iter& iter_end;
         const Fun& fun;
     } ctx { iter_first, iter_end, fun };
 
     if constexpr (std::random_access_iterator<Iter>) {
-        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, const void* const context) -> void {
+        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, void* const context) -> void {
             const auto& [first_iter, end_iter, f] = *static_cast<const Context*>(context);
             const auto total = static_cast<unsigned int>(end_iter - first_iter);
             const auto chunk = total / kernels_count;
@@ -93,7 +93,7 @@ void parallel_for_i(const Iter& iter_first, const Iter& iter_end, const Fun& fun
                 f(*iter, i, kernel_index);
             } }, &ctx);
     } else {
-        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, const void* const context) {
+        parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, void* const context) {
             const auto& [first_iter, end_iter, f] = *static_cast<const Context*>(context);
             auto index = kernel_index;
             Iter curr_iter = first_iter;

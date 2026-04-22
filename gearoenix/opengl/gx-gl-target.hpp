@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/job/gx-cr-job-end-caller.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "../render/texture/gx-rnd-txt-target.hpp"

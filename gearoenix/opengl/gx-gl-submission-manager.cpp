@@ -181,19 +181,18 @@ void gearoenix::gl::submission::Manager::initialise_screen_vertices()
 
 void gearoenix::gl::submission::Manager::render_shadows()
 {
-    push_debug_group("render-shadows");
+    GX_GL_PUSH_DEBUG_GROUP("{}", "render-shadow-all-scenes");
     GX_GL_CHECK_D;
     glDisable(GL_BLEND);
     for (auto* const scene : scenes | std::views::values) {
         scene->render_shadows(current_shader);
     }
     GX_GL_CHECK_D;
-    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_reflection_probes()
 {
-    push_debug_group("render-reflection-probes");
+    GX_GL_PUSH_DEBUG_GROUP("{}", "render-reflection-probes");
     core::ecs::World::get().synchronised_system<RuntimeReflection>([&](const auto* const, const auto* const r) {
         constexpr std::array face_uv_axis {
             std::array { math::Vec3(0.0f, 0.0f, -1.0f), math::Vec3(0.0f, -1.0f, 0.0f), math::Vec3(1.0f, 0.0f, 0.0f) }, // PositiveX
@@ -252,7 +251,6 @@ void gearoenix::gl::submission::Manager::render_reflection_probes()
             return;
         }
     });
-    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_with_deferred()
@@ -369,16 +367,17 @@ void gearoenix::gl::submission::Manager::render_with_deferred()
 
 void gearoenix::gl::submission::Manager::render_with_forward()
 {
-    push_debug_group("render-forward");
-    for (const auto& scene : scenes | std::views::values) {
-        GX_PROFILE_EXP(scene->render_forward(current_shader));
+    {
+        GX_GL_PUSH_DEBUG_GROUP("{}", "render-forward-all-scenes");
+        for (const auto& scene : scenes | std::views::values) {
+            GX_PROFILE_EXP(scene->render_forward(current_shader));
+        }
     }
-    pop_debug_group();
 
     const auto& base_os_app = platform::Application::get().get_base();
     const auto& window_size = base_os_app.get_window_size();
 
-    push_debug_group("combine-all-cameras");
+    GX_GL_PUSH_DEBUG_GROUP("{}", "combine-all-cameras");
     ctx::set_framebuffer(0);
     ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), 0, math::Vec2<sizei>(window_size) });
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -408,19 +407,17 @@ void gearoenix::gl::submission::Manager::render_with_forward()
     }
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-    pop_debug_group();
 }
 
 void gearoenix::gl::submission::Manager::render_imgui()
 {
-    push_debug_group("render-imgui");
+    GX_GL_PUSH_DEBUG_GROUP("{}", "render-imgui");
     ImGui::Render();
     const auto& io = ImGui::GetIO();
     ctx::set_viewport_scissor_clip({ 0, 0, static_cast<sizei>(io.DisplaySize.x), static_cast<sizei>(io.DisplaySize.y) });
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     ignore_gl_errors();
-    pop_debug_group();
 }
 
 gearoenix::gl::submission::Manager::Manager()

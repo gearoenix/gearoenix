@@ -1,3 +1,4 @@
+#include <gearoenix/core/ecs/gx-cr-ecs-entity.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/constraint/gx-phs-cns-manager.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
@@ -28,7 +29,14 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
+    {
+        GxSceneManager::get().build("scene", 0.0, GxEntityEndCaller([this](GxEntityPtr&& entity) {
+            scene_entity = std::move(entity);
+            scene_is_ready();
+        }));
+    }
+
+    void scene_is_ready()
     {
         GxEndCaller<void> end([this] {
             scene_entity->add_to_world();
@@ -46,8 +54,6 @@ public:
 
         GX_LOG_D("Initialised");
     }
-
-    void update() override { Application::update(); }
 };
 
 GEAROENIX_START(GameApp);

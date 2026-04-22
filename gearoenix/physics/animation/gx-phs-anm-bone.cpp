@@ -1,6 +1,7 @@
 #include "gx-phs-anm-bone.hpp"
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
+#include "../../render/model/gx-rnd-mdl-uniform.hpp"
 #include "../gx-phs-transformation.hpp"
 
 void gearoenix::physics::animation::Bone::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end_caller)
@@ -93,13 +94,8 @@ void gearoenix::physics::animation::Bone::set_inverse_bind_matrix(const math::Ma
     bind_matrix = m.inverted().transposed();
 }
 
-void gearoenix::physics::animation::Bone::update_matrices()
+void gearoenix::physics::animation::Bone::update_uniform(GxShaderDataBone& uniform_struct) const
 {
-    global_matrix = transform->get_global_matrix() * inverse_bind_matrix;
-    transposed_inverted_global_matrix = transform->get_transposed_inverted_global_matrix() * bind_matrix;
-}
-
-void gearoenix::physics::animation::Bone::update_all_bones_after_transform_updates()
-{
-    core::ecs::World::get().parallel_system<Bone>([](auto, auto* const bone, auto) { bone->update_matrices(); });
+    uniform_struct.m = (transform->get_global_matrix() * inverse_bind_matrix).to<float>();
+    uniform_struct.inv_transpose_m = (transform->get_transposed_inverted_global_matrix() * bind_matrix).to<float>();
 }

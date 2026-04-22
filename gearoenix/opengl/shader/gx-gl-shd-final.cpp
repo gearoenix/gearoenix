@@ -1,5 +1,5 @@
 #include "gx-gl-shd-final.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 
 namespace {
 constexpr auto vertex_shader_body = R"SHADER(

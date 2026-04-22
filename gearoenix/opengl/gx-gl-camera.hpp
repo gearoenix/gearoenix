@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/camera/gx-rnd-cmr-camera.hpp"
 #include "../render/camera/gx-rnd-cmr-manager.hpp"
 #include "gx-gl-types.hpp"

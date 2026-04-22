@@ -15,16 +15,21 @@ gearoenix::vulkan::mesh::Buffer::Buffer(const math::Aabb3<core::fp_t>& box)
 
 gearoenix::vulkan::mesh::Buffer::~Buffer() = default;
 
-void gearoenix::vulkan::mesh::Buffer::construct(std::string&& name, render::Vertices&& vertices, std::vector<std::uint32_t>&& indices, const math::Aabb3<core::fp_t>& occlusion_box, core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
+void gearoenix::vulkan::mesh::Buffer::construct(
+    std::string&& name,
+    render::Vertices&& vertices,
+    std::vector<std::uint32_t>&& indices,
+    const math::Aabb3<core::fp_t>& occlusion_box,
+    core::job::EndCallerShared<render::mesh::Buffer>&& end_callback)
 {
     auto result = buffer_allocator->make_shared(occlusion_box);
     result->indices_count = static_cast<std::uint32_t>(indices.size());
 
     core::job::EndCaller end([c = std::move(end_callback), r = result] { c.set_return(r); });
 
-    auto& buf_mgr = buffer::Manager::get();
+    auto& buf_mgr = core::Singleton<buffer::Manager>::get();
     result->vertex = buf_mgr.create(name + "-vertex", render::get_data(vertices), static_cast<std::int64_t>(core::bytes_count(vertices)), core::job::EndCaller(end));
-    result->index = buf_mgr.create(name + "-index", indices.data(), static_cast<std::int64_t>(indices.size() * sizeof(std::uint32_t)), std::move(end));
+    result->index = buf_mgr.create(name + "-index", indices.data(), static_cast<std::int64_t>(indices.size()) * static_cast<std::int64_t>(sizeof(std::uint32_t)), std::move(end));
 }
 
 #endif

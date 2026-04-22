@@ -2,14 +2,8 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/material/gx-rnd-mat-manager.hpp"
-#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
-
-namespace gearoenix::vulkan::buffer {
-struct Uniform;
-}
 
 namespace gearoenix::vulkan::material {
-using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataMaterial, descriptor::IndexingPolicy::Allocator>;
 
 /// Vulkan backend's material manager.
 ///
@@ -26,18 +20,14 @@ using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataMaterial, descr
 ///   6- Most of the time OpenGL backend has the most updated implementation of the materials, so look there for further detail of the implementation of the shader and cpp codes
 ///      and apply those logics in here based on the current material implementations (like Pbr).
 struct Manager final : render::material::Manager, core::Singleton<Manager> {
-private:
-    uniform_indexer_t uniform_indexer;
-
-public:
-    [[nodiscard]] const uniform_indexer_t& get_uniform_indexer() const { return uniform_indexer; }
-
-    Manager();
-    ~Manager() override;
+protected:
     void construct_pbr(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c) override;
     void construct_unlit(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c) override;
     void construct_sprite(std::string&& name, core::job::EndCallerShared<render::material::Sprite>&& c) override;
-    void upload_uniforms();
+
+public:
+    Manager();
+    ~Manager() override;
 };
 }
 #endif

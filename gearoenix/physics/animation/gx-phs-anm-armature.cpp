@@ -15,7 +15,7 @@ void gearoenix::physics::animation::Armature::insert_bone(Bone* const bone)
     }
 }
 
-void gearoenix::physics::animation::Armature::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end)
+void gearoenix::physics::animation::Armature::write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&&, core::job::EndCaller<>&&)
 {
     GX_TODO; // I have to use an object streamer
     stream->write_fail_debug(root_bone->get_object_id());

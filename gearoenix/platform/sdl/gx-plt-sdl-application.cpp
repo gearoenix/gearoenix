@@ -130,7 +130,7 @@ bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
     return true;
 }
 
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 bool gearoenix::platform::Application::create_gl_window(const int mj, const int mn, const std::uint32_t flags)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, mj);
@@ -239,7 +239,7 @@ gearoenix::platform::Application::Application()
 gearoenix::platform::Application::~Application()
 {
     base.terminate();
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
     if (nullptr != gl_context) {
         SDL_GL_DestroyContext(gl_context);
     }
@@ -325,7 +325,7 @@ void gearoenix::platform::Application::set_clipboard(const char* const clipboard
 
 bool gearoenix::platform::Application::open_url(const char* const url) { return SDL_OpenURL(url); }
 
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const
 {
     std::uint32_t count = 0;

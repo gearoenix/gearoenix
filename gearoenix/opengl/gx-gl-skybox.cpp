@@ -1,5 +1,5 @@
 #include "gx-gl-skybox.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
 #include "gx-gl-engine.hpp"
@@ -28,7 +28,7 @@ gearoenix::gl::Skybox::~Skybox() = default;
 
 gearoenix::gl::uint gearoenix::gl::Skybox::get_vertex_object() const
 {
-    return gl_mesh->get_cached_vertex_object(); // todo these can be cached for improving
+    return gl_mesh->get_cached_vertex_object();
 }
 
 gearoenix::gl::uint gearoenix::gl::Skybox::get_index_buffer() const

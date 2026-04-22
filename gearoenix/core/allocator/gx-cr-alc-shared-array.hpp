@@ -1,6 +1,6 @@
 #pragma once
-#include "../gx-cr-build-configuration.hpp"
 #include "../../math/gx-math-numeric.hpp"
+#include "../gx-cr-build-configuration.hpp"
 #include "../macro/gx-cr-mcr-assert.hpp"
 
 #include <array>

@@ -40,8 +40,7 @@ std::uint32_t gearoenix::vulkan::memory::Manager::get_memory_type_index(const st
         // On unified-memory GPUs, prefer memory that is both device-local and host-accessible.
         // This eliminates the need for staging buffers and CPU-to-GPU copies.
         if (const auto idx = physical_device.get_memory_type_index(
-                type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal |
-                    vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent));
+                type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal | vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent));
             idx.has_value()) {
             return *idx;
         }
@@ -54,8 +53,7 @@ std::uint32_t gearoenix::vulkan::memory::Manager::get_memory_type_index(const st
         }
     }
     if (const auto idx = physical_device.get_memory_type_index(
-            type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent));
+            type_bits, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent));
         idx.has_value()) {
         return *idx;
     }

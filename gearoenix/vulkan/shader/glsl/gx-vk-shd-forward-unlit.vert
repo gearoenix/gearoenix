@@ -27,7 +27,7 @@ void main() {
     out_uv = in_uv * material.emission_roughness_factor.xy + material.emission_roughness_factor.zw;
 
     if (GX_SPEC_HAS_BONES) {
-        ivec4 bone_index = ivec4(in_bones_indices) + int(model.bones_begin_index);
+        uvec4 bone_index = uvec4(in_bones_indices) + uint(model.reflection_probe_bones_begin_reserved_reserved.y);
         mat4 m = (bones[bone_index.x].m * in_bones_weight.x) +
                  (bones[bone_index.y].m * in_bones_weight.y) +
                  (bones[bone_index.z].m * in_bones_weight.z) +

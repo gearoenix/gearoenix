@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/texture/gx-rnd-txt-manager.hpp"
 #include "../render/texture/gx-rnd-txt-texture-2d.hpp"
 #include "../render/texture/gx-rnd-txt-texture-cube.hpp"

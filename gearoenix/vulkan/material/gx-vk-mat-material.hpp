@@ -15,8 +15,6 @@ struct Material {
     constexpr static std::array<core::object_type_index_t, 0> immediate_parent_object_type_indices { };
 
 protected:
-    uniform_indexer_t::DataAccess shader_data;
-
     Material();
 
 public:

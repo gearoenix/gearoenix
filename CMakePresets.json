@@ -188,7 +188,8 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       },
-      "configurePreset": "windows-release"
+      "configurePreset": "windows-release",
+      "configuration": "Release"
     },
     {
       "name": "linux-debug",

@@ -749,12 +749,12 @@ gearoenix::vulkan::pipeline::FormatPipelinesDataHolder gearoenix::vulkan::pipeli
 
     FormatPipelinesDataHolder fp;
 
-    fp.pbr_forward            = create_pbr_forward_pipeline(colour_format);
-    fp.pbr_skinned_forward    = create_pbr_skinned_forward_pipeline(colour_format);
-    fp.unlit_forward          = create_unlit_forward_pipeline(colour_format);
-    fp.unlit_skinned_forward  = create_unlit_skinned_forward_pipeline(colour_format);
+    fp.pbr_forward = create_pbr_forward_pipeline(colour_format);
+    fp.pbr_skinned_forward = create_pbr_skinned_forward_pipeline(colour_format);
+    fp.unlit_forward = create_unlit_forward_pipeline(colour_format);
+    fp.unlit_skinned_forward = create_unlit_skinned_forward_pipeline(colour_format);
     fp.skybox_equirectangular = create_skybox_equirectangular_pipeline(colour_format);
-    fp.skybox_cube            = create_skybox_cube_pipeline(colour_format);
+    fp.skybox_cube = create_skybox_cube_pipeline(colour_format);
 
     return fp;
 }
@@ -766,12 +766,12 @@ void gearoenix::vulkan::pipeline::Manager::set(AllPipelines& pipelines, const vk
         fp = create_format_pipelines(colour_format);
     }
 
-    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_forward_index)]            = fp.pbr_forward->get_vulkan_data();
-    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_skinned_forward_index)]    = fp.pbr_skinned_forward->get_vulkan_data();
-    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_forward_index)]          = fp.unlit_forward->get_vulkan_data();
-    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_skinned_forward_index)]  = fp.unlit_skinned_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_forward_index)] = fp.pbr_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::pbr_skinned_forward_index)] = fp.pbr_skinned_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_forward_index)] = fp.unlit_forward->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::unlit_skinned_forward_index)] = fp.unlit_skinned_forward->get_vulkan_data();
     pipelines[static_cast<std::size_t>(FormatPipelinesIndices::skybox_equirectangular_index)] = fp.skybox_equirectangular->get_vulkan_data();
-    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::skybox_cube_index)]            = fp.skybox_cube->get_vulkan_data();
+    pipelines[static_cast<std::size_t>(FormatPipelinesIndices::skybox_cube_index)] = fp.skybox_cube->get_vulkan_data();
 }
 
 void gearoenix::vulkan::pipeline::Manager::set(AllPipelines& pipelines) const

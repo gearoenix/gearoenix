@@ -5,6 +5,7 @@
 #include "../../physics/gx-phs-engine.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-runtime-configuration.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../font/gx-rnd-fnt-manager.hpp"
 #include "../gizmo/gx-rnd-gzm-manager.hpp"
@@ -37,16 +38,28 @@
 #include "../../opengl/gx-gl-engine.hpp"
 #endif
 
-gearoenix::render::engine::Engine::Engine(const Type engine_type)
+gearoenix::render::engine::Type gearoenix::render::engine::Engine::engine_type;
+std::thread::id gearoenix::render::engine::Engine::jobs_thread_id;
+std::uint8_t gearoenix::render::engine::Engine::frames_count = static_cast<std::uint8_t>(-1);
+std::uint8_t gearoenix::render::engine::Engine::frame_number = 0;
+std::uint8_t gearoenix::render::engine::Engine::next_frame_number = static_cast<std::uint8_t>(-1);
+std::uint8_t gearoenix::render::engine::Engine::previous_frame_number = static_cast<std::uint8_t>(-1);
+std::uint64_t gearoenix::render::engine::Engine::frame_number_from_start = static_cast<std::uint64_t>(-1);
+gearoenix::core::fp_t gearoenix::render::engine::Engine::minimum_frame_time = 1.0 / 121.0;
+gearoenix::core::fp_t gearoenix::render::engine::Engine::delta_time = 0.0f;
+std::chrono::time_point<gearoenix::render::engine::Engine::clock_t> gearoenix::render::engine::Engine::last_frame_time = clock_t::now();
+bool gearoenix::render::engine::Engine::half_depth_clip = false;
+
+gearoenix::render::engine::Engine::Engine(const Type in_engine_type)
     : Singleton(this)
     , world(new core::ecs::World())
-    , jobs_thread_id(std::this_thread::get_id())
-    , engine_type(engine_type)
     , physics_engine(new physics::Engine())
     , font_manager(new font::Manager())
     , gizmo_manager(new gizmo::Manager())
-    , last_frame_time(clock_t::now())
 {
+    jobs_thread_id = std::this_thread::get_id();
+    engine_type = in_engine_type;
+    last_frame_time = clock_t::now();
     core::job::register_current_thread();
 }
 
@@ -139,20 +152,21 @@ void gearoenix::render::engine::Engine::start_frame()
             counter = 0.0;
         }
     }
+
+    GX_PROFILE_EXP(buffer_manager->start_frame());
 }
 
 void gearoenix::render::engine::Engine::end_frame()
 {
     // Don't mistake the following with the actual start of a frame.
     // In start_frame of Engine, we prepare everything for the interactions of the user of the engine.
-
     GX_PROFILE_EXP(physics_engine->start_frame());
-    GX_PROFILE_EXP(model_manager->update());
     GX_PROFILE_EXP(camera_manager->update());
     GX_PROFILE_EXP(light_manager->update());
     GX_PROFILE_EXP(reflection_manager->update());
     GX_PROFILE_EXP(scene_manager->update());
     GX_PROFILE_EXP(physics_engine->end_frame());
+    GX_PROFILE_EXP(buffer_manager->end_frame());
 }
 
 void gearoenix::render::engine::Engine::window_resized()
@@ -162,9 +176,9 @@ void gearoenix::render::engine::Engine::window_resized()
 
 void gearoenix::render::engine::Engine::show_debug_gui()
 {
-    imgui::tree_scope(this, [this] {
+    imgui::tree_scope(this, [] {
         ImGui::Text("Type: %s", to_string(engine_type));
-        ImGui::Text("Frames Count: %" PRIu64, frames_count);
+        ImGui::Text("Frames Count: %" PRIu8, frames_count);
         core::ecs::World::get().show_debug_gui();
         // TODO: I have to show all other things
     });

@@ -9,7 +9,7 @@
 namespace gearoenix::vulkan::pipeline {
 struct Pipeline;
 
-enum struct FormatPipelinesIndices: std::uint8_t {
+enum struct FormatPipelinesIndices : std::uint8_t {
     pbr_forward_index = 0,
     pbr_skinned_forward_index = 1,
     unlit_forward_index = 2,
@@ -20,7 +20,7 @@ enum struct FormatPipelinesIndices: std::uint8_t {
     count = 6,
 };
 
-enum struct ShadowPipelinesIndices: std::uint8_t {
+enum struct ShadowPipelinesIndices : std::uint8_t {
     no_skin_index = static_cast<std::uint8_t>(FormatPipelinesIndices::count),
     skinned_index = no_skin_index + 1,
 

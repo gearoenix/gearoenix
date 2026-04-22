@@ -63,10 +63,13 @@ void gearoenix::editor::ui::MenuScene::show_new_popup()
     ImGui::SetCursorPosX(second_button_start_ratio * window_width);
     if (new_scene_valid_name && ImGui::Button("Create New Scene", ImVec2(button_width, 0.0f))) {
         is_new_popup_open = false;
-        auto entity = render::scene::Manager::get().build(std::move(new_scene_name), new_scene_priority);
-        entity->add_to_world();
-        set_current_scene(entity.get());
-        active_scenes.emplace(std::move(entity));
+        render::scene::Manager::get().build(
+            std::move(new_scene_name), new_scene_priority,
+            core::job::EndCaller<core::ecs::EntityPtr>([this](core::ecs::EntityPtr&& entity) {
+                entity->add_to_world();
+                set_current_scene(entity.get());
+                active_scenes.emplace(std::move(entity));
+            }));
     }
 
     ImGui::EndPopup();

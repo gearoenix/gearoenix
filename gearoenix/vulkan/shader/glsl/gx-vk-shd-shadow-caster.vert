@@ -18,18 +18,18 @@ void main() {
     out_uv = in_uv;
 
     if (GX_SPEC_HAS_BONES) {
-        GxShaderDataModel model = models[pc.model_index];
-        GxShaderDataCamera camera = cameras[pc.camera_index];
+        const GxShaderDataModel model = models[pc.model_index];
+        const GxShaderDataCamera camera = cameras[pc.camera_index];
 
-        ivec4 bone_index = ivec4(in_bones_indices) + int(model.bones_begin_index);
-        mat4 m = (bones[bone_index.x].m * in_bones_weight.x) +
+        const uvec4 bone_index = uvec4(in_bones_indices) + uint(model.reflection_probe_bones_begin_reserved_reserved.y);
+        const mat4 m = (bones[bone_index.x].m * in_bones_weight.x) +
                  (bones[bone_index.y].m * in_bones_weight.y) +
                  (bones[bone_index.z].m * in_bones_weight.z) +
                  (bones[bone_index.w].m * in_bones_weight.w);
 
         gl_Position = camera.view_projection * m * vec4(in_position, 1.0);
     } else {
-        GxShaderDataCameraJointModel cjm = cameras_joint_models[pc.camera_model_index];
+        const GxShaderDataCameraJointModel cjm = cameras_joint_models[pc.camera_model_index];
         gl_Position = cjm.mvp * vec4(in_position, 1.0);
     }
 }

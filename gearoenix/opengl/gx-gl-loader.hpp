@@ -19,12 +19,17 @@ typedef void(GX_GL_APIENTRY ActiveTextureFnp)(enumerated texture);
 typedef void(GX_GL_APIENTRY AttachShaderFnp)(uint program, uint shader);
 typedef void(GX_GL_APIENTRY BindAttribLocationFnp)(uint program, uint index, const char* name);
 typedef void(GX_GL_APIENTRY BindBufferFnp)(enumerated, uint);
+typedef void(GX_GL_APIENTRY BindBufferBaseFnp)(enumerated target, uint index, uint buffer);
+typedef void(GX_GL_APIENTRY BindBufferRangeFnp)(enumerated target, uint index, uint buffer, sizeiptr offset, sizeiptr size);
 typedef void(GX_GL_APIENTRY BindFramebufferFnp)(enumerated target, uint framebuffer);
 typedef void(GX_GL_APIENTRY BindRenderbufferFnp)(enumerated target, uint renderbuffer);
 typedef void(GX_GL_APIENTRY BindTextureFnp)(enumerated, uint);
 typedef void(GX_GL_APIENTRY BindVertexArrayFnp)(uint arr);
 typedef void(GX_GL_APIENTRY BlendFuncFnp)(enumerated, enumerated);
 typedef void(GX_GL_APIENTRY BufferDataFnp)(enumerated, sizeiptr, const void*, enumerated);
+typedef void(GX_GL_APIENTRY BufferSubDataFnp)(enumerated target, sizeiptr offset, sizeiptr size, const void* data);
+typedef void*(GX_GL_APIENTRY MapBufferRangeFnp)(enumerated target, sizeiptr offset, sizeiptr length, bitfield access);
+typedef boolean(GX_GL_APIENTRY UnmapBufferFnp)(enumerated target);
 typedef enumerated(GX_GL_APIENTRY CheckFramebufferStatusFnp)(enumerated target);
 typedef void(GX_GL_APIENTRY ClearColorFnp)(float, float, float, float);
 typedef void(GX_GL_APIENTRY ClearFnp)(bitfield);
@@ -102,12 +107,15 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(AttachShader);            \
     gx_gl_function_map_arg(BindAttribLocation);      \
     gx_gl_function_map_arg(BindBuffer);              \
+    gx_gl_function_map_arg(BindBufferBase);          \
+    gx_gl_function_map_arg(BindBufferRange);         \
     gx_gl_function_map_arg(BindFramebuffer);         \
     gx_gl_function_map_arg(BindRenderbuffer);        \
     gx_gl_function_map_arg(BindTexture);             \
     gx_gl_function_map_arg(BindVertexArray);         \
     gx_gl_function_map_arg(BlendFunc);               \
     gx_gl_function_map_arg(BufferData);              \
+    gx_gl_function_map_arg(BufferSubData);           \
     gx_gl_function_map_arg(CheckFramebufferStatus);  \
     gx_gl_function_map_arg(ClearColor);              \
     gx_gl_function_map_arg(Clear);                   \
@@ -177,9 +185,11 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
 
 #define GX_GL_OPTIONAL_FUNCTION_MAP(gx_gl_function_map_arg) \
     gx_gl_function_map_arg(DebugMessageCallback);           \
+    gx_gl_function_map_arg(MapBufferRange);                 \
     gx_gl_function_map_arg(ObjectLabel);                    \
     gx_gl_function_map_arg(PopDebugGroup);                  \
-    gx_gl_function_map_arg(PushDebugGroup)
+    gx_gl_function_map_arg(PushDebugGroup);                 \
+    gx_gl_function_map_arg(UnmapBuffer)
 
 #define GX_GL_FUNCTION_DECL(gx_gl_function) extern gx_gl_function##Fnp gl##gx_gl_function
 

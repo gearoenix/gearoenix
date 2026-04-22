@@ -16,7 +16,11 @@ gearoenix::render::model::Manager::Manager()
 gearoenix::render::model::Manager::~Manager() = default;
 
 gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(
-    std::string&& name, core::ecs::Entity* const parent, meshes_set_t&& meshes, const bool, const bool)
+    std::string&& name,
+    core::ecs::Entity* parent,
+    meshes_set_t&& meshes,
+    const bool,
+    std::shared_ptr<physics::animation::Armature>&&)
 {
     auto entity = core::ecs::Entity::construct(std::move(name), parent);
     math::Aabb3<core::fp_t> box;
@@ -28,5 +32,3 @@ gearoenix::core::ecs::EntityPtr gearoenix::render::model::Manager::build(
     entity->add_component(std::move(transform));
     return entity;
 }
-
-void gearoenix::render::model::Manager::update() { }

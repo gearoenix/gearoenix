@@ -482,7 +482,7 @@ void gearoenix::render::texture::Manager::create_target(std::string&& name, std:
                 GX_ASSERT_D(attachments[i].shallow_equal(t->get_attachments()[i]));
             }
 #endif
-            c.set_return(std::move(t));
+            c.set_return_if_empty(std::move(t));
         }))) {
         return;
     }

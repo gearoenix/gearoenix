@@ -1,6 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../render/texture/gx-rnd-txt-target.hpp"
 #include "../gx-vk-loader.hpp"

@@ -1,5 +1,6 @@
 #include "gx-gl-mat-unlit.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
+#include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../gx-gl-engine.hpp"
@@ -26,11 +27,11 @@ void gearoenix::gl::material::Unlit::construct(std::string&& name, core::job::En
 
 gearoenix::gl::material::Unlit::~Unlit() = default;
 
-void gearoenix::gl::material::Unlit::shadow(const Mesh& mesh, const render::record::Camera& cam, const render::record::CameraModel& cmm, uint& current_shader)
+void gearoenix::gl::material::Unlit::shadow(const Mesh& mesh, const render::record::Camera&, const render::record::CameraModel& cmm, uint& current_shader)
 {
-    auto& shadow_caster_shader = shadow_caster_combination->get(cmm.model->bones_count);
+    auto& shadow_caster_shader = shadow_caster_combination->get(cmm.model->model->get_bones_count());
     shadow_caster_shader.bind(current_shader);
-    shadow_caster_shader.set_mvp_data(cam.mvps[cmm.first_mvp_index].data());
+    shadow_caster_shader.set_mvp_data(cmm.get_first_mvp().mvp.data());
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff);
     shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(reinterpret_cast<const float*>(&alpha_factor_alpha_cutoff));
 
@@ -41,11 +42,11 @@ void gearoenix::gl::material::Unlit::shadow(const Mesh& mesh, const render::reco
     glDrawElements(GL_TRIANGLES, mesh.get_cached_indices_count(), GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Unlit::render_forward(const Scene&, const render::record::Camera& cam, const render::record::CameraModel& cmm, const Mesh& mesh, uint& current_shader)
+void gearoenix::gl::material::Unlit::render_forward(const Scene&, const render::record::Camera&, const render::record::CameraModel& cmm, const Mesh& mesh, uint& current_shader)
 {
     const auto& shader = unlit_combination->get(false, true, true, true);
     shader.bind(current_shader);
-    shader.set_mvp_data(cam.mvps[cmm.first_mvp_index].data());
+    shader.set_mvp_data(cmm.get_first_mvp().mvp.data());
     shader.set_albedo_factor_data(albedo_factor.data());
     shader.set_alpha_cutoff_data(&alpha_cutoff);
     glActiveTexture(GL_TEXTURE0 + shader.get_albedo_index());

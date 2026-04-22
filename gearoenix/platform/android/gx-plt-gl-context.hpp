@@ -2,7 +2,7 @@
 #include "../gx-plt-build-configuration.hpp"
 #ifdef GX_PLATFORM_INTERFACE_ANDROID
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>

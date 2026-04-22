@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             auto gxq = transform->get_rotation().get_quat();
             auto glmq = glm::quat_cast(glmm);
 
-            if (!gxq.safe_equal(math::Quat<core::fp_t>(glmq.x, glmq.y, glmq.z, glmq.w))) {
+            if (!gxq.safe_equal(math::Quat(glmq.x, glmq.y, glmq.z, glmq.w).to<core::fp_t>())) {
                 GX_TEST_FLOAT_NEAR(gxq.w, glmq.w);
                 GX_TEST_FLOAT_NEAR(gxq.x, glmq.x);
                 GX_TEST_FLOAT_NEAR(gxq.y, glmq.y);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             math::Mat4x4<core::fp_t> local;
             for (int i = 0; i < 4; ++i) {
                 for (int j = 0; j < 4; ++j) {
-                    local[i][j] = glmm[i][j];
+                    local[i][j] = static_cast<core::fp_t>(glmm[i][j]);
                 }
             }
 
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(gearoenix_physics_transformation)
             const auto gxs = transform->get_scale();
             const auto gxq = transform->get_rotation().get_quat();
 
-            BOOST_TEST_CHECK(gxt.equal(math::Vec3<core::fp_t>(tran.x, tran.y, tran.z)));
-            BOOST_TEST_CHECK(gxs.equal(math::Vec3<core::fp_t>(scale.x, scale.y, scale.z)));
-            BOOST_TEST_CHECK(gxq.safe_equal(math::Quat<core::fp_t>(rot.x, rot.y, rot.z, rot.w)));
+            BOOST_TEST_CHECK(gxt.equal(math::Vec3(tran.x, tran.y, tran.z).to<core::fp_t>()));
+            BOOST_TEST_CHECK(gxs.equal(math::Vec3(scale.x, scale.y, scale.z).to<core::fp_t>()));
+            BOOST_TEST_CHECK(gxq.safe_equal(math::Quat(rot.x, rot.y, rot.z, rot.w).to<core::fp_t>()));
         }
         world.update();
     }

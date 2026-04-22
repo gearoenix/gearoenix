@@ -1,5 +1,5 @@
 #include "gx-gl-material.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../platform/gx-plt-log.hpp"
 
 gearoenix::gl::material::Material::Material() = default;

@@ -24,31 +24,15 @@ gearoenix::physics::Engine::~Engine() = default;
 
 void gearoenix::physics::Engine::start_frame()
 {
-    GX_PROFILE_SCOPE(physics_start_frame);
-
-    {
-        GX_PROFILE_SCOPE(physics - start - animation_manager->update);
-        animation_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(physics - start - constraint_manager->update);
-        constraint_manager->update();
-    }
-    {
-        GX_PROFILE_SCOPE(physics - start - transformations->update);
-        Transformation::update();
-    }
-    {
-        GX_PROFILE_SCOPE(physics - start - bones->update);
-        animation::Bone::update_all_bones_after_transform_updates();
-    }
-    {
-        GX_PROFILE_SCOPE(physics - start - colliders->update);
-        collider::Collider::update_all_after_transform_update();
-    }
+    GX_PROFILE_EXP(animation_manager->update());
+    GX_PROFILE_EXP(constraint_manager->update());
+    GX_PROFILE_EXP(Transformation::update());
+    GX_PROFILE_EXP(collider::Collider::update_all_after_transform_update());
 }
 
 void gearoenix::physics::Engine::end_frame()
 {
-    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) { transform->clear_change(); });
+    core::ecs::World::get().parallel_system<Transformation>([&](const auto, auto* const transform, const auto) {
+        transform->clear_change();
+    });
 }

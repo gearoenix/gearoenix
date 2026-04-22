@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/camera/gx-rnd-cmr-manager.hpp"
-#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../gx-vk-loader.hpp"
 
 #include <memory>
@@ -36,9 +35,6 @@ struct ColourCorrectionPushConstants final {
 static_assert(sizeof(ColourCorrectionPushConstants) == 16);
 
 struct Manager final : render::camera::Manager, core::Singleton<Manager> {
-public:
-    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataCamera>& get_camera_uniform_indexer() const { return camera_uniform_indexer; }
-    [[nodiscard]] const descriptor::UniformIndexer<GxShaderDataCameraJointModel>& get_cameras_joint_models_uniform_indexer() const { return cameras_joint_models_uniform_indexer; }
     [[nodiscard]] vk::DescriptorSetLayout get_bloom_descriptor_set_layout() const { return *bloom_descriptor_set_layout; }
     [[nodiscard]] vk::Sampler get_bloom_sampler() const { return *bloom_sampler; }
     [[nodiscard]] vk::PipelineLayout get_bloom_pipeline_layout() const { return *bloom_pipeline_layout; }
@@ -51,9 +47,6 @@ public:
     [[nodiscard]] const std::shared_ptr<pipeline::Pipeline>& get_ctaa_pipeline() const { return ctaa_pipeline; }
 
 private:
-    descriptor::UniformIndexer<GxShaderDataCamera> camera_uniform_indexer;
-    descriptor::UniformIndexer<GxShaderDataCameraJointModel> cameras_joint_models_uniform_indexer;
-
     vk::raii::DescriptorSetLayout bloom_descriptor_set_layout { nullptr };
     vk::raii::Sampler bloom_sampler { nullptr };
     vk::raii::PipelineLayout bloom_pipeline_layout { nullptr };
@@ -85,7 +78,6 @@ public:
     void build(std::string&& name, core::ecs::Entity* parent, core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
     void window_resized() override;
     void update() override;
-    void upload_uniforms();
 };
 }
 

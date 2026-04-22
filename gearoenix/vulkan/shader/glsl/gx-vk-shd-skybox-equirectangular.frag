@@ -16,5 +16,5 @@ void main() {
     const vec3 v = normalize(in_pos);
     const vec2 uv = 0.5 - vec2(atan(v.y, v.x), asin(v.z)) * inv_atan;
 
-    frag_out = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), uv) * material.albedo_factor;
+    frag_out = sample_texture_2d(material.albedo_normal_texture_sampler_index.xy, uv) * material.albedo_factor;
 }

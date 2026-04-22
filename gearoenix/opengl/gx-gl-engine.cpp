@@ -1,8 +1,9 @@
 #include "gx-gl-engine.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-engine.hpp"
 #include "../platform/gx-plt-application.hpp"
+#include "buffer/gx-gl-buf-manager.hpp"
 #include "gx-gl-camera.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
@@ -69,6 +70,9 @@ gearoenix::gl::Engine::Engine()
             extension_exists("GL_OES_texture_half_float_linear"));
     specification.is_deferred_supported = false;
 
+    gl_buffer_manager = new buffer::Manager();
+    buffer_manager = std::unique_ptr<buffer::Manager>(gl_buffer_manager);
+    GX_GL_CHECK_D;
     scene_manager = std::make_unique<SceneManager>();
     GX_GL_CHECK_D;
     camera_manager = std::make_unique<CameraManager>();
@@ -100,6 +104,7 @@ gearoenix::gl::Engine::~Engine()
     physics_engine = nullptr;
     material_manager = nullptr;
     reflection_manager = nullptr;
+    buffer_manager = nullptr;
     core::job::execute_current_thread_jobs();
     ImGui_ImplOpenGL3_Shutdown();
 }
@@ -109,7 +114,6 @@ void gearoenix::gl::Engine::start_frame()
     core::job::execute_current_thread_jobs();
     render::engine::Engine::start_frame();
     core::job::execute_current_thread_jobs();
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 }
@@ -150,7 +154,10 @@ void gearoenix::gl::Engine::set_es_profile()
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-bool gearoenix::gl::Engine::is_es_profile() { return is_es_profile_activated; }
+bool gearoenix::gl::Engine::is_es_profile()
+{
+    return is_es_profile_activated;
+}
 
 void gearoenix::gl::Engine::set_core_profile()
 {
@@ -158,7 +165,10 @@ void gearoenix::gl::Engine::set_core_profile()
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-bool gearoenix::gl::Engine::is_core_profile() { return !is_es_profile_activated; }
+bool gearoenix::gl::Engine::is_core_profile()
+{
+    return !is_es_profile_activated;
+}
 
 void gearoenix::gl::Engine::set_gl_version(const int major, const int minor)
 {
@@ -167,6 +177,9 @@ void gearoenix::gl::Engine::set_gl_version(const int major, const int minor)
     shader::Shader::set_profile(is_es_profile_activated, profile_major_version, profile_minor_version);
 }
 
-std::pair<int, int> gearoenix::gl::Engine::get_gl_version() { return { profile_major_version, profile_minor_version }; }
+std::pair<int, int> gearoenix::gl::Engine::get_gl_version()
+{
+    return { profile_major_version, profile_minor_version };
+}
 
 #endif

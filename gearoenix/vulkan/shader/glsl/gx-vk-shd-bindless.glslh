@@ -75,4 +75,22 @@ layout(push_constant) uniform PushConstants {
     uint camera_model_index;
 } pc;
 
+// ========== Bindless Sampling Helpers ==========
+// ts_index.x is the texture index, ts_index.y is the sampler index.
+vec4 sample_texture_2d(const uvec2 ts_index, const vec2 uv) {
+    return texture(sampler2D(textures_2d[ts_index.x], samplers[ts_index.y]), uv);
+}
+
+vec4 sample_texture_cube(const uvec2 ts_index, const vec3 dir) {
+    return texture(samplerCube(textures_cube[ts_index.x], samplers[ts_index.y]), dir);
+}
+
+vec4 sample_texture_cube_lod(const uvec2 ts_index, const vec3 dir, const float lod) {
+    return textureLod(samplerCube(textures_cube[ts_index.x], samplers[ts_index.y]), dir, lod);
+}
+
+float sample_shadow_2d_cmp(const uint shadow_texture_index, const vec3 uv_depth) {
+    return texture(sampler2DShadow(shadow_textures_2d[shadow_texture_index], shadow_sampler_cmp), uv_depth);
+}
+
 #endif

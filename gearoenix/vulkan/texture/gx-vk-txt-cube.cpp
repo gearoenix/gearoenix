@@ -18,7 +18,6 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::Text
           static_cast<std::uint32_t>(compute_mipmaps_count(info)), 6u, convert_image_format(info.get_format()),
           vk::ImageCreateFlagBits::eCubeCompatible,
           vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eStorage | (render::texture::format_is_depth(info.get_format()) ? vk::ImageUsageFlagBits::eDepthStencilAttachment : vk::ImageUsageFlagBits::eColorAttachment))))
-    , view_index(descriptor::Bindless::get().allocate_cube_image(view))
     , mips([this] {
         std::array<std::vector<std::shared_ptr<image::View>>, 6> result;
         const auto mip_count = view->get_image()->get_mipmap_levels();
@@ -30,8 +29,9 @@ gearoenix::vulkan::texture::TextureCube::TextureCube(const render::texture::Text
         }
         return result;
     }())
-    , sampler_index(sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index())
 {
+    shader_resource_index = descriptor::Bindless::get().allocate_cube_image(view);
+    sampler_shader_resource_index = sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index();
 }
 
 gearoenix::vulkan::texture::TextureCube::~TextureCube() = default;

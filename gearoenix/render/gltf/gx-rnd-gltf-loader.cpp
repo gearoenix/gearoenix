@@ -18,13 +18,16 @@ void load_scenes(const std::shared_ptr<Context>& ctx, const core::job::EndCaller
             (void)ctx;
         });
         for (int index = 0; index < ctx->data.scenes.size(); ++index) {
-            const auto& scn = ctx->data.scenes[index];
-            GX_LOG_D("Loading scene: " << scn.name);
-            auto scene_entity = scene::Manager::get().build(std::string(scn.name), 0.0);
-            for (const int scene_node_index : scn.nodes) {
-                ctx->nodes.process(scene_node_index, scene_entity.get(), gpu_end_callback);
-            }
-            scenes_end_callback.get_return()[index] = std::move(scene_entity);
+            scene::Manager::get().build(
+                std::string(ctx->data.scenes[index].name), 0.0,
+                core::job::EndCaller<core::ecs::EntityPtr>([gpu_end_callback, index, ctx, scenes_end_callback](core::ecs::EntityPtr&& scene_entity) {
+                    const auto& scn = ctx->data.scenes[index];
+                    GX_LOG_D("Loading scene: " << scn.name);
+                    for (const int scene_node_index : scn.nodes) {
+                        ctx->nodes.process(scene_node_index, scene_entity.get(), gpu_end_callback);
+                    }
+                    scenes_end_callback.get_return()[index] = std::move(scene_entity);
+                }));
         }
     });
 

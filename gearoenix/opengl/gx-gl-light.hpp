@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/light/gx-rnd-lt-directional.hpp"
 #include "../render/light/gx-rnd-lt-manager.hpp"
 #include "gx-gl-types.hpp"
@@ -13,6 +13,8 @@ struct ShadowCasterDirectionalLight final : render::light::ShadowCasterDirection
     constexpr static auto object_type_index = gearoenix_gapi_light_shadow_caster_directional_type_index;
     constexpr static std::array all_parent_object_type_indices { ShadowCasterDirectional::object_type_index, Light::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { ShadowCasterDirectional::object_type_index };
+
+    static std::array<std::pair<uint, render::buffer::Uniform*>, max_count> shadow_maps_uniforms;
 
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, shadow_map_texture);
     GX_GET_CREF_PRV(std::shared_ptr<Target>, shadow_map_target);

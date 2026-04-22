@@ -1,7 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
-#include "../../render/model/gx-rnd-mdl-manager.hpp"
 #include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../mesh/gx-vk-msh-draw-cache.hpp"
 
@@ -39,19 +38,19 @@ struct Model final : render::model::Model {
 
 private:
     draw_caches_t draw_caches;
-    std::uint64_t last_update_frame = static_cast<std::uint64_t>(-1);
-    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
 
-    Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable, bool is_skinned);
+    Model(
+        core::ecs::Entity* entity,
+        bool is_transformable,
+        std::shared_ptr<physics::Transformation>&& transformation,
+        render::model::meshes_set_t&&,
+        std::string&& name,
+        std::shared_ptr<physics::animation::Armature>&&);
 
 public:
-    [[nodiscard]] std::uint64_t get_last_update_frame() const { return last_update_frame; }
-    [[nodiscard]] std::uint32_t get_shader_data_index() const { return shader_data_index; }
-
     ~Model() override;
     void render_shadow(DrawState& draw_state);
     void render_forward(DrawState& draw_state);
-    void after_record(std::uint64_t frame_number, const render::record::CameraModel& rec_cam_mdl);
 };
 }
 #endif

@@ -4,7 +4,7 @@
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "gx-plt-x11-key.hpp"
 
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../../vulkan/gx-vk-loader.hpp"
 #endif
 
@@ -102,7 +102,7 @@ void gearoenix::platform::Application::run(core::Application* const core_app)
     }
 }
 
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 std::vector<const char*> gearoenix::platform::Application::get_vulkan_extensions() const { return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME }; }
 #endif
 

@@ -4,10 +4,10 @@
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../../platform/gx-plt-log.hpp"
+#include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
-#include "../buffer/gx-vk-buf-buffer.hpp"
 
 gearoenix::vulkan::memory::Memory::Memory(
     std::shared_ptr<Memory> parent,
@@ -66,14 +66,14 @@ std::int64_t gearoenix::vulkan::memory::Memory::get_max_cpu_needed_size()
 
 std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place in_place, const std::uint32_t type_index)
 {
-    const auto place = device::Physical::get().get_unified_memory()? Place::Gpu: in_place;
+    const auto place = device::Physical::get().get_unified_memory() ? Place::Gpu : in_place;
     const auto size = static_cast<vk::DeviceSize>(place == Place::Gpu ? get_max_gpu_needed_size() : get_max_cpu_needed_size());
     return construct(place, type_index, size);
 }
 
 std::shared_ptr<gearoenix::vulkan::memory::Memory> gearoenix::vulkan::memory::Memory::construct(const Place in_place, const std::uint32_t type_index, const vk::DeviceSize size)
 {
-    const auto place = device::Physical::get().get_unified_memory()? Place::Gpu: in_place;
+    const auto place = device::Physical::get().get_unified_memory() ? Place::Gpu : in_place;
     const auto is_gpu = place == Place::Gpu;
 
     const auto& mem_props = device::Physical::get().get_memory_properties();

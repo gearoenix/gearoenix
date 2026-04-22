@@ -5,6 +5,7 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/gx-plt-application.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../camera/gx-vk-cmr-camera.hpp"
 #include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
@@ -16,6 +17,7 @@
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../reflection/gx-vk-rfl-manager.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
+#include "../texture/gx-vk-txt-manager.hpp"
 #include "../texture/gx-vk-txt-target.hpp"
 #include "gx-vk-scn-scene.hpp"
 
@@ -29,35 +31,33 @@ boost::container::flat_set<std::pair<gearoenix::core::fp_t, gearoenix::vulkan::s
 
 gearoenix::vulkan::scene::Manager::Manager()
     : Singleton<Manager>(this)
-    , uniform_indexer(Scene::max_count)
 {
     core::ecs::ComponentType::add<Scene>();
 }
 
 gearoenix::vulkan::scene::Manager::~Manager() = default;
 
-gearoenix::core::ecs::EntityPtr gearoenix::vulkan::scene::Manager::build(std::string&& name, core::fp_t layer) const
+void gearoenix::vulkan::scene::Manager::build(std::string&& name, core::fp_t layer, core::job::EndCaller<core::ecs::EntityPtr>&& end) const
 {
-    auto entity = render::scene::Manager::build(std::move(name), layer);
-    entity->add_component(core::Object::construct<Scene>(entity.get(), entity->get_object_name() + "-scene", layer));
-    return entity;
+    auto entity = core::ecs::Entity::construct(std::move(name), nullptr);
+    end.set_return(std::move(entity));
+    Singleton<texture::Manager>::get().get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>(
+        [end = std::move(end), layer](std::shared_ptr<render::texture::Texture2D>&& t) {
+            auto* const e = end.get_return().get();
+            e->add_component(core::Object::construct<Scene>(e, e->get_object_name() + "-scene", layer, std::move(t)));
+        }));
 }
 
 void gearoenix::vulkan::scene::Manager::update()
 {
-    uniform_indexer.reset();
-    scenes.clear();
-
     render::scene::Manager::update();
 
-    const auto frame_number = render::engine::Engine::get().get_frame_number_from_start();
-
+    scenes.clear();
     core::ecs::World::get().synchronised_system<Scene>([&](const auto* const, Scene* const scene) -> void {
         if (!scene->get_enabled()) {
             return;
         }
         scenes.emplace(scene->get_layer(), scene);
-        scene->after_record(frame_number);
     });
 }
 
@@ -66,7 +66,7 @@ void gearoenix::vulkan::scene::Manager::submit(const vk::CommandBuffer cmd)
     DrawState draw_state;
     draw_state.command_buffer = cmd;
     pipeline::Manager::get().set(draw_state.pipelines);
-    draw_state.gpu_buffer = buffer::Manager::get().get_device_root()->get_vulkan_data();
+    draw_state.gpu_buffer = Singleton<buffer::Manager>::get().get_device_root()->get_vulkan_data();
     draw_state.bindless_pipeline_layout = descriptor::Bindless::get().get_pipeline_layout();
 
     GX_PROFILE_EXP(render_shadows(draw_state));
@@ -98,8 +98,8 @@ void gearoenix::vulkan::scene::Manager::render_forward(DrawState& draw_state)
 
         // Check if the swapchain supports being a blit destination
         if (!(swapchain_image.get_usage() & vk::ImageUsageFlagBits::eTransferDst)) {
-            // TODO: Fall back to shader-based rendering to swapchain
-            GX_LOG_D("Swapchain does not support blit destination, skipping camera composition.");
+            GX_LOG_E("Swapchain does not support blit destination, skipping camera composition.");
+            GX_UNIMPLEMENTED;
             return;
         }
 
@@ -208,10 +208,5 @@ void gearoenix::vulkan::scene::Manager::render_shadows(DrawState& draw_state)
     for (const auto& scene : scenes | std::views::values) {
         scene->render_shadows(draw_state);
     }
-}
-
-void gearoenix::vulkan::scene::Manager::upload_uniforms()
-{
-    uniform_indexer.update();
 }
 #endif

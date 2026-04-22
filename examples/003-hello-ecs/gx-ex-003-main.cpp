@@ -17,8 +17,6 @@
 #include <gearoenix/render/mesh/gx-rnd-msh-manager.hpp>
 #include <gearoenix/render/model/gx-rnd-mdl-manager.hpp>
 #include <gearoenix/render/scene/gx-rnd-scn-manager.hpp>
-#include <gearoenix/render/scene/gx-rnd-scn-scene.hpp>
-#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 #include <random>
 
@@ -147,7 +145,14 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
+    {
+        GxSceneManager::get().build("scene", 0.0, GxEndCaller<GxEntityPtr>([this](GxEntityPtr&& e) {
+            scene_entity = std::move(e);
+            scene_ready();
+        }));
+    }
+
+    void scene_ready()
     {
         gearoenix::core::ecs::ComponentType::add<Position>();
         gearoenix::core::ecs::ComponentType::add<Speed>();
@@ -186,7 +191,7 @@ public:
     void meshes_ready(std::array<GxMeshPtr, objects_count>& meshes)
     {
         for (std::uint32_t model_index = 0; model_index < objects_count; ++model_index) {
-            auto entity = GxModelManager::get().build("triangle" + std::to_string(model_index), scene_entity.get(), { std::move(meshes[model_index]) }, true, false);
+            auto entity = GxModelManager::get().build("triangle" + std::to_string(model_index), scene_entity.get(), { std::move(meshes[model_index]) }, true, nullptr);
             auto speed = Speed::construct<Speed>(entity.get());
             auto position = Position::construct<Position>(entity.get());
             auto* const trn = entity->get_component<GxTransform>();

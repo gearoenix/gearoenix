@@ -4,6 +4,8 @@
 #include "../../core/gx-cr-static-flat-set.hpp"
 #include "gx-phs-anm-keyframe.hpp"
 
+struct GxShaderDataBone;
+
 namespace gearoenix::physics {
 struct Transformation;
 }
@@ -37,7 +39,6 @@ public:
     ~Bone() override;
     [[nodiscard]] static core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent);
     void set_inverse_bind_matrix(const math::Mat4x4<core::fp_t>& m);
-    void update_matrices();
-    static void update_all_bones_after_transform_updates();
+    void update_uniform(GxShaderDataBone& uniform_struct) const;
 };
 }

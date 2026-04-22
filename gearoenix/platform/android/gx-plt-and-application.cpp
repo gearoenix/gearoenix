@@ -1,5 +1,5 @@
 #include "gx-plt-and-application.hpp"
-#ifdef GX_PLATFORM_INTERFACE_ANDROID
+#if GX_PLATFORM_INTERFACE_ANDROID
 #include "../../core/gx-cr-application.hpp"
 #include "../../render/engine/gx-rnd-eng-engine.hpp"
 #include "../../render/gx-rnd-build-configuration.hpp"
@@ -7,7 +7,7 @@
 #include "gx-plt-and-google-play-billing.hpp"
 #include "gx-plt-and-key.hpp"
 
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "gx-plt-gl-context.hpp"
 #endif
 
@@ -55,7 +55,7 @@ void gearoenix::platform::Application::handle(android_app* const a, int32_t cmd)
         GX_LOG_D("Android window terminated.");
         surface_ready = false;
         on_not_ready_to_render();
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
         if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
             gl_context->suspend();
         }
@@ -149,7 +149,7 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
     if (android_application->window == nullptr)
         return;
     if (nullptr == base.render_engine) {
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
         if (gl_context != nullptr) {
             gl_context->init(android_application->window);
             base.initialize_window_size(ANativeWindow_getWidth(android_application->window), ANativeWindow_getHeight(android_application->window));
@@ -158,7 +158,7 @@ void gearoenix::platform::Application::on_check_ready_to_render(android_app* con
         }
 #endif
     } else if (a->window != android_application->window) {
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
         if (base.render_engine->get_engine_type() == render::engine::Type::OpenGL) {
             gl_context->suspend();
             gl_context->resume(a->window);

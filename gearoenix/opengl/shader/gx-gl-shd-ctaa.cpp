@@ -1,5 +1,5 @@
 #include "gx-gl-shd-ctaa.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 
 constexpr static auto vertex_shader_body = R"SHADER(
 layout(location = 0) in vec2 position;

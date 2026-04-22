@@ -1,5 +1,5 @@
 #include "gx-gl-shd-multiply.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 
 namespace {
 constexpr char vertex_shader_body[] = R"SHADER(

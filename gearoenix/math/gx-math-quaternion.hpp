@@ -7,6 +7,9 @@
 namespace gearoenix::math {
 template <typename Element>
 struct Quat final {
+    template <typename T>
+    constexpr static bool is_deep_same_v = std::is_same_v<std::remove_cvref_t<std::decay_t<Element>>, std::remove_cvref_t<std::decay_t<T>>>;
+
     Element x, y, z, w;
 
     constexpr Quat()
@@ -50,6 +53,16 @@ struct Quat final {
     {
     }
 
+    template <typename T>
+    constexpr std::conditional_t<is_deep_same_v<T>, const Quat&, Quat<T>> to() const
+    {
+        if constexpr (is_deep_same_v<T>) {
+            return *this;
+        } else {
+            return Quat<T>(*this);
+        }
+    }
+
     constexpr void normalise()
     {
         const auto inv_length = (w > static_cast<Element>(0) ? static_cast<Element>(1) : static_cast<Element>(-1)) / std::sqrt(x * x + y * y + z * z + w * w);
@@ -66,7 +79,10 @@ struct Quat final {
         return q;
     }
 
-    constexpr Mat4x4<Element> to_m4x4() const { return Mat4x4(to_m3x3()); }
+    constexpr Mat4x4<Element> to_m4x4() const
+    {
+        return Mat4x4(to_m3x3());
+    }
 
     constexpr Mat3x3<Element> to_m3x3() const
     {
@@ -92,7 +108,10 @@ struct Quat final {
         return Numeric::equal(nt.x, no.x) && Numeric::equal(nt.y, no.y) && Numeric::equal(nt.z, no.z) && Numeric::equal(nt.w, no.w);
     }
 
-    [[nodiscard]] constexpr Quat conjugate() const { return { -x, -y, -z, w }; }
+    [[nodiscard]] constexpr Quat conjugate() const
+    {
+        return { -x, -y, -z, w };
+    }
 
     [[nodiscard]] constexpr Vec3<Element> rotate(const Vec3<Element>& v) const
     {
@@ -100,9 +119,15 @@ struct Quat final {
         return { q.x, q.y, q.z };
     }
 
-    [[nodiscard]] constexpr Quat operator*(const Element v) const { return { x * v, y * v, z * v, w * v }; }
+    [[nodiscard]] constexpr Quat operator*(const Element v) const
+    {
+        return { x * v, y * v, z * v, w * v };
+    }
 
-    [[nodiscard]] constexpr Quat operator/(const Element v) const { return *this * (static_cast<Element>(1) / v); }
+    [[nodiscard]] constexpr Quat operator/(const Element v) const
+    {
+        return *this * (static_cast<Element>(1) / v);
+    }
 
     [[nodiscard]] constexpr Quat operator*(const Quat& o) const
     {
@@ -116,17 +141,35 @@ struct Quat final {
         return { w * o.x + y * o.z - z * o.y, w * o.y + z * o.x - x * o.z, w * o.z + x * o.y - y * o.x, -x * o.x - y * o.y - z * o.z };
     }
 
-    [[nodiscard]] constexpr Quat operator+(const Quat& o) const { return { x + o.x, y + o.y, z + o.z, w + o.w }; }
+    [[nodiscard]] constexpr Quat operator+(const Quat& o) const
+    {
+        return { x + o.x, y + o.y, z + o.z, w + o.w };
+    }
 
-    [[nodiscard]] constexpr Quat operator-(const Quat& o) const { return { x - o.x, y - o.y, z - o.z, w - o.w }; }
+    [[nodiscard]] constexpr Quat operator-(const Quat& o) const
+    {
+        return { x - o.x, y - o.y, z - o.z, w - o.w };
+    }
 
-    [[nodiscard]] constexpr Quat operator-(const Element v) const { return { x - v, y - v, z - v, w - v }; }
+    [[nodiscard]] constexpr Quat operator-(const Element v) const
+    {
+        return { x - v, y - v, z - v, w - v };
+    }
 
-    [[nodiscard]] constexpr Quat operator-() const { return { -x, -y, -z, -w }; }
+    [[nodiscard]] constexpr Quat operator-() const
+    {
+        return { -x, -y, -z, -w };
+    }
 
-    [[nodiscard]] constexpr Quat abs() const { return { std::abs(x), std::abs(y), std::abs(z), std::abs(w) }; }
+    [[nodiscard]] constexpr Quat abs() const
+    {
+        return { std::abs(x), std::abs(y), std::abs(z), std::abs(w) };
+    }
 
-    [[nodiscard]] constexpr Element dot(const Quat& o) const { return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w); }
+    [[nodiscard]] constexpr Element dot(const Quat& o) const
+    {
+        return (x * o.x) + (y * o.y) + (z * o.z) + (w * o.w);
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Quat& q)
     {
@@ -180,7 +223,10 @@ struct Quat final {
         return angles;
     }
 
-    [[nodiscard]] constexpr Quat mix(const Quat& o, const Element t) const { return (*this * (static_cast<Element>(1) - t)) + (o * t); }
+    [[nodiscard]] constexpr Quat mix(const Quat& o, const Element t) const
+    {
+        return (*this * (static_cast<Element>(1) - t)) + (o * t);
+    }
 
     [[nodiscard]] Quat slerp(const Quat& o, const Element t) const
     {
@@ -206,9 +252,15 @@ struct Quat final {
         return ((*this * std::sin((static_cast<Element>(1) - t) * angle)) + (oo * std::sin(t * angle))) / std::sin(angle);
     }
 
-    [[nodiscard]] Quat linear_mix(const Quat& o, const Element t) const { return slerp(o, t); }
+    [[nodiscard]] Quat linear_mix(const Quat& o, const Element t) const
+    {
+        return slerp(o, t);
+    }
 
-    [[nodiscard]] Vec3<Element> to_euler_degree() const { return to_euler() * (180.0 / std::numbers::pi); }
+    [[nodiscard]] Vec3<Element> to_euler_degree() const
+    {
+        return to_euler() * (180.0 / std::numbers::pi);
+    }
 
     [[nodiscard]] constexpr static Quat from_euler(const Element x, const Element y, const Element z)
     {
@@ -222,9 +274,15 @@ struct Quat final {
         return { sr * cp * cy - cr * sp * sy, cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy, cr * cp * cy + sr * sp * sy };
     }
 
-    [[nodiscard]] constexpr static Quat from_euler(Vec3<Element> angles) { return from_euler(angles.x, angles.y, angles.z); }
+    [[nodiscard]] constexpr static Quat from_euler(Vec3<Element> angles)
+    {
+        return from_euler(angles.x, angles.y, angles.z);
+    }
 
-    [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles) { return from_euler(angles * static_cast<Element>(std::numbers::pi / 180.0)); }
+    [[nodiscard]] constexpr static Quat from_euler_degree(Vec3<Element> angles)
+    {
+        return from_euler(angles * static_cast<Element>(std::numbers::pi / 180.0));
+    }
 
     [[nodiscard]] constexpr static Quat from(const Vec3<Element>& x, const Vec3<Element>& y, const Vec3<Element>& z)
     {
@@ -273,7 +331,10 @@ struct Quat final {
         return from(x, y, z);
     }
 
-    [[nodiscard]] constexpr static Quat from(const Mat3x3<Element>& m) { return from(m[0], m[1], m[2]); }
+    [[nodiscard]] constexpr static Quat from(const Mat3x3<Element>& m)
+    {
+        return from(m[0], m[1], m[2]);
+    }
 
     [[nodiscard]] constexpr static Quat angle_axis(const Element rad, const Vec3<Element>& axis)
     {

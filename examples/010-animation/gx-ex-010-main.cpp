@@ -90,7 +90,8 @@ public:
         entity->get_component<GxCamera>()->set_near(0.01);
         auto trn = entity->get_component_shared_ptr<GxTransform>();
         trn->local_look_at({ 0.0, 0.0, 3.0 }, { 0.0, 0.3, 0.0 }, { 0.0, 1.0, 0.0 });
-        const auto e = GxConstraintManager::get().create_jet_controller(entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
+        const auto e = GxConstraintManager::get().create_jet_controller(
+            entity->get_object_name() + "-controller", std::move(trn), scene_entity.get());
         e->get_component<GxJetCtrl>()->set_movement_speed(1.0);
     }
 };

@@ -78,29 +78,29 @@ void main() {
     const GxShaderDataMaterial material = materials[pc.material_index];
 
     // Albedo
-    const vec4 alb = texture(sampler2D(textures_2d[material.albedo_texture_index], samplers[material.albedo_sampler_index]), in_uv) * material.albedo_factor;
+    const vec4 alb = sample_texture_2d(material.albedo_normal_texture_sampler_index.xy, in_uv) * material.albedo_factor;
 
     // Alpha test
-    if (alb.a <= material.alpha_cutoff_occlusion_strength_reserved.x) {
+    if (alb.a <= material.alpha_cutoff_occlusion_strength_reserved_reserved.x) {
         discard;
     }
 
-    const vec3 orm_sample = texture(sampler2D(textures_2d[material.orm_texture_index], samplers[material.orm_sampler_index]), in_uv).xyz;
+    const vec3 orm_sample = sample_texture_2d(material.orm_emission_texture_sampler_index.xy, in_uv).xyz;
     const float metallic = clamp(orm_sample.z * material.normal_metallic_factor.w, 0.0001, 0.9999);
     const float sqrt_roughness = orm_sample.y * material.emission_roughness_factor.w;
     const float roughness = clamp(sqrt_roughness * sqrt_roughness, 0.0001, 0.9999); // Perceptual roughness squared
 
     // Ambient occlusion
-    const float ao = mix(1.0, orm_sample.x, material.alpha_cutoff_occlusion_strength_reserved.y);
+    const float ao = mix(1.0, orm_sample.x, material.alpha_cutoff_occlusion_strength_reserved_reserved.y);
 
     // Normal mapping
-    const vec3 normal_sample = texture(sampler2D(textures_2d[material.normal_texture_index], samplers[material.normal_sampler_index]), in_uv).xyz;
+    const vec3 normal_sample = sample_texture_2d(material.albedo_normal_texture_sampler_index.zw, in_uv).xyz;
     const vec3 normal_tangent = (normal_sample * 2.0 - 1.0) * material.normal_metallic_factor.xyz;
     const mat3 tbn = mat3(in_tng, in_btg, in_nrm);
     const vec3 nrm = normalize(tbn * normal_tangent);
 
     // Emission
-    vec3 ems = texture(sampler2D(textures_2d[material.emission_texture_index], samplers[material.emission_sampler_index]), in_uv).rgb;
+    vec3 ems = sample_texture_2d(material.orm_emission_texture_sampler_index.zw, in_uv).rgb;
     ems *= material.emission_roughness_factor.xyz;
 
     // Calculate F0 (surface reflection at zero incidence)
@@ -120,9 +120,13 @@ void main() {
 
     vec3 illumination = vec3(0.0001);
 
+    // uvec4 layout: x=bones, y=point_lights, z=directional_lights, w=shadow_caster_directional_lights
+    const uvec4 lights_counts = model.bones_point_lights_directional_lights_shadow_caster_directional_lights_count;
+
     // ========== Point Lights ==========
-    for (uint i = model.point_light_begin_index; i < model.point_light_end_index; ++i) {
-        GxShaderDataPointLight light = point_lights[i];
+    for (uint i = 0; i < lights_counts.y; ++i) {
+        const uint light_index = model.point_lights[i >> 2u][i & 3u];
+        GxShaderDataPointLight light = point_lights[light_index];
 
         vec3 light_vec = light.position.xyz - in_pos;
         float distance_sq = dot(light_vec, light_vec);
@@ -139,8 +143,9 @@ void main() {
     }
 
     // ========== Directional Lights (Non-Shadow Casting) ==========
-    for (uint i = model.directional_light_begin_index; i < model.directional_light_end_index; ++i) {
-        GxShaderDataDirectionalLight light = directional_lights[i];
+    for (uint i = 0; i < lights_counts.z; ++i) {
+        const uint light_index = model.directional_lights[i >> 2u][i & 3u];
+        GxShaderDataDirectionalLight light = directional_lights[light_index];
 
         illumination += compute_light(
             light.direction.xyz,
@@ -149,8 +154,9 @@ void main() {
     }
 
     // ========== Shadow-Casting Directional Lights ==========
-    for (uint i = 0; i < model.shadow_caster_directional_lights_count; ++i) {
-        const GxShaderDataShadowCasterDirectionalLight light = shadow_caster_directional_lights[model.shadow_caster_directional_lights[i]];
+    for (uint i = 0; i < lights_counts.w; ++i) {
+        const uint light_index = model.shadow_caster_directional_lights[i >> 2u][i & 3u];
+        const GxShaderDataShadowCasterDirectionalLight light = shadow_caster_directional_lights[light_index];
 
         const uint shadow_map_texture_index = floatBitsToUint(light.direction_bit_shadow_map_texture_index.w);
 
@@ -168,7 +174,7 @@ void main() {
         const float in_shadow_map = uv_bounds.x * uv_bounds.y * uv_bounds.z;
 
         // Sample shadow map using comparison sampler (uses separate binding for Metal depth2d compatibility)
-        const float shadow_sample = texture(sampler2DShadow(shadow_textures_2d[shadow_map_texture_index], shadow_sampler_cmp), light_uv_depth.xyz);
+        const float shadow_sample = sample_shadow_2d_cmp(shadow_map_texture_index, light_uv_depth.xyz);
 
         const float shadow_w = in_shadow_map * (1.0 - shadow_sample);
         const float light_w = 1.0 - shadow_w;
@@ -181,17 +187,17 @@ void main() {
     }
 
     // ========== Image-Based Lighting (IBL) ==========
-    const GxShaderDataReflectionProbe probe = reflection_probes[model.reflection_probe_index];
+    const GxShaderDataReflectionProbe probe = reflection_probes[model.reflection_probe_bones_begin_reserved_reserved.x];
 
-    // Diffuse IBL - irradiance map
-    const vec3 irr = texture(samplerCube(textures_cube[probe.irradiance_texture_index], samplers[probe.irradiance_sampler_index]), nrm).rgb;
+    // Diffuse IBL - irradiance map (texture/sampler in .xy)
+    const vec3 irr = sample_texture_cube(probe.irradiance_radiance_texture_sampler_index.xy, nrm).rgb;
 
-    // Specular IBL - radiance (pre-filtered environment) map with LOD based on roughness
-    const float rad_lod = sqrt_roughness * probe.radiance_lod_coefficient;
-    const vec3 rad = textureLod(samplerCube(textures_cube[probe.radiance_texture_index], samplers[probe.radiance_sampler_index]), reflection, rad_lod).rgb;
+    // Specular IBL - radiance (pre-filtered environment) map with LOD based on roughness (texture/sampler in .zw)
+    const float rad_lod = sqrt_roughness * probe.radiance_lod_coefficient.x;
+    const vec3 rad = sample_texture_cube_lod(probe.irradiance_radiance_texture_sampler_index.zw, reflection, rad_lod).rgb;
 
     // BRDF integration LUT
-    const vec2 brdf = texture(sampler2D(textures_2d[scene.brdflut_texture_index], samplers[scene.brdflut_sampler_index]), vec2(normal_dot_view, roughness)).rg;
+    const vec2 brdf = sample_texture_2d(scene.brdflut_sheen_lut_texture_sampler_index.xy, vec2(normal_dot_view, roughness)).rg;
 
     // Ambient diffuse (reduced by fresnel and metallic for energy conservation)
     vec3 ambient = irr * alb.rgb * (vec3(1.0) - fresnel) * (1.0 - metallic);
@@ -203,7 +209,7 @@ void main() {
     ambient *= ao;
 
     // Scene ambient light (flat ambient term)
-    ambient += scene.ambient_light.rgb * alb.rgb * ao;
+    ambient += scene.ambient_light_layer.rgb * alb.rgb * ao;
 
     // Final color
     const vec3 frag_colour = ambient + ems + illumination;

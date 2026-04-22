@@ -21,22 +21,15 @@ struct ShadowCasterDirectional final : render::light::ShadowCasterDirectional {
 private:
     std::shared_ptr<texture::Texture2D> vk_shadow_map_texture;
     std::shared_ptr<texture::Target> vk_shadow_map_target;
-    std::uint64_t last_update_frame = static_cast<std::uint64_t>(-1);
-    std::uint32_t shadow_map_shader_index = static_cast<std::uint32_t>(-1);
-    std::uint32_t shader_index = static_cast<std::uint32_t>(-1);
 
 public:
     [[nodiscard]] const std::shared_ptr<texture::Texture2D>& get_vk_shadow_map_texture() const { return vk_shadow_map_texture; }
     [[nodiscard]] const std::shared_ptr<texture::Target>& get_vk_shadow_map_target() const { return vk_shadow_map_target; }
-    [[nodiscard]] std::uint64_t get_last_update_frame() const { return last_update_frame; }
-    [[nodiscard]] std::uint32_t get_shadow_map_shader_index() const { return shadow_map_shader_index; }
-    [[nodiscard]] std::uint32_t get_shader_index() const { return shader_index; }
 
     ShadowCasterDirectional(core::ecs::Entity* entity, std::string&& name);
     ~ShadowCasterDirectional() override;
     void set_shadow_map(std::shared_ptr<render::texture::Texture2D>&& t, core::job::EndCaller<>&& end_callback) override;
     void set_shadow_map_target(std::shared_ptr<render::texture::Target>&& t) override;
-    void after_record(std::uint64_t frame_number, const render::record::ShadowCasterDirectionalLightData& rec);
 };
 }
 #endif

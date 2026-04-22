@@ -1,5 +1,5 @@
 #include "gx-gl-mat-manager.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/gx-cr-object.hpp"
 #include "../gx-gl-engine.hpp"
 #include "gx-gl-mat-pbr.hpp"

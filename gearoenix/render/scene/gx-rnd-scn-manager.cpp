@@ -1,7 +1,6 @@
 #include "gx-rnd-scn-manager.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../core/gx-cr-profiler.hpp"
-#include "../engine/gx-rnd-eng-engine.hpp"
 #include "gx-rnd-scn-scene.hpp"
 
 gearoenix::render::scene::Manager::Manager()
@@ -11,11 +10,6 @@ gearoenix::render::scene::Manager::Manager()
 }
 
 gearoenix::render::scene::Manager::~Manager() = default;
-
-gearoenix::core::ecs::EntityPtr gearoenix::render::scene::Manager::build(std::string&& name, const core::fp_t) const
-{
-    return core::ecs::Entity::construct(std::move(name), nullptr);
-}
 
 void gearoenix::render::scene::Manager::update()
 {

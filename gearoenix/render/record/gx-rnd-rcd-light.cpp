@@ -6,39 +6,39 @@
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../light/gx-rnd-lt-directional.hpp"
+#include "../model/gx-rnd-mdl-model.hpp"
+#include "../model/gx-rnd-mdl-uniform.hpp"
 #include "gx-rnd-rcd-model.hpp"
 
 namespace {
-template<typename Shadow, typename Model>
+template <typename Shadow, typename Model>
 void on_intersection(Shadow& shadow, Model& model)
 {
-    auto& l = model.lights;
-    if (l.shadow_caster_directionals.size() == l.shadow_caster_directionals.max_size()) {
-        if (l.directionals.size() == l.directionals.max_size()) {
-            return;
-        }
-        l.directionals.push_back(gearoenix::render::record::ModelDirectionalLight {
-            .direction = shadow.direction->template to<float>(),
-            .light = shadow.shadow_caster_directional });
+    auto& u = model.model->get_uniform_inner_pointer();
+    auto& counts = u.bones_point_lights_directional_lights_shadow_caster_directional_lights_count;
+    if (auto& count = counts.w; count < GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER) {
+        u.shadow_caster_directional_lights[count >> 2][count & 3] = shadow.shadow_caster_directional->get_uniform().shader_data_index;
+        ++count;
         return;
     }
-    l.shadow_caster_directionals.push_back(&shadow);
+    if (auto& count = counts.z; count < GX_RENDER_MAX_DIRECTIONAL_LIGHTS) {
+        u.directional_lights[count >> 2][count & 3] = shadow.shadow_caster_directional->get_directional_uniform().shader_data_index;
+        ++count;
+    }
 }
 
-template<typename Shadow, typename Model>
+template <typename Shadow, typename Model>
 void not_intersection(Shadow& shadow, Model& model)
 {
-    auto& l = model.lights;
-    if (l.directionals.size() == l.directionals.max_size()) {
-        return;
+    auto& u = model.model->get_uniform_inner_pointer();
+    auto& counts = u.bones_point_lights_directional_lights_shadow_caster_directional_lights_count;
+    if (auto& count = counts.z; count < GX_RENDER_MAX_DIRECTIONAL_LIGHTS) {
+        u.directional_lights[count >> 2][count & 3] = shadow.shadow_caster_directional->get_directional_uniform().shader_data_index;
+        ++count;
     }
-    l.directionals.push_back(gearoenix::render::record::ModelDirectionalLight {
-        .direction = shadow.direction->template to<float>(),
-        .light = shadow.shadow_caster_directional,
-    });
 }
 
-template<typename Shadow, typename Model>
+template <typename Shadow, typename Model>
 void check_intersection(Shadow& shadow, Model& model)
 {
     if (shadow.frustum->check_intersection(model.collider->get_surrounding_box())) {
@@ -47,9 +47,18 @@ void check_intersection(Shadow& shadow, Model& model)
         not_intersection(shadow, model);
     }
 }
+
+template <typename Model>
+void clear_lights(Model& model)
+{
+    auto& count = model.model->get_uniform_inner_pointer().bones_point_lights_directional_lights_shadow_caster_directional_lights_count;
+    count.y = 0;
+    count.z = 0;
+    count.w = 0;
+}
 }
 
-void gearoenix::render::record::Lights::update_per_frame(core::ecs::Entity*const)
+void gearoenix::render::record::Lights::update_per_frame(core::ecs::Entity* const)
 {
 }
 
@@ -88,9 +97,7 @@ void gearoenix::render::record::Lights::update_after_change(core::ecs::Entity* c
 void gearoenix::render::record::Lights::update_models(physics::accelerator::Bvh& bvh, std::vector<Model>& models)
 {
     bvh.call_on_all([&](auto& n) -> void {
-        auto& l = models[n.index].lights;
-        l.shadow_caster_directionals.clear();
-        l.directionals.clear();
+        clear_lights(models[n.index]);
     });
 
     for (auto& shadow : shadow_caster_directionals) {
@@ -107,16 +114,13 @@ void gearoenix::render::record::Lights::update_dynamic_models(Models& models)
     update_models(models.dynamic_models_bvh, models.models);
 #else
     const auto models_count = models.models.size();
-    const auto dynamic_models_count = models_count - models.dynamic_models_starting_index;
-    if (dynamic_models_count == 0) {
+    if (const auto dynamic_models_count = models_count - models.dynamic_models_starting_index; dynamic_models_count == 0) {
         return;
     }
 
     const auto begin = models.models.begin() + static_cast<decltype(models.models)::difference_type>(models.dynamic_models_starting_index);
     core::sync::parallel_for(begin, models.models.end(), [&](auto& model, auto) {
-        auto& l = model.lights;
-        l.shadow_caster_directionals.clear();
-        l.directionals.clear();
+        clear_lights(model);
         for (auto& shadow : shadow_caster_directionals) {
             check_intersection(shadow, model);
         }
@@ -126,6 +130,5 @@ void gearoenix::render::record::Lights::update_dynamic_models(Models& models)
 
 void gearoenix::render::record::Lights::update_static_models(Models& models)
 {
-    /// TODO: later we can have static and dynamic (in terms of transformation) lights and we can cache the following computation.
     update_models(models.static_models_bvh, models.models);
 }
