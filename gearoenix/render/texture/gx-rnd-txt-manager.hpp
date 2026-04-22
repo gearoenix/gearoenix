@@ -3,7 +3,7 @@
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../../core/job/gx-cr-job-single-end.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
-#include "../gx-rnd-build-configuration.hpp"
+#include "../gx-rnd-constants.hpp"
 #include "gx-rnd-txt-attachment.hpp"
 #include "gx-rnd-txt-texture-info.hpp"
 

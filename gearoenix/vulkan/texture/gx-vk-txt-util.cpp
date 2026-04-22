@@ -93,7 +93,7 @@ void gearoenix::vulkan::texture::write_gpu_texture_data(
         auto level_width = width;
         auto level_height = height;
         for (std::uint32_t mip = 0; mip < mips_count; ++mip) {
-            staging_buffers.push_back(buffer::Manager::get().create_staging(
+            staging_buffers.push_back(buffer::Manager::create_staging(
                 static_cast<std::int64_t>(pixel_size) * static_cast<std::int64_t>(level_width) * static_cast<std::int64_t>(level_height)));
             level_width = std::max(1u, level_width >> 1);
             level_height = std::max(1u, level_height >> 1);

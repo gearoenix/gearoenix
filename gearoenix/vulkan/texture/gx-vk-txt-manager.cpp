@@ -1,5 +1,5 @@
 #include "gx-vk-txt-manager.hpp"
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
@@ -16,7 +16,7 @@ namespace {
 [[nodiscard]] std::shared_ptr<gearoenix::vulkan::buffer::Buffer> create_staging_buffer(const std::vector<std::uint8_t>& pixels)
 {
     GX_ASSERT_D(!pixels.empty());
-    auto buff = gearoenix::vulkan::buffer::Manager::get().create_staging(static_cast<std::int64_t>(pixels.size()));
+    auto buff = gearoenix::vulkan::buffer::Manager::create_staging(static_cast<std::int64_t>(pixels.size()));
     GX_ASSERT_D(buff);
     buff->write(pixels.data(), static_cast<std::int64_t>(pixels.size()));
     return buff;

@@ -17,7 +17,6 @@ struct Bvh final {
     constexpr static index_t walls_count = bins_count - 1u;
     constexpr static index_t leaf_flag = 0x80000000u;
 
-
     static_assert(bins_count > 4u && bins_count % 2u == 0u, "Bins count is unexpected.");
 
     struct Data final {

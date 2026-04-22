@@ -1,3 +1,4 @@
+#include <gearoenix/core/ecs/gx-cr-ecs-entity.hpp>
 #include <gearoenix/core/gx-cr-application.hpp>
 #include <gearoenix/physics/gx-phs-transformation.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
@@ -42,7 +43,14 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
+    {
+        GxSceneManager::get().build("scene", 0.0, GxEntityEndCaller([this](GxEntityPtr&& e) {
+            scene_entity = std::move(e);
+            scene_ready();
+        }));
+    }
+
+    void scene_ready()
     {
         GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& material) -> void {
             set_material(std::move(material));
@@ -80,7 +88,7 @@ public:
 
     void set_mesh(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxModelManager::get().build("triangle-model", scene_entity.get(), { std::move(mesh) }, false, false);
+        auto model_builder = GxModelManager::get().build("triangle-model", scene_entity.get(), { std::move(mesh) }, false, nullptr);
 
         GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& c) { set_camera(std::move(c)); }));
     }

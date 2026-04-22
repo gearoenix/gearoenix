@@ -1,84 +1,46 @@
 #!/usr/bin/env python3
-
-import os
 import re
+import shutil
 import subprocess
 import sys
-import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-
-submodules_dir = script_dir / 'submodules'
-submodules_dir_str = str(submodules_dir)
-
-build_dir = script_dir / 'build'
-build_dir_str = str(build_dir)
-
-
-def print_fatal(msg):
-    print(f"\033[91m Error: {msg} \033[0m ", file=sys.stderr)
-    sys.exit(1)
-
 CLANG_FORMAT_VERSION = 22
-
-def find_clang_format():
-    try:
-        subprocess.run([f'clang-format-{CLANG_FORMAT_VERSION}', '--version'], capture_output=True, text=True)
-        print(f"Found clang-format-{CLANG_FORMAT_VERSION}")
-        return f'clang-format-{CLANG_FORMAT_VERSION}'
-    except:
-        try:
-            result = subprocess.run(['clang-format', '--version'], capture_output=True, text=True)
-            version_match = re.search(r'version (\d+)', result.stdout)
-            if version_match and int(version_match.group(1)) >= CLANG_FORMAT_VERSION:
-                print(f"Found clang-format with version: {result.stdout}")
-                return 'clang-format'
-            else:
-                print_fatal(f"clang-format version must be {CLANG_FORMAT_VERSION} or higher {result.stdout}")
-        except:
-            print_fatal("No suitable clang-format found")
-    return None
+ROOT = Path(__file__).resolve().parent
+IGNORED_DIRS = {'submodules', 'build', '.cxx', 'vcpkg_installed', '.git', 'node_modules'}
+EXTS = {'.cpp', '.hpp', '.cppm', '.hppm', '.mm'}
 
 
-def is_cpp_file(path):
-    return path.suffix in {'.cpp', '.hpp', '.cppm', '.hppm', '.mm'}
+def find_clang_format() -> str:
+    for name in (f'clang-format-{CLANG_FORMAT_VERSION}', 'clang-format'):
+        if path := shutil.which(name):
+            out = subprocess.run(
+                [path, '--version'], capture_output=True, text=True, check=True
+            ).stdout
+            if (m := re.search(r'version (\d+)', out)) and int(m.group(1)) >= CLANG_FORMAT_VERSION:
+                print(f"Using {path}: {out.strip()}")
+                return path
+    sys.exit(f"\033[91mError: clang-format >= {CLANG_FORMAT_VERSION} not found\033[0m")
 
 
-def is_not_ignored(path):
-    p = str(path)
-    return submodules_dir_str not in p and build_dir_str not in p
-
-
-def format_file(args):
-    path, formatter = args
-    print(f"Formatting: {path}")
-    subprocess.run([formatter, '-i', str(path)], check=True)
-
-
-def main():
-    clang_format = find_clang_format()
-    cpp_files = []
-    all_files = script_dir.rglob('*')
-
-    for path in all_files:
-        if not path.is_file():
-            continue
-        if not is_cpp_file(path):
-            continue
-        if not is_not_ignored(path):
-            continue
-        cpp_files.append(path)
-
-    if not cpp_files:
+def main() -> None:
+    fmt = find_clang_format()
+    files: list[Path] = []
+    for dirpath, dirnames, filenames in ROOT.walk():
+        dirnames[:] = [d for d in dirnames if d not in IGNORED_DIRS]
+        files.extend(dirpath / fn for fn in filenames if Path(fn).suffix in EXTS)
+    files.sort()
+    if not files:
         print("No C++ files found")
         return
 
-    cpp_files.sort()
+    def run(p: Path) -> None:
+        print(f"Formatting: {p}")
+        subprocess.run([fmt, '-i', str(p)], check=True)
 
-    with ThreadPoolExecutor(max_workers=int((multiprocessing.cpu_count() * 3) / 2)) as executor:
-        executor.map(format_file, [(f, clang_format) for f in cpp_files])
+    with ThreadPoolExecutor() as ex:
+        list(ex.map(run, files))
 
 
 if __name__ == '__main__':

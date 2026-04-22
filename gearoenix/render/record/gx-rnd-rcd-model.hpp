@@ -2,7 +2,7 @@
 #include "../../core/gx-cr-build-configuration.hpp"
 #include "../../core/gx-cr-growing-array.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
-#include "../gx-rnd-build-configuration.hpp"
+#include "../gx-rnd-constants.hpp"
 
 #include <boost/container/static_vector.hpp>
 
@@ -43,31 +43,10 @@ struct Probe;
 }
 
 namespace gearoenix::render::record {
-struct ShadowCasterDirectionalLightData;
-
-struct ModelDirectionalLight final {
-    math::Vec3<float> direction;
-    light::Light* light = nullptr;
-
-    ~ModelDirectionalLight() = default;
-};
-
-struct ModelLight final {
-    core::GrowingArray<ModelDirectionalLight, GX_RENDER_MAX_DIRECTIONAL_LIGHTS> directionals;
-    core::GrowingArray<ShadowCasterDirectionalLightData*, GX_RENDER_MAX_DIRECTIONAL_LIGHTS_SHADOW_CASTER> shadow_caster_directionals;
-
-    ~ModelLight() = default;
-};
-
 struct Model final {
-    core::ecs::Entity* entity = nullptr;
     model::Model* model = nullptr;
-    physics::animation::Armature* armature = nullptr;
-    physics::Transformation* transform = nullptr;
     physics::collider::Collider* collider = nullptr;
     reflection::Probe* probe = nullptr;
-    std::uint32_t bones_count = 0;
-    ModelLight lights;
 
     ~Model() = default;
 };

@@ -16,7 +16,7 @@ struct ParallelContext final {
     const unsigned int count;
     std::atomic<unsigned int> terminated_count = 0;
     gearoenix::core::sync::parallel_for_t task = nullptr;
-    const void* context = nullptr;
+    void* context = nullptr;
     std::vector<std::thread> workers;
 
     ParallelContext()
@@ -76,7 +76,7 @@ struct ParallelContext final {
         }
     }
 
-    void run(const gearoenix::core::sync::parallel_for_t fun, const void* const fun_data)
+    void run(const gearoenix::core::sync::parallel_for_t fun, void* const fun_data)
     {
         GX_ASSERT_D(terminated_count.load(std::memory_order_relaxed) == 0); // One or more threads in ParallelContext is dead already!
         task = fun;
@@ -93,7 +93,7 @@ struct ParallelContext final {
 thread_local std::optional<ParallelContext> ctx;
 }
 
-void gearoenix::core::sync::parallel(const parallel_for_t fun, const void* const fun_data)
+void gearoenix::core::sync::parallel(const parallel_for_t fun, void* const fun_data)
 {
     if (!ctx.has_value()) {
         ctx.emplace();

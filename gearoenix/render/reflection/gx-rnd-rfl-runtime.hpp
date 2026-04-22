@@ -1,9 +1,11 @@
 #pragma once
 #include "../../core/job/gx-cr-job-end-caller.hpp"
-#include "../gx-rnd-build-configuration.hpp"
+#include "../gx-rnd-constants.hpp"
 #include "gx-rnd-rfl-probe.hpp"
-#include <array>
+
 #include <boost/container/static_vector.hpp>
+
+#include <array>
 #include <functional>
 #include <limits>
 #include <memory>

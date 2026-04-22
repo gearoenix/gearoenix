@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/engine/gx-rnd-eng-engine.hpp"
 
 namespace gearoenix::gl::shader {
@@ -11,10 +11,15 @@ namespace gearoenix::gl::submission {
 struct Manager;
 }
 
+namespace gearoenix::gl::buffer {
+struct Manager;
+}
+
 namespace gearoenix::gl {
 struct Engine final : render::engine::Engine, core::Singleton<Engine> {
     GX_GET_UPTR_PRV(submission::Manager, submission_manager);
     GX_GET_UPTR_PRV(shader::Manager, shader_manager);
+    buffer::Manager* gl_buffer_manager;
 
 public:
     Engine();

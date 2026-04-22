@@ -1,5 +1,9 @@
 #include "gx-gl-mat-sprite.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
+#include "../../render/buffer/gx-rnd-buf-manager.hpp"
+#include "../../render/camera/gx-rnd-cmr-uniform.hpp"
+#include "../../render/model/gx-rnd-mdl-model.hpp"
 #include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../../render/record/gx-rnd-rcd-model.hpp"
 #include "../gx-gl-engine.hpp"
@@ -26,12 +30,14 @@ void gearoenix::gl::material::Sprite::construct(std::string&& name, core::job::E
 
 gearoenix::gl::material::Sprite::~Sprite() = default;
 
-void gearoenix::gl::material::Sprite::shadow(const Mesh& mesh, const render::record::Camera& camera, const render::record::CameraModel& camera_model, uint& current_shader)
+void gearoenix::gl::material::Sprite::shadow(const Mesh& mesh, const render::record::Camera&, const render::record::CameraModel& camera_model, uint& current_shader)
 {
     /// TODO: uv_transform must be used in here too
-    auto& shadow_caster_shader = shadow_caster_combination->get(camera_model.model->bones_count);
+    const auto* const arm = camera_model.model->model->get_armature().get();
+    const auto bones_count = arm ? arm->get_all_bones().size() : 0;
+    auto& shadow_caster_shader = shadow_caster_combination->get(static_cast<std::uint32_t>(bones_count));
     shadow_caster_shader.bind(current_shader);
-    shadow_caster_shader.set_mvp_data(camera.mvps[camera_model.first_mvp_index].data());
+    shadow_caster_shader.set_mvp_data(camera_model.get_first_mvp().mvp.data());
     const math::Vec2 alpha_factor_alpha_cutoff(albedo_factor.w, alpha_cutoff);
     shadow_caster_shader.set_alpha_factor_alpha_cutoff_data(alpha_factor_alpha_cutoff.data());
 
@@ -42,11 +48,11 @@ void gearoenix::gl::material::Sprite::shadow(const Mesh& mesh, const render::rec
     glDrawElements(GL_TRIANGLES, mesh.get_cached_indices_count(), GL_UNSIGNED_INT, nullptr);
 }
 
-void gearoenix::gl::material::Sprite::render_forward(const Scene&, const render::record::Camera& camera, const render::record::CameraModel& camera_model, const Mesh& mesh, uint& current_shader)
+void gearoenix::gl::material::Sprite::render_forward(const Scene&, const render::record::Camera&, const render::record::CameraModel& camera_model, const Mesh& mesh, uint& current_shader)
 {
     const auto& shader = unlit_combination->get(true, true, true, true);
     shader.bind(current_shader);
-    shader.set_mvp_data(camera.mvps[camera_model.first_mvp_index].data());
+    shader.set_mvp_data(camera_model.get_first_mvp().mvp.data());
     shader.set_albedo_factor_data(albedo_factor.data());
     shader.set_alpha_cutoff_data(&alpha_cutoff);
     shader.set_uv_transform_data(uv_transform.data());

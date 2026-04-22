@@ -1,6 +1,6 @@
 #pragma once
 #include "gx-gl-shader.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../render/camera/gx-rnd-cmr-colour-tuning.hpp"
 
 namespace gearoenix::gl::shader {

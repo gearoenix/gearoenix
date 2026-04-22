@@ -1,5 +1,5 @@
 #include "gx-gl-shd-shadow-caster.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../gx-gl-engine.hpp"
 #include <sstream>
 

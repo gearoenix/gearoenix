@@ -5,7 +5,6 @@
 #include <gearoenix/platform/gx-plt-log.hpp>
 #include <gearoenix/platform/stream/gx-plt-stm-path.hpp>
 #include <gearoenix/render/camera/gx-rnd-cmr-manager.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
 #include <gearoenix/render/gx-rnd-vertex.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-directional.hpp>
 #include <gearoenix/render/light/gx-rnd-lt-manager.hpp>
@@ -52,7 +51,14 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
+    {
+        GxSceneManager::get().build("scene", 0.0, GxEntityEndCaller([this](GxEntityPtr&& e) {
+            scene_entity = std::move(e);
+            scene_is_ready();
+        }));
+    }
+
+    void scene_is_ready()
     {
         GxMatManager::get().get_pbr("material", GxPbrEndCaller([this](GxPbrPtr&& m) -> void {
             material_is_ready(std::move(m));
@@ -108,7 +114,7 @@ public:
 
     void mesh_is_ready(GxMeshPtr&& mesh)
     {
-        auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false, false);
+        auto model_builder = GxMdlManager::get().build("triangle", scene_entity.get(), { std::move(mesh) }, false, nullptr);
 
         GxCamManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this](GxEntityPtr&& e) -> void {
             camera_is_ready(std::move(e));

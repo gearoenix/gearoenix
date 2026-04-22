@@ -68,7 +68,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
         SET(GX_NO_WARNING_FLAG "/w")
         set(CMAKE_CXX_FLAGS "/std:c++latest /MP /arch:AVX2 /fp:fast /Oi ${CMAKE_CXX_FLAGS}")
         add_compile_options("$<$<CONFIG:RELEASE>:/O2>")
-        add_compile_options("$<$<CONFIG:RELEASE>:/GL>")
+        # add_compile_options("$<$<CONFIG:RELEASE>:/GL>") # it actually made my performance worst!
         add_compile_options("$<$<CONFIG:RELEASE>:/Gw>")
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/LTCG /OPT:REF,ICF /CGTHREADS:8 ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
         set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/LTCG /OPT:REF,ICF /CGTHREADS:8 ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")

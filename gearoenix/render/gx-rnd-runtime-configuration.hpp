@@ -2,6 +2,7 @@
 #include "../core/gx-cr-observed.hpp"
 #include "../core/macro/gx-cr-mcr-getter-setter.hpp"
 #include "gx-rnd-build-configuration.hpp"
+#include "gx-rnd-constants.hpp"
 #include "gx-rnd-resolution.hpp"
 
 #include <cstdint>

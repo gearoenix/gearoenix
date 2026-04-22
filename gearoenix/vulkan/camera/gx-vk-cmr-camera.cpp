@@ -2,7 +2,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
-#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-draw-state.hpp"
@@ -86,7 +85,7 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
 {
     GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.3f, 0.5f, 0.9f, "render-shadow-camera for camera: {}", object_name);
 
-    draw_state.push_constants.camera_index = shader_data_index;
+    draw_state.push_constants.camera_index = uniform.shader_data_index;
 
     draw_state.command_buffer.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
@@ -98,7 +97,7 @@ void gearoenix::vulkan::camera::Camera::render_shadow(const render::record::Came
 
     for (const auto& camera_model : cmr.all_models | std::views::values) {
         GX_ASSERT_D(camera_model.first_mvp_index != static_cast<std::uint32_t>(-1));
-        draw_state.push_constants.camera_model_index = cameras_joint_model_indices[camera_model.first_mvp_index];
+        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index;
         draw_state.camera_model = &camera_model;
         core::cast_ptr<model::Model>(camera_model.model->model)->render_shadow(draw_state);
     }
@@ -108,7 +107,7 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
 {
     GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.8f, 0.4f, 0.6f, "render-forward-camera for camera: {}", object_name);
 
-    draw_state.push_constants.camera_index = shader_data_index;
+    draw_state.push_constants.camera_index = uniform.shader_data_index;
 
     draw_state.command_buffer.setFrontFace(y_flipped ? vk::FrontFace::eCounterClockwise : vk::FrontFace::eClockwise);
 
@@ -129,14 +128,14 @@ void gearoenix::vulkan::camera::Camera::render_forward(const render::record::Cam
 
     for (std::size_t camera_model_i = 0; camera_model_i < cmr.translucent_models_starting_index; ++camera_model_i) {
         const auto& camera_model = cmr.all_models[camera_model_i].second;
-        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
+        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? camera_model.first_mvp_index : 0;
         draw_state.camera_model = &camera_model;
         core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(draw_state);
     }
     render_forward_skyboxes(skyboxes, draw_state);
     for (std::size_t camera_model_i = cmr.translucent_models_starting_index; camera_model_i < cmr.all_models.size(); ++camera_model_i) {
         const auto& camera_model = cmr.all_models[camera_model_i].second;
-        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? cameras_joint_model_indices[camera_model.first_mvp_index] : 0;
+        draw_state.push_constants.camera_model_index = camera_model.first_mvp_index != static_cast<std::uint32_t>(-1) ? camera_model.first_mvp_index : 0;
         draw_state.camera_model = &camera_model;
         core::cast_ptr<model::Model>(camera_model.model->model)->render_forward(draw_state);
     }
@@ -146,7 +145,7 @@ void gearoenix::vulkan::camera::Camera::render_forward_skyboxes(const render::re
 {
     GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.8f, 0.8f, 0.6f, "render-skyboxes for camera: {}", object_name);
     for (const auto& skybox_data : skyboxes.skyboxes | std::views::values) {
-        core::cast_ptr<skybox::Skybox>(skybox_data.skybox)->render_forward(draw_state);
+        dynamic_cast<skybox::Skybox*>(skybox_data.skybox)->render_forward(draw_state);
     }
 }
 
@@ -440,34 +439,6 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing([
     const auto w = tex1_img->get_image_width();
     const auto h = tex1_img->get_image_height();
     cmd.dispatch((w + 15u) >> 4u, (h + 15u) >> 4u, 1u);
-}
-
-void gearoenix::vulkan::camera::Camera::after_record(const std::uint64_t frame_number, const render::record::Camera& rc)
-{
-    if (frame_number == last_update_frame_number) {
-        return;
-    }
-    last_update_frame_number = frame_number;
-
-    cameras_joint_model_indices.clear();
-
-    {
-        const auto sd = descriptor::UniformIndexer<GxShaderDataCamera>::get().get_next();
-        shader_data_index = sd.get_index();
-        auto& [vp, position_far] = *sd.get_ptr();
-        position_far = { rc.transform->get_local_position().to<float>(), far };
-        vp = view_projection;
-    }
-
-    for (const auto& mvp : rc.mvps) {
-        auto sd = descriptor::UniformIndexer<GxShaderDataCameraJointModel>::get().get_next();
-        sd.get_ptr()->mvp = mvp;
-        cameras_joint_model_indices.push_back(sd.get_index());
-    }
-
-    for (const auto& camera_model : rc.all_models | std::views::values) {
-        core::cast_ptr<model::Model>(camera_model.model->model)->after_record(frame_number, camera_model);
-    }
 }
 
 void gearoenix::vulkan::camera::Camera::record_viewport(const render::record::Camera& cmr, const vk::CommandBuffer cmd)

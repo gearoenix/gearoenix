@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/model/gx-rnd-mdl-manager.hpp"
 #include "../render/model/gx-rnd-mdl-model.hpp"
 #include "gx-gl-types.hpp"
@@ -26,7 +26,10 @@ struct Model final : render::model::Model {
 
     GX_GET_CREF_PRV(gl_meshes_set_t, gl_meshes);
 
-    Model(core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable, bool is_skinned);
+    Model(
+        core::ecs::Entity* entity, render::model::meshes_set_t&& ms, std::string&& name, bool is_transformable,
+        std::shared_ptr<physics::Transformation>&& transformation,
+        std::shared_ptr<physics::animation::Armature>&& armature);
 
 public:
     ~Model() override;
@@ -36,7 +39,12 @@ public:
 
 struct ModelManager final : render::model::Manager {
 private:
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::ecs::Entity* parent, render::model::meshes_set_t&& meshes, bool is_transformable, bool is_skinned) override;
+    [[nodiscard]] core::ecs::EntityPtr build(
+        std::string&& name,
+        core::ecs::Entity* parent,
+        render::model::meshes_set_t&& meshes,
+        bool is_transformable,
+        std::shared_ptr<physics::animation::Armature>&& armature) override;
 
 public:
     ModelManager();

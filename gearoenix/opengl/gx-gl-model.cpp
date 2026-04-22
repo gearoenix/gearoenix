@@ -1,14 +1,24 @@
 #include "gx-gl-model.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
-#include "../core/allocator/gx-cr-alc-shared-array.hpp"
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../physics/animation/gx-phs-anm-armature.hpp"
+#include "../physics/gx-phs-transformation.hpp"
 #include "gx-gl-engine.hpp"
 #include "gx-gl-mesh.hpp"
 #include "material/gx-gl-material.hpp"
 
-gearoenix::gl::Model::Model(core::ecs::Entity* const entity, render::model::meshes_set_t&& ms, std::string&& name, const bool is_transformable, const bool is_skinned)
-    : render::model::Model(entity, core::ecs::ComponentType::create_index(this), is_transformable, std::move(ms), std::move(name), is_skinned)
+gearoenix::gl::Model::Model(
+    core::ecs::Entity* const entity,
+    render::model::meshes_set_t&& ms,
+    std::string&& name,
+    const bool is_transformable,
+    std::shared_ptr<physics::Transformation>&& transformation,
+    std::shared_ptr<physics::animation::Armature>&& armature)
+    : render::model::Model(
+          entity, core::ecs::ComponentType::create_index(this), is_transformable,
+          std::move(transformation), std::move(ms), std::move(name),
+          std::move(armature))
 {
     for (const auto& mesh : meshes) {
         auto m = std::dynamic_pointer_cast<Mesh>(mesh);
@@ -33,14 +43,23 @@ void gearoenix::gl::Model::render_forward(const Scene& scene, const render::reco
     }
 }
 
-gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(std::string&& name, core::ecs::Entity* const parent, render::model::meshes_set_t&& meshes, const bool is_transformable, const bool is_skinned)
+gearoenix::core::ecs::EntityPtr gearoenix::gl::ModelManager::build(
+    std::string&& name,
+    core::ecs::Entity* const parent,
+    render::model::meshes_set_t&& meshes,
+    const bool is_transformable,
+    std::shared_ptr<physics::animation::Armature>&& armature)
 {
-    auto entity = Manager::build(std::move(name), parent, std::move(meshes), is_transformable, is_skinned);
-    entity->add_component(core::Object::construct<Model>(entity.get(), std::move(meshes), std::move(name), is_transformable, is_skinned));
+    auto entity = Manager::build(std::string(name), parent, render::model::meshes_set_t(meshes), is_transformable, std::shared_ptr(armature));
+    auto transform = entity->get_component_shared_ptr<physics::Transformation>();
+    entity->add_component(core::Object::construct<Model>(entity.get(), std::move(meshes), std::move(name), is_transformable, std::move(transform), std::move(armature)));
     return entity;
 }
 
-gearoenix::gl::ModelManager::ModelManager() { core::ecs::ComponentType::add<Model>(); }
+gearoenix::gl::ModelManager::ModelManager()
+{
+    core::ecs::ComponentType::add<Model>();
+}
 
 gearoenix::gl::ModelManager::~ModelManager() = default;
 

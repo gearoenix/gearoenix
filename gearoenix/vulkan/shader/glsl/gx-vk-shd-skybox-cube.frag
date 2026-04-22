@@ -13,5 +13,5 @@ const vec2 inv_atan = vec2(0.1591, 0.3183);
 void main() {
     const GxShaderDataMaterial material = materials[pc.material_index];
 
-    frag_out = texture(samplerCube(textures_cube[material.albedo_texture_index], samplers[material.albedo_sampler_index]), normalize(in_pos));
+    frag_out = sample_texture_cube(material.albedo_normal_texture_sampler_index.xy, normalize(in_pos));
 }

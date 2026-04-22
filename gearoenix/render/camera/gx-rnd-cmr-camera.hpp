@@ -3,11 +3,13 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
 #include "../../math/gx-math-ray.hpp"
+#include "../buffer/gx-rnd-buf-uniform.hpp"
 #include "gx-rnd-cmr-bloom-data.hpp"
 #include "gx-rnd-cmr-colour-tuning.hpp"
 #include "gx-rnd-cmr-exposure.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include "gx-rnd-cmr-target.hpp"
+
 #include <array>
 #include <optional>
 
@@ -47,9 +49,9 @@ struct Camera : core::ecs::Component {
         Main = 23,
     };
 
+    GX_GET_CREF_PRT(buffer::Uniform, uniform);
     GX_GET_CREF_PRT(math::Mat4x4<float>, view);
     GX_GET_CREF_PRT(math::Mat4x4<float>, projection);
-    GX_GET_CREF_PRT(math::Mat4x4<float>, view_projection);
     GX_GET_CREF_PRT(math::Vec4<float>, starting_clip_ending_clip);
     GX_GET_CREF_PRT(Target, target);
     GX_GET_CREF_PRT(std::optional<float>, customised_target_aspect_ratio);
@@ -68,21 +70,31 @@ struct Camera : core::ecs::Component {
     GX_GET_CVAL_PRT(std::string, render_pass_name);
     GX_GET_VAL_PRT(bool, y_flipped, false);
 
-    Camera(core::ecs::Entity* entity, core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform);
+    Camera(
+        core::ecs::Entity* entity,
+        core::object_type_index_t final_type,
+        const std::string& name,
+        Target&& target,
+        std::shared_ptr<physics::Transformation>&& transform);
 
     /// It should be called exactly after the shared_ptr got generated, and it has a valid weak_ptr of self.
     void initialise();
     void write(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const;
     void read(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&);
-    void show_debug_gui() override;
 
 public:
     ~Camera() override;
-    void generate_frustum_points(const math::Vec3<core::fp_t>& location, const math::Vec3<core::fp_t>& x, const math::Vec3<core::fp_t>& y, const math::Vec3<core::fp_t>& z, std::array<math::Vec3<core::fp_t>, 8>& points) const;
-    void set_view(const math::Mat4x4<float>& view);
+    void generate_frustum_points(
+        const math::Vec3<core::fp_t>& location,
+        const math::Vec3<core::fp_t>& x,
+        const math::Vec3<core::fp_t>& y,
+        const math::Vec3<core::fp_t>& z,
+        std::array<math::Vec3<core::fp_t>, 8>& points) const;
+    void set_view(const math::Mat4x4<float>&);
+    [[nodiscard]] const math::Mat4x4<float>& get_view_projection() const;
     void set_customised_target_aspect_ratio(float target_aspect_ratio);
     void disable_customised_target_aspect_ratio();
-    /// This returns customised_target_aspect_ratio value if it is set or the actual target aspect ratio
+    /// This returns a customised_target_aspect_ratio value if it is set or the actual target aspect ratio
     [[nodiscard]] float get_target_aspect_ratio() const;
     void set_projection_data(ProjectionData);
     [[nodiscard]] bool is_perspective() const;
@@ -96,5 +108,6 @@ public:
     virtual void enable_bloom();
     virtual void update_bloom();
     virtual void update_target(core::job::EndCaller<>&& end);
+    void show_debug_gui() override;
 };
 }

@@ -5,24 +5,14 @@
 #include "../gx-vk-draw-state.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
-#include "../shader/glsl/gx-vk-shd-common.glslh"
 #include "../skybox/gx-vk-sky-skybox.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
-#include "../texture/gx-vk-txt-manager.hpp"
-#include "gx-vk-scn-manager.hpp"
 
 #include <ranges>
 
-gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const core::fp_t layer)
-    : render::scene::Scene(e, core::ecs::ComponentType::create_index(this), layer, std::move(name))
+gearoenix::vulkan::scene::Scene::Scene(core::ecs::Entity* const e, std::string&& name, const core::fp_t layer, std::shared_ptr<render::texture::Texture2D>&& brdflut)
+    : render::scene::Scene(e, core::ecs::ComponentType::create_index(this), layer, std::move(name), std::move(brdflut))
 {
-    initialise_brdflut();
-}
-
-gearoenix::vulkan::scene::Scene::Scene(const core::object_id_t id, std::string&& name)
-    : render::scene::Scene(core::ecs::ComponentType::create_index(this), id, std::move(name))
-{
-    initialise_brdflut();
 }
 
 void gearoenix::vulkan::scene::Scene::read(
@@ -38,27 +28,13 @@ void gearoenix::vulkan::scene::Scene::read(
         std::move(end));
 }
 
-void gearoenix::vulkan::scene::Scene::initialise_brdflut()
-{
-    render::texture::Manager::get().get_brdflut(
-        core::job::EndCallerShared<render::texture::Texture2D>(
-            [this](std::shared_ptr<render::texture::Texture2D>&& t) {
-                brdflut = core::cast_shared<texture::Texture2D>(std::move(t));
-            }));
-}
-
 gearoenix::vulkan::scene::Scene::~Scene() = default;
-
-void gearoenix::vulkan::scene::Scene::update_per_frame()
-{
-    render::scene::Scene::update_per_frame();
-}
 
 void gearoenix::vulkan::scene::Scene::render_shadows(DrawState& draw_state)
 {
-    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.0f, "{}", shadow_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.0f, "Shadow pass of Scene {}", object_name);
 
-    draw_state.push_constants.scene_index = shader_data_index;
+    draw_state.push_constants.scene_index = uniform.shader_data_index;
 
     for (const auto& index : record.cameras.shadow_casters | std::views::values) {
         auto& cmr_rcd = record.cameras.cameras[index];
@@ -68,7 +44,7 @@ void gearoenix::vulkan::scene::Scene::render_shadows(DrawState& draw_state)
 
 void gearoenix::vulkan::scene::Scene::render_reflection_probes(DrawState& draw_state) const
 {
-    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.5f, "{}", shadow_reflection_probe_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 1.0f, 0.5f, "Reflection probe pass of Scene: {}", object_name);
 
     for (const auto ci : record.cameras.reflections | std::views::values) {
         auto& camera = record.cameras.cameras[ci];
@@ -78,11 +54,11 @@ void gearoenix::vulkan::scene::Scene::render_reflection_probes(DrawState& draw_s
 
 void gearoenix::vulkan::scene::Scene::render_forward(DrawState& draw_state)
 {
-    draw_state.push_constants.scene_index = shader_data_index;
+    draw_state.push_constants.scene_index = uniform.shader_data_index;
 
     render_reflection_probes(draw_state);
 
-    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 0.0f, 0.5f, "{}", forward_render_pass_name);
+    GX_VK_PUSH_DEBUG_GROUP(draw_state.command_buffer, 0.5f, 0.0f, 0.5f, "Forward pass scene: {}", object_name);
 
     for (const auto camera_index : record.cameras.mains | std::views::values) {
         auto& rc = record.cameras.cameras[camera_index];
@@ -90,23 +66,6 @@ void gearoenix::vulkan::scene::Scene::render_forward(DrawState& draw_state)
         cam.render_forward(rc, record.skyboxes, draw_state);
         cam.render_bloom(*this, draw_state.command_buffer);
         cam.render_colour_correction_anti_aliasing(*this, draw_state.command_buffer);
-    }
-}
-
-void gearoenix::vulkan::scene::Scene::after_record(const std::uint64_t frame_number)
-{
-    auto sd = descriptor::UniformIndexer<GxShaderDataScene>::get().get_next();
-    shader_data_index = sd.get_index();
-    auto& ref = *sd.get_ptr();
-    ref.ambient_light = math::Vec4(0.001f); // TODO: Temporary later, render module must provide it.
-    GX_ASSERT_D(brdflut);
-    ref.brdflut_texture_index = brdflut->get_view_index();
-    ref.brdflut_sampler_index = brdflut->get_sampler_index();
-
-    const auto& cameras = record.cameras;
-    for (auto cam_i = 0; cam_i < cameras.last_camera_index; ++cam_i) {
-        auto& rc = cameras.cameras[cam_i];
-        core::cast_ptr<camera::Camera>(rc.camera)->after_record(frame_number, rc);
     }
 }
 

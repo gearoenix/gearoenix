@@ -1,17 +1,26 @@
 #include "gx-rnd-mat-material.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../imgui/gx-rnd-imgui-type-table.hpp"
 #include "../imgui/gx-rnd-imgui-type-tree.hpp"
+
 #include <utility>
 
-gearoenix::render::material::Material::Material(const core::object_type_index_t final_object_type, std::string&& name, const bool need_model_view_projection_matrix)
+gearoenix::render::material::Material::Material(
+    const core::object_type_index_t final_object_type,
+    std::string&& name,
+    const bool need_model_view_projection_matrix)
     : Object(final_object_type, std::move(name))
+    , uniform(buffer::Manager::get().get_range(buffer::UniformRegionIndex::materials))
     , need_model_view_projection_matrix(need_model_view_projection_matrix)
 {
 }
 
 gearoenix::render::material::Material::~Material() = default;
 
-void gearoenix::render::material::Material::set_albedo(std::shared_ptr<texture::Texture2D>&&) { GX_UNIMPLEMENTED; }
+void gearoenix::render::material::Material::set_albedo(std::shared_ptr<texture::Texture2D>&&)
+{
+    GX_UNIMPLEMENTED;
+}
 
 void gearoenix::render::material::Material::show_debug_gui()
 {

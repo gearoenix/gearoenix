@@ -29,12 +29,15 @@ struct Directional final : Light {
     constexpr static std::array all_parent_object_type_indices { Light::object_type_index };
     constexpr static std::array immediate_parent_object_type_indices { Light::object_type_index };
 
+    static std::array<buffer::Uniform*, max_count> uniforms;
+
     GX_GET_CREF_PRT(math::Vec3<float>, direction);
 
     Directional(core::ecs::Entity* entity, std::string&& name);
 
 public:
     ~Directional() override;
+    void update_uniforms() override;
 };
 
 struct ShadowCasterDirectional : Light {
@@ -46,6 +49,8 @@ struct ShadowCasterDirectional : Light {
     constexpr static std::array immediate_parent_object_type_indices { Light::object_type_index };
 
     GX_GET_CREF_PRV(std::shared_ptr<texture::Texture2D>, shadow_map);
+    /// The following uniform is for the time that a model is outside the shadow bound.
+    GX_GET_CREF_PRV(buffer::Uniform, directional_uniform);
     GX_GET_CREF_PRV(std::shared_ptr<texture::Target>, shadow_map_target);
     GX_GET_CREF_PRV(std::shared_ptr<camera::Camera>, shadow_camera);
     GX_GET_CREF_PRV(std::shared_ptr<physics::collider::Frustum>, shadow_frustum);
@@ -61,5 +66,6 @@ public:
     virtual void set_shadow_map(std::uint32_t resolution, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map(std::shared_ptr<texture::Texture2D>&&, core::job::EndCaller<>&& end_callback);
     virtual void set_shadow_map_target(std::shared_ptr<texture::Target>&&);
+    void update_uniforms() override;
 };
 }

@@ -1,5 +1,5 @@
 #include "gx-gl-mesh.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/allocator/gx-cr-alc-shared-array.hpp"
 #include "../render/material/gx-rnd-mat-material.hpp"
 #include "gx-gl-check.hpp"

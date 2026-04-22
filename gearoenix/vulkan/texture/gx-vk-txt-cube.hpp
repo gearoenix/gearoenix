@@ -17,15 +17,11 @@ struct TextureCube final : render::texture::TextureCube {
 
 private:
     std::shared_ptr<image::View> view;
-    std::uint32_t view_index;
     mips_t mips;
-    std::uint32_t sampler_index;
 
 public:
     [[nodiscard]] const std::shared_ptr<image::View>& get_view() const { return view; }
-    [[nodiscard]] std::uint32_t get_view_index() const { return view_index; }
     [[nodiscard]] const mips_t& get_mips() const { return mips; }
-    [[nodiscard]] std::uint32_t get_sampler_index() const { return sampler_index; }
 
     TextureCube(const render::texture::TextureInfo& info, std::string&&);
     ~TextureCube() override;

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GEAROENIX_CORE_MACRO_STRINGIFIER_HPP // No pragma, because of some of the shader compilers.
+#define GEAROENIX_CORE_MACRO_STRINGIFIER_HPP
 
 #define GX_STR_0(a) #a
 #define GX_STR_1(a) GX_STR_0(a)
@@ -11,3 +12,5 @@
 #define GX_STR_8(a) GX_STR_7(a)
 #define GX_STR_9(a) GX_STR_8(a)
 #define GX_STRINGIFY(a) GX_STR_9(a)
+
+#endif

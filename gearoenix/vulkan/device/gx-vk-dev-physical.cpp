@@ -201,7 +201,7 @@ void gearoenix::vulkan::device::Physical::initialize_properties()
         if ((flags & vk::MemoryPropertyFlagBits::eDeviceLocal)
             && (flags & vk::MemoryPropertyFlagBits::eHostVisible)
             && (flags & vk::MemoryPropertyFlagBits::eHostCoherent)
-            && req_size_for_unified_mem < heap_size) {
+            && req_size_for_unified_mem < static_cast<std::int64_t>(heap_size)) {
             unified_memory = true;
             break;
         }

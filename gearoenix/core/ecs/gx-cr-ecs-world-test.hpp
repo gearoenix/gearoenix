@@ -208,18 +208,18 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     };
 
     e1 = Entity::construct("1", nullptr);
-    e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
-    e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
+    e1->add_component(Object::construct<Position>(e1.get(), static_cast<fp_t>(2), static_cast<fp_t>(3)));
+    e1->add_component(Object::construct<Speed>(e1.get(), static_cast<fp_t>(4), static_cast<fp_t>(5)));
 
     e2 = Entity::construct("2", e1.get());
-    e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
+    e2->add_component(Object::construct<Position>(e2.get(), static_cast<fp_t>(6), static_cast<fp_t>(7)));
 
     e3 = Entity::construct("3", e2.get());
-    e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
-    e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
+    e3->add_component(Object::construct<Speed>(e3.get(), static_cast<fp_t>(10), static_cast<fp_t>(11)));
+    e3->add_component(Object::construct<Position>(e3.get(), static_cast<fp_t>(8), static_cast<fp_t>(9)));
 
     e4 = Entity::construct("4", e3.get());
-    e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
+    e4->add_component(Object::construct<Speed>(e4.get(), static_cast<fp_t>(12), static_cast<fp_t>(13)));
 
     e5 = Entity::construct("5", e4.get());
 
@@ -239,30 +239,30 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     w.delayed_pullout_entity(std::move(e1), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e1 = std::move(e);
-        e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
-        e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
+        e1->add_component(Object::construct<Position>(e1.get(), static_cast<fp_t>(2), static_cast<fp_t>(3)));
+        e1->add_component(Object::construct<Speed>(e1.get(), static_cast<fp_t>(4), static_cast<fp_t>(5)));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e2), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e2 = std::move(e);
-        e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
+        e2->add_component(Object::construct<Position>(e2.get(), static_cast<fp_t>(6), static_cast<fp_t>(7.0)));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e3), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e3 = std::move(e);
-        e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
-        e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
+        e3->add_component(Object::construct<Speed>(e3.get(), static_cast<fp_t>(10), static_cast<fp_t>(11.0)));
+        e3->add_component(Object::construct<Position>(e3.get(), static_cast<fp_t>(8), static_cast<fp_t>(9.0)));
     }));
 
     w.update();
 
     w.delayed_pullout_entity(std::move(e4), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e4 = std::move(e);
-        e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
+        e4->add_component(Object::construct<Speed>(e4.get(), static_cast<fp_t>(12), static_cast<fp_t>(13)));
     }));
 
     w.update();
@@ -274,18 +274,18 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
     end_of_step();
 
     e1 = Entity::construct("1", nullptr);
-    e1->add_component(Object::construct<Position>(e1.get(), 2.0, 3.0));
-    e1->add_component(Object::construct<Speed>(e1.get(), 4.0, 5.0));
+    e1->add_component(Object::construct<Position>(e1.get(), static_cast<fp_t>(2), static_cast<fp_t>(3.0)));
+    e1->add_component(Object::construct<Speed>(e1.get(), static_cast<fp_t>(4), static_cast<fp_t>(5.0)));
 
     e2 = Entity::construct("2", e1.get());
-    e2->add_component(Object::construct<Position>(e2.get(), 6.0, 7.0));
+    e2->add_component(Object::construct<Position>(e2.get(), static_cast<fp_t>(6), static_cast<fp_t>(7.0)));
 
     e3 = Entity::construct("3", e2.get());
-    e3->add_component(Object::construct<Speed>(e3.get(), 10.0, 11.0));
-    e3->add_component(Object::construct<Position>(e3.get(), 8.0, 9.));
+    e3->add_component(Object::construct<Speed>(e3.get(), static_cast<fp_t>(10), static_cast<fp_t>(11)));
+    e3->add_component(Object::construct<Position>(e3.get(), static_cast<fp_t>(8), static_cast<fp_t>(9)));
 
     e4 = Entity::construct("4", e3.get());
-    e4->add_component(Object::construct<Speed>(e4.get(), 12.0, 13.0));
+    e4->add_component(Object::construct<Speed>(e4.get(), static_cast<fp_t>(12), static_cast<fp_t>(13)));
 
     e5 = Entity::construct("5", e4.get());
 
@@ -293,24 +293,24 @@ BOOST_AUTO_TEST_CASE(gearoenix_core_ecs_world)
 
     w.update();
 
-    std::atomic<int> progressed = 0;
+    std::atomic progressed = 0;
 
     w.delayed_pullout_entity(std::move(e2), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e2 = std::move(e);
-        e2->add_component(Object::construct<Speed>(e2.get(), -1.0, -1.0));
+        e2->add_component(Object::construct<Speed>(e2.get(), static_cast<fp_t>(-1), static_cast<fp_t>(-1)));
         ++progressed;
     }));
 
     w.delayed_pullout_entity(std::move(e4), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e4 = std::move(e);
-        e4->add_component(Object::construct<Position>(e4.get(), -1.0, -1.0));
+        e4->add_component(Object::construct<Position>(e4.get(), static_cast<fp_t>(-1), static_cast<fp_t>(-1)));
         ++progressed;
     }));
 
     w.delayed_pullout_entity(std::move(e5), EndCaller<EntityPtr>([&](EntityPtr&& e) {
         e5 = std::move(e);
-        e5->add_component(Object::construct<Position>(e5.get(), -1.0, -1.0));
-        e5->add_component(Object::construct<Speed>(e5.get(), -1.0, -1.0));
+        e5->add_component(Object::construct<Position>(e5.get(), static_cast<fp_t>(-1), static_cast<fp_t>(-1)));
+        e5->add_component(Object::construct<Speed>(e5.get(), static_cast<fp_t>(-1), static_cast<fp_t>(-1)));
         ++progressed;
     }));
 

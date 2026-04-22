@@ -2,9 +2,12 @@
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../imgui/gx-rnd-imgui-type-tree.hpp"
 #include "../texture/gx-rnd-txt-target.hpp"
+#include "gx-rnd-cmr-uniform.hpp"
+
 #include <random>
 
 namespace {
@@ -13,8 +16,14 @@ thread_local std::uniform_real_distribution urd(0.5f, 1.0f);
 thread_local std::default_random_engine re(rd());
 }
 
-gearoenix::render::camera::Camera::Camera(core::ecs::Entity* const entity, const core::object_type_index_t final_type, const std::string& name, Target&& target, std::shared_ptr<physics::Transformation>&& transform)
+gearoenix::render::camera::Camera::Camera(
+    core::ecs::Entity* const entity,
+    const core::object_type_index_t final_type,
+    const std::string& name,
+    Target&& target,
+    std::shared_ptr<physics::Transformation>&& transform)
     : Component(entity, final_type, std::string(name))
+    , uniform(buffer::Manager::get().get_range(buffer::UniformRegionIndex::cameras))
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))
     , debug_colour {
@@ -103,7 +112,12 @@ void gearoenix::render::camera::Camera::read(std::shared_ptr<platform::stream::S
     }));
 }
 
-void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3<core::fp_t>& location, const math::Vec3<core::fp_t>& x, const math::Vec3<core::fp_t>& y, const math::Vec3<core::fp_t>& z, std::array<math::Vec3<core::fp_t>, 8>& points) const
+void gearoenix::render::camera::Camera::generate_frustum_points(
+    const math::Vec3<core::fp_t>& location,
+    const math::Vec3<core::fp_t>& x,
+    const math::Vec3<core::fp_t>& y,
+    const math::Vec3<core::fp_t>& z,
+    std::array<math::Vec3<core::fp_t>, 8>& points) const
 {
     const auto [scale, fpn] = [&] {
         if (projection_data.is_perspective()) {
@@ -140,12 +154,19 @@ void gearoenix::render::camera::Camera::generate_frustum_points(const math::Vec3
 void gearoenix::render::camera::Camera::set_view(const math::Mat4x4<float>& v)
 {
     view = v;
+    auto& [view_projection, position_far] = uniform.get_ref<GxShaderDataCamera>();
     view_projection = projection * v;
+    position_far = math::Vec4(transform->get_global_position().to<float>(), far);
 }
 
-void gearoenix::render::camera::Camera::set_customised_target_aspect_ratio(const float tar)
+const gearoenix::math::Mat4x4<float>& gearoenix::render::camera::Camera::get_view_projection() const
 {
-    customised_target_aspect_ratio = tar;
+    return uniform.get_ref<GxShaderDataCamera>().view_projection;
+}
+
+void gearoenix::render::camera::Camera::set_customised_target_aspect_ratio(const float target_aspect_ratio)
+{
+    customised_target_aspect_ratio = target_aspect_ratio;
     update_projection();
 }
 
@@ -191,7 +212,7 @@ void gearoenix::render::camera::Camera::update_projection()
     } else {
         GX_UNEXPECTED;
     }
-    if (engine::Engine::get().get_half_depth_clip()) {
+    if (engine::Engine::get_half_depth_clip()) {
         y_flipped = !target.has_cube();
         const auto y_flip = y_flipped ? -1.0f : 1.0f;
         // clang-format off
@@ -202,7 +223,6 @@ void gearoenix::render::camera::Camera::update_projection()
             0.0f,   0.0f,   0.5f,   1.0f) * projection;
         // clang-format on
     }
-    view_projection = projection * view;
 }
 
 void gearoenix::render::camera::Camera::set_near(const float f)
@@ -293,14 +313,16 @@ void gearoenix::render::camera::Camera::update_target(core::job::EndCaller<>&& e
     if (!target.is_default()) {
         return;
     }
-    texture::Manager::get().create_default_camera_render_target(object_name, core::job::EndCaller<texture::DefaultCameraTargets>([this, w = object_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
-        const auto s = w.lock();
-        if (nullptr == s) {
-            return;
-        }
-        target = Target(std::move(t));
-        update_projection();
-        update_bloom();
-        (void)s;
-    }));
+    texture::Manager::get().create_default_camera_render_target(
+        object_name,
+        core::job::EndCaller<texture::DefaultCameraTargets>([this, w = object_self, end = std::move(end)](texture::DefaultCameraTargets&& t) mutable {
+            const auto s = w.lock();
+            if (nullptr == s) {
+                return;
+            }
+            target = Target(std::move(t));
+            update_projection();
+            update_bloom();
+            (void)s;
+        }));
 }

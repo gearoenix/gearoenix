@@ -4,7 +4,6 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
-#include "../../render/record/gx-rnd-rcd-camera.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../pipeline/gx-vk-pip-cache.hpp"
@@ -124,8 +123,6 @@ void gearoenix::vulkan::camera::Manager::terminate_ctaa()
 
 gearoenix::vulkan::camera::Manager::Manager()
     : Singleton<Manager>(this)
-    , camera_uniform_indexer(Camera::max_count)
-    , cameras_joint_models_uniform_indexer(render::record::Camera::cameras_joint_models_max_count)
 {
     core::ecs::ComponentType::add<Camera>();
     initialise_bloom();
@@ -158,14 +155,6 @@ void gearoenix::vulkan::camera::Manager::window_resized()
 
 void gearoenix::vulkan::camera::Manager::update()
 {
-    camera_uniform_indexer.reset();
-    cameras_joint_models_uniform_indexer.reset();
     render::camera::Manager::update();
-}
-
-void gearoenix::vulkan::camera::Manager::upload_uniforms()
-{
-    camera_uniform_indexer.update();
-    cameras_joint_models_uniform_indexer.update();
 }
 #endif

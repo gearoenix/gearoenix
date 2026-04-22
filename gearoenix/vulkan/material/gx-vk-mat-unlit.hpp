@@ -19,10 +19,6 @@ private:
 public:
     static void construct(std::string&& name, core::job::EndCallerShared<render::material::Unlit>&& c);
     ~Unlit() override;
-    void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_albedo_factor(const math::Vec4<float>&) override;
-    void set_uv_transform(const math::Vec4<float>&) override;
-    void set_alpha_cutoff(float) override;
     void set(bool skinned, DrawCache& dc) override;
 };
 }

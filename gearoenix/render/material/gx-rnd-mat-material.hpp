@@ -1,9 +1,15 @@
 #pragma once
 #include "../../core/gx-cr-object.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
+#include "../buffer/gx-rnd-buf-uniform.hpp"
 #include "gx-rnd-mat-transparency.hpp"
+
 #include <memory>
 #include <string>
+
+namespace gearoenix::core::allocator {
+struct Range;
+}
 
 namespace gearoenix::render::texture {
 struct Texture2D;
@@ -14,12 +20,16 @@ struct Material : core::Object {
     constexpr static auto max_count = 8;
     constexpr static auto object_type_index = gearoenix_render_material_type_index;
 
+    GX_GET_CREF_PRT(buffer::Uniform, uniform);
     GX_GETSET_VAL_PRT(bool, is_shadow_caster, true);
     GX_GETSET_VAL_PRT(bool, is_shadow_receiver, true);
     GX_GETSET_VAL_PRT(Transparency, transparency, Transparency::Opaque);
     GX_GET_CVAL_PRT(bool, need_model_view_projection_matrix);
 
-    Material(core::object_type_index_t final_object_type, std::string&& name, bool need_model_view_projection_matrix);
+    Material(
+        core::object_type_index_t final_object_type,
+        std::string&& name,
+        bool need_model_view_projection_matrix);
 
 public:
     ~Material() override;

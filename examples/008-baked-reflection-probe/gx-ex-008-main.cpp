@@ -43,6 +43,7 @@ using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
 using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
 using GxMeshPtr = std::shared_ptr<GxMesh>;
 using GxPbrPtr = std::shared_ptr<GxPbr>;
+using GxFloat = gearoenix::core::fp_t;
 
 struct GameApp final : GxCoreApp {
 private:
@@ -50,9 +51,18 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
     {
-        const GxEndCaller end([this] { scene_entity->add_to_world(); });
+        GxSceneManager::get().build("scene", 0.0, GxEntityEndCaller([this](GxEntityPtr&& entity) {
+            scene_entity = std::move(entity);
+            scene_is_ready();
+        }));
+    }
+
+    void scene_is_ready()
+    {
+        const GxEndCaller end([this] {
+            scene_entity->add_to_world();
+        });
 
         for (int metallic_i = 0; metallic_i < 11; ++metallic_i) {
             for (int roughness_i = 0; roughness_i < 11; ++roughness_i) {
@@ -66,7 +76,9 @@ public:
             }
         }
 
-        GxSkyboxManager::get().build("skybox", scene_entity.get(), GxPath::create_asset("sky.gx-cube-texture"), GxEntityEndCaller([end](auto&&) { (void)end; }));
+        GxSkyboxManager::get().build("skybox", scene_entity.get(), GxPath::create_asset("sky.gx-cube-texture"), GxEntityEndCaller([end](auto&&) {
+            (void)end;
+        }));
 
         GxCameraManager::get().build("camera", scene_entity.get(), GxEntityEndCaller([this, end](auto&& entity) {
             auto trn = entity->template get_component_shared_ptr<GxTransform>();
@@ -76,8 +88,13 @@ public:
             (void)end;
         }));
 
-        GxReflectionManager::get().build_baked("baked-reflection", scene_entity.get(), GxPath::create_asset("exported.gx-reflection"),
-            GxEntityEndCaller([end](auto&&) { (void)end; }));
+        GxReflectionManager::get().build_baked(
+            "baked-reflection",
+            scene_entity.get(),
+            GxPath::create_asset("exported.gx-reflection"),
+            GxEntityEndCaller([end](auto&&) {
+                (void)end;
+            }));
 
         GX_LOG_D("Initialised");
     }
@@ -88,7 +105,8 @@ public:
         material->set_emission_roughness_factor({ 0.0f, 0.0f, 0.0f, roughness });
 
         GxMeshManager::get().build_icosphere(
-            4, std::move(material), GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
+            4, std::move(material),
+            GxMeshEndCaller([this, metallic, roughness, p = std::move(postfix), e = std::move(end)](GxMeshPtr&& m) mutable {
                 mesh_is_ready(std::move(m), metallic, roughness, std::move(p), std::move(e));
             }));
     }
@@ -98,8 +116,9 @@ public:
         // The reason for `is_transformable` is to show to have mixed static and dynamic models in a scene.
         const auto is_transformable = roughness > 0.5f;
 
-        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, is_transformable, false);
-        entity->get_component<GxTransform>()->local_translate(GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
+        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, is_transformable, nullptr);
+        entity->get_component<GxTransform>()->local_translate(
+            GxVec3(static_cast<GxFloat>(metallic * 30.0 - 15.0), static_cast<GxFloat>(roughness * 30.0 - 15.0), static_cast<GxFloat>(0)));
     }
 };
 }

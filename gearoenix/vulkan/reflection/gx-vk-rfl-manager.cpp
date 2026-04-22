@@ -4,13 +4,11 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
-#include "../../render/reflection/gx-rnd-rfl-baked.hpp"
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
-#include "../image/gx-vk-img-image.hpp"
-#include "../image/gx-vk-img-view.hpp"
 #include "../pipeline/gx-vk-pip-cache.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../shader/gx-vk-shd-module.hpp"
@@ -80,14 +78,13 @@ void gearoenix::vulkan::reflection::Manager::initialise_convolution_compute()
 void gearoenix::vulkan::reflection::Manager::update()
 {
     render::reflection::Manager::update();
-    uniform_indexer.reset();
 }
 
 void gearoenix::vulkan::reflection::Manager::initialise_black()
 {
     if (descriptor::Bindless::singleton_is_invalid() || render::texture::Manager::singleton_is_invalid()) {
         core::job::send_job_to_pool([this] {
-            core::job::send_job(Singleton<engine::Engine>::get().get_jobs_thread_id(), [this] {
+            core::job::send_job(engine::Engine::get_jobs_thread_id(), [this] {
                 initialise_black();
             });
         });
@@ -104,9 +101,7 @@ void gearoenix::vulkan::reflection::Manager::initialise_black()
 
 gearoenix::vulkan::reflection::Manager::Manager()
     : Singleton<Manager>(this)
-    , uniform_indexer(render::reflection::Baked::max_count + render::reflection::Runtime::max_count)
 {
-    core::ecs::ComponentType::add<Probe, Runtime>();
     core::ecs::ComponentType::add<Baked>();
     core::ecs::ComponentType::add<Runtime>();
 
@@ -157,11 +152,6 @@ void gearoenix::vulkan::reflection::Manager::build_runtime(
         core::job::EndCallerShared<Runtime>([e = std::move(entity_callback)](std::shared_ptr<Runtime>&& r) -> void {
             e.get_return()->add_component(std::move(r));
         }));
-}
-
-void gearoenix::vulkan::reflection::Manager::upload_uniforms()
-{
-    uniform_indexer.update();
 }
 
 void gearoenix::vulkan::reflection::Manager::submit(const vk::CommandBuffer cmd) const

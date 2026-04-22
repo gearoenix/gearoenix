@@ -1,5 +1,7 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
+#include "../../math/gx-math-vector-4d.hpp"
+#include "../buffer/gx-rnd-buf-uniform.hpp"
 
 namespace gearoenix::render::mesh {
 struct Mesh;
@@ -17,6 +19,8 @@ struct Skybox : core::ecs::Component {
     const bool is_equirectangular;
     const bool is_cube;
 
+    GX_GET_CREF_PRT(math::Vec4<float>, strength);
+    GX_GET_CREF_PRT(buffer::Uniform, uniform);
     GX_GET_CREF_PRT(std::shared_ptr<mesh::Mesh>, bound_mesh);
     GX_GET_CREF_PRT(std::shared_ptr<texture::Texture>, bound_texture);
     GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
@@ -30,5 +34,6 @@ struct Skybox : core::ecs::Component {
 
 public:
     ~Skybox() override;
+    void set_strength(const math::Vec4<float>&);
 };
 }

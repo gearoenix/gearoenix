@@ -9,6 +9,7 @@
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
+#include "../model/gx-rnd-mdl-uniform.hpp"
 #include "../reflection/gx-rnd-rfl-baked.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
 #include "../reflection/gx-rnd-rfl-probe.hpp"
@@ -48,17 +49,14 @@ void gearoenix::render::record::Models::update_after_change(core::ecs::Entity* c
         auto* const parent_entity = e->get_parent();
         auto* const armature = parent_entity ? parent_entity->template get_component<physics::animation::Armature>() : nullptr;
         const auto bones_count = armature ? static_cast<std::uint32_t>(armature->get_all_bones().size()) : 0;
+        mdl->get_uniform().template get_ref<GxShaderDataModel>().bones_point_lights_directional_lights_shadow_caster_directional_lights_count.x = bones_count;
 
         auto& td = threads[kernel_index];
 
         Model data {
-            .entity = e,
             .model = mdl,
-            .armature = armature,
-            .transform = trn,
             .collider = cld,
             .probe = black_probe,
-            .bones_count = bones_count,
         };
 
         if (mdl->get_is_transformable()) {
@@ -86,7 +84,7 @@ void gearoenix::render::record::Models::update_after_change(core::ecs::Entity* c
     {
         static_models_bvh.reset();
         const auto static_models_count = static_cast<physics::accelerator::Bvh::index_t>(dynamic_models_starting_index);
-        for (auto i = decltype(static_models_count){0}; i < static_models_count; ++i) {
+        for (auto i = decltype(static_models_count) { 0 }; i < static_models_count; ++i) {
             const auto& m = models[i];
             static_models_bvh.add({ m.collider->get_surrounding_box(), i });
         }
@@ -99,12 +97,16 @@ void gearoenix::render::record::Models::update_after_change(core::ecs::Entity* c
         boost::hash_combine(previous_models_hash, td.models_hash);
     }
 
-    last_frame_update = engine::Engine::get().get_frame_number_from_start();
+    last_frame_update = engine::Engine::get_frame_number_from_start();
 #endif
 }
 
-void gearoenix::render::record::Models::update_per_frame(core::ecs::Entity* scene_entity)
+void gearoenix::render::record::Models::update_per_frame([[maybe_unused]] core::ecs::Entity* scene_entity)
 {
+    for (const auto& m : models) {
+        m.model->update_uniform();
+    }
+
 #if GEAROENIX_RENDER_RECORD_MODEL_DEBUG
     struct ModelThreadData final {
         std::size_t models_hash = 0;

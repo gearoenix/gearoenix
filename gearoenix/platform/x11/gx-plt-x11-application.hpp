@@ -29,7 +29,7 @@ public:
     explicit Application(GX_MAIN_ENTRY_ARGS_DEF, const RuntimeConfiguration& config = RuntimeConfiguration());
     ~Application();
     void run(core::Application* core_application = nullptr);
-#ifdef GX_RENDER_VULKAN_ENABLED
+#if GX_RENDER_VULKAN_ENABLED
     [[nodiscard]] std::vector<const char*> get_vulkan_extensions() const;
 #endif
 };

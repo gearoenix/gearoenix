@@ -38,13 +38,11 @@ struct Camera final : render::camera::Camera {
     [[nodiscard]] const Target& get_gapi_target() const { return gapi_target; }
     [[nodiscard]] const std::shared_ptr<pipeline::SkyboxCube>& get_skybox_cube() const { return skybox_cube; }
     [[nodiscard]] const std::shared_ptr<pipeline::SkyboxEquirectangular>& get_skybox_equirectangular() const { return skybox_equirectangular; }
-    [[nodiscard]] std::uint64_t get_last_update_frame_number() const { return last_update_frame_number; }
 
 private:
     Target gapi_target;
     std::shared_ptr<pipeline::SkyboxCube> skybox_cube;
     std::shared_ptr<pipeline::SkyboxEquirectangular> skybox_equirectangular;
-    std::uint64_t last_update_frame_number = static_cast<std::uint64_t>(-1);
 
     vk::raii::DescriptorPool bloom_descriptor_pool { nullptr };
     std::array<vk::DescriptorSet, GX_RENDER_DEFAULT_CAMERA_TARGET_MIPS_COUNT> bloom_ds_tex0_to_tex1 { };
@@ -54,11 +52,6 @@ private:
     void destroy_bloom_descriptors();
 
     vk::Format rendering_colour_format = vk::Format::eUndefined;
-    std::vector<std::uint32_t> cameras_joint_model_indices; // MVPs
-    std::uint32_t shader_data_index = static_cast<std::uint32_t>(-1);
-
-    void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
-    void update_target(core::job::EndCaller<>&& end) override;
 
     Camera(core::ecs::Entity* entity, const std::string& name, render::camera::Target&& target, std::shared_ptr<physics::Transformation>&& transform);
 
@@ -70,7 +63,8 @@ public:
     void render_forward_skyboxes(const render::record::Skyboxes&, DrawState& draw_state) const;
     void render_bloom(const scene::Scene& scene, vk::CommandBuffer cmd) const;
     void render_colour_correction_anti_aliasing(const scene::Scene& scene, vk::CommandBuffer cmd) const;
-    void after_record(std::uint64_t frame_number, const render::record::Camera& rc);
+    void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
+    void update_target(core::job::EndCaller<>&& end) override;
     static void record_viewport(const render::record::Camera&, vk::CommandBuffer);
 };
 }

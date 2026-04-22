@@ -2,6 +2,7 @@
 #include "../../core/gx-cr-static-flat-map.hpp"
 #include "../../core/gx-cr-static-flat-set.hpp"
 #include "../../math/gx-math-matrix-4d.hpp"
+#include "../camera/gx-rnd-cmr-uniform.hpp"
 
 namespace gearoenix::core::ecs {
 struct Entity;
@@ -34,7 +35,8 @@ struct Models;
 struct CameraModel final {
     Model* model = nullptr;
     std::uint32_t first_mvp_index = static_cast<std::uint32_t>(-1);
-    std::uint32_t mvps_count = static_cast<std::uint32_t>(-1);
+
+    [[nodiscard]] GxShaderDataCameraJointModel& get_first_mvp() const;
 };
 
 struct Bloom final {
@@ -56,8 +58,6 @@ struct Camera final {
     std::vector<std::pair<core::fp_t, CameraModel>> temp_models;
     std::vector<std::pair<core::fp_t, CameraModel>> all_models;
     std::size_t translucent_models_starting_index = 0;
-    std::vector<math::Mat4x4<float>> mvps;
-    std::vector<std::vector<std::pair<std::uint32_t, math::Mat4x4<float>>>> threads_mvps;
     std::vector<std::vector<std::pair<core::fp_t, CameraModel>>> threads_temp_models;
     std::vector<std::vector<std::pair<core::fp_t, CameraModel>>> threads_all_models;
 

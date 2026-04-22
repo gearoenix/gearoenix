@@ -1,9 +1,9 @@
 #pragma once
+#include "../gx-cr-profiler.hpp"
 #include "../gx-cr-singleton.hpp"
 #include "gx-cr-ecs-archetype.hpp"
 #include "gx-cr-ecs-comp-type.hpp"
 #include "gx-cr-ecs-entity-ptr.hpp"
-#include "../gx-cr-profiler.hpp"
 
 #include <map>
 #include <memory>

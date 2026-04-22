@@ -10,7 +10,6 @@
 
 namespace gearoenix::vulkan::buffer {
 struct Buffer;
-struct Uniform;
 }
 
 namespace gearoenix::vulkan::image {
@@ -50,17 +49,7 @@ private:
     void write_sampler_descriptor(std::uint32_t index, vk::Sampler sampler) const;
 
 public:
-    Bindless(
-        const buffer::Uniform& scenes_uniform,
-        const buffer::Uniform& cameras_uniform,
-        const buffer::Uniform& models_uniform,
-        const buffer::Uniform& materials_uniform,
-        const buffer::Uniform& point_lights_uniform,
-        const buffer::Uniform& directional_lights_uniform,
-        const buffer::Uniform& shadow_caster_directional_lights_uniform,
-        const buffer::Uniform& bones_uniform,
-        const buffer::Uniform& reflection_probes_uniform,
-        const buffer::Uniform& cameras_joint_models_uniform);
+    Bindless();
     ~Bindless() override = default;
 
     Bindless(Bindless&&) = delete;

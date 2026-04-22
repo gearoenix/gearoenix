@@ -1,13 +1,16 @@
 #include "gx-rnd-rcd-camera.hpp"
+#include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
-#include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../core/gx-cr-profiler.hpp"
+#include "../../core/sync/gx-cr-sync-thread.hpp"
 #include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../physics/collider/gx-phs-cld-collider.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
+#include "../camera/gx-rnd-cmr-uniform.hpp"
 #include "../model/gx-rnd-mdl-model.hpp"
 #include "../reflection/gx-rnd-rfl-baked.hpp"
 #include "../reflection/gx-rnd-rfl-manager.hpp"
@@ -38,12 +41,20 @@ void on_intersection(auto& m, auto& self, const auto& camera_location, const aut
         all_models.emplace_back(dis, &m);
     }
 }
+
+std::atomic<std::size_t> last_mvp_index { 0 };
+std::atomic<std::size_t> mvp_uniform_buffer_frame_pointer { 0 };
+}
+
+GxShaderDataCameraJointModel& gearoenix::render::record::CameraModel::get_first_mvp() const
+{
+    return buffer::Manager::get_uniform_region_ptr<GxShaderDataCameraJointModel>(buffer::UniformRegionIndex::camera_joint_model)[first_mvp_index];
 }
 
 gearoenix::render::record::Camera::Camera()
-    : threads_mvps(core::sync::threads_count())
+    :
 #if !GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
-    , threads_temp_models(core::sync::threads_count())
+    threads_temp_models(core::sync::threads_count())
     , threads_all_models(core::sync::threads_count())
 #endif
 {
@@ -53,11 +64,14 @@ void gearoenix::render::record::Camera::clear()
 {
     temp_models.clear();
     all_models.clear();
-    mvps.clear();
 
 #if !GEAROENIX_RENDER_RECORD_MODEL_BUILD_BVH_FOR_DYNAMICS
-    for (auto& t : threads_temp_models) { t.clear(); }
-    for (auto& t : threads_all_models) { t.clear(); }
+    for (auto& t : threads_temp_models) {
+        t.clear();
+    }
+    for (auto& t : threads_all_models) {
+        t.clear();
+    }
 #endif
 }
 
@@ -109,49 +123,64 @@ void gearoenix::render::record::Camera::update_models(Models& models)
     }
 #endif
 
-    std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(), [](const auto& rhs, const auto& lhs) {
+    GX_PROFILE_EXP(std::sort(GX_PARALLEL_POLICY all_models.begin(), all_models.end(), [](const auto& rhs, const auto& lhs) {
         return rhs.first < lhs.first;
-    });
-    std::sort(GX_PARALLEL_POLICY temp_models.begin(), temp_models.end(), [](const auto& rhs, const auto& lhs) {
+    }));
+    GX_PROFILE_EXP(std::sort(GX_PARALLEL_POLICY temp_models.begin(), temp_models.end(), [](const auto& rhs, const auto& lhs) {
         return rhs.first > lhs.first;
-    });
+    }));
     translucent_models_starting_index = all_models.size();
-    all_models.insert(all_models.end(), temp_models.begin(), temp_models.end());
+    GX_PROFILE_EXP(all_models.insert(all_models.end(), temp_models.begin(), temp_models.end()));
 
-    auto gather_mvps = [&](auto& trn_opq_models) {
-        for (auto& t : threads_mvps) {
-            t.clear();
-        }
-        core::sync::parallel_for_i(trn_opq_models, [&](const auto& d_m, const auto i, const auto ki) {
-            const auto& rm = *d_m.second.model;
-            if (const auto& m = *rm.model; !m.needs_mvp() && camera->get_usage() != camera::Camera::Usage::Shadow) {
-                return;
-            }
-            if (rm.armature) {
-                for (auto* const bone : rm.armature->get_all_bones()) {
-                    threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(bone->get_global_matrix()));
+    const auto gather_mvps = [&](std::vector<std::pair<core::fp_t, CameraModel>>& trn_opq_models) {
+        struct Context {
+            std::vector<std::pair<core::fp_t, CameraModel>>& models;
+            camera::Camera& camera;
+        } ctx { trn_opq_models, *camera };
+
+        core::sync::parallel(+[](const unsigned int kernel_index, const unsigned int kernels_count, void* const context) {
+            auto& [mds, cmr] = *static_cast<Context*>(context);
+            const auto mds_count = static_cast<unsigned int>(mds.size());
+            std::size_t mvps_count = 0;
+            const auto is_shadow = cmr.get_usage() == camera::Camera::Usage::Shadow;
+            for (auto i = kernel_index; i < mds_count; i += kernels_count) {
+                const auto& m = *mds[i].second.model->model;
+                if (!(m.needs_mvp() || is_shadow)) {
+                    continue;
                 }
-            } else {
-                threads_mvps[ki].emplace_back(i, camera->get_view_projection() * math::Mat4x4<float>(rm.transform->get_global_matrix()));
-            }
-        });
-        auto current_model_index = static_cast<std::uint32_t>(-1);
-        for (auto& ms : threads_mvps) {
-            for (auto& [i, m] : ms) {
-                auto& cam_model = trn_opq_models[i].second;
-                if (current_model_index != i) {
-                    cam_model.first_mvp_index = static_cast<std::uint32_t>(mvps.size());
-                    cam_model.mvps_count = 1;
-                    current_model_index = i;
+                if (m.get_armature()) {
+                     mvps_count += m.get_armature()->get_all_bones().size();
                 } else {
-                    ++cam_model.mvps_count;
+                    ++mvps_count;
                 }
-                mvps.push_back(m);
             }
-        }
+            auto mvp_index = last_mvp_index.fetch_add(mvps_count, std::memory_order_relaxed);
+            GX_ASSERT_D(mvp_index + mvps_count <= gearoenix::render::record::Camera::cameras_joint_models_max_count);
+            const auto ptr_i = mvp_uniform_buffer_frame_pointer.load(std::memory_order_relaxed) + mvp_index * sizeof(GxShaderDataCameraJointModel);
+            auto ptr = reinterpret_cast<GxShaderDataCameraJointModel*>(ptr_i);
+            for (auto i = kernel_index; i < mds_count; i += kernels_count) {
+                auto& cam_m = mds[i].second;
+                auto& m = *cam_m.model->model;
+                if (!(m.needs_mvp() || is_shadow)) {
+                    continue;
+                }
+                cam_m.first_mvp_index = static_cast<std::uint32_t>(mvp_index);
+                if (m.get_armature()) {
+                    const auto bones_count = m.get_armature()->get_all_bones().size();
+                    m.update_bones_uniform(cmr.get_view_projection(), ptr);
+                    ptr += bones_count;
+                    mvp_index += bones_count;
+                } else {
+                    ptr->mvp = cmr.get_view_projection() * m.get_transform()->get_global_matrix();
+                    ++ptr;
+                    ++mvp_index;
+                }
+            } }, &ctx);
     };
 
     GX_PROFILE_EXP(gather_mvps(all_models));
+
+    GX_ASSERT_D(last_mvp_index.load(std::memory_order_relaxed) <= cameras_joint_models_max_count);
 }
 
 void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_entity)
@@ -159,6 +188,11 @@ void gearoenix::render::record::Cameras::update(core::ecs::Entity* const scene_e
     for (int i = 0; i < last_camera_index; ++i) {
         cameras[i].clear();
     }
+
+    last_mvp_index.store(0, std::memory_order_relaxed);
+    mvp_uniform_buffer_frame_pointer.store(
+        buffer::Uniform::get_frame_pointer() + static_cast<std::size_t>(buffer::Manager::get_region(buffer::UniformRegionIndex::camera_joint_model)->get_offset()),
+        std::memory_order_relaxed);
 
     last_camera_index = 0;
     indices_map.clear();

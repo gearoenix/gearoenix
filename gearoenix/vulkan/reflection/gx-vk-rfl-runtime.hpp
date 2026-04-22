@@ -3,7 +3,6 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-runtime.hpp"
 #include "../gx-vk-loader.hpp"
-#include "gx-vk-rfl-probe.hpp"
 
 #include <array>
 
@@ -13,7 +12,7 @@ struct TextureCube;
 }
 
 namespace gearoenix::vulkan::reflection {
-struct Runtime final : render::reflection::Runtime, Probe {
+struct Runtime final : render::reflection::Runtime {
     GEAROENIX_OBJECT_STRUCT_DEF;
 
     struct IrradiancePushConstants final {
@@ -42,12 +41,10 @@ struct Runtime final : render::reflection::Runtime, Probe {
     constexpr static auto object_type_index = gearoenix_gapi_reflection_runtime_type_index;
     constexpr static std::array all_parent_object_type_indices {
         render::reflection::Runtime::object_type_index,
-        reflection::Probe::object_type_index,
-        render::reflection::Probe::object_type_index
+        Probe::object_type_index
     };
     constexpr static std::array immediate_parent_object_type_indices {
         render::reflection::Runtime::object_type_index,
-        reflection::Probe::object_type_index
     };
 
 private:

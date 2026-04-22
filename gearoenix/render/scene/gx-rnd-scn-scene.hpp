@@ -1,9 +1,12 @@
 #pragma once
 #include "../../core/ecs/gx-cr-ecs-component.hpp"
-#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../math/gx-math-vector-4d.hpp"
-#include "../../physics/accelerator/gx-phs-acc-bvh.hpp"
+#include "../buffer/gx-rnd-buf-uniform.hpp"
 #include "../record/gx-rnd-rcd-scene.hpp"
+
+namespace gearoenix::render::texture {
+struct Texture2D;
+}
 
 namespace gearoenix::render::scene {
 struct Scene : core::ecs::Component {
@@ -12,21 +15,20 @@ struct Scene : core::ecs::Component {
 
     // radius, normal-jitter, min and max depth values for occlusion
     GX_GET_REF_PRT(math::Vec4<float>, ssao_settings);
+    GX_GET_REF_PRT(math::Vec3<float>, ambient_light);
     GX_GET_REF_PRT(record::Scene, record);
-    GX_GET_REFC_PRT(std::string, forward_render_pass_name);
-    GX_GET_REFC_PRT(std::string, shadow_render_pass_name);
-    GX_GET_REFC_PRT(std::string, shadow_reflection_probe_render_pass_name);
     GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
     GX_GETSET_VAL_PRT(bool, changed, true);
+    GX_GET_CREF_PRT(buffer::Uniform, uniform);
+    GX_GET_CREF_PRT(std::shared_ptr<texture::Texture2D>, brdflut);
 
-    Scene(core::ecs::Entity* entity, core::object_type_index_t final_type_index, core::fp_t layer, std::string&& name);
-    Scene(core::object_type_index_t final_type_index, core::object_id_t id, std::string&& name);
-
+    Scene(core::ecs::Entity* entity, core::object_type_index_t final_type_index, core::fp_t layer, std::string&& name, std::shared_ptr<texture::Texture2D>&& brdflut);
     static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
     void write(std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end_caller) override;
 
 public:
     ~Scene() override;
+    void update_uniform();
     virtual void update_per_frame();
 
     /// Update the whole scene after major changes

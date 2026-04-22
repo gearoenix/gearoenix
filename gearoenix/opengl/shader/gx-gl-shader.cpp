@@ -1,5 +1,5 @@
 #include "gx-gl-shader.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/job/gx-cr-job-end-caller.hpp"
 #include "../gx-gl-check.hpp"
 #include "../gx-gl-engine.hpp"

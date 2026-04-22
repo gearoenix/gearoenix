@@ -30,15 +30,6 @@ private:
 public:
     static void construct(std::string&& name, core::job::EndCallerShared<render::material::Pbr>&& c);
     ~Pbr() override;
-    void show_debug_gui() override;
-    void set_albedo(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_orm(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_albedo_factor(const math::Vec4<float>&) override;
-    void set_emission_roughness_factor(const math::Vec4<float>&) override;
-    void set_normal_metallic_factor(const math::Vec4<float>&) override;
-    void set_alpha_cutoff_occlusion_strength_reserved_reserved(const math::Vec4<float>&) override;
     void set(bool skinned, DrawCache& dc) override;
 };
 }

@@ -34,11 +34,8 @@ void gearoenix::vulkan::reflection::Runtime::initialise_gapi()
     gapi_radiance = std::dynamic_pointer_cast<texture::TextureCube>(radiance);
     GX_ASSERT_D(gapi_radiance);
 
-    environment_texture_index = gapi_environment->get_view_index();
-    environment_sampler_index = gapi_environment->get_sampler_index();
-
-    set_textures(*gapi_irradiance, *gapi_radiance);
-    radiance_lod_coefficient = static_cast<float>(roughnesses.size() - 1);
+    environment_texture_index = gapi_environment->get_shader_resource_index();
+    environment_sampler_index = gapi_environment->get_sampler_shader_resource_index();
 
     const auto& mgr = core::Singleton<Manager>::get();
     const auto dev = device::Logical::get().get_vulkan_data();

@@ -1,51 +1,73 @@
 #include "gx-rnd-lt-directional.hpp"
+
 #include "../../core/ecs/gx-cr-ecs-world.hpp"
 #include "../../physics/collider/gx-phs-cld-frustum.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
+#include "../buffer/gx-rnd-buf-manager.hpp"
 #include "../camera/gx-rnd-cmr-camera.hpp"
 #include "../camera/gx-rnd-cmr-manager.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
+#include "../texture/gx-rnd-txt-target.hpp"
 #include "../texture/gx-rnd-txt-texture-2d.hpp"
+#include "gx-rnd-lt-uniform.hpp"
+
+std::array<gearoenix::render::buffer::Uniform*, gearoenix::render::light::Directional::max_count>
+    gearoenix::render::light::Directional::uniforms;
 
 gearoenix::render::light::Directional::Directional(core::ecs::Entity* const entity, std::string&& name)
-    : Light(entity, core::ecs::ComponentType::create_index(this), std::move(name))
+    : Light(
+          entity,
+          core::ecs::ComponentType::create_index(this),
+          std::move(name),
+          buffer::Manager::get_range(buffer::UniformRegionIndex::directional_lights))
     , direction(0.0f, 0.0f, -1.0f)
 {
+    uniforms[uniform.shader_data_index] = &uniform;
 }
 
 gearoenix::render::light::Directional::~Directional() = default;
 
-gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(core::ecs::Entity* const entity, const core::object_type_index_t final_type_index, std::string&& name)
-    : Light(entity, final_type_index, std::move(name))
+void gearoenix::render::light::Directional::update_uniforms()
 {
+    auto& ref = uniform.get_ref<GxShaderDataDirectionalLight>();
+    ref.direction = math::Vec4(direction.to<float>(), 0.0f);
+    ref.colour = math::Vec4(colour.to<float>(), 1.0f);
+}
+
+gearoenix::render::light::ShadowCasterDirectional::ShadowCasterDirectional(
+    core::ecs::Entity* const entity, const core::object_type_index_t final_type_index, std::string&& name)
+    : Light(entity, final_type_index, std::move(name), buffer::Manager::get_range(buffer::UniformRegionIndex::shadow_caster_directional_lights))
+    , directional_uniform(buffer::Manager::get_range(buffer::UniformRegionIndex::directional_lights))
+{
+    Directional::uniforms[directional_uniform.shader_data_index] = &directional_uniform;
 }
 
 gearoenix::render::light::ShadowCasterDirectional::~ShadowCasterDirectional() = default;
 
-void gearoenix::render::light::ShadowCasterDirectional::initialise(const std::uint32_t resolution, const float camera_far, const float camera_near, const float camera_aspect, core::job::EndCaller<>&& end_callback)
+void gearoenix::render::light::ShadowCasterDirectional::initialise(
+    const std::uint32_t resolution, const float camera_far, const float camera_near, const float camera_aspect, core::job::EndCaller<>&& end_callback)
 {
     if (nullptr == shadow_camera) {
-        camera::Manager::get().build(object_name + "-shadow-camera", entity,
-            core::job::EndCaller<core::ecs::EntityPtr>([this, resolution, c = object_self, camera_aspect, camera_near, camera_far, e = std::move(end_callback)](core::ecs::EntityPtr&& camera_entity) mutable -> void {
-                const auto self = c.lock();
-                if (nullptr == self) {
-                    return;
-                }
+        camera::Manager::get().build(object_name + "-shadow-camera", entity, core::job::EndCaller<core::ecs::EntityPtr>([this, resolution, c = object_self, camera_aspect, camera_near, camera_far, e = std::move(end_callback)](core::ecs::EntityPtr&& camera_entity) mutable -> void {
+            const auto self = c.lock();
+            if (nullptr == self) {
+                return;
+            }
 
-                shadow_camera_entity = std::move(camera_entity);
+            shadow_camera_entity = std::move(camera_entity);
 
-                shadow_transform = shadow_camera_entity->get_component_shared_ptr<physics::Transformation>();
-                shadow_frustum = shadow_camera_entity->get_component_shared_ptr<physics::collider::Frustum>();
+            shadow_transform = shadow_camera_entity->get_component_shared_ptr<physics::Transformation>();
+            shadow_frustum = shadow_camera_entity->get_component_shared_ptr<physics::collider::Frustum>();
 
-                shadow_camera = shadow_camera_entity->get_component_shared_ptr<camera::Camera>();
-                shadow_camera->set_usage(camera::Camera::Usage::Shadow);
-                shadow_camera->set_enabled(false); // Disabled until customised target is ready
+            shadow_camera = shadow_camera_entity->get_component_shared_ptr<camera::Camera>();
+            shadow_camera->set_usage(camera::Camera::Usage::Shadow);
+            shadow_camera->set_enabled(false); // Disabled until customised target is ready
 
-                initialise_camera(camera_far, camera_near, camera_aspect);
-                set_shadow_map(resolution, std::move(e));
+            initialise_camera(camera_far, camera_near, camera_aspect);
+            set_shadow_map(resolution, std::move(e));
 
-                (void)self;
-            }));
+            (void)self;
+        }));
     } else {
         initialise_camera(camera_far, camera_near, camera_aspect);
         set_shadow_map(resolution, std::move(end_callback));
@@ -72,7 +94,12 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(const std
     texture::Manager::get().create_2d_from_pixels(object_name + "-shadow-map", std::move(pixels),
         texture::TextureInfo()
             .set_format(texture::TextureFormat::D32)
-            .set_sampler_info(texture::SamplerInfo().set_min_filter(texture::Filter::Nearest).set_mag_filter(texture::Filter::Nearest).set_wrap_s(texture::Wrap::ClampToEdge).set_wrap_t(texture::Wrap::ClampToEdge))
+            .set_sampler_info(
+                texture::SamplerInfo()
+                    .set_min_filter(texture::Filter::Nearest)
+                    .set_mag_filter(texture::Filter::Nearest)
+                    .set_wrap_s(texture::Wrap::ClampToEdge)
+                    .set_wrap_t(texture::Wrap::ClampToEdge))
             .set_width(resolution)
             .set_height(resolution)
             .set_type(texture::Type::Texture2D)
@@ -86,7 +113,9 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map(std::shar
 {
     auto self = std::dynamic_pointer_cast<ShadowCasterDirectional>(object_self.lock());
     shadow_map = std::move(sm);
-    texture::Manager::get().create_target(object_name + "-shadow-map-target", { texture::Attachment(texture::Attachment2D(std::shared_ptr(shadow_map))) },
+    texture::Manager::get().create_target(
+        object_name + "-shadow-map-target",
+        { texture::Attachment(texture::Attachment2D(std::shared_ptr(shadow_map))) },
         core::job::EndCallerShared<texture::Target>([e = std::move(end_callback), s = std::move(self)](std::shared_ptr<texture::Target>&& t) mutable {
             s->set_shadow_map_target(std::move(t));
             (void)e;
@@ -98,4 +127,20 @@ void gearoenix::render::light::ShadowCasterDirectional::set_shadow_map_target(st
     shadow_map_target = std::move(t);
     shadow_camera->set_customised_target(std::shared_ptr(shadow_map_target));
     shadow_camera->set_enabled(true); // Target is ready, camera can now participate in rendering
+}
+
+void gearoenix::render::light::ShadowCasterDirectional::update_uniforms()
+{
+    auto& ref = uniform.get_ref<GxShaderDataShadowCasterDirectionalLight>();
+    GX_ASSERT_D(shadow_map);
+    const auto txt_idx = shadow_map->get_shader_resource_index();
+    const auto direction = shadow_transform->get_z_axis().to<float>();
+    const auto colour_f = colour.to<float>();
+    ref.direction_bit_shadow_map_texture_index = math::Vec4(direction, *reinterpret_cast<const float*>(&txt_idx));
+    ref.colour = math::Vec4(colour_f, 1.0f);
+    ref.normalised_vp = shadow_camera->get_view_projection();
+
+    auto& dref = directional_uniform.get_ref<GxShaderDataDirectionalLight>();
+    dref.direction = math::Vec4(direction, 0.0f);
+    dref.colour = math::Vec4(colour_f, 1.0f);
 }

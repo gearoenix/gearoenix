@@ -3,31 +3,21 @@
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/job/gx-cr-job-manager.hpp"
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
+#include "../../render/buffer/gx-rnd-buf-manager.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
-#include "../buffer/gx-vk-buf-uniform.hpp"
+#include "../buffer/gx-vk-buf-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-marker.hpp"
 #include "../image/gx-vk-img-view.hpp"
-#include "../memory/gx-vk-mem-memory.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
 
 namespace {
 constexpr vk::DescriptorBindingFlags gx_binding_flags = vk::DescriptorBindingFlagBits::ePartiallyBound | vk::DescriptorBindingFlagBits::eUpdateAfterBind | vk::DescriptorBindingFlagBits::eUpdateUnusedWhilePending;
 }
 
-gearoenix::vulkan::descriptor::Bindless::Bindless(
-    const buffer::Uniform& scenes_uniform,
-    const buffer::Uniform& cameras_uniform,
-    const buffer::Uniform& models_uniform,
-    const buffer::Uniform& materials_uniform,
-    const buffer::Uniform& point_lights_uniform,
-    const buffer::Uniform& directional_lights_uniform,
-    const buffer::Uniform& shadow_caster_directional_lights_uniform,
-    const buffer::Uniform& bones_uniform,
-    const buffer::Uniform& reflection_probes_uniform,
-    const buffer::Uniform& cameras_joint_models_uniform)
+gearoenix::vulkan::descriptor::Bindless::Bindless()
     : Singleton(this)
     , descriptor_set_count(device::Physical::get().get_unified_memory() ? frames_in_flight : 1)
 {
@@ -158,33 +148,38 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
     }
 
     // ========== Initialize Buffer Descriptors ==========
-    const std::array uniforms {
-        &scenes_uniform,
-        &cameras_uniform,
-        &models_uniform,
-        &materials_uniform,
-        &point_lights_uniform,
-        &directional_lights_uniform,
-        &shadow_caster_directional_lights_uniform,
-        &bones_uniform,
-        &reflection_probes_uniform,
-        &cameras_joint_models_uniform
+    using RegionIndex = render::buffer::UniformRegionIndex;
+    constexpr std::array<RegionIndex, buffer_bindings_count> region_order {
+        RegionIndex::scenes,
+        RegionIndex::cameras,
+        RegionIndex::models,
+        RegionIndex::materials,
+        RegionIndex::point_lights,
+        RegionIndex::directional_lights,
+        RegionIndex::shadow_caster_directional_lights,
+        RegionIndex::bones,
+        RegionIndex::reflection_probes,
+        RegionIndex::camera_joint_model,
     };
 
     const auto is_unified = device::Physical::get().get_unified_memory();
+    const auto& buffer_manager = core::Singleton<buffer::Manager>::get();
 
     for (std::uint32_t s = 0; s < descriptor_set_count; ++s) {
+        const auto& base_buffer = is_unified
+            ? *buffer_manager.get_each_frame(s)
+            : *buffer_manager.get_each_frame_destination();
+        const auto base_offset = static_cast<vk::DeviceSize>(base_buffer.get_offset());
+        const auto base_vulkan_buffer = base_buffer.get_vulkan_data();
+
         std::array<vk::DescriptorBufferInfo, buffer_bindings_count> buffer_infos { };
         std::array<vk::WriteDescriptorSet, buffer_bindings_count> writes { };
 
         for (std::uint32_t i = 0; i < buffer_bindings_count; ++i) {
-            const auto& buff = is_unified
-                ? uniforms[i]->get_cpu_buffer(s)
-                : *uniforms[i]->get_gpu();
-            const auto& allocator = *buff.get_allocated_memory()->get_allocator();
-            buffer_infos[i].buffer = buff.get_vulkan_data();
-            buffer_infos[i].offset = static_cast<vk::DeviceSize>(buff.get_offset());
-            buffer_infos[i].range = static_cast<vk::DeviceSize>(allocator.get_size());
+            const auto& region = *render::buffer::Manager::get_region(region_order[i]);
+            buffer_infos[i].buffer = base_vulkan_buffer;
+            buffer_infos[i].offset = base_offset + static_cast<vk::DeviceSize>(region.get_offset());
+            buffer_infos[i].range = static_cast<vk::DeviceSize>(region.get_size());
 
             writes[i].dstSet = descriptor_sets[s];
             writes[i].dstBinding = 7 + i; // Buffers start at binding 7
@@ -227,7 +222,7 @@ gearoenix::vulkan::descriptor::Bindless::Bindless(
 void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(
     const std::uint32_t binding, const std::uint32_t index, const std::shared_ptr<image::View>& view, const vk::ImageLayout layout) const
 {
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, binding, index, layout, view]() {
+    core::job::send_job(engine::Engine::get_jobs_thread_id(), [this, binding, index, layout, view]() {
         vk::DescriptorImageInfo info;
         info.imageView = view->get_vulkan_data();
         info.imageLayout = layout;
@@ -246,7 +241,7 @@ void gearoenix::vulkan::descriptor::Bindless::write_image_descriptor(
 
 void gearoenix::vulkan::descriptor::Bindless::write_sampler_descriptor(const std::uint32_t index, const vk::Sampler sampler) const
 {
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, index, sampler]() {
+    core::job::send_job(engine::Engine::get_jobs_thread_id(), [this, index, sampler]() {
         vk::DescriptorImageInfo info;
         info.sampler = sampler;
 
@@ -384,7 +379,7 @@ void gearoenix::vulkan::descriptor::Bindless::free_sampler(const std::uint32_t i
 
 void gearoenix::vulkan::descriptor::Bindless::bind(const vk::CommandBuffer cmd) const
 {
-    const auto frame_number = Singleton<engine::Engine>::get().get_frame_number();
+    const auto frame_number = engine::Engine::get_frame_number();
     const auto set_index = frame_number % descriptor_set_count;
     cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pipeline_layout, 0, descriptor_sets[set_index], { });
 }

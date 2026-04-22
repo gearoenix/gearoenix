@@ -1,6 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../render/material/gx-rnd-mat-pbr.hpp"
 #include "gx-gl-material.hpp"
 
@@ -23,10 +23,9 @@ struct Pbr final : render::material::Pbr, Material {
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_normal);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_emission);
     GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_orm);
-    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, gl_brdflut);
     GX_GET_REFC_PRV(std::shared_ptr<shader::ShadowCasterCombination>, shadow_caster_combination);
     GX_GET_REFC_PRV(std::shared_ptr<shader::ForwardPbrCombination>, forward_pbr_combination);
-    GX_GET_REFC_PRV(std::shared_ptr<shader::GBuffersFiller>, gbuffers_filler_combination); /// TODO it has too change to combination and support bones, ...
+    GX_GET_REFC_PRV(std::shared_ptr<shader::GBuffersFiller>, gbuffers_filler_combination);
 
     explicit Pbr(std::string&& name);
 
@@ -40,7 +39,6 @@ public:
     void set_normal(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_emission(std::shared_ptr<render::texture::Texture2D>&&) override;
     void set_orm(std::shared_ptr<render::texture::Texture2D>&&) override;
-    void set_brdflut(std::shared_ptr<render::texture::Texture2D>&&) override;
 };
 }
 

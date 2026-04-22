@@ -1,6 +1,6 @@
 #pragma once
 #include "../../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../../core/gx-cr-object-type-indices.hpp"
 #include "../gx-gl-types.hpp"
 #include <array>

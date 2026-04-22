@@ -1,5 +1,5 @@
 #include "gx-gl-loader.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../core/macro/gx-cr-mcr-assert.hpp"
 #include "../platform/gx-plt-log.hpp"
 #include "gx-gl-constants.hpp"

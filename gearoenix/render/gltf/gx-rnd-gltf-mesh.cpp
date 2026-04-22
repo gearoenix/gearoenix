@@ -1,4 +1,5 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
+#include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../engine/gx-rnd-eng-engine.hpp"
 #include "../material/gx-rnd-mat-pbr.hpp"
@@ -7,7 +8,6 @@
 #include "../model/gx-rnd-mdl-manager.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
-#include "../../physics/animation/gx-phs-anm-armature.hpp"
 
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
@@ -341,9 +341,9 @@ bool gearoenix::render::gltf::Meshes::process(const int node_index, core::ecs::E
     for (const auto& m : meshes[node.mesh]->meshes) {
         meshes_set.insert(m);
     }
-    const bool has_skeletal_animation = node.skin != -1;
-    GX_ASSERT_D(!has_skeletal_animation || (parent != nullptr && parent->get_component<physics::animation::Armature>() != nullptr));
-    auto entity = model::Manager::get().build(std::string(node.name), parent, std::move(meshes_set), true, has_skeletal_animation);
+    auto arm = parent != nullptr ? parent->get_component_shared_ptr<physics::animation::Armature>() : nullptr;
+    GX_ASSERT_D((node.skin != -1) == (arm != nullptr));
+    auto entity = model::Manager::get().build(std::string(node.name), parent, std::move(meshes_set), true, std::move(arm));
     apply_transform(node_index, context, *entity->get_component<physics::Transformation>());
     return true;
 }

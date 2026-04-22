@@ -6,7 +6,6 @@
 
 gearoenix::vulkan::material::Manager::Manager()
     : Singleton<Manager>(this)
-    , uniform_indexer(Pbr::max_count + Unlit::max_count + Sprite::max_count)
 {
     core::Object::register_type<Material, Pbr>();
 
@@ -31,7 +30,4 @@ void gearoenix::vulkan::material::Manager::construct_sprite(std::string&&, core:
 {
     GX_UNIMPLEMENTED;
 }
-
-void gearoenix::vulkan::material::Manager::upload_uniforms() { uniform_indexer.update(); }
-
 #endif

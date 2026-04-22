@@ -1,5 +1,5 @@
 #include "gx-gl-texture.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../platform/stream/gx-plt-stm-local.hpp"
 #include "../platform/stream/gx-plt-stm-memory.hpp"
 #include "gx-gl-check.hpp"
@@ -27,14 +27,6 @@ void flip_texture(std::vector<std::uint8_t>& pixels, const std::uint32_t height)
             std::swap(pixels[top_index], pixels[bottom_index]);
         }
         bottom_index = next_bottom_index;
-    }
-}
-
-void flip_texture(std::vector<std::vector<std::uint8_t>>& pixels, std::uint32_t height)
-{
-    for (auto& mip_pixels : pixels) {
-        flip_texture(mip_pixels, height);
-        height >>= 1;
     }
 }
 }
@@ -183,7 +175,7 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
     if (!content) {
         return;
     }
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, s = s, c = c]() mutable {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
@@ -228,11 +220,13 @@ void* gearoenix::gl::Texture2D::get_imgui_ptr() const { return reinterpret_cast<
 gearoenix::gl::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& name)
     : render::texture::Texture2D(std::move(name), info)
 {
+    shader_resource_index = 0;
+    sampler_shader_resource_index = 0;
 }
 
 gearoenix::gl::Texture2D::~Texture2D()
 {
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object] {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [o = object] {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures(1, &o);
     });
@@ -257,7 +251,7 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
     if (!content) {
         return;
     }
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [this, s = s, c = c]() mutable {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [this, s = s, c = c]() mutable {
         GX_GL_CHECK_D;
         uint framebuffer = 0;
         glGenFramebuffers(1, &framebuffer);
@@ -300,11 +294,13 @@ void gearoenix::gl::TextureCube::write(const std::shared_ptr<platform::stream::S
 gearoenix::gl::TextureCube::TextureCube(const render::texture::TextureInfo& info, std::string&& name)
     : render::texture::TextureCube(std::move(name), info)
 {
+    shader_resource_index = 0;
+    sampler_shader_resource_index = 0;
 }
 
 gearoenix::gl::TextureCube::~TextureCube()
 {
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [o = object]() {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [o = object]() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glDeleteTextures(1, &o);
     });
@@ -334,7 +330,7 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
     const auto gl_img_width = static_cast<sizei>(info.get_width());
     const auto gl_img_height = static_cast<sizei>(info.get_height());
     c.set_return(result);
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_2D, result->object);
@@ -389,7 +385,7 @@ void gearoenix::gl::TextureManager::create_cube_from_pixels_v(
     const auto gl_img_width = static_cast<gl::sizei>(info.get_width());
     const auto gl_img_height = static_cast<gl::sizei>(info.get_height());
     c.set_return(result);
-    core::job::send_job(render::engine::Engine::get().get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, info, c = std::move(c)] {
         GX_GL_CHECK_D;
         glGenTextures(1, &(result->object));
         glBindTexture(GL_TEXTURE_CUBE_MAP, result->object);

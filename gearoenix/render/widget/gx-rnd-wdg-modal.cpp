@@ -42,14 +42,17 @@ void gearoenix::render::widget::Modal::construct(std::string&& name, std::string
     auto values_ready = core::job::EndCaller([values, parent = std::move(parent), camera_entity]() mutable {
         values->mat->set_transparency(material::Transparency::Transparent);
         values->mat->set_albedo(std::move(values->background_texture));
-        values->return_value.background_model_builder = model::Manager::get().build(values->return_value.modal->name + "-background-model", parent ? parent->get_model_entity().get() : nullptr, { values->msh }, true, false);
+        values->return_value.background_model_builder = model::Manager::get().build(
+            values->return_value.modal->name + "-background-model",
+            parent ? parent->get_model_entity().get() : nullptr,
+            { values->msh }, true, nullptr);
         values->return_value.modal->transform = values->return_value.background_model_builder->get_component_shared_ptr<physics::Transformation>();
         values->return_value.modal->set_model_entity(core::ecs::EntityPtr(values->return_value.background_model_builder));
         values->return_value.modal->set_camera_entity(camera_entity);
         if (nullptr != parent) {
             parent->add_child(values->return_value.modal);
         }
-        values->return_value.modal->parent = std::move(parent);
+        values->return_value.modal->parent = parent;
         values->end_callback.set_return(std::move(values->return_value));
     });
 
@@ -70,8 +73,13 @@ void gearoenix::render::widget::Modal::construct(std::string&& name, std::string
     auto& result = values->return_value.modal;
 
     if (close_button_texture_asset.has_value()) {
-        Button::construct(result->name + "-close-button", std::string(close_button_texture_asset->first), std::string(close_button_texture_asset->second), camera_entity, std::shared_ptr(result),
-            core::job::EndCallerShared<Button>([values, values_ready](auto&& button) {
+        Button::construct(
+            result->name + "-close-button",
+            std::string(close_button_texture_asset->first),
+            std::string(close_button_texture_asset->second),
+            camera_entity,
+            std::shared_ptr(result),
+            core::job::EndCallerShared<Button>([values, values_ready](std::shared_ptr<Button>&& button) {
                 values->return_value.modal->close = std::move(button);
                 (void)values_ready;
             }));
@@ -87,7 +95,12 @@ void gearoenix::render::widget::Modal::construct(std::string&& name, std::string
 
     if (ok_button_texture_asset.has_value()) {
         Button::construct(
-            result->name + "-ok-button", std::string(ok_button_texture_asset->first), std::string(ok_button_texture_asset->second), camera_entity, std::shared_ptr(result), core::job::EndCallerShared<Button>([values, values_ready](auto&& button) {
+            result->name + "-ok-button",
+            std::string(ok_button_texture_asset->first),
+            std::string(ok_button_texture_asset->second),
+            camera_entity,
+            std::shared_ptr(result),
+            core::job::EndCallerShared<Button>([values, values_ready](std::shared_ptr<Button>&& button) {
                 values->return_value.modal->ok = std::move(button);
                 (void)values_ready;
             }));

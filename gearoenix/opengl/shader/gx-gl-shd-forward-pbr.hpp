@@ -1,6 +1,8 @@
 #pragma once
 #include "gx-gl-shader.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
+#include "../../render/gx-rnd-constants.hpp"
+
 #include <array>
 #include <boost/container/static_vector.hpp>
 #include <optional>

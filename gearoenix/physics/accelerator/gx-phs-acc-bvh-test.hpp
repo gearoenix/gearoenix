@@ -73,8 +73,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_ray_hit)
 
     /// Place 5 boxes along the +Z axis at z = 2, 4, 6, 8, 10
     for (index_t i = 0; i < 5; ++i) {
-        const core::fp_t z = 2.0 + 2.0 * static_cast<core::fp_t>(i);
-        bvh.add({ Box(V3(1.0, 1.0, z + 0.5), V3(-1.0, -1.0, z - 0.5)), i });
+        const auto z = static_cast<core::fp_t>(2.0 + 2.0 * static_cast<double>(i));
+        bvh.add({ Box(
+                      V3(static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), static_cast<core::fp_t>(z + 0.5)),
+                      V3(static_cast<core::fp_t>(-1), static_cast<core::fp_t>(-1), static_cast<core::fp_t>(z - 0.5))),
+            i });
     }
     bvh.create_nodes();
 
@@ -162,8 +165,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_call_on_all)
     std::array<bool, n> visited = { };
 
     for (index_t i = 0; i < n; ++i) {
-        const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
+        const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
+        bvh.add({ Box(
+                      V3(x + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), static_cast<core::fp_t>(1)),
+                      V3(x - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1), static_cast<core::fp_t>(-1))),
+            i });
     }
     bvh.create_nodes();
 
@@ -194,8 +200,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_intersecting_with_miss)
 
     /// Create a 1D row of boxes along X: 10 boxes, spaced at x = 0, 5, 10, ..., 45
     for (index_t i = 0; i < 10; ++i) {
-        const core::fp_t x = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
+        const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(5);
+        bvh.add({ Box(
+                      V3(x + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), static_cast<core::fp_t>(1)),
+                      V3(x - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1), static_cast<core::fp_t>(-1))),
+            i });
     }
     bvh.create_nodes();
 
@@ -238,9 +247,12 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_quality)
     constexpr index_t grid = 10;
     for (index_t i = 0; i < grid; ++i) {
         for (index_t j = 0; j < grid; ++j) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
-            const core::fp_t y = static_cast<core::fp_t>(j) * 3.0;
-            bvh.add({ Box(V3(x + 0.5, y + 0.5, 0.5), V3(x - 0.5, y - 0.5, -0.5)), i * grid + j });
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
+            const core::fp_t y = static_cast<core::fp_t>(j) * static_cast<core::fp_t>(3);
+            bvh.add({ Box(
+                          V3(x + static_cast<core::fp_t>(0.5), y + static_cast<core::fp_t>(0.5), static_cast<core::fp_t>(0.5)),
+                          V3(x - static_cast<core::fp_t>(0.5), y - static_cast<core::fp_t>(0.5), static_cast<core::fp_t>(-0.5))),
+                i * grid + j });
         }
     }
     bvh.create_nodes();
@@ -248,8 +260,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_quality)
     /// Cast a ray down onto each grid cell and verify it hits the correct box
     for (index_t i = 0; i < grid; ++i) {
         for (index_t j = 0; j < grid; ++j) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
-            const core::fp_t y = static_cast<core::fp_t>(j) * 3.0;
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
+            const core::fp_t y = static_cast<core::fp_t>(j) * static_cast<core::fp_t>(3);
             const Ray ray(V3(x, y, 100.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
@@ -262,8 +274,8 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_quality)
     /// Cast rays that miss between grid cells
     for (index_t i = 0; i < grid - 1; ++i) {
         for (index_t j = 0; j < grid - 1; ++j) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 3.0 + 1.5;
-            const core::fp_t y = static_cast<core::fp_t>(j) * 3.0 + 1.5;
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3) + static_cast<core::fp_t>(1.5);
+            const core::fp_t y = static_cast<core::fp_t>(j) * static_cast<core::fp_t>(3) + static_cast<core::fp_t>(1.5);
             const Ray ray(V3(x, y, 100.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(!result.has_value());
@@ -288,16 +300,19 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_depth_layers)
     /// 4 layers of 4 boxes each, all overlapping in XY but at different Z
     for (index_t layer = 0; layer < 4; ++layer) {
         for (index_t i = 0; i < 4; ++i) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
-            const core::fp_t z = static_cast<core::fp_t>(layer) * 5.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, z + 1.0), V3(x - 1.0, -1.0, z - 1.0)), layer * 4 + i });
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
+            const core::fp_t z = static_cast<core::fp_t>(layer) * static_cast<core::fp_t>(5);
+            bvh.add({ Box(
+                          V3(x + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), z + static_cast<core::fp_t>(1)),
+                          V3(x - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1), z - static_cast<core::fp_t>(1))),
+                layer * 4 + i });
         }
     }
     bvh.create_nodes();
 
     /// Ray going along +Z from below should hit layer 0 first
     for (index_t i = 0; i < 4; ++i) {
-        const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
+        const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
         const Ray ray(V3(x, 0.0, -100.0), V3(0.0, 0.0, 1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
@@ -308,7 +323,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_sah_depth_layers)
 
     /// Ray going along -Z from above should hit layer 3 first
     for (index_t i = 0; i < 4; ++i) {
-        const core::fp_t x = static_cast<core::fp_t>(i) * 3.0;
+        const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(3);
         const Ray ray(V3(x, 0.0, 100.0), V3(0.0, 0.0, -1.0));
         const auto result = bvh.hit(ray, 1000.0);
         BOOST_TEST(result.has_value());
@@ -330,7 +345,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_single_element)
     physics::accelerator::Bvh bvh;
     using index_t = physics::accelerator::Bvh::index_t;
 
-    bvh.add({ Box(V3(1.0), V3(-1.0)),  42 });
+    bvh.add({ Box(V3(1.0), V3(-1.0)), 42 });
     bvh.create_nodes();
 
     /// Ray that hits the single box
@@ -371,13 +386,16 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_leaf_boundary)
         using index_t = physics::accelerator::Bvh::index_t;
 
         for (index_t i = 0; i < 5; ++i) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(4);
+            bvh.add({ Box(
+                          V3(x + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), static_cast<core::fp_t>(1)),
+                          V3(x - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1), static_cast<core::fp_t>(-1))),
+                i });
         }
         bvh.create_nodes();
 
         for (index_t i = 0; i < 5; ++i) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(4);
             const Ray ray(V3(x, 0.0, 10.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
@@ -393,13 +411,16 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_leaf_boundary)
         using index_t = physics::accelerator::Bvh::index_t;
 
         for (index_t i = 0; i < 6; ++i) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
-            bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(4);
+            bvh.add({ Box(
+                          V3(x + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1), static_cast<core::fp_t>(1)),
+                          V3(x - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1), static_cast<core::fp_t>(-1))),
+                i });
         }
         bvh.create_nodes();
 
         for (index_t i = 0; i < 6; ++i) {
-            const core::fp_t x = static_cast<core::fp_t>(i) * 4.0;
+            const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(4);
             const Ray ray(V3(x, 0.0, 10.0), V3(0.0, 0.0, -1.0));
             const auto result = bvh.hit(ray, 1000.0);
             BOOST_TEST(result.has_value());
@@ -426,11 +447,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_coincident_centers)
     using Ray = math::Ray3<core::fp_t>;
 
     physics::accelerator::Bvh bvh;
-        using index_t = physics::accelerator::Bvh::index_t;
+    using index_t = physics::accelerator::Bvh::index_t;
 
     for (index_t i = 0; i < 20; ++i) {
-        const core::fp_t half = 1.0 + static_cast<core::fp_t>(i) * 0.1;
-        bvh.add({ Box(V3(half), V3(-half)),  i });
+        const core::fp_t half = static_cast<core::fp_t>(1) + static_cast<core::fp_t>(i) * static_cast<core::fp_t>(0.1);
+        bvh.add({ Box(V3(half), V3(-half)), i });
     }
     bvh.create_nodes();
 
@@ -470,7 +491,7 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_diagonal_ray)
                     static_cast<core::fp_t>(x) * spacing,
                     static_cast<core::fp_t>(y) * spacing,
                     static_cast<core::fp_t>(z) * spacing);
-                bvh.add({ Box(center + 0.5, center - 0.5),  id++ });
+                bvh.add({ Box(center + 0.5, center - 0.5), id++ });
             }
         }
     }
@@ -522,8 +543,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_reset_and_rebuild)
 
     /// First build: 3 boxes along X
     for (index_t i = 0; i < 3; ++i) {
-        const core::fp_t x = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(x + 1.0, 1.0, 1.0), V3(x - 1.0, -1.0, -1.0)), i });
+        const core::fp_t x = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(5);
+        bvh.add({ Box(
+                      V3(x + static_cast<core::fp_t>(1), 1.0, 1.0),
+                      V3(x - static_cast<core::fp_t>(1), -1.0, -1.0)),
+            i });
     }
     bvh.create_nodes();
 
@@ -538,8 +562,11 @@ BOOST_AUTO_TEST_CASE(gearoenix_accelerator_bvh_reset_and_rebuild)
     bvh.reset();
 
     for (index_t i = 0; i < 3; ++i) {
-        const core::fp_t y = static_cast<core::fp_t>(i) * 5.0;
-        bvh.add({ Box(V3(1.0, y + 1.0, 1.0), V3(-1.0, y - 1.0, -1.0)),  100 + i });
+        const core::fp_t y = static_cast<core::fp_t>(i) * static_cast<core::fp_t>(5);
+        bvh.add({ Box(
+                      V3(static_cast<core::fp_t>(1), y + static_cast<core::fp_t>(1), static_cast<core::fp_t>(1)),
+                      V3(static_cast<core::fp_t>(-1), y - static_cast<core::fp_t>(1), static_cast<core::fp_t>(-1))),
+            100 + i });
     }
     bvh.create_nodes();
 

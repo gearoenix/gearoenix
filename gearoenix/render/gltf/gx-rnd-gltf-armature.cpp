@@ -1,4 +1,5 @@
 #include "gx-rnd-gltf-armature.hpp"
+#include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../physics/animation/gx-phs-anm-armature.hpp"
 #include "../../physics/animation/gx-phs-anm-bone.hpp"
 #include "../../physics/animation/gx-phs-anm-manager.hpp"
@@ -6,6 +7,7 @@
 #include "../scene/gx-rnd-scn-scene.hpp"
 #include "gx-rnd-gltf-context.hpp"
 #include "gx-rnd-gltf-transform.hpp"
+
 #include <algorithm>
 
 gearoenix::render::gltf::Armatures::Armatures(const Context& context)

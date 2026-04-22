@@ -52,6 +52,7 @@ using GxMeshEndCaller = GxEndCallerShared<GxMesh>;
 using GxPbrEndCaller = GxEndCallerShared<GxPbr>;
 using GxMeshPtr = std::shared_ptr<GxMesh>;
 using GxPbrPtr = std::shared_ptr<GxPbr>;
+using GxFloat = gearoenix::core::fp_t;
 
 struct GameApp final : GxCoreApp {
 private:
@@ -59,7 +60,14 @@ private:
 
 public:
     GameApp()
-        : scene_entity(GxSceneManager::get().build("scene", 0.0))
+    {
+        GxSceneManager::get().build("scene", 0.0, GxEntityEndCaller([this](GxEntityPtr&& e) {
+            scene_entity = std::move(e);
+            scene_is_ready();
+        }));
+    }
+
+    void scene_is_ready()
     {
         const GxEndCaller end([this] { scene_entity->add_to_world(); });
 
@@ -123,9 +131,9 @@ public:
 
     void mesh_is_ready(GxMeshPtr&& mesh, const float metallic, const float roughness, std::string&& postfix, GxEndCaller&&)
     {
-        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, false, false);
+        auto entity = GxModelManager::get().build("icosphere" + postfix, scene_entity.get(), { std::move(mesh) }, false, nullptr);
         entity->get_component<GxTransform>()->local_translate(
-            GxVec3(static_cast<double>(metallic) * 30.0 - 15.0, static_cast<double>(roughness) * 30.0 - 15.0, 0.0));
+            GxVec3(static_cast<GxFloat>(metallic * 30.0 - 15.0), static_cast<GxFloat>(roughness * 30.0 - 15.0), static_cast<GxFloat>(0)));
     }
 };
 }

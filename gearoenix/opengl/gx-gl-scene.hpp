@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/gx-rnd-build-configuration.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 #include "../render/scene/gx-rnd-scn-manager.hpp"
 #include "../render/scene/gx-rnd-scn-scene.hpp"
 #include "gx-gl-types.hpp"
@@ -14,13 +14,11 @@ struct Scene final : render::scene::Scene {
     constexpr static std::array immediate_parent_object_type_indices { render::scene::Scene::object_type_index };
 
 private:
-    Scene(core::ecs::Entity* entity, std::string&& name, core::fp_t layer);
-    Scene(core::object_id_t id, std::string&& name);
+    Scene(core::ecs::Entity* entity, std::string&& name, core::fp_t layer, std::shared_ptr<render::texture::Texture2D>&& brdflut);
     static void read(std::shared_ptr<Scene>&& self, std::shared_ptr<platform::stream::Stream>&& stream, std::shared_ptr<core::ObjectStreamer>&& object_streamer, core::job::EndCaller<>&& end);
 
 public:
     ~Scene() override;
-    void update_per_frame() override;
     void render_shadows(uint& current_shader);
     void render_reflection_probes(uint& current_shader) const;
     void render_forward(uint& current_shader);
@@ -29,7 +27,7 @@ public:
 struct SceneManager final : render::scene::Manager {
     SceneManager();
     ~SceneManager() override;
-    [[nodiscard]] core::ecs::EntityPtr build(std::string&& name, core::fp_t layer) const override;
+    void build(std::string&& name, core::fp_t layer, core::job::EndCaller<core::ecs::EntityPtr>&& end) const override;
 };
 }
 

@@ -79,7 +79,10 @@ public:
     [[nodiscard]] EntityPtr get_ptr() const;
 
     template <typename ComponentType>
-    [[nodiscard]] ComponentType* get_component() const { return static_cast<ComponentType*>(get_component(ComponentType::object_type_index).get()); }
+    [[nodiscard]] ComponentType* get_component() const
+    {
+        return static_cast<ComponentType*>(get_component(ComponentType::object_type_index).get());
+    }
 
     template <typename ComponentType>
     [[nodiscard]] std::shared_ptr<ComponentType> get_component_shared_ptr() const

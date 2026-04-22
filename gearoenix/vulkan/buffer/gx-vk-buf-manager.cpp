@@ -3,6 +3,7 @@
 #include "../../core/allocator/gx-cr-alc-range.hpp"
 #include "../../core/sync/gx-cr-sync-work-waiter.hpp"
 #include "../../platform/gx-plt-application.hpp"
+#include "../../render/buffer/gx-rnd-buf-uniform.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../device/gx-vk-dev-physical.hpp"
@@ -12,7 +13,6 @@
 #include "../queue/gx-vk-qu-queue.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-buf-buffer.hpp"
-#include "gx-vk-buf-uniform.hpp"
 
 namespace {
 std::atomic last_staging = 0;
@@ -30,7 +30,7 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return result;
 }
 
-std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_device_root() const
+std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create_device_root()
 {
     const auto sz = Buffer::get_max_gpu_needed_size();
     auto result = Buffer::construct("gpu-buffer", sz, memory::Place::Gpu);
@@ -56,14 +56,25 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     return device_root->allocate(dyn_sz);
 }
 
+std::size_t gearoenix::vulkan::buffer::Manager::get_uniform_frame_pointer()
+{
+    const auto frame_number = engine::Engine::get_frame_number();
+    const auto base_ptr = reinterpret_cast<std::size_t>(each_frame[frame_number]->get_allocated_memory()->get_data());
+    return base_ptr;
+}
+
 gearoenix::vulkan::buffer::Manager::Manager()
-    : Singleton(this)
+    : Singleton<Manager>(this)
     , is_unified_memory(device::Physical::get().get_unified_memory())
     , device_root(create_device_root())
     , host_root(create_host_root())
     , each_frame(create_each_frame())
     , each_frame_destination(create_each_frame_destination())
 {
+    uniform_range_alignment = static_cast<std::int64_t>(device::Physical::get().get_properties().limits.minUniformBufferOffsetAlignment);
+    uniform_internal_range_alignment = 1;
+    initialise_ranges();
+    GX_ASSERT_D(uniform_root_range->get_size() <= host_root->get_allocated_memory()->get_allocator()->get_size());
 }
 
 gearoenix::vulkan::buffer::Manager::~Manager() = default;
@@ -80,17 +91,6 @@ std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Ma
     auto result = Buffer::construct(name, size, memory::Place::Cpu, true);
     GX_ASSERT_D(result);
     return result;
-}
-
-std::shared_ptr<gearoenix::vulkan::buffer::Uniform> gearoenix::vulkan::buffer::Manager::create_uniform(const std::int64_t size)
-{
-    const auto alignment = static_cast<std::int64_t>(device::Physical::get().get_properties().limits.minUniformBufferOffsetAlignment);
-    std::vector<std::shared_ptr<Buffer>> cpus(each_frame.size());
-    for (std::uint64_t fi = 0; fi < each_frame.size(); ++fi) {
-        cpus[fi] = each_frame[fi]->allocate(size, alignment);
-    }
-    auto gpu = is_unified_memory? nullptr: each_frame_destination->allocate(size, alignment);
-    return std::make_shared<Uniform>(std::move(cpus), std::move(gpu));
 }
 
 std::shared_ptr<gearoenix::vulkan::buffer::Buffer> gearoenix::vulkan::buffer::Manager::create([[maybe_unused]] const std::string& name, const void* const data, const std::int64_t size, core::job::EndCaller<>&& end)
@@ -141,7 +141,7 @@ void gearoenix::vulkan::buffer::Manager::upload_dynamics(const vk::CommandBuffer
         return; // No need to upload
     }
 
-    const auto frame_number = Singleton<engine::Engine>::get().get_frame_number();
+    const auto frame_number = engine::Engine::get_frame_number();
     const auto& src = *each_frame[frame_number];
     const auto& dst = *each_frame_destination;
 

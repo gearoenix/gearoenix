@@ -1,5 +1,5 @@
 #include "gx-gl-shd-bloom.hpp"
-#ifdef GX_RENDER_OPENGL_ENABLED
+#if GX_RENDER_OPENGL_ENABLED
 
 namespace {
 constexpr auto vertex_shader_body = R"SHADER(
@@ -36,7 +36,7 @@ gearoenix::gl::shader::BloomPrefilter::BloomPrefilter()
     fs << "    vec4 b = textureLod(source_texture, out_uv + texel_size * vec2(0.0, -1.0), 0.0);\n";
     fs << "    vec4 c = textureLod(source_texture, out_uv + texel_size * vec2(1.0, -1.0), 0.0);\n";
     fs << "    vec4 d = textureLod(source_texture, out_uv + texel_size * vec2(-0.5, -0.5), 0.0);\n";
-    fs << "    vec4 e = textureLod(source_texture, out_uv + texel_size * vec2(0.5, -0.5), 0.0);\n"; // TODO I have to check to see if it needs to be doubled, and remove the mip map in that case
+    fs << "    vec4 e = textureLod(source_texture, out_uv + texel_size * vec2(0.5, -0.5), 0.0);\n";
     fs << "    vec4 f = textureLod(source_texture, out_uv + texel_size * vec2(-1.0, 0.0), 0.0);\n";
     fs << "    vec4 g = textureLod(source_texture, out_uv, 0.0);\n";
     fs << "    vec4 h = textureLod(source_texture, out_uv + texel_size * vec2(1.0, 0.0), 0.0);\n";

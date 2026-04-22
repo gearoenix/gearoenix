@@ -37,17 +37,25 @@ void gearoenix::render::widget::Label::construct(
     std::string&& name, std::shared_ptr<texture::Texture2D>&& background_texture, std::shared_ptr<material::Material>&& mat, core::ecs::Entity* const camera_entity, std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
 {
     auto copy_mat = std::shared_ptr(mat);
-    mesh::Manager::get().build_plate(std::move(copy_mat),
-        core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](
-                                                   std::shared_ptr<mesh::Mesh>&& msh) mutable { construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(e)); }));
+    mesh::Manager::get().build_plate(
+        std::move(copy_mat),
+        core::job::EndCallerShared<mesh::Mesh>([n = std::move(name), t = std::move(background_texture), m = std::move(mat), c = camera_entity, p = std::move(parent), e = std::move(end_callback)](std::shared_ptr<mesh::Mesh>&& msh) mutable {
+            construct(std::move(n), std::move(t), std::move(m), std::move(msh), c, std::move(p), std::move(e));
+        }));
 }
 
-void gearoenix::render::widget::Label::construct(std::string&& name, std::shared_ptr<texture::Texture2D>&& background_texture, std::shared_ptr<material::Material>&& mat, std::shared_ptr<mesh::Mesh>&& msh, core::ecs::Entity* const camera_entity,
-    std::shared_ptr<Widget>&& parent, core::job::EndCallerShared<Label>&& end_callback)
+void gearoenix::render::widget::Label::construct(
+    std::string&& name,
+    std::shared_ptr<texture::Texture2D>&& background_texture,
+    std::shared_ptr<material::Material>&& mat,
+    std::shared_ptr<mesh::Mesh>&& msh,
+    core::ecs::Entity* const camera_entity,
+    std::shared_ptr<Widget>&& parent,
+    core::job::EndCallerShared<Label>&& end_callback)
 {
     mat->set_transparency(material::Transparency::Transparent);
     mat->set_albedo(std::move(background_texture));
-    auto model_entity = model::Manager::get().build(name + "-model", parent->get_model_entity().get(), { std::move(msh) }, true, false);
+    auto model_entity = model::Manager::get().build(name + "-model", parent->get_model_entity().get(), { std::move(msh) }, true, nullptr);
     auto result = std::make_shared<Label>(std::move(name));
     result->transform = model_entity->get_component_shared_ptr<physics::Transformation>();
     result->set_model_entity(std::move(model_entity));
@@ -55,6 +63,6 @@ void gearoenix::render::widget::Label::construct(std::string&& name, std::shared
     if (nullptr != parent) {
         parent->add_child(result);
     }
-    result->parent = std::move(parent);
+    result->parent = parent;
     end_callback.set_return(std::move(result));
 }

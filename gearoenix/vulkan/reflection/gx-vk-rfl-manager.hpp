@@ -2,7 +2,6 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../render/reflection/gx-rnd-rfl-manager.hpp"
-#include "../descriptor/gx-vk-des-uniform-indexer.hpp"
 #include "../gx-vk-loader.hpp"
 
 namespace gearoenix::vulkan::pipeline {
@@ -15,12 +14,9 @@ struct Module;
 }
 
 namespace gearoenix::vulkan::reflection {
-using uniform_indexer_t = descriptor::UniformIndexer<GxShaderDataReflectionProbe>;
 struct Runtime;
 struct Manager final : render::reflection::Manager, core::Singleton<Manager> {
 private:
-    uniform_indexer_t uniform_indexer;
-
     vk::raii::DescriptorSetLayout convolution_descriptor_set_layout { nullptr };
     vk::raii::Sampler convolution_sampler { nullptr };
     std::shared_ptr<pipeline::Cache> convolution_pipeline_cache;
@@ -34,8 +30,6 @@ private:
     std::shared_ptr<shader::Module> radiance_shader_module;
 
 public:
-    [[nodiscard]] const uniform_indexer_t& get_uniform_indexer() const { return uniform_indexer; }
-
     [[nodiscard]] vk::DescriptorSetLayout get_convolution_descriptor_set_layout() const { return *convolution_descriptor_set_layout; }
     [[nodiscard]] vk::Sampler get_convolution_sampler() const { return *convolution_sampler; }
     [[nodiscard]] const std::shared_ptr<pipeline::Cache>& get_convolution_pipeline_cache() const { return convolution_pipeline_cache; }
@@ -50,7 +44,6 @@ public:
 
 private:
     void initialise_convolution_compute();
-    void update() override;
     void initialise_black();
 
 public:
@@ -72,8 +65,8 @@ public:
         std::uint32_t irradiance_resolution,
         std::uint32_t radiance_resolution,
         core::job::EndCaller<core::ecs::EntityPtr>&& entity_callback) override;
-    void upload_uniforms();
     void submit(vk::CommandBuffer cmd) const;
+    void update() override;
 };
 }
 #endif
