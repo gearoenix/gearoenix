@@ -53,8 +53,8 @@ void open_world()
 void gearoenix::editor::ui::MenuWorld::show_new_popup()
 {
     static constexpr char name[] = "Start a new project?";
-    static constexpr char body[] = "Are you sure you want to start a new project?\nYou will loose your current unsaved work!";
-    static const std::function<void()> fun = [] { core::Singleton<EditorApplication>::get().renew(); };
+    static constexpr char body[] = "Are you sure you want to start a new project?\nYou will lose your current unsaved work!";
+    static const std::function fun = [] { core::Singleton<EditorApplication>::get().renew(); };
 
     render::imgui::show_sure_popup(name, is_new_popup_open, body, fun);
 }
@@ -86,7 +86,7 @@ void gearoenix::editor::ui::MenuWorld::show_settings()
 void gearoenix::editor::ui::MenuWorld::show_quit_popup()
 {
     static constexpr char name[] = "Quit the project?";
-    static constexpr char body[] = "Are you sure, you want to quit the editor?\nYou will loose your current unsaved work!";
+    static constexpr char body[] = "Are you sure, you want to quit the editor?\nYou will lose your current unsaved work!";
     static const std::function<void()> fun = [] { core::Singleton<EditorApplication>::get().quit(); };
 
     render::imgui::show_sure_popup(name, is_quit_popup_open, body, fun);

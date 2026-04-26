@@ -17,10 +17,7 @@ gearoenix::editor::viewport::TranslateButton::TranslateButton(const Button& prev
     toggled_tooltip = "Disable translation gizmo";
     text = "";
     toggled_text = "";
-    start_point = { previous.get_end_point().x + spacing, top_margin };
-    size = { height, height };
     toggled_background_colour = IM_COL32(90, 90, 200, 200);
-    compute_values();
 
     core::job::send_job_to_pool([this] {
         const render::texture::TextureInfo txt_info;
@@ -35,6 +32,17 @@ gearoenix::editor::viewport::TranslateButton::TranslateButton(const Button& prev
 }
 
 gearoenix::editor::viewport::TranslateButton::~TranslateButton() = default;
+
+float gearoenix::editor::viewport::TranslateButton::compute_start_x() const
+{
+    return previous.get_end_point().x + spacing;
+}
+
+ImVec2 gearoenix::editor::viewport::TranslateButton::compute_size() const
+{
+    // Square gizmo-toggle buttons — only icon, no label, so width == height.
+    return { height, height };
+}
 
 void gearoenix::editor::viewport::TranslateButton::update()
 {

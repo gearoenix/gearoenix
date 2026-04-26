@@ -2,6 +2,8 @@
 #include "../../core/gx-cr-application.hpp"
 #include "../gx-plt-application.hpp"
 
+#include <filesystem>
+
 #if GX_PLATFORM_INTERFACE_SDL
 #include <SDL3/SDL_system.h>
 #elif GX_PLATFORM_IOS
@@ -66,7 +68,10 @@ void gearoenix::platform::stream::Local::seek(const stream_size_t offset)
     file.seekp(static_cast<std::streamoff>(offset));
 }
 
-gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::tell() { return static_cast<stream_size_t>(file.tellg()); }
+gearoenix::platform::stream::Stream::stream_size_t gearoenix::platform::stream::Local::tell()
+{
+    return static_cast<stream_size_t>(file.tellg());
+}
 
 bool gearoenix::platform::stream::Local::exist(const std::string& name)
 {
@@ -76,6 +81,9 @@ bool gearoenix::platform::stream::Local::exist(const std::string& name)
 
 std::string gearoenix::platform::stream::Local::create_path(const std::string_view name)
 {
+    if (std::filesystem::path(name).is_absolute()) {
+        return std::string(name);
+    }
 #if GX_PLATFORM_INTERFACE_SDL
     const auto* const path_ptr = SDL_GetPrefPath(core::Application::get_organization_url().c_str(), core::Application::get_application_name().c_str());
     if (!path_ptr) {

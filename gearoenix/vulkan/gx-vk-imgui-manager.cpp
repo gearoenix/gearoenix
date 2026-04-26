@@ -34,26 +34,10 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
 
     const auto api_version = Instance::get().get_api_version();
 
-    // Determine the colour format for ImGui rendering.
-    // If the swapchain has a UNORM imgui_view (mutable sRGB swapchain), use the UNORM format
-    // to avoid double gamma correction. Otherwise, use the swapchain format as-is.
-    const auto& swapchain = Swapchain::get();
-    const auto& swapchain_format = swapchain.get_format().format;
-    if (swapchain.get_frames()[0].imgui_view) {
-        switch (swapchain_format) {
-        case vk::Format::eR8G8B8A8Srgb:
-            imgui_colour_format = vk::Format::eR8G8B8A8Unorm;
-            break;
-        case vk::Format::eB8G8R8A8Srgb:
-            imgui_colour_format = vk::Format::eB8G8R8A8Unorm;
-            break;
-        default:
-            imgui_colour_format = swapchain_format;
-            break;
-        }
-    } else {
-        imgui_colour_format = swapchain_format;
-    }
+    // ImGui renders directly into the swapchain view; the swapchain is now UNORM-only
+    // (no mutable-format aliasing), so there's a single format to use for both the
+    // pipeline and the runtime attachment.
+    const auto& swapchain_colour_format = Swapchain::get().get_format().format;
 
     // Initialize ImGui Vulkan backend with dynamic rendering
     ImGui_ImplVulkan_InitInfo info { };
@@ -70,7 +54,7 @@ gearoenix::vulkan::ImGuiManager::ImGuiManager()
     info.UseDynamicRendering = true;
     info.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
     info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
-    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = reinterpret_cast<const VkFormat*>(&imgui_colour_format);
+    info.PipelineRenderingCreateInfo.pColorAttachmentFormats = reinterpret_cast<const VkFormat*>(&swapchain_colour_format);
 #if GX_DEBUG_MODE
     info.CheckVkResultFn = +[](const VkResult result) { GX_VK_CHK_L(result); };
 #endif
@@ -102,7 +86,10 @@ void gearoenix::vulkan::ImGuiManager::start_frame()
     ImGui::NewFrame();
 }
 
-void gearoenix::vulkan::ImGuiManager::end_frame() { ImGui::Render(); }
+void gearoenix::vulkan::ImGuiManager::end_frame()
+{
+    ImGui::Render();
+}
 
 void gearoenix::vulkan::ImGuiManager::update()
 {
@@ -110,8 +97,6 @@ void gearoenix::vulkan::ImGuiManager::update()
     const auto& frame = e.get_current_frame();
     const auto& swapchain_frame = Swapchain::get().get_frame();
     const auto& swapchain_view = *swapchain_frame.view;
-    // Use the UNORM view for ImGui rendering if available, to avoid double gamma correction
-    const auto& imgui_render_view = swapchain_frame.imgui_view ? *swapchain_frame.imgui_view : swapchain_view;
     auto& swapchain_image = *swapchain_view.get_image();
     const auto vk_cmd = frame.cmd->get_vulkan_data();
 
@@ -124,7 +109,7 @@ void gearoenix::vulkan::ImGuiManager::update()
 
         // Begin dynamic rendering
         vk::RenderingAttachmentInfo color_attachment;
-        color_attachment.imageView = imgui_render_view.get_vulkan_data();
+        color_attachment.imageView = swapchain_view.get_vulkan_data();
         color_attachment.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
         // If a scene was blitted (came from COLOR_ATTACHMENT_OPTIMAL), use LOAD to preserve the content.
         color_attachment.loadOp = scene_content_present ? vk::AttachmentLoadOp::eLoad : vk::AttachmentLoadOp::eClear;
@@ -139,6 +124,11 @@ void gearoenix::vulkan::ImGuiManager::update()
 
         vk_cmd.beginRendering(rendering_info);
 
+        // `RenderDrawData` may call `ImGui_ImplVulkan_UpdateTexture`, which internally
+        // does `vkQueueSubmit` + `vkQueueWaitIdle` on the queue handle we handed ImGui
+        // at init. Take the queue's submission mutex here so those ops are serialised
+        // with every other submit / present path in the backend.
+        const std::lock_guard _ { queue::Queue::get().get_submission_lock() };
         ImGui_ImplVulkan_RenderDrawData(draw_data, static_cast<VkCommandBuffer>(vk_cmd));
 
         vk_cmd.endRendering();

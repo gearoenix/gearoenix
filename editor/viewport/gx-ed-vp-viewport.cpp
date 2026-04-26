@@ -1,22 +1,25 @@
 #include "gx-ed-vp-viewport.hpp"
+#include "../ui/gx-ed-ui-side-panel.hpp"
 #include "gx-ed-vp-camera.hpp"
 #include "gx-ed-vp-gizmo-buttons.hpp"
 #include "gx-ed-vp-projection-button.hpp"
 
 #include <gearoenix/core/gx-cr-string.hpp>
 #include <gearoenix/math/gx-math-imgui.hpp>
+#include <gearoenix/render/gizmo/gx-rnd-gzm-manager.hpp>
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_internal.h>
 
+#include <algorithm>
 #include <string>
 
 gearoenix::editor::viewport::Viewport::Viewport()
     : Singleton(this)
     , invisible_window_id("##window-" + core::String::ptr_name(this))
-    , projection_button(new ProjectionButton())
-    , gizmo_buttons(new GizmoButtons(*projection_button))
-    , camera(new Camera())
+    , projection_button(std::make_unique<ProjectionButton>())
+    , gizmo_buttons(std::make_unique<GizmoButtons>(*projection_button))
+    , camera(std::make_unique<Camera>())
 {
 }
 
@@ -24,8 +27,22 @@ gearoenix::editor::viewport::Viewport::~Viewport() = default;
 
 void gearoenix::editor::viewport::Viewport::update()
 {
+    const auto display_size = ImGui::GetIO().DisplaySize;
+    const auto* const main_vp = ImGui::GetMainViewport();
+    const float right_panel_width = ui::SidePanel::get().get_width();
+    const auto viewport_size = ImVec2(std::max(1.0f, display_size.x - right_panel_width), display_size.y);
+
+    // Free 3D area = everything below the main menu bar and to the left of the right panel.
+    // WorkPos.y is the bottom of the menu bar (adapts automatically when menu-bar height
+    // changes with UI text size), so the axis gizmo and ImGuizmo handles follow it.
+    const float free_3d_x = main_vp->WorkPos.x;
+    const float free_3d_y = main_vp->WorkPos.y;
+    const float free_3d_w = std::max(1.0f, main_vp->WorkSize.x - right_panel_width);
+    const float free_3d_h = main_vp->WorkSize.y;
+    render::gizmo::Manager::get().set_viewport_rect(free_3d_x, free_3d_y, free_3d_w, free_3d_h);
+
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(viewport_size, ImGuiCond_Always);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
     [[maybe_unused]] const auto is_window_open = ImGui::Begin(

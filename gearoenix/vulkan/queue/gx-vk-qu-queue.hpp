@@ -32,8 +32,20 @@ public:
     Queue();
     ~Queue() override;
     void submit(const command::Buffer&, const sync::Fence& fence);
-    void submit(vk::ArrayProxy<const vk::Semaphore> wait_semaphores, vk::ArrayProxy<const vk::PipelineStageFlags> wait_stages, vk::ArrayProxy<const vk::CommandBuffer> commands,
-        vk::ArrayProxy<const vk::Semaphore> signal_semaphores, vk::Fence fence = nullptr);
+    void submit(
+        vk::ArrayProxy<const vk::Semaphore> wait_semaphores,
+        vk::ArrayProxy<const vk::PipelineStageFlags> wait_stages,
+        vk::ArrayProxy<const vk::CommandBuffer> commands,
+        vk::ArrayProxy<const vk::Semaphore> signal_semaphores,
+        vk::Fence fence = nullptr);
+    /// Raw access to the submission mutex. Any code that touches the queue through
+    /// `get_vulkan_data()` (e.g. ImGui's backend calling `vkQueueSubmit` / `vkQueueWaitIdle`
+    /// inside `RenderDrawData`) must take this lock locally via `std::lock_guard`/
+    /// `std::scoped_lock` so its ops are serialised with the `submit` / `present` paths
+    /// above. Exposing the mutex directly (rather than returning a guard from here) keeps
+    /// the lock's lifetime fully in the caller's scope — no reliance on copy-elision of a
+    /// non-movable `std::lock_guard` across a function return.
+    [[nodiscard]] std::mutex& get_submission_lock() { return submission_lock; }
     void present(const vk::PresentInfoKHR& info);
 };
 }

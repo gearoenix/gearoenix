@@ -337,8 +337,8 @@ void gearoenix::render::texture::Manager::create_2d_from_formatted(std::string&&
 
     GX_ASSERT_D(Type::Unknown == info.get_type()); // type converting is not implemented and is not going to be implemented soon.
     GX_ASSERT_D(TextureFormat::Unknown == info.get_format()); // format converting does not have a high priority
-    GX_ASSERT_D(0 == info.get_width()); // dimension changing does not have a high priority
-    GX_ASSERT_D(0 == info.get_height()); // dimension changing does not have a high priority
+    GX_ASSERT_D(2 > info.get_width()); // dimension changing does not have a high priority
+    GX_ASSERT_D(2 > info.get_height()); // dimension changing does not have a high priority
 
     std::uint32_t img_width = 0;
     std::uint32_t img_height = 0;

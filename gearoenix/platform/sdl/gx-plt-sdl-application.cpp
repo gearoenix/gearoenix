@@ -118,6 +118,48 @@ void gearoenix::platform::Application::initialize_mouse()
     base.initialize_mouse_position(x, y);
 }
 
+void gearoenix::platform::Application::initialize_mouse_cursors()
+{
+    // Map each ImGui cursor enumerator to the closest SDL3 system cursor. ImGui only
+    // requests these shapes from widgets (resize grabbers, text carets, hand, etc.) —
+    // anything it doesn't recognise falls back to the default arrow in `update_mouse_cursor`.
+    mouse_cursors[ImGuiMouseCursor_Arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
+    mouse_cursors[ImGuiMouseCursor_TextInput] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
+    mouse_cursors[ImGuiMouseCursor_ResizeAll] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
+    mouse_cursors[ImGuiMouseCursor_ResizeNS] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NS_RESIZE);
+    mouse_cursors[ImGuiMouseCursor_ResizeEW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_EW_RESIZE);
+    mouse_cursors[ImGuiMouseCursor_ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NESW_RESIZE);
+    mouse_cursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+    mouse_cursors[ImGuiMouseCursor_Hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
+    mouse_cursors[ImGuiMouseCursor_NotAllowed] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NOT_ALLOWED);
+    mouse_cursors[ImGuiMouseCursor_Wait] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+    mouse_cursors[ImGuiMouseCursor_Progress] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_PROGRESS);
+
+    // Let ImGui know it can request cursor shapes — without this flag, widgets skip
+    // their `SetMouseCursor` calls entirely.
+    ImGui::GetIO().BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+}
+
+void gearoenix::platform::Application::update_mouse_cursor()
+{
+    const auto& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) {
+        return;
+    }
+    const auto cursor = ImGui::GetMouseCursor();
+    if (io.MouseDrawCursor || cursor == ImGuiMouseCursor_None) {
+        // ImGui is drawing its own software cursor, or no cursor requested — hide the OS one.
+        SDL_HideCursor();
+        return;
+    }
+    // Fall back to the default arrow for any enum value we didn't pre-create a cursor for.
+    SDL_Cursor* const sdl_cursor = (cursor >= 0 && cursor < ImGuiMouseCursor_COUNT && mouse_cursors[cursor] != nullptr)
+        ? mouse_cursors[cursor]
+        : mouse_cursors[ImGuiMouseCursor_Arrow];
+    SDL_SetCursor(sdl_cursor);
+    SDL_ShowCursor();
+}
+
 bool gearoenix::platform::Application::create_window(const std::uint32_t flags)
 {
     const auto& c = RuntimeConfiguration::get();
@@ -219,6 +261,7 @@ void gearoenix::platform::Application::fetch_events()
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
             base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
             break;
+
         default:
             GX_LOG_D("Unhandled event " << e.type);
             break;
@@ -233,6 +276,7 @@ gearoenix::platform::Application::Application()
     initialize_screen();
     initialize_window();
     initialize_mouse();
+    initialize_mouse_cursors();
     base.initialize_engine();
 }
 
@@ -244,6 +288,11 @@ gearoenix::platform::Application::~Application()
         SDL_GL_DestroyContext(gl_context);
     }
 #endif
+    for (auto* const cursor : mouse_cursors) {
+        if (nullptr != cursor) {
+            SDL_DestroyCursor(cursor);
+        }
+    }
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
@@ -265,6 +314,10 @@ void gearoenix::platform::Application::loop()
 {
     fetch_events();
     base.update();
+    // After the UI widgets have run, ImGui knows what cursor shape it wants — push
+    // that to the OS now so the user sees the right cursor on the next tick (resize
+    // arrows over the side-panel handles, text caret over InputText, etc.).
+    update_mouse_cursor();
 }
 
 void gearoenix::platform::Application::set_caption(const std::string& s) { SDL_SetWindowTitle(window, s.c_str()); }

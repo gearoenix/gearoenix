@@ -26,7 +26,7 @@ void gearoenix::vulkan::sync::Fence::reset()
 
 std::vector<std::shared_ptr<gearoenix::vulkan::sync::Fence>> gearoenix::vulkan::sync::Fence::create_frame_based(const bool signaled)
 {
-    std::vector<std::shared_ptr<Fence>> result(core::Singleton<engine::Engine>::get().get_frames_count());
+    std::vector<std::shared_ptr<Fence>> result(engine::Engine::get_frames_count());
     for (auto& s : result) {
         s = std::make_shared<Fence>(signaled);
     }

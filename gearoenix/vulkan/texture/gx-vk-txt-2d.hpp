@@ -17,6 +17,7 @@ struct Texture2D final : render::texture::Texture2D {
 private:
     std::shared_ptr<image::View> view;
     std::vector<std::shared_ptr<image::View>> mips;
+    mutable VkDescriptorSet imgui_descriptor_set = VK_NULL_HANDLE;
 
 public:
     [[nodiscard]] const std::shared_ptr<image::View>& get_view() const { return view; }
@@ -25,6 +26,7 @@ public:
     Texture2D(const render::texture::TextureInfo& info, std::string&&);
     ~Texture2D() override;
     void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
+    [[nodiscard]] void* get_imgui_ptr() const override;
 };
 }
 #endif

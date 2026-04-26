@@ -43,19 +43,20 @@ void gearoenix::editor::ui::MenuEntity::show_create_camera_window()
         new_scene_valid_name = render::imgui::entity_name_text_input(create_camera_entity_name, 200.0f).second;
     });
 
-    const float window_width = ImGui::GetWindowSize().x;
+    // Button widths come from label text, not from a window fraction — keeps "Create
+    // New Camera" (and any other long confirm label) inside the button.
+    const auto& style = ImGui::GetStyle();
+    const float label_w = std::max(
+        ImGui::CalcTextSize("Cancel").x, ImGui::CalcTextSize(popup_id).x);
+    const float button_width = label_w + style.FramePadding.x * 2.0f + ImGui::GetFontSize();
+    const float buttons_row_w = button_width * 2.0f + style.ItemSpacing.x;
+    const float row_indent = std::max(0.0f, (ImGui::GetContentRegionAvail().x - buttons_row_w) * 0.5f);
 
-    constexpr auto button_width_ratio = 0.35f;
-    constexpr auto spacing_width_ratio = (1.0f - button_width_ratio * 2.0f) / 3.0f;
-    constexpr auto second_button_start_ratio = button_width_ratio + spacing_width_ratio * 2.0f;
-
-    ImGui::SetCursorPosX(spacing_width_ratio * window_width);
-    const auto button_width = window_width * button_width_ratio;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + row_indent);
     if (ImGui::Button("Cancel", ImVec2(button_width, 0.0f))) {
         is_create_camera_open = false;
     }
     ImGui::SameLine();
-    ImGui::SetCursorPosX(second_button_start_ratio * window_width);
     if (new_scene_valid_name && ImGui::Button(popup_id, ImVec2(button_width, 0.0f))) {
         is_create_camera_open = false;
         render::camera::Manager::get().build(
@@ -98,12 +99,15 @@ void gearoenix::editor::ui::MenuEntity::show_create_skybox_window()
             if (ImGui::Button("Create")) {
                 auto progress_bar = WindowOverlayProgressBarManager::get().add("Loading Skybox [" + create_skybox_file_path.get_raw_data() + "]...");
                 core::job::send_job_to_pool([this, scene_entity, progress_bar = std::move(progress_bar)]() mutable noexcept -> void {
-                    render::texture::Manager::get().create(create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
+                    render::texture::Manager::get().create(
+                        create_skybox_file_path, *skybox_stream, render::texture::TextureInfo(),
                         core::job::EndCallerShared<render::texture::Texture>([this, progress_bar = std::move(progress_bar), scene_entity](std::shared_ptr<render::texture::Texture>&& txt) mutable {
-                            render::skybox::Manager::get().build(std::string(create_skybox_entity_name), scene_entity, std::move(txt), core::job::EndCaller<core::ecs::EntityPtr>([progress_bar = std::move(progress_bar)](auto&& skybox_entity) {
-                                (void)progress_bar;
-                                skybox_entity->add_to_world();
-                            }));
+                            render::skybox::Manager::get().build(
+                                std::string(create_skybox_entity_name), scene_entity, std::move(txt),
+                                core::job::EndCaller<core::ecs::EntityPtr>([progress_bar = std::move(progress_bar)](auto&& skybox_entity) {
+                                    (void)progress_bar;
+                                    skybox_entity->add_to_world();
+                                }));
                         }));
                 });
             }

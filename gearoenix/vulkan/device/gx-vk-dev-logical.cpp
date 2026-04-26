@@ -2,10 +2,12 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/macro/gx-cr-mcr-assert.hpp"
 #include "../../platform/gx-plt-log.hpp"
+#include "../queue/gx-vk-qu-queue.hpp"
 #include "gx-vk-dev-physical.hpp"
 
 #include <array>
 #include <limits>
+#include <mutex>
 #include <set>
 
 gearoenix::vulkan::device::Logical::Logical()
@@ -147,7 +149,31 @@ gearoenix::vulkan::device::Logical::~Logical() = default;
 
 void gearoenix::vulkan::device::Logical::wait_to_finish()
 {
-    vulkan_device.waitIdle();
+    // `vkDeviceWaitIdle`'s externsync contract requires that host access to *every*
+    // queue of the device be synchronised against this call — from the validation
+    // layer's perspective it counts as an op on every queue. So any thread currently
+    // inside `vkQueueSubmit` / `vkQueuePresentKHR` / `vkQueueWaitIdle` on our queue
+    // would race this wait without a lock (this was the source of the
+    // UNASSIGNED-Threading-MultipleThreads-Write validation error: the render thread
+    // calling `initialize_frame` on a swapchain rebuild vs. a job-pool worker
+    // submitting an asset upload).
+    //
+    // Centralising the lock here covers every existing and future caller of
+    // `wait_to_finish` uniformly. The `singleton_is_valid` guard handles the two
+    // windows where the queue object doesn't exist:
+    //   * early construction — `device::Logical` is built before `queue::Queue`
+    //     (check the engine's member init list); and
+    //   * late destruction — `~Engine` releases `render_queue` before triggering
+    //     the imgui-manager destructor (which itself calls `wait_to_finish`) and
+    //     before its own trailing `wait_to_finish`.
+    // In both windows no other thread can be touching the queue either, so an
+    // unlocked `waitIdle` is safe.
+    if (queue::Queue::singleton_is_valid()) {
+        const std::lock_guard _ { queue::Queue::get().get_submission_lock() };
+        vulkan_device.waitIdle();
+    } else {
+        vulkan_device.waitIdle();
+    }
 }
 
 #endif

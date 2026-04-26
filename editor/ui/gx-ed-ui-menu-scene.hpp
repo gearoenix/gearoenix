@@ -8,7 +8,7 @@ namespace gearoenix::editor::ui {
 struct MenuScene final : core::Singleton<MenuScene> {
     GX_GET_PTR_PRV(core::ecs::Entity, current_scene);
 
-    boost::container::flat_set<core::ecs::EntityPtr> active_scenes;
+    GX_GET_CREF_PRV(boost::container::flat_set<core::ecs::EntityPtr>, active_scenes);
 
     bool is_new_popup_open = false;
     std::string new_scene_name;

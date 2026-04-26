@@ -8,6 +8,7 @@
 #include "../command/gx-vk-cmd-buffer.hpp"
 #include "../command/gx-vk-cmd-manager.hpp"
 #include "../descriptor/gx-vk-des-bindless.hpp"
+#include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../image/gx-vk-img-image.hpp"
 #include "../image/gx-vk-img-view.hpp"
@@ -17,6 +18,8 @@
 #include "../sampler/gx-vk-smp-sampler.hpp"
 #include "../sync/gx-vk-sync-fence.hpp"
 #include "gx-vk-txt-util.hpp"
+
+#include <ImGui/backends/imgui_impl_vulkan.h>
 
 gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& in_name)
     : render::texture::Texture2D(std::move(in_name), info)
@@ -46,7 +49,13 @@ gearoenix::vulkan::texture::Texture2D::Texture2D(const render::texture::TextureI
     sampler_shader_resource_index = sampler::Manager::get().get_sampler(info.get_sampler_info())->get_bindless_index();
 }
 
-gearoenix::vulkan::texture::Texture2D::~Texture2D() = default;
+gearoenix::vulkan::texture::Texture2D::~Texture2D()
+{
+    if (VK_NULL_HANDLE != imgui_descriptor_set) {
+        ImGui_ImplVulkan_RemoveTexture(imgui_descriptor_set);
+        imgui_descriptor_set = VK_NULL_HANDLE;
+    }
+}
 
 void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& e, const bool c) const
 {
@@ -55,5 +64,17 @@ void gearoenix::vulkan::texture::Texture2D::write(const std::shared_ptr<platform
         return;
     }
     write_gpu_texture_data(*view->get_image(), info, static_cast<std::uint32_t>(get_mipmaps_count()), 1, s, e);
+}
+
+void* gearoenix::vulkan::texture::Texture2D::get_imgui_ptr() const
+{
+    if (VK_NULL_HANDLE == imgui_descriptor_set) {
+        const auto& smp = sampler::Manager::get().get_sampler(info.get_sampler_info());
+        imgui_descriptor_set = ImGui_ImplVulkan_AddTexture(
+            static_cast<VkSampler>(smp->get_vulkan_data()),
+            static_cast<VkImageView>(view->get_vulkan_data()),
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+    return imgui_descriptor_set;
 }
 #endif

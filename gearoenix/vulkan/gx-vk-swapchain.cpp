@@ -12,20 +12,6 @@
 
 #include <utility>
 
-namespace {
-[[nodiscard]] std::optional<vk::Format> srgb_to_unorm(const vk::Format format)
-{
-    switch (format) {
-    case vk::Format::eR8G8B8A8Srgb:
-        return vk::Format::eR8G8B8A8Unorm;
-    case vk::Format::eB8G8R8A8Srgb:
-        return vk::Format::eB8G8R8A8Unorm;
-    default:
-        return std::nullopt;
-    }
-}
-}
-
 gearoenix::vulkan::Swapchain::Swapchain()
     : Singleton(this)
 {
@@ -63,12 +49,15 @@ void gearoenix::vulkan::Swapchain::initialize()
     const auto& formats = physical_device.get_surface_formats();
     vulkan_data = vk::raii::SwapchainKHR { nullptr };
 
+    // The swapchain stores linear UNORM pixels — sRGB encoding for display is the
+    // responsibility of the final camera composition pass that writes into it.
+    // Picking UNORM consistently across platforms (no sRGB surface formats, no
+    // `VK_KHR_swapchain_mutable_format`) keeps ImGui, the scene compositor, and
+    // CAMetalLayer's colour management in one unambiguous space.
     auto chosen_format_index = [&] {
         constexpr std::array acceptable_formats {
-            std::pair { vk::Format::eR8G8B8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear },
-            std::pair { vk::Format::eB8G8R8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear },
-            std::pair { vk::Format::eR8G8B8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear },
             std::pair { vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear },
+            std::pair { vk::Format::eR8G8B8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear },
         };
         for (const auto& acceptable_format : acceptable_formats) {
             for (std::uint32_t i = 0; i < formats.size(); ++i) {
@@ -100,22 +89,7 @@ void gearoenix::vulkan::Swapchain::initialize()
         image_usage |= vk::ImageUsageFlagBits::eTransferDst;
     }
 
-    const auto unorm_format = srgb_to_unorm(format.format);
-    const auto mutable_format_supported = unorm_format.has_value() && physical_device.get_supported_extensions().contains(VK_KHR_SWAPCHAIN_MUTABLE_FORMAT_EXTENSION_NAME);
-
-    // For mutable format: list both sRGB and UNORM so we can create a UNORM view for ImGui
-    vk::ImageFormatListCreateInfo format_list_info;
-    std::array format_list_entries = { format.format, unorm_format.value_or(format.format) };
-
-    if (mutable_format_supported) {
-        format_list_info.setViewFormats(format_list_entries);
-    }
-
     vk::SwapchainCreateInfoKHR info;
-    if (mutable_format_supported) {
-        info.flags = vk::SwapchainCreateFlagBitsKHR::eMutableFormat;
-        info.pNext = &format_list_info;
-    }
     info.surface = surface.get_vulkan_data();
     info.minImageCount = frames_in_flight;
     info.imageFormat = format.format;
@@ -160,14 +134,11 @@ void gearoenix::vulkan::Swapchain::initialize()
             static_cast<std::uint32_t>(1),
             static_cast<std::uint32_t>(1),
             info.imageFormat,
-            mutable_format_supported ? vk::ImageCreateFlagBits::eMutableFormat : vk::ImageCreateFlags { },
+            vk::ImageCreateFlags { },
             info.imageUsage,
             images[i]);
         img->set_owned(false);
         frames[i].view = std::make_shared<image::View>(std::shared_ptr(img));
-        if (mutable_format_supported) {
-            frames[i].imgui_view = std::make_shared<image::View>(std::shared_ptr(img), 0, std::nullopt, 0, std::nullopt, *unorm_format);
-        }
         frames[i].present = std::make_unique<sync::Semaphore>("present-" + std::to_string(i));
     }
     is_valid = true;
@@ -184,7 +155,6 @@ void gearoenix::vulkan::Swapchain::present()
     info.pImageIndices = &image_index;
     try {
         queue::Queue::get().present(info);
-        is_valid = true;
     } catch (const vk::OutOfDateKHRError&) {
         is_valid = false;
     } catch (const vk::SystemError& e) {

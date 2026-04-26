@@ -28,7 +28,10 @@ public:
         const ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
         ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
         if (ImGui::BeginPopupModal(progress_bar_id, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
-            const auto progress_bar_length = static_cast<float>(progress_bar_text.size()) * 10.0f;
+            // Bar width is sized to its label so it fits at any UI scale / font.
+            const auto& style = ImGui::GetStyle();
+            const float text_w = ImGui::CalcTextSize(progress_bar_text.c_str()).x;
+            const float progress_bar_length = text_w + style.FramePadding.x * 2.0f;
             if (progress_indicator.has_value()) {
                 const auto progress = (*progress_indicator)();
                 ImGui::ProgressBar(progress, ImVec2(progress_bar_length, 0.0f), progress_bar_text.c_str());

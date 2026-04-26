@@ -1,5 +1,6 @@
 #pragma once
-#include <gearoenix/core/macro/gx-cr-mcr-getter-setter.hpp>
+#include <gearoenix/core/gx-cr-singleton.hpp>
+
 #include <memory>
 
 namespace gearoenix::editor::ui {
@@ -7,18 +8,16 @@ struct MenuEntity;
 struct MenuWorld;
 struct MenuScene;
 struct MenuWindow;
-struct MenuBar final {
-private:
-    GX_GET_UPTR_PRV(MenuEntity, entity_menu);
-    GX_GET_UPTR_PRV(MenuWorld, project_menu);
-    GX_GET_UPTR_PRV(MenuScene, scene_menu);
-    GX_GET_UPTR_PRV(MenuWindow, window_menu);
 
-    bool show_scene_import_popup = false;
+struct MenuBar final : core::Singleton<MenuBar> {
+    const std::unique_ptr<MenuEntity> entity_menu;
+    const std::unique_ptr<MenuWorld> project_menu;
+    const std::unique_ptr<MenuScene> scene_menu;
+    const std::unique_ptr<MenuWindow> window_menu;
 
-public:
     MenuBar();
-    ~MenuBar();
+    ~MenuBar() override;
+
     void update();
     void renew();
 };

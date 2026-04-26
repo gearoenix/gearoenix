@@ -9,10 +9,11 @@
 #include <ImGui/imgui.h>
 
 gearoenix::editor::ui::MenuBar::MenuBar()
-    : entity_menu(new MenuEntity())
-    , project_menu(new MenuWorld())
-    , scene_menu(new MenuScene())
-    , window_menu(new MenuWindow())
+    : Singleton(this)
+    , entity_menu(std::make_unique<MenuEntity>())
+    , project_menu(std::make_unique<MenuWorld>())
+    , scene_menu(std::make_unique<MenuScene>())
+    , window_menu(std::make_unique<MenuWindow>())
 {
 }
 

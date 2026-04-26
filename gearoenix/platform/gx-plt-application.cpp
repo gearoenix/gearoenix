@@ -297,9 +297,11 @@ void gearoenix::platform::BaseApplication::close() { running = false; }
 void gearoenix::platform::BaseApplication::terminate()
 {
     running = false;
+    render_engine->flush();
     core_application = nullptr;
     render_engine->flush();
     core::ecs::World::get().clear();
+    render_engine->flush();
     render_engine = nullptr;
     ImGui::DestroyContext();
     core::job::terminate();

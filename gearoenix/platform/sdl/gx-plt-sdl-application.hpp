@@ -5,13 +5,22 @@
 #include "../../render/gx-rnd-build-configuration.hpp"
 #include "../gx-plt-application.hpp"
 
+#include <ImGui/imgui.h>
 #include <SDL3/SDL.h>
+
+#include <array>
 
 namespace gearoenix::platform {
 struct Application final : core::Singleton<Application> {
     GX_GET_VAL_PRV(SDL_Window*, window, nullptr);
     GX_GET_REF_PRV(BaseApplication, base);
     char* current_clipboard = nullptr; //!< It is a temporary memory to keep the text alive
+
+    /// Pre-allocated OS cursors indexed by `ImGuiMouseCursor_*`. Populated once during
+    /// construction; each frame `update_mouse_cursor()` reads `ImGui::GetMouseCursor()`
+    /// and applies the matching cursor via `SDL_SetCursor`, so hovering a resize handle
+    /// / drag splitter / hand widget shows the correct OS cursor shape.
+    std::array<SDL_Cursor*, ImGuiMouseCursor_COUNT> mouse_cursors { };
 
 #if GX_RENDER_OPENGL_ENABLED
     GX_GET_VAL_PRV(int, gl_major, 0);
@@ -25,6 +34,13 @@ struct Application final : core::Singleton<Application> {
     void initialize_screen();
     void initialize_window();
     void initialize_mouse();
+    /// Create one SDL system cursor per `ImGuiMouseCursor_*` enumerator and set the
+    /// `ImGuiBackendFlags_HasMouseCursors` flag so ImGui widgets know the backend
+    /// honours `SetMouseCursor`.
+    void initialize_mouse_cursors();
+    /// Reads ImGui's current cursor shape and forwards it to the OS. Call once per frame
+    /// after UI widgets have been submitted (i.e. after `base.update()`).
+    void update_mouse_cursor();
     [[nodiscard]] bool create_window(std::uint32_t flags);
 
 #if GX_RENDER_OPENGL_ENABLED

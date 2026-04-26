@@ -4,6 +4,8 @@
 #include "../platform/gx-plt-application.hpp"
 #include "../platform/gx-plt-log.hpp"
 
+#include <array>
+#include <cstdint>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -161,6 +163,54 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
             | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
         impl_vk_debug_utils_callback,
         nullptr);
+
+    // Programmatic equivalent of a `vk_layer_settings.txt` file — configures the
+    // Khronos validation layer through `VK_EXT_layer_settings` (a layer-consumed
+    // extension attached via pNext). We turn on `VK_DBG_LAYER_ACTION_BREAK` so the
+    // layer raises SIGTRAP on every violation (including the threading ones); when
+    // run under lldb this halts the process at the exact moment, with all threads
+    // still at their offending callsites — `bt all` then shows which path reached
+    // the queue without holding `submission_lock`.
+    //
+    // Arrays are plain locals (non-const) because `vk::ArrayProxyNoTemporaries<T>`
+    // needs `data()` convertible to `T*` — a `constexpr std::array<const char*, N>`
+    // yields `const char* const*`, which doesn't bind. Local lifetime is fine:
+    // everything here outlives the call to `createInstance` below.
+    constexpr const char* validation_layer_name = "VK_LAYER_KHRONOS_validation";
+    std::array<const char*, 2> debug_action_values {
+        "VK_DBG_LAYER_ACTION_LOG_MSG",
+        "VK_DBG_LAYER_ACTION_BREAK",
+    };
+    std::array<const char*, 3> report_flag_values {
+        "error",
+        "warn",
+        "perf",
+    };
+    constexpr VkBool32 enable_message_limit_value = VK_TRUE;
+    constexpr std::uint32_t duplicate_message_limit_value = 1;
+
+    const std::array layer_settings {
+        vk::LayerSettingEXT {
+            validation_layer_name, "debug_action",
+            vk::LayerSettingTypeEXT::eString, debug_action_values },
+        vk::LayerSettingEXT {
+            validation_layer_name, "report_flags",
+            vk::LayerSettingTypeEXT::eString, report_flag_values },
+        vk::LayerSettingEXT {
+            validation_layer_name, "enable_message_limit",
+            vk::LayerSettingTypeEXT::eBool32, 1, &enable_message_limit_value },
+        vk::LayerSettingEXT {
+            validation_layer_name, "duplicate_message_limit",
+            vk::LayerSettingTypeEXT::eUint32, 1, &duplicate_message_limit_value },
+    };
+
+    vk::LayerSettingsCreateInfoEXT layer_settings_info(layer_settings);
+    // Chain the layer settings behind the debug-utils messenger: InstanceCreateInfo
+    //   → DebugUtilsMessengerCreateInfoEXT → LayerSettingsCreateInfoEXT.
+    // The constexpr `debug_info` can't have its `pNext` mutated directly, so rebuild
+    // a non-const copy that forwards to the settings struct.
+    auto chained_debug_info = debug_info;
+    chained_debug_info.setPNext(&layer_settings_info);
 #endif
 
     vk::InstanceCreateFlags instance_create_flags;
@@ -174,7 +224,7 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
         instance_layers,
         instance_extensions);
 #if GX_VULKAN_INSTANCE_DEBUG
-    create_info.setPNext(&debug_info);
+    create_info.setPNext(&chained_debug_info);
 #endif
 
     try {

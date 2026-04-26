@@ -8,6 +8,6 @@ protected:
 
 public:
     ~Texture2D() override;
-    [[nodiscard]] virtual void* get_imgui_ptr() const;
+    [[nodiscard]] virtual void* get_imgui_ptr() const = 0;
 };
 }

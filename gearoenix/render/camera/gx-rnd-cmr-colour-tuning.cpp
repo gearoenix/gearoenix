@@ -1,13 +1,25 @@
 #include "gx-rnd-cmr-colour-tuning.hpp"
 #include "../../platform/stream/gx-plt-stm-stream.hpp"
 
-void gearoenix::render::camera::ColourTuning::GammaCorrection::write(platform::stream::Stream& s) const { gamma_exponent.write(s); }
+void gearoenix::render::camera::ColourTuning::GammaCorrection::write(platform::stream::Stream& s) const
+{
+    gamma_exponent.write(s);
+}
 
-void gearoenix::render::camera::ColourTuning::GammaCorrection::read(platform::stream::Stream& s) { gamma_exponent.read(s); }
+void gearoenix::render::camera::ColourTuning::GammaCorrection::read(platform::stream::Stream& s)
+{
+    gamma_exponent.read(s);
+}
 
-void gearoenix::render::camera::ColourTuning::Multiply::write(platform::stream::Stream& s) const { scale.write(s); }
+void gearoenix::render::camera::ColourTuning::Multiply::write(platform::stream::Stream& s) const
+{
+    scale.write(s);
+}
 
-void gearoenix::render::camera::ColourTuning::Multiply::read(platform::stream::Stream& s) { scale.read(s); }
+void gearoenix::render::camera::ColourTuning::Multiply::read(platform::stream::Stream& s)
+{
+    scale.read(s);
+}
 
 const gearoenix::render::camera::ColourTuning::GammaCorrection& gearoenix::render::camera::ColourTuning::get_gamma_correction() const
 {

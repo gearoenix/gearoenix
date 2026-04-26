@@ -16,6 +16,8 @@
 #include <ImGui/imgui.h>
 
 #include <format>
+#include <iterator>
+#include <string>
 
 void gearoenix::editor::ui::MenuScene::show_new_popup()
 {
@@ -48,19 +50,22 @@ void gearoenix::editor::ui::MenuScene::show_new_popup()
         ImGui::InputFloat("##" GX_STRINGIFY(scene_priority), &new_scene_priority);
     });
 
-    const float window_width = ImGui::GetWindowSize().x;
+    // Button widths are driven by the widest label text, not by a fraction of the
+    // window — otherwise long labels like "Create New Scene" truncate inside a small
+    // auto-resized window. Each button gets the same width (so they read as a pair),
+    // and the row is centred within the available content region.
+    const auto& style = ImGui::GetStyle();
+    const float label_w = std::max(
+        ImGui::CalcTextSize("Cancel").x, ImGui::CalcTextSize("Create New Scene").x);
+    const float button_width = label_w + style.FramePadding.x * 2.0f + ImGui::GetFontSize();
+    const float buttons_row_w = button_width * 2.0f + style.ItemSpacing.x;
+    const float row_indent = std::max(0.0f, (ImGui::GetContentRegionAvail().x - buttons_row_w) * 0.5f);
 
-    constexpr auto button_width_ratio = 0.35f;
-    constexpr auto spacing_width_ratio = (1.0f - button_width_ratio * 2.0f) / 3.0f;
-    constexpr auto second_button_start_ratio = button_width_ratio + spacing_width_ratio * 2.0f;
-
-    ImGui::SetCursorPosX(spacing_width_ratio * window_width);
-    const auto button_width = window_width * button_width_ratio;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + row_indent);
     if (ImGui::Button("Cancel", ImVec2(button_width, 0.0f))) {
         is_new_popup_open = false;
     }
     ImGui::SameLine();
-    ImGui::SetCursorPosX(second_button_start_ratio * window_width);
     if (new_scene_valid_name && ImGui::Button("Create New Scene", ImVec2(button_width, 0.0f))) {
         is_new_popup_open = false;
         render::scene::Manager::get().build(
@@ -133,10 +138,16 @@ void gearoenix::editor::ui::MenuScene::update()
             ImGui::Separator();
 
             boost::container::flat_set<core::ecs::EntityPtr> to_remove;
+            // Reused scratch `std::string` whose capacity sticks across frames — written
+            // into via `std::format_to(back_inserter)` so there's no per-frame heap
+            // allocation per scene. Safe because the editor UI is single-threaded and
+            // ImGui consumes the label synchronously inside `BeginMenu`.
+            static std::string label;
             std::size_t idx = 0;
             for (const auto& e : active_scenes) {
                 ++idx;
-                const std::string label = std::format("Scene [{}]: {}", idx, e->get_object_name());
+                label.clear();
+                std::format_to(std::back_inserter(label), "Scene [{}]: {}", idx, e->get_object_name());
 
                 ImGui::PushID(static_cast<int>(e->get_object_id()));
                 if (ImGui::BeginMenu(label.c_str())) {
@@ -186,4 +197,7 @@ void gearoenix::editor::ui::MenuScene::add_active_scene(core::ecs::EntityPtr&& e
     active_scenes.emplace(std::move(e));
 }
 
-bool gearoenix::editor::ui::MenuScene::has_active_scene() const { return !active_scenes.empty(); }
+bool gearoenix::editor::ui::MenuScene::has_active_scene() const
+{
+    return !active_scenes.empty();
+}

@@ -6,10 +6,10 @@
 
 gearoenix::editor::viewport::GizmoButtons::GizmoButtons(const Button& previous)
     : previous(previous)
-    , transform_mode(new TransformModeButton(previous))
-    , translate(new TranslateButton(*transform_mode))
-    , rotate(new RotateButton(*translate))
-    , scale(new ScaleButton(*rotate))
+    , transform_mode(std::make_unique<TransformModeButton>(previous))
+    , translate(std::make_unique<TranslateButton>(*transform_mode))
+    , rotate(std::make_unique<RotateButton>(*translate))
+    , scale(std::make_unique<ScaleButton>(*rotate))
 {
 }
 

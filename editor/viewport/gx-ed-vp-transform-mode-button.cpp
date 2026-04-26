@@ -17,9 +17,6 @@ gearoenix::editor::viewport::TransformModeButton::TransformModeButton(const Butt
     toggled_tooltip = "Local Transformation [Toggle Projection to Global]";
     text = "Global";
     toggled_text = "  Local";
-    start_point = { previous.get_end_point().x + spacing, top_margin };
-    size = { height * 3.1f, height };
-    compute_values();
 
     core::job::send_job_to_pool([this] {
         const render::texture::TextureInfo txt_info;
@@ -39,6 +36,17 @@ gearoenix::editor::viewport::TransformModeButton::TransformModeButton(const Butt
 }
 
 gearoenix::editor::viewport::TransformModeButton::~TransformModeButton() = default;
+
+float gearoenix::editor::viewport::TransformModeButton::compute_start_x() const
+{
+    return previous.get_end_point().x + spacing;
+}
+
+ImVec2 gearoenix::editor::viewport::TransformModeButton::compute_size() const
+{
+    // Width 3.1× height accommodates the "Global" / "  Local" label alongside the icon.
+    return { height * 3.1f, height };
+}
 
 void gearoenix::editor::viewport::TransformModeButton::update()
 {

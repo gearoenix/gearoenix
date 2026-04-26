@@ -7,7 +7,6 @@ namespace gearoenix::vulkan {
 struct ImGuiManager final {
 private:
     vk::raii::DescriptorPool descriptor_pool { nullptr };
-    vk::Format imgui_colour_format = vk::Format::eUndefined;
 
 public:
     ImGuiManager(ImGuiManager&&) = delete;

@@ -16,10 +16,7 @@ gearoenix::editor::viewport::ScaleButton::ScaleButton(const Button& previous)
     toggled_tooltip = "Disable scale gizmo";
     text = "";
     toggled_text = "";
-    start_point = { previous.get_end_point().x + spacing, top_margin };
-    size = { height, height };
     toggled_background_colour = IM_COL32(90, 90, 200, 200);
-    compute_values();
 
     core::job::send_job_to_pool([this] {
         const render::texture::TextureInfo txt_info;
@@ -34,6 +31,16 @@ gearoenix::editor::viewport::ScaleButton::ScaleButton(const Button& previous)
 }
 
 gearoenix::editor::viewport::ScaleButton::~ScaleButton() = default;
+
+float gearoenix::editor::viewport::ScaleButton::compute_start_x() const
+{
+    return previous.get_end_point().x + spacing;
+}
+
+ImVec2 gearoenix::editor::viewport::ScaleButton::compute_size() const
+{
+    return { height, height };
+}
 
 void gearoenix::editor::viewport::ScaleButton::update()
 {

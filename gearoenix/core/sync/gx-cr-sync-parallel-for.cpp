@@ -76,6 +76,8 @@ struct ParallelContext final {
         }
     }
 
+    /// For eaach instance of this struct, this function is called by one thread because the instance is gauged by thread_local,
+    /// and it will run the given function in parallel.
     void run(const gearoenix::core::sync::parallel_for_t fun, void* const fun_data)
     {
         GX_ASSERT_D(terminated_count.load(std::memory_order_relaxed) == 0); // One or more threads in ParallelContext is dead already!

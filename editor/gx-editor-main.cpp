@@ -1,14 +1,26 @@
 #include "gx-editor-main.hpp"
+#include "ui/gx-ed-ui-font.hpp"
 #include "ui/gx-ed-ui-manager.hpp"
 #include "ui/gx-ed-ui-menu-scene.hpp"
 #include "viewport/gx-ed-vp-viewport.hpp"
 
 #include <gearoenix/platform/gx-plt-application.hpp>
 
+#include <ImGui/imgui.h>
+
+#include <memory>
+
 void gearoenix::editor::EditorApplication::update()
 {
+    // Push the user-selected UI size for the entire editor frame, so UI widgets,
+    // viewport buttons and gizmo overlays all see the same scaled font and can
+    // derive their geometry from ImGui::GetFontSize().
+    ImGui::PushFont(nullptr, ui::font::get_size_px());
+
     ui_manager->update();
     viewport->update();
+
+    ImGui::PopFont();
 }
 
 void gearoenix::editor::EditorApplication::update_caption() const
@@ -18,8 +30,8 @@ void gearoenix::editor::EditorApplication::update_caption() const
 
 gearoenix::editor::EditorApplication::EditorApplication()
     : Singleton<EditorApplication>(this)
-    , ui_manager(new ui::Manager())
-    , viewport(new viewport::Viewport())
+    , ui_manager(std::make_unique<ui::Manager>())
+    , viewport(std::make_unique<viewport::Viewport>())
     , current_open_world("Untitled")
 {
     update_caption();
