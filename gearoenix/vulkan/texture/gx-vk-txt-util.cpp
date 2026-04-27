@@ -5,6 +5,7 @@
 #include "../../platform/stream/gx-plt-stm-memory.hpp"
 #include "../../render/texture/gx-rnd-txt-texture-info.hpp"
 #include "../../render/texture/gx-rnd-txt-texture.hpp"
+#include "gx-vk-txt-format.hpp"
 #include "../buffer/gx-vk-buf-buffer.hpp"
 #include "../buffer/gx-vk-buf-manager.hpp"
 #include "../command/gx-vk-cmd-buffer.hpp"
@@ -31,34 +32,11 @@ vk::ImageType gearoenix::vulkan::texture::convert_image_type(const render::textu
 
 vk::Format gearoenix::vulkan::texture::convert_image_format(const render::texture::TextureFormat format)
 {
-    switch (format) {
-    case render::texture::TextureFormat::RgbaUint8:
-        return vk::Format::eR8G8B8A8Unorm;
-    case render::texture::TextureFormat::RgbaFloat32:
-        return vk::Format::eR32G32B32A32Sfloat;
-    case render::texture::TextureFormat::RgbFloat32:
-        return vk::Format::eR32G32B32Sfloat;
-    case render::texture::TextureFormat::RgFloat32:
-        return vk::Format::eR32G32Sfloat;
-    case render::texture::TextureFormat::Float32:
-        return vk::Format::eR32Sfloat;
-    case render::texture::TextureFormat::RgbaFloat16:
-        return vk::Format::eR16G16B16A16Sfloat;
-    case render::texture::TextureFormat::RgbFloat16:
-        return vk::Format::eR16G16B16Sfloat;
-    case render::texture::TextureFormat::RgFloat16:
-        return vk::Format::eR16G16Sfloat;
-    case render::texture::TextureFormat::Float16:
-        return vk::Format::eR16Sfloat;
-    case render::texture::TextureFormat::D32:
-        return vk::Format::eD32Sfloat;
-    case render::texture::TextureFormat::D24:
-        return vk::Format::eX8D24UnormPack32;
-    case render::texture::TextureFormat::D16:
-        return vk::Format::eD16Unorm;
-    default:
+    const auto code = format_to_vk_format_code(format);
+    if (0u == code) {
         GX_UNEXPECTED;
     }
+    return static_cast<vk::Format>(code);
 }
 
 bool gearoenix::vulkan::texture::has_depth(const vk::Format format)

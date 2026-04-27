@@ -2,6 +2,7 @@
 #if GX_RENDER_OPENGL_ENABLED
 #include "../core/ecs/gx-cr-ecs-world.hpp"
 #include "../physics/gx-phs-transformation.hpp"
+#include "../render/engine/gx-rnd-eng-engine.hpp"
 #include "../render/record/gx-rnd-rcd-camera.hpp"
 #include "../render/record/gx-rnd-rcd-model.hpp"
 #include "gx-gl-check.hpp"
@@ -15,7 +16,7 @@
 #include "gx-gl-target.hpp"
 #include "gx-gl-texture.hpp"
 #include "shader/gx-gl-shd-bloom.hpp"
-#include "shader/gx-gl-shd-ctaa.hpp"
+#include "shader/gx-gl-shd-colour-tuning.hpp"
 #include "shader/gx-gl-shd-manager.hpp"
 #include "shader/gx-gl-shd-multiply.hpp"
 #include "shader/gx-gl-shd-skybox-cube.hpp"
@@ -84,7 +85,7 @@ gearoenix::gl::Camera::Camera(core::ecs::Entity* const entity, const std::string
 void gearoenix::gl::Camera::construct(core::ecs::Entity* const entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
     c.set_return(Object::construct<Camera>(entity, name, render::camera::Target(), std::move(transform)));
-    core::job::send_job(core::Singleton<Engine>::get().get_jobs_thread_id(), [c] {
+    core::job::send_job(Engine::get_jobs_thread_id(), [c] {
         auto& self = *c.get_return();
         self.bloom_prefilter_shader = shader::Manager::get().get_shader<shader::BloomPrefilter>();
         self.bloom_horizontal_shader = shader::Manager::get().get_shader<shader::BloomHorizontal>();
@@ -93,10 +94,9 @@ void gearoenix::gl::Camera::construct(core::ecs::Entity* const entity, const std
         self.multiply_shader = shader::Manager::get().get_shader<shader::Multiply>();
         self.skybox_cube_shader = shader::Manager::get().get_shader<shader::SkyboxCube>();
         self.skybox_equirectangular_shader = shader::Manager::get().get_shader<shader::SkyboxEquirectangular>();
-        self.colour_tuning_anti_aliasing_shader_combination = shader::Manager::get().get_combiner<shader::ColourTuningAntiAliasingCombination>();
+        self.colour_tuning_shader = shader::Manager::get().get_shader<shader::ColourTuning>();
     });
-    c.get_return()->initialise();
-    c.get_return()->update_target(core::job::EndCaller([c] { c.get_return()->enable_bloom(); }));
+    c.get_return()->initialise(core::job::EndCaller([c] { (void)c; }));
 }
 
 gearoenix::gl::Camera::~Camera() = default;
@@ -327,28 +327,56 @@ void gearoenix::gl::Camera::render_bloom([[maybe_unused]] const Scene& scene, co
     GX_GL_CHECK_D;
 }
 
-void gearoenix::gl::Camera::render_colour_correction_anti_aliasing([[maybe_unused]] const Scene& scene, const render::record::Camera& rc, uint& current_shader) const
+void gearoenix::gl::Camera::render_colour_tuning([[maybe_unused]] const Scene& scene, const render::record::Camera& rc, uint& current_shader) const
 {
     GX_GL_CHECK_D;
 
     GX_ASSERT_D(target.is_default()); // This function only works on a default-target.
 
-    GX_GL_PUSH_DEBUG_GROUP("render-colour-correction-anti-aliasing for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
+    GX_GL_PUSH_DEBUG_GROUP("render-colour-tuning for scene: {}, and for camera: {}", scene.get_object_name(), object_name);
 
     glDisable(GL_BLEND);
-    const auto texel_size = math::Vec2(1.0f) / (rc.viewport_clip.zw() - rc.viewport_clip.xy());
     const auto viewport_clip = math::Vec4<sizei>(rc.viewport_clip);
 
     ctx::set_framebuffer(gl_target.get_default().framebuffers[1][0]);
     ctx::set_viewport_scissor_clip(viewport_clip);
-    auto& shader = colour_tuning_anti_aliasing_shader_combination->get(colour_tuning);
+    auto& shader = *colour_tuning_shader;
     shader.bind(current_shader);
-    shader.set(colour_tuning);
-    shader.set_screen_space_uv_data(texel_size.data());
+
+    auto& sub = submission::Manager::get();
+    const auto* noise = sub.get_blue_noise().get();
+    GX_ASSERT_D(nullptr != noise);
+
+    // Inline tonemaps (Identity / AgX / Aces) don't sample a LUT. Only CustomLut binds a 3D
+    // texture; otherwise the colour_lut sampler stays unbound -- the shader's CustomLut branch
+    // gates the sample so the unused sampler doesn't matter.
+    const auto& tuning = colour_tuning;
+    const auto effective_mode = tuning.effective_tonemap_mode();
+    const bool uses_lut = render::camera::TonemapMode::CustomLut == effective_mode;
+    const auto* const lut = uses_lut ? core::cast_ptr<Texture3D>(tuning.colour_lut.get()) : nullptr;
+
+    const auto lut_size = lut ? static_cast<float>(lut->get_info().get_width()) : 0.0f;
+    shader.set_lut_size_data(&lut_size);
+    const auto frame_index = static_cast<float>(render::engine::Engine::get_frame_number_from_start() & 4095u);
+    shader.set_frame_index_data(&frame_index);
+    const sint tonemap_mode_value = static_cast<sint>(effective_mode);
+    shader.set_tonemap_mode_data(&tonemap_mode_value);
+    const float peak = tuning.effective_agx_peak();
+    shader.set_agx_peak_ratio_data(&peak);
+    const float noise_scale[2] = {
+        1.0f / static_cast<float>(noise->get_info().get_width()),
+        1.0f / static_cast<float>(noise->get_info().get_height()),
+    };
+    shader.set_noise_uv_scale_data(noise_scale);
+
     glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_source_texture_index()));
     glBindTexture(GL_TEXTURE_2D, gl_target.get_default().colour_attachments[0]);
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_depth_texture_index()));
-    glBindTexture(GL_TEXTURE_2D, gl_target.get_default().colour_attachments[0]);
+    if (lut) {
+        glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_colour_lut_index()));
+        glBindTexture(GL_TEXTURE_3D, lut->get_object());
+    }
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(shader.get_blue_noise_index()));
+    glBindTexture(GL_TEXTURE_2D, noise->get_object());
     glBindVertexArray(submission::Manager::get().get_screen_vertex_object());
     glDrawArrays(GL_TRIANGLES, 0, 3);
     GX_GL_CHECK_D;

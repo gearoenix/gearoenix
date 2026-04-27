@@ -48,7 +48,7 @@ void gearoenix::gl::Scene::render_forward(uint& current_shader)
         auto* const gl_cam = core::cast_ptr<Camera>(camera.camera);
         GX_PROFILE_EXP(gl_cam->render_forward(*this, camera, current_shader));
         GX_PROFILE_EXP(gl_cam->render_bloom(*this, camera, current_shader));
-        GX_PROFILE_EXP(gl_cam->render_colour_correction_anti_aliasing(*this, camera, current_shader));
+        GX_PROFILE_EXP(gl_cam->render_colour_tuning(*this, camera, current_shader));
     }
 }
 

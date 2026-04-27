@@ -16,7 +16,7 @@ struct Texture {
     std::uint32_t shader_resource_index = static_cast<std::uint32_t>(-1);
     std::uint32_t sampler_shader_resource_index = static_cast<std::uint32_t>(-1);
 
-    Texture(std::string name, const TextureInfo& info);
+    Texture(std::string&& name, const TextureInfo& info);
 
 private:
     static void write_image(platform::stream::Stream& s, const std::uint8_t* data, std::uint32_t img_width, std::uint32_t img_height, TextureFormat format);

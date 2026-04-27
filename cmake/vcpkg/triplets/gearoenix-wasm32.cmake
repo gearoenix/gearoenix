@@ -22,7 +22,10 @@ set(VCPKG_LIBRARY_LINKAGE static)
 set(VCPKG_CMAKE_SYSTEM_NAME Emscripten)
 set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${GEAROENIX_EMSCRIPTEN_TOOLCHAIN}")
 set(VCPKG_BUILD_TYPE release)
-set(VCPKG_C_FLAGS "-pthread -msimd128 -O3 -flto=full") # because of SDL3 fast-math removed
-set(VCPKG_CXX_FLAGS "-pthread -msimd128 -O3 -flto=full") # because of SDL3 fast-math removed
+# -Wno-error=overriding-complex-range: ktx 4.4.2 bundles astc-encoder, whose
+# CMake injects -ffast-math; vcpkg/ktx separately inject -ffp-model=precise,
+# and recent clang (Emscripten) errors on the combination via that warning.
+set(VCPKG_C_FLAGS "-pthread -msimd128 -O3 -flto=full -Wno-error=overriding-complex-range") # because of SDL3 fast-math removed
+set(VCPKG_CXX_FLAGS "-pthread -msimd128 -O3 -flto=full -Wno-error=overriding-complex-range") # because of SDL3 fast-math removed
 set(VCPKG_LINKER_FLAGS "-pthread -sPROXY_TO_PTHREAD=1 -fwasm-exceptions -sOFFSCREENCANVAS_SUPPORT=1 -sNO_EXIT_RUNTIME=1 -sALLOW_MEMORY_GROWTH=1 -sPTHREAD_POOL_SIZE='navigator.hardwareConcurrency' -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sALLOW_TABLE_GROWTH=1 -ffast-math -msimd128 -O3 -flto=full")
 set(VCPKG_TARGET_TRIPLET "gearoenix-wasm32")

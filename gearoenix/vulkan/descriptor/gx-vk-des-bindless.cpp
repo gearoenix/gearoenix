@@ -384,4 +384,11 @@ void gearoenix::vulkan::descriptor::Bindless::bind(const vk::CommandBuffer cmd) 
     cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pipeline_layout, 0, descriptor_sets[set_index], { });
 }
 
+vk::DescriptorSet gearoenix::vulkan::descriptor::Bindless::get_current_descriptor_set() const
+{
+    const auto frame_number = engine::Engine::get_frame_number();
+    const auto set_index = frame_number % descriptor_set_count;
+    return descriptor_sets[set_index];
+}
+
 #endif

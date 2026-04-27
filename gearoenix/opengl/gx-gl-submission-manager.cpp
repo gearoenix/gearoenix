@@ -382,30 +382,35 @@ void gearoenix::gl::submission::Manager::render_with_forward()
     ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), 0, math::Vec2<sizei>(window_size) });
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     const auto screen_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
-    if (screen_ratio < back_buffer_aspect_ratio) {
-        const auto screen_height = static_cast<sizei>(static_cast<float>(window_size.x) / back_buffer_aspect_ratio + 0.1f);
-        const auto screen_y = (static_cast<sizei>(window_size.y) - screen_height) / 2;
-        ctx::set_viewport_scissor_clip({ static_cast<sizei>(0), screen_y, static_cast<sizei>(window_size.x), screen_height });
-    } else {
+    const auto dst_clip = [&]() -> math::Vec4<sizei> {
+        if (screen_ratio < back_buffer_aspect_ratio) {
+            const auto screen_height = static_cast<sizei>(static_cast<float>(window_size.x) / back_buffer_aspect_ratio + 0.1f);
+            const auto screen_y = (static_cast<sizei>(window_size.y) - screen_height) / 2;
+            return { static_cast<sizei>(0), screen_y, static_cast<sizei>(window_size.x), screen_height };
+        }
         const auto screen_width = static_cast<sizei>(static_cast<float>(window_size.y) * back_buffer_aspect_ratio + 0.1f);
         const auto screen_x = (static_cast<sizei>(window_size.x) - screen_width) / 2;
-        ctx::set_viewport_scissor_clip({ screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) });
-    }
+        return { screen_x, static_cast<sizei>(0), screen_width, static_cast<sizei>(window_size.y) };
+    }();
+    ctx::set_viewport_scissor_clip(dst_clip);
 
-    glEnable(GL_BLEND);
+    // Draw each camera's tonemapped/sRGB-encoded output (already display-referred from the
+    // colour-tuning pass) onto the default framebuffer with a fullscreen-triangle copy. We
+    // previously used glBlitFramebuffer here but Apple GL drivers reject the RGBA16F->BGRA8
+    // blit on some configurations -- a textured draw is the universally compatible path.
+    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     final_shader->bind(current_shader);
-    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_albedo_index()));
+    glActiveTexture(GL_TEXTURE0 + static_cast<enumerated>(final_shader->get_source_index()));
+    glBindVertexArray(screen_vertex_object);
     for (auto* const scene : scenes | std::views::values) {
         const auto& record_cameras = scene->get_record().cameras;
         for (auto& camera_index : record_cameras.mains | std::views::values) {
             auto& camera = *core::cast_ptr<Camera>(record_cameras.cameras[camera_index].camera);
             glBindTexture(GL_TEXTURE_2D, camera.get_gl_target().get_default().colour_attachments[1]);
-            glBindVertexArray(screen_vertex_object);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
     }
-    glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -422,9 +427,9 @@ void gearoenix::gl::submission::Manager::render_imgui()
 
 gearoenix::gl::submission::Manager::Manager()
     : Singleton(this)
-    , final_shader(shader::Manager::get().get_shader<shader::Final>())
     , deferred_pbr_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::DeferredPbr>() : nullptr)
     , deferred_pbr_transparent_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::DeferredPbrTransparent>() : nullptr)
+    , final_shader(shader::Manager::get().get_shader<shader::Final>())
     , irradiance_shader(shader::Manager::get().get_shader<shader::Irradiance>())
     , radiance_shader(shader::Manager::get().get_shader<shader::Radiance>())
     , ssao_resolve_shader(render::engine::Engine::get().get_specification().is_deferred_supported ? shader::Manager::get().get_shader<shader::SsaoResolve>() : nullptr)
@@ -432,9 +437,17 @@ gearoenix::gl::submission::Manager::Manager()
     , unlit_coloured_shader(unlit_shader_combination->get(false, false, true, false))
 {
     render::texture::Manager::get().create_cube_from_colour(
-        math::Vec4(0.0f), core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) { black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t)); }));
+        math::Vec4(0.0f), core::job::EndCallerShared<render::texture::TextureCube>([this](std::shared_ptr<render::texture::TextureCube>&& t) {
+            black_cube = std::dynamic_pointer_cast<TextureCube>(std::move(t));
+        }));
 
-    render::texture::Manager::get().get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) { brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t)); }));
+    render::texture::Manager::get().get_brdflut(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+        brdflut = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+    }));
+
+    render::texture::Manager::get().get_blue_noise(core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+        blue_noise = std::dynamic_pointer_cast<Texture2D>(std::move(t));
+    }));
 
     GX_GL_CHECK_D;
     GX_LOG_D("Creating submission manager.");

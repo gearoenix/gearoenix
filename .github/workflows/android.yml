@@ -28,16 +28,17 @@ jobs:
           echo "GRADLE_HOME=$GRADLE_HOME"
           echo "VCPKG_ROOT=$VCPKG_ROOT"
           echo "PATH=$PATH"
-      - name: Generate Gradle wrapper
-        working-directory: android
-        run: gradle wrapper
+      - name: Refresh vcpkg baseline
+        run: |
+          git -C "$VCPKG_ROOT" fetch --quiet origin master
+          git -C "$VCPKG_ROOT" reset --hard origin/master
       - name: Build Debug
         working-directory: android
         run: |
           unset CC CXX
-          ./gradlew assembleDebug
+          gradle assembleDebug
       - name: Build Release
         working-directory: android
         run: |
           unset CC CXX
-          ./gradlew assembleRelease
+          gradle assembleRelease

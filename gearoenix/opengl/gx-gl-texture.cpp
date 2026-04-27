@@ -2,6 +2,7 @@
 #if GX_RENDER_OPENGL_ENABLED
 #include "../platform/stream/gx-plt-stm-local.hpp"
 #include "../platform/stream/gx-plt-stm-memory.hpp"
+#include "../render/texture/gx-rnd-txt-ktx2.hpp"
 #include "gx-gl-check.hpp"
 #include "gx-gl-constants.hpp"
 #include "gx-gl-engine.hpp"
@@ -44,6 +45,8 @@ gearoenix::gl::sint gearoenix::gl::convert_internal_format(const render::texture
         return GL_RGBA32F;
     case render::texture::TextureFormat::RgbaUint8:
         return GL_RGBA;
+    case render::texture::TextureFormat::R8Unorm:
+        return GL_R8;
     case render::texture::TextureFormat::RgbFloat16:
         return GL_RGB16F;
     case render::texture::TextureFormat::RgbFloat32:
@@ -64,6 +67,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_format(const render::texture::T
     switch (f) {
     case render::texture::TextureFormat::Float16:
     case render::texture::TextureFormat::Float32:
+    case render::texture::TextureFormat::R8Unorm:
         return GL_RED;
     case render::texture::TextureFormat::RgbaFloat16:
     case render::texture::TextureFormat::RgbaFloat32:
@@ -97,6 +101,7 @@ gearoenix::gl::enumerated gearoenix::gl::convert_data_format(const render::textu
     case render::texture::TextureFormat::RgFloat16:
         return GL_HALF_FLOAT;
     case render::texture::TextureFormat::RgbaUint8:
+    case render::texture::TextureFormat::R8Unorm:
         return GL_UNSIGNED_BYTE;
     default:
         GX_LOG_F("Unsupported or unimplemented setting for texture with id " << static_cast<int>(f));
@@ -216,6 +221,65 @@ void gearoenix::gl::Texture2D::write(const std::shared_ptr<platform::stream::Str
 }
 
 void* gearoenix::gl::Texture2D::get_imgui_ptr() const { return reinterpret_cast<void*>(static_cast<std::uintptr_t>(object)); }
+
+void gearoenix::gl::Texture3D::write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, const bool content) const
+{
+    render::texture::Texture3D::write(s, c, content);
+    if (!content) {
+        return;
+    }
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [this, s = s, c = c]() mutable {
+        GX_GL_CHECK_D;
+        // GLES3 / WebGL2 lack glGetTexImage; read back layer-by-layer through an FBO instead.
+        const auto width = info.get_width();
+        const auto height = info.get_height();
+        const auto depth = info.get_depth();
+        const auto pixel_size = format_pixel_size(info.get_format());
+        const auto slice_bytes = static_cast<std::size_t>(pixel_size) * width * height;
+        std::vector<std::uint8_t> pixels(slice_bytes * depth);
+
+        uint framebuffer = 0;
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        for (std::uint32_t z = 0; z < depth; ++z) {
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, object, 0, static_cast<sint>(z));
+            glReadPixels(0, 0, static_cast<sizei>(width), static_cast<sizei>(height),
+                convert_format(info.get_format()), convert_data_format(info.get_format()),
+                pixels.data() + z * slice_bytes);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDeleteFramebuffers(1, &framebuffer);
+        GX_GL_CHECK_D;
+
+        const auto info_copy = info;
+        core::job::send_job_to_pool([s = std::move(s), c = std::move(c), pixels = std::move(pixels), info_copy]() mutable {
+            const auto blob = render::texture::encode_ktx2_3d(pixels.data(), info_copy.get_width(), info_copy.get_height(), info_copy.get_depth(), info_copy.get_format());
+            s->write(blob);
+            (void)c;
+        });
+    });
+}
+
+gearoenix::gl::Texture3D::Texture3D(const render::texture::TextureInfo& info, std::string&& name)
+    : render::texture::Texture3D(std::move(name), info)
+{
+    shader_resource_index = 0;
+    sampler_shader_resource_index = 0;
+}
+
+gearoenix::gl::Texture3D::~Texture3D()
+{
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [o = object] {
+        glBindTexture(GL_TEXTURE_3D, 0);
+        glDeleteTextures(1, &o);
+    });
+}
+
+void gearoenix::gl::Texture3D::bind(const enumerated texture_unit) const
+{
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_3D, object);
+}
 
 gearoenix::gl::Texture2D::Texture2D(const render::texture::TextureInfo& info, std::string&& name)
     : render::texture::Texture2D(std::move(name), info)
@@ -369,6 +433,63 @@ void gearoenix::gl::TextureManager::create_2d_from_pixels_v(
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         glBindTexture(GL_TEXTURE_2D, 0);
+        set_texture_label(result->object, result->name);
+        GX_GL_CHECK_D;
+    });
+}
+
+void gearoenix::gl::TextureManager::create_3d_from_pixels_v(
+    std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture3D>&& c)
+{
+    std::shared_ptr<Texture3D> result(new Texture3D(info, std::move(name)));
+    const bool needs_mipmap_generation = info.get_has_mipmap() && pixels.size() < 2;
+    const auto internal_format = convert_internal_format(info.get_format());
+    const auto format = convert_format(info.get_format());
+    const auto data_format = convert_data_format(info.get_format());
+    const auto gl_img_width = static_cast<sizei>(info.get_width());
+    const auto gl_img_height = static_cast<sizei>(info.get_height());
+    const auto gl_img_depth = static_cast<sizei>(info.get_depth());
+    c.set_return(result);
+    core::job::send_job(render::engine::Engine::get_jobs_thread_id(), [result = std::move(result), needs_mipmap_generation, pixels = std::move(pixels), internal_format, format, data_format, gl_img_width, gl_img_height, gl_img_depth, info, c = std::move(c)] {
+        GX_GL_CHECK_D;
+        glGenTextures(1, &(result->object));
+        glBindTexture(GL_TEXTURE_3D, result->object);
+        GX_GL_CHECK_D;
+        glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, convert_min(info.get_sampler_info().get_min_filter()));
+        glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, convert_mag(info.get_sampler_info().get_mag_filter()));
+        GX_GL_CHECK_D;
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, convert(info.get_sampler_info().get_wrap_s()));
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, convert(info.get_sampler_info().get_wrap_t()));
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, convert(info.get_sampler_info().get_wrap_r()));
+        GX_GL_CHECK_D;
+        if (pixels.size() > 1 || (!pixels.empty() && !info.get_has_mipmap())) {
+            glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAX_LEVEL, static_cast<float>(pixels.size() - 1));
+        }
+        GX_GL_CHECK_D;
+        if (pixels.empty()) {
+            glTexImage3D(GL_TEXTURE_3D, 0, internal_format, gl_img_width, gl_img_height, gl_img_depth, 0, format, data_format, nullptr);
+        } else {
+            for (std::uint32_t level_index = 0; level_index < pixels.size(); ++level_index) {
+                const auto li = static_cast<gl::sint>(level_index);
+                auto lw = gl_img_width >> level_index;
+                if (lw < 1) {
+                    lw = 1;
+                }
+                auto lh = gl_img_height >> level_index;
+                if (lh < 1) {
+                    lh = 1;
+                }
+                auto ld = gl_img_depth >> level_index;
+                if (ld < 1) {
+                    ld = 1;
+                }
+                glTexImage3D(GL_TEXTURE_3D, li, internal_format, lw, lh, ld, 0, format, data_format, pixels[level_index].data());
+            }
+        }
+        if (needs_mipmap_generation) {
+            glGenerateMipmap(GL_TEXTURE_3D);
+        }
+        glBindTexture(GL_TEXTURE_3D, 0);
         set_texture_label(result->object, result->name);
         GX_GL_CHECK_D;
     });

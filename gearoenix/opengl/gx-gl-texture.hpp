@@ -3,6 +3,7 @@
 #if GX_RENDER_OPENGL_ENABLED
 #include "../render/texture/gx-rnd-txt-manager.hpp"
 #include "../render/texture/gx-rnd-txt-texture-2d.hpp"
+#include "../render/texture/gx-rnd-txt-texture-3d.hpp"
 #include "../render/texture/gx-rnd-txt-texture-cube.hpp"
 #include "gx-gl-types.hpp"
 
@@ -32,6 +33,19 @@ public:
     void generate_mipmaps();
 };
 
+struct Texture3D final : render::texture::Texture3D {
+    friend struct TextureManager;
+
+    GX_GET_VAL_PRV(uint, object, static_cast<uint>(-1));
+
+    void write(const std::shared_ptr<platform::stream::Stream>& s, const core::job::EndCaller<>& c, bool) const override;
+
+public:
+    Texture3D(const render::texture::TextureInfo& info, std::string&& name);
+    ~Texture3D() override;
+    void bind(enumerated texture_unit) const;
+};
+
 struct TextureCube final : render::texture::TextureCube {
     friend struct TextureManager;
 
@@ -51,6 +65,7 @@ struct TextureManager final : render::texture::Manager, core::Singleton<TextureM
 
 private:
     void create_2d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c) override;
+    void create_3d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture3D>&& c) override;
     void create_cube_from_pixels_v(std::string&& name, std::vector<std::vector<std::vector<std::uint8_t>>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::TextureCube>&& c) override;
     void create_target_v(std::string&& name, std::vector<render::texture::Attachment>&& attachments, core::job::EndCallerShared<render::texture::Target>&& c) override;
 };

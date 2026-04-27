@@ -126,6 +126,10 @@ find_package(unofficial-sodium CONFIG REQUIRED)
 
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
+find_package(Ktx CONFIG REQUIRED)
+
+find_package(zstd CONFIG REQUIRED)
+
 find_path(SQLITE_MODERN_CPP_INCLUDE_DIRS "sqlite_modern_cpp.h")
 
 if (GX_PROFILING_ENABLED)

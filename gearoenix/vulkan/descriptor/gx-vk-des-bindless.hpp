@@ -20,7 +20,10 @@ namespace gearoenix::vulkan::descriptor {
 struct Bindless final : core::Singleton<Bindless> {
     static constexpr std::uint32_t max_1d_images = 8;
     static constexpr std::uint32_t max_2d_images = 8192;
-    static constexpr std::uint32_t max_3d_images = 8;
+    /// Sized for: 10 AgX peak variants + 1 identity LUT (engine-procedural) + per-camera custom
+    /// `.cube` imports + headroom. The GLSL `texture3D textures_3d[]` is an unsized runtime-array
+    /// so this number can grow without shader changes.
+    static constexpr std::uint32_t max_3d_images = 32;
     static constexpr std::uint32_t max_cube_images = 32;
     static constexpr std::uint32_t max_shadow_2d_images = 256;
     static constexpr std::uint32_t max_images = max_1d_images + max_2d_images + max_3d_images + max_cube_images + max_shadow_2d_images;
@@ -60,6 +63,7 @@ public:
     [[nodiscard]] vk::DescriptorSetLayout get_descriptor_set_layout() const { return *descriptor_set_layout; }
     [[nodiscard]] vk::PipelineLayout get_pipeline_layout() const { return *pipeline_layout; }
     [[nodiscard]] vk::Sampler get_shadow_sampler() const { return *shadow_sampler; }
+    [[nodiscard]] vk::DescriptorSet get_current_descriptor_set() const;
 
     [[nodiscard]] std::uint32_t allocate_1d_image(const std::shared_ptr<image::View>& view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
     [[nodiscard]] std::uint32_t allocate_2d_image(const std::shared_ptr<image::View>& view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);

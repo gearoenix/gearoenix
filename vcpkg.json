@@ -1,5 +1,5 @@
 {
-  "builtin-baseline": "6d7bf7ef2193e2d1c5798a5ff8811d533104c861",
+  "builtin-baseline": "d64aa3825b1d52b799b424d48be2f7d5b42d42cf",
   "name": "gearoenix",
   "version": "0.1",
   "dependencies": [
@@ -12,11 +12,18 @@
     "boost-lockfree",
     {
       "name": "sdl3",
-      "features": ["vulkan"]
+      "default-features": false,
+      "features": [
+        "vulkan",
+        { "name": "wayland", "platform": "linux" },
+        { "name": "x11", "platform": "linux" }
+      ]
     },
     "libsodium",
     "enet",
     "sqlite3",
-    "sqlite-modern-cpp"
+    "sqlite-modern-cpp",
+    "ktx",
+    "zstd"
   ]
 }

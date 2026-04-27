@@ -96,7 +96,7 @@ jobs:
           echo "VULKAN_SDK=$VULKAN_SDK" >> $GITHUB_ENV
           echo "$VULKAN_SDK/bin" >> $GITHUB_PATH
       - name: Install system dependencies
-        run: brew install autoconf automake libtool
+        run: brew install autoconf autoconf-archive automake libtool
       - name: Echo settings
         run: |
           echo "PATH=$PATH"

@@ -65,7 +65,7 @@ void gearoenix::vulkan::scene::Scene::render_forward(DrawState& draw_state)
         auto& cam = *core::cast_ptr<camera::Camera>(rc.camera);
         cam.render_forward(rc, record.skyboxes, draw_state);
         cam.render_bloom(*this, draw_state.command_buffer);
-        cam.render_colour_correction_anti_aliasing(*this, draw_state.command_buffer);
+        cam.render_colour_tuning(*this, draw_state.command_buffer);
     }
 }
 

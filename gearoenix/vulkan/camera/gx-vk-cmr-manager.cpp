@@ -4,6 +4,8 @@
 #include "../../core/ecs/gx-cr-ecs-entity.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
 #include "../../platform/stream/gx-plt-stm-asset.hpp"
+#include "../../render/texture/gx-rnd-txt-manager.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../pipeline/gx-vk-pip-cache.hpp"
@@ -102,23 +104,32 @@ void gearoenix::vulkan::camera::Manager::terminate_bloom()
     bloom_descriptor_set_layout = vk::raii::DescriptorSetLayout(nullptr);
 }
 
-void gearoenix::vulkan::camera::Manager::initialise_ctaa()
+void gearoenix::vulkan::camera::Manager::initialise_colour_tuning()
 {
-    vk::PushConstantRange push_range { vk::ShaderStageFlagBits::eCompute, 0, sizeof(ColourCorrectionPushConstants) };
+    vk::PushConstantRange push_range { vk::ShaderStageFlagBits::eCompute, 0, sizeof(ColourTuningPushConstants) };
 
-    const vk::PipelineLayoutCreateInfo pl_info { { }, *bloom_descriptor_set_layout, push_range };
-    ctaa_pipeline_layout = vk::raii::PipelineLayout(device::Logical::get().get_device(), pl_info);
+    const std::array set_layouts {
+        descriptor::Bindless::get().get_descriptor_set_layout(),
+        *bloom_descriptor_set_layout,
+    };
+    const vk::PipelineLayoutCreateInfo pl_info { { }, set_layouts, push_range };
+    colour_tuning_pipeline_layout = vk::raii::PipelineLayout(device::Logical::get().get_device(), pl_info);
 
-    ctaa_pipeline = create_bloom_compute_pipeline(bloom_pipeline_cache, *ctaa_pipeline_layout,
-        "vulkan/shader/ctaa.comp.spv", ctaa_shader_module);
+    colour_tuning_pipeline = create_bloom_compute_pipeline(bloom_pipeline_cache, *colour_tuning_pipeline_layout,
+        "vulkan/shader/colour-tuning.comp.spv", colour_tuning_shader_module);
+
+    render::texture::Manager::get().get_blue_noise(
+        core::job::EndCallerShared<render::texture::Texture2D>([this](std::shared_ptr<render::texture::Texture2D>&& t) {
+            blue_noise = std::move(t);
+        }));
 }
 
-void gearoenix::vulkan::camera::Manager::terminate_ctaa()
+void gearoenix::vulkan::camera::Manager::terminate_colour_tuning()
 {
-    ctaa_pipeline = nullptr;
-    ctaa_shader_module = nullptr;
+    colour_tuning_pipeline = nullptr;
+    colour_tuning_shader_module = nullptr;
 
-    ctaa_pipeline_layout = vk::raii::PipelineLayout(nullptr);
+    colour_tuning_pipeline_layout = vk::raii::PipelineLayout(nullptr);
 }
 
 gearoenix::vulkan::camera::Manager::Manager()
@@ -126,12 +137,12 @@ gearoenix::vulkan::camera::Manager::Manager()
 {
     core::ecs::ComponentType::add<Camera>();
     initialise_bloom();
-    initialise_ctaa();
+    initialise_colour_tuning();
 }
 
 gearoenix::vulkan::camera::Manager::~Manager()
 {
-    terminate_ctaa();
+    terminate_colour_tuning();
     terminate_bloom();
 }
 

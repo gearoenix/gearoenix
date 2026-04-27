@@ -134,6 +134,14 @@ void gearoenix::platform::BaseApplication::update_window_size(const int w, const
     last_time_window_resized = std::chrono::high_resolution_clock::now();
 }
 
+void gearoenix::platform::BaseApplication::hdr_state_changed()
+{
+    if (nullptr == render_engine) {
+        return;
+    }
+    render_engine->hdr_state_changed();
+}
+
 void gearoenix::platform::BaseApplication::update_window()
 {
     if (const auto& config = RuntimeConfiguration::get();

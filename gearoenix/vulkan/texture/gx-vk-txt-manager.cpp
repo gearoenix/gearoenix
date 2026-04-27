@@ -7,6 +7,7 @@
 #include "../image/gx-vk-img-manager.hpp"
 #include "../image/gx-vk-img-view.hpp"
 #include "gx-vk-txt-2d.hpp"
+#include "gx-vk-txt-3d.hpp"
 #include "gx-vk-txt-cube.hpp"
 #include "gx-vk-txt-target.hpp"
 
@@ -33,6 +34,19 @@ gearoenix::vulkan::texture::Manager::~Manager() = default;
 void gearoenix::vulkan::texture::Manager::create_2d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture2D>&& c)
 {
     auto result = std::make_shared<Texture2D>(info, std::move(name));
+    std::vector<std::vector<std::shared_ptr<buffer::Buffer>>> buffers(1);
+    buffers[0].reserve(pixels.size());
+    for (auto& mip_pixels : pixels) {
+        buffers[0].push_back(create_staging_buffer(mip_pixels));
+    }
+    auto img = std::shared_ptr(result->get_view()->get_image());
+    c.set_return(std::move(result));
+    image::Manager::upload(std::move(img), std::move(buffers), info.get_has_mipmap(), core::job::EndCaller([c = std::move(c)] { }));
+}
+
+void gearoenix::vulkan::texture::Manager::create_3d_from_pixels_v(std::string&& name, std::vector<std::vector<std::uint8_t>>&& pixels, const render::texture::TextureInfo& info, core::job::EndCallerShared<render::texture::Texture3D>&& c)
+{
+    auto result = std::make_shared<Texture3D>(info, std::move(name));
     std::vector<std::vector<std::shared_ptr<buffer::Buffer>>> buffers(1);
     buffers[0].reserve(pixels.size());
     for (auto& mip_pixels : pixels) {

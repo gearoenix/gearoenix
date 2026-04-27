@@ -123,6 +123,9 @@ public:
     virtual void start_frame();
     virtual void end_frame();
     virtual void window_resized();
+    /// Called when the OS reports HDR state changed. Default is no-op; Vulkan overrides to
+    /// re-pick swapchain peak/OETF and update texture::Manager (which fans out to cameras).
+    virtual void hdr_state_changed() { }
     virtual void upload_imgui_fonts() = 0;
     virtual void show_debug_gui();
     virtual void flush();

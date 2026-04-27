@@ -4,7 +4,9 @@
 #include "ui/gx-ed-ui-menu-scene.hpp"
 #include "viewport/gx-ed-vp-viewport.hpp"
 
+#include <gearoenix/core/job/gx-cr-job-end-caller.hpp>
 #include <gearoenix/platform/gx-plt-application.hpp>
+#include <gearoenix/render/texture/gx-rnd-txt-manager.hpp>
 
 #include <ImGui/imgui.h>
 

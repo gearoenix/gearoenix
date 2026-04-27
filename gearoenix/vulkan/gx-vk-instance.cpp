@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -120,6 +121,14 @@ std::unique_ptr<gearoenix::vulkan::Instance> gearoenix::vulkan::Instance::constr
 
     auto sdl_extensions = platform::Application::get().get_vulkan_extensions();
     instance_extensions_set.insert(std::make_move_iterator(sdl_extensions.begin()), std::make_move_iterator(sdl_extensions.end()));
+
+    const auto available_extensions = instance->context.enumerateInstanceExtensionProperties();
+    for (const auto& prop : available_extensions) {
+        if (std::strcmp(prop.extensionName.data(), VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME) == 0) {
+            instance_extensions_set.insert(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+            break;
+        }
+    }
 
     std::vector<const char*> instance_layers;
 #if GX_VULKAN_INSTANCE_DEBUG

@@ -5,7 +5,7 @@
 #include "../../math/gx-math-ray.hpp"
 #include "../buffer/gx-rnd-buf-uniform.hpp"
 #include "gx-rnd-cmr-bloom-data.hpp"
-#include "gx-rnd-cmr-colour-tuning.hpp"
+#include "gx-rnd-cmr-colour-tuning-data.hpp"
 #include "gx-rnd-cmr-exposure.hpp"
 #include "gx-rnd-cmr-projection.hpp"
 #include "gx-rnd-cmr-target.hpp"
@@ -25,6 +25,10 @@
 
 namespace gearoenix::physics {
 struct Transformation;
+}
+
+namespace gearoenix::render::texture {
+struct Texture3D;
 }
 
 namespace gearoenix::render::engine {
@@ -58,7 +62,10 @@ struct Camera : core::ecs::Component {
     GX_GETSET_VAL_PRT(std::uint64_t, flag, 0);
     GX_GET_VAL_PRT(float, far, 100.0f);
     GX_GET_VAL_PRT(float, near, 1.0f);
-    GX_GET_REF_PRT(ColourTuning, colour_tuning);
+    /// All inputs the colour-tuning compute pass needs from this camera (LUT, tonemap mode,
+    /// AgX peak control). Encapsulated so the dispatch / UI both go through one accessor and
+    /// future colour-tuning state lands in one place.
+    GX_GET_REF_PRT(ColourTuningData, colour_tuning);
     GX_GET_CREF_PRT(ProjectionData, projection_data);
     GX_GETSET_VAL_PRT(core::fp_t, layer, 0.0);
     GX_GETSET_VAL_PRT(Usage, usage, Usage::Main);
@@ -78,7 +85,8 @@ struct Camera : core::ecs::Component {
         std::shared_ptr<physics::Transformation>&& transform);
 
     /// It should be called exactly after the shared_ptr got generated, and it has a valid weak_ptr of self.
-    void initialise();
+    /// Async: fetches the engine default LUT, then runs `update_target` and `enable_bloom`.
+    void initialise(core::job::EndCaller<>&& end);
     void write(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&) const;
     void read(std::shared_ptr<platform::stream::Stream>&&, core::job::EndCaller<>&&);
 

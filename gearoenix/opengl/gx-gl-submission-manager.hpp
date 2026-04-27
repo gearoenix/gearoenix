@@ -15,6 +15,7 @@ struct Camera;
 struct Engine;
 struct Target;
 struct Texture2D;
+struct Texture3D;
 struct TextureCube;
 struct Scene;
 }
@@ -35,9 +36,9 @@ struct Unlit;
 namespace gearoenix::gl::submission {
 struct Manager final : core::Singleton<Manager> {
 private:
-    const std::shared_ptr<shader::Final> final_shader;
     const std::shared_ptr<shader::DeferredPbr> deferred_pbr_shader;
     const std::shared_ptr<shader::DeferredPbrTransparent> deferred_pbr_transparent_shader;
+    const std::shared_ptr<shader::Final> final_shader;
     const std::shared_ptr<shader::Irradiance> irradiance_shader;
     const std::shared_ptr<shader::Radiance> radiance_shader;
     const std::shared_ptr<shader::SsaoResolve> ssao_resolve_shader;
@@ -56,6 +57,7 @@ private:
     std::shared_ptr<Texture2D> ssao_resolve_texture;
     std::shared_ptr<Target> ssao_resolve_target;
     std::shared_ptr<Texture2D> brdflut;
+    GX_GET_CREF_PRV(std::shared_ptr<Texture2D>, blue_noise);
     std::shared_ptr<TextureCube> black_cube;
 
     math::Vec2<uint> back_buffer_size { static_cast<uint>(-1) };
@@ -65,7 +67,6 @@ private:
 
     GX_GET_VAL_PRV(uint, screen_vertex_object, static_cast<uint>(-1));
     GX_GET_VAL_PRV(uint, screen_vertex_buffer, static_cast<uint>(-1));
-    math::Vec4<sizei> current_viewport_clip;
     uint current_bound_framebuffer = static_cast<uint>(-1);
     uint current_shader = static_cast<uint>(-1);
     std::uint32_t resolution_cfg_listener_id = static_cast<std::uint32_t>(-1);

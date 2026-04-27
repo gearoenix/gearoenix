@@ -89,7 +89,6 @@ void gearoenix::render::scene::Splash::initialise(core::job::EndCaller<>&& start
         auto& camera = *ce->template get_component<camera::Camera>();
         camera.set_projection_data(camera::ProjectionData::construct_orthographic(1.0f));
         camera.disable_bloom();
-        camera.get_colour_tuning() = camera::ColourTuning::Unchanged { };
     }));
 
     struct Values {

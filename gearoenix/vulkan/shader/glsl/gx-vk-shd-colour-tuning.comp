@@ -1,0 +1,171 @@
+#version 460
+#extension GL_EXT_nonuniform_qualifier : require
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+// Bindless arrays from set 0 (matches gx-vk-shd-bindless.glslh layout, but we only declare what we
+// need because this shader has its own push-constant block).
+layout(set = 0, binding = 1) uniform texture2D textures_2d[];
+layout(set = 0, binding = 2) uniform texture3D textures_3d[];
+layout(set = 0, binding = 5) uniform sampler samplers[32];
+
+// Per-pass set 1: source HDR (bloom output) and storage image output (the camera target).
+layout(set = 1, binding = 0) uniform sampler2D source_texture;
+layout(set = 1, binding = 1) writeonly uniform image2D output_image;
+
+// `tonemap_mode` matches `render::camera::TonemapMode` (0=Identity, 1=AgX, 2=Aces, 3=CustomLut).
+// Inline modes never read the bindless 3D-texture array, so the descriptor at `lut_texture_index`
+// is allowed to be invalid in those modes (PartiallyBound).
+//
+// `oetf_mode` matches `render::hdr::OutputOetf` (Linear=0, Srgb=1, Pq=2, Hlg=3). Both branches are
+// warp-coherent (every pixel hits the same case), so the cost is one transform per pixel.
+layout(push_constant) uniform PushConstants {
+    uint lut_texture_index;
+    uint lut_sampler_index;
+    uint noise_texture_index;
+    uint noise_sampler_index;
+    uint frame_index;
+    uint oetf_mode;
+    uint tonemap_mode;
+    float agx_peak_ratio;
+    float lut_size;
+    float sdr_white_nits;
+    float linear_scale;
+    float dither_lsb;
+    float noise_uv_scale_x;
+    float noise_uv_scale_y;
+};
+
+vec3 linear_to_srgb(vec3 c) {
+    return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c));
+}
+
+vec3 linear_to_pq(vec3 linear) {
+    const float m1 = 0.1593017578125;
+    const float m2 = 78.84375;
+    const float c1 = 0.8359375;
+    const float c2 = 18.8515625;
+    const float c3 = 18.6875;
+    vec3 yp = pow(max(linear, vec3(0.0)), vec3(m1));
+    return pow((c1 + c2 * yp) / (1.0 + c3 * yp), vec3(m2));
+}
+
+vec3 linear_to_hlg(vec3 linear) {
+    const float a = 0.17883277;
+    const float b = 0.28466892;
+    const float c = 0.55991073;
+    vec3 e = max(linear, vec3(0.0));
+    // `mix` evaluates BOTH branches; for e < b/12 the gamma branch's `log(12*e - b)` argument is
+    // non-positive and yields NaN. The step is 0 there but `0 * NaN = NaN` (IEEE-754) propagates.
+    // Clamp the log argument to a tiny positive so the inactive branch stays finite; the active
+    // (sqrt) branch already handles e in [0, 1/12].
+    vec3 log_arg = max(12.0 * e - b, vec3(1e-6));
+    return mix(sqrt(3.0 * e), a * log(log_arg) + c, step(vec3(1.0 / 12.0), e));
+}
+
+// AgX (Sobotka) tonemap, inlined per-pixel. Constants must match gx-math-colour.hpp's reference.
+vec3 agx_input_matrix(vec3 v) {
+    return vec3(
+        0.842479062253094 * v.r + 0.0784335999999992 * v.g + 0.0792237451477643 * v.b,
+        0.0423282422610123 * v.r + 0.878468636469772  * v.g + 0.0791661274605434 * v.b,
+        0.0423756549057051 * v.r + 0.0784336          * v.g + 0.879142973793104  * v.b
+    );
+}
+
+vec3 agx_log_encode(vec3 linear) {
+    const float min_ev = -12.47393;
+    const float max_ev = 4.026069;
+    const float ev_range = max_ev - min_ev;
+    return clamp((log2(max(linear, vec3(1e-10))) - min_ev) / ev_range, vec3(0.0), vec3(1.0));
+}
+
+vec3 agx_default_contrast(vec3 x) {
+    vec3 x2 = x * x;
+    vec3 x4 = x2 * x2;
+    return 15.5 * x4 * x2
+        - 40.14 * x4 * x
+        + 31.96 * x4
+        - 6.868 * x2 * x
+        + 0.4298 * x2
+        + 0.1191 * x
+        - vec3(0.00232);
+}
+
+vec3 agx_tonemap(vec3 linear, float peak) {
+    return agx_default_contrast(agx_log_encode(agx_input_matrix(linear))) * peak;
+}
+
+// Narkowicz ACES filmic fit -- the popular 5-coefficient rational approximation. Per-channel,
+// SDR-only (output saturates at ~1.0). Cheap to compute and visually closer to identity than
+// AgX in mid-tones, which makes it a good middle-ground tonemap.
+vec3 aces_narkowicz(vec3 x) {
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), vec3(0.0), vec3(1.0));
+}
+
+void main() {
+    const ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    const ivec2 size = imageSize(output_image);
+    if (pixel.x >= size.x || pixel.y >= size.y) {
+        return;
+    }
+    const vec2 uv = (vec2(pixel) + 0.5) / vec2(size);
+    vec3 hdr = textureLod(source_texture, uv, 0.0).rgb;
+
+    vec3 graded;
+    if (tonemap_mode == 0u) {
+        // Identity: scene-linear pass-through, no transform.
+        graded = hdr;
+    } else if (tonemap_mode == 1u) {
+        // AgX: matrix + log + sigmoid + peak_ratio, all inline. Per-pixel cost is small enough
+        // that running it directly beats baking 10 LUT variants (saves GPU memory + bindless slots
+        // + LUT precision artifacts).
+        graded = agx_tonemap(max(hdr, vec3(0.0)), agx_peak_ratio);
+    } else if (tonemap_mode == 2u) {
+        // ACES (Narkowicz): per-channel rational approximation, SDR-only.
+        graded = aces_narkowicz(max(hdr, vec3(0.0)));
+    } else {
+        // Custom LUT: log-encode the HDR input (engine middle-gray ±7 EV), sample the 3D LUT.
+        // MUST MATCH gx-rnd-txt-lut-encode.hpp.
+        const float lut_log_grey = 0.18;
+        const float lut_log_range = 14.0;
+        const float lut_log_eps = 0.18 * 0.0078125;
+        vec3 log_hdr = log2(max(hdr, vec3(lut_log_eps)) / lut_log_grey) / lut_log_range + 0.5;
+        float scale = (lut_size - 1.0) / lut_size;
+        float bias = 0.5 / lut_size;
+        vec3 lut_uv = clamp(log_hdr, vec3(0.0), vec3(1.0)) * scale + bias;
+        graded = textureLod(sampler3D(textures_3d[lut_texture_index], samplers[lut_sampler_index]), lut_uv, 0.0).rgb;
+    }
+
+    vec3 encoded;
+    if (oetf_mode == 1u) {
+        encoded = linear_to_srgb(clamp(graded, vec3(0.0), vec3(1.0)));
+    } else if (oetf_mode == 2u) {
+        // PQ peak is 10000 nits; scale 1.0 = SDR-white to (sdr_white_nits/10000) of the PQ range.
+        encoded = linear_to_pq(graded * (sdr_white_nits / 10000.0));
+    } else if (oetf_mode == 3u) {
+        // HLG: display luminance = peak * scene_E^gamma; gamma=1.2 for 1000-nit displays per BT.2100.
+        const float hlg_peak_nits = 1000.0;
+        const float hlg_inv_gamma = 1.0 / 1.2;
+        const vec3 hlg_scene_e = pow(max(graded * (sdr_white_nits / hlg_peak_nits), vec3(0.0)), vec3(hlg_inv_gamma));
+        encoded = linear_to_hlg(hlg_scene_e);
+    } else {
+        // Linear: scRGB float swapchains use absolute scaling (1.0 = 80 nits) and need
+        // `linear_scale = sdr_white_nits/80`; sRGB-encoded BGRA8 are signal-space (linear_scale = 1).
+        encoded = graded * linear_scale;
+    }
+
+    // Blue-noise dither, scrolled per frame with golden-ratio offsets to decorrelate frames. The
+    // dither magnitude is one LSB at the framebuffer's bit depth (set by submission); float
+    // swapchains pass `dither_lsb = 0` so the multiply zeroes the dither out entirely.
+    vec2 frame_offset = vec2(float(frame_index) * 0.61803398875, float(frame_index) * 0.7548776662);
+    vec2 noise_uv = (vec2(pixel) + frame_offset) * vec2(noise_uv_scale_x, noise_uv_scale_y);
+    float noise = textureLod(sampler2D(textures_2d[noise_texture_index], samplers[noise_sampler_index]), noise_uv, 0.0).r;
+    float dither = (noise - 0.5) * dither_lsb;
+
+    imageStore(output_image, pixel, vec4(encoded + vec3(dither), 1.0));
+}

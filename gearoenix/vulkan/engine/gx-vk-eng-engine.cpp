@@ -47,6 +47,14 @@ void gearoenix::vulkan::engine::Engine::window_resized()
     initialize_frame();
 }
 
+void gearoenix::vulkan::engine::Engine::hdr_state_changed()
+{
+    // SDL3 fires this when the window's HDR enabled / headroom flipped. Rerunning format selection
+    // through `initialize_frame` re-creates the swapchain (it calls `swapchain->initialize()` and
+    // rebuilds the per-frame resources) so subsequent frames land in the right colour space.
+    initialize_frame();
+}
+
 gearoenix::vulkan::engine::Engine::Engine()
     : render::engine::Engine(render::engine::Type::Vulkan)
     , Singleton<Engine>(this)
@@ -65,7 +73,6 @@ gearoenix::vulkan::engine::Engine::Engine()
     , vk_material_manager(new material::Manager())
     , vk_model_manager(new model::Manager())
     , vk_light_manager(new light::Manager())
-    , vk_camera_manager(new camera::Manager())
     , vk_scene_manager(new scene::Manager())
     , vk_skybox_manager(new skybox::Manager())
     , vk_reflection_manager(new reflection::Manager())
@@ -77,7 +84,6 @@ gearoenix::vulkan::engine::Engine::Engine()
     texture_manager = std::unique_ptr<render::texture::Manager>(vk_texture_manager);
     material_manager = std::unique_ptr<material::Manager>(vk_material_manager);
     model_manager = std::unique_ptr<render::model::Manager>(vk_model_manager);
-    camera_manager = std::unique_ptr<camera::Manager>(vk_camera_manager);
     light_manager = std::unique_ptr<light::Manager>(vk_light_manager);
     scene_manager = std::unique_ptr<scene::Manager>(vk_scene_manager);
     reflection_manager = std::unique_ptr<reflection::Manager>(vk_reflection_manager);
@@ -86,6 +92,11 @@ gearoenix::vulkan::engine::Engine::Engine()
 
     bindless_descriptor_manager = std::make_unique<descriptor::Bindless>();
     pipeline_manager = std::make_unique<pipeline::Manager>();
+    // Bindless is alive now -- safe to construct camera::Manager (its colour-tuning init reads
+    // the bindless descriptor set layout). Symmetric teardown: `camera_manager = nullptr;` in the
+    // destructor runs before `bindless_descriptor_manager = nullptr;`, so the order matches.
+    vk_camera_manager = new camera::Manager();
+    camera_manager = std::unique_ptr<camera::Manager>(vk_camera_manager);
     imgui_manager = std::make_unique<ImGuiManager>();
     initialize_frame();
 }

@@ -25,6 +25,8 @@ enum struct TextureFormat : std::uint8_t {
     D24 = 15,
     D32 = 16,
 
+    R8Unorm = 17,
+
     Unknown = 255,
 };
 
@@ -50,6 +52,7 @@ enum struct TextureFormat : std::uint8_t {
     case TextureFormat::D32:
         return 32;
     case TextureFormat::RgbaUint8:
+    case TextureFormat::R8Unorm:
         return 8;
     default:
         return static_cast<std::uint32_t>(-1);
@@ -102,6 +105,7 @@ enum struct TextureFormat : std::uint8_t {
     case TextureFormat::D16:
     case TextureFormat::D24:
     case TextureFormat::D32:
+    case TextureFormat::R8Unorm:
         return 1;
     default:
         return 0;
@@ -123,6 +127,8 @@ enum struct TextureFormat : std::uint8_t {
 [[nodiscard]] constexpr std::uint32_t format_pixel_size(const TextureFormat f)
 {
     switch (f) {
+    case TextureFormat::R8Unorm:
+        return 1;
     case TextureFormat::Float16:
     case TextureFormat::D16:
         return 2;

@@ -23,7 +23,7 @@ gearoenix::render::camera::Camera::Camera(
     Target&& target,
     std::shared_ptr<physics::Transformation>&& transform)
     : Component(entity, final_type, std::string(name))
-    , uniform(buffer::Manager::get().get_range(buffer::UniformRegionIndex::cameras))
+    , uniform(buffer::Manager::get_range(buffer::UniformRegionIndex::cameras))
     , starting_clip_ending_clip(0.0f, 0.0f, 1.0f, 1.0f)
     , target(std::move(target))
     , debug_colour {
@@ -40,9 +40,12 @@ gearoenix::render::camera::Camera::Camera(
     }
 }
 
-gearoenix::render::camera::Camera::~Camera() { RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_observer); }
+gearoenix::render::camera::Camera::~Camera()
+{
+    RuntimeConfiguration::get().get_runtime_resolution().remove_observer(resolution_cfg_observer);
+}
 
-void gearoenix::render::camera::Camera::initialise()
+void gearoenix::render::camera::Camera::initialise(core::job::EndCaller<>&& end)
 {
     if (0 == resolution_cfg_observer) {
         resolution_cfg_observer = RuntimeConfiguration::get().get_runtime_resolution().add_observer([c = object_self](const Resolution&) {
@@ -54,6 +57,12 @@ void gearoenix::render::camera::Camera::initialise()
             return true;
         });
     }
+    // No LUT loaded by default -- Identity / AgX / Aces all run inline in the shader. CustomLut is
+    // the only mode that needs a LUT, and it's loaded on demand via the `.cube` import in the UI.
+    update_target(core::job::EndCaller([self = object_self.lock(), end = std::move(end)] {
+        std::static_pointer_cast<Camera>(self)->enable_bloom();
+        (void)end;
+    }));
 }
 
 void gearoenix::render::camera::Camera::write(std::shared_ptr<platform::stream::Stream>&& s, core::job::EndCaller<>&& end) const
@@ -68,7 +77,6 @@ void gearoenix::render::camera::Camera::write(std::shared_ptr<platform::stream::
     s->write_fail_debug(flag);
     s->write_fail_debug(far);
     s->write_fail_debug(near);
-    colour_tuning.write(*s);
     projection_data.write(*s);
     s->write_fail_debug(layer);
     s->write_fail_debug(usage);
@@ -90,7 +98,6 @@ void gearoenix::render::camera::Camera::read(std::shared_ptr<platform::stream::S
     s->read(flag);
     s->read(far);
     s->read(near);
-    colour_tuning.read(*s);
     projection_data.read(*s);
     s->read(layer);
     s->read(usage);
@@ -264,6 +271,7 @@ void gearoenix::render::camera::Camera::show_debug_gui()
         if (bloom_data.has_value()) {
             bloom_data->show_debug_data();
         }
+        colour_tuning.show_debug_gui(object_self);
     });
 }
 

@@ -22,6 +22,7 @@ typedef void(GX_GL_APIENTRY BindBufferFnp)(enumerated, uint);
 typedef void(GX_GL_APIENTRY BindBufferBaseFnp)(enumerated target, uint index, uint buffer);
 typedef void(GX_GL_APIENTRY BindBufferRangeFnp)(enumerated target, uint index, uint buffer, sizeiptr offset, sizeiptr size);
 typedef void(GX_GL_APIENTRY BindFramebufferFnp)(enumerated target, uint framebuffer);
+typedef void(GX_GL_APIENTRY BlitFramebufferFnp)(sint src_x0, sint src_y0, sint src_x1, sint src_y1, sint dst_x0, sint dst_y0, sint dst_x1, sint dst_y1, bitfield mask, enumerated filter);
 typedef void(GX_GL_APIENTRY BindRenderbufferFnp)(enumerated target, uint renderbuffer);
 typedef void(GX_GL_APIENTRY BindTextureFnp)(enumerated, uint);
 typedef void(GX_GL_APIENTRY BindVertexArrayFnp)(uint arr);
@@ -55,6 +56,7 @@ typedef void(GX_GL_APIENTRY FinishFnp)();
 typedef void(GX_GL_APIENTRY FlushFnp)();
 typedef void(GX_GL_APIENTRY FramebufferRenderbufferFnp)(enumerated target, enumerated attachment, enumerated renderbuffer_target, uint renderbuffer);
 typedef void(GX_GL_APIENTRY FramebufferTexture2DFnp)(enumerated target, enumerated attachment, enumerated textarget, uint texture, sint level);
+typedef void(GX_GL_APIENTRY FramebufferTextureLayerFnp)(enumerated target, enumerated attachment, uint texture, sint level, sint layer);
 typedef void(GX_GL_APIENTRY GenBuffersFnp)(sizei, uint*);
 typedef void(GX_GL_APIENTRY GenFramebuffersFnp)(sizei n, uint* framebuffers);
 typedef void(GX_GL_APIENTRY GenRenderbuffersFnp)(sizei n, uint* renderbuffers);
@@ -76,6 +78,7 @@ typedef void(GX_GL_APIENTRY ReadBufferFnp)(enumerated src);
 typedef void(GX_GL_APIENTRY ReadPixelsFnp)(sint x, sint y, sizei width, sizei height, enumerated format, enumerated gl_type, void* data);
 typedef void(GX_GL_APIENTRY RenderbufferStorageFnp)(enumerated target, enumerated internal_format, sizei img_width, sizei img_height);
 typedef void(GX_GL_APIENTRY TexImage2DFnp)(enumerated target, sint level, sint internal_format, sizei image_width, sizei image_height, sint border, enumerated format, enumerated data_type, const void* pixels);
+typedef void(GX_GL_APIENTRY TexImage3DFnp)(enumerated target, sint level, sint internal_format, sizei image_width, sizei image_height, sizei image_depth, sint border, enumerated format, enumerated data_type, const void* pixels);
 typedef void(GX_GL_APIENTRY TexParameterfFnp)(enumerated, enumerated, float);
 typedef void(GX_GL_APIENTRY TexParameterfvFnp)(enumerated, enumerated, const float*);
 typedef void(GX_GL_APIENTRY TexParameteriFnp)(enumerated, enumerated, sint);
@@ -110,6 +113,7 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(BindBufferBase);          \
     gx_gl_function_map_arg(BindBufferRange);         \
     gx_gl_function_map_arg(BindFramebuffer);         \
+    gx_gl_function_map_arg(BlitFramebuffer);         \
     gx_gl_function_map_arg(BindRenderbuffer);        \
     gx_gl_function_map_arg(BindTexture);             \
     gx_gl_function_map_arg(BindVertexArray);         \
@@ -141,6 +145,7 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(Flush);                   \
     gx_gl_function_map_arg(FramebufferRenderbuffer); \
     gx_gl_function_map_arg(FramebufferTexture2D);    \
+    gx_gl_function_map_arg(FramebufferTextureLayer); \
     gx_gl_function_map_arg(GenBuffers);              \
     gx_gl_function_map_arg(GenFramebuffers);         \
     gx_gl_function_map_arg(GenRenderbuffers);        \
@@ -162,6 +167,7 @@ typedef void(GX_GL_APIENTRY PushDebugGroupFnp)(enumerated source, uint id, sizei
     gx_gl_function_map_arg(ReadPixels);              \
     gx_gl_function_map_arg(RenderbufferStorage);     \
     gx_gl_function_map_arg(TexImage2D);              \
+    gx_gl_function_map_arg(TexImage3D);              \
     gx_gl_function_map_arg(TexParameterf);           \
     gx_gl_function_map_arg(TexParameterfv);          \
     gx_gl_function_map_arg(TexParameteri);           \

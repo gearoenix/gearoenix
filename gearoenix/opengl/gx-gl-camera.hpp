@@ -11,7 +11,7 @@ struct Camera;
 
 namespace gearoenix::gl::shader {
 
-struct ColourTuningAntiAliasingCombination;
+struct ColourTuning;
 struct BloomHorizontal;
 struct BloomPrefilter;
 struct BloomUpsampler;
@@ -66,8 +66,7 @@ struct Camera final : render::camera::Camera {
     GX_GET_CREF_PRV(std::shared_ptr<shader::Multiply>, multiply_shader);
     GX_GET_CREF_PRV(std::shared_ptr<shader::SkyboxCube>, skybox_cube_shader);
     GX_GET_CREF_PRV(std::shared_ptr<shader::SkyboxEquirectangular>, skybox_equirectangular_shader);
-
-    GX_GET_CREF_PRV(std::shared_ptr<shader::ColourTuningAntiAliasingCombination>, colour_tuning_anti_aliasing_shader_combination);
+    GX_GET_CREF_PRV(std::shared_ptr<shader::ColourTuning>, colour_tuning_shader);
 
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
@@ -81,7 +80,7 @@ public:
     void render_forward(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
     void render_forward_skyboxes(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
     void render_bloom(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
-    void render_colour_correction_anti_aliasing(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
+    void render_colour_tuning(const Scene& scene, const render::record::Camera&, uint& current_shader) const;
 };
 
 struct CameraManager final : render::camera::Manager {

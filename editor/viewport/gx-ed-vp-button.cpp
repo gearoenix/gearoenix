@@ -3,8 +3,6 @@
 #include "../ui/gx-ed-ui-tooltip.hpp"
 
 #include <gearoenix/core/gx-cr-string.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-engine.hpp>
-#include <gearoenix/render/engine/gx-rnd-eng-type.hpp>
 #include <gearoenix/render/texture/gx-rnd-txt-texture-2d.hpp>
 
 void gearoenix::editor::viewport::Button::apply_current_scale()
@@ -103,12 +101,7 @@ void gearoenix::editor::viewport::Button::show()
     }
     if (nullptr != icon_ptr) {
         const auto tex_id = static_cast<ImTextureID>(reinterpret_cast<std::size_t>(icon_ptr));
-        // OpenGL textures are Y-flipped on upload; swap UVs here so they render upright.
-        if (render::engine::Type::OpenGL == render::engine::Engine::get_engine_type()) {
-            dl->AddImage(tex_id, icon_start_point, icon_end_point, { 0, 1 }, { 1, 0 });
-        } else {
-            dl->AddImage(tex_id, icon_start_point, icon_end_point);
-        }
+        dl->AddImage(tex_id, icon_start_point, icon_end_point);
     }
 
     // Label (if any).

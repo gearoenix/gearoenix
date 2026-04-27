@@ -134,6 +134,7 @@ public:
     [[nodiscard]] static bool is_supported();
     void flush() override;
     void window_resized() override;
+    void hdr_state_changed() override;
 };
 }
 #endif

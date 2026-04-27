@@ -101,6 +101,8 @@ target_link_libraries(GearoenixGameEngine PUBLIC unofficial::enet::enet)
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial-sodium::sodium)
 target_include_directories(GearoenixGameEngine SYSTEM PUBLIC ${SQLITE_MODERN_CPP_INCLUDE_DIRS})
 target_link_libraries(GearoenixGameEngine PUBLIC unofficial::sqlite3::sqlite3)
+target_link_libraries(GearoenixGameEngine PUBLIC KTX::ktx)
+target_link_libraries(GearoenixGameEngine PUBLIC zstd::libzstd)
 
 if(GX_PROFILING_ENABLED)
     target_link_libraries(GearoenixGameEngine PUBLIC TracyClient)

@@ -2,6 +2,10 @@
 #if GX_RENDER_VULKAN_ENABLED
 #include "../../core/ecs/gx-cr-ecs-comp-type.hpp"
 #include "../../physics/gx-phs-transformation.hpp"
+#include "../../render/engine/gx-rnd-eng-engine.hpp"
+#include "../../render/texture/gx-rnd-txt-texture-2d.hpp"
+#include "../../render/texture/gx-rnd-txt-texture-3d.hpp"
+#include "../descriptor/gx-vk-des-bindless.hpp"
 #include "../device/gx-vk-dev-logical.hpp"
 #include "../engine/gx-vk-eng-engine.hpp"
 #include "../gx-vk-draw-state.hpp"
@@ -12,6 +16,7 @@
 #include "../pipeline/gx-vk-pip-manager.hpp"
 #include "../pipeline/gx-vk-pip-pipeline.hpp"
 #include "../pipeline/gx-vk-pip-push-constant.hpp"
+#include "../gx-vk-swapchain.hpp"
 #include "../scene/gx-vk-scn-scene.hpp"
 #include "../skybox/gx-vk-sky-skybox.hpp"
 #include "../texture/gx-vk-txt-2d.hpp"
@@ -72,8 +77,7 @@ void gearoenix::vulkan::camera::Camera::construct(
     core::ecs::Entity* const entity, const std::string& name, core::job::EndCallerShared<Camera>&& c, std::shared_ptr<physics::Transformation>&& transform)
 {
     c.set_return(Object::construct<Camera>(entity, name, render::camera::Target(), std::move(transform)));
-    c.get_return()->initialise();
-    c.get_return()->update_target(core::job::EndCaller([c] { c.get_return()->enable_bloom(); }));
+    c.get_return()->initialise(core::job::EndCaller([c] { (void)c; }));
 }
 
 gearoenix::vulkan::camera::Camera::~Camera()
@@ -388,13 +392,13 @@ void gearoenix::vulkan::camera::Camera::destroy_bloom_descriptors()
     }
 }
 
-void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing([[maybe_unused]] const scene::Scene& scene, const vk::CommandBuffer cmd) const
+void gearoenix::vulkan::camera::Camera::render_colour_tuning([[maybe_unused]] const scene::Scene& scene, const vk::CommandBuffer cmd) const
 {
     if (!target.is_default() || !*bloom_descriptor_pool) {
         return;
     }
 
-    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.6f, 0.8f, 0.7f, "render-ctaa in scene: {}, camera: {}", scene.get_object_name(), object_name);
+    GX_VK_PUSH_DEBUG_GROUP(cmd, 0.6f, 0.8f, 0.7f, "render-colour-tuning in scene: {}, camera: {}", scene.get_object_name(), object_name);
 
     const auto& mgr = core::Singleton<Manager>::get();
     const auto& def = gapi_target.get_default();
@@ -412,29 +416,39 @@ void gearoenix::vulkan::camera::Camera::render_colour_correction_anti_aliasing([
         tex1_img->transit(cmd, req.with_mips(0, 1));
     }
 
-    cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_ctaa_pipeline()->get_vulkan_data());
-    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_ctaa_pipeline_layout(), 0, bloom_ds_tex0_to_tex1[0], { });
+    cmd.bindPipeline(vk::PipelineBindPoint::eCompute, mgr.get_colour_tuning_pipeline()->get_vulkan_data());
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_colour_tuning_pipeline_layout(), 0, descriptor::Bindless::get().get_current_descriptor_set(), { });
+    cmd.bindDescriptorSets(vk::PipelineBindPoint::eCompute, mgr.get_colour_tuning_pipeline_layout(), 1, bloom_ds_tex0_to_tex1[0], { });
 
-    ColourCorrectionPushConstants pc { };
-    switch (colour_tuning.get_index()) {
-    case render::camera::ColourTuning::gamma_correction_index:
-        pc.mode = 0.0f;
-        pc.param_x = colour_tuning.get_gamma_correction().gamma_exponent.x;
-        pc.param_y = colour_tuning.get_gamma_correction().gamma_exponent.y;
-        pc.param_z = colour_tuning.get_gamma_correction().gamma_exponent.z;
-        break;
-    case render::camera::ColourTuning::multiply_index:
-        pc.mode = 1.0f;
-        pc.param_x = colour_tuning.get_multiply().scale.x;
-        pc.param_y = colour_tuning.get_multiply().scale.y;
-        pc.param_z = colour_tuning.get_multiply().scale.z;
-        break;
-    default:
-        pc.mode = 2.0f;
-        break;
-    }
+    const auto* noise = mgr.get_blue_noise().get();
+    GX_ASSERT_D(nullptr != noise);
 
-    cmd.pushConstants(mgr.get_ctaa_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
+    // Inline tonemaps (Identity / AgX / Aces) don't sample a LUT. Only CustomLut needs a bound 3D
+    // texture. PartiallyBound covers the unused descriptor slot in inline modes -- we still pass an
+    // index but the shader's `if (tonemap_mode == CustomLut)` branch gates the access.
+    const auto& tuning = colour_tuning;
+    const auto effective_mode = tuning.effective_tonemap_mode();
+    const bool uses_lut = render::camera::TonemapMode::CustomLut == effective_mode;
+    const auto* const lut = uses_lut ? tuning.colour_lut.get() : nullptr;
+
+    ColourTuningPushConstants pc { };
+    pc.lut_texture_index = lut ? lut->get_shader_resource_index() : 0u;
+    pc.lut_sampler_index = lut ? lut->get_sampler_shader_resource_index() : 0u;
+    pc.noise_texture_index = noise->get_shader_resource_index();
+    pc.noise_sampler_index = noise->get_sampler_shader_resource_index();
+    pc.frame_index = static_cast<std::uint32_t>(engine::Engine::get_frame_number_from_start() & 4095u);
+    const auto& swapchain = Swapchain::get();
+    pc.oetf_mode = static_cast<std::uint32_t>(swapchain.get_active_oetf());
+    pc.tonemap_mode = static_cast<std::uint32_t>(effective_mode);
+    pc.agx_peak_ratio = tuning.effective_agx_peak();
+    pc.lut_size = lut ? static_cast<float>(lut->get_info().get_width()) : 0.0f;
+    pc.sdr_white_nits = swapchain.get_active_sdr_white_nits();
+    pc.linear_scale = swapchain.get_active_linear_scale();
+    pc.dither_lsb = swapchain.get_active_dither_lsb();
+    pc.noise_uv_scale_x = 1.0f / static_cast<float>(noise->get_info().get_width());
+    pc.noise_uv_scale_y = 1.0f / static_cast<float>(noise->get_info().get_height());
+
+    cmd.pushConstants(mgr.get_colour_tuning_pipeline_layout(), vk::ShaderStageFlagBits::eCompute, 0u, sizeof(pc), &pc);
 
     const auto w = tex1_img->get_image_width();
     const auto h = tex1_img->get_image_height();

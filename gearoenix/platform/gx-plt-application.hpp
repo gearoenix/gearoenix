@@ -74,6 +74,10 @@ public:
     void initialize_window_size(int w, int h);
     void update_window_size(int w, int h);
     void update_window();
+    /// Called when the OS reports the window's HDR state changed (display moved between
+    /// HDR/SDR monitors, system HDR toggle). Re-queries the swapchain peak / OETF and
+    /// notifies cameras tracking the default LUT to swap to the matching AgX variant.
+    void hdr_state_changed();
     void initialize_mouse_position(core::fp_t x, core::fp_t y);
     void update_mouse_position(core::fp_t x, core::fp_t y);
     void mouse_key(key::Id, key::Action);

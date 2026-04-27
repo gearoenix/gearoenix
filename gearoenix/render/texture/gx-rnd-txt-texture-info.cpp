@@ -186,6 +186,8 @@ std::string std::to_string(const gearoenix::render::texture::TextureFormat f)
         return "Float32 ";
     case gearoenix::render::texture::TextureFormat::RgbaUint8:
         return "RgbaUint8 ";
+    case gearoenix::render::texture::TextureFormat::R8Unorm:
+        return "R8Unorm";
     case gearoenix::render::texture::TextureFormat::D16:
         return "D16";
     case gearoenix::render::texture::TextureFormat::D24:

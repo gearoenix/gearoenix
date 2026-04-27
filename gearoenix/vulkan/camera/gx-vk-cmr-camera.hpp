@@ -62,7 +62,7 @@ public:
     void render_forward(const render::record::Camera&, const render::record::Skyboxes&, DrawState& draw_state) const;
     void render_forward_skyboxes(const render::record::Skyboxes&, DrawState& draw_state) const;
     void render_bloom(const scene::Scene& scene, vk::CommandBuffer cmd) const;
-    void render_colour_correction_anti_aliasing(const scene::Scene& scene, vk::CommandBuffer cmd) const;
+    void render_colour_tuning(const scene::Scene& scene, vk::CommandBuffer cmd) const;
     void set_customised_target(std::shared_ptr<render::texture::Target>&&) override;
     void update_target(core::job::EndCaller<>&& end) override;
     static void record_viewport(const render::record::Camera&, vk::CommandBuffer);

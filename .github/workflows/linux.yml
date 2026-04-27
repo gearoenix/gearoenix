@@ -30,6 +30,10 @@ jobs:
           echo "EMSDK=$EMSDK"
           echo "VCPKG_ROOT=$VCPKG_ROOT"
           echo "PATH=$PATH"
+      - name: Refresh vcpkg baseline
+        run: |
+          git -C "$VCPKG_ROOT" fetch --quiet origin master
+          git -C "$VCPKG_ROOT" reset --hard origin/master
       - name: Building Release
         run: |
           cmake --fresh --preset linux-release &&

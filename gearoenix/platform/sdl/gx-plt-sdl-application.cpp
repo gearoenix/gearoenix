@@ -261,6 +261,11 @@ void gearoenix::platform::Application::fetch_events()
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
             base.update_window_size(static_cast<int>(e.window.data1), static_cast<int>(e.window.data2));
             break;
+        case SDL_EVENT_WINDOW_HDR_STATE_CHANGED:
+            // Forward to BaseApplication so the renderer can re-pick the swapchain OETF + AgX peak.
+            // Default LUTs on cameras update via the texture::Manager observer.
+            base.hdr_state_changed();
+            break;
 
         default:
             GX_LOG_D("Unhandled event " << e.type);
